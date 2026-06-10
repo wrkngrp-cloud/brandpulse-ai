@@ -87,6 +87,66 @@ export async function getTwitterUserId(accessToken: string) {
   return data.data
 }
 
+export interface TwitterMention {
+  id: string
+  content: string
+  authorHandle: string
+  authorFollowers: number
+  reach: number
+  created_at: string
+}
+
+export async function fetchTwitterMentions(
+  brandName: string,
+  since: Date
+): Promise<TwitterMention[]> {
+  const bearerToken = process.env.TWITTER_BEARER_TOKEN
+  if (!bearerToken) return []
+
+  const sinceIso = since.toISOString().replace(/\.\d{3}Z$/, 'Z')
+  const query = encodeURIComponent(`"${brandName}" -is:retweet`)
+  const url =
+    `${API}/2/tweets/search/recent` +
+    `?query=${query}` +
+    `&tweet.fields=created_at,public_metrics,text,author_id` +
+    `&expansions=author_id` +
+    `&user.fields=public_metrics,username` +
+    `&start_time=${sinceIso}` +
+    `&max_results=100`
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${bearerToken}` },
+  })
+  if (!res.ok) return []
+
+  const data = await res.json() as {
+    data?: Array<{
+      id: string
+      text: string
+      created_at: string
+      author_id: string
+      public_metrics: { impression_count: number }
+    }>
+    includes?: {
+      users?: Array<{ id: string; username: string; public_metrics?: { followers_count: number } }>
+    }
+  }
+
+  const userMap = new Map((data.includes?.users ?? []).map(u => [u.id, u]))
+
+  return (data.data ?? []).map(t => {
+    const author = userMap.get(t.author_id)
+    return {
+      id: t.id,
+      content: t.text,
+      authorHandle: author?.username ?? '',
+      authorFollowers: author?.public_metrics?.followers_count ?? 0,
+      reach: t.public_metrics.impression_count,
+      created_at: t.created_at,
+    }
+  })
+}
+
 export async function fetchTwitterPosts(userId: string, accessToken: string, since: Date): Promise<TwitterPost[]> {
   const sinceIso = since.toISOString().replace(/\.\d{3}Z$/, 'Z')
   const fields = 'created_at,public_metrics,text'
