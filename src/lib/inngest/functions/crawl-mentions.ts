@@ -1,0 +1,135 @@
+import { inngest } from '@/lib/inngest/client'
+import { createServiceClient } from '@/lib/supabase/server'
+import { fetchTwitterMentions } from '@/lib/social/twitter'
+import { classifySentiment } from '@/lib/ai/classify-sentiment'
+
+export const crawlMentions = inngest.createFunction(
+  {
+    id: 'crawl-mentions',
+    name: 'Crawl X mentions and score sentiment (nightly)',
+    triggers: [{ cron: 'TZ=Africa/Lagos 0 4 * * *' }],
+  },
+  async ({ step, logger }) => {
+    const supabase = await createServiceClient()
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const today = new Date().toISOString().slice(0, 10)
+
+    const { data: brands } = await supabase.from('brands').select('id, name')
+    if (!brands?.length) return { processed: 0 }
+
+    for (const brand of brands) {
+      await step.run(`crawl-x-${brand.id}`, async () => {
+        const mentions = await fetchTwitterMentions(brand.name, since)
+        if (!mentions.length) return
+
+        // Dedup against what we already stored for this window
+        const { data: existing } = await supabase
+          .from('mentions')
+          .select('external_id')
+          .eq('brand_id', brand.id)
+          .eq('platform', 'twitter')
+          .in('external_id', mentions.map(m => m.id))
+
+        const seenIds = new Set((existing ?? []).map(m => m.external_id))
+        const fresh = mentions.filter(m => !seenIds.has(m.id))
+        if (!fresh.length) return
+
+        const rows = fresh.map(m => ({
+          brand_id: brand.id,
+          platform: 'twitter',
+          external_id: m.id,
+          content: m.content,
+          author_handle: m.authorHandle,
+          author_followers: m.authorFollowers,
+          reach: m.reach,
+          created_at: m.created_at,
+        }))
+
+        const { error } = await supabase.from('mentions').insert(rows)
+        if (error) logger.error(`Insert mentions failed for brand ${brand.id}: ${error.message}`)
+      })
+
+      await step.run(`classify-${brand.id}`, async () => {
+        const { data: unclassified } = await supabase
+          .from('mentions')
+          .select('id, content')
+          .eq('brand_id', brand.id)
+          .is('sentiment_label', null)
+          .gte('created_at', since.toISOString())
+          .limit(100)
+
+        const items = (unclassified ?? [])
+          .filter(m => m.content)
+          .map(m => ({ id: m.id, text: m.content! }))
+
+        if (!items.length) return
+
+        const results = await classifySentiment(brand.id, items)
+
+        for (const r of results) {
+          await supabase
+            .from('mentions')
+            .update({
+              sentiment_label: r.sentiment,
+              sentiment_score: Math.round(r.confidence * 100),
+              emotion_tags: [r.emotion],
+            })
+            .eq('id', r.id)
+        }
+      })
+
+      await step.run(`aggregate-${brand.id}`, async () => {
+        const { data: classified } = await supabase
+          .from('mentions')
+          .select('sentiment_label, emotion_tags')
+          .eq('brand_id', brand.id)
+          .not('sentiment_label', 'is', null)
+          .gte('created_at', `${today}T00:00:00.000Z`)
+
+        if (!classified?.length) return
+
+        const total = classified.length
+        const positiveCount = classified.filter(m => m.sentiment_label === 'positive').length
+        const neutralCount = classified.filter(m => m.sentiment_label === 'neutral').length
+        const negativeCount = classified.filter(m => m.sentiment_label === 'negative').length
+        const mixedCount = classified.filter(m => m.sentiment_label === 'mixed').length
+
+        const positive_pct = Number(((positiveCount / total) * 100).toFixed(2))
+        // mixed leans neutral for the percentage split
+        const neutral_pct = Number((((neutralCount + mixedCount) / total) * 100).toFixed(2))
+        const negative_pct = Number(((negativeCount / total) * 100).toFixed(2))
+
+        // 0-100 weighted: positive=100, neutral/mixed=50, negative=0
+        const social_score = Number(
+          ((positiveCount * 100 + (neutralCount + mixedCount) * 50) / total).toFixed(2)
+        )
+
+        const emotionDistribution: Record<string, number> = {}
+        for (const m of classified) {
+          for (const emotion of (m.emotion_tags ?? [])) {
+            emotionDistribution[emotion] = (emotionDistribution[emotion] ?? 0) + 1
+          }
+        }
+
+        const { error } = await supabase.from('sentiment_daily').upsert(
+          {
+            brand_id: brand.id,
+            day: today,
+            social_score,
+            blended_score: social_score,
+            positive_pct,
+            neutral_pct,
+            negative_pct,
+            emotion_distribution: emotionDistribution,
+          },
+          { onConflict: 'brand_id,day' }
+        )
+
+        if (error) logger.error(`Aggregate sentiment failed for brand ${brand.id}: ${error.message}`)
+        else logger.info(`Aggregated sentiment for brand ${brand.id}: total=${total}, score=${social_score}`)
+      })
+    }
+
+    return { processed: brands.length }
+  }
+)

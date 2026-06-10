@@ -29,7 +29,7 @@ export async function GET(
       await redis.set(`oauth:${state}`, { userId: user.id, platform }, { ex: 600 })
 
       const scopes = platform === 'instagram'
-        ? 'instagram_basic,instagram_manage_insights,pages_show_list,pages_read_engagement'
+        ? 'instagram_business_basic,instagram_business_manage_insights,pages_show_list,pages_read_engagement'
         : 'pages_show_list,pages_read_engagement,public_profile'
 
       const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth')
