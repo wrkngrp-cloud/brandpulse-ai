@@ -18,10 +18,17 @@ export type ModelTier = keyof typeof MODELS
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const nim = new OpenAI({
-  baseURL: 'https://integrate.api.nvidia.com/v1',
-  apiKey: process.env.NIM_API_KEY ?? '',
-})
+// Lazy-initialized so the empty-key check in OpenAI SDK v6 doesn't fire at build time
+let _nim: OpenAI | null = null
+function getNim(): OpenAI {
+  if (!_nim) {
+    _nim = new OpenAI({
+      baseURL: 'https://integrate.api.nvidia.com/v1',
+      apiKey: process.env.NIM_API_KEY ?? 'nim-not-configured',
+    })
+  }
+  return _nim
+}
 
 export interface AiMessage {
   role: 'user' | 'assistant'
@@ -53,7 +60,7 @@ export async function callAi(opts: AiCallOptions): Promise<string> {
   }
 
   // NIM / GLM-4 via OpenAI-compatible endpoint
-  const resp = await nim.chat.completions.create({
+  const resp = await getNim().chat.completions.create({
     model: MODELS[tier],
     max_tokens: maxTokens,
     temperature,
