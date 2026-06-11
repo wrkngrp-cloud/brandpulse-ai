@@ -89,12 +89,19 @@ export function SocialConnectCard({ connections }: { connections: ConnectionStat
                     </span>
                   )
                 ) : (
-                  <a
-                    href={`/api/social/connect/${platform}`}
-                    className="inline-flex items-center justify-center h-7 px-2.5 text-xs rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground font-medium transition-colors"
-                  >
-                    Connect
-                  </a>
+                  <div className="flex flex-col items-end gap-0.5">
+                    <a
+                      href={`/api/social/connect/${platform}`}
+                      className="inline-flex items-center justify-center h-7 px-2.5 text-xs rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground font-medium transition-colors"
+                    >
+                      Connect
+                    </a>
+                    {platform === 'instagram' && (
+                      <span className="text-[10px] text-muted-foreground text-right leading-tight max-w-[120px]">
+                        Needs a Facebook Page + Business account
+                      </span>
+                    )}
+                  </div>
                 )}
                 {conn?.sync_status === 'error' && (
                   <a
