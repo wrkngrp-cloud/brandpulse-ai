@@ -28,9 +28,11 @@ export async function GET(
     case 'facebook': {
       await redis.set(`oauth:${state}`, { userId: user.id, platform }, { ex: 600 })
 
-      const scopes = platform === 'instagram'
-        ? 'instagram_basic,instagram_manage_insights,pages_show_list,pages_read_engagement'
-        : 'pages_show_list,pages_read_engagement,public_profile'
+      // Minimal scopes using only the consumer use case (already approved).
+      // Page and Instagram scopes require additional Meta use cases — add them
+      // once the "Access content shared by Pages" and "Access Instagram" use
+      // cases are enabled in the Meta developer portal.
+      const scopes = 'public_profile,email'
 
       const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth')
       authUrl.searchParams.set('client_id', process.env.META_APP_ID ?? '')
