@@ -26,7 +26,8 @@ export async function GET(
   const error = searchParams.get('error')
 
   if (error || !code || !state) {
-    return NextResponse.redirect(`${APP_URL}/dashboard?error=oauth_cancelled`)
+    const reason = searchParams.get('error_reason') ?? searchParams.get('error_description') ?? error ?? 'no_code'
+    return NextResponse.redirect(`${APP_URL}/dashboard?error=oauth_cancelled&reason=${encodeURIComponent(reason)}`)
   }
 
   // Verify state and retrieve session data
