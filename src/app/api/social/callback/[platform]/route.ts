@@ -59,54 +59,21 @@ export async function GET(
 
   try {
     switch (platform) {
-      case 'instagram': {
-        const { access_token: shortToken } = await exchangeMetaCode(code, redirectUri)
-        const { access_token } = await getLongLivedToken(shortToken)
-        const user = await getMetaUserId(access_token)
-
-        // Get the first connected Facebook page
-        const pagesRes = await fetch(
-          `https://graph.facebook.com/v21.0/me/accounts?access_token=${access_token}`
-        )
-        const pages = await pagesRes.json() as { data?: { id: string; access_token: string; name: string }[] }
-        const page = pages.data?.[0]
-        if (!page) return NextResponse.redirect(`${APP_URL}/dashboard?error=no_page`)
-
-        // Get Instagram Business Account connected to this page
-        const igData = await getInstagramAccount(page.access_token, page.id)
-        const igId = igData.instagram_business_account?.id
-        if (!igId) return NextResponse.redirect(`${APP_URL}/dashboard?error=no_ig_account`)
-
-        await supabase.from('social_connections').upsert({
-          brand_id: brand.id,
-          platform: 'instagram',
-          account_id: igId,
-          account_name: user.name,
-          access_token: encrypt(access_token),
-          sync_status: 'active',
-          connected_at: new Date().toISOString(),
-        }, { onConflict: 'brand_id,platform,account_id' })
-        break
-      }
-
+      case 'instagram':
       case 'facebook': {
         const { access_token: shortToken } = await exchangeMetaCode(code, redirectUri)
         const { access_token } = await getLongLivedToken(shortToken)
         const user = await getMetaUserId(access_token)
 
-        const pagesRes = await fetch(
-          `https://graph.facebook.com/v21.0/me/accounts?access_token=${access_token}`
-        )
-        const pages = await pagesRes.json() as { data?: { id: string; access_token: string; name: string }[] }
-        const page = pages.data?.[0]
-        if (!page) return NextResponse.redirect(`${APP_URL}/dashboard?error=no_page`)
-
+        // Store the user-level token. Page and Instagram Business Account
+        // access requires the Meta "Pages" and "Instagram" use cases to be
+        // enabled in the developer portal — upgrade scopes once those are live.
         await supabase.from('social_connections').upsert({
           brand_id: brand.id,
-          platform: 'facebook',
-          account_id: page.id,
-          account_name: page.name,
-          access_token: encrypt(page.access_token),
+          platform,
+          account_id: user.id,
+          account_name: user.name,
+          access_token: encrypt(access_token),
           sync_status: 'active',
           connected_at: new Date().toISOString(),
         }, { onConflict: 'brand_id,platform,account_id' })
