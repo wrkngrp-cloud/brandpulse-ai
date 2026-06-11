@@ -24,20 +24,26 @@ export async function GET(
   const redirectUri = `${APP_URL}/api/social/callback/${platform}`
 
   switch (platform) {
-    case 'instagram':
     case 'facebook': {
       await redis.set(`oauth:${state}`, { userId: user.id, platform }, { ex: 600 })
-
-      // Minimal scopes using only the consumer use case (already approved).
-      // Page and Instagram scopes require additional Meta use cases — add them
-      // once the "Access content shared by Pages" and "Access Instagram" use
-      // cases are enabled in the Meta developer portal.
-      const scopes = 'public_profile,email'
 
       const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth')
       authUrl.searchParams.set('client_id', process.env.META_APP_ID ?? '')
       authUrl.searchParams.set('redirect_uri', redirectUri)
-      authUrl.searchParams.set('scope', scopes)
+      authUrl.searchParams.set('scope', 'public_profile,pages_show_list,pages_read_engagement')
+      authUrl.searchParams.set('state', state)
+      authUrl.searchParams.set('response_type', 'code')
+
+      return NextResponse.redirect(authUrl.toString())
+    }
+
+    case 'instagram': {
+      await redis.set(`oauth:${state}`, { userId: user.id, platform }, { ex: 600 })
+
+      const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth')
+      authUrl.searchParams.set('client_id', process.env.META_APP_ID ?? '')
+      authUrl.searchParams.set('redirect_uri', redirectUri)
+      authUrl.searchParams.set('scope', 'public_profile,pages_show_list,pages_read_engagement,instagram_basic,instagram_manage_insights')
       authUrl.searchParams.set('state', state)
       authUrl.searchParams.set('response_type', 'code')
 
