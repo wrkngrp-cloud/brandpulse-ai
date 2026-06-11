@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { DashboardNav } from '@/components/dashboard/dashboard-nav'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -25,13 +26,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar placeholder — will be built out in later items */}
         <nav className="w-56 border-r shrink-0 p-4 hidden md:block">
-          <ul className="space-y-1 text-sm text-muted-foreground">
-            <li className="text-foreground font-medium px-2 py-1.5 rounded-md bg-muted">Overview</li>
-            <li className="px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer">Content</li>
-            <li className="px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer">Sentiment</li>
-            <li className="px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer">Surveys</li>
-            <li className="px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer">Ask AI</li>
-          </ul>
+          <DashboardNav />
         </nav>
         <main className="flex-1 overflow-auto p-6">{children}</main>
       </div>
