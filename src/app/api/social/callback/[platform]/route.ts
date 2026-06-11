@@ -115,16 +115,27 @@ export async function GET(
         const { access_token } = await getLongLivedToken(shortToken)
         const user = await getMetaUserId(access_token)
 
+        // Debug: log what permissions the token actually received
+        const permRes = await fetch(`${GRAPH}/me/permissions?access_token=${access_token}`)
+        const permData = await permRes.json() as { data?: { permission: string; status: string }[] }
+        const grantedPerms = permData.data?.filter(p => p.status === 'granted').map(p => p.permission) ?? []
+        console.log('[instagram-oauth] granted permissions:', grantedPerms)
+
         // Instagram Graph API requires a Facebook Page with a linked Instagram Business Account
         const pagesRes = await fetch(
           `${GRAPH}/me/accounts?fields=id,name,access_token&access_token=${access_token}`
         )
         const pagesData: FacebookPagesResponse = await pagesRes.json()
+        console.log('[instagram-oauth] /me/accounts response:', JSON.stringify(pagesData))
         const page = pagesData.data?.[0]
 
         if (!page) {
+          const missing = ['pages_show_list', 'pages_read_engagement'].filter(p => !grantedPerms.includes(p))
+          const reason = missing.length
+            ? `missing_scopes:${missing.join(',')}`
+            : 'no_pages_returned'
           return NextResponse.redirect(
-            `${APP_URL}/dashboard/content?error=no_facebook_page`
+            `${APP_URL}/dashboard/content?error=no_facebook_page&reason=${encodeURIComponent(reason)}`
           )
         }
 
