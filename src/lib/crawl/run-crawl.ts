@@ -2,6 +2,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { fetchTwitterUserMentions } from '@/lib/social/twitter'
 import { fetchInstagramHashtagMentions, fetchInstagramTaggedMedia } from '@/lib/social/instagram'
 import { classifySentiment } from '@/lib/ai/classify-sentiment'
+import { decrypt } from '@/lib/crypto'
 
 export interface CrawlResult {
   mentionsFound: number
@@ -87,7 +88,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     try {
       const tweets = await fetchTwitterUserMentions(
         twitterConn.account_id,
-        twitterConn.access_token,
+        decrypt(twitterConn.access_token),
         since
       )
       allMentions.push(...tweets.map(t => ({
@@ -108,9 +109,10 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
   if (instagramConn?.account_id && instagramConn.access_token) {
     try {
       const hashtags = deriveHashtags(brand.name)
+      const igToken = decrypt(instagramConn.access_token)
       const [hashtagMentions, taggedMedia] = await Promise.all([
-        fetchInstagramHashtagMentions(instagramConn.account_id, instagramConn.access_token, hashtags, since),
-        fetchInstagramTaggedMedia(instagramConn.account_id, instagramConn.access_token, since),
+        fetchInstagramHashtagMentions(instagramConn.account_id, igToken, hashtags, since),
+        fetchInstagramTaggedMedia(instagramConn.account_id, igToken, since),
       ])
       allMentions.push(...[...hashtagMentions, ...taggedMedia].map(m => ({
         platform: 'instagram',
