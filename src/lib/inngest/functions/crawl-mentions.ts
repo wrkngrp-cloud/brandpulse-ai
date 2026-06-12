@@ -12,20 +12,42 @@ export const crawlMentions = inngest.createFunction(
       { event: 'brandpulse/crawl.requested' },
     ],
   },
-  async ({ step, logger }) => {
+  async ({ event, step, logger }) => {
     const supabase = await createServiceClient()
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000)
     const today = new Date().toISOString().slice(0, 10)
 
+    const manualRunId = (event.data as { runId?: string } | undefined)?.runId
+
     const { data: brands } = await supabase.from('brands').select('id, name')
-    if (!brands?.length) return { processed: 0 }
+    if (!brands?.length) {
+      if (manualRunId) {
+        await supabase.from('crawl_runs').update({
+          status: 'error', error_message: 'No brands found', completed_at: new Date().toISOString(),
+        }).eq('id', manualRunId)
+      }
+      return { processed: 0 }
+    }
+
+    // For cron triggers: create a new run row. For manual triggers: row already exists.
+    let activeRunId = manualRunId
+    if (!activeRunId) {
+      const { data: run } = await supabase
+        .from('crawl_runs')
+        .insert({ brand_id: brands[0].id, trigger_type: 'cron', status: 'running' })
+        .select('id')
+        .single()
+      activeRunId = run?.id ?? null
+    }
+
+    let totalMentionsFound = 0
+    let totalClassified = 0
 
     for (const brand of brands) {
       await step.run(`crawl-x-${brand.id}`, async () => {
         const mentions = await fetchTwitterMentions(brand.name, since)
         if (!mentions.length) return
 
-        // Dedup against what we already stored for this window
         const { data: existing } = await supabase
           .from('mentions')
           .select('external_id')
@@ -49,7 +71,11 @@ export const crawlMentions = inngest.createFunction(
         }))
 
         const { error } = await supabase.from('mentions').insert(rows)
-        if (error) logger.error(`Insert mentions failed for brand ${brand.id}: ${error.message}`)
+        if (error) {
+          logger.error(`Insert mentions failed for brand ${brand.id}: ${error.message}`)
+        } else {
+          totalMentionsFound += rows.length
+        }
       })
 
       await step.run(`classify-${brand.id}`, async () => {
@@ -69,7 +95,6 @@ export const crawlMentions = inngest.createFunction(
 
         try {
           const results = await classifySentiment(brand.id, items)
-
           for (const r of results) {
             await supabase
               .from('mentions')
@@ -80,9 +105,8 @@ export const crawlMentions = inngest.createFunction(
               })
               .eq('id', r.id)
           }
+          totalClassified += results.length
         } catch (err) {
-          // Classification failed (e.g. no AI credits) — mentions are still stored.
-          // Sentiment dashboard will show "unclassified" until next successful run.
           logger.error(`Classify step failed for brand ${brand.id}: ${String(err)}`)
         }
       })
@@ -97,18 +121,15 @@ export const crawlMentions = inngest.createFunction(
 
         if (!classified?.length) return
 
-        const total = classified.length
+        const total        = classified.length
         const positiveCount = classified.filter(m => m.sentiment_label === 'positive').length
-        const neutralCount = classified.filter(m => m.sentiment_label === 'neutral').length
+        const neutralCount  = classified.filter(m => m.sentiment_label === 'neutral').length
         const negativeCount = classified.filter(m => m.sentiment_label === 'negative').length
-        const mixedCount = classified.filter(m => m.sentiment_label === 'mixed').length
+        const mixedCount    = classified.filter(m => m.sentiment_label === 'mixed').length
 
         const positive_pct = Number(((positiveCount / total) * 100).toFixed(2))
-        // mixed leans neutral for the percentage split
-        const neutral_pct = Number((((neutralCount + mixedCount) / total) * 100).toFixed(2))
+        const neutral_pct  = Number((((neutralCount + mixedCount) / total) * 100).toFixed(2))
         const negative_pct = Number(((negativeCount / total) * 100).toFixed(2))
-
-        // 0-100 weighted: positive=100, neutral/mixed=50, negative=0
         const social_score = Number(
           ((positiveCount * 100 + (neutralCount + mixedCount) * 50) / total).toFixed(2)
         )
@@ -121,24 +142,24 @@ export const crawlMentions = inngest.createFunction(
         }
 
         const { error } = await supabase.from('sentiment_daily').upsert(
-          {
-            brand_id: brand.id,
-            day: today,
-            social_score,
-            blended_score: social_score,
-            positive_pct,
-            neutral_pct,
-            negative_pct,
-            emotion_distribution: emotionDistribution,
-          },
+          { brand_id: brand.id, day: today, social_score, blended_score: social_score, positive_pct, neutral_pct, negative_pct, emotion_distribution: emotionDistribution },
           { onConflict: 'brand_id,day' }
         )
-
         if (error) logger.error(`Aggregate sentiment failed for brand ${brand.id}: ${error.message}`)
         else logger.info(`Aggregated sentiment for brand ${brand.id}: total=${total}, score=${social_score}`)
       })
     }
 
-    return { processed: brands.length }
+    // Mark the run complete
+    if (activeRunId) {
+      await supabase.from('crawl_runs').update({
+        status: 'done',
+        mentions_found: totalMentionsFound,
+        classified: totalClassified,
+        completed_at: new Date().toISOString(),
+      }).eq('id', activeRunId)
+    }
+
+    return { processed: brands.length, mentionsFound: totalMentionsFound, classified: totalClassified }
   }
 )

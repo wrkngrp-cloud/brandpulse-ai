@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TrendingUp, TrendingDown, Minus, MessageCircle } from 'lucide-react'
 import { TriggerCrawlButton } from './trigger-crawl-button'
+import { CrawlHistory } from './crawl-history'
 
 const SENTIMENT_COLOURS: Record<string, string> = {
   positive: 'text-green-600',
@@ -26,7 +27,7 @@ function ScoreIcon({ score }: { score: number }) {
 async function SentimentData() {
   const supabase = await createClient()
 
-  const [{ data: daily }, { data: mentions }] = await Promise.all([
+  const [{ data: daily }, { data: mentions }, { data: lastRun }] = await Promise.all([
     supabase
       .from('sentiment_daily')
       .select('day, social_score, positive_pct, neutral_pct, negative_pct, emotion_distribution')
@@ -37,10 +38,17 @@ async function SentimentData() {
       .select('id, content, author_handle, sentiment_label, emotion_tags, reach, created_at')
       .order('created_at', { ascending: false })
       .limit(20),
+    supabase
+      .from('crawl_runs')
+      .select('id, status, mentions_found')
+      .order('started_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ])
 
-  const latest = daily?.[0]
+  const latest       = daily?.[0]
   const totalMentions = mentions?.length ?? 0
+  const hasRanBefore = Boolean(lastRun)
 
   if (!latest && totalMentions === 0) {
     return (
@@ -53,7 +61,7 @@ async function SentimentData() {
             The nightly job runs at 4 AM Lagos time, or kick it off now.
           </p>
         </div>
-        <TriggerCrawlButton />
+        <TriggerCrawlButton hasRanBefore={hasRanBefore} />
       </div>
     )
   }
@@ -199,6 +207,11 @@ async function SentimentData() {
           </div>
         </div>
       )}
+
+      {/* Manual crawl trigger when data is present */}
+      <div className="flex justify-end">
+        <TriggerCrawlButton hasRanBefore />
+      </div>
     </div>
   )
 }
@@ -206,12 +219,16 @@ async function SentimentData() {
 export default function SentimentPage() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Sentiment</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Public perception · X mentions · nightly at 4 AM Lagos time
-        </p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Sentiment</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Public perception · X mentions · nightly at 4 AM Lagos time
+          </p>
+        </div>
+        <CrawlHistory />
       </div>
+
       <Suspense fallback={
         <div className="space-y-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
