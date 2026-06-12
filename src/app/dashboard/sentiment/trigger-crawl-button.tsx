@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { RefreshCw, CheckCircle2, AlertCircle, SearchX } from 'lucide-react'
 
-type RunState =
+type State =
   | { phase: 'idle' }
-  | { phase: 'starting' }
-  | { phase: 'running'; runId: string; progress: number; elapsed: number }
+  | { phase: 'running'; progress: number }
   | { phase: 'done'; mentionsFound: number }
   | { phase: 'error'; message: string }
 
@@ -15,144 +14,66 @@ interface Props {
   hasRanBefore?: boolean
 }
 
-const POLL_INTERVAL   = 3000   // ms
-const PROGRESS_TARGET = 90     // fill to 90 % while running, snap to 100 on done
-const FILL_DURATION   = 60000  // ms to reach 90 %
-
 export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
-  const [run, setRun] = useState<RunState>({ phase: 'idle' })
-  const pollRef  = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startRef = useRef<number>(0)
-
-  useEffect(() => {
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
-  }, [])
-
-  function stopPolling() {
-    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
-  }
-
-  async function pollStatus(runId: string) {
-    try {
-      const res = await fetch(`/api/crawl/runs/${runId}`)
-      if (!res.ok) return
-      const data = await res.json() as {
-        status: string; mentions_found: number; error_message?: string
-      }
-
-      if (data.status === 'done') {
-        stopPolling()
-        setRun({ phase: 'done', mentionsFound: data.mentions_found })
-      } else if (data.status === 'error') {
-        stopPolling()
-        setRun({ phase: 'error', message: data.error_message ?? 'Crawl failed' })
-      } else {
-        // Still running — update progress bar
-        const elapsed  = Date.now() - startRef.current
-        const progress = Math.min(PROGRESS_TARGET, (elapsed / FILL_DURATION) * PROGRESS_TARGET)
-        setRun(prev =>
-          prev.phase === 'running'
-            ? { ...prev, progress: Math.round(progress), elapsed }
-            : prev
-        )
-      }
-    } catch {
-      // Network glitch — keep polling
-    }
-  }
+  const [state, setState] = useState<State>({ phase: 'idle' })
 
   async function trigger() {
-    setRun({ phase: 'starting' })
+    setState({ phase: 'running', progress: 5 })
+
+    // Animate progress while the request is in flight
+    const timer = setInterval(() => {
+      setState(prev =>
+        prev.phase === 'running'
+          ? { ...prev, progress: Math.min(90, prev.progress + 3) }
+          : prev
+      )
+    }, 1500)
+
     try {
-      const res = await fetch('/api/inngest/trigger', { method: 'POST' })
+      const res = await fetch('/api/crawl/run', { method: 'POST' })
+      clearInterval(timer)
+
       if (!res.ok) {
         const body = await res.json().catch(() => ({})) as { error?: string }
-        setRun({ phase: 'error', message: body.error ?? 'Failed to start crawl' })
+        setState({ phase: 'error', message: body.error ?? `Server error ${res.status}` })
         return
       }
-      const body = await res.json() as { runId: string | null }
-      startRef.current = Date.now()
-      setRun({ phase: 'running', runId: body.runId ?? '', progress: 2, elapsed: 0 })
 
-      if (body.runId) {
-        // Poll for live status updates
-        pollRef.current = setInterval(() => pollStatus(body.runId!), POLL_INTERVAL)
-      } else {
-        // crawl_runs table not yet created — just animate for 90s then assume done
-        pollRef.current = setInterval(() => {
-          const elapsed  = Date.now() - startRef.current
-          const progress = Math.min(PROGRESS_TARGET, (elapsed / FILL_DURATION) * PROGRESS_TARGET)
-          setRun(prev =>
-            prev.phase === 'running' ? { ...prev, progress: Math.round(progress), elapsed } : prev
-          )
-        }, 1000)
-      }
-
-      // Hard timeout — stop after 3 minutes
-      setTimeout(() => {
-        if (pollRef.current) {
-          stopPolling()
-          setRun(prev => {
-            if (prev.phase !== 'running') return prev
-            // If no runId, assume success after timeout (we can't know for sure)
-            return (prev as { runId: string }).runId
-              ? { phase: 'error', message: 'Timed out — check Inngest dashboard' }
-              : { phase: 'done', mentionsFound: -1 }  // -1 = unknown count
-          })
-        }
-      }, 3 * 60 * 1000)
-    } catch {
-      setRun({ phase: 'error', message: 'Network error — try again' })
+      const data = await res.json() as { mentionsFound: number }
+      setState({ phase: 'done', mentionsFound: data.mentionsFound })
+    } catch (err) {
+      clearInterval(timer)
+      setState({ phase: 'error', message: err instanceof Error ? err.message : 'Network error' })
     }
   }
 
-  // ── Render ──────────────────────────────────────────────────────────────────
-
-  if (run.phase === 'running' || run.phase === 'starting') {
-    const progress = run.phase === 'starting' ? 2 : run.progress
+  if (state.phase === 'running') {
+    const label =
+      state.progress < 30 ? 'Fetching X mentions...' :
+      state.progress < 65 ? 'Classifying sentiment...' :
+      'Aggregating results...'
 
     return (
       <div className="space-y-2 w-full max-w-xs">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <RefreshCw className="h-3 w-3 animate-spin" />
-            {run.phase === 'starting'
-              ? 'Starting crawl...'
-              : run.elapsed < 15000
-                ? 'Fetching X mentions...'
-                : run.elapsed < 40000
-                  ? 'Classifying sentiment...'
-                  : 'Aggregating results...'}
+            {label}
           </span>
-          <span>{progress}%</span>
+          <span>{state.progress}%</span>
         </div>
         <div className="h-1.5 bg-muted rounded-full overflow-hidden">
           <div
             className="h-full bg-foreground rounded-full transition-all duration-1000"
-            style={{ width: `${progress}%` }}
+            style={{ width: `${state.progress}%` }}
           />
         </div>
       </div>
     )
   }
 
-  if (run.phase === 'done') {
-    if (run.mentionsFound === -1) {
-      // No runId tracking — can't know result, just prompt a refresh
-      return (
-        <div className="flex flex-col items-center gap-2">
-          <div className="flex items-center gap-1.5 text-sm text-green-600">
-            <CheckCircle2 className="h-4 w-4" />
-            Crawl dispatched — refresh the page in a moment to see results.
-          </div>
-          <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
-            Refresh page
-          </Button>
-        </div>
-      )
-    }
-
-    if (run.mentionsFound === 0) {
+  if (state.phase === 'done') {
+    if (state.mentionsFound === 0) {
       return (
         <div className="space-y-3 text-center">
           <div className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
@@ -160,8 +81,8 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
             No mentions found for your brand on X in the last 24 hours.
           </div>
           <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-            This could mean no one mentioned you today, or the brand name in your profile
-            doesn't match how people tag you on X.
+            This could mean no public tweets mentioned your brand name today, or the name
+            in your profile doesn&apos;t match how people tag you on X.
           </p>
           <Button size="sm" variant="outline" onClick={trigger}>
             <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Crawl again
@@ -174,21 +95,21 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
       <div className="flex flex-col items-center gap-2">
         <div className="flex items-center gap-1.5 text-sm text-green-600">
           <CheckCircle2 className="h-4 w-4" />
-          {run.mentionsFound} mention{run.mentionsFound !== 1 ? 's' : ''} found — refresh the page to see data.
+          {state.mentionsFound} mention{state.mentionsFound !== 1 ? 's' : ''} found and classified.
         </div>
-        <Button size="sm" variant="outline" onClick={() => { setRun({ phase: 'idle' }); window.location.reload() }}>
-          Refresh page
+        <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+          Refresh page to see data
         </Button>
       </div>
     )
   }
 
-  if (run.phase === 'error') {
+  if (state.phase === 'error') {
     return (
       <div className="flex flex-col items-center gap-2">
         <div className="flex items-center gap-1.5 text-sm text-red-500">
           <AlertCircle className="h-4 w-4" />
-          {run.message}
+          {state.message}
         </div>
         <Button size="sm" variant="outline" onClick={trigger}>
           <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Try again

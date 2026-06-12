@@ -117,7 +117,15 @@ export async function fetchTwitterMentions(
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${bearerToken}` },
   })
-  if (!res.ok) return []
+
+  if (res.status === 402) {
+    throw new Error(
+      'X API returned 402 Payment Required. The tweets/search/recent endpoint requires the X Developer Basic plan ($100/month). Your current account is on the Free tier (write-only).'
+    )
+  }
+  if (!res.ok) {
+    throw new Error(`X API error ${res.status}: ${await res.text()}`)
+  }
 
   const data = await res.json() as {
     data?: Array<{
