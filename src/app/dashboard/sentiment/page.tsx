@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TrendingUp, TrendingDown, Minus, MessageCircle } from 'lucide-react'
+import { TriggerCrawlButton } from './trigger-crawl-button'
 
 const SENTIMENT_COLOURS: Record<string, string> = {
   positive: 'text-green-600',
@@ -43,14 +44,16 @@ async function SentimentData() {
 
   if (!latest && totalMentions === 0) {
     return (
-      <div className="border rounded-xl p-12 text-center space-y-3">
+      <div className="border rounded-xl p-12 text-center space-y-4">
         <MessageCircle className="h-8 w-8 text-muted-foreground/40 mx-auto" />
-        <p className="text-sm font-medium">No sentiment data yet</p>
-        <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-          Add your <code className="bg-muted px-1 rounded text-xs">TWITTER_BEARER_TOKEN</code> to
-          Vercel env vars, then trigger the <strong>crawl-mentions</strong> function from your
-          Inngest dashboard to pull your first mentions.
-        </p>
+        <div className="space-y-1">
+          <p className="text-sm font-medium">No mentions crawled yet</p>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+            Your first crawl pulls the last 24 hours of X mentions for your brand.
+            The nightly job runs at 4 AM Lagos time, or kick it off now.
+          </p>
+        </div>
+        <TriggerCrawlButton />
       </div>
     )
   }

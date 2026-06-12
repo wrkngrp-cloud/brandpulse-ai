@@ -46,7 +46,9 @@ export interface AiCallOptions {
 export async function callAi(opts: AiCallOptions): Promise<string> {
   const { tier, system, messages, maxTokens = 2048, temperature = 0 } = opts
 
-  if (tier === 'cultural' || tier === 'boardGrade') {
+  const hasAnthropicKey = Boolean(process.env.ANTHROPIC_API_KEY)
+
+  if ((tier === 'cultural' || tier === 'boardGrade') && hasAnthropicKey) {
     const resp = await anthropic.messages.create({
       model: MODELS[tier],
       max_tokens: maxTokens,
@@ -57,6 +59,12 @@ export async function callAi(opts: AiCallOptions): Promise<string> {
     const block = resp.content[0]
     if (block.type !== 'text') throw new Error('Unexpected content type from Claude')
     return block.text
+  }
+
+  if (tier === 'cultural' && !hasAnthropicKey) {
+    // ANTHROPIC_API_KEY not set — fall back to NIM Llama 4 Maverick.
+    // Pidgin/Yoruba/Igbo nuance accuracy is reduced. Add Anthropic credits to restore full fidelity.
+    console.warn('[ai/client] ANTHROPIC_API_KEY missing — cultural tier using NIM fallback')
   }
 
   // NIM / GLM-4 via OpenAI-compatible endpoint

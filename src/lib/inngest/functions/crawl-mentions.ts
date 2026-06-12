@@ -7,7 +7,10 @@ export const crawlMentions = inngest.createFunction(
   {
     id: 'crawl-mentions',
     name: 'Crawl X mentions and score sentiment (nightly)',
-    triggers: [{ cron: 'TZ=Africa/Lagos 0 4 * * *' }],
+    triggers: [
+      { cron: 'TZ=Africa/Lagos 0 4 * * *' },
+      { event: 'brandpulse/crawl.requested' },
+    ],
   },
   async ({ step, logger }) => {
     const supabase = await createServiceClient()
@@ -64,17 +67,23 @@ export const crawlMentions = inngest.createFunction(
 
         if (!items.length) return
 
-        const results = await classifySentiment(brand.id, items)
+        try {
+          const results = await classifySentiment(brand.id, items)
 
-        for (const r of results) {
-          await supabase
-            .from('mentions')
-            .update({
-              sentiment_label: r.sentiment,
-              sentiment_score: Math.round(r.confidence * 100),
-              emotion_tags: [r.emotion],
-            })
-            .eq('id', r.id)
+          for (const r of results) {
+            await supabase
+              .from('mentions')
+              .update({
+                sentiment_label: r.sentiment,
+                sentiment_score: Math.round(r.confidence * 100),
+                emotion_tags: [r.emotion],
+              })
+              .eq('id', r.id)
+          }
+        } catch (err) {
+          // Classification failed (e.g. no AI credits) — mentions are still stored.
+          // Sentiment dashboard will show "unclassified" until next successful run.
+          logger.error(`Classify step failed for brand ${brand.id}: ${String(err)}`)
         }
       })
 
