@@ -51,12 +51,14 @@ export function InstagramPageIdForm({ pendingKey }: { pendingKey: string }) {
         <div className="text-sm text-amber-700 dark:text-amber-400 space-y-1">
           <p className="font-medium">How to find your Page ID:</p>
           <ol className="list-decimal list-outside ml-4 space-y-1">
-            <li>Go to your Facebook Page (Sweetness Studios)</li>
-            <li>Click <strong>About</strong> in the left menu</li>
-            <li>Scroll to the bottom — you&apos;ll see <strong>Page ID</strong> as a number</li>
+            <li>Log into Facebook, then click your profile photo in the top right</li>
+            <li>Click <strong>See all profiles</strong>, then select your Page</li>
+            <li>Click your Page&apos;s name in the left menu to go to it</li>
+            <li>Click your Page&apos;s name beneath the cover photo</li>
+            <li>Click <strong>Transparency and privacy policy</strong> — your Page ID is listed there</li>
           </ol>
           <a
-            href="https://www.facebook.com/help/1559365524386266"
+            href="https://www.facebook.com/help/1503421039731588"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-amber-600 hover:underline mt-1"
