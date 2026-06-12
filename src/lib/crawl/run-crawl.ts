@@ -1,11 +1,30 @@
 import { createServiceClient } from '@/lib/supabase/server'
-import { fetchTwitterMentions } from '@/lib/social/twitter'
+import { fetchTwitterUserMentions } from '@/lib/social/twitter'
+import { fetchInstagramHashtagMentions, fetchInstagramTaggedMedia } from '@/lib/social/instagram'
 import { classifySentiment } from '@/lib/ai/classify-sentiment'
 
 export interface CrawlResult {
   mentionsFound: number
   classified: number
+  sources: string[]
   error?: string
+}
+
+interface RawMention {
+  platform: string
+  external_id: string
+  content: string
+  author_handle: string
+  author_followers: number
+  reach: number
+  created_at: string
+}
+
+// Derive hashtags to search from brand name: 'Kuda Bank' → ['kudabank', 'kuda']
+function deriveHashtags(brandName: string): string[] {
+  const slug = brandName.toLowerCase().replace(/[^a-z0-9]/g, '')
+  const first = brandName.toLowerCase().split(/\s+/)[0].replace(/[^a-z0-9]/g, '')
+  return [...new Set([slug, first])].filter(h => h.length > 2)
 }
 
 export async function runCrawl(brandId: string, runId?: string): Promise<CrawlResult> {
@@ -17,33 +36,108 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     .from('brands').select('id, name').eq('id', brandId).single()
   if (!brand) throw new Error('Brand not found')
 
-  // ── 1. Fetch mentions ──────────────────────────────────────────────────────
-  // fetchTwitterMentions throws on 402 (tier too low) or other API errors
-  const mentions = await fetchTwitterMentions(brand.name, since)
+  // ── 1. Get connected social accounts ──────────────────────────────────────
+  const { data: connections } = await supabase
+    .from('social_connections')
+    .select('platform, account_id, access_token, account_name')
+    .eq('brand_id', brandId)
+    .eq('sync_status', 'active')
 
-  let mentionsFound = 0
-  if (mentions.length) {
-    const { data: existing } = await supabase
-      .from('mentions').select('external_id')
-      .eq('brand_id', brandId).eq('platform', 'twitter')
-      .in('external_id', mentions.map(m => m.id))
+  const twitterConn = connections?.find(c => c.platform === 'twitter')
+  const instagramConn = connections?.find(c => c.platform === 'instagram')
 
-    const seenIds = new Set((existing ?? []).map(m => m.external_id))
-    const fresh = mentions.filter(m => !seenIds.has(m.id))
+  // ── 2. Fetch mentions from all connected platforms ─────────────────────────
+  const allMentions: RawMention[] = []
+  const sources: string[] = []
+  const platformErrors: string[] = []
 
-    if (fresh.length) {
-      const rows = fresh.map(m => ({
-        brand_id: brandId, platform: 'twitter',
-        external_id: m.id, content: m.content,
-        author_handle: m.authorHandle, author_followers: m.authorFollowers,
-        reach: m.reach, created_at: m.created_at,
-      }))
-      const { error } = await supabase.from('mentions').insert(rows)
-      if (!error) mentionsFound = rows.length
+  if (twitterConn?.account_id && twitterConn.access_token) {
+    try {
+      const tweets = await fetchTwitterUserMentions(
+        twitterConn.account_id,
+        twitterConn.access_token,
+        since
+      )
+      allMentions.push(...tweets.map(t => ({
+        platform: 'twitter',
+        external_id: t.id,
+        content: t.content,
+        author_handle: t.authorHandle,
+        author_followers: t.authorFollowers,
+        reach: t.reach,
+        created_at: t.created_at,
+      })))
+      sources.push('twitter')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.warn('[runCrawl] Twitter mentions failed:', msg)
+      platformErrors.push(`Twitter: ${msg}`)
     }
   }
 
-  // ── 2. Classify unclassified mentions ──────────────────────────────────────
+  if (instagramConn?.account_id && instagramConn.access_token) {
+    try {
+      const hashtags = deriveHashtags(brand.name)
+      const [hashtagMentions, taggedMedia] = await Promise.all([
+        fetchInstagramHashtagMentions(instagramConn.account_id, instagramConn.access_token, hashtags, since),
+        fetchInstagramTaggedMedia(instagramConn.account_id, instagramConn.access_token, since),
+      ])
+      const igMentions = [...hashtagMentions, ...taggedMedia]
+      allMentions.push(...igMentions.map(m => ({
+        platform: 'instagram',
+        external_id: m.id,
+        content: m.content,
+        author_handle: m.authorHandle,
+        author_followers: 0,
+        reach: m.reach,
+        created_at: m.created_at,
+      })))
+      sources.push('instagram')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.warn('[runCrawl] Instagram mentions failed:', msg)
+      platformErrors.push(`Instagram: ${msg}`)
+    }
+  }
+
+  // ── 3. Dedup and insert fresh mentions ────────────────────────────────────
+  let mentionsFound = 0
+
+  if (allMentions.length) {
+    // Group by platform to run efficient dedup queries
+    const byPlatform = allMentions.reduce<Record<string, RawMention[]>>((acc, m) => {
+      ;(acc[m.platform] ??= []).push(m)
+      return acc
+    }, {})
+
+    for (const [platform, platformMentions] of Object.entries(byPlatform)) {
+      const externalIds = platformMentions.map(m => m.external_id)
+      const { data: existing } = await supabase
+        .from('mentions').select('external_id')
+        .eq('brand_id', brandId).eq('platform', platform)
+        .in('external_id', externalIds)
+
+      const seenIds = new Set((existing ?? []).map(m => m.external_id))
+      const fresh = platformMentions.filter(m => !seenIds.has(m.external_id))
+
+      if (fresh.length) {
+        const rows = fresh.map(m => ({
+          brand_id: brandId,
+          platform: m.platform,
+          external_id: m.external_id,
+          content: m.content,
+          author_handle: m.author_handle,
+          author_followers: m.author_followers,
+          reach: m.reach,
+          created_at: m.created_at,
+        }))
+        const { error } = await supabase.from('mentions').insert(rows)
+        if (!error) mentionsFound += rows.length
+      }
+    }
+  }
+
+  // ── 4. Classify unclassified mentions ─────────────────────────────────────
   let classified = 0
   const { data: unclassified } = await supabase
     .from('mentions').select('id, content')
@@ -70,7 +164,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     }
   }
 
-  // ── 3. Aggregate into sentiment_daily ─────────────────────────────────────
+  // ── 5. Aggregate into sentiment_daily ─────────────────────────────────────
   const { data: scored } = await supabase
     .from('mentions').select('sentiment_label, emotion_tags')
     .eq('brand_id', brandId).not('sentiment_label', 'is', null)
@@ -103,7 +197,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     }, { onConflict: 'brand_id,day' })
   }
 
-  // ── 4. Mark run complete ───────────────────────────────────────────────────
+  // ── 6. Mark run complete ───────────────────────────────────────────────────
   if (runId) {
     await supabase.from('crawl_runs').update({
       status: 'done', mentions_found: mentionsFound,
@@ -111,5 +205,5 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     }).eq('id', runId)
   }
 
-  return { mentionsFound, classified }
+  return { mentionsFound, classified, sources }
 }

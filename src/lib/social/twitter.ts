@@ -155,6 +155,64 @@ export async function fetchTwitterMentions(
   })
 }
 
+// ── User mentions timeline (FREE tier — uses connected OAuth token) ───────────
+// Unlike tweets/search/recent (requires $100/mo Basic plan), this endpoint
+// returns tweets that @mention the connected account and is available on the
+// free tier with user context OAuth.
+export async function fetchTwitterUserMentions(
+  userId: string,
+  accessToken: string,
+  since: Date
+): Promise<TwitterMention[]> {
+  const sinceIso = since.toISOString().replace(/\.\d{3}Z$/, 'Z')
+  const url =
+    `${API}/2/users/${userId}/mentions` +
+    `?tweet.fields=created_at,public_metrics,text,author_id` +
+    `&expansions=author_id` +
+    `&user.fields=public_metrics,username` +
+    `&start_time=${sinceIso}` +
+    `&max_results=100`
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+
+  if (res.status === 403 || res.status === 401) {
+    throw new Error(`X mentions auth error ${res.status}: token may be expired or missing tweet.read scope`)
+  }
+  if (!res.ok) {
+    throw new Error(`X API mentions error ${res.status}: ${await res.text()}`)
+  }
+
+  const data = await res.json() as {
+    data?: Array<{
+      id: string
+      text: string
+      created_at: string
+      author_id: string
+      public_metrics: { impression_count: number }
+    }>
+    includes?: {
+      users?: Array<{ id: string; username: string; public_metrics?: { followers_count: number } }>
+    }
+  }
+
+  if (!data.data?.length) return []
+
+  const userMap = new Map((data.includes?.users ?? []).map(u => [u.id, u]))
+  return data.data.map(t => {
+    const author = userMap.get(t.author_id)
+    return {
+      id: t.id,
+      content: t.text,
+      authorHandle: author?.username ?? '',
+      authorFollowers: author?.public_metrics?.followers_count ?? 0,
+      reach: t.public_metrics.impression_count,
+      created_at: t.created_at,
+    }
+  })
+}
+
 export async function fetchTwitterPosts(userId: string, accessToken: string, since: Date): Promise<TwitterPost[]> {
   const sinceIso = since.toISOString().replace(/\.\d{3}Z$/, 'Z')
   const fields = 'created_at,public_metrics,text'
