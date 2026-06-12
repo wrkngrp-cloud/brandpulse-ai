@@ -26,15 +26,16 @@ export async function POST() {
   }
 
   // Send event — surface any error rather than swallowing it
+  let sendResult: { ids: string[] } | null = null
   try {
-    await inngest.send({
+    sendResult = await inngest.send({
       name: 'brandpulse/crawl.requested',
       data: { triggeredBy: user.id, runId: runId ?? undefined },
     })
+    console.log('[trigger] inngest.send result:', JSON.stringify(sendResult))
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error('[trigger] inngest.send failed:', msg)
-    // Mark the run as errored if we created one
     if (runId) {
       const service = await createServiceClient()
       await service.from('crawl_runs').update({
@@ -46,7 +47,24 @@ export async function POST() {
     return NextResponse.json({ error: `Inngest event dispatch failed: ${msg}` }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, runId })
+  // ids empty means Inngest received the call but didn't register the event
+  if (!sendResult?.ids?.length) {
+    console.error('[trigger] inngest.send returned empty ids — event key may be wrong or app not synced')
+    if (runId) {
+      const service = await createServiceClient()
+      await service.from('crawl_runs').update({
+        status: 'error',
+        error_message: 'Event sent but not accepted by Inngest (check event key)',
+        completed_at: new Date().toISOString(),
+      }).eq('id', runId)
+    }
+    return NextResponse.json({
+      error: 'Inngest accepted the call but returned no event IDs — the event key may belong to a different app or environment than where the functions are synced.',
+      sendResult,
+    }, { status: 502 })
+  }
+
+  return NextResponse.json({ ok: true, runId, eventIds: sendResult.ids })
 }
 
 // Diagnostic GET — tells you exactly what keys are configured
