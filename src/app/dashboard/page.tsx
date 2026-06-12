@@ -145,7 +145,7 @@ async function DashboardContent() {
             <div className="py-6 text-center space-y-1">
               <p className="text-3xl font-bold text-muted-foreground/30">—</p>
               <p className="text-xs text-muted-foreground">
-                Add <code className="bg-muted px-1 rounded text-[10px]">TWITTER_BEARER_TOKEN</code> to enable
+                No crawl data yet. Go to Sentiment and click Run crawl now.
               </p>
             </div>
           )}
