@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardNav } from '@/components/dashboard/dashboard-nav'
+import { AiCommand } from './ai-command'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -30,6 +31,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </nav>
         <main className="flex-1 overflow-auto p-6">{children}</main>
       </div>
+      <AiCommand />
     </div>
   )
 }
