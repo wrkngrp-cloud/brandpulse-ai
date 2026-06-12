@@ -1,8 +1,8 @@
 import { createServiceClient } from '@/lib/supabase/server'
-import { fetchTwitterUserMentions } from '@/lib/social/twitter'
+import { fetchTwitterUserMentions, refreshTwitterToken } from '@/lib/social/twitter'
 import { fetchInstagramHashtagMentions, fetchInstagramTaggedMedia } from '@/lib/social/instagram'
 import { classifySentiment } from '@/lib/ai/classify-sentiment'
-import { decrypt } from '@/lib/crypto'
+import { decrypt, encrypt } from '@/lib/crypto'
 
 export interface CrawlResult {
   mentionsFound: number
@@ -73,7 +73,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
   // ── 1. Get connected social accounts ──────────────────────────────────────
   const { data: connections } = await supabase
     .from('social_connections')
-    .select('platform, account_id, access_token, account_name')
+    .select('platform, account_id, access_token, refresh_token, account_name')
     .eq('brand_id', brandId)
     .eq('sync_status', 'active')
 
@@ -86,11 +86,30 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
 
   if (twitterConn?.account_id && twitterConn.access_token) {
     try {
-      const tweets = await fetchTwitterUserMentions(
-        twitterConn.account_id,
-        decrypt(twitterConn.access_token),
-        since
-      )
+      let accessToken = decrypt(twitterConn.access_token)
+
+      // Inner fetch — on 401 attempt one token refresh before giving up
+      const fetchMentions = async () =>
+        fetchTwitterUserMentions(twitterConn.account_id!, accessToken, since)
+
+      let tweets = await fetchMentions().catch(async (err: unknown) => {
+        const msg = err instanceof Error ? err.message : ''
+        const isExpired = msg.includes('401') || msg.includes('auth error')
+        if (!isExpired || !twitterConn.refresh_token) throw err
+
+        // Refresh the token
+        const refreshed = await refreshTwitterToken(decrypt(twitterConn.refresh_token))
+        accessToken = refreshed.access_token
+
+        // Persist refreshed tokens so the next crawl works without re-auth
+        await supabase.from('social_connections').update({
+          access_token: encrypt(refreshed.access_token),
+          ...(refreshed.refresh_token ? { refresh_token: encrypt(refreshed.refresh_token) } : {}),
+        }).eq('brand_id', brandId).eq('platform', 'twitter')
+
+        return fetchMentions()
+      })
+
       allMentions.push(...tweets.map(t => ({
         platform: 'twitter',
         external_id: t.id,
