@@ -8,9 +8,10 @@ import OpenAI from 'openai'
 // board-grade business cases only                   → Claude Opus 4.8
 
 export const MODELS = {
-  cultural:   'claude-haiku-4-5-20251001',
-  structural: 'meta/llama-4-maverick-17b-128e-instruct',
-  boardGrade: 'claude-opus-4-8',
+  cultural:    'claude-haiku-4-5-20251001',
+  structural:  'meta/llama-4-maverick-17b-128e-instruct',
+  chat:        'claude-sonnet-4-6',   // AI Command Layer — needs cultural nuance + structured output
+  boardGrade:  'claude-opus-4-8',
   nimFallback: 'zhipu/glm-4',
 } as const
 
@@ -48,8 +49,8 @@ export interface AiCallOptions {
 export async function callAi(opts: AiCallOptions): Promise<string> {
   const { tier, system, messages, maxTokens = 2048, temperature = 0 } = opts
 
-  // Cultural and board-grade always go to Anthropic
-  if (tier === 'cultural' || tier === 'boardGrade') {
+  // Cultural, chat (Command Layer), and board-grade always go to Anthropic
+  if (tier === 'cultural' || tier === 'chat' || tier === 'boardGrade') {
     const resp = await anthropic.messages.create({
       model: MODELS[tier],
       max_tokens: maxTokens,
