@@ -20,11 +20,44 @@ interface RawMention {
   created_at: string
 }
 
-// Derive hashtags to search from brand name: 'Kuda Bank' → ['kudabank', 'kuda']
+interface PlatformStats {
+  volume: number
+  score: number
+  positive_pct: number
+  neutral_pct: number
+  negative_pct: number
+}
+
+// 'Kuda Bank' → ['kudabank', 'kuda']
 function deriveHashtags(brandName: string): string[] {
   const slug = brandName.toLowerCase().replace(/[^a-z0-9]/g, '')
   const first = brandName.toLowerCase().split(/\s+/)[0].replace(/[^a-z0-9]/g, '')
   return [...new Set([slug, first])].filter(h => h.length > 2)
+}
+
+function computePlatformStats(
+  mentions: Array<{ sentiment_label: string | null; platform: string }>
+): Record<string, PlatformStats> {
+  const platforms = [...new Set(mentions.map(m => m.platform))]
+  const result: Record<string, PlatformStats> = {}
+
+  for (const platform of platforms) {
+    const pm = mentions.filter(m => m.platform === platform)
+    const vol = pm.length
+    if (!vol) continue
+    const pos = pm.filter(m => m.sentiment_label === 'positive').length
+    const neu = pm.filter(m => m.sentiment_label === 'neutral').length
+    const neg = pm.filter(m => m.sentiment_label === 'negative').length
+    const mix = pm.filter(m => m.sentiment_label === 'mixed').length
+    result[platform] = {
+      volume: vol,
+      score: Number(((pos * 100 + (neu + mix) * 50) / vol).toFixed(2)),
+      positive_pct: Number(((pos / vol) * 100).toFixed(2)),
+      neutral_pct: Number((((neu + mix) / vol) * 100).toFixed(2)),
+      negative_pct: Number(((neg / vol) * 100).toFixed(2)),
+    }
+  }
+  return result
 }
 
 export async function runCrawl(brandId: string, runId?: string): Promise<CrawlResult> {
@@ -43,13 +76,12 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     .eq('brand_id', brandId)
     .eq('sync_status', 'active')
 
-  const twitterConn = connections?.find(c => c.platform === 'twitter')
+  const twitterConn  = connections?.find(c => c.platform === 'twitter')
   const instagramConn = connections?.find(c => c.platform === 'instagram')
 
   // ── 2. Fetch mentions from all connected platforms ─────────────────────────
   const allMentions: RawMention[] = []
   const sources: string[] = []
-  const platformErrors: string[] = []
 
   if (twitterConn?.account_id && twitterConn.access_token) {
     try {
@@ -69,9 +101,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
       })))
       sources.push('twitter')
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err)
-      console.warn('[runCrawl] Twitter mentions failed:', msg)
-      platformErrors.push(`Twitter: ${msg}`)
+      console.warn('[runCrawl] Twitter mentions failed:', err instanceof Error ? err.message : err)
     }
   }
 
@@ -82,8 +112,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
         fetchInstagramHashtagMentions(instagramConn.account_id, instagramConn.access_token, hashtags, since),
         fetchInstagramTaggedMedia(instagramConn.account_id, instagramConn.access_token, since),
       ])
-      const igMentions = [...hashtagMentions, ...taggedMedia]
-      allMentions.push(...igMentions.map(m => ({
+      allMentions.push(...[...hashtagMentions, ...taggedMedia].map(m => ({
         platform: 'instagram',
         external_id: m.id,
         content: m.content,
@@ -94,9 +123,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
       })))
       sources.push('instagram')
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err)
-      console.warn('[runCrawl] Instagram mentions failed:', msg)
-      platformErrors.push(`Instagram: ${msg}`)
+      console.warn('[runCrawl] Instagram mentions failed:', err instanceof Error ? err.message : err)
     }
   }
 
@@ -104,7 +131,6 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
   let mentionsFound = 0
 
   if (allMentions.length) {
-    // Group by platform to run efficient dedup queries
     const byPlatform = allMentions.reduce<Record<string, RawMention[]>>((acc, m) => {
       ;(acc[m.platform] ??= []).push(m)
       return acc
@@ -164,14 +190,26 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     }
   }
 
-  // ── 5. Aggregate into sentiment_daily ─────────────────────────────────────
+  // ── 5. Aggregate into sentiment_daily (per-platform + volume-weighted blend)
   const { data: scored } = await supabase
-    .from('mentions').select('sentiment_label, emotion_tags')
-    .eq('brand_id', brandId).not('sentiment_label', 'is', null)
+    .from('mentions')
+    .select('sentiment_label, emotion_tags, platform')
+    .eq('brand_id', brandId)
+    .not('sentiment_label', 'is', null)
     .gte('created_at', `${today}T00:00:00.000Z`)
 
   if (scored?.length) {
-    const total        = scored.length
+    const total = scored.length
+    const platformBreakdown = computePlatformStats(scored)
+
+    // Volume-weighted blend across all platforms
+    const social_score = Number(
+      (Object.values(platformBreakdown)
+        .reduce((sum, p) => sum + p.score * p.volume, 0) / total
+      ).toFixed(2)
+    )
+
+    // Overall distribution (used for the breakdown bars)
     const positiveCount = scored.filter(m => m.sentiment_label === 'positive').length
     const neutralCount  = scored.filter(m => m.sentiment_label === 'neutral').length
     const negativeCount = scored.filter(m => m.sentiment_label === 'negative').length
@@ -180,7 +218,6 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     const positive_pct = Number(((positiveCount / total) * 100).toFixed(2))
     const neutral_pct  = Number((((neutralCount + mixedCount) / total) * 100).toFixed(2))
     const negative_pct = Number(((negativeCount / total) * 100).toFixed(2))
-    const social_score = Number(((positiveCount * 100 + (neutralCount + mixedCount) * 50) / total).toFixed(2))
 
     const emotionDistribution: Record<string, number> = {}
     for (const m of scored) {
@@ -194,6 +231,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
       social_score, blended_score: social_score,
       positive_pct, neutral_pct, negative_pct,
       emotion_distribution: emotionDistribution,
+      platform_breakdown: platformBreakdown,
     }, { onConflict: 'brand_id,day' })
   }
 
