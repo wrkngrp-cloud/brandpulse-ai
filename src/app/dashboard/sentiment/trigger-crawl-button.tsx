@@ -7,7 +7,7 @@ import { RefreshCw, CheckCircle2, AlertCircle, SearchX } from 'lucide-react'
 type State =
   | { phase: 'idle' }
   | { phase: 'running'; progress: number }
-  | { phase: 'done'; mentionsFound: number }
+  | { phase: 'done'; mentionsFound: number; sources: string[] }
   | { phase: 'error'; message: string }
 
 interface Props {
@@ -39,8 +39,8 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
         return
       }
 
-      const data = await res.json() as { mentionsFound: number }
-      setState({ phase: 'done', mentionsFound: data.mentionsFound })
+      const data = await res.json() as { mentionsFound: number; sources?: string[] }
+      setState({ phase: 'done', mentionsFound: data.mentionsFound, sources: data.sources ?? [] })
     } catch (err) {
       clearInterval(timer)
       setState({ phase: 'error', message: err instanceof Error ? err.message : 'Network error' })
@@ -49,7 +49,7 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
 
   if (state.phase === 'running') {
     const label =
-      state.progress < 30 ? 'Fetching X mentions...' :
+      state.progress < 30 ? 'Fetching mentions...' :
       state.progress < 65 ? 'Classifying sentiment...' :
       'Aggregating results...'
 
@@ -73,16 +73,23 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
   }
 
   if (state.phase === 'done') {
+    const platformList = state.sources.length
+      ? state.sources.map(s => s === 'twitter' ? 'X' : 'Instagram').join(' and ')
+      : null
+
     if (state.mentionsFound === 0) {
       return (
         <div className="space-y-3 text-center">
           <div className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
             <SearchX className="h-4 w-4" />
-            No mentions found for your brand on X in the last 24 hours.
+            {state.sources.length === 0
+              ? 'No social accounts connected yet.'
+              : `No new mentions found on ${platformList} in the last 24 hours.`}
           </div>
           <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-            This could mean no public tweets mentioned your brand name today, or the name
-            in your profile doesn&apos;t match how people tag you on X.
+            {state.sources.length === 0
+              ? 'Connect your X or Instagram account in Settings to start collecting mentions.'
+              : 'Nobody @mentioned your account today, or the crawl already ran recently.'}
           </p>
           <Button size="sm" variant="outline" onClick={trigger}>
             <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Crawl again
@@ -95,7 +102,7 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
       <div className="flex flex-col items-center gap-2">
         <div className="flex items-center gap-1.5 text-sm text-green-600">
           <CheckCircle2 className="h-4 w-4" />
-          {state.mentionsFound} mention{state.mentionsFound !== 1 ? 's' : ''} found and classified.
+          {state.mentionsFound} mention{state.mentionsFound !== 1 ? 's' : ''} found{platformList ? ` from ${platformList}` : ''} and classified.
         </div>
         <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
           Refresh page to see data
