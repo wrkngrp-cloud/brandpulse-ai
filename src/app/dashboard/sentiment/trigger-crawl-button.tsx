@@ -70,21 +70,35 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
         setRun({ phase: 'error', message: body.error ?? 'Failed to start crawl' })
         return
       }
-      const { runId } = await res.json() as { runId: string }
+      const body = await res.json() as { runId: string | null }
       startRef.current = Date.now()
-      setRun({ phase: 'running', runId, progress: 2, elapsed: 0 })
+      setRun({ phase: 'running', runId: body.runId ?? '', progress: 2, elapsed: 0 })
 
-      pollRef.current = setInterval(() => pollStatus(runId), POLL_INTERVAL)
+      if (body.runId) {
+        // Poll for live status updates
+        pollRef.current = setInterval(() => pollStatus(body.runId!), POLL_INTERVAL)
+      } else {
+        // crawl_runs table not yet created — just animate for 90s then assume done
+        pollRef.current = setInterval(() => {
+          const elapsed  = Date.now() - startRef.current
+          const progress = Math.min(PROGRESS_TARGET, (elapsed / FILL_DURATION) * PROGRESS_TARGET)
+          setRun(prev =>
+            prev.phase === 'running' ? { ...prev, progress: Math.round(progress), elapsed } : prev
+          )
+        }, 1000)
+      }
 
-      // Hard timeout — stop polling after 3 minutes regardless
+      // Hard timeout — stop after 3 minutes
       setTimeout(() => {
         if (pollRef.current) {
           stopPolling()
-          setRun(prev =>
-            prev.phase === 'running'
+          setRun(prev => {
+            if (prev.phase !== 'running') return prev
+            // If no runId, assume success after timeout (we can't know for sure)
+            return (prev as { runId: string }).runId
               ? { phase: 'error', message: 'Timed out — check Inngest dashboard' }
-              : prev
-          )
+              : { phase: 'done', mentionsFound: -1 }  // -1 = unknown count
+          })
         }
       }, 3 * 60 * 1000)
     } catch {
@@ -123,6 +137,21 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
   }
 
   if (run.phase === 'done') {
+    if (run.mentionsFound === -1) {
+      // No runId tracking — can't know result, just prompt a refresh
+      return (
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center gap-1.5 text-sm text-green-600">
+            <CheckCircle2 className="h-4 w-4" />
+            Crawl dispatched — refresh the page in a moment to see results.
+          </div>
+          <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+            Refresh page
+          </Button>
+        </div>
+      )
+    }
+
     if (run.mentionsFound === 0) {
       return (
         <div className="space-y-3 text-center">
