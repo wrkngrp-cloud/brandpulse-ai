@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { Redis } from '@upstash/redis'
 import { encrypt } from '@/lib/crypto'
+import { randomBytes } from 'crypto'
 import {
   exchangeMetaCode, getLongLivedToken, getMetaUserId,
   getInstagramAccount,
@@ -164,12 +165,15 @@ export async function GET(
 
         if (!page) {
           const missing = ['pages_show_list', 'pages_read_engagement'].filter(p => !grantedPerms.includes(p))
-          const reason = missing.length
-            ? `missing_scopes:${missing.join(',')}`
-            : 'no_pages_returned'
-          return NextResponse.redirect(
-            `${APP_URL}/dashboard/content?error=no_facebook_page&reason=${encodeURIComponent(reason)}`
-          )
+          if (missing.length) {
+            return NextResponse.redirect(
+              `${APP_URL}/dashboard/content?error=no_facebook_page&reason=${encodeURIComponent(`missing_scopes:${missing.join(',')}`)}`
+            )
+          }
+          // NPE page — auto-discovery failed. Store token temporarily and ask user for their Page ID.
+          const pendingKey = randomBytes(16).toString('hex')
+          await redis.set(`ig-pending:${pendingKey}`, { accessToken: access_token, userId: session.userId }, { ex: 600 })
+          return NextResponse.redirect(`${APP_URL}/dashboard/content?action=needs-page-id&key=${pendingKey}`)
         }
 
         // Get the Instagram Business Account linked to the Facebook Page

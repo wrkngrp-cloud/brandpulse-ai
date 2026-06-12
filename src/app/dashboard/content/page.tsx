@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ContentTableClient } from './content-table-client'
 import { SovWidgetClient } from './sov-widget-client'
 import { SocialConnectCard } from '@/components/dashboard/social-connect-card'
+import { InstagramPageIdForm } from '@/components/dashboard/instagram-page-id-form'
 import { ContentTableSkeleton } from '@/components/dashboard/content-table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AlertTriangle, CheckCircle2 } from 'lucide-react'
@@ -125,6 +126,7 @@ export default async function ContentPage({
   const params = await searchParams
   const oauthError = params.error
   const connected = params.connected
+  const needsPageId = params.action === 'needs-page-id' ? params.key : null
   const errorInfo = getOAuthError(oauthError, params.reason, params.page)
 
   return (
@@ -143,6 +145,9 @@ export default async function ContentPage({
           </p>
         </div>
       )}
+
+      {/* Instagram NPE page-id form */}
+      {needsPageId && <InstagramPageIdForm pendingKey={needsPageId} />}
 
       {/* OAuth error banner with setup steps */}
       {errorInfo && (
