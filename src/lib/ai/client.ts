@@ -4,11 +4,11 @@ import OpenAI from 'openai'
 // Three-tier routing per CLAUDE.md:
 // cultural (sentiment, Pidgin/Yoruba/Igbo/Hausa)  → Claude Haiku 4.5
 // structural (reports, briefings, funnel diagnosis) → NIM Llama 4 Maverick
+//   ↳ NIM not verified yet: falls back to Claude Haiku 4.5
 // board-grade business cases only                   → Claude Opus 4.8
-// fallback if NIM credits exhausted                 → zhipu/glm-4
 
 export const MODELS = {
-  cultural: 'claude-haiku-4-5-20251001',
+  cultural:   'claude-haiku-4-5-20251001',
   structural: 'meta/llama-4-maverick-17b-128e-instruct',
   boardGrade: 'claude-opus-4-8',
   nimFallback: 'zhipu/glm-4',
@@ -30,6 +30,8 @@ function getNim(): OpenAI {
   return _nim
 }
 
+const nimAvailable = Boolean(process.env.NIM_API_KEY)
+
 export interface AiMessage {
   role: 'user' | 'assistant'
   content: string
@@ -46,9 +48,8 @@ export interface AiCallOptions {
 export async function callAi(opts: AiCallOptions): Promise<string> {
   const { tier, system, messages, maxTokens = 2048, temperature = 0 } = opts
 
-  const hasAnthropicKey = Boolean(process.env.ANTHROPIC_API_KEY)
-
-  if ((tier === 'cultural' || tier === 'boardGrade') && hasAnthropicKey) {
+  // Cultural and board-grade always go to Anthropic
+  if (tier === 'cultural' || tier === 'boardGrade') {
     const resp = await anthropic.messages.create({
       model: MODELS[tier],
       max_tokens: maxTokens,
@@ -61,15 +62,23 @@ export async function callAi(opts: AiCallOptions): Promise<string> {
     return block.text
   }
 
-  if (tier === 'cultural' && !hasAnthropicKey) {
-    // ANTHROPIC_API_KEY not set — fall back to NIM Llama 4 Maverick.
-    // Pidgin/Yoruba/Igbo nuance accuracy is reduced. Add Anthropic credits to restore full fidelity.
-    console.warn('[ai/client] ANTHROPIC_API_KEY missing — cultural tier using NIM fallback')
+  // Structural tier: NIM when verified, Claude Haiku 4.5 until then
+  if (tier === 'structural' && !nimAvailable) {
+    const resp = await anthropic.messages.create({
+      model: MODELS.cultural,   // Haiku — cheapest Anthropic model, good enough for structural tasks
+      max_tokens: maxTokens,
+      temperature,
+      system,
+      messages,
+    })
+    const block = resp.content[0]
+    if (block.type !== 'text') throw new Error('Unexpected content type from Claude')
+    return block.text
   }
 
   // NIM / GLM-4 via OpenAI-compatible endpoint
   const resp = await getNim().chat.completions.create({
-    model: MODELS[tier],
+    model: nimAvailable ? MODELS.structural : MODELS.nimFallback,
     max_tokens: maxTokens,
     temperature,
     messages: [{ role: 'system', content: system }, ...messages],
