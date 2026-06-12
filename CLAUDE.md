@@ -30,6 +30,29 @@ for cache/rate-limit.
 - Public endpoints (/survey/[id], /ambassador/[token], /go/[slug]) post/redirect via a
   service-role API route that validates the token/slug. NEVER open anon RLS on those tables.
 
+## Sentiment data model
+Social mentions are collected from ALL connected platforms (X and Instagram today;
+TikTok/LinkedIn/Facebook are supported by the schema). Each mention row carries
+a `platform` field ('twitter' | 'instagram' | ...).
+
+`sentiment_daily` stores per-day aggregates with two layers:
+- Top-level `social_score` = volume-weighted blend across all platforms.
+  Formula: Σ(platform_score × platform_volume) / total_volume
+- `platform_breakdown` JSONB = per-platform detail:
+  { "twitter": { volume, score, positive_pct, neutral_pct, negative_pct },
+    "instagram": { ... } }
+  Add new platforms by pushing a new key here — no migration needed.
+
+The BHI reads only `social_score` (the blended value). The Sentiment dashboard
+reads `platform_breakdown` to show per-platform pills and a split panel.
+
+Social mention sources (free tier, no paid API needed):
+- X: GET /2/users/:id/mentions with the connected OAuth token (free tier, user context)
+  Catches direct @handle mentions only. app-only bearer token search is NOT used (402).
+- Instagram: GET /{ig-user-id}/ig_hashtags + /recent_media (hashtag search, 30/week free)
+  and GET /{ig-user-id}/tags (tagged media, free). Hashtags derived from brand name.
+  Both require a connected Instagram Business account.
+
 ## Voice for any user-facing copy
 Warm, confident, plain English. Active voice. Connection before sales. No jargon. No em dashes.
 Banned words: delve, underscore, pivotal, crucial, robust, vibrant, leverage, seamless, tapestry.
