@@ -64,25 +64,57 @@ async function ContentData() {
   )
 }
 
-const OAUTH_ERRORS: Record<string, { title: string; steps: string[] }> = {
-  no_facebook_page: {
-    title: 'Instagram needs a Facebook Page as a bridge',
-    steps: [
-      'Go to facebook.com and create a free Page for your brand (takes about 2 minutes).',
-      'In the Instagram app, go to Settings > Account > Switch to Professional Account and choose Business or Creator.',
-      'Then go to Settings > Business > Connect to Facebook, and link that Page.',
-      'Come back here and click Connect on Instagram again.',
-    ],
-  },
-  no_ig_business_account: {
-    title: 'No Instagram Business account found on your Facebook Page',
-    steps: [
-      'Open the Instagram app and go to Settings > Account > Switch to Professional Account.',
-      'Choose Business or Creator (either works).',
-      'Go to Settings > Business > Connect to Facebook and link your Facebook Page.',
-      'Come back here and click Connect on Instagram again.',
-    ],
-  },
+function getOAuthError(error: string | undefined, reason: string | undefined, page: string | undefined): { title: string; steps: string[] } | null {
+  if (!error) return null
+
+  if (error === 'no_facebook_page') {
+    if (reason === 'no_pages_returned') {
+      return {
+        title: 'Facebook did not share your Page with this app',
+        steps: [
+          'Click Connect on Instagram again.',
+          'During the Facebook login dialog, look for a step that says "What Sweetness Studios (or your page name) can do" — there will be a Pages section.',
+          'Make sure your page is listed and toggled on before clicking Continue.',
+          'If you do not see that step, click "Edit access" on the permissions screen to expand it.',
+        ],
+      }
+    }
+    if (reason?.startsWith('missing_scopes')) {
+      return {
+        title: 'Instagram needs a Facebook Page as a bridge',
+        steps: [
+          'Go to facebook.com and create a free Page for your brand (takes about 2 minutes).',
+          'In the Instagram app, go to Settings > Account > Switch to Professional Account and choose Business or Creator.',
+          'Go to Settings > Business > Connect to Facebook, and link that Page.',
+          'Come back here and click Connect on Instagram again.',
+        ],
+      }
+    }
+    return {
+      title: 'Instagram needs a Facebook Page as a bridge',
+      steps: [
+        'Go to facebook.com and create a free Page for your brand (takes about 2 minutes).',
+        'In the Instagram app, go to Settings > Account > Switch to Professional Account and choose Business or Creator.',
+        'Go to Settings > Business > Connect to Facebook, and link that Page.',
+        'Come back here and click Connect on Instagram again.',
+      ],
+    }
+  }
+
+  if (error === 'no_ig_business_account') {
+    const pageName = page ?? 'your Facebook Page'
+    return {
+      title: `Found "${pageName}" but no linked Instagram Business account`,
+      steps: [
+        'Open the Instagram app and go to Settings > Account > Switch to Professional Account.',
+        'Choose Business or Creator (either works).',
+        `Go to Settings > Business > Connect to Facebook and link "${pageName}".`,
+        'Come back here and click Connect on Instagram again.',
+      ],
+    }
+  }
+
+  return null
 }
 
 export default async function ContentPage({
@@ -93,7 +125,7 @@ export default async function ContentPage({
   const params = await searchParams
   const oauthError = params.error
   const connected = params.connected
-  const errorInfo = oauthError ? OAUTH_ERRORS[oauthError] : null
+  const errorInfo = getOAuthError(oauthError, params.reason, params.page)
 
   return (
     <div className="space-y-6">
