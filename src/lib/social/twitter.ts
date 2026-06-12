@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from 'crypto'
 
-const API = 'https://api.twitter.com'
+const API = 'https://api.x.com'
 
 export interface TwitterPost {
   id: string
