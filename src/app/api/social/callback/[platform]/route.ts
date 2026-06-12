@@ -115,19 +115,52 @@ export async function GET(
         const { access_token } = await getLongLivedToken(shortToken)
         const user = await getMetaUserId(access_token)
 
-        // Debug: log what permissions the token actually received
+        // Log granted permissions for debugging
         const permRes = await fetch(`${GRAPH}/me/permissions?access_token=${access_token}`)
         const permData = await permRes.json() as { data?: { permission: string; status: string }[] }
         const grantedPerms = permData.data?.filter(p => p.status === 'granted').map(p => p.permission) ?? []
         console.log('[instagram-oauth] granted permissions:', grantedPerms)
 
-        // Instagram Graph API requires a Facebook Page with a linked Instagram Business Account
+        // Fetch pages — include tasks field which helps surface New Page Experience pages
         const pagesRes = await fetch(
-          `${GRAPH}/me/accounts?fields=id,name,access_token&access_token=${access_token}`
+          `${GRAPH}/me/accounts?fields=id,name,access_token,tasks&access_token=${access_token}`
         )
         const pagesData: FacebookPagesResponse = await pagesRes.json()
         console.log('[instagram-oauth] /me/accounts response:', JSON.stringify(pagesData))
-        const page = pagesData.data?.[0]
+
+        // Fallback 1: field-expansion syntax — behaves differently for NPE pages
+        let pages = pagesData.data ?? []
+        if (pages.length === 0) {
+          const meRes = await fetch(
+            `${GRAPH}/me?fields=accounts{id,name,access_token,tasks}&access_token=${access_token}`
+          )
+          const meData = await meRes.json() as { accounts?: { data?: FacebookPage[] } }
+          console.log('[instagram-oauth] /me?fields=accounts response:', JSON.stringify(meData))
+          pages = meData.accounts?.data ?? []
+        }
+
+        // Fallback 2: try the IG account directly on the user node (NPE pages sometimes expose this)
+        if (pages.length === 0) {
+          const igDirectRes = await fetch(
+            `${GRAPH}/me?fields=instagram_business_account{id,name}&access_token=${access_token}`
+          )
+          const igDirectData = await igDirectRes.json() as { instagram_business_account?: { id: string; name: string } }
+          console.log('[instagram-oauth] /me?fields=instagram_business_account response:', JSON.stringify(igDirectData))
+          if (igDirectData.instagram_business_account?.id) {
+            await supabase.from('social_connections').upsert({
+              brand_id: brand.id,
+              platform: 'instagram',
+              account_id: igDirectData.instagram_business_account.id,
+              account_name: igDirectData.instagram_business_account.name ?? user.name,
+              access_token: encrypt(access_token),
+              sync_status: 'active',
+              connected_at: new Date().toISOString(),
+            }, { onConflict: 'brand_id,platform,account_id' })
+            return NextResponse.redirect(`${APP_URL}/dashboard/content?connected=instagram`)
+          }
+        }
+
+        const page = pages[0]
 
         if (!page) {
           const missing = ['pages_show_list', 'pages_read_engagement'].filter(p => !grantedPerms.includes(p))
@@ -145,7 +178,7 @@ export async function GET(
 
         if (!igId) {
           return NextResponse.redirect(
-            `${APP_URL}/dashboard/content?error=no_ig_business_account`
+            `${APP_URL}/dashboard/content?error=no_ig_business_account&page=${encodeURIComponent(page.name)}`
           )
         }
 
