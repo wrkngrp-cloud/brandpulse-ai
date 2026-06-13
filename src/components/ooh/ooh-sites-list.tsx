@@ -5,7 +5,7 @@ import Link               from 'next/link'
 import { cn }             from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { ItemActions }    from '@/components/ui/item-actions'
-import { MapPin, Copy, Crosshair, Eye, Pencil, Trash2, BarChart2 } from 'lucide-react'
+import { MapPin, Copy, Crosshair, Eye, Pencil, Trash2, BarChart2, Megaphone } from 'lucide-react'
 import { toast }          from 'sonner'
 import { deleteSite }     from '@/app/dashboard/ooh/actions'
 
@@ -26,6 +26,8 @@ interface Site {
   lga?: string | null
   vanity_slug?: string | null
   visits: number
+  campaign_id?: string | null
+  campaign_name?: string | null
 }
 
 interface OohSitesListProps {
@@ -85,6 +87,17 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                   <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', STATUS_STYLES[status])}>
                     {STATUS_LABELS[status]}
                   </span>
+                  {site.campaign_id && site.campaign_name ? (
+                    <Link
+                      href={`/dashboard/campaigns/${site.campaign_id}`}
+                      className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <Megaphone className="h-3 w-3" />
+                      {site.campaign_name}
+                    </Link>
+                  ) : !site.campaign_id ? (
+                    <span className="text-xs text-muted-foreground/60 italic">Always On</span>
+                  ) : null}
                   {site.format_type && (
                     <span className="text-xs text-muted-foreground">{site.format_type}</span>
                   )}

@@ -157,12 +157,15 @@ export async function createSite(
 
   const shortCode = rawShortCode || await generateShortCode(supabase)
 
+  const campaignId = typeof raw.campaign_id === 'string' && raw.campaign_id ? raw.campaign_id : null
+
   const { data: site, error } = await supabase
     .from('ooh_sites')
     .insert({
       ...siteData,
       brand_id:             brand.id,
       status:               'active',
+      campaign_id:          campaignId,
       qr_token:             qrToken,
       short_code:           shortCode,
       lat:                  siteData.lat           ?? null,

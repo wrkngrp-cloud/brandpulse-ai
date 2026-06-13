@@ -1,7 +1,7 @@
 import { createClient }       from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link                   from 'next/link'
-import { ArrowLeft }          from 'lucide-react'
+import { ArrowLeft, Megaphone } from 'lucide-react'
 import { LiveDashboard }       from '@/components/events/live-dashboard'
 import { AmbassadorList }      from '@/components/events/ambassador-list'
 import { computeEventMetrics, fmtNGN, fmtPct } from '@/lib/events/roi'
@@ -22,7 +22,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
   const { data: event } = await supabase
     .from('events')
-    .select('*')
+    .select('*, campaigns ( id, name )')
     .eq('id', id)
     .single()
 
@@ -50,13 +50,27 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <Link
-          href="/dashboard/events"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Events
-        </Link>
+        <div className="flex items-center gap-3 mb-3">
+          <Link
+            href="/dashboard/events"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Events
+          </Link>
+          {(event.campaigns as { id: string; name: string } | null) && (
+            <>
+              <span className="text-muted-foreground/40">·</span>
+              <Link
+                href={`/dashboard/campaigns/${(event.campaigns as { id: string; name: string }).id}?tab=events`}
+                className="inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                <Megaphone className="h-3.5 w-3.5" />
+                {(event.campaigns as { id: string; name: string }).name}
+              </Link>
+            </>
+          )}
+        </div>
         <div className="flex items-start justify-between gap-3">
           <div>
             <h1 className="text-xl font-semibold">{event.name}</h1>
