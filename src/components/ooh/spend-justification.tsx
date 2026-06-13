@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import { TrendingUp } from 'lucide-react'
 
 interface SpendJustificationProps {
-  weeklyCost:    number
+  monthlyCost:    number
   currency:      string
   dailyTraffic:  number | null
   campaignStart: string | null
@@ -22,7 +22,7 @@ const DIGITAL_BENCHMARKS = [
 ]
 
 export function SpendJustification({
-  weeklyCost,
+  monthlyCost,
   currency,
   dailyTraffic,
   campaignStart,
@@ -35,7 +35,7 @@ export function SpendJustification({
       const diff = (new Date(campaignEnd).getTime() - new Date(campaignStart).getTime()) / (1000 * 60 * 60 * 24)
       campaignDays = Math.max(1, Math.round(diff))
     }
-    const totalCost  = weeklyCost * (campaignDays / 7)
+    const totalCost  = monthlyCost * (campaignDays / 30)
     const grossImpr  = dailyTraffic ? dailyTraffic * campaignDays : null
     const effectiveR = grossImpr ? Math.round(grossImpr * 0.25) : null
 
@@ -47,7 +47,7 @@ export function SpendJustification({
     const costPerVisit = trackedVisits > 0 ? totalCost / trackedVisits : null
 
     return { totalCost, grossImpr, effectiveR, oohCpm, costPerVisit, campaignDays }
-  }, [weeklyCost, campaignStart, campaignEnd, dailyTraffic, trackedVisits])
+  }, [monthlyCost, campaignStart, campaignEnd, dailyTraffic, trackedVisits])
 
   const chartData = DIGITAL_BENCHMARKS.map(b => ({
     ...b,

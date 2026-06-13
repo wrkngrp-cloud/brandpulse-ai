@@ -97,9 +97,9 @@ export default async function OohSitePage({
         <StatCard label="Total visits" value={site.visits?.toLocaleString() ?? '0'} />
         <StatCard label="Daily traffic est." value={site.daily_traffic ? site.daily_traffic.toLocaleString() : '—'} />
         <StatCard
-          label="Weekly cost"
-          value={site.weekly_cost
-            ? `${site.currency ?? 'NGN'} ${Number(site.weekly_cost).toLocaleString()}`
+          label="Monthly cost"
+          value={site.monthly_cost
+            ? `${site.currency ?? 'NGN'} ${Number(site.monthly_cost).toLocaleString()}`
             : '—'}
         />
         <StatCard
@@ -116,7 +116,7 @@ export default async function OohSitePage({
       {/* Impression calculator */}
       <ImpressionCalculator
         dailyTraffic={site.daily_traffic}
-        weeklyCost={site.weekly_cost ? Number(site.weekly_cost) : null}
+        monthlyCost={site.monthly_cost ? Number(site.monthly_cost) : null}
         currency={site.currency ?? 'NGN'}
         campaignStart={site.campaign_start}
         campaignEnd={site.campaign_end}
@@ -124,9 +124,9 @@ export default async function OohSitePage({
       />
 
       {/* Spend justification */}
-      {site.weekly_cost && (
+      {site.monthly_cost && (
         <SpendJustification
-          weeklyCost={Number(site.weekly_cost)}
+          monthlyCost={Number(site.monthly_cost)}
           currency={site.currency ?? 'NGN'}
           dailyTraffic={site.daily_traffic}
           campaignStart={site.campaign_start}

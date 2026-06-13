@@ -20,7 +20,7 @@ export default async function OohPage() {
     .from('ooh_sites')
     .select(`
       id, site_name, city, state, country, format_type, illuminated,
-      daily_traffic, weekly_cost, currency,
+      daily_traffic, monthly_cost, currency,
       campaign_start, campaign_end, lga,
       vanity_slug, landing_url, visits, qr_token, qr_scan_count,
       lat, lng, photo_url, notes

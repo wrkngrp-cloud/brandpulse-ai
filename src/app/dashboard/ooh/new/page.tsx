@@ -30,6 +30,7 @@ export default async function NewOohSitePage() {
         action={createSite}
         brandName={brand.name}
         appUrl={appUrl}
+        customDomain={brand.ooh_redirect_domain ?? null}
       />
     </div>
   )
