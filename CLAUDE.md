@@ -18,11 +18,12 @@ for cache/rate-limit.
   OPENAI_API_KEY, or SUPABASE_SERVICE_ROLE_KEY to the client.
 - Write the SQL migration BEFORE the API route that uses it.
 - Mark every component "use client" or leave it a server component, explicitly.
-- AI calls go through lib/ai/ (a provider-agnostic wrapper). THREE-TIER ROUTING:
-  · structural features (reports, competitive briefings, funnel diagnosis, general AI answers) → NVIDIA NIM Llama 4 Maverick (meta/llama-4-maverick-17b-128e-instruct), free tier
-  · cultural features (sentiment, Pre-Post widget, anything touching Pidgin/Yoruba/Igbo/Hausa) → Claude Haiku 4.5 (no other model is trained for this)
-  · board-grade business cases only → Claude Opus 4.8
-  Cache the Layer-1 brand context for Claude calls. Credit-free fallback if NIM credits run low: zhipu/glm-4.
+- AI calls go through lib/ai/client.ts (Anthropic-only). FOUR-TIER ROUTING:
+  · cultural features (sentiment, Pre-Post widget, anything touching Pidgin/Yoruba/Igbo/Hausa) → claude-haiku-4-5-20251001
+  · structural features (reports, competitive briefings, funnel diagnosis, general AI answers, chat) → claude-sonnet-4-6
+  · board-grade business cases only → claude-opus-4-8
+  NVIDIA NIM is NOT in use (account pending verification). Do not add NIM or any OpenAI-compatible calls.
+  Cache the Layer-1 brand context. Never display the model name in any UI.
 - Surveys deliver by email + in-app + WhatsApp + shareable link. NO SMS, NO USSD.
 - OOH attribution = branded vanity link + UTM (primary), search-uplift (corroboration).
   Event attribution = ambassador-captured leads via the PWA. QR is a secondary toggle, off by default.
