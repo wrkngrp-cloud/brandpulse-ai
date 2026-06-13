@@ -60,30 +60,39 @@ You MUST return ONLY valid JSON in this exact shape — no markdown fences, no p
 }`
 }
 
-export function buildPrePostUserMessage(input: PrePostInput, brandSegments: unknown[]): string {
+export function buildPrePostUserMessage(
+  input: PrePostInput,
+  brandSegments: unknown[],
+  hasVisual = false
+): string {
   const segments = Array.isArray(brandSegments) && brandSegments.length
     ? JSON.stringify(brandSegments)
     : input.targetSegment || 'General Nigerian audience'
 
-  return `Analyse this content before it is published.
+  const visualNote = hasVisual
+    ? `\nA visual asset is attached. Factor the image into all five scores — consider visual hook strength (will it stop the scroll?), colour psychology and cultural visual cues for this audience, brand aesthetic consistency, visual-text alignment, and any visual risks (inappropriate imagery, culturally insensitive symbols, etc.).`
+    : ''
+
+  const rewriteLabel = hasVisual
+    ? 'suggested_rewrite: improved caption or accompanying copy that complements the visual better for this audience, platform, and cultural moment. Do not describe a new image — improve the words only.'
+    : 'suggested_rewrite: an improved version that keeps the same message but executes better for this audience, platform, and cultural moment.'
+
+  return `Analyse this content before it is published.${visualNote}
 Platform: ${input.platform}
 Funnel goal: ${input.funnelStage}
 Target audience segment: ${segments}
-Content:
-"""
-${input.content}
-"""
+${input.content ? `Content / caption:\n"""\n${input.content}\n"""` : '(No caption text provided — score based on the visual only.)'}
 
 Score each dimension 0-100 with specific, evidence-based reasoning:
 
-1. PREDICTED ENGAGEMENT (0-100): likelihood of active response (comment, share, save) vs scroll-past. Consider hook strength, relatability, shareability, conversation triggers for THIS segment on THIS platform.
-2. CULTURAL RESONANCE (0-100): authentic alignment with the target audience's culture. Consider language authenticity, cultural references, values fit, community feel. If below 65, state the specific cultural improvement.
-3. TONE MATCH (0-100): fit between the content's tone and the brand voice profile AND the audience's preference. Name any line that breaks the brand voice.
-4. MESSAGE CLARITY (0-100): will the core message land on first read for this audience? Consider simplicity, jargon, assumed knowledge, language level.
+1. PREDICTED ENGAGEMENT (0-100): likelihood of active response (comment, share, save) vs scroll-past. Consider hook strength, relatability, shareability, conversation triggers for THIS segment on THIS platform.${hasVisual ? ' Factor in whether the visual will stop the scroll.' : ''}
+2. CULTURAL RESONANCE (0-100): authentic alignment with the target audience's culture. Consider language authenticity, cultural references, values fit, community feel.${hasVisual ? ' Include visual cultural signals.' : ''} If below 65, state the specific cultural improvement.
+3. TONE MATCH (0-100): fit between the content's tone and the brand voice profile AND the audience's preference. Name any line — or visual element — that breaks the brand voice.
+4. MESSAGE CLARITY (0-100): will the core message land on first read for this audience? Consider simplicity, jargon, assumed knowledge, language level.${hasVisual ? ' Does the visual support or contradict the text?' : ''}
 5. RISK FLAG (0-100): risk of misunderstanding, offence, or cultural backfire. 0 = none, 100 = high. For every risk above 0, return a flag object.
 
 Also return:
 - verdict: one plain-English sentence on overall prediction.
 - improvements: up to 3 specific, actionable suggestions.
-- suggested_rewrite: an improved version that keeps the same message but executes better for this audience, platform, and cultural moment.`
+- ${rewriteLabel}`
 }

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { Zap, X, ChevronDown, Send, Loader2, AlertTriangle, Copy, Check } from 'lucide-react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Zap, X, ChevronDown, Send, Loader2, AlertTriangle, Copy, Check, ImagePlus, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -12,6 +12,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+
+type SupportedMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
+
+interface ImageAttachment {
+  base64: string
+  mediaType: SupportedMediaType
+  previewUrl: string
+  fileName: string
+  sizeKb: number
+}
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -102,16 +112,52 @@ function ScoreCard({ label, dim, isRisk = false }: {
 
 // ── Widget ────────────────────────────────────────────────────────────────────
 
+const ALLOWED_TYPES: SupportedMediaType[] = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+const MAX_SIZE_BYTES = 4 * 1024 * 1024 // 4 MB
+
 export function PrePostWidget() {
   const [open, setOpen]           = useState(false)
   const [minimised, setMinimised] = useState(false)
   const [content, setContent]     = useState('')
   const [platform, setPlatform]   = useState('')
   const [funnel, setFunnel]       = useState('')
+  const [image, setImage]         = useState<ImageAttachment | null>(null)
+  const [imageError, setImageError] = useState<string | null>(null)
   const [loading, setLoading]     = useState(false)
   const [result, setResult]       = useState<AnalysisResult | null>(null)
   const [error, setError]         = useState<string | null>(null)
   const [copiedRewrite, setCopied] = useState(false)
+  const fileInputRef              = useRef<HTMLInputElement>(null)
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!ALLOWED_TYPES.includes(file.type as SupportedMediaType)) {
+      setImageError('Unsupported file type. Use JPEG, PNG, WEBP, or GIF.')
+      return
+    }
+    if (file.size > MAX_SIZE_BYTES) {
+      setImageError('Image too large. Max size is 4 MB.')
+      return
+    }
+    setImageError(null)
+    const reader = new FileReader()
+    reader.onload = ev => {
+      const dataUrl = ev.target?.result as string
+      // dataUrl = 'data:image/jpeg;base64,<data>'
+      const base64 = dataUrl.split(',')[1]
+      setImage({
+        base64,
+        mediaType: file.type as SupportedMediaType,
+        previewUrl: dataUrl,
+        fileName: file.name,
+        sizeKb: Math.round(file.size / 1024),
+      })
+    }
+    reader.readAsDataURL(file)
+    // Reset input so re-selecting the same file triggers onChange
+    e.target.value = ''
+  }
 
   // Keyboard shortcut: Cmd/Ctrl+Shift+P
   const handleKey = useCallback((e: KeyboardEvent) => {
@@ -128,7 +174,7 @@ export function PrePostWidget() {
   }, [handleKey])
 
   async function analyse() {
-    if (!content.trim() || !platform || !funnel || loading) return
+    if ((!content.trim() && !image) || !platform || !funnel || loading) return
     setLoading(true)
     setError(null)
     setResult(null)
@@ -137,7 +183,12 @@ export function PrePostWidget() {
       const res = await fetch('/api/ai/pre-post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, platform, funnelStage: funnel }),
+        body: JSON.stringify({
+          content,
+          platform,
+          funnelStage: funnel,
+          ...(image ? { imageBase64: image.base64, imageMediaType: image.mediaType } : {}),
+        }),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({})) as { error?: string }
@@ -159,6 +210,8 @@ export function PrePostWidget() {
     setContent('')
     setPlatform('')
     setFunnel('')
+    setImage(null)
+    setImageError(null)
   }
 
   function copyRewrite() {
@@ -221,11 +274,50 @@ export function PrePostWidget() {
             {!result ? (
               /* Input form */
               <div className="p-4 space-y-3">
+                {/* Image attachment */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  className="hidden"
+                  onChange={handleFileSelect}
+                />
+                {image ? (
+                  <div className="relative rounded-xl overflow-hidden border bg-muted group">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={image.previewUrl} alt="Visual to analyse" className="w-full max-h-48 object-cover" />
+                    <div className="absolute top-2 right-2 flex items-center gap-1.5">
+                      <span className="text-[10px] bg-background/80 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-full border font-mono">
+                        {image.mediaType.split('/')[1].toUpperCase()} · {image.sizeKb}KB
+                      </span>
+                      <button
+                        onClick={() => { setImage(null); setImageError(null) }}
+                        className="bg-background/80 backdrop-blur-sm rounded-full p-0.5 hover:bg-red-50 transition-colors"
+                        title="Remove image"
+                      >
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      </button>
+                    </div>
+                    <div className="absolute bottom-2 left-2">
+                      <span className="text-[10px] bg-foreground text-background px-2 py-0.5 rounded-full font-medium">Visual attached</span>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                  >
+                    <ImagePlus className="h-4 w-4" />
+                    Add image for visual analysis (optional)
+                  </button>
+                )}
+                {imageError && <p className="text-xs text-red-500">{imageError}</p>}
+
                 <Textarea
                   value={content}
                   onChange={e => setContent(e.target.value)}
-                  placeholder="Paste your caption, post copy, press release, or any content you're about to publish..."
-                  className="min-h-[120px] text-sm resize-none"
+                  placeholder={image ? 'Caption or copy to go with this visual (optional)...' : 'Paste your caption, post copy, press release, or any content you\'re about to publish...'}
+                  className="min-h-[100px] text-sm resize-none"
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <Select value={platform} onValueChange={v => setPlatform(v ?? '')}>
@@ -252,16 +344,16 @@ export function PrePostWidget() {
                   className="w-full"
                   size="sm"
                   onClick={analyse}
-                  disabled={!content.trim() || !platform || !funnel || loading}
+                  disabled={(!content.trim() && !image) || !platform || !funnel || loading}
                 >
                   {loading
                     ? <><Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> Analysing...</>
-                    : <><Send className="h-3.5 w-3.5 mr-2" /> Analyse content</>
+                    : <><Send className="h-3.5 w-3.5 mr-2" /> {image ? 'Analyse visual + copy' : 'Analyse content'}</>
                   }
                 </Button>
                 {loading && (
                   <p className="text-center text-[11px] text-muted-foreground animate-pulse">
-                    Reading cultural context and scoring your content...
+                    {image ? 'Reading image and cultural context, scoring your content...' : 'Reading cultural context and scoring your content...'}
                   </p>
                 )}
               </div>
