@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import Anthropic from '@anthropic-ai/sdk'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
 import { buildPrePostSystemPrompt, buildPrePostUserMessage } from '@/lib/ai/pre-post-context'
@@ -6,11 +7,15 @@ import { buildPrePostSystemPrompt, buildPrePostUserMessage } from '@/lib/ai/pre-
 export const runtime    = 'nodejs'
 export const maxDuration = 60
 
+type SupportedMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
+
 interface PrePostRequestBody {
   content: string
   platform: string
   funnelStage: string
   targetSegment?: string
+  imageBase64?: string
+  imageMediaType?: SupportedMediaType
 }
 
 interface RiskFlag {
@@ -31,6 +36,8 @@ interface PrePostAiResponse {
   suggested_rewrite: string
 }
 
+const ALLOWED_MEDIA_TYPES: SupportedMediaType[] = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -40,33 +47,67 @@ export async function POST(req: NextRequest) {
   if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
 
   const body = await req.json() as PrePostRequestBody
-  if (!body.content?.trim()) return NextResponse.json({ error: 'Content is required' }, { status: 400 })
+  if (!body.content?.trim() && !body.imageBase64) {
+    return NextResponse.json({ error: 'Content or image is required' }, { status: 400 })
+  }
+  if (body.imageMediaType && !ALLOWED_MEDIA_TYPES.includes(body.imageMediaType)) {
+    return NextResponse.json({ error: 'Unsupported image type' }, { status: 400 })
+  }
 
-  const [systemPrompt] = await Promise.all([buildPrePostSystemPrompt(brand.id)])
+  const systemPrompt = await buildPrePostSystemPrompt(brand.id)
+  const hasVisual = Boolean(body.imageBase64 && body.imageMediaType)
 
   const userMessage = buildPrePostUserMessage(
     { content: body.content, platform: body.platform, funnelStage: body.funnelStage, targetSegment: body.targetSegment },
-    brand.target_segments ?? []
+    brand.target_segments ?? [],
+    hasVisual
   )
 
-  const raw = await callAi({
-    tier: 'chat',
-    system: systemPrompt,
-    messages: [{ role: 'user', content: userMessage }],
-    maxTokens: 2000,
-    temperature: 0.1,
-  })
+  let raw: string
+  if (hasVisual) {
+    // Vision call — Anthropic SDK directly (callAi wrapper is text-only)
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    const resp = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 2000,
+      temperature: 0.1,
+      system: systemPrompt,
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: body.imageMediaType!,
+              data: body.imageBase64!,
+            },
+          },
+          { type: 'text', text: userMessage },
+        ],
+      }],
+    })
+    const block = resp.content[0]
+    if (block.type !== 'text') throw new Error('Unexpected response type from Claude Vision')
+    raw = block.text
+  } else {
+    raw = await callAi({
+      tier: 'chat',
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
+      maxTokens: 2000,
+      temperature: 0.1,
+    })
+  }
 
-  // Strip possible markdown fences
   const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
   const parsed = JSON.parse(cleaned) as PrePostAiResponse
 
-  // Persist
   const service = await createServiceClient()
   const { data: saved } = await service.from('pre_post_analyses').insert({
     brand_id:         brand.id,
     created_by:       user.id,
-    content_text:     body.content,
+    content_text:     body.content ?? '',
     platform:         body.platform,
     target_segment:   body.targetSegment ?? null,
     funnel_goal:      body.funnelStage,
@@ -79,7 +120,7 @@ export async function POST(req: NextRequest) {
     verdict:          parsed.verdict,
     improvements:     parsed.improvements ?? [],
     suggested_rewrite: parsed.suggested_rewrite,
-    raw_response:     parsed,
+    raw_response:     { ...parsed, has_visual: hasVisual },
   }).select('id').single()
 
   return NextResponse.json({
@@ -92,5 +133,6 @@ export async function POST(req: NextRequest) {
     verdict:    parsed.verdict,
     improvements: parsed.improvements,
     suggested_rewrite: parsed.suggested_rewrite,
+    hasVisual,
   })
 }
