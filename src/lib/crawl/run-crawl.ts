@@ -1,5 +1,5 @@
 import { createServiceClient } from '@/lib/supabase/server'
-import { fetchTwitterUserMentions, refreshTwitterToken } from '@/lib/social/twitter'
+import { fetchTwitterUserMentions, fetchTwitterKeywordMentions, refreshTwitterToken } from '@/lib/social/twitter'
 import { fetchInstagramHashtagMentions, fetchInstagramTaggedMedia } from '@/lib/social/instagram'
 import { classifySentiment } from '@/lib/ai/classify-sentiment'
 import { decrypt, encrypt } from '@/lib/crypto'
@@ -90,29 +90,48 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     try {
       let accessToken = decrypt(twitterConn.access_token)
 
-      // Inner fetch — on 401 attempt one token refresh before giving up
-      const fetchMentions = async () =>
-        fetchTwitterUserMentions(twitterConn.account_id!, accessToken, since)
+      // Attempt fetch; on 401 try one token refresh then retry
+      const withRefresh = async <T>(fn: () => Promise<T>): Promise<T> => {
+        return fn().catch(async (err: unknown) => {
+          const msg = err instanceof Error ? err.message : ''
+          const isExpired = (msg.includes('401') || msg.includes('auth error')) && !msg.includes('X_CREDITS_DEPLETED')
+          if (!isExpired || !twitterConn.refresh_token) throw err
 
-      let tweets = await fetchMentions().catch(async (err: unknown) => {
-        const msg = err instanceof Error ? err.message : ''
-        const isExpired = (msg.includes('401') || msg.includes('auth error')) && !msg.includes('X_CREDITS_DEPLETED')
-        if (!isExpired || !twitterConn.refresh_token) throw err
+          const refreshed = await refreshTwitterToken(decrypt(twitterConn.refresh_token))
+          accessToken = refreshed.access_token
+          await supabase.from('social_connections').update({
+            access_token: encrypt(refreshed.access_token),
+            ...(refreshed.refresh_token ? { refresh_token: encrypt(refreshed.refresh_token) } : {}),
+          }).eq('brand_id', brandId).eq('platform', 'twitter')
 
-        // Refresh the token
-        const refreshed = await refreshTwitterToken(decrypt(twitterConn.refresh_token))
-        accessToken = refreshed.access_token
+          return fn()
+        })
+      }
 
-        // Persist refreshed tokens so the next crawl works without re-auth
-        await supabase.from('social_connections').update({
-          access_token: encrypt(refreshed.access_token),
-          ...(refreshed.refresh_token ? { refresh_token: encrypt(refreshed.refresh_token) } : {}),
-        }).eq('brand_id', brandId).eq('platform', 'twitter')
+      // username stored as "@handle" — strip the @ for the search -(from:) operator
+      const handle = (twitterConn.account_name ?? '').replace(/^@/, '')
 
-        return fetchMentions()
+      // Run @mention timeline and keyword/text search in parallel
+      const [mentionTweets, keywordTweets] = await Promise.all([
+        withRefresh(() => fetchTwitterUserMentions(twitterConn.account_id!, accessToken, since)),
+        withRefresh(() => fetchTwitterKeywordMentions(brand.name, handle, accessToken, since))
+          .catch((err: unknown): import('@/lib/social/twitter').TwitterMention[] => {
+            // Keyword search failing (e.g. credits) should not block @mentions
+            const msg = err instanceof Error ? err.message : String(err)
+            console.warn('[runCrawl] Twitter keyword search failed (non-fatal):', msg)
+            return []
+          }),
+      ])
+
+      // Deduplicate by tweet ID — a tweet could appear in both result sets
+      const seen = new Set<string>()
+      const allTweets = [...mentionTweets, ...keywordTweets].filter(t => {
+        if (seen.has(t.id)) return false
+        seen.add(t.id)
+        return true
       })
 
-      allMentions.push(...tweets.map(t => ({
+      allMentions.push(...allTweets.map(t => ({
         platform: 'twitter',
         external_id: t.id,
         content: t.content,
