@@ -1,8 +1,13 @@
 'use client'
 
 import { useRef } from 'react'
-import { OohMapClient } from '@/components/ooh/ooh-map-client'
+import dynamic from 'next/dynamic'
 import { OohSitesList } from '@/components/ooh/ooh-sites-list'
+
+const OohMapClient = dynamic(
+  () => import('@/components/ooh/ooh-map-client').then(m => m.OohMapClient),
+  { ssr: false, loading: () => <div className="h-72 rounded-xl bg-muted animate-pulse" /> },
+)
 
 interface Site {
   id: string

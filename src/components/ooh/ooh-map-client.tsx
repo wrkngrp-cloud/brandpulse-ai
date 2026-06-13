@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { MapPin } from 'lucide-react'
-import 'mapbox-gl/dist/mapbox-gl.css'
 
 interface Site {
   id: string
