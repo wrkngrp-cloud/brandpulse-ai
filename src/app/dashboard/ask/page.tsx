@@ -91,28 +91,26 @@ export default function AskPage() {
 
   useEffect(() => { loadList() }, [loadList])
 
-  // Load messages when cid changes (from URL)
+  // Load full messages when a conversation is selected
   useEffect(() => {
     if (!cid) { setMessages([]); setConvId(null); return }
     if (cid === conversationId && messages.length > 0) return
 
     setHistLoading(true)
     setConvId(cid)
+    setMessages([])
 
-    // Pull full message history from the conversation list we already fetched
-    // (messages aren't in the list; we need to re-call ask with empty question just to load —
-    //  instead, we store messages locally and reload from list on navigation)
-    // Since the list endpoint doesn't return full messages, fetch them directly
-    fetch('/api/ai/conversations')
-      .then(r => r.json() as Promise<{ conversations: ConversationSummary[] }>)
+    fetch(`/api/ai/conversations/${cid}`)
+      .then(r => r.json() as Promise<{ messages: Array<{ role: string; content: string }> }>)
       .then(data => {
-        setConversations(data.conversations)
-        // The full messages are not in the list endpoint — we'll reconstruct them
-        // from a separate fetch, but for now show a "continue this conversation" state
-        setMessages([])
-        setHistLoading(false)
+        const msgs: Message[] = (data.messages ?? []).map(m => ({
+          role:    m.role as 'user' | 'assistant',
+          content: m.content,
+        }))
+        setMessages(msgs)
       })
-      .catch(() => setHistLoading(false))
+      .catch(() => setMessages([]))
+      .finally(() => setHistLoading(false))
   }, [cid]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
