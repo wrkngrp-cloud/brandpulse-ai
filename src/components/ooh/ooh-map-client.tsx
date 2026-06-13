@@ -1,6 +1,5 @@
 'use client'
 
-import 'mapbox-gl/dist/mapbox-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import { MapPin } from 'lucide-react'
 
