@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { MapPin } from 'lucide-react'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 interface Site {
   id: string
@@ -20,6 +21,7 @@ interface Site {
 
 interface OohMapClientProps {
   sites: Site[]
+  onMapReady?: (flyTo: (lat: number, lng: number, siteId: string) => void) => void
 }
 
 function getRoiTier(visits: number): string {
@@ -33,9 +35,10 @@ function fmtDate(iso: string | null) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
 }
 
-export function OohMapClient({ sites }: OohMapClientProps) {
+export function OohMapClient({ sites, onMapReady }: OohMapClientProps) {
   const mapRef      = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<unknown>(null)
+  const markersRef  = useRef<Record<string, unknown>>({})
   const [mapError, setMapError] = useState(false)
   const [loaded, setLoaded]     = useState(false)
 
@@ -80,10 +83,12 @@ export function OohMapClient({ sites }: OohMapClientProps) {
               </div>
             `)
 
-          new mapboxgl.Marker({ color: getRoiTier(site.visits) })
+          const marker = new mapboxgl.Marker({ color: getRoiTier(site.visits) })
             .setLngLat([site.lng, site.lat])
             .setPopup(popup)
             .addTo(map)
+
+          markersRef.current[site.id] = marker
         })
 
         if (mappable.length === 1 && mappable[0].lng != null && mappable[0].lat != null) {
@@ -101,6 +106,17 @@ export function OohMapClient({ sites }: OohMapClientProps) {
           map.fitBounds(bounds, { padding: 60 })
         }
 
+        // Expose flyTo to parent dashboard wrapper
+        if (onMapReady) {
+          onMapReady((lat, lng, siteId) => {
+            map.flyTo({ center: [lng, lat], zoom: 15 })
+            map.once('moveend', () => {
+              const marker = markersRef.current[siteId] as { togglePopup(): void } | undefined
+              marker?.togglePopup()
+            })
+          })
+        }
+
         setLoaded(true)
       })
 
@@ -112,6 +128,7 @@ export function OohMapClient({ sites }: OohMapClientProps) {
       if (mapInstance.current) {
         ;(mapInstance.current as { remove(): void }).remove()
         mapInstance.current = null
+        markersRef.current  = {}
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,7 +137,7 @@ export function OohMapClient({ sites }: OohMapClientProps) {
   if (mapError) {
     if (mappable.length === 0) return null
     return (
-      <div className="border rounded-xl p-4 space-y-2">
+      <div className="border rounded-xl p-4">
         <p className="text-xs text-muted-foreground flex items-center gap-1">
           <MapPin className="h-3.5 w-3.5" />
           {mappable.length} site{mappable.length > 1 ? 's' : ''} with GPS coordinates — add NEXT_PUBLIC_MAPBOX_TOKEN to enable map view.

@@ -4,8 +4,7 @@ import Link                 from 'next/link'
 import { buttonVariants }   from '@/components/ui/button'
 import { cn }               from '@/lib/utils'
 import { MapPin, Plus }     from 'lucide-react'
-import { OohSitesList }     from '@/components/ooh/ooh-sites-list'
-import { OohMapClient }     from '@/components/ooh/ooh-map-client'
+import { OohDashboardClient } from '@/components/ooh/ooh-dashboard-client'
 
 export default async function OohPage() {
   const supabase = await createClient()
@@ -67,10 +66,7 @@ export default async function OohPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-6">
-          <OohMapClient sites={sites ?? []} />
-          <OohSitesList sites={sites ?? []} appUrl={appUrl} />
-        </div>
+        <OohDashboardClient sites={sites ?? []} appUrl={appUrl} />
       )}
     </div>
   )
