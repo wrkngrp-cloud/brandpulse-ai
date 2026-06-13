@@ -99,36 +99,63 @@ interface MapboxFeature {
 
 type FormState = { error?: string; success?: boolean; siteId?: string; siteName?: string } | null
 
-interface OohSiteFormProps {
-  action: (prev: FormState, formData: FormData) => Promise<FormState>
-  brandName:     string
-  appUrl:        string
-  customDomain:  string | null
-  defaultValues?: Record<string, string | number | boolean | null>
+interface DraftValues {
+  id: string
+  site_name?: string | null
+  city?: string | null
+  address?: string | null
+  vanity_slug?: string | null
+  lat?: number | null
+  lng?: number | null
+  landing_url?: string | null
+  format_type?: string | null
+  lga?: string | null
+  state?: string | null
+  daily_traffic?: number | null
+  monthly_cost?: number | null
+  currency?: string | null
+  campaign_start?: string | null
+  campaign_end?: string | null
+  illuminated?: boolean | null
+  pole_count?: number | null
+  short_code?: string | null
+  notes?: string | null
+  operator?: string | null
+  traffic_ai_estimated?: boolean | null
 }
 
-export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultValues }: OohSiteFormProps) {
+interface OohSiteFormProps {
+  action: (prev: FormState, formData: FormData) => Promise<FormState>
+  brandName:    string
+  appUrl:       string
+  customDomain: string | null
+  defaultValues?: Record<string, string | number | boolean | null>
+  draft?: DraftValues | null
+}
+
+export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultValues, draft }: OohSiteFormProps) {
   const [state, formAction, pending] = useActionState(action, null)
 
-  const [siteName,     setSiteName]     = useState(String(defaultValues?.site_name    ?? ''))
-  const [address,      setAddress]      = useState(String(defaultValues?.address      ?? ''))
-  const [city,         setCity]         = useState(String(defaultValues?.city         ?? ''))
-  const [stateNg,      setStateNg]      = useState(String(defaultValues?.state        ?? ''))
-  const [lga,          setLga]          = useState(String(defaultValues?.lga          ?? ''))
-  const [formatType,   setFormatType]   = useState(String(defaultValues?.format_type  ?? ''))
-  const [landingUrl,   setLandingUrl]   = useState(String(defaultValues?.landing_url  ?? ''))
-  const [slug,         setSlug]         = useState(String(defaultValues?.vanity_slug  ?? ''))
+  const dv = defaultValues ?? {}
+  const [siteName,     setSiteName]     = useState(String(dv.site_name    ?? draft?.site_name    ?? ''))
+  const [address,      setAddress]      = useState(String(dv.address      ?? draft?.address      ?? ''))
+  const [city,         setCity]         = useState(String(dv.city         ?? draft?.city         ?? ''))
+  const [stateNg,      setStateNg]      = useState(String(dv.state        ?? draft?.state        ?? ''))
+  const [lga,          setLga]          = useState(String(dv.lga          ?? draft?.lga          ?? ''))
+  const [formatType,   setFormatType]   = useState(String(dv.format_type  ?? draft?.format_type  ?? ''))
+  const [landingUrl,   setLandingUrl]   = useState(String(dv.landing_url  ?? draft?.landing_url  ?? ''))
+  const [slug,         setSlug]         = useState(String(dv.vanity_slug  ?? draft?.vanity_slug  ?? ''))
   const [shortCode,    setShortCode]    = useState(
-    String(defaultValues?.short_code ?? randomShortCode())
+    String(dv.short_code ?? draft?.short_code ?? randomShortCode())
   )
   const [poleCount,    setPoleCount]    = useState<number>(
-    defaultValues?.pole_count != null ? Number(defaultValues.pole_count) : 1
+    dv.pole_count != null ? Number(dv.pole_count) : (draft?.pole_count ?? 1)
   )
-  const [qrEnabled,    setQrEnabled]    = useState(Boolean(defaultValues?.qr_token))
-  const [lat,          setLat]          = useState<number | ''>(defaultValues?.lat != null ? Number(defaultValues.lat) : '')
-  const [lng,          setLng]          = useState<number | ''>(defaultValues?.lng != null ? Number(defaultValues.lng) : '')
-  const [dailyTraffic, setDailyTraffic] = useState<number | ''>(defaultValues?.daily_traffic != null ? Number(defaultValues.daily_traffic) : '')
-  const [trafficAiEst, setTrafficAiEst] = useState(Boolean(defaultValues?.traffic_ai_estimated))
+  const [qrEnabled,    setQrEnabled]    = useState(Boolean(dv.qr_token))
+  const [lat,          setLat]          = useState<number | ''>(dv.lat != null ? Number(dv.lat) : (draft?.lat != null ? Number(draft.lat) : ''))
+  const [lng,          setLng]          = useState<number | ''>(dv.lng != null ? Number(dv.lng) : (draft?.lng != null ? Number(draft.lng) : ''))
+  const [dailyTraffic, setDailyTraffic] = useState<number | ''>(dv.daily_traffic != null ? Number(dv.daily_traffic) : (draft?.daily_traffic != null ? Number(draft.daily_traffic) : ''))
+  const [trafficAiEst, setTrafficAiEst] = useState(Boolean(dv.traffic_ai_estimated ?? draft?.traffic_ai_estimated))
   const [estimating,   setEstimating]   = useState(false)
 
   // Autocomplete state
@@ -144,9 +171,16 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
   const pinMapInstance = useRef<unknown>(null)
   const pinMarkerRef   = useRef<unknown>(null)
 
+  // Draft auto-save state
+  const [draftId,        setDraftId]        = useState<string | null>(draft?.id ?? null)
+  const [showDraftBanner, setShowDraftBanner] = useState(Boolean(draft))
+  const [draftSaving,    setDraftSaving]    = useState(false)
+  const [draftSavedAt,   setDraftSavedAt]   = useState<Date | null>(null)
+  const draftTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   // Auto-derive slug from site name + city (only for new sites)
   useEffect(() => {
-    if (!defaultValues?.vanity_slug && (siteName || city)) {
+    if (!dv.vanity_slug && !draft?.vanity_slug && (siteName || city)) {
       setSlug(slugify(`${siteName}-${city}`))
     }
   }, [siteName, city, defaultValues?.vanity_slug])
@@ -255,6 +289,23 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
   useEffect(() => {
     if (state?.error) toast.error(state.error)
   }, [state])
+
+  // Auto-save draft 3s after the user stops typing (only for new sites, not edits)
+  function scheduleDraftSave(formEl: HTMLFormElement | null) {
+    if (defaultValues || !formEl) return // don't auto-save on edit pages
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current)
+    draftTimerRef.current = setTimeout(async () => {
+      setDraftSaving(true)
+      try {
+        const { saveDraft } = await import('@/app/dashboard/ooh/actions')
+        const result = await saveDraft(draftId, new FormData(formEl))
+        if (result?.draftId && !draftId) setDraftId(result.draftId)
+        if (!result?.error) setDraftSavedAt(new Date())
+      } finally {
+        setDraftSaving(false)
+      }
+    }, 3000)
+  }
 
   // Close suggestions on outside click
   useEffect(() => {
@@ -379,7 +430,39 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
     : []
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form
+      action={formAction}
+      className="space-y-6"
+      onChange={e => scheduleDraftSave(e.currentTarget)}
+    >
+
+      {/* Draft resume banner */}
+      {showDraftBanner && draft && !defaultValues && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20 px-4 py-3 flex items-center justify-between gap-3 text-xs">
+          <p className="text-amber-800 dark:text-amber-300">
+            You have an unsaved draft: <strong>{draft.site_name || 'Untitled'}</strong>. We&apos;ve pre-filled the form for you.
+          </p>
+          <button
+            type="button"
+            className="shrink-0 text-amber-700 dark:text-amber-400 underline"
+            onClick={async () => {
+              const { discardDraft } = await import('@/app/dashboard/ooh/actions')
+              if (draft.id) await discardDraft(draft.id)
+              setShowDraftBanner(false)
+              setDraftId(null)
+            }}
+          >
+            Discard draft
+          </button>
+        </div>
+      )}
+
+      {/* Auto-save indicator */}
+      {!defaultValues && (draftSaving || draftSavedAt) && (
+        <p className="text-xs text-muted-foreground text-right">
+          {draftSaving ? 'Saving draft…' : `Draft saved ${draftSavedAt?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+        </p>
+      )}
 
       {/* Domain banner */}
       <div className="rounded-lg border bg-muted/40 px-4 py-3 flex items-center justify-between gap-3 text-xs">
