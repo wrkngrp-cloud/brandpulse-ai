@@ -4,7 +4,6 @@ import { DashboardNav } from '@/components/dashboard/dashboard-nav'
 import { UserDropdown } from '@/components/dashboard/user-dropdown'
 import { AiCommand } from './ai-command'
 import { PrePostWidget } from './pre-post-widget'
-import 'mapbox-gl/dist/mapbox-gl.css'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()

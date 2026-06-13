@@ -14,6 +14,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${manrope.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        {/* Served as a static file so Turbopack/Tailwind v4 never touches it */}
+        <link rel="stylesheet" href="/mapbox-gl.css" />
+      </head>
       <body className="min-h-full flex flex-col">
         {children}
         <Toaster richColors position="top-right" />
