@@ -33,6 +33,9 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
     { data: sovRow },
     { data: surveyNPS },
     { data: connections },
+    { data: oohSites },
+    { data: recentEvents },
+    { data: activeCampaigns },
   ] = await Promise.all([
     supabase
       .from('sentiment_daily')
@@ -64,6 +67,26 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
       .from('social_connections')
       .select('platform, account_name, sync_status, last_synced_at')
       .eq('brand_id', brandId),
+    supabase
+      .from('ooh_sites')
+      .select('site_name, city, state, format_type, visits, monthly_cost, currency, campaign_start, campaign_end, vanity_slug, status')
+      .eq('brand_id', brandId)
+      .eq('status', 'active')
+      .order('visits', { ascending: false })
+      .limit(10),
+    supabase
+      .from('events')
+      .select('name, event_type, city, date_start, date_end, status, budget, currency')
+      .eq('brand_id', brandId)
+      .order('date_start', { ascending: false })
+      .limit(5),
+    supabase
+      .from('campaigns')
+      .select('name, objective, start_date, end_date, total_budget, currency, status, campaign_channels(channel, budget_allocation)')
+      .eq('brand_id', brandId)
+      .in('status', ['active', 'paused'])
+      .order('created_at', { ascending: false })
+      .limit(5),
   ])
 
   const latestSentiment = sentimentRows?.[0]
@@ -161,12 +184,69 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
     parts.push('Survey NPS: no survey responses yet')
   }
 
-  // Connected platforms
+  // Survey NPS already done above — Connected platforms
   const connectedPlatforms = (connections ?? [])
     .map(c => `${c.platform} (${c.sync_status}${c.last_synced_at ? ', last synced ' + ago(c.last_synced_at) : ''})`)
     .join(', ')
   if (connectedPlatforms) {
     parts.push(`Connected social accounts: ${connectedPlatforms}`)
+  }
+
+  // ── Active Campaigns ─────────────────────────────────────────────────────
+  if (activeCampaigns && activeCampaigns.length > 0) {
+    const campaignLines = activeCampaigns.map(c => {
+      const channels = (c.campaign_channels as { channel: string; budget_allocation: number | null }[] ?? [])
+        .map(ch => ch.channel + (ch.budget_allocation ? ` (${c.currency} ${Number(ch.budget_allocation).toLocaleString()})` : ''))
+        .join(', ')
+      const dates = c.start_date
+        ? `${c.start_date}${c.end_date ? ` → ${c.end_date}` : ' (Always On)'}`
+        : 'no dates'
+      return `  • "${c.name}" [${c.status}] — objective: ${c.objective ?? 'not set'}, channels: ${channels || 'none'}, dates: ${dates}, budget: ${c.total_budget ? `${c.currency} ${Number(c.total_budget).toLocaleString()}` : 'not set'}`
+    }).join('\n')
+    parts.push(`Active/Paused Campaigns (${activeCampaigns.length}):\n${campaignLines}`)
+    availableSources.push({
+      label: 'Campaigns',
+      detail: `${activeCampaigns.length} active/paused campaign${activeCampaigns.length > 1 ? 's' : ''}`,
+    })
+  } else {
+    parts.push('Campaigns: no active campaigns yet')
+  }
+
+  // ── OOH Sites ────────────────────────────────────────────────────────────
+  if (oohSites && oohSites.length > 0) {
+    const totalVisits = oohSites.reduce((s, site) => s + (site.visits ?? 0), 0)
+    const totalSpend  = oohSites.reduce((s, site) => s + (Number(site.monthly_cost) || 0), 0)
+    const topSites    = oohSites.slice(0, 5).map(site => {
+      const loc = [site.city, site.state].filter(Boolean).join(', ')
+      return `  • ${site.site_name} (${loc}${site.format_type ? ', ' + site.format_type : ''}) — ${site.visits ?? 0} visits`
+    }).join('\n')
+    parts.push(
+      `OOH Sites (${oohSites.length} active sites):\n` +
+      `  Total attributed visits: ${totalVisits.toLocaleString()}\n` +
+      `  Total monthly spend: ${totalSpend > 0 ? 'NGN ' + totalSpend.toLocaleString() : 'not entered'}\n` +
+      `  Top sites by visits:\n${topSites}`
+    )
+    availableSources.push({
+      label: 'OOH attribution',
+      detail: `${oohSites.length} sites, ${totalVisits.toLocaleString()} total vanity-link visits`,
+    })
+  } else {
+    parts.push('OOH Sites: no active OOH sites yet')
+  }
+
+  // ── Events ───────────────────────────────────────────────────────────────
+  if (recentEvents && recentEvents.length > 0) {
+    const eventLines = recentEvents.map(ev => {
+      const loc = [ev.city].filter(Boolean).join(', ')
+      return `  • "${ev.name}" [${ev.status}]${ev.event_type ? ' — ' + ev.event_type : ''}, ${loc}, ${ev.date_start}${ev.date_end && ev.date_end !== ev.date_start ? ' → ' + ev.date_end : ''}${ev.budget ? `, budget ${ev.currency} ${Number(ev.budget).toLocaleString()}` : ''}`
+    }).join('\n')
+    parts.push(`Events & Activations (recent ${recentEvents.length}):\n${eventLines}`)
+    availableSources.push({
+      label: 'Events & Activations',
+      detail: `${recentEvents.length} recent events`,
+    })
+  } else {
+    parts.push('Events: no events recorded yet')
   }
 
   const dataSnapshot = parts.join('\n\n')
@@ -175,6 +255,8 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
   const segments = (brandCtx.targetSegments as Array<{ name?: string }> | null)?.map(s => s?.name ?? '').filter(Boolean).join(', ')
 
   const systemPrompt = `You are BrandPulse, the brand intelligence assistant for ${brandCtx.brandName}. You answer any brand question by reasoning over the connected data provided to you, and you always cite which data you used. You serve marketers, not analysts, so you explain plainly and lead with the answer.
+
+Connected data sources: Brand Health Index (BHI), Social Sentiment (X + Instagram), Share of Voice, Survey NPS, OOH attribution (vanity-link visits per site), Campaign Intelligence (active campaigns, channels, budgets), Events & Activations, Social connections.
 
 Context for this brand:
 - Identity & values: ${formatBrandContextBlock(brandCtx)}

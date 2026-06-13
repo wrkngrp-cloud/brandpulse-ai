@@ -9,7 +9,11 @@ import { ImpressionCalculator } from '@/components/ooh/impression-calculator'
 import { SpendJustification }  from '@/components/ooh/spend-justification'
 import { SearchUpliftWidget }  from '@/components/ooh/search-uplift-widget'
 import { OohVanityCard }       from '@/components/ooh/ooh-vanity-card'
-import { OohSiteMapClient }    from '@/components/ooh/ooh-site-map-client'
+import dynamic from 'next/dynamic'
+const OohSiteMapClient = dynamic(
+  () => import('@/components/ooh/ooh-site-map-client').then(m => m.OohSiteMapClient),
+  { ssr: false, loading: () => <div className="h-72 rounded-xl bg-muted animate-pulse" /> },
+)
 
 export default async function OohSitePage({
   params,

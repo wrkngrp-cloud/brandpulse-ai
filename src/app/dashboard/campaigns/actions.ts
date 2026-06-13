@@ -5,16 +5,16 @@ import { revalidatePath } from 'next/cache'
 import { z }             from 'zod'
 
 const CampaignSchema = z.object({
-  name:         z.string().min(2, 'Campaign name required'),
-  description:  z.string().optional(),
-  objective:    z.enum(['awareness', 'consideration', 'conversion', 'retention']).optional(),
-  start_date:   z.string().optional(),
-  end_date:     z.string().optional(),
-  total_budget: z.coerce.number().positive().optional(),
-  currency:     z.string().length(3).default('NGN'),
-  channels:     z.array(z.enum(['ooh', 'events', 'digital', 'radio', 'tv', 'print'])).optional(),
-  // per-channel budget allocations as JSON string
-  channel_budgets: z.string().optional(),
+  name:           z.string().min(2, 'Campaign name required'),
+  description:    z.string().optional(),
+  start_date:     z.string().optional(),
+  end_date:       z.string().optional(),
+  total_budget:   z.coerce.number().positive().optional(),
+  currency:       z.string().length(3).default('NGN'),
+  objectives:     z.array(z.enum(['awareness', 'consideration', 'conversion', 'retention'])).optional(),
+  channels:       z.array(z.enum(['ooh', 'events', 'digital', 'radio', 'tv', 'print'])).optional(),
+  // JSON: { [channel]: { budget: number|null, objectives: string[] } }
+  channel_config: z.string().optional(),
 })
 
 export type CampaignFormState = {
@@ -37,12 +37,13 @@ export async function createCampaign(
 
   const raw = Object.fromEntries(formData.entries())
 
-  const channels = formData.getAll('channels') as string[]
-  const parsed = CampaignSchema.safeParse({ ...raw, channels })
+  const channels   = formData.getAll('channels') as string[]
+  const objectives = formData.getAll('objectives') as string[]
+  const parsed = CampaignSchema.safeParse({ ...raw, channels, objectives })
 
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
-  const { channels: selectedChannels, channel_budgets: channelBudgetsJson, ...campaignData } = parsed.data
+  const { channels: selectedChannels, objectives: campaignObjectives, channel_config: channelConfigJson, ...campaignData } = parsed.data
 
   const { data: campaign, error } = await supabase
     .from('campaigns')
@@ -50,6 +51,7 @@ export async function createCampaign(
       ...campaignData,
       brand_id:     brand.id,
       status:       'active',
+      objectives:   campaignObjectives ?? [],
       start_date:   campaignData.start_date   || null,
       end_date:     campaignData.end_date     || null,
       total_budget: campaignData.total_budget ?? null,
@@ -59,18 +61,20 @@ export async function createCampaign(
 
   if (error) return { error: error.message }
 
-  // Insert channel rows
+  // Insert channel rows with per-channel budget and objective links
   if (selectedChannels?.length) {
-    let channelBudgets: Record<string, number> = {}
+    type ChannelCfg = { budget: number | null; objectives: string[] }
+    let channelConfig: Record<string, ChannelCfg> = {}
     try {
-      if (channelBudgetsJson) channelBudgets = JSON.parse(channelBudgetsJson)
+      if (channelConfigJson) channelConfig = JSON.parse(channelConfigJson)
     } catch { /* ignore */ }
 
     await supabase.from('campaign_channels').insert(
       selectedChannels.map(ch => ({
         campaign_id:       campaign.id,
         channel:           ch,
-        budget_allocation: channelBudgets[ch] ?? null,
+        budget_allocation: channelConfig[ch]?.budget ?? null,
+        objectives:        channelConfig[ch]?.objectives ?? [],
       }))
     )
   }
