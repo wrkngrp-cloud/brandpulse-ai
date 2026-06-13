@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FileText, BarChart2, ClipboardList, Sparkles } from 'lucide-react'
+import { LayoutDashboard, FileText, BarChart2, ClipboardList, Sparkles, CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
@@ -10,6 +10,7 @@ const links = [
   { label: 'Content',   href: '/dashboard/content',   icon: FileText },
   { label: 'Sentiment', href: '/dashboard/sentiment', icon: BarChart2 },
   { label: 'Surveys',   href: '/dashboard/surveys',   icon: ClipboardList },
+  { label: 'Events',    href: '/dashboard/events',    icon: CalendarDays },
   { label: 'Ask AI',    href: '/dashboard/ask',        icon: Sparkles, highlight: true },
 ]
 
