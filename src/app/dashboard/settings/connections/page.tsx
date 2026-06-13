@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { SocialConnectCard } from '@/components/dashboard/social-connect-card'
-import { InstagramPageIdForm } from '@/components/dashboard/instagram-page-id-form'
 
 export default async function ConnectionsSettingsPage() {
   const supabase = await createClient()
@@ -9,23 +8,9 @@ export default async function ConnectionsSettingsPage() {
     .from('social_connections')
     .select('platform, account_name, sync_status, last_synced_at')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .single()
-
-  const igConnection = connections?.find(
-    c => c.platform === 'instagram' && c.sync_status === 'active'
-  )
-
   return (
     <div className="space-y-6">
       <SocialConnectCard connections={connections ?? []} />
-
-      {igConnection && (
-        <InstagramPageIdForm pendingKey={igConnection.account_name ?? 'instagram'} />
-      )}
 
       <div className="border rounded-xl p-5 bg-card space-y-2">
         <p className="text-sm font-semibold">About connections</p>

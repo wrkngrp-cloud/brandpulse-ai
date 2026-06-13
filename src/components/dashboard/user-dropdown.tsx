@@ -45,7 +45,7 @@ export function UserDropdown({ name, email, brandName }: Props) {
 
         <DropdownMenuItem
           className="cursor-pointer"
-          onSelect={() => router.push('/dashboard/settings')}
+          onClick={() => router.push('/dashboard/settings')}
         >
           <Settings className="mr-2 h-4 w-4" />
           Settings
@@ -57,7 +57,7 @@ export function UserDropdown({ name, email, brandName }: Props) {
           variant="destructive"
           disabled={pending}
           className="cursor-pointer"
-          onSelect={() => startTransition(() => logout())}
+          onClick={() => !pending && startTransition(() => logout())}
         >
           <LogOut className="mr-2 h-4 w-4" />
           {pending ? 'Signing out…' : 'Sign out'}
