@@ -1,7 +1,6 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect }       from 'next/navigation'
 import { randomBytes }    from 'crypto'
 import { z }              from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
@@ -182,7 +181,7 @@ export async function submitDebrief(
   // Debrief saved — NOW trigger ROI report generation
   await inngest.send({ name: 'brandpulse/event.closed', data: { eventId } })
 
-  redirect(`/dashboard/events/${eventId}`)
+  return { success: true }
 }
 
 // ── Skip debrief — triggers ROI report directly ───────────────────────────────
