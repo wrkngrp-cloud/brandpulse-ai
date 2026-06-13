@@ -1,14 +1,15 @@
 'use client'
 
 import { useActionState, useState, useEffect, useRef, useCallback } from 'react'
-import { toast }             from 'sonner'
-import { Button }            from '@/components/ui/button'
-import { Input }             from '@/components/ui/input'
-import { Label }             from '@/components/ui/label'
-import { Textarea }          from '@/components/ui/textarea'
-import { Copy, RefreshCw, Link2, QrCode, MapPin, Sparkles, Loader2, Settings } from 'lucide-react'
-import { estimateTraffic }   from '@/app/dashboard/ooh/actions'
-import Link                  from 'next/link'
+import { toast }              from 'sonner'
+import { Button }             from '@/components/ui/button'
+import { Input }              from '@/components/ui/input'
+import { Label }              from '@/components/ui/label'
+import { Textarea }           from '@/components/ui/textarea'
+import { Copy, RefreshCw, Link2, QrCode, MapPin, Sparkles, Loader2, Settings, Zap } from 'lucide-react'
+import { estimateTraffic }    from '@/app/dashboard/ooh/actions'
+import { UrlLengthAdvisor }   from '@/components/ooh/url-length-advisor'
+import Link                   from 'next/link'
 
 // ── Nigerian states + LGAs ────────────────────────────────────────────────────
 const LGAS_BY_STATE: Record<string, string[]> = {
@@ -65,11 +66,19 @@ const LGAS_BY_STATE: Record<string, string[]> = {
 
 const FORMAT_TYPES = [
   'Billboard', 'Unipole', 'Bridge Panel', 'Transit Shelter',
-  'Digital Billboard', 'Wall Mural', 'Mall Display', 'Lamp Post Banner', 'Other',
+  'Digital Billboard', 'Wall Mural', 'Mall Display', 'Lamp Post Banner',
+  'Lamppole', 'Other',
 ]
+
+const LAMPPOLE_FORMATS = new Set(['Lamppole', 'Lamp Post Banner'])
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 60)
+}
+
+function randomShortCode() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  return Array.from({ length: 5 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
 }
 
 interface MapboxFeature {
@@ -78,8 +87,8 @@ interface MapboxFeature {
     name?: string
     place_formatted?: string
     context?: {
-      place?:   { name?: string }
-      region?:  { name?: string }
+      place?:    { name?: string }
+      region?:   { name?: string }
       locality?: { name?: string }
     }
   }
@@ -107,6 +116,12 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
   const [formatType,   setFormatType]   = useState(String(defaultValues?.format_type  ?? ''))
   const [landingUrl,   setLandingUrl]   = useState(String(defaultValues?.landing_url  ?? ''))
   const [slug,         setSlug]         = useState(String(defaultValues?.vanity_slug  ?? ''))
+  const [shortCode,    setShortCode]    = useState(
+    String(defaultValues?.short_code ?? randomShortCode())
+  )
+  const [poleCount,    setPoleCount]    = useState<number>(
+    defaultValues?.pole_count != null ? Number(defaultValues.pole_count) : 1
+  )
   const [qrEnabled,    setQrEnabled]    = useState(Boolean(defaultValues?.qr_token))
   const [lat,          setLat]          = useState<number | ''>(defaultValues?.lat != null ? Number(defaultValues.lat) : '')
   const [lng,          setLng]          = useState<number | ''>(defaultValues?.lng != null ? Number(defaultValues.lng) : '')
@@ -121,7 +136,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const wrapperRef  = useRef<HTMLDivElement>(null)
 
-  // Auto-derive slug
+  // Auto-derive slug from site name + city (only for new sites)
   useEffect(() => {
     if (!defaultValues?.vanity_slug && (siteName || city)) {
       setSlug(slugify(`${siteName}-${city}`))
@@ -175,8 +190,8 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
   function selectSuggestion(f: MapboxFeature) {
     const [foundLng, foundLat] = f.geometry.coordinates
-    const fullAddr  = f.properties.full_address ?? f.properties.place_formatted ?? f.properties.name ?? ''
-    const placeCity = f.properties.context?.place?.name ?? f.properties.context?.locality?.name ?? ''
+    const fullAddr    = f.properties.full_address ?? f.properties.place_formatted ?? f.properties.name ?? ''
+    const placeCity   = f.properties.context?.place?.name ?? f.properties.context?.locality?.name ?? ''
     const placeRegion = f.properties.context?.region?.name ?? ''
 
     setAddress(fullAddr)
@@ -196,7 +211,10 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
       if (result) {
         setDailyTraffic(result.traffic)
         setTrafficAiEst(true)
-        toast.success(`${result.traffic.toLocaleString()}/day — ${result.reasoning}`)
+        const poleNote = isLamppole && poleCount > 1
+          ? ` × ${poleCount} poles = ${(result.traffic * poleCount).toLocaleString()} total/day`
+          : ''
+        toast.success(`${result.traffic.toLocaleString()}/day per pole${poleNote} — ${result.reasoning}`)
       } else {
         toast.error('AI estimate failed. Try again.')
       }
@@ -205,14 +223,24 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
     }
   }
 
+  const isLamppole = LAMPPOLE_FORMATS.has(formatType)
+
+  // Short domain: platform-level (bp.ng in future), falls back to app URL
+  const shortBase  = process.env.NEXT_PUBLIC_SHORT_DOMAIN
+    ? `https://${process.env.NEXT_PUBLIC_SHORT_DOMAIN}`
+    : appUrl
+  const shortLink  = shortCode ? `${shortBase}/s/${shortCode}` : ''
+
+  // Vanity link: uses brand's custom domain if set
   const effectiveAppUrl = customDomain ? `https://${customDomain}` : appUrl
   const vanityLink = slug ? `${effectiveAppUrl}/go/${slug}` : ''
-  const utmLink    = vanityLink && landingUrl
+
+  const utmLink = vanityLink && landingUrl
     ? (() => {
         try {
           const url = new URL(landingUrl)
           url.searchParams.set('utm_source',   'ooh')
-          url.searchParams.set('utm_medium',   'billboard')
+          url.searchParams.set('utm_medium',   isLamppole ? 'lamppole' : 'billboard')
           url.searchParams.set('utm_campaign', slugify(brandName))
           url.searchParams.set('utm_content',  slug)
           return url.toString()
@@ -230,7 +258,10 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
     setSlug(base ? `${base}-${suffix}` : suffix)
   }
 
-  // LGA list filtered by selected Nigerian state
+  function regenerateShortCode() {
+    setShortCode(randomShortCode())
+  }
+
   const lgaOptions = stateNg
     ? Object.entries(LGAS_BY_STATE).find(([k]) =>
         k.toLowerCase().includes(stateNg.toLowerCase()) ||
@@ -277,23 +308,20 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         <div className="space-y-1.5">
           <Label htmlFor="address">Address</Label>
           <div className="relative" ref={wrapperRef}>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  id="address" name="address"
-                  placeholder="Start typing an address…"
-                  value={address}
-                  onChange={e => handleAddressChange(e.target.value)}
-                  onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                  autoComplete="off"
-                />
-                {geocoding && (
-                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 animate-spin text-muted-foreground" />
-                )}
-              </div>
+            <div className="relative">
+              <Input
+                id="address" name="address"
+                placeholder="Start typing an address…"
+                value={address}
+                onChange={e => handleAddressChange(e.target.value)}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                autoComplete="off"
+              />
+              {geocoding && (
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 animate-spin text-muted-foreground" />
+              )}
             </div>
 
-            {/* Suggestions dropdown */}
             {showSuggestions && suggestions.length > 0 && (
               <ul className="absolute z-50 mt-1 w-full rounded-lg border bg-popover shadow-lg overflow-hidden">
                 {suggestions.map((f, i) => {
@@ -323,7 +351,6 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           )}
         </div>
 
-        {/* Hidden lat/lng */}
         <input type="hidden" name="lat" value={lat === '' ? '' : String(lat)} />
         <input type="hidden" name="lng" value={lng === '' ? '' : String(lng)} />
 
@@ -382,6 +409,25 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           </div>
         </div>
 
+        {/* Lamppole: pole count field */}
+        {isLamppole && (
+          <div className="space-y-1.5">
+            <Label htmlFor="pole_count">Number of poles in corridor</Label>
+            <div className="flex items-center gap-3">
+              <Input
+                id="pole_count" name="pole_count" type="number" min="1" max="500"
+                value={poleCount}
+                onChange={e => setPoleCount(Math.max(1, Number(e.target.value)))}
+                className="w-32"
+              />
+              <p className="text-xs text-muted-foreground">
+                Impressions and CPM will be multiplied across all poles in the run.
+              </p>
+            </div>
+          </div>
+        )}
+        {!isLamppole && <input type="hidden" name="pole_count" value="1" />}
+
         <div className="flex items-center gap-2">
           <input
             type="checkbox" id="illuminated" name="illuminated"
@@ -396,13 +442,14 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
       <div className="border rounded-xl p-5 space-y-4">
         <h2 className="text-sm font-semibold">Cost &amp; Campaign Window</h2>
 
-        {/* Daily traffic with AI estimate */}
         <div className="space-y-1.5">
-          <Label htmlFor="daily_traffic">Est. daily traffic exposure</Label>
+          <Label htmlFor="daily_traffic">
+            {isLamppole ? 'Est. daily traffic per pole' : 'Est. daily traffic exposure'}
+          </Label>
           <div className="flex gap-2">
             <Input
               id="daily_traffic" name="daily_traffic" type="number" min="0"
-              placeholder="50000"
+              placeholder={isLamppole ? '10000' : '50000'}
               value={dailyTraffic === '' ? '' : String(dailyTraffic)}
               onChange={e => {
                 setDailyTraffic(e.target.value === '' ? '' : Number(e.target.value))
@@ -415,7 +462,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
               className="shrink-0 gap-1.5"
               onClick={handleEstimateTraffic}
               disabled={estimating || !city}
-              title="AI-estimate based on format, LGA, address, and city"
+              title="AI estimate based on format, LGA, address, and city"
             >
               {estimating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
               {estimating ? 'Estimating…' : 'AI estimate'}
@@ -423,7 +470,10 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           </div>
           {trafficAiEst && (
             <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <Sparkles className="h-3 w-3" /> AI-estimated — verify with operator if available.
+              <Sparkles className="h-3 w-3" />
+              {isLamppole && poleCount > 1
+                ? `AI-estimated per pole. Total corridor: ~${((dailyTraffic as number) * poleCount).toLocaleString()}/day across ${poleCount} poles.`
+                : 'AI-estimated — verify with operator if available.'}
             </p>
           )}
           <input type="hidden" name="traffic_ai_estimated" value={String(trafficAiEst)} />
@@ -440,7 +490,9 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2 space-y-1.5">
-            <Label htmlFor="monthly_cost">Monthly cost</Label>
+            <Label htmlFor="monthly_cost">
+              {isLamppole ? 'Monthly cost (total for all poles)' : 'Monthly cost'}
+            </Label>
             <Input
               id="monthly_cost" name="monthly_cost" type="number" min="0" step="0.01"
               placeholder="1500000"
@@ -471,9 +523,9 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         </div>
       </div>
 
-      {/* Section 3: Attribution Link */}
+      {/* Section 3: Attribution Links */}
       <div className="border rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Attribution Link</h2>
+        <h2 className="text-sm font-semibold">Attribution Links</h2>
 
         <div className="space-y-1.5">
           <Label htmlFor="landing_url">Landing page URL</Label>
@@ -484,11 +536,36 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             onChange={e => setLandingUrl(e.target.value)}
             required
           />
-          <p className="text-xs text-muted-foreground">The page visitors land on after typing or scanning the vanity link.</p>
+          <p className="text-xs text-muted-foreground">The page visitors land on after typing or scanning the link.</p>
         </div>
 
+        {/* Short code — for billboard print */}
         <div className="space-y-1.5">
-          <Label htmlFor="vanity_slug">Vanity slug</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="short_code">Short code</Label>
+            <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium flex items-center gap-1">
+              <Zap className="h-3 w-3" /> Print on billboard
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <Input
+              id="short_code" name="short_code"
+              placeholder="k3d9x"
+              value={shortCode}
+              onChange={e => setShortCode(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10))}
+              className="flex-1 font-mono"
+              maxLength={10}
+            />
+            <Button type="button" variant="outline" size="icon" onClick={regenerateShortCode} title="Regenerate">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">2–10 lowercase letters and numbers only. Short enough to type from a billboard.</p>
+        </div>
+
+        {/* Vanity slug — for QR/digital */}
+        <div className="space-y-1.5">
+          <Label htmlFor="vanity_slug">Vanity slug <span className="text-muted-foreground font-normal">(QR codes &amp; digital)</span></Label>
           <div className="flex gap-2">
             <Input
               id="vanity_slug" name="vanity_slug"
@@ -503,20 +580,45 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           </div>
         </div>
 
-        {vanityLink && (
+        {/* Link preview panel */}
+        {(shortLink || vanityLink) && (
           <div className="rounded-lg bg-muted/50 border p-3 space-y-3">
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
-                  <Link2 className="h-3 w-3" /> Vanity Link — print this on the billboard
-                </span>
-                <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => copyLink(vanityLink)}>
-                  <Copy className="h-3 w-3 mr-1" /> Copy
-                </Button>
-              </div>
-              <p className="text-xs font-mono break-all text-foreground">{vanityLink}</p>
-            </div>
 
+            {/* Short link — hero row */}
+            {shortLink && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold flex items-center gap-1.5">
+                    <Zap className="h-3 w-3 text-primary" />
+                    Short link — print this on the billboard
+                  </span>
+                  <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => copyLink(shortLink)}>
+                    <Copy className="h-3 w-3 mr-1" /> Copy
+                  </Button>
+                </div>
+                <p className="text-sm font-mono font-semibold break-all text-foreground">{shortLink}</p>
+                {formatType && (
+                  <UrlLengthAdvisor url={shortLink} formatType={formatType} />
+                )}
+              </div>
+            )}
+
+            {/* Vanity link */}
+            {vanityLink && (
+              <div className={`space-y-1 ${shortLink ? 'pt-2 border-t' : ''}`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                    <Link2 className="h-3 w-3" /> Vanity link — QR codes &amp; digital
+                  </span>
+                  <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => copyLink(vanityLink)}>
+                    <Copy className="h-3 w-3 mr-1" /> Copy
+                  </Button>
+                </div>
+                <p className="text-xs font-mono break-all text-foreground">{vanityLink}</p>
+              </div>
+            )}
+
+            {/* UTM destination */}
             {utmLink && (
               <div className="space-y-1 pt-2 border-t">
                 <div className="flex items-center justify-between">

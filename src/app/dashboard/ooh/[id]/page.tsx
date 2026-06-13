@@ -53,6 +53,11 @@ export default async function OohSitePage({
     : defaultUrl
   const vanityLink = site.vanity_slug ? `${appUrl}/go/${site.vanity_slug}` : null
 
+  const shortBase  = process.env.NEXT_PUBLIC_SHORT_DOMAIN
+    ? `https://${process.env.NEXT_PUBLIC_SHORT_DOMAIN}`
+    : defaultUrl
+  const shortLink  = site.short_code ? `${shortBase}/s/${site.short_code}` : null
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -83,9 +88,10 @@ export default async function OohSitePage({
       </div>
 
       {/* Vanity link card */}
-      {vanityLink && (
+      {(vanityLink || shortLink) && (
         <OohVanityCard
           vanityLink={vanityLink}
+          shortLink={shortLink}
           qrToken={site.qr_token}
           totalVisits={site.visits}
           appUrl={appUrl}
@@ -121,6 +127,7 @@ export default async function OohSitePage({
         campaignStart={site.campaign_start}
         campaignEnd={site.campaign_end}
         illuminated={site.illuminated}
+        poleCount={site.pole_count ?? 1}
       />
 
       {/* Spend justification */}

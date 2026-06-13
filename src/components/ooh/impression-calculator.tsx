@@ -10,6 +10,7 @@ interface ImpressionCalculatorProps {
   campaignStart: string | null
   campaignEnd:   string | null
   illuminated:   boolean
+  poleCount?:    number
 }
 
 export function ImpressionCalculator({
@@ -19,6 +20,7 @@ export function ImpressionCalculator({
   campaignStart,
   campaignEnd,
   illuminated,
+  poleCount = 1,
 }: ImpressionCalculatorProps) {
   const metrics = useMemo(() => {
     if (!dailyTraffic) return null
@@ -29,8 +31,10 @@ export function ImpressionCalculator({
       campaignDays = Math.max(1, Math.round(diff))
     }
 
-    const grossImpressions = dailyTraffic * campaignDays
-    const noticeRate       = illuminated ? 0.30 : 0.25
+    // For lamppole corridors, daily_traffic is per-pole; multiply across all poles
+    const effectiveDailyTraffic = dailyTraffic * Math.max(1, poleCount)
+    const grossImpressions = effectiveDailyTraffic * campaignDays
+    const noticeRate       = poleCount > 1 ? 0.40 : illuminated ? 0.30 : 0.25
     const effectiveReach   = Math.round(grossImpressions * noticeRate)
 
     // Total cost = monthly_cost × campaign months
@@ -66,7 +70,7 @@ export function ImpressionCalculator({
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricTile label="Gross impressions" value={formatLargeNumber(metrics.grossImpressions)} note="All passers-by" />
-        <MetricTile label="Effective reach" value={formatLargeNumber(metrics.effectiveReach)} note={`${illuminated ? '30%' : '25%'} notice rate`} />
+        <MetricTile label="Effective reach" value={formatLargeNumber(metrics.effectiveReach)} note={`${poleCount > 1 ? '40%' : illuminated ? '30%' : '25%'} notice rate`} />
         <MetricTile
           label="Gross CPM"
           value={metrics.grossCpm != null ? `${currency} ${metrics.grossCpm.toFixed(2)}` : '—'}
@@ -80,7 +84,9 @@ export function ImpressionCalculator({
       </div>
 
       <p className="text-xs text-muted-foreground bg-muted/50 rounded-md p-2.5">
-        Notice rate benchmarks: 25% standard OOH, 30% illuminated. Effective CPM is the more conservative and honest metric for planning.
+        {poleCount > 1
+          ? `Corridor of ${poleCount} poles. Notice rate 40% — lamppole audiences are slower-moving and eye-level. Effective CPM is the more conservative and honest metric for planning.`
+          : 'Notice rate benchmarks: 25% standard OOH, 30% illuminated. Effective CPM is the more conservative and honest metric for planning.'}
       </p>
     </div>
   )

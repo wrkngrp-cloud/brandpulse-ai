@@ -28,11 +28,36 @@ const SiteSchema = z.object({
   vanity_slug:          z.string()
     .min(3, 'Slug must be at least 3 characters')
     .regex(/^[a-z0-9-]+$/, 'Slug may only contain lowercase letters, numbers, and hyphens'),
+  short_code:           z.string()
+    .min(2, 'Short code must be at least 2 characters')
+    .max(10, 'Short code must be 10 characters or less')
+    .regex(/^[a-z0-9]+$/, 'Short code may only contain lowercase letters and numbers')
+    .optional(),
+  pole_count:           z.coerce.number().int().min(1).default(1).optional(),
   notes:                z.string().optional(),
   qr_enabled:           z.boolean().default(false),
 })
 
 type FormState = { error?: string; success?: boolean; siteId?: string } | null
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function generateShortCode(supabase: any): Promise<string> {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  for (let i = 0; i < 10; i++) {
+    const code = Array.from(
+      { length: 5 },
+      () => chars[Math.floor(Math.random() * chars.length)],
+    ).join('')
+    const { data } = await supabase
+      .from('ooh_sites')
+      .select('id')
+      .eq('short_code', code)
+      .maybeSingle()
+    if (!data) return code
+  }
+  // Fallback: timestamp base-36 suffix (always unique)
+  return Date.now().toString(36).slice(-6)
+}
 
 function slugify(text: string): string {
   return text
@@ -65,6 +90,8 @@ Site details:
 
 Return JSON exactly: {"traffic": <integer>, "reasoning": "<one sentence explanation referencing the specific location>"}
 
+IMPORTANT: For Lamppole or Lamp Post Banner format, return the per-pole daily traffic — the operator will multiply by pole count separately.
+
 Nigerian traffic benchmarks to guide your estimate:
 - Lagos Island / VI / Ikoyi unipoles and bridge panels: 120,000–200,000/day
 - Lekki Phase 1 / Admiralty Way: 60,000–100,000/day
@@ -79,11 +106,18 @@ Nigerian traffic benchmarks to guide your estimate:
 - Kano Kofar Nassarawa / Bompai: 50,000–90,000/day
 - Mall displays (Ikeja City Mall, Palms, etc.): 10,000–30,000/day
 - Transit shelters in major cities: 20,000–50,000/day
-- Lamp post banners on arterial roads: 30,000–60,000/day`,
+- Lamppole / lamp post — per pole benchmarks:
+  · Lagos Island / CMS / Broad St corridor: 12,000–18,000/pole/day
+  · Ikeja / Allen / Alausa arterials: 8,000–12,000/pole/day
+  · Victoria Island / Eti-Osa side streets: 6,000–10,000/pole/day
+  · Lekki Phase 1 / Admiralty Way lamppoles: 4,000–8,000/pole/day
+  · Abuja CBD / Wuse 2 / Maitama: 5,000–10,000/pole/day
+  · Surulere / Mushin / Oshodi arterials: 7,000–12,000/pole/day`,
       }],
     })
 
-    const parsed = JSON.parse(response.trim())
+    const cleaned = response.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')
+    const parsed = JSON.parse(cleaned)
     if (typeof parsed.traffic === 'number' && typeof parsed.reasoning === 'string') {
       return parsed
     }
@@ -115,11 +149,13 @@ export async function createSite(
     return { error: parsed.error.issues[0].message }
   }
 
-  const { qr_enabled, ...siteData } = parsed.data
+  const { qr_enabled, short_code: rawShortCode, ...siteData } = parsed.data
 
-  const qrToken = qr_enabled
+  const qrToken  = qr_enabled
     ? `qr-${Math.random().toString(36).slice(2, 10)}`
     : null
+
+  const shortCode = rawShortCode || await generateShortCode(supabase)
 
   const { data: site, error } = await supabase
     .from('ooh_sites')
@@ -127,18 +163,20 @@ export async function createSite(
       ...siteData,
       brand_id:             brand.id,
       qr_token:             qrToken,
+      short_code:           shortCode,
       lat:                  siteData.lat           ?? null,
       lng:                  siteData.lng           ?? null,
       daily_traffic:        siteData.daily_traffic ?? null,
       monthly_cost:         siteData.monthly_cost  ?? null,
       campaign_start:       siteData.campaign_start ?? null,
       campaign_end:         siteData.campaign_end   ?? null,
+      pole_count:           siteData.pole_count    ?? 1,
     })
     .select('id')
     .single()
 
   if (error) {
-    if (error.code === '23505') return { error: 'That vanity slug is already taken. Choose another.' }
+    if (error.code === '23505') return { error: 'That vanity slug or short code is already taken. Choose another.' }
     return { error: error.message }
   }
 
@@ -165,19 +203,24 @@ export async function updateSite(
     return { error: parsed.error.issues[0].message }
   }
 
-  const { qr_enabled, ...siteData } = parsed.data
+  const { qr_enabled, short_code: rawShortCode, ...siteData } = parsed.data
+
+  const updatePayload: Record<string, unknown> = {
+    ...siteData,
+    lat:           siteData.lat           ?? null,
+    lng:           siteData.lng           ?? null,
+    daily_traffic: siteData.daily_traffic ?? null,
+    monthly_cost:  siteData.monthly_cost  ?? null,
+    campaign_start: siteData.campaign_start ?? null,
+    campaign_end:  siteData.campaign_end   ?? null,
+    pole_count:    siteData.pole_count    ?? 1,
+  }
+  // Only update short_code if the user explicitly changed it
+  if (rawShortCode) updatePayload.short_code = rawShortCode
 
   const { error } = await supabase
     .from('ooh_sites')
-    .update({
-      ...siteData,
-      lat:                  siteData.lat           ?? null,
-      lng:                  siteData.lng           ?? null,
-      daily_traffic:        siteData.daily_traffic ?? null,
-      monthly_cost:         siteData.monthly_cost  ?? null,
-      campaign_start:       siteData.campaign_start ?? null,
-      campaign_end:         siteData.campaign_end   ?? null,
-    })
+    .update(updatePayload)
     .eq('id', siteId)
 
   if (error) {
