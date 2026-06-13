@@ -1,9 +1,24 @@
 'use server'
 
+import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
 export type SettingsState = { error?: string; success?: boolean } | null
+
+// ── Account deletion ─────────────────────────────────────────────────────────
+
+export async function deleteAccount(): Promise<SettingsState> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated.' }
+
+  const service = await createServiceClient()
+  const { error } = await service.auth.admin.deleteUser(user.id)
+  if (error) return { error: error.message }
+
+  redirect('/auth/login')
+}
 
 // ── Profile ───────────────────────────────────────────────────────────────────
 
