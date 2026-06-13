@@ -5,6 +5,7 @@ import { ArrowLeft }          from 'lucide-react'
 import { LiveDashboard }      from '@/components/events/live-dashboard'
 import { AmbassadorList }     from '@/components/events/ambassador-list'
 import { computeEventMetrics, fmtNGN, fmtPct } from '@/lib/events/roi'
+import { ReportPoller } from '@/components/events/report-poller'
 
 const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -75,13 +76,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         </div>
       </div>
 
-      {/* Generating notice */}
-      {event.status === 'closed' && (
-        <div className="border rounded-xl p-5 bg-muted/40 text-center space-y-1">
-          <p className="text-sm font-medium">ROI report generating…</p>
-          <p className="text-xs text-muted-foreground">Your report will be ready shortly. Refresh to check.</p>
-        </div>
-      )}
+      {/* Report generation progress */}
+      {event.status === 'closed' && <ReportPoller eventId={id} />}
 
       {/* ROI report (reported status) */}
       {event.status === 'reported' && roiReport && (
