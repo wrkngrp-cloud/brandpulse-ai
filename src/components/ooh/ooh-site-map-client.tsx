@@ -1,5 +1,6 @@
 'use client'
 
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import { MapPin } from 'lucide-react'
 
@@ -105,7 +106,7 @@ export function OohSiteMapClient({
       <div className="border rounded-xl p-4">
         <p className="text-xs text-muted-foreground flex items-center gap-1">
           <MapPin className="h-3.5 w-3.5" />
-          {lat.toFixed(5)}, {lng.toFixed(5)} — add NEXT_PUBLIC_MAPBOX_TOKEN to enable map.
+          {lat.toFixed(5)}, {lng.toFixed(5)} — map failed to load.
         </p>
       </div>
     )

@@ -1,5 +1,6 @@
 'use client'
 
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { useActionState, useState, useEffect, useRef, useCallback } from 'react'
 import { SuccessDialog } from '@/components/ui/success-dialog'
 import { toast }              from 'sonner'

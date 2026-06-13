@@ -1,5 +1,6 @@
 'use client'
 
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import { MapPin } from 'lucide-react'
 
@@ -141,7 +142,7 @@ export function OohMapClient({ sites, onMapReady }: OohMapClientProps) {
       <div className="border rounded-xl p-4">
         <p className="text-xs text-muted-foreground flex items-center gap-1">
           <MapPin className="h-3.5 w-3.5" />
-          {mappable.length} site{mappable.length > 1 ? 's' : ''} with GPS coordinates — add NEXT_PUBLIC_MAPBOX_TOKEN to enable map view.
+          {mappable.length} site{mappable.length > 1 ? 's' : ''} with GPS coordinates — map failed to load, check console for details.
         </p>
       </div>
     )
