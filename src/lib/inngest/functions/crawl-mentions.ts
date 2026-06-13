@@ -1,6 +1,7 @@
 import { inngest } from '@/lib/inngest/client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { runCrawl } from '@/lib/crawl/run-crawl'
+import { crawlCompetitorVolumes } from '@/lib/crawl/crawl-competitors'
 import { computeBHI } from '@/lib/bhi'
 
 export const crawlMentions = inngest.createFunction(
@@ -46,6 +47,59 @@ export const crawlMentions = inngest.createFunction(
       totalMentionsFound += result.mentionsFound
       totalClassified    += result.classified
       logger.info(`Brand ${brand.name}: ${result.mentionsFound} mentions, ${result.classified} classified`)
+
+      // ── SOV snapshot: crawl competitor volumes, compute SOV, persist ────────
+      await step.run(`sov-snapshot-${brand.id}`, async () => {
+        const svc   = await createServiceClient()
+        const today = new Date().toISOString().slice(0, 10)
+        const since = new Date(Date.now() - 24 * 60 * 60 * 1000)
+
+        const { data: competitors } = await svc
+          .from('competitors').select('id, name').eq('brand_id', brand.id)
+
+        if (!competitors?.length) return { skipped: 'no competitors tracked' }
+
+        // Brand's own mention volume for today (already crawled above)
+        const { count: brandVolume } = await svc
+          .from('mentions')
+          .select('*', { count: 'exact', head: true })
+          .eq('brand_id', brand.id)
+          .gte('created_at', `${today}T00:00:00.000Z`)
+
+        // Re-fetch connections — token may have been refreshed in the crawl step
+        const { data: connections } = await svc
+          .from('social_connections')
+          .select('platform, account_id, access_token, account_name')
+          .eq('brand_id', brand.id)
+          .eq('sync_status', 'active')
+
+        const competitorVolumes = await crawlCompetitorVolumes(
+          competitors,
+          connections ?? [],
+          since,
+        )
+
+        const brandCount       = brandVolume ?? 0
+        const competitorTotal  = Object.values(competitorVolumes).reduce((a, b) => a + b, 0)
+        const totalVolume      = brandCount + competitorTotal
+        const socialSov        = totalVolume > 0
+          ? Number(((brandCount / totalVolume) * 100).toFixed(2))
+          : null
+
+        await svc.from('sov_snapshots').upsert({
+          brand_id:       brand.id,
+          snapshot_date:  today,
+          social_sov:     socialSov,
+          competitor_data: {
+            brand_volume:        brandCount,
+            competitor_volumes:  competitorVolumes,
+            total_volume:        totalVolume,
+          },
+        }, { onConflict: 'brand_id,snapshot_date' })
+
+        logger.info(`Brand ${brand.name}: SOV ${socialSov ?? 'n/a'}% (${brandCount} brand vs ${competitorTotal} competitor mentions)`)
+        return { socialSov, brandCount, competitorVolumes }
+      })
 
       await step.run(`bhi-snapshot-${brand.id}`, async () => {
         const today = new Date().toISOString().slice(0, 10)
