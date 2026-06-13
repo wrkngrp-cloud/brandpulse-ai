@@ -25,6 +25,7 @@ export default async function OohPage() {
       lat, lng, photo_url, notes
     `)
     .eq('brand_id', brand.id)
+    .eq('status', 'active')
     .order('created_at', { ascending: false })
 
   const defaultUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'

@@ -162,6 +162,7 @@ export async function createSite(
     .insert({
       ...siteData,
       brand_id:             brand.id,
+      status:               'active',
       qr_token:             qrToken,
       short_code:           shortCode,
       lat:                  siteData.lat           ?? null,
@@ -207,6 +208,7 @@ export async function updateSite(
 
   const updatePayload: Record<string, unknown> = {
     ...siteData,
+    status:        'active',
     lat:           siteData.lat           ?? null,
     lng:           siteData.lng           ?? null,
     daily_traffic: siteData.daily_traffic ?? null,
@@ -236,4 +238,73 @@ export async function deleteSite(siteId: string): Promise<void> {
   const supabase = await createClient()
   await supabase.from('ooh_sites').delete().eq('id', siteId)
   redirect('/dashboard/ooh')
+}
+
+// ── Draft auto-save ───────────────────────────────────────────────────────────
+
+const DraftSchema = SiteSchema.partial().extend({
+  site_name: z.string().optional(),
+  city:      z.string().optional(),
+  landing_url: z.string().optional(),
+  vanity_slug: z.string().optional(),
+})
+
+export type DraftState = { error?: string; draftId?: string } | null
+
+export async function saveDraft(
+  draftId: string | null,
+  formData: FormData,
+): Promise<DraftState> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
+  if (!brand) return { error: 'No brand found' }
+
+  const raw = Object.fromEntries(formData.entries())
+  const parsed = DraftSchema.safeParse({
+    ...raw,
+    illuminated:          raw.illuminated          === 'true' || raw.illuminated          === 'on',
+    qr_enabled:           raw.qr_enabled           === 'true' || raw.qr_enabled           === 'on',
+    traffic_ai_estimated: raw.traffic_ai_estimated === 'true' || raw.traffic_ai_estimated === 'on',
+  })
+
+  // Draft saves are best-effort — don't block on validation
+  const draftPayload = {
+    brand_id:   brand.id,
+    status:     'draft' as const,
+    site_name:  (raw.site_name as string) || 'Untitled draft',
+    city:       (raw.city as string) || '',
+    country:    'Nigeria',
+    landing_url: (raw.landing_url as string) || 'https://placeholder.com',
+    vanity_slug: (raw.vanity_slug as string) || `draft-${Date.now().toString(36)}`,
+    ...(parsed.success ? parsed.data : {}),
+    lat:  parsed.success && parsed.data.lat != null ? parsed.data.lat : null,
+    lng:  parsed.success && parsed.data.lng != null ? parsed.data.lng : null,
+  }
+
+  if (draftId) {
+    const { error } = await supabase
+      .from('ooh_sites')
+      .update(draftPayload)
+      .eq('id', draftId)
+      .eq('status', 'draft')
+    if (error) return { error: error.message }
+    return { draftId }
+  }
+
+  const { data, error } = await supabase
+    .from('ooh_sites')
+    .insert(draftPayload)
+    .select('id')
+    .single()
+
+  if (error) return { error: error.message }
+  return { draftId: data.id }
+}
+
+export async function discardDraft(draftId: string): Promise<void> {
+  const supabase = await createClient()
+  await supabase.from('ooh_sites').delete().eq('id', draftId).eq('status', 'draft')
 }

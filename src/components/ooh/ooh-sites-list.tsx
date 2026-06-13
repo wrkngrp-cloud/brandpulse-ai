@@ -1,11 +1,13 @@
 'use client'
 
-import Link                from 'next/link'
-import { Badge }           from '@/components/ui/badge'
-import { buttonVariants }  from '@/components/ui/button'
-import { cn }              from '@/lib/utils'
-import { MapPin, Copy, Crosshair } from 'lucide-react'
-import { toast }           from 'sonner'
+import { useRouter }      from 'next/navigation'
+import Link               from 'next/link'
+import { cn }             from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
+import { ItemActions }    from '@/components/ui/item-actions'
+import { MapPin, Copy, Crosshair, Eye, Pencil, Trash2, BarChart2 } from 'lucide-react'
+import { toast }          from 'sonner'
+import { deleteSite }     from '@/app/dashboard/ooh/actions'
 
 interface Site {
   id: string
@@ -54,6 +56,8 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps) {
+  const router = useRouter()
+
   function copyVanity(slug: string) {
     navigator.clipboard.writeText(`${appUrl}/go/${slug}`)
       .then(() => toast.success('Link copied!'))
@@ -65,7 +69,7 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
       <div className="divide-y border rounded-xl overflow-hidden">
         {sites.map(site => {
           const status     = campaignStatus(site.campaign_start, site.campaign_end)
-          const hasCoorods = site.lat != null && site.lng != null
+          const hasCoords  = site.lat != null && site.lng != null
 
           return (
             <div key={site.id} className="flex items-center gap-4 px-4 py-3 bg-card hover:bg-muted/30 transition-colors">
@@ -97,9 +101,9 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                 <p className="text-xs text-muted-foreground">visits</p>
               </div>
 
-              <div className="shrink-0 flex items-center gap-1.5">
-                {/* Locate on map — only shown when site has GPS coordinates */}
-                {hasCoorods && onLocateSite && (
+              <div className="shrink-0 flex items-center gap-1">
+                {/* Locate on map — only when site has GPS coordinates */}
+                {hasCoords && onLocateSite && (
                   <button
                     onClick={() => onLocateSite(site.lat!, site.lng!, site.id)}
                     className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-muted transition-colors"
@@ -108,21 +112,44 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                     <Crosshair className="h-3.5 w-3.5 text-muted-foreground" />
                   </button>
                 )}
-                {site.vanity_slug && (
-                  <button
-                    onClick={() => copyVanity(site.vanity_slug!)}
-                    className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-muted transition-colors"
-                    title="Copy vanity link"
-                  >
-                    <Copy className="h-3.5 w-3.5 text-muted-foreground" />
-                  </button>
-                )}
-                <Link
-                  href={`/dashboard/ooh/${site.id}`}
-                  className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'h-7 px-2 text-xs')}
-                >
-                  View
-                </Link>
+
+                <ItemActions
+                  actions={[
+                    {
+                      label:   'View site',
+                      icon:    Eye,
+                      onClick: () => router.push(`/dashboard/ooh/${site.id}`),
+                    },
+                    {
+                      label:   'Edit',
+                      icon:    Pencil,
+                      onClick: () => router.push(`/dashboard/ooh/${site.id}/edit`),
+                    },
+                    ...(site.vanity_slug ? [{
+                      label:   'Copy attribution link',
+                      icon:    Copy,
+                      onClick: () => copyVanity(site.vanity_slug!),
+                    }] : []),
+                    {
+                      label:   'Generate report',
+                      icon:    BarChart2,
+                      onClick: () => router.push(`/dashboard/ooh/${site.id}#uplift`),
+                    },
+                    {
+                      label:              'Delete',
+                      icon:               Trash2,
+                      variant:            'destructive' as const,
+                      separator:          true,
+                      requireConfirm:     true,
+                      confirmTitle:       'Delete site?',
+                      confirmDescription: `"${site.site_name}" and all its visit history will be permanently deleted.`,
+                      onClick:            async () => {
+                        await deleteSite(site.id)
+                        router.refresh()
+                      },
+                    },
+                  ]}
+                />
               </div>
             </div>
           )
