@@ -80,7 +80,7 @@ export const eventRoiReport = inngest.createFunction(
       }
     })
 
-    // ── Step 2: generate AI narrative (NIM → Haiku fallback built into callAi) ─
+    // ── Step 2: generate AI narrative ────────────────────────────────────────
     const narrative = await step.run('generate-narrative', async () => {
       const { name, city, state, date_start, date_end, budget, kpi_targets, brandName,
               surveyCount, debrief, objectivesList, metrics, ambBreakdown } = eventData
