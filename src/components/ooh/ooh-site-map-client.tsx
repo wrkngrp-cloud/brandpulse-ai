@@ -37,7 +37,7 @@ export function OohSiteMapClient({
 
     import('mapbox-gl').then(({ default: mapboxgl }) => {
       if (!mapRef.current) return
-      mapboxgl.workerUrl = `https://api.mapbox.com/mapbox-gl-js/v${mapboxgl.version}/mapbox-gl-csp-worker.js`
+      mapboxgl.workerUrl = '/mapbox-gl-csp-worker.js'
       mapboxgl.accessToken = token
 
       const map = new mapboxgl.Map({
