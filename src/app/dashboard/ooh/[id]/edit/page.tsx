@@ -25,8 +25,12 @@ export default async function EditOohSitePage({
 
   if (!site) notFound()
 
-  const { data: brand } = await supabase.from('brands').select('name').limit(1).single()
-  const appUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const { data: brand } = await supabase
+    .from('brands').select('name, ooh_redirect_domain').limit(1).single()
+  const defaultUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const appUrl = brand?.ooh_redirect_domain
+    ? `https://${brand.ooh_redirect_domain}`
+    : defaultUrl
 
   const boundAction = updateSite.bind(null, id)
 

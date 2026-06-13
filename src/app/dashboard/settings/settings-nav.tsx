@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Building2, Link2 } from 'lucide-react'
+import { User, Building2, Link2, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
-  { label: 'Profile',            href: '/dashboard/settings/profile',     icon: User },
-  { label: 'Brand',              href: '/dashboard/settings/brand',        icon: Building2 },
-  { label: 'Connected Accounts', href: '/dashboard/settings/connections',  icon: Link2 },
+  { label: 'Profile',            href: '/dashboard/settings/profile',      icon: User },
+  { label: 'Brand',              href: '/dashboard/settings/brand',         icon: Building2 },
+  { label: 'Connected Accounts', href: '/dashboard/settings/connections',   icon: Link2 },
+  { label: 'OOH Domain',         href: '/dashboard/settings/ooh-domain',   icon: MapPin },
 ]
 
 export function SettingsNav() {

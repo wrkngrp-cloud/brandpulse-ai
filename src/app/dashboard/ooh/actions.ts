@@ -1,32 +1,35 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { redirect }     from 'next/navigation'
-import { z }            from 'zod'
+import { redirect }       from 'next/navigation'
+import { z }              from 'zod'
 import { revalidatePath } from 'next/cache'
+import { callAi }         from '@/lib/ai/client'
 
 const SiteSchema = z.object({
-  site_name:      z.string().min(2, 'Site name required'),
-  city:           z.string().min(1, 'City required'),
-  state:          z.string().optional(),
-  country:        z.string().default('Nigeria'),
-  format_type:    z.string().optional(),
-  illuminated:    z.boolean().default(false),
-  lat:            z.coerce.number().optional(),
-  lng:            z.coerce.number().optional(),
-  daily_traffic:  z.coerce.number().int().positive().optional(),
-  operator:       z.string().optional(),
-  weekly_cost:    z.coerce.number().positive().optional(),
-  currency:       z.string().length(3).default('NGN'),
-  campaign_start: z.string().optional(),
-  campaign_end:   z.string().optional(),
-  cultural_zone:  z.string().optional(),
-  landing_url:    z.string().url('Landing URL must be a valid URL'),
-  vanity_slug:    z.string()
+  site_name:            z.string().min(2, 'Site name required'),
+  address:              z.string().optional(),
+  city:                 z.string().min(1, 'City required'),
+  state:                z.string().optional(),
+  country:              z.string().default('Nigeria'),
+  format_type:          z.string().optional(),
+  illuminated:          z.boolean().default(false),
+  lat:                  z.coerce.number().optional(),
+  lng:                  z.coerce.number().optional(),
+  daily_traffic:        z.coerce.number().int().positive().optional(),
+  traffic_ai_estimated: z.boolean().default(false),
+  operator:             z.string().optional(),
+  weekly_cost:          z.coerce.number().positive().optional(),
+  currency:             z.string().length(3).default('NGN'),
+  campaign_start:       z.string().optional(),
+  campaign_end:         z.string().optional(),
+  lga:                  z.string().optional(),
+  landing_url:          z.string().url('Landing URL must be a valid URL'),
+  vanity_slug:          z.string()
     .min(3, 'Slug must be at least 3 characters')
     .regex(/^[a-z0-9-]+$/, 'Slug may only contain lowercase letters, numbers, and hyphens'),
-  notes:          z.string().optional(),
-  qr_enabled:     z.boolean().default(false),
+  notes:                z.string().optional(),
+  qr_enabled:           z.boolean().default(false),
 })
 
 type FormState = { error?: string; success?: boolean; siteId?: string } | null
@@ -38,6 +41,40 @@ function slugify(text: string): string {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .slice(0, 60)
+}
+
+export async function estimateTraffic(
+  formatType: string,
+  lga: string,
+  city: string,
+): Promise<{ traffic: number; reasoning: string } | null> {
+  try {
+    const response = await callAi({
+      tier:   'cultural',
+      system: 'You are an OOH media planning expert for Nigeria. Respond ONLY with valid JSON, no markdown.',
+      messages: [{
+        role:    'user',
+        content: `Estimate the average daily vehicle and pedestrian traffic exposure for an OOH advertising site in Nigeria.
+
+Site details:
+- Format: ${formatType || 'Billboard'}
+- LGA: ${lga || 'Unknown'}
+- City: ${city}
+
+Return JSON exactly: {"traffic": <integer>, "reasoning": "<one sentence explanation>"}
+
+Use realistic Nigerian traffic benchmarks. Lagos Island / Victoria Island unipoles: 80,000-150,000. Lekki Phase 1 corridor: 50,000-90,000. Highway billboards outside Lagos: 30,000-70,000. Mall displays: 8,000-25,000. Bridge panels on major Lagos roads: 120,000-200,000.`,
+      }],
+    })
+
+    const parsed = JSON.parse(response.trim())
+    if (typeof parsed.traffic === 'number' && typeof parsed.reasoning === 'string') {
+      return parsed
+    }
+    return null
+  } catch {
+    return null
+  }
 }
 
 export async function createSite(
@@ -54,8 +91,9 @@ export async function createSite(
   const raw = Object.fromEntries(formData.entries())
   const parsed = SiteSchema.safeParse({
     ...raw,
-    illuminated: raw.illuminated === 'true' || raw.illuminated === 'on',
-    qr_enabled:  raw.qr_enabled  === 'true' || raw.qr_enabled  === 'on',
+    illuminated:          raw.illuminated          === 'true' || raw.illuminated          === 'on',
+    qr_enabled:           raw.qr_enabled           === 'true' || raw.qr_enabled           === 'on',
+    traffic_ai_estimated: raw.traffic_ai_estimated === 'true' || raw.traffic_ai_estimated === 'on',
   })
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message }
@@ -71,14 +109,14 @@ export async function createSite(
     .from('ooh_sites')
     .insert({
       ...siteData,
-      brand_id:  brand.id,
-      qr_token:  qrToken,
-      lat:       siteData.lat ?? null,
-      lng:       siteData.lng ?? null,
-      daily_traffic: siteData.daily_traffic ?? null,
-      weekly_cost:   siteData.weekly_cost   ?? null,
-      campaign_start: siteData.campaign_start ?? null,
-      campaign_end:   siteData.campaign_end   ?? null,
+      brand_id:             brand.id,
+      qr_token:             qrToken,
+      lat:                  siteData.lat           ?? null,
+      lng:                  siteData.lng           ?? null,
+      daily_traffic:        siteData.daily_traffic ?? null,
+      weekly_cost:          siteData.weekly_cost   ?? null,
+      campaign_start:       siteData.campaign_start ?? null,
+      campaign_end:         siteData.campaign_end   ?? null,
     })
     .select('id')
     .single()
@@ -103,8 +141,9 @@ export async function updateSite(
   const raw = Object.fromEntries(formData.entries())
   const parsed = SiteSchema.safeParse({
     ...raw,
-    illuminated: raw.illuminated === 'true' || raw.illuminated === 'on',
-    qr_enabled:  raw.qr_enabled  === 'true' || raw.qr_enabled  === 'on',
+    illuminated:          raw.illuminated          === 'true' || raw.illuminated          === 'on',
+    qr_enabled:           raw.qr_enabled           === 'true' || raw.qr_enabled           === 'on',
+    traffic_ai_estimated: raw.traffic_ai_estimated === 'true' || raw.traffic_ai_estimated === 'on',
   })
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message }
@@ -116,12 +155,12 @@ export async function updateSite(
     .from('ooh_sites')
     .update({
       ...siteData,
-      lat:       siteData.lat ?? null,
-      lng:       siteData.lng ?? null,
-      daily_traffic: siteData.daily_traffic ?? null,
-      weekly_cost:   siteData.weekly_cost   ?? null,
-      campaign_start: siteData.campaign_start ?? null,
-      campaign_end:   siteData.campaign_end   ?? null,
+      lat:                  siteData.lat           ?? null,
+      lng:                  siteData.lng           ?? null,
+      daily_traffic:        siteData.daily_traffic ?? null,
+      weekly_cost:          siteData.weekly_cost   ?? null,
+      campaign_start:       siteData.campaign_start ?? null,
+      campaign_end:         siteData.campaign_end   ?? null,
     })
     .eq('id', siteId)
 

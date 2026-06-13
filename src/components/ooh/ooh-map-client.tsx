@@ -11,7 +11,7 @@ interface Site {
   city: string | null
   format_type: string | null
   visits: number
-  cultural_zone: string | null
+  lga: string | null
   campaign_start: string | null
   campaign_end: string | null
 }
