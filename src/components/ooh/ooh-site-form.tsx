@@ -203,7 +203,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
     const timer = setTimeout(async () => {
       if (!pinMapRef.current) return
       const { default: mapboxgl } = await import('mapbox-gl')
-      mapboxgl.workerUrl = '/mapbox-gl-csp-worker.js'
+      mapboxgl.workerUrl = `https://api.mapbox.com/mapbox-gl-js/v${mapboxgl.version}/mapbox-gl-csp-worker.js`
       mapboxgl.accessToken = token
 
       const hasCoords = lat !== '' && lng !== ''
