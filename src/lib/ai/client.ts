@@ -77,12 +77,26 @@ export async function callAi(opts: AiCallOptions): Promise<string> {
     return block.text
   }
 
-  // NIM / GLM-4 via OpenAI-compatible endpoint
-  const resp = await getNim().chat.completions.create({
-    model: nimAvailable ? MODELS.structural : MODELS.nimFallback,
-    max_tokens: maxTokens,
-    temperature,
-    messages: [{ role: 'system', content: system }, ...messages],
-  })
-  return resp.choices[0].message.content ?? ''
+  // NIM with automatic Haiku fallback
+  try {
+    const resp = await getNim().chat.completions.create({
+      model: nimAvailable ? MODELS.structural : MODELS.nimFallback,
+      max_tokens: maxTokens,
+      temperature,
+      messages: [{ role: 'system', content: system }, ...messages],
+    })
+    return resp.choices[0].message.content ?? ''
+  } catch (nimErr) {
+    console.warn('[callAi] NIM call failed, falling back to Claude Haiku:', (nimErr as Error).message)
+    const resp = await anthropic.messages.create({
+      model:      MODELS.cultural,
+      max_tokens: maxTokens,
+      temperature,
+      system,
+      messages,
+    })
+    const block = resp.content[0]
+    if (block.type !== 'text') throw new Error('Unexpected content type from Claude')
+    return block.text
+  }
 }
