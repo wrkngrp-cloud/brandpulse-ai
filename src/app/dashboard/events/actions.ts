@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 import { randomBytes } from 'crypto'
 import { z } from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
@@ -173,6 +174,20 @@ export async function submitDebrief(
   const { error } = await service.from('events').update({ debrief: parsed.data }).eq('id', eventId)
   if (error) return { error: error.message }
 
+  return { success: true }
+}
+
+// ── Delete event ─────────────────────────────────────────────────────────────
+
+export async function deleteEvent(eventId: string): Promise<EventState> {
+  const result = await getBrandId()
+  if ('error' in result) return { error: result.error }
+
+  const service = await createServiceClient()
+  const { error } = await service.from('events').delete().eq('id', eventId)
+  if (error) return { error: error.message }
+
+  revalidatePath('/dashboard/events')
   return { success: true }
 }
 

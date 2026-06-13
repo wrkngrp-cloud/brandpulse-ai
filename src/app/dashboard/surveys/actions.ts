@@ -68,3 +68,16 @@ export async function updateSurveyStatus(surveyId: string, status: 'live' | 'clo
   revalidatePath('/dashboard/surveys')
   revalidatePath(`/dashboard/surveys/${surveyId}`)
 }
+
+export async function deleteSurvey(surveyId: string) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('surveys')
+    .delete()
+    .eq('id', surveyId)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/dashboard/surveys')
+}
