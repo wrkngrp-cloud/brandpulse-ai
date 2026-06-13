@@ -1,0 +1,131 @@
+'use client'
+
+import { useMemo } from 'react'
+import { Calculator } from 'lucide-react'
+
+interface ImpressionCalculatorProps {
+  dailyTraffic:   number | null
+  weeklyCost:     number | null
+  currency:       string
+  campaignStart:  string | null
+  campaignEnd:    string | null
+  illuminated:    boolean
+}
+
+export function ImpressionCalculator({
+  dailyTraffic,
+  weeklyCost,
+  currency,
+  campaignStart,
+  campaignEnd,
+  illuminated,
+}: ImpressionCalculatorProps) {
+  const metrics = useMemo(() => {
+    if (!dailyTraffic) return null
+
+    // Campaign duration in days
+    let campaignDays = 30 // default
+    if (campaignStart && campaignEnd) {
+      const diff = (new Date(campaignEnd).getTime() - new Date(campaignStart).getTime()) / (1000 * 60 * 60 * 24)
+      campaignDays = Math.max(1, Math.round(diff))
+    }
+
+    // Gross impressions = traffic × campaign days
+    const grossImpressions = dailyTraffic * campaignDays
+
+    // Effective reach factor: 25% of passers-by actually notice the ad
+    // +5% for illuminated
+    const noticeRate        = illuminated ? 0.30 : 0.25
+    const effectiveReach    = Math.round(grossImpressions * noticeRate)
+
+    // CPM = cost / (gross impressions / 1000)
+    const totalCost = weeklyCost ? weeklyCost * (campaignDays / 7) : null
+    const grossCpm  = totalCost && grossImpressions > 0
+      ? (totalCost / grossImpressions) * 1000
+      : null
+    const effectiveCpm = totalCost && effectiveReach > 0
+      ? (totalCost / effectiveReach) * 1000
+      : null
+
+    return {
+      campaignDays,
+      grossImpressions,
+      effectiveReach,
+      totalCost,
+      grossCpm,
+      effectiveCpm,
+    }
+  }, [dailyTraffic, weeklyCost, campaignStart, campaignEnd, illuminated])
+
+  if (!metrics) {
+    return (
+      <div className="border rounded-xl p-5 bg-card">
+        <div className="flex items-center gap-2 mb-3">
+          <Calculator className="h-4 w-4 text-muted-foreground" />
+          <h3 className="text-sm font-semibold">Impression Calculator</h3>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Add estimated daily traffic to calculate impressions and CPM.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="border rounded-xl p-5 bg-card space-y-4">
+      <div className="flex items-center gap-2">
+        <Calculator className="h-4 w-4 text-muted-foreground" />
+        <h3 className="text-sm font-semibold">Impression Calculator</h3>
+        <span className="text-xs text-muted-foreground ml-auto">{metrics.campaignDays}-day campaign</span>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <MetricTile
+          label="Gross impressions"
+          value={formatLargeNumber(metrics.grossImpressions)}
+          note="All passers-by"
+        />
+        <MetricTile
+          label="Effective reach"
+          value={formatLargeNumber(metrics.effectiveReach)}
+          note={`${illuminated ? '30%' : '25%'} notice rate`}
+        />
+        <MetricTile
+          label="Gross CPM"
+          value={metrics.grossCpm != null
+            ? `${currency} ${metrics.grossCpm.toFixed(2)}`
+            : '—'}
+          note="Per 1,000 impressions"
+        />
+        <MetricTile
+          label="Effective CPM"
+          value={metrics.effectiveCpm != null
+            ? `${currency} ${metrics.effectiveCpm.toFixed(2)}`
+            : '—'}
+          note="Per 1,000 engaged"
+        />
+      </div>
+
+      <p className="text-xs text-muted-foreground bg-muted/50 rounded-md p-2.5">
+        Notice rate based on industry benchmarks: 25% for standard OOH, 30% for illuminated.
+        Effective CPM is the more conservative and honest metric for OOH planning.
+      </p>
+    </div>
+  )
+}
+
+function MetricTile({ label, value, note }: { label: string; value: string; note: string }) {
+  return (
+    <div className="bg-muted/40 rounded-lg p-3">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-base font-semibold mt-0.5 tabular-nums">{value}</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{note}</p>
+    </div>
+  )
+}
+
+function formatLargeNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`
+  return n.toLocaleString()
+}

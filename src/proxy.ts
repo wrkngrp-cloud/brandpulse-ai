@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -38,7 +38,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Exclude Inngest handler, static assets, and public routes from middleware
     '/((?!_next/static|_next/image|favicon.ico|api/inngest|survey|go|ambassador|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
