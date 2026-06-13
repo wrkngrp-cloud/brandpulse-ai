@@ -121,7 +121,7 @@ export function CompetitiveClient({ hasSovData, brandName, competitorNames }: Pr
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="grid grid-cols-3 gap-3 text-sm">
             <div className="border rounded-lg p-3 space-y-0.5">
               <p className="text-xs text-muted-foreground">Brand</p>
               <p className="font-medium">{brandName}</p>
@@ -135,10 +135,6 @@ export function CompetitiveClient({ hasSovData, brandName, competitorNames }: Pr
               <p className={cn('font-medium', hasSovData ? 'text-green-600' : 'text-muted-foreground')}>
                 {hasSovData ? 'Available' : 'Not yet — run a crawl first'}
               </p>
-            </div>
-            <div className="border rounded-lg p-3 space-y-0.5">
-              <p className="text-xs text-muted-foreground">Model</p>
-              <p className="font-medium">Llama 4 Maverick (structural)</p>
             </div>
           </div>
 
