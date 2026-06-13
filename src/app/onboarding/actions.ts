@@ -5,6 +5,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
 const onboardingSchema = z.object({
+  websiteUrl: z.string().optional().default(''),
   brandName: z.string().min(1, 'Brand name is required'),
   category: z.string().min(1, 'Category is required'),
   brandValues: z.array(z.string()).default([]),
@@ -40,7 +41,6 @@ export async function completeOnboarding(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated.' }
 
-  // Parse JSON payload sent from the client wizard
   const payload = formData.get('payload')
   if (!payload || typeof payload !== 'string') return { error: 'Invalid form data.' }
 
@@ -52,7 +52,6 @@ export async function completeOnboarding(
   const d = parsed.data
   const service = await createServiceClient()
 
-  // Find the blank brand created during signup
   const { data: brand } = await service
     .from('brands')
     .select('id')
@@ -71,12 +70,13 @@ export async function completeOnboarding(
   const { error } = await service
     .from('brands')
     .update({
-      name: d.brandName,
-      category: d.category,
-      brand_values: d.brandValues,
-      brand_voice: d.brandVoice,
+      name:             d.brandName,
+      website_url:      d.websiteUrl || null,
+      category:         d.category,
+      brand_values:     d.brandValues,
+      brand_voice:      d.brandVoice,
       cultural_profile: d.culturalProfile,
-      target_segments: d.targetSegments,
+      target_segments:  d.targetSegments,
     })
     .eq('id', brand.id)
 
