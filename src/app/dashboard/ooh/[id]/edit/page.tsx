@@ -53,6 +53,7 @@ export default async function EditOohSitePage({
         action={boundAction}
         brandName={brand?.name ?? ''}
         appUrl={appUrl}
+        customDomain={brand?.ooh_redirect_domain ?? null}
         defaultValues={{
           ...site,
           lat: site.lat ? Number(site.lat) : null,

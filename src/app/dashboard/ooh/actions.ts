@@ -19,7 +19,7 @@ const SiteSchema = z.object({
   daily_traffic:        z.coerce.number().int().positive().optional(),
   traffic_ai_estimated: z.boolean().default(false),
   operator:             z.string().optional(),
-  weekly_cost:          z.coerce.number().positive().optional(),
+  monthly_cost:         z.coerce.number().positive().optional(),
   currency:             z.string().length(3).default('NGN'),
   campaign_start:       z.string().optional(),
   campaign_end:         z.string().optional(),
@@ -47,23 +47,39 @@ export async function estimateTraffic(
   formatType: string,
   lga: string,
   city: string,
+  stateNg: string,
+  address: string,
 ): Promise<{ traffic: number; reasoning: string } | null> {
   try {
+    const locationContext = [address, lga, city, stateNg].filter(Boolean).join(', ')
     const response = await callAi({
       tier:   'cultural',
-      system: 'You are an OOH media planning expert for Nigeria. Respond ONLY with valid JSON, no markdown.',
+      system: 'You are an OOH media planning expert for Nigeria and West Africa. Respond ONLY with valid JSON, no markdown.',
       messages: [{
         role:    'user',
-        content: `Estimate the average daily vehicle and pedestrian traffic exposure for an OOH advertising site in Nigeria.
+        content: `Estimate the average daily vehicle and pedestrian traffic exposure for an OOH advertising site.
 
 Site details:
 - Format: ${formatType || 'Billboard'}
-- LGA: ${lga || 'Unknown'}
-- City: ${city}
+- Location: ${locationContext || city}
 
-Return JSON exactly: {"traffic": <integer>, "reasoning": "<one sentence explanation>"}
+Return JSON exactly: {"traffic": <integer>, "reasoning": "<one sentence explanation referencing the specific location>"}
 
-Use realistic Nigerian traffic benchmarks. Lagos Island / Victoria Island unipoles: 80,000-150,000. Lekki Phase 1 corridor: 50,000-90,000. Highway billboards outside Lagos: 30,000-70,000. Mall displays: 8,000-25,000. Bridge panels on major Lagos roads: 120,000-200,000.`,
+Nigerian traffic benchmarks to guide your estimate:
+- Lagos Island / VI / Ikoyi unipoles and bridge panels: 120,000–200,000/day
+- Lekki Phase 1 / Admiralty Way: 60,000–100,000/day
+- Lekki-Epe Expressway: 40,000–80,000/day
+- Ikeja / Allen Avenue / Alausa corridor: 70,000–120,000/day
+- Surulere / Mushin / Oshodi: 80,000–130,000/day
+- Third Mainland Bridge approaches: 150,000–250,000/day
+- Abuja CBD (Wuse, Maitama, CBD): 40,000–80,000/day
+- Abuja Airport Road: 30,000–60,000/day
+- Port Harcourt GRA / Aba Road: 30,000–60,000/day
+- Ibadan Ring Road / Challenge: 40,000–70,000/day
+- Kano Kofar Nassarawa / Bompai: 50,000–90,000/day
+- Mall displays (Ikeja City Mall, Palms, etc.): 10,000–30,000/day
+- Transit shelters in major cities: 20,000–50,000/day
+- Lamp post banners on arterial roads: 30,000–60,000/day`,
       }],
     })
 
@@ -114,7 +130,7 @@ export async function createSite(
       lat:                  siteData.lat           ?? null,
       lng:                  siteData.lng           ?? null,
       daily_traffic:        siteData.daily_traffic ?? null,
-      weekly_cost:          siteData.weekly_cost   ?? null,
+      monthly_cost:         siteData.monthly_cost  ?? null,
       campaign_start:       siteData.campaign_start ?? null,
       campaign_end:         siteData.campaign_end   ?? null,
     })
@@ -158,7 +174,7 @@ export async function updateSite(
       lat:                  siteData.lat           ?? null,
       lng:                  siteData.lng           ?? null,
       daily_traffic:        siteData.daily_traffic ?? null,
-      weekly_cost:          siteData.weekly_cost   ?? null,
+      monthly_cost:         siteData.monthly_cost  ?? null,
       campaign_start:       siteData.campaign_start ?? null,
       campaign_end:         siteData.campaign_end   ?? null,
     })

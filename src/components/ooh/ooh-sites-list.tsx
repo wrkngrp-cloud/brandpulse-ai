@@ -15,7 +15,7 @@ interface Site {
   format_type: string | null
   illuminated: boolean
   daily_traffic: number | null
-  weekly_cost: number | null
+  monthly_cost: number | null
   currency: string | null
   campaign_start: string | null
   campaign_end: string | null
