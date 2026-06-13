@@ -90,3 +90,40 @@ export async function logout() {
   await supabase.auth.signOut()
   redirect('/auth/login')
 }
+
+export async function forgotPassword(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const email = formData.get('email')
+  if (typeof email !== 'string' || !email.includes('@')) {
+    return { error: 'Please enter a valid email address.' }
+  }
+
+  const supabase = await createClient()
+  const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${APP_URL}/api/auth/callback?next=/auth/reset-password`,
+  })
+
+  if (error) return { error: error.message }
+
+  // Return a special flag so the page can show the confirmation state
+  return { error: '__sent__' }
+}
+
+export async function updatePassword(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const password    = formData.get('password')
+  const confirmPass = formData.get('confirm')
+
+  if (typeof password !== 'string' || password.length < 8) {
+    return { error: 'Password must be at least 8 characters.' }
+  }
+  if (password !== confirmPass) {
+    return { error: 'Passwords do not match.' }
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) return { error: error.message }
+
+  redirect('/dashboard')
+}

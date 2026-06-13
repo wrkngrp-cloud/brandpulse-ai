@@ -1,15 +1,18 @@
 'use client'
 
-import { useActionState } from 'react'
+import { Suspense, useActionState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { login } from '@/app/auth/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
-export default function LoginPage() {
+function LoginForm() {
   const [state, action, pending] = useActionState(login, null)
+  const searchParams = useSearchParams()
+  const linkExpired  = searchParams.get('error') === 'link_expired'
 
   return (
     <Card>
@@ -19,6 +22,11 @@ export default function LoginPage() {
       </CardHeader>
       <form action={action}>
         <CardContent className="space-y-4">
+          {linkExpired && (
+            <p className="text-sm text-amber-700 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400 px-3 py-2 rounded-md">
+              That reset link has expired. Request a new one below.
+            </p>
+          )}
           {state?.error && (
             <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
               {state.error}
@@ -32,7 +40,15 @@ export default function LoginPage() {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Link
+                href="/auth/forgot-password"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <Input id="password" name="password" type="password" required />
             {state?.fieldErrors?.password && (
               <p className="text-xs text-destructive">{state.fieldErrors.password[0]}</p>
@@ -52,5 +68,13 @@ export default function LoginPage() {
         </CardFooter>
       </form>
     </Card>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }
