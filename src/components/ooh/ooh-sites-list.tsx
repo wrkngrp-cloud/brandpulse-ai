@@ -19,7 +19,7 @@ interface Site {
   currency: string | null
   campaign_start: string | null
   campaign_end: string | null
-  cultural_zone: string | null
+  lga: string | null
   vanity_slug: string | null
   visits: number
 }
@@ -82,7 +82,7 @@ export function OohSitesList({ sites, appUrl }: OohSitesListProps) {
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5 truncate">
                   {[site.city, site.state].filter(Boolean).join(', ')}
-                  {site.cultural_zone ? ` · ${site.cultural_zone}` : ''}
+                  {site.lga ? ` · ${site.lga}` : ''}
                   {site.daily_traffic ? ` · ${site.daily_traffic.toLocaleString()}/day est.` : ''}
                 </p>
               </div>

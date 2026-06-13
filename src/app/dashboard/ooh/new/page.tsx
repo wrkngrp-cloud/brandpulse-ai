@@ -8,10 +8,14 @@ export default async function NewOohSitePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase.from('brands').select('name').limit(1).single()
+  const { data: brand } = await supabase
+    .from('brands').select('name, ooh_redirect_domain').limit(1).single()
   if (!brand) redirect('/onboarding')
 
-  const appUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const defaultUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const appUrl = brand.ooh_redirect_domain
+    ? `https://${brand.ooh_redirect_domain}`
+    : defaultUrl
 
   return (
     <div className="max-w-2xl space-y-6">

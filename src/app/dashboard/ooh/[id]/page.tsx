@@ -45,7 +45,12 @@ export default async function OohSitePage({
     .order('week_start', { ascending: true })
     .limit(12)
 
-  const appUrl  = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const { data: brand } = await supabase
+    .from('brands').select('ooh_redirect_domain').limit(1).single()
+  const defaultUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const appUrl     = brand?.ooh_redirect_domain
+    ? `https://${brand.ooh_redirect_domain}`
+    : defaultUrl
   const vanityLink = site.vanity_slug ? `${appUrl}/go/${site.vanity_slug}` : null
 
   return (
@@ -64,7 +69,7 @@ export default async function OohSitePage({
             <p className="text-sm text-muted-foreground mt-0.5">
               {[site.city, site.state, site.country].filter(Boolean).join(', ')}
               {site.format_type ? ` · ${site.format_type}` : ''}
-              {site.cultural_zone ? ` · ${site.cultural_zone}` : ''}
+              {site.lga ? ` · ${site.lga}` : ''}
             </p>
           </div>
         </div>

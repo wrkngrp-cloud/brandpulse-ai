@@ -1,23 +1,81 @@
 'use client'
 
-import { useActionState, useState, useEffect } from 'react'
-import { toast }           from 'sonner'
-import { Button }          from '@/components/ui/button'
-import { Input }           from '@/components/ui/input'
-import { Label }           from '@/components/ui/label'
-import { Textarea }        from '@/components/ui/textarea'
-import { Copy, RefreshCw, Link2, QrCode } from 'lucide-react'
-import { cn }              from '@/lib/utils'
+import { useActionState, useState, useEffect, useRef } from 'react'
+import { toast }             from 'sonner'
+import { Button }            from '@/components/ui/button'
+import { Input }             from '@/components/ui/input'
+import { Label }             from '@/components/ui/label'
+import { Textarea }          from '@/components/ui/textarea'
+import { Copy, RefreshCw, Link2, QrCode, MapPin, Sparkles, Loader2 } from 'lucide-react'
+import { estimateTraffic }   from '@/app/dashboard/ooh/actions'
 
 const FORMAT_TYPES = [
-  'Billboard', 'Transit Shelter', 'Digital Billboard',
-  'Bridge Panel', 'Unipole', 'Wall Mural', 'Mall Display', 'Other',
+  'Billboard', 'Unipole', 'Bridge Panel', 'Transit Shelter',
+  'Digital Billboard', 'Wall Mural', 'Mall Display', 'Lamp Post Banner', 'Other',
 ]
 
-const CULTURAL_ZONES = [
-  'Lagos Island', 'Lagos Mainland', 'Abuja', 'Port Harcourt',
-  'Kano', 'Ibadan', 'Enugu', 'Other',
-]
+// Nigerian LGAs for major OOH markets
+const LGAS_BY_CITY: Record<string, string[]> = {
+  Lagos: [
+    'Eti-Osa (Victoria Island / Ikoyi / Lekki)',
+    'Lagos Island',
+    'Lagos Mainland',
+    'Alimosho',
+    'Ikeja',
+    'Surulere',
+    'Mushin',
+    'Oshodi-Isolo',
+    'Kosofe',
+    'Shomolu',
+    'Agege',
+    'Ajeromi-Ifelodun',
+    'Amuwo-Odofin',
+    'Apapa',
+    'Badagry',
+    'Epe',
+    'Ibeju-Lekki',
+    'Ifako-Ijaiye',
+    'Ikorodu',
+    'Ojodu',
+    'Ojota',
+  ],
+  Abuja: [
+    'Municipal Area Council (City Centre)',
+    'Abuja North',
+    'Abuja South',
+    'Bwari',
+    'Gwagwalada',
+    'Kuje',
+    'Kwali',
+  ],
+  'Port Harcourt': [
+    'Port Harcourt City',
+    'Obio-Akpor',
+    'Eleme',
+    'Ikwerre',
+    'Oyigbo',
+  ],
+  Kano: [
+    'Kano Municipal',
+    'Nassarawa',
+    'Dala',
+    'Fagge',
+    'Gwale',
+    'Tarauni',
+    'Ungogo',
+  ],
+  Ibadan: [
+    'Ibadan North',
+    'Ibadan North-East',
+    'Ibadan North-West',
+    'Ibadan South-East',
+    'Ibadan South-West',
+    'Lagelu',
+    'Ona Ara',
+  ],
+}
+
+const ALL_LGAS = [...new Set(Object.values(LGAS_BY_CITY).flat())].sort()
 
 function slugify(text: string) {
   return text
@@ -39,11 +97,23 @@ interface OohSiteFormProps {
 
 export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSiteFormProps) {
   const [state, formAction, pending] = useActionState(action, null)
-  const [siteName,   setSiteName]   = useState(String(defaultValues?.site_name   ?? ''))
-  const [city,       setCity]       = useState(String(defaultValues?.city        ?? ''))
-  const [landingUrl, setLandingUrl] = useState(String(defaultValues?.landing_url ?? ''))
-  const [slug,       setSlug]       = useState(String(defaultValues?.vanity_slug ?? ''))
-  const [qrEnabled,  setQrEnabled]  = useState(Boolean(defaultValues?.qr_token))
+
+  const [siteName,     setSiteName]     = useState(String(defaultValues?.site_name    ?? ''))
+  const [address,      setAddress]      = useState(String(defaultValues?.address      ?? ''))
+  const [city,         setCity]         = useState(String(defaultValues?.city         ?? ''))
+  const [landingUrl,   setLandingUrl]   = useState(String(defaultValues?.landing_url  ?? ''))
+  const [slug,         setSlug]         = useState(String(defaultValues?.vanity_slug  ?? ''))
+  const [qrEnabled,    setQrEnabled]    = useState(Boolean(defaultValues?.qr_token))
+  const [lat,          setLat]          = useState<number | ''>(defaultValues?.lat != null ? Number(defaultValues.lat) : '')
+  const [lng,          setLng]          = useState<number | ''>(defaultValues?.lng != null ? Number(defaultValues.lng) : '')
+  const [geocoding,    setGeocoding]    = useState(false)
+  const [geocodeHint,  setGeocodeHint]  = useState('')
+  const [dailyTraffic, setDailyTraffic] = useState<number | ''>(defaultValues?.daily_traffic != null ? Number(defaultValues.daily_traffic) : '')
+  const [trafficAiEst, setTrafficAiEst] = useState(Boolean(defaultValues?.traffic_ai_estimated))
+  const [estimating,   setEstimating]   = useState(false)
+  const [lga,          setLga]          = useState(String(defaultValues?.lga ?? ''))
+
+  const addressRef = useRef<HTMLInputElement>(null)
 
   // Auto-derive slug from site name + city
   useEffect(() => {
@@ -56,11 +126,71 @@ export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSit
     if (state?.error) toast.error(state.error)
   }, [state])
 
+  // Mapbox forward geocoding
+  async function geocodeAddress() {
+    const query = address.trim() || `${siteName}, ${city}, Nigeria`
+    if (!query) return
+
+    const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+    if (!token) {
+      toast.error('Mapbox token not configured — add NEXT_PUBLIC_MAPBOX_TOKEN')
+      return
+    }
+
+    setGeocoding(true)
+    setGeocodeHint('')
+    try {
+      const url = new URL('https://api.mapbox.com/search/geocode/v6/forward')
+      url.searchParams.set('q',             query)
+      url.searchParams.set('country',       'NG')
+      url.searchParams.set('limit',         '1')
+      url.searchParams.set('access_token',  token)
+
+      const res  = await fetch(url.toString())
+      const json = await res.json()
+      const feature = json?.features?.[0]
+
+      if (!feature) {
+        setGeocodeHint('Address not found. Try adding city or state.')
+        return
+      }
+
+      const [foundLng, foundLat] = feature.geometry.coordinates as [number, number]
+      setLat(Number(foundLat.toFixed(6)))
+      setLng(Number(foundLng.toFixed(6)))
+      setGeocodeHint(`Pinned: ${feature.properties.full_address ?? feature.properties.name}`)
+    } catch {
+      toast.error('Geocoding failed. Check your connection.')
+    } finally {
+      setGeocoding(false)
+    }
+  }
+
+  async function handleEstimateTraffic() {
+    setEstimating(true)
+    try {
+      const result = await estimateTraffic(
+        (document.getElementById('format_type') as HTMLSelectElement)?.value ?? '',
+        lga,
+        city,
+      )
+      if (result) {
+        setDailyTraffic(result.traffic)
+        setTrafficAiEst(true)
+        toast.success(`AI estimate: ${result.traffic.toLocaleString()}/day — ${result.reasoning}`)
+      } else {
+        toast.error('Could not generate estimate. Add city and format first.')
+      }
+    } finally {
+      setEstimating(false)
+    }
+  }
+
   const vanityLink = slug ? `${appUrl}/go/${slug}` : ''
   const utmLink = vanityLink && landingUrl
     ? (() => {
         try {
-          const url = new URL(landingUrl)
+          const url      = new URL(landingUrl)
           const brandSlug = slugify(brandName)
           url.searchParams.set('utm_source',   'ooh')
           url.searchParams.set('utm_medium',   'billboard')
@@ -81,8 +211,12 @@ export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSit
     setSlug(base ? `${base}-${suffix}` : suffix)
   }
 
+  // LGA list: city-specific if city matches, otherwise full list
+  const lgaOptions = LGAS_BY_CITY[city] ?? ALL_LGAS
+
   return (
     <form action={formAction} className="space-y-6">
+
       {/* Section 1: Site Details */}
       <div className="border rounded-xl p-5 space-y-4">
         <h2 className="text-sm font-semibold">Site Details</h2>
@@ -91,12 +225,53 @@ export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSit
           <Label htmlFor="site_name">Site name</Label>
           <Input
             id="site_name" name="site_name"
-            placeholder="e.g. Marina Unipole Billboard"
+            placeholder="e.g. Marina Unipole"
             value={siteName}
             onChange={e => setSiteName(e.target.value)}
             required
           />
         </div>
+
+        {/* Address with geocoding */}
+        <div className="space-y-1.5">
+          <Label htmlFor="address">Address</Label>
+          <div className="flex gap-2">
+            <Input
+              id="address" name="address"
+              ref={addressRef}
+              placeholder="e.g. 3 Ahmed Onibudo Street, Victoria Island"
+              value={address}
+              onChange={e => setAddress(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); geocodeAddress() } }}
+              className="flex-1"
+            />
+            <Button
+              type="button" variant="outline" size="sm"
+              className="shrink-0 gap-1.5"
+              onClick={geocodeAddress}
+              disabled={geocoding}
+            >
+              {geocoding
+                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                : <MapPin className="h-3.5 w-3.5" />}
+              {geocoding ? 'Looking up…' : 'Get coordinates'}
+            </Button>
+          </div>
+          {geocodeHint && (
+            <p className={`text-xs ${geocodeHint.startsWith('Pinned') ? 'text-green-600 dark:text-green-400' : 'text-amber-600'}`}>
+              {geocodeHint}
+            </p>
+          )}
+          {lat !== '' && lng !== '' && (
+            <p className="text-xs text-muted-foreground tabular-nums">
+              Coordinates: {Number(lat).toFixed(6)}, {Number(lng).toFixed(6)}
+            </p>
+          )}
+        </div>
+
+        {/* Hidden lat/lng — populated by geocoding */}
+        <input type="hidden" name="lat" value={lat === '' ? '' : String(lat)} />
+        <input type="hidden" name="lng" value={lng === '' ? '' : String(lng)} />
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
@@ -128,22 +303,20 @@ export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSit
               className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="">Select format…</option>
-              {FORMAT_TYPES.map(f => (
-                <option key={f} value={f}>{f}</option>
-              ))}
+              {FORMAT_TYPES.map(f => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cultural_zone">Cultural zone</Label>
+            <Label htmlFor="lga">LGA</Label>
             <select
-              id="cultural_zone" name="cultural_zone"
-              defaultValue={String(defaultValues?.cultural_zone ?? '')}
+              id="lga" name="lga"
+              value={lga}
+              onChange={e => setLga(e.target.value)}
               className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <option value="">Select zone…</option>
-              {CULTURAL_ZONES.map(z => (
-                <option key={z} value={z}>{z}</option>
-              ))}
+              <option value="">Select LGA…</option>
+              {lgaOptions.map(l => <option key={l} value={l}>{l}</option>)}
+              <option value="Other">Other</option>
             </select>
           </div>
         </div>
@@ -156,48 +329,55 @@ export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSit
           />
           <Label htmlFor="illuminated" className="cursor-pointer">Illuminated / backlit</Label>
         </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="lat">Latitude</Label>
-            <Input
-              id="lat" name="lat" type="number" step="0.000001"
-              placeholder="6.4541"
-              defaultValue={defaultValues?.lat != null ? String(defaultValues.lat) : ''}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="lng">Longitude</Label>
-            <Input
-              id="lng" name="lng" type="number" step="0.000001"
-              placeholder="3.3947"
-              defaultValue={defaultValues?.lng != null ? String(defaultValues.lng) : ''}
-            />
-          </div>
-        </div>
       </div>
 
       {/* Section 2: Cost & Campaign */}
       <div className="border rounded-xl p-5 space-y-4">
         <h2 className="text-sm font-semibold">Cost &amp; Campaign Window</h2>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="daily_traffic">Est. daily traffic</Label>
+        {/* Daily traffic with AI estimate */}
+        <div className="space-y-1.5">
+          <Label htmlFor="daily_traffic">Est. daily traffic</Label>
+          <div className="flex gap-2">
             <Input
               id="daily_traffic" name="daily_traffic" type="number" min="0"
               placeholder="50000"
-              defaultValue={defaultValues?.daily_traffic != null ? String(defaultValues.daily_traffic) : ''}
+              value={dailyTraffic === '' ? '' : String(dailyTraffic)}
+              onChange={e => {
+                setDailyTraffic(e.target.value === '' ? '' : Number(e.target.value))
+                setTrafficAiEst(false)
+              }}
+              className="flex-1"
             />
+            <Button
+              type="button" variant="outline" size="sm"
+              className="shrink-0 gap-1.5"
+              onClick={handleEstimateTraffic}
+              disabled={estimating || !city}
+              title="AI-estimate based on format, LGA, and city"
+            >
+              {estimating
+                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                : <Sparkles className="h-3.5 w-3.5" />}
+              {estimating ? 'Estimating…' : 'AI estimate'}
+            </Button>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="operator">Operator / vendor</Label>
-            <Input
-              id="operator" name="operator"
-              placeholder="Posterscope, etc."
-              defaultValue={String(defaultValues?.operator ?? '')}
-            />
-          </div>
+          {trafficAiEst && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <Sparkles className="h-3 w-3" />
+              AI-estimated — verify with your media operator if available.
+            </p>
+          )}
+          <input type="hidden" name="traffic_ai_estimated" value={String(trafficAiEst)} />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="operator">Operator / vendor</Label>
+          <Input
+            id="operator" name="operator"
+            placeholder="Posterscope, LAASAA permit, etc."
+            defaultValue={String(defaultValues?.operator ?? '')}
+          />
         </div>
 
         <div className="grid grid-cols-3 gap-4">
@@ -250,7 +430,9 @@ export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSit
             onChange={e => setLandingUrl(e.target.value)}
             required
           />
-          <p className="text-xs text-muted-foreground">The page visitors land on after scanning/typing the vanity link.</p>
+          <p className="text-xs text-muted-foreground">
+            The page visitors land on after typing or scanning the vanity link.
+          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -275,13 +457,9 @@ export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSit
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
-                  <Link2 className="h-3 w-3" /> Vanity Link
+                  <Link2 className="h-3 w-3" /> Vanity Link (print this on the billboard)
                 </span>
-                <Button
-                  type="button" variant="ghost" size="sm"
-                  className="h-6 px-2 text-xs"
-                  onClick={() => copyLink(vanityLink)}
-                >
+                <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => copyLink(vanityLink)}>
                   <Copy className="h-3 w-3 mr-1" /> Copy
                 </Button>
               </div>
@@ -292,13 +470,9 @@ export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSit
               <div className="space-y-1 pt-2 border-t">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    UTM Destination
+                    Full UTM Destination (for analytics)
                   </span>
-                  <Button
-                    type="button" variant="ghost" size="sm"
-                    className="h-6 px-2 text-xs"
-                    onClick={() => copyLink(utmLink)}
-                  >
+                  <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => copyLink(utmLink)}>
                     <Copy className="h-3 w-3 mr-1" /> Copy
                   </Button>
                 </div>
@@ -312,9 +486,7 @@ export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSit
           <QrCode className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
           <div className="flex-1">
             <div className="flex items-center justify-between">
-              <Label htmlFor="qr_enabled" className="text-sm cursor-pointer">
-                Generate QR code
-              </Label>
+              <Label htmlFor="qr_enabled" className="text-sm cursor-pointer">Generate QR code</Label>
               <input
                 type="checkbox" id="qr_enabled" name="qr_enabled"
                 checked={qrEnabled}
@@ -323,7 +495,7 @@ export function OohSiteForm({ action, brandName, appUrl, defaultValues }: OohSit
               />
             </div>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Off by default. Enable only if the format allows scan interaction (e.g. bus shelter, mall display).
+              Off by default. Enable only for formats that allow scan interaction (bus shelter, mall display).
             </p>
           </div>
         </div>

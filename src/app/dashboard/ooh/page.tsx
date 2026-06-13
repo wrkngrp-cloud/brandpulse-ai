@@ -12,7 +12,8 @@ export default async function OohPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase.from('brands').select('id, name').limit(1).single()
+  const { data: brand } = await supabase
+    .from('brands').select('id, name, ooh_redirect_domain').limit(1).single()
   if (!brand) redirect('/onboarding')
 
   const { data: sites } = await supabase
@@ -20,14 +21,17 @@ export default async function OohPage() {
     .select(`
       id, site_name, city, state, country, format_type, illuminated,
       daily_traffic, weekly_cost, currency,
-      campaign_start, campaign_end, cultural_zone,
+      campaign_start, campaign_end, lga,
       vanity_slug, landing_url, visits, qr_token, qr_scan_count,
       lat, lng, photo_url, notes
     `)
     .eq('brand_id', brand.id)
     .order('created_at', { ascending: false })
 
-  const appUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const defaultUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const appUrl = brand.ooh_redirect_domain
+    ? `https://${brand.ooh_redirect_domain}`
+    : defaultUrl
 
   return (
     <div className="space-y-6">
