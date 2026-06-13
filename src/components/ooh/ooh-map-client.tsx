@@ -50,7 +50,7 @@ export function OohMapClient({ sites, onMapReady }: OohMapClientProps) {
     import('mapbox-gl').then(({ default: mapboxgl }) => {
       if (!mapRef.current) return
       // Point worker at CDN so Turbopack production builds don't break
-      mapboxgl.workerUrl = `https://api.mapbox.com/mapbox-gl-js/v${mapboxgl.version}/mapbox-gl-csp-worker.js`
+      mapboxgl.workerUrl = '/mapbox-gl-csp-worker.js'
       mapboxgl.accessToken = token
 
       const map = new mapboxgl.Map({
