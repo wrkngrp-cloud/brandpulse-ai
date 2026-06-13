@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { StatusToggle } from './status-toggle'
 import { CopyLinkButton } from './copy-link-button'
+import { SurveyAiAnalysis } from './ai-analysis'
 import { Badge } from '@/components/ui/badge'
 
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
@@ -184,6 +185,8 @@ export default async function SurveyDetailPage({
           No responses yet. Share the link above to start collecting feedback.
         </div>
       )}
+
+      <SurveyAiAnalysis surveyId={survey.id} responseCount={okResponses.length} />
     </div>
   )
 }

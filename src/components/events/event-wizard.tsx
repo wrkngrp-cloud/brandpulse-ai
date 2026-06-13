@@ -82,7 +82,7 @@ const INIT: WizardData = {
   ambassadors: [{ name: '', phone: '' }],
 }
 
-export function EventWizard() {
+export function EventWizard({ campaignId }: { campaignId?: string | null }) {
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [data, setData] = useState<WizardData>(INIT)
@@ -137,6 +137,7 @@ export function EventWizard() {
       event_type:          data.event_type || undefined,
       venue:               data.venue.trim()    || undefined,
       city:                data.city.trim(),
+      campaign_id:         campaignId ?? undefined,
       state:               data.state.trim()    || undefined,
       date_start:          data.date_start,
       date_end:            data.date_end,

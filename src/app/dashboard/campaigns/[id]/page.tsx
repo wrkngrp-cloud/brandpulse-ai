@@ -30,7 +30,7 @@ export default async function CampaignDetailPage({
 
   if (!campaign) notFound()
 
-  const [{ data: oohSites }, { data: events }] = await Promise.all([
+  const [{ data: oohSites }, { data: events }, { data: unlinkedSites }, { data: unlinkedEvents }] = await Promise.all([
     supabase
       .from('ooh_sites')
       .select('id, site_name, city, state, format_type, visits, campaign_start, campaign_end, vanity_slug, lat, lng, monthly_cost, currency, lga')
@@ -42,6 +42,19 @@ export default async function CampaignDetailPage({
       .select('id, name, event_type, city, state, date_start, date_end, status, budget, currency')
       .eq('campaign_id', id)
       .order('date_start', { ascending: false }),
+    supabase
+      .from('ooh_sites')
+      .select('id, site_name, city, state, format_type, visits')
+      .is('campaign_id', null)
+      .eq('status', 'active')
+      .order('visits', { ascending: false })
+      .limit(30),
+    supabase
+      .from('events')
+      .select('id, name, event_type, city, date_start, status')
+      .is('campaign_id', null)
+      .order('date_start', { ascending: false })
+      .limit(30),
   ])
 
   return (
@@ -65,6 +78,8 @@ export default async function CampaignDetailPage({
         oohSites={oohSites ?? []}
         events={events ?? []}
         activeTab={tab}
+        unlinkedSites={unlinkedSites ?? []}
+        unlinkedEvents={unlinkedEvents ?? []}
       />
     </div>
   )

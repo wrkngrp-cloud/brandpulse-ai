@@ -6,6 +6,7 @@ import { cn }         from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink } from 'lucide-react'
 import { CampaignOverview } from './campaign-overview'
+import { LinkOohSiteDialog, LinkEventDialog } from './link-existing-dialog'
 
 interface Channel {
   id: string
@@ -58,11 +59,16 @@ interface Event {
   currency: string
 }
 
+interface UnlinkedSite { id: string; site_name: string; city: string | null; state: string | null; format_type: string | null; visits: number }
+interface UnlinkedEvent { id: string; name: string; event_type: string | null; city: string; date_start: string; status: string }
+
 interface Props {
   campaign: Campaign
   oohSites: OohSite[]
   events: Event[]
   activeTab: string
+  unlinkedSites?: UnlinkedSite[]
+  unlinkedEvents?: UnlinkedEvent[]
 }
 
 const TABS = [
@@ -119,7 +125,7 @@ function fmtMoney(amount: number | null, currency = 'NGN') {
   return `${currency} ${Number(amount).toLocaleString('en-NG')}`
 }
 
-export function CampaignDetailClient({ campaign, oohSites, events, activeTab }: Props) {
+export function CampaignDetailClient({ campaign, oohSites, events, activeTab, unlinkedSites = [], unlinkedEvents = [] }: Props) {
   const router = useRouter()
 
   const objectives    = campaign.objectives ?? []
@@ -183,17 +189,20 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab }: 
       {/* ── OOH Placements ── */}
       {activeTab === 'ooh' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <p className="text-sm text-muted-foreground">
               {oohSites.length} site{oohSites.length !== 1 ? 's' : ''} · {oohSites.reduce((s, site) => s + (site.visits ?? 0), 0).toLocaleString()} total visits
             </p>
-            <Link
-              href={`/dashboard/ooh/new?campaign_id=${campaign.id}`}
-              className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'inline-flex items-center')}
-            >
-              <Plus className="h-4 w-4 mr-1.5" />
-              Add OOH site
-            </Link>
+            <div className="flex items-center gap-2">
+              <LinkOohSiteDialog campaignId={campaign.id} availableSites={unlinkedSites} />
+              <Link
+                href={`/dashboard/ooh/new?campaign_id=${campaign.id}`}
+                className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'inline-flex items-center')}
+              >
+                <Plus className="h-4 w-4 mr-1.5" />
+                New site
+              </Link>
+            </div>
           </div>
 
           {oohSites.length === 0 ? (
@@ -246,17 +255,20 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab }: 
       {/* ── Events ── */}
       {activeTab === 'events' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <p className="text-sm text-muted-foreground">
               {events.length} event{events.length !== 1 ? 's' : ''} linked to this campaign
             </p>
-            <Link
-              href={`/dashboard/events/new?campaign_id=${campaign.id}`}
-              className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'inline-flex items-center')}
-            >
-              <Plus className="h-4 w-4 mr-1.5" />
-              Add event
-            </Link>
+            <div className="flex items-center gap-2">
+              <LinkEventDialog campaignId={campaign.id} availableEvents={unlinkedEvents} />
+              <Link
+                href={`/dashboard/events/new?campaign_id=${campaign.id}`}
+                className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'inline-flex items-center')}
+              >
+                <Plus className="h-4 w-4 mr-1.5" />
+                New event
+              </Link>
+            </div>
           </div>
 
           {events.length === 0 ? (

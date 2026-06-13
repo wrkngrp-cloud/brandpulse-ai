@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { TrendingUp, TrendingDown, Minus, MessageCircle } from 'lucide-react'
 import { TriggerCrawlButton } from './trigger-crawl-button'
 import { CrawlHistory } from './crawl-history'
+import { SentimentTrendChart } from './sentiment-trend-chart'
 
 const SENTIMENT_COLOURS: Record<string, string> = {
   positive: 'text-green-600',
@@ -234,27 +235,25 @@ async function SentimentData() {
         </div>
       )}
 
-      {/* 7-day trend */}
+      {/* 7-day trend — Recharts line chart */}
       {daily && daily.length > 1 && (
         <div className="border rounded-xl p-4 space-y-3">
-          <p className="text-sm font-medium">7-day trend</p>
-          <div className="flex items-end gap-1.5 h-16">
-            {[...daily].reverse().map(d => {
-              const height = Math.max(4, Math.round((d.social_score / 100) * 64))
-              return (
-                <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
-                  <div
-                    className="w-full rounded-sm bg-foreground/20 hover:bg-foreground/40 transition-colors"
-                    style={{ height: `${height}px` }}
-                    title={`${d.day}: ${Math.round(d.social_score)}`}
-                  />
-                  <span className="text-[9px] text-muted-foreground">
-                    {new Date(d.day).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
-                  </span>
-                </div>
-              )
-            })}
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">7-day trend</p>
+            <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-0.5 bg-foreground" /> sentiment score</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-0.5 bg-green-500" style={{ backgroundImage: 'repeating-linear-gradient(90deg, #22c55e 0, #22c55e 4px, transparent 4px, transparent 6px)' }} /> positive %</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-0.5 bg-red-400" style={{ backgroundImage: 'repeating-linear-gradient(90deg, #f87171 0, #f87171 4px, transparent 4px, transparent 6px)' }} /> negative %</span>
+            </div>
           </div>
+          <SentimentTrendChart
+            data={[...daily].reverse().map(d => ({
+              day:      d.day,
+              score:    d.social_score,
+              positive: d.positive_pct,
+              negative: d.negative_pct,
+            }))}
+          />
         </div>
       )}
 

@@ -66,6 +66,7 @@ const eventSchema = z.object({
   currency:           z.string().default('NGN'),
   missed_call_number: z.string().optional(),
   ambassadors:        z.array(ambassadorSchema).min(1, 'Add at least one ambassador'),
+  campaign_id:        z.string().uuid().optional(),
 })
 
 export async function createEvent(_prev: EventState, formData: FormData): Promise<EventState> {
@@ -98,6 +99,7 @@ export async function createEvent(_prev: EventState, formData: FormData): Promis
     budget:               d.budget               ?? null,
     currency:             d.currency,
     missed_call_number:   d.missed_call_number   ?? null,
+    campaign_id:          d.campaign_id          ?? null,
     status:               'planned',
   }).select('id').single()
 
