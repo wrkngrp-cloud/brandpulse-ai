@@ -33,7 +33,6 @@ export function DebriefForm({ eventId, existingDebrief }: Props) {
     if (state?.success) {
       toast.success('Debrief saved. Generating your ROI report…')
       router.push(`/dashboard/events/${eventId}`)
-      router.refresh()
     }
     if (state?.error) toast.error(state.error)
   }, [state, router, eventId])
