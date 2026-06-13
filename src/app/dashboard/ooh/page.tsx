@@ -15,18 +15,47 @@ export default async function OohPage() {
     .from('brands').select('id, name, ooh_redirect_domain').limit(1).single()
   if (!brand) redirect('/onboarding')
 
-  const { data: sites } = await supabase
+  // Fetch sites. campaign_id and campaigns join are available after migration 20260620000000.
+  // If the column doesn't exist yet (pre-migration), the query falls back to sites without campaign data.
+  const { data: sitesRaw, error: sitesError } = await supabase
     .from('ooh_sites')
     .select(`
       id, site_name, address, city, state, country, format_type, illuminated,
       daily_traffic, monthly_cost, currency,
       campaign_start, campaign_end, lga,
       vanity_slug, landing_url, visits, qr_token, qr_scan_count,
-      lat, lng, photo_url, notes
+      lat, lng, photo_url, notes,
+      campaign_id,
+      campaigns ( id, name )
     `)
     .eq('brand_id', brand.id)
     .eq('status', 'active')
     .order('created_at', { ascending: false })
+
+  // If the campaign join fails (pre-migration), fall back to a query without it
+  let sites = sitesRaw
+  if (sitesError) {
+    const { data: fallback } = await supabase
+      .from('ooh_sites')
+      .select(`
+        id, site_name, address, city, state, country, format_type, illuminated,
+        daily_traffic, monthly_cost, currency,
+        campaign_start, campaign_end, lga,
+        vanity_slug, landing_url, visits, qr_token, qr_scan_count,
+        lat, lng, photo_url, notes
+      `)
+      .eq('brand_id', brand.id)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+    sites = fallback as unknown as typeof sitesRaw
+  }
+
+  const sitesWithCampaign = (sites ?? []).map(s => ({
+    ...s,
+    campaign_name: (s as { campaigns?: unknown }).campaigns
+      ? ((s as { campaigns?: { name?: string } }).campaigns?.name ?? null)
+      : null,
+  }))
 
   const defaultUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
   const appUrl = brand.ooh_redirect_domain
@@ -51,7 +80,7 @@ export default async function OohPage() {
         </Link>
       </div>
 
-      {!sites?.length ? (
+      {!sitesWithCampaign.length ? (
         <div className="border rounded-xl p-12 text-center space-y-3">
           <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mx-auto">
             <MapPin className="h-6 w-6 text-muted-foreground" />
@@ -67,7 +96,7 @@ export default async function OohPage() {
           </Link>
         </div>
       ) : (
-        <OohDashboardClient sites={sites ?? []} appUrl={appUrl} />
+        <OohDashboardClient sites={sitesWithCampaign} appUrl={appUrl} />
       )}
     </div>
   )

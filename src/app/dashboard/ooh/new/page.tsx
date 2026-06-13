@@ -3,7 +3,13 @@ import { redirect }      from 'next/navigation'
 import { OohSiteForm }   from '@/components/ooh/ooh-site-form'
 import { createSite }    from '../actions'
 
-export default async function NewOohSitePage() {
+export default async function NewOohSitePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ campaign_id?: string }>
+}) {
+  const { campaign_id } = await searchParams
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
@@ -11,6 +17,14 @@ export default async function NewOohSitePage() {
   const { data: brand } = await supabase
     .from('brands').select('id, name, ooh_redirect_domain').limit(1).single()
   if (!brand) redirect('/onboarding')
+
+  // Resolve campaign name for display if campaign_id provided
+  let campaignName: string | null = null
+  if (campaign_id) {
+    const { data: campaign } = await supabase
+      .from('campaigns').select('name').eq('id', campaign_id).single()
+    campaignName = campaign?.name ?? null
+  }
 
   const defaultUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
   const appUrl = brand.ooh_redirect_domain
@@ -32,7 +46,9 @@ export default async function NewOohSitePage() {
       <div>
         <h1 className="text-xl font-semibold">Add OOH Site</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Generate a vanity link and UTM to attribute traffic from this site.
+          {campaignName
+            ? `Adding to campaign: ${campaignName}`
+            : 'Generate a vanity link and UTM to attribute traffic from this site.'}
         </p>
       </div>
 
@@ -42,6 +58,7 @@ export default async function NewOohSitePage() {
         appUrl={appUrl}
         customDomain={brand.ooh_redirect_domain ?? null}
         draft={draft ?? null}
+        campaignId={campaign_id ?? null}
       />
     </div>
   )

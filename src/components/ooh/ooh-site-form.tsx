@@ -131,9 +131,10 @@ interface OohSiteFormProps {
   customDomain: string | null
   defaultValues?: Record<string, string | number | boolean | null>
   draft?: DraftValues | null
+  campaignId?: string | null
 }
 
-export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultValues, draft }: OohSiteFormProps) {
+export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultValues, draft, campaignId }: OohSiteFormProps) {
   const [state, formAction, pending] = useActionState(action, null)
 
   const dv = defaultValues ?? {}
@@ -435,6 +436,8 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
       className="space-y-6"
       onChange={e => scheduleDraftSave(e.currentTarget)}
     >
+
+      {campaignId && <input type="hidden" name="campaign_id" value={campaignId} />}
 
       {/* Draft resume banner */}
       {showDraftBanner && draft && !defaultValues && (
