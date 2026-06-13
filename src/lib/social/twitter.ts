@@ -216,6 +216,72 @@ export async function fetchTwitterUserMentions(
   })
 }
 
+// Searches recent tweets that mention the brand name as text or hashtag.
+// Uses the connected user's OAuth token — same credential as fetchTwitterUserMentions.
+// Excludes retweets and the brand's own tweets so results are third-party mentions only.
+export async function fetchTwitterKeywordMentions(
+  brandName: string,
+  excludeUsername: string,   // handle WITHOUT @, e.g. "kudabank"
+  accessToken: string,
+  since: Date
+): Promise<TwitterMention[]> {
+  // Build hashtag variant: "Kuda Bank" → "kudabank"
+  const hashtagSlug = brandName.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+  // Exact phrase OR hashtag, exclude retweets and the brand's own posts
+  const query = `("${brandName}" OR #${hashtagSlug}) -is:retweet${excludeUsername ? ` -(from:${excludeUsername})` : ''}`
+  const sinceIso = since.toISOString().replace(/\.\d{3}Z$/, 'Z')
+
+  const url =
+    `${API}/2/tweets/search/recent` +
+    `?query=${encodeURIComponent(query)}` +
+    `&tweet.fields=created_at,public_metrics,text,author_id` +
+    `&expansions=author_id` +
+    `&user.fields=public_metrics,username` +
+    `&start_time=${sinceIso}` +
+    `&max_results=100`
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+
+  if (res.status === 402) throw new Error('X_CREDITS_DEPLETED')
+  if (res.status === 403 || res.status === 401) {
+    throw new Error(`X keyword search auth error ${res.status}: ${await res.text()}`)
+  }
+  if (!res.ok) {
+    throw new Error(`X API keyword search error ${res.status}: ${await res.text()}`)
+  }
+
+  const data = await res.json() as {
+    data?: Array<{
+      id: string
+      text: string
+      created_at: string
+      author_id: string
+      public_metrics: { impression_count: number }
+    }>
+    includes?: {
+      users?: Array<{ id: string; username: string; public_metrics?: { followers_count: number } }>
+    }
+  }
+
+  if (!data.data?.length) return []
+
+  const userMap = new Map((data.includes?.users ?? []).map(u => [u.id, u]))
+  return data.data.map(t => {
+    const author = userMap.get(t.author_id)
+    return {
+      id: t.id,
+      content: t.text,
+      authorHandle: author?.username ?? '',
+      authorFollowers: author?.public_metrics?.followers_count ?? 0,
+      reach: t.public_metrics.impression_count,
+      created_at: t.created_at,
+    }
+  })
+}
+
 export async function fetchTwitterPosts(userId: string, accessToken: string, since: Date): Promise<TwitterPost[]> {
   const sinceIso = since.toISOString().replace(/\.\d{3}Z$/, 'Z')
   const fields = 'created_at,public_metrics,text'
