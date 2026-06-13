@@ -24,7 +24,7 @@ export async function POST() {
 
   try {
     const result = await runCrawl(brand.id, runId)
-    return NextResponse.json({ ok: true, runId, ...result })
+    return NextResponse.json({ ok: true, runId, ...result, platformErrors: result.platformErrors })
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     if (runId) {
