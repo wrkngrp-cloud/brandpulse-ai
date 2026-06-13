@@ -68,7 +68,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
   const today = new Date().toISOString().slice(0, 10)
 
   const { data: brand } = await supabase
-    .from('brands').select('id, name').eq('id', brandId).single()
+    .from('brands').select('id, name, monitored_hashtags').eq('id', brandId).single()
   if (!brand) throw new Error('Brand not found')
 
   // ── 1. Get connected social accounts ──────────────────────────────────────
@@ -112,9 +112,11 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
       const handle = (twitterConn.account_name ?? '').replace(/^@/, '')
 
       // Run @mention timeline and keyword/text search in parallel
+      // Pass custom hashtags so the search query includes them alongside the brand name
+      const extraHashtags = (brand.monitored_hashtags as string[] | null) ?? []
       const [mentionTweets, keywordTweets] = await Promise.all([
         withRefresh(() => fetchTwitterUserMentions(twitterConn.account_id!, accessToken, since)),
-        withRefresh(() => fetchTwitterKeywordMentions(brand.name, handle, accessToken, since))
+        withRefresh(() => fetchTwitterKeywordMentions(brand.name, handle, accessToken, since, extraHashtags))
           .catch((err: unknown): import('@/lib/social/twitter').TwitterMention[] => {
             // Keyword search failing (e.g. credits) should not block @mentions
             const msg = err instanceof Error ? err.message : String(err)
@@ -150,7 +152,8 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
 
   if (instagramConn?.account_id && instagramConn.access_token) {
     try {
-      const hashtags = deriveHashtags(brand.name)
+      const customHashtags = (brand.monitored_hashtags as string[] | null) ?? []
+      const hashtags = [...new Set([...deriveHashtags(brand.name), ...customHashtags])]
       const igToken = decrypt(instagramConn.access_token)
       const [hashtagMentions, taggedMedia] = await Promise.all([
         fetchInstagramHashtagMentions(instagramConn.account_id, igToken, hashtags, since),

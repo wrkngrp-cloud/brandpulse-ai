@@ -223,13 +223,16 @@ export async function fetchTwitterKeywordMentions(
   brandName: string,
   excludeUsername: string,   // handle WITHOUT @, e.g. "kudabank"
   accessToken: string,
-  since: Date
+  since: Date,
+  extraHashtags: string[] = []
 ): Promise<TwitterMention[]> {
-  // Build hashtag variant: "Kuda Bank" → "kudabank"
-  const hashtagSlug = brandName.toLowerCase().replace(/[^a-z0-9]/g, '')
+  // Build base hashtag from brand name: "Kuda Bank" → "#kudabank"
+  const baseSlug = brandName.toLowerCase().replace(/[^a-z0-9]/g, '')
+  const allHashtags = [...new Set([baseSlug, ...extraHashtags.map(h => h.replace(/^#/, '').toLowerCase())])]
+  const hashtagPart = allHashtags.map(h => `#${h}`).join(' OR ')
 
-  // Exact phrase OR hashtag, exclude retweets and the brand's own posts
-  const query = `("${brandName}" OR #${hashtagSlug}) -is:retweet${excludeUsername ? ` -(from:${excludeUsername})` : ''}`
+  // Exact brand name phrase OR any of the hashtags, no retweets, exclude brand's own tweets
+  const query = `("${brandName}" OR ${hashtagPart}) -is:retweet${excludeUsername ? ` -(from:${excludeUsername})` : ''}`
   const sinceIso = since.toISOString().replace(/\.\d{3}Z$/, 'Z')
 
   const url =

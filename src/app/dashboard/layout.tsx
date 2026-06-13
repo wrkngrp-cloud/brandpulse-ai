@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardNav } from '@/components/dashboard/dashboard-nav'
+import { UserDropdown } from '@/components/dashboard/user-dropdown'
 import { AiCommand } from './ai-command'
 import { PrePostWidget } from './pre-post-widget'
 
@@ -18,12 +19,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   if (!brand?.name) redirect('/onboarding')
 
+  const userName  = (user.user_metadata?.full_name as string | undefined) ?? ''
+  const userEmail = user.email ?? ''
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Topbar */}
       <header className="border-b px-6 h-14 flex items-center justify-between shrink-0">
         <span className="font-semibold text-sm tracking-tight">BrandPulse</span>
-        <span className="text-xs text-muted-foreground">{brand.name}</span>
+        <UserDropdown name={userName} email={userEmail} brandName={brand.name} />
       </header>
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar placeholder — will be built out in later items */}
