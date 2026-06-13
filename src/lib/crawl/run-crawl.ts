@@ -96,7 +96,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
 
       let tweets = await fetchMentions().catch(async (err: unknown) => {
         const msg = err instanceof Error ? err.message : ''
-        const isExpired = msg.includes('401') || msg.includes('auth error')
+        const isExpired = (msg.includes('401') || msg.includes('auth error')) && !msg.includes('X_CREDITS_DEPLETED')
         if (!isExpired || !twitterConn.refresh_token) throw err
 
         // Refresh the token
