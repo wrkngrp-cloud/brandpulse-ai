@@ -19,7 +19,20 @@ export function ReportPoller({ eventId }: { eventId: string }) {
   const [ready,    setReady   ] = useState(false)
 
   useEffect(() => {
-    // Advance progress bar ~1.5% per second, capping at 90% until report arrives
+    const storageKey = `bp_report_start_${eventId}`
+
+    // Restore or initialise the start timestamp
+    let startMs = parseInt(localStorage.getItem(storageKey) ?? '0', 10)
+    if (!startMs) {
+      startMs = Date.now()
+      localStorage.setItem(storageKey, String(startMs))
+    }
+
+    // Jump to the appropriate progress level based on elapsed time
+    const elapsedSec = (Date.now() - startMs) / 1000
+    setProgress(Math.min(elapsedSec * 1.5, 90))
+
+    // Advance ~1.5% per second, capping at 90% until the report arrives
     const tick = setInterval(() => {
       setProgress(p => Math.min(p + 1.5, 90))
     }, 1000)
@@ -36,9 +49,9 @@ export function ReportPoller({ eventId }: { eventId: string }) {
       if (data) {
         clearInterval(tick)
         clearInterval(poll)
+        localStorage.removeItem(storageKey)
         setProgress(100)
         setReady(true)
-        // Give the progress bar 600ms to hit 100% then reload
         setTimeout(() => router.refresh(), 600)
       }
     }, 6000)

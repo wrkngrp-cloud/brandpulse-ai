@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { toast }        from 'sonner'
 import { goLive, closeEvent } from '@/app/dashboard/events/actions'
@@ -51,6 +52,7 @@ function buildHourlyData(interactions: Interaction[]): { hour: string; count: nu
 }
 
 export function LiveDashboard({ eventId, status, budget, ambassadors, initialInteractions }: Props) {
+  const router = useRouter()
   const [interactions, setInteractions] = useState<Interaction[]>(initialInteractions)
   const [goLivePending,  startGoLive ] = useTransition()
   const [closePending,   startClose  ] = useTransition()
@@ -108,7 +110,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
               onClick={() => startGoLive(async () => {
                 const r = await goLive(eventId)
                 if (r?.error) toast.error(r.error)
-                else { toast.success('Event is now live!'); window.location.reload() }
+                else { toast.success('Event is now live!'); router.refresh() }
               })}
               disabled={goLivePending}
             >
@@ -123,7 +125,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
               onClick={() => startClose(async () => {
                 const r = await closeEvent(eventId)
                 if (r?.error) toast.error(r.error)
-                else { toast.success('Event closed. ROI report generating…'); window.location.reload() }
+                else { toast.success('Event closed. Fill in the debrief to generate your ROI report.'); router.refresh() }
               })}
               disabled={closePending}
             >

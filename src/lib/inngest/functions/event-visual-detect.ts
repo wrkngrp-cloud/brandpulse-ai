@@ -1,13 +1,11 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 
-// E6 — Visual Brand Mention Detector
-// Crawls event-hashtag Instagram posts and runs Claude vision for logo/merch/booth detection.
-// Full implementation requires: connected Instagram business account + event hashtags set.
 export const eventVisualDetect = inngest.createFunction(
   { id: 'event-visual-detect', name: 'Event Visual Brand Detection (E6)', triggers: [{ event: 'brandpulse/event.live' }] },
-  async ({ event, step }: { event: { data: { eventId: string } }; step: { run: <T>(id: string, fn: () => Promise<T>) => Promise<T> } }) => {
-    const { eventId } = event.data
+  async ({ event, step }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { eventId } = (event as any).data as { eventId: string }
 
     return await step.run('check-prerequisites', async () => {
       const service = await createServiceClient()
@@ -31,8 +29,6 @@ export const eventVisualDetect = inngest.createFunction(
 
       if (!igConnection) return { skipped: 'No active Instagram connection — connect Instagram to enable visual detection' }
 
-      // Full E6 crawl-and-vision pipeline is implemented in Phase 3 alongside full Creative Analysis.
-      // This stub registers the trigger and logs the prerequisites so the feature can be activated later.
       console.log(`[E6] Visual detection ready for event "${ev.name}" (${eventId}). Hashtags: ${ev.hashtags.join(', ')}. IG: @${igConnection.account_name}`)
 
       return {

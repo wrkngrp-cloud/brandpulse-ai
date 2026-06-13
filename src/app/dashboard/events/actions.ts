@@ -1,13 +1,12 @@
 'use server'
 
-import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { randomBytes } from 'crypto'
-import { z } from 'zod'
+import { randomBytes }    from 'crypto'
+import { z }              from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { inngest } from '@/lib/inngest/client'
+import { inngest }        from '@/lib/inngest/client'
 
-export type EventState = { error?: string; success?: boolean } | null
+export type EventState = { error?: string; success?: boolean; eventId?: string } | null
 
 function generateToken(): string {
   return randomBytes(24).toString('hex')
@@ -48,16 +47,17 @@ const eventSchema = z.object({
   hashtags:            z.array(z.string()).default([]),
   expected_attendance: z.number().int().positive().optional(),
   objectives: z.object({
-    awareness:     z.string().optional(),
-    consideration: z.string().optional(),
-    action:        z.string().optional(),
-    advocacy:      z.string().optional(),
-  }).default({}),
+    stages:       z.array(z.string()).default([]),
+    notes:        z.string().optional(),
+  }).default({ stages: [] }),
   activation_mechanics: z.array(z.string()).default([]),
   kpi_targets: z.object({
+    expected_reach:          z.number().int().optional(),
     expected_engaged:        z.number().int().optional(),
+    expected_samples:        z.number().int().optional(),
     expected_leads:          z.number().int().optional(),
     expected_new_customers:  z.number().int().optional(),
+    expected_photo_moments:  z.number().int().optional(),
     target_cost_per_lead:    z.number().optional(),
     target_cost_per_customer: z.number().optional(),
   }).default({}),
@@ -112,7 +112,9 @@ export async function createEvent(_prev: EventState, formData: FormData): Promis
   const { error: ambErr } = await service.from('event_ambassadors').insert(ambassadorRows)
   if (ambErr) return { error: ambErr.message }
 
-  redirect(`/dashboard/events/${event.id}`)
+  revalidatePath('/dashboard/events')
+  // Return success + eventId so the wizard can show a success screen before navigating
+  return { success: true, eventId: event.id }
 }
 
 // ── Go live ───────────────────────────────────────────────────────────────────
@@ -130,6 +132,7 @@ export async function goLive(eventId: string): Promise<EventState> {
 }
 
 // ── Close event ───────────────────────────────────────────────────────────────
+// Does NOT trigger ROI report — debrief must be submitted first (see submitDebrief).
 
 export async function closeEvent(eventId: string): Promise<EventState> {
   const result = await getBrandId()
@@ -139,20 +142,19 @@ export async function closeEvent(eventId: string): Promise<EventState> {
   const { error } = await service.from('events').update({ status: 'closed' }).eq('id', eventId)
   if (error) return { error: error.message }
 
-  await inngest.send({ name: 'brandpulse/event.closed', data: { eventId } })
   return { success: true }
 }
 
-// ── E5: Submit debrief ────────────────────────────────────────────────────────
+// ── E5: Submit debrief — triggers ROI report generation ───────────────────────
 
 const debriefSchema = z.object({
-  overall:              z.string().optional(),
-  wins:                 z.string().optional(),
-  challenges:           z.string().optional(),
-  product_feedback:     z.string().optional(),
-  competitor_activity:  z.string().optional(),
-  follow_up_actions:    z.string().optional(),
-  estimated_reach:      z.number().int().optional(),
+  overall:             z.string().optional(),
+  wins:                z.string().optional(),
+  challenges:          z.string().optional(),
+  product_feedback:    z.string().optional(),
+  competitor_activity: z.string().optional(),
+  follow_up_actions:   z.string().optional(),
+  estimated_reach:     z.number().int().optional(),
 })
 
 export async function submitDebrief(
@@ -174,10 +176,23 @@ export async function submitDebrief(
   const { error } = await service.from('events').update({ debrief: parsed.data }).eq('id', eventId)
   if (error) return { error: error.message }
 
+  // Debrief saved — NOW trigger ROI report generation
+  await inngest.send({ name: 'brandpulse/event.closed', data: { eventId } })
+
   return { success: true }
 }
 
-// ── Delete event ─────────────────────────────────────────────────────────────
+// ── Skip debrief — triggers ROI report directly ───────────────────────────────
+
+export async function skipDebriefAndGenerate(eventId: string): Promise<EventState> {
+  const result = await getBrandId()
+  if ('error' in result) return { error: result.error }
+
+  await inngest.send({ name: 'brandpulse/event.closed', data: { eventId } })
+  return { success: true }
+}
+
+// ── Delete event ──────────────────────────────────────────────────────────────
 
 export async function deleteEvent(eventId: string): Promise<EventState> {
   const result = await getBrandId()
