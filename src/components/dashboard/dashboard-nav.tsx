@@ -2,18 +2,20 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FileText, BarChart2, ClipboardList, Sparkles, CalendarDays, MapPin, Megaphone } from 'lucide-react'
+import { LayoutDashboard, FileText, BarChart2, ClipboardList, Sparkles, CalendarDays, MapPin, Megaphone, Zap, Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
-  { label: 'Overview',   href: '/dashboard',            icon: LayoutDashboard },
-  { label: 'Content',    href: '/dashboard/content',    icon: FileText },
-  { label: 'Sentiment',  href: '/dashboard/sentiment',  icon: BarChart2 },
-  { label: 'Surveys',    href: '/dashboard/surveys',    icon: ClipboardList },
-  { label: 'Campaigns',  href: '/dashboard/campaigns',  icon: Megaphone },
-  { label: 'Events',     href: '/dashboard/events',     icon: CalendarDays },
-  { label: 'OOH',        href: '/dashboard/ooh',        icon: MapPin },
-  { label: 'Ask AI',     href: '/dashboard/ask',        icon: Sparkles, highlight: true },
+  { label: 'Overview',     href: '/dashboard',              icon: LayoutDashboard },
+  { label: 'Content',      href: '/dashboard/content',      icon: FileText },
+  { label: 'Sentiment',    href: '/dashboard/sentiment',    icon: BarChart2 },
+  { label: 'Surveys',      href: '/dashboard/surveys',      icon: ClipboardList },
+  { label: 'Campaigns',    href: '/dashboard/campaigns',    icon: Megaphone },
+  { label: 'Events',       href: '/dashboard/events',       icon: CalendarDays },
+  { label: 'OOH',          href: '/dashboard/ooh',          icon: MapPin },
+  { label: 'Pre-Post',     href: '/dashboard/pre-post',     icon: Zap },
+  { label: 'Competitive',  href: '/dashboard/competitive',  icon: Trophy },
+  { label: 'Ask AI',       href: '/dashboard/ask',          icon: Sparkles, highlight: true },
 ]
 
 export function DashboardNav() {

@@ -7,6 +7,7 @@ import { InstagramPageIdForm } from '@/components/dashboard/instagram-page-id-fo
 import { ContentTableSkeleton } from '@/components/dashboard/content-table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { FunnelChart } from './funnel-chart'
 
 async function ContentData() {
   const supabase = await createClient()
@@ -55,6 +56,38 @@ async function ContentData() {
           competitors={competitors ?? []}
         />
       </div>
+
+      {/* Funnel breakdown charts */}
+      {(posts ?? []).some(p => p.funnel_stage) && (() => {
+        const stagePosts = (posts ?? []).filter(p => p.funnel_stage)
+        const byStage: Record<string, { count: number; engagements: number[]; reaches: number[] }> = {}
+        for (const p of stagePosts) {
+          const s = p.funnel_stage!
+          if (!byStage[s]) byStage[s] = { count: 0, engagements: [], reaches: [] }
+          byStage[s].count++
+          if (p.engagement_rate) byStage[s].engagements.push(Number(p.engagement_rate))
+          if (p.reach) byStage[s].reaches.push(Number(p.reach))
+        }
+        const funnelOrder = ['Awareness', 'Consideration', 'Conversion', 'Loyalty', 'Re-engagement']
+        const funnelData = funnelOrder
+          .filter(s => byStage[s])
+          .map(s => ({
+            stage:          s,
+            posts:          byStage[s].count,
+            avg_engagement: byStage[s].engagements.length
+              ? byStage[s].engagements.reduce((a, b) => a + b, 0) / byStage[s].engagements.length
+              : 0,
+            avg_reach: byStage[s].reaches.length
+              ? byStage[s].reaches.reduce((a, b) => a + b, 0) / byStage[s].reaches.length
+              : 0,
+          }))
+        return funnelData.length > 0 ? (
+          <div className="border rounded-xl p-5 bg-card space-y-3">
+            <h2 className="text-sm font-medium">Content by funnel stage</h2>
+            <FunnelChart data={funnelData} />
+          </div>
+        ) : null
+      })()}
 
       {/* Content Performance table */}
       <div className="space-y-3">

@@ -123,3 +123,28 @@ export async function unlinkOohSiteFromCampaign(
   revalidatePath(`/dashboard/campaigns/${campaignId}`)
   revalidatePath('/dashboard/ooh')
 }
+
+export async function linkEventToCampaign(
+  eventId: string,
+  campaignId: string,
+): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('events')
+    .update({ campaign_id: campaignId })
+    .eq('id', eventId)
+  if (error) return { error: error.message }
+  revalidatePath(`/dashboard/campaigns/${campaignId}`)
+  revalidatePath('/dashboard/events')
+  return {}
+}
+
+export async function unlinkEventFromCampaign(
+  eventId: string,
+  campaignId: string,
+): Promise<void> {
+  const supabase = await createClient()
+  await supabase.from('events').update({ campaign_id: null }).eq('id', eventId)
+  revalidatePath(`/dashboard/campaigns/${campaignId}`)
+  revalidatePath('/dashboard/events')
+}
