@@ -1,18 +1,13 @@
-import { Suspense } from 'react'
+import { Suspense }     from 'react'
 import { createClient } from '@/lib/supabase/server'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton }     from '@/components/ui/skeleton'
 import { NewSurveyDialog } from './new-survey-dialog'
-import Link from 'next/link'
+import { SurveysList }  from '@/components/surveys/surveys-list'
 import { MessageSquare } from 'lucide-react'
 
-const STATUS_BADGE: Record<string, string> = {
-  draft:  'bg-muted text-muted-foreground',
-  live:   'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400',
-  closed: 'bg-muted text-muted-foreground',
-}
+const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
-async function SurveyList() {
+async function SurveyListServer() {
   const supabase = await createClient()
 
   const { data: surveys } = await supabase
@@ -32,45 +27,22 @@ async function SurveyList() {
     )
   }
 
-  const surveyIds = surveys.map(s => s.id)
   const { data: allResponses } = await supabase
     .from('survey_responses')
     .select('survey_id')
-    .in('survey_id', surveyIds)
+    .in('survey_id', surveys.map(s => s.id))
 
   const countMap = (allResponses ?? []).reduce<Record<string, number>>((acc, r) => {
     acc[r.survey_id] = (acc[r.survey_id] ?? 0) + 1
     return acc
   }, {})
 
-  return (
-    <div className="border rounded-xl divide-y overflow-hidden">
-      {surveys.map(survey => (
-        <Link
-          key={survey.id}
-          href={`/dashboard/surveys/${survey.id}`}
-          className="flex items-center justify-between px-5 py-4 hover:bg-muted/50 transition-colors"
-        >
-          <div className="space-y-0.5 min-w-0">
-            <p className="text-sm font-medium truncate">{survey.name}</p>
-            <p className="text-xs text-muted-foreground">
-              {new Date(survey.created_at).toLocaleDateString('en-NG', {
-                day: 'numeric', month: 'short', year: 'numeric',
-              })}
-            </p>
-          </div>
-          <div className="flex items-center gap-3 ml-4 shrink-0">
-            <span className="text-xs text-muted-foreground">
-              {countMap[survey.id] ?? 0} {(countMap[survey.id] ?? 0) === 1 ? 'response' : 'responses'}
-            </span>
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE[survey.status] ?? ''}`}>
-              {survey.status}
-            </span>
-          </div>
-        </Link>
-      ))}
-    </div>
-  )
+  const surveysWithCounts = surveys.map(s => ({
+    ...s,
+    responseCount: countMap[s.id] ?? 0,
+  }))
+
+  return <SurveysList surveys={surveysWithCounts} appUrl={APP_URL} />
 }
 
 export default function SurveysPage() {
@@ -86,7 +58,7 @@ export default function SurveysPage() {
         <NewSurveyDialog />
       </div>
       <Suspense fallback={<Skeleton className="h-48 rounded-xl" />}>
-        <SurveyList />
+        <SurveyListServer />
       </Suspense>
     </div>
   )
