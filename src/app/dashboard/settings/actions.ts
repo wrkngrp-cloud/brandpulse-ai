@@ -14,6 +14,22 @@ export async function deleteAccount(): Promise<SettingsState> {
   if (!user) return { error: 'Not authenticated.' }
 
   const service = await createServiceClient()
+
+  // Resolve workspace before deleting — cascade stops at workspace_members,
+  // so workspaces and brands must be deleted explicitly first.
+  const { data: member } = await service
+    .from('workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (member?.workspace_id) {
+    // brands → workspace (brands FK workspace_id will cascade once workspace is gone)
+    await service.from('brands').delete().eq('workspace_id', member.workspace_id)
+    await service.from('workspaces').delete().eq('id', member.workspace_id)
+  }
+
+  // Delete auth user — cascades to workspace_members
   const { error } = await service.auth.admin.deleteUser(user.id)
   if (error) return { error: error.message }
 
