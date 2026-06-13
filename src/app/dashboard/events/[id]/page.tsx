@@ -2,10 +2,11 @@ import { createClient }       from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link                   from 'next/link'
 import { ArrowLeft }          from 'lucide-react'
-import { LiveDashboard }      from '@/components/events/live-dashboard'
-import { AmbassadorList }     from '@/components/events/ambassador-list'
+import { LiveDashboard }       from '@/components/events/live-dashboard'
+import { AmbassadorList }      from '@/components/events/ambassador-list'
 import { computeEventMetrics, fmtNGN, fmtPct } from '@/lib/events/roi'
-import { ReportPoller } from '@/components/events/report-poller'
+import { ReportPoller }        from '@/components/events/report-poller'
+import { DebriefPromptCard }   from '@/components/events/debrief-prompt-card'
 
 const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -76,8 +77,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         </div>
       </div>
 
-      {/* Report generation progress */}
-      {event.status === 'closed' && <ReportPoller eventId={id} />}
+      {/* Closed: prompt for debrief or show progress if debrief already submitted */}
+      {event.status === 'closed' && !event.debrief && <DebriefPromptCard eventId={id} />}
+      {event.status === 'closed' &&  event.debrief && <ReportPoller eventId={id} />}
 
       {/* ROI report (reported status) */}
       {event.status === 'reported' && roiReport && (
