@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Manrope, Geist_Mono } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const manrope  = Manrope({ variable: '--font-sans', subsets: ['latin'], display: 'swap' })
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full flex flex-col">
         {children}
         <Toaster richColors position="top-right" />
+        <Analytics />
       </body>
     </html>
   )
