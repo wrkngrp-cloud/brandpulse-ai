@@ -20,13 +20,14 @@ interface UpliftRow {
 }
 
 interface SearchUpliftWidgetProps {
-  upliftRows: UpliftRow[]
-  siteName:   string
-  siteId:     string
-  brandId:    string
+  upliftRows:          UpliftRow[]
+  siteName:            string
+  siteId:              string
+  brandId:             string
+  totalTrackedVisits?: number
 }
 
-export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId }: SearchUpliftWidgetProps) {
+export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId, totalTrackedVisits = 0 }: SearchUpliftWidgetProps) {
   const [keyword,   setKeyword]   = useState('')
   const [loading,   setLoading]   = useState(false)
 
@@ -74,6 +75,22 @@ export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId }: Se
 
       {upliftRows.length === 0 ? (
         <div className="space-y-3">
+          {totalTrackedVisits === 0 && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20 p-3 flex items-start gap-2">
+              <TrendingUp className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+              <p className="text-xs text-amber-800 dark:text-amber-300">
+                No visits tracked yet. Make sure your attribution link is live and being used — once visits come in, the uplift analysis will have data to work with.
+              </p>
+            </div>
+          )}
+          {totalTrackedVisits > 0 && totalTrackedVisits < 7 && (
+            <div className="rounded-lg border bg-muted/30 p-3 flex items-start gap-2">
+              <Info className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                {totalTrackedVisits} visit{totalTrackedVisits > 1 ? 's' : ''} tracked so far. The analysis works best with at least 2 weeks of data.
+              </p>
+            </div>
+          )}
           <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
             <div className="flex items-start gap-2">
               <Info className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
@@ -95,7 +112,7 @@ export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId }: Se
               </div>
               <Button
                 size="sm" variant="outline" className="h-8 shrink-0"
-                onClick={requestUplift} disabled={loading || !keyword.trim()}
+                onClick={requestUplift} disabled={loading || !keyword.trim() || totalTrackedVisits === 0}
               >
                 {loading ? 'Queuing…' : 'Run analysis'}
               </Button>
