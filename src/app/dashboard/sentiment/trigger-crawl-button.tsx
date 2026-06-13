@@ -7,7 +7,7 @@ import { RefreshCw, CheckCircle2, AlertCircle, SearchX } from 'lucide-react'
 type State =
   | { phase: 'idle' }
   | { phase: 'running'; progress: number }
-  | { phase: 'done'; mentionsFound: number; sources: string[] }
+  | { phase: 'done'; mentionsFound: number; sources: string[]; platformErrors: Record<string, string> }
   | { phase: 'error'; message: string }
 
 interface Props {
@@ -39,8 +39,8 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
         return
       }
 
-      const data = await res.json() as { mentionsFound: number; sources?: string[] }
-      setState({ phase: 'done', mentionsFound: data.mentionsFound, sources: data.sources ?? [] })
+      const data = await res.json() as { mentionsFound: number; sources?: string[]; platformErrors?: Record<string, string> }
+      setState({ phase: 'done', mentionsFound: data.mentionsFound, sources: data.sources ?? [], platformErrors: data.platformErrors ?? {} })
     } catch (err) {
       clearInterval(timer)
       setState({ phase: 'error', message: err instanceof Error ? err.message : 'Network error' })
@@ -76,6 +76,8 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
     const platformList = state.sources.length
       ? state.sources.map(s => s === 'twitter' ? 'X' : 'Instagram').join(' and ')
       : null
+    const errors = Object.entries(state.platformErrors)
+      .map(([p, msg]) => `${p === 'twitter' ? 'X' : 'Instagram'}: ${msg}`)
 
     if (state.mentionsFound === 0) {
       return (
@@ -91,6 +93,13 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
               ? 'Connect your X or Instagram account in Settings to start collecting mentions.'
               : 'Nobody @mentioned your account today, or the crawl already ran recently.'}
           </p>
+          {errors.length > 0 && (
+            <div className="text-left max-w-xs mx-auto space-y-1">
+              {errors.map((e, i) => (
+                <p key={i} className="text-[11px] text-red-500 bg-red-50 border border-red-200 rounded px-2 py-1 font-mono break-all">{e}</p>
+              ))}
+            </div>
+          )}
           <Button size="sm" variant="outline" onClick={trigger}>
             <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Crawl again
           </Button>
@@ -104,6 +113,13 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
           <CheckCircle2 className="h-4 w-4" />
           {state.mentionsFound} mention{state.mentionsFound !== 1 ? 's' : ''} found{platformList ? ` from ${platformList}` : ''} and classified.
         </div>
+        {errors.length > 0 && (
+          <div className="w-full max-w-xs space-y-1">
+            {errors.map((e, i) => (
+              <p key={i} className="text-[11px] text-red-500 bg-red-50 border border-red-200 rounded px-2 py-1 font-mono break-all">{e}</p>
+            ))}
+          </div>
+        )}
         <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
           Refresh page to see data
         </Button>

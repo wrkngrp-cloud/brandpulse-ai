@@ -8,6 +8,7 @@ export interface CrawlResult {
   mentionsFound: number
   classified: number
   sources: string[]
+  platformErrors: Record<string, string>
   error?: string
 }
 
@@ -83,6 +84,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
   // ── 2. Fetch mentions from all connected platforms ─────────────────────────
   const allMentions: RawMention[] = []
   const sources: string[] = []
+  const platformErrors: Record<string, string> = {}
 
   if (twitterConn?.account_id && twitterConn.access_token) {
     try {
@@ -121,7 +123,9 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
       })))
       sources.push('twitter')
     } catch (err) {
-      console.warn('[runCrawl] Twitter mentions failed:', err instanceof Error ? err.message : err)
+      const msg = err instanceof Error ? err.message : String(err)
+      console.warn('[runCrawl] Twitter mentions failed:', msg)
+      platformErrors.twitter = msg
     }
   }
 
@@ -144,7 +148,9 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
       })))
       sources.push('instagram')
     } catch (err) {
-      console.warn('[runCrawl] Instagram mentions failed:', err instanceof Error ? err.message : err)
+      const msg = err instanceof Error ? err.message : String(err)
+      console.warn('[runCrawl] Instagram mentions failed:', msg)
+      platformErrors.instagram = msg
     }
   }
 
@@ -264,5 +270,5 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     }).eq('id', runId)
   }
 
-  return { mentionsFound, classified, sources }
+  return { mentionsFound, classified, sources, platformErrors }
 }
