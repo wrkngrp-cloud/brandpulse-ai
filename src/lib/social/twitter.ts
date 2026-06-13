@@ -177,6 +177,9 @@ export async function fetchTwitterUserMentions(
     headers: { Authorization: `Bearer ${accessToken}` },
   })
 
+  if (res.status === 402) {
+    throw new Error('X_CREDITS_DEPLETED')
+  }
   if (res.status === 403 || res.status === 401) {
     throw new Error(`X mentions auth error ${res.status}: token may be expired or missing tweet.read scope`)
   }

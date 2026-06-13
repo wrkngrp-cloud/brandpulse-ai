@@ -76,8 +76,14 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
     const platformList = state.sources.length
       ? state.sources.map(s => s === 'twitter' ? 'X' : 'Instagram').join(' and ')
       : null
+    const FRIENDLY: Record<string, string> = {
+      X_CREDITS_DEPLETED: 'X free-tier credits exhausted for this month. Resets on the 1st. Instagram mentions are still collecting.',
+    }
     const errors = Object.entries(state.platformErrors)
-      .map(([p, msg]) => `${p === 'twitter' ? 'X' : 'Instagram'}: ${msg}`)
+      .map(([p, msg]) => {
+        const friendly = FRIENDLY[msg]
+        return friendly ?? `${p === 'twitter' ? 'X' : 'Instagram'}: ${msg}`
+      })
 
     if (state.mentionsFound === 0) {
       return (
