@@ -4,45 +4,48 @@ import Link                from 'next/link'
 import { Badge }           from '@/components/ui/badge'
 import { buttonVariants }  from '@/components/ui/button'
 import { cn }              from '@/lib/utils'
-import { MapPin, ExternalLink, Copy } from 'lucide-react'
+import { MapPin, Copy, Crosshair } from 'lucide-react'
 import { toast }           from 'sonner'
 
 interface Site {
   id: string
   site_name: string
-  city: string | null
-  state: string | null
-  format_type: string | null
-  illuminated: boolean
-  daily_traffic: number | null
-  monthly_cost: number | null
-  currency: string | null
-  campaign_start: string | null
-  campaign_end: string | null
-  lga: string | null
-  vanity_slug: string | null
+  lat?: number | null
+  lng?: number | null
+  city?: string | null
+  state?: string | null
+  format_type?: string | null
+  illuminated?: boolean
+  daily_traffic?: number | null
+  monthly_cost?: number | null
+  currency?: string | null
+  campaign_start?: string | null
+  campaign_end?: string | null
+  lga?: string | null
+  vanity_slug?: string | null
   visits: number
 }
 
 interface OohSitesListProps {
   sites: Site[]
   appUrl: string
+  onLocateSite?: (lat: number, lng: number, siteId: string) => void
 }
 
-function campaignStatus(start: string | null, end: string | null): 'live' | 'upcoming' | 'ended' | 'no-dates' {
+function campaignStatus(start: string | null | undefined, end: string | null | undefined): 'live' | 'upcoming' | 'ended' | 'no-dates' {
   if (!start || !end) return 'no-dates'
-  const now   = new Date()
-  const s     = new Date(start)
-  const e     = new Date(end)
+  const now = new Date()
+  const s   = new Date(start)
+  const e   = new Date(end)
   if (now >= s && now <= e) return 'live'
   if (now < s) return 'upcoming'
   return 'ended'
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  live:     'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300',
-  upcoming: 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300',
-  ended:    'bg-muted text-muted-foreground',
+  live:       'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300',
+  upcoming:   'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300',
+  ended:      'bg-muted text-muted-foreground',
   'no-dates': 'bg-muted text-muted-foreground',
 }
 
@@ -50,7 +53,7 @@ const STATUS_LABELS: Record<string, string> = {
   live: 'Live', upcoming: 'Upcoming', ended: 'Ended', 'no-dates': 'No dates',
 }
 
-export function OohSitesList({ sites, appUrl }: OohSitesListProps) {
+export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps) {
   function copyVanity(slug: string) {
     navigator.clipboard.writeText(`${appUrl}/go/${slug}`)
       .then(() => toast.success('Link copied!'))
@@ -61,7 +64,9 @@ export function OohSitesList({ sites, appUrl }: OohSitesListProps) {
       <h2 className="text-sm font-semibold">All Sites</h2>
       <div className="divide-y border rounded-xl overflow-hidden">
         {sites.map(site => {
-          const status = campaignStatus(site.campaign_start, site.campaign_end)
+          const status     = campaignStatus(site.campaign_start, site.campaign_end)
+          const hasCoorods = site.lat != null && site.lng != null
+
           return (
             <div key={site.id} className="flex items-center gap-4 px-4 py-3 bg-card hover:bg-muted/30 transition-colors">
               <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
@@ -93,6 +98,16 @@ export function OohSitesList({ sites, appUrl }: OohSitesListProps) {
               </div>
 
               <div className="shrink-0 flex items-center gap-1.5">
+                {/* Locate on map — only shown when site has GPS coordinates */}
+                {hasCoorods && onLocateSite && (
+                  <button
+                    onClick={() => onLocateSite(site.lat!, site.lng!, site.id)}
+                    className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-muted transition-colors"
+                    title="Locate on map"
+                  >
+                    <Crosshair className="h-3.5 w-3.5 text-muted-foreground" />
+                  </button>
+                )}
                 {site.vanity_slug && (
                   <button
                     onClick={() => copyVanity(site.vanity_slug!)}
