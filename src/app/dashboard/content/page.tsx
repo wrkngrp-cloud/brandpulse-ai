@@ -32,10 +32,15 @@ async function ContentData() {
         .maybeSingle(),
     ])
 
+  const competitorData = sovSnap?.competitor_data as {
+    brand_volume?:       number
+    competitor_volumes?: Record<string, number>
+  } | null
+
   const sovData = {
-    brand_mentions: 0,
-    competitor_mentions: {} as Record<string, number>,
-    sov_pct: sovSnap?.social_sov ?? null,
+    brand_mentions:     competitorData?.brand_volume       ?? 0,
+    competitor_mentions: competitorData?.competitor_volumes ?? {},
+    sov_pct:            sovSnap?.social_sov                ?? null,
   }
 
   return (

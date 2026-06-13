@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { Plus, X, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -76,32 +75,44 @@ export function SovWidget({
         </p>
       )}
 
-      {/* Competitor list */}
+      {/* Competitor breakdown */}
       <div className="space-y-2">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Competitors tracked</p>
         {competitors.length === 0 ? (
           <p className="text-xs text-muted-foreground">None added yet.</p>
         ) : (
-          <div className="space-y-1">
-            {competitors.map(c => (
-              <div key={c.id} className="flex items-center justify-between text-sm">
-                <span>{c.name}</span>
-                <div className="flex items-center gap-2">
-                  {sov.competitor_mentions[c.name] !== undefined && (
-                    <Badge variant="outline" className="text-xs tabular-nums">
-                      {sov.competitor_mentions[c.name].toLocaleString()}
-                    </Badge>
+          <div className="space-y-2.5">
+            {competitors.map(c => {
+              const count  = sov.competitor_mentions[c.name] ?? 0
+              const pct    = total > 0 ? (count / total) * 100 : 0
+              return (
+                <div key={c.id} className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground truncate max-w-[140px]">{c.name}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {count > 0 && (
+                        <span className="tabular-nums text-muted-foreground">{pct.toFixed(1)}%</span>
+                      )}
+                      <Button
+                        variant="ghost" size="icon"
+                        className="h-5 w-5 text-muted-foreground hover:text-destructive"
+                        onClick={() => onRemoveCompetitor(c.id)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  {count > 0 && (
+                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-muted-foreground/40 rounded-full transition-all duration-500"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
                   )}
-                  <Button
-                    variant="ghost" size="icon"
-                    className="h-6 w-6 text-muted-foreground hover:text-destructive"
-                    onClick={() => onRemoveCompetitor(c.id)}
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </Button>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
 
