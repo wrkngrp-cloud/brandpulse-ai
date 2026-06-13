@@ -4,8 +4,9 @@ import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { logout } from '@/app/auth/actions'
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
+  DropdownMenuLabel, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Settings, LogOut, ChevronDown } from 'lucide-react'
 
@@ -34,34 +35,40 @@ export function UserDropdown({ name, email, brandName }: Props) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
-          <div className="flex flex-col gap-0.5">
-            <p className="text-sm font-medium truncate">{name || 'User'}</p>
-            <p className="text-xs text-muted-foreground truncate">{email}</p>
-          </div>
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>
+            <div className="flex flex-col gap-0.5">
+              <p className="text-sm font-medium truncate">{name || 'User'}</p>
+              <p className="text-xs text-muted-foreground truncate">{email}</p>
+            </div>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onClick={() => router.push('/dashboard/settings')}
-        >
-          <Settings className="mr-2 h-4 w-4" />
-          Settings
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => router.push('/dashboard/settings')}
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          variant="destructive"
-          disabled={pending}
-          className="cursor-pointer"
-          onClick={() => !pending && startTransition(() => logout())}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          {pending ? 'Signing out…' : 'Sign out'}
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            variant="destructive"
+            disabled={pending}
+            className="cursor-pointer"
+            onClick={() => !pending && startTransition(() => logout())}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            {pending ? 'Signing out…' : 'Sign out'}
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )
