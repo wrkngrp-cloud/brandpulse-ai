@@ -1,7 +1,6 @@
 'use client'
 
 import { useActionState, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { toast }      from 'sonner'
 import { submitDebrief } from '@/app/dashboard/events/actions'
 import { Button }     from '@/components/ui/button'
@@ -15,7 +14,6 @@ interface Props {
 }
 
 export function DebriefForm({ eventId, existingDebrief }: Props) {
-  const router = useRouter()
   const bound = submitDebrief.bind(null, eventId)
   const [state, action, pending] = useActionState(bound, null)
 
@@ -30,12 +28,8 @@ export function DebriefForm({ eventId, existingDebrief }: Props) {
   const [estimatedReach,      setEstimatedReach    ] = useState(String(existingDebrief?.estimated_reach ?? ''))
 
   useEffect(() => {
-    if (state?.success) {
-      toast.success('Debrief saved. Generating your ROI report…')
-      router.push(`/dashboard/events/${eventId}`)
-    }
     if (state?.error) toast.error(state.error)
-  }, [state, router, eventId])
+  }, [state])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
