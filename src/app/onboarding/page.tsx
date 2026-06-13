@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Check, Sparkles, Globe, ArrowRight, Loader2, AlertCircle, X, Plus } from 'lucide-react'
+import { Check, Sparkles, Globe, ArrowRight, ArrowLeft, Loader2, AlertCircle, X, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
 
@@ -233,6 +233,13 @@ export default function OnboardingPage() {
               <Globe className="h-3 w-3" /> Reading {websiteUrl}
             </p>
           )}
+          <button
+            type="button"
+            onClick={() => setScreen('identify')}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            ← Cancel and go back
+          </button>
         </div>
       </div>
     )
@@ -386,13 +393,15 @@ export default function OnboardingPage() {
               : <><Check className="h-4 w-4 mr-2" /> Looks good — take me in</>
             }
           </Button>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            className="w-full text-muted-foreground hover:text-foreground"
             onClick={() => setScreen('identify')}
-            className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-1"
           >
-            ← Go back and change my brand name or website
-          </button>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Change brand name or website
+          </Button>
         </div>
       </div>
     </div>
