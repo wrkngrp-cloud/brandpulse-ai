@@ -6,7 +6,7 @@ import { Button }             from '@/components/ui/button'
 import { Input }              from '@/components/ui/input'
 import { Label }              from '@/components/ui/label'
 import { Textarea }           from '@/components/ui/textarea'
-import { Copy, RefreshCw, Link2, QrCode, MapPin, Sparkles, Loader2, Settings, Zap } from 'lucide-react'
+import { Copy, RefreshCw, Link2, QrCode, MapPin, Sparkles, Loader2, Settings, Zap, Map, X } from 'lucide-react'
 import { estimateTraffic }    from '@/app/dashboard/ooh/actions'
 import { UrlLengthAdvisor }   from '@/components/ooh/url-length-advisor'
 import Link                   from 'next/link'
@@ -136,12 +136,119 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const wrapperRef  = useRef<HTMLDivElement>(null)
 
+  // Pin-drop map state
+  const [showPinMap,   setShowPinMap]   = useState(false)
+  const pinMapRef      = useRef<HTMLDivElement>(null)
+  const pinMapInstance = useRef<unknown>(null)
+  const pinMarkerRef   = useRef<unknown>(null)
+
   // Auto-derive slug from site name + city (only for new sites)
   useEffect(() => {
     if (!defaultValues?.vanity_slug && (siteName || city)) {
       setSlug(slugify(`${siteName}-${city}`))
     }
   }, [siteName, city, defaultValues?.vanity_slug])
+
+  // Pin-drop map — init/destroy when toggled
+  useEffect(() => {
+    if (!showPinMap) {
+      if (pinMapInstance.current) {
+        ;(pinMapInstance.current as { remove(): void }).remove()
+        pinMapInstance.current = null
+        pinMarkerRef.current   = null
+      }
+      return
+    }
+
+    const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+    if (!token) return
+
+    // Wait for the div to be in the DOM
+    const timer = setTimeout(async () => {
+      if (!pinMapRef.current) return
+      const { default: mapboxgl } = await import('mapbox-gl')
+      mapboxgl.accessToken = token
+
+      const hasCoords = lat !== '' && lng !== ''
+      const center: [number, number] = hasCoords
+        ? [Number(lng), Number(lat)]
+        : [3.3792, 6.5244] // Lagos default
+
+      const map = new mapboxgl.Map({
+        container: pinMapRef.current!,
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center,
+        zoom: hasCoords ? 15 : 10,
+      })
+
+      map.addControl(new mapboxgl.NavigationControl(), 'top-right')
+      map.addControl(
+        new mapboxgl.GeolocateControl({
+          positionOptions: { enableHighAccuracy: true },
+          trackUserLocation: false,
+          showUserHeading: false,
+        }),
+        'top-right',
+      )
+
+      const marker = new mapboxgl.Marker({ color: '#2563eb', draggable: true })
+
+      if (hasCoords) {
+        marker.setLngLat([Number(lng), Number(lat)]).addTo(map)
+      }
+
+      async function reverseGeocode(clickLng: number, clickLat: number) {
+        try {
+          const url = new URL('https://api.mapbox.com/search/geocode/v6/reverse')
+          url.searchParams.set('longitude',     String(clickLng))
+          url.searchParams.set('latitude',      String(clickLat))
+          url.searchParams.set('country',       'NG')
+          url.searchParams.set('access_token',  token!)
+          const res  = await fetch(url.toString())
+          const json = await res.json()
+          const f    = json?.features?.[0]
+          if (f) {
+            const fullAddr    = f.properties?.full_address ?? f.properties?.place_formatted ?? ''
+            const placeCity   = f.properties?.context?.place?.name ?? f.properties?.context?.locality?.name ?? ''
+            const placeRegion = f.properties?.context?.region?.name ?? ''
+            if (fullAddr) setAddress(fullAddr)
+            if (placeCity && !city)   setCity(placeCity)
+            if (placeRegion && !stateNg) setStateNg(placeRegion)
+          }
+        } catch { /* silent */ }
+      }
+
+      map.on('click', (e) => {
+        const { lng: clickLng, lat: clickLat } = e.lngLat
+        const roundedLat = Number(clickLat.toFixed(6))
+        const roundedLng = Number(clickLng.toFixed(6))
+        setLat(roundedLat)
+        setLng(roundedLng)
+        marker.setLngLat([clickLng, clickLat]).addTo(map)
+        reverseGeocode(clickLng, clickLat)
+      })
+
+      marker.on('dragend', () => {
+        const pos = (marker as { getLngLat(): { lat: number; lng: number } }).getLngLat()
+        setLat(Number(pos.lat.toFixed(6)))
+        setLng(Number(pos.lng.toFixed(6)))
+        reverseGeocode(pos.lng, pos.lat)
+      })
+
+      pinMapInstance.current = map
+      pinMarkerRef.current   = marker
+    }, 50)
+
+    return () => {
+      clearTimeout(timer)
+      if (pinMapInstance.current) {
+        ;(pinMapInstance.current as { remove(): void }).remove()
+        pinMapInstance.current = null
+        pinMarkerRef.current   = null
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showPinMap])
 
   useEffect(() => {
     if (state?.error) toast.error(state.error)
@@ -343,11 +450,34 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             )}
           </div>
 
-          {lat !== '' && lng !== '' && (
-            <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              Coordinates set: {Number(lat).toFixed(5)}, {Number(lng).toFixed(5)}
-            </p>
+          <div className="flex items-center justify-between mt-1.5">
+            {lat !== '' && lng !== '' ? (
+              <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {Number(lat).toFixed(5)}, {Number(lng).toFixed(5)}
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">No coordinates yet — type an address above or pin on map.</p>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-7 px-2.5 text-xs gap-1.5 shrink-0"
+              onClick={() => setShowPinMap(v => !v)}
+            >
+              {showPinMap ? <X className="h-3 w-3" /> : <Map className="h-3 w-3" />}
+              {showPinMap ? 'Close map' : 'Pin on map'}
+            </Button>
+          </div>
+
+          {showPinMap && (
+            <div className="rounded-xl border overflow-hidden">
+              <div className="bg-muted/50 px-3 py-2 text-xs text-muted-foreground border-b">
+                Click anywhere on the map to drop a pin, or drag the marker to adjust. The address fields will auto-fill.
+              </div>
+              <div ref={pinMapRef} style={{ height: '320px' }} />
+            </div>
           )}
         </div>
 

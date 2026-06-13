@@ -19,7 +19,7 @@ export default async function OohPage() {
   const { data: sites } = await supabase
     .from('ooh_sites')
     .select(`
-      id, site_name, city, state, country, format_type, illuminated,
+      id, site_name, address, city, state, country, format_type, illuminated,
       daily_traffic, monthly_cost, currency,
       campaign_start, campaign_end, lga,
       vanity_slug, landing_url, visits, qr_token, qr_scan_count,

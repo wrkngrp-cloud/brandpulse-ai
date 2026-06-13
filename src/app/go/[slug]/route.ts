@@ -32,20 +32,6 @@ export async function GET(
   const utmCampaign  = sp.get('utm_campaign')
   const utmContent   = sp.get('utm_content')
 
-  // Log visit + increment counter (non-blocking)
-  void supabase.from('ooh_visits').insert({
-    site_id:      site.id,
-    brand_id:     site.brand_id,
-    ip_region:    ipRegion,
-    device_type:  deviceType,
-    referrer:     request.headers.get('referer') ?? null,
-    utm_source:   utmSource,
-    utm_medium:   utmMedium,
-    utm_campaign: utmCampaign,
-    utm_content:  utmContent,
-  })
-  void supabase.rpc('increment_ooh_visits', { site_id: site.id })
-
   // Forward UTM params to landing page
   let destination = site.landing_url
   try {
@@ -59,5 +45,24 @@ export async function GET(
     // landing_url may be relative — send as-is
   }
 
-  return NextResponse.redirect(destination, 301)
+  // Log visit + increment counter before redirecting so the serverless function
+  // doesn't get killed before the DB writes complete (void fire-and-forget is
+  // unreliable on Vercel edge — the process exits with the response).
+  await Promise.allSettled([
+    supabase.from('ooh_visits').insert({
+      site_id:      site.id,
+      brand_id:     site.brand_id,
+      ip_region:    ipRegion,
+      device_type:  deviceType,
+      referrer:     request.headers.get('referer') ?? null,
+      utm_source:   utmSource,
+      utm_medium:   utmMedium,
+      utm_campaign: utmCampaign,
+      utm_content:  utmContent,
+    }),
+    supabase.rpc('increment_ooh_visits', { site_id: site.id }),
+  ])
+
+  // 302 so browsers never cache the redirect — every visit hits the server.
+  return NextResponse.redirect(destination, 302)
 }

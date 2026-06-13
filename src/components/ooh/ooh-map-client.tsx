@@ -8,7 +8,9 @@ interface Site {
   site_name: string
   lat: number | null
   lng: number | null
+  address?: string | null
   city: string | null
+  state?: string | null
   format_type: string | null
   visits: number
   lga: string | null
@@ -21,13 +23,18 @@ interface OohMapClientProps {
 }
 
 function getRoiTier(visits: number): string {
-  if (visits >= 500) return '#16a34a'   // green
-  if (visits >= 100) return '#d97706'   // amber
-  return '#dc2626'                       // red
+  if (visits >= 500) return '#16a34a'
+  if (visits >= 100) return '#d97706'
+  return '#dc2626'
+}
+
+function fmtDate(iso: string | null) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
 }
 
 export function OohMapClient({ sites }: OohMapClientProps) {
-  const mapRef     = useRef<HTMLDivElement>(null)
+  const mapRef      = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<unknown>(null)
   const [mapError, setMapError] = useState(false)
   const [loaded, setLoaded]     = useState(false)
@@ -55,35 +62,33 @@ export function OohMapClient({ sites }: OohMapClientProps) {
         mappable.forEach(site => {
           if (site.lng == null || site.lat == null) return
 
-          const el = document.createElement('div')
-          el.style.cssText = `
-            width: 28px; height: 28px; border-radius: 50%;
-            background: ${getRoiTier(site.visits)};
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,.3);
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 11px; font-weight: 700;
-          `
-          el.title = site.site_name
+          const locationLine = [site.city, site.lga, site.state].filter(Boolean).join(' · ')
+          const campaignLine = site.campaign_start
+            ? `${fmtDate(site.campaign_start)}${site.campaign_end ? ` – ${fmtDate(site.campaign_end)}` : ''}`
+            : ''
 
-          const popup = new mapboxgl.Popup({ offset: 16, closeButton: false })
+          const popup = new mapboxgl.Popup({ offset: 30, closeButton: false, maxWidth: '220px' })
             .setHTML(`
-              <div style="font-size:12px;line-height:1.5">
-                <strong>${site.site_name}</strong><br/>
-                ${site.city ?? ''}${site.format_type ? ` · ${site.format_type}` : ''}<br/>
-                <span style="color:#6b7280">${site.visits.toLocaleString()} tracked visits</span>
+              <div style="font-size:12px;line-height:1.65;padding:2px 0">
+                <strong style="font-size:13px;display:block;margin-bottom:3px">${site.site_name}</strong>
+                ${site.format_type ? `<span style="color:#6b7280">${site.format_type}</span><br/>` : ''}
+                ${locationLine ? `<span>${locationLine}</span><br/>` : ''}
+                ${campaignLine ? `<span style="color:#6b7280;font-size:11px">Campaign: ${campaignLine}</span><br/>` : ''}
+                <span style="color:${getRoiTier(site.visits)};font-weight:600;margin-top:4px;display:block">
+                  ${site.visits.toLocaleString()} tracked visits
+                </span>
               </div>
             `)
 
-          new mapboxgl.Marker(el)
+          new mapboxgl.Marker({ color: getRoiTier(site.visits) })
             .setLngLat([site.lng, site.lat])
             .setPopup(popup)
             .addTo(map)
         })
 
-        // Fit to markers if we have any
-        if (mappable.length > 0) {
+        if (mappable.length === 1 && mappable[0].lng != null && mappable[0].lat != null) {
+          map.flyTo({ center: [mappable[0].lng, mappable[0].lat], zoom: 14 })
+        } else if (mappable.length > 1) {
           const bounds = mappable.reduce((b, s) => {
             if (s.lng != null && s.lat != null) {
               b[0][0] = Math.min(b[0][0], s.lng)
@@ -93,12 +98,7 @@ export function OohMapClient({ sites }: OohMapClientProps) {
             }
             return b
           }, [[180, 90], [-180, -90]] as [[number, number], [number, number]])
-
-          if (mappable.length === 1 && mappable[0].lng != null && mappable[0].lat != null) {
-            map.flyTo({ center: [mappable[0].lng, mappable[0].lat], zoom: 13 })
-          } else {
-            map.fitBounds(bounds, { padding: 60 })
-          }
+          map.fitBounds(bounds, { padding: 60 })
         }
 
         setLoaded(true)
@@ -117,11 +117,7 @@ export function OohMapClient({ sites }: OohMapClientProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const token = typeof window !== 'undefined'
-    ? undefined
-    : process.env.NEXT_PUBLIC_MAPBOX_TOKEN
-
-  if (mapError || (!process.env.NEXT_PUBLIC_MAPBOX_TOKEN && typeof window !== 'undefined' && !document.querySelector('[data-mapbox]'))) {
+  if (mapError) {
     if (mappable.length === 0) return null
     return (
       <div className="border rounded-xl p-4 space-y-2">

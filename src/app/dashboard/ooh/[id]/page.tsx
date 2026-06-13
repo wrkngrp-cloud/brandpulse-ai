@@ -9,6 +9,7 @@ import { ImpressionCalculator } from '@/components/ooh/impression-calculator'
 import { SpendJustification }  from '@/components/ooh/spend-justification'
 import { SearchUpliftWidget }  from '@/components/ooh/search-uplift-widget'
 import { OohVanityCard }       from '@/components/ooh/ooh-vanity-card'
+import { OohSiteMapClient }    from '@/components/ooh/ooh-site-map-client'
 
 export default async function OohSitePage({
   params,
@@ -142,12 +143,30 @@ export default async function OohSitePage({
         />
       )}
 
+      {/* Site location map */}
+      {site.lat != null && site.lng != null && (
+        <OohSiteMapClient
+          lat={site.lat}
+          lng={site.lng}
+          siteName={site.site_name}
+          address={site.address}
+          city={site.city}
+          state={site.state}
+          lga={site.lga}
+          formatType={site.format_type}
+          visits={site.visits ?? 0}
+          campaignStart={site.campaign_start}
+          campaignEnd={site.campaign_end}
+        />
+      )}
+
       {/* Search uplift */}
       <SearchUpliftWidget
         upliftRows={upliftRows ?? []}
         siteName={site.site_name}
         siteId={id}
         brandId={site.brand_id}
+        totalTrackedVisits={site.visits ?? 0}
       />
     </div>
   )

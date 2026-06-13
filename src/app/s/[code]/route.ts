@@ -32,19 +32,6 @@ export async function GET(
   const utmCampaign = sp.get('utm_campaign')
   const utmContent  = sp.get('utm_content')
 
-  void supabase.from('ooh_visits').insert({
-    site_id:      site.id,
-    brand_id:     site.brand_id,
-    ip_region:    ipRegion,
-    device_type:  deviceType,
-    referrer:     request.headers.get('referer') ?? null,
-    utm_source:   utmSource,
-    utm_medium:   utmMedium,
-    utm_campaign: utmCampaign,
-    utm_content:  utmContent,
-  })
-  void supabase.rpc('increment_ooh_visits', { site_id: site.id })
-
   let destination = site.landing_url
   try {
     const url = new URL(destination)
@@ -55,5 +42,20 @@ export async function GET(
     destination = url.toString()
   } catch { /* relative URL — send as-is */ }
 
-  return NextResponse.redirect(destination, 301)
+  await Promise.allSettled([
+    supabase.from('ooh_visits').insert({
+      site_id:      site.id,
+      brand_id:     site.brand_id,
+      ip_region:    ipRegion,
+      device_type:  deviceType,
+      referrer:     request.headers.get('referer') ?? null,
+      utm_source:   utmSource,
+      utm_medium:   utmMedium,
+      utm_campaign: utmCampaign,
+      utm_content:  utmContent,
+    }),
+    supabase.rpc('increment_ooh_visits', { site_id: site.id }),
+  ])
+
+  return NextResponse.redirect(destination, 302)
 }
