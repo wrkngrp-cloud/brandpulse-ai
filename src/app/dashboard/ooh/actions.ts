@@ -1,8 +1,8 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { redirect }       from 'next/navigation'
-import { z }              from 'zod'
+import { redirect }      from 'next/navigation'
+import { z }             from 'zod'
 import { revalidatePath } from 'next/cache'
 import { callAi }         from '@/lib/ai/client'
 
@@ -38,7 +38,7 @@ const SiteSchema = z.object({
   qr_enabled:           z.boolean().default(false),
 })
 
-type FormState = { error?: string; success?: boolean; siteId?: string } | null
+type FormState = { error?: string; success?: boolean; siteId?: string; siteName?: string } | null
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function generateShortCode(supabase: any): Promise<string> {
@@ -180,7 +180,7 @@ export async function createSite(
     return { error: error.message }
   }
 
-  redirect(`/dashboard/ooh/${site.id}`)
+  return { success: true, siteId: site.id, siteName: siteData.site_name }
 }
 
 export async function updateSite(
@@ -229,7 +229,7 @@ export async function updateSite(
   }
 
   revalidatePath(`/dashboard/ooh/${siteId}`)
-  return { success: true }
+  return { success: true, siteId, siteName: parsed.data.site_name }
 }
 
 export async function deleteSite(siteId: string): Promise<void> {

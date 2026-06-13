@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState, useState, useEffect, useRef, useCallback } from 'react'
+import { SuccessDialog } from '@/components/ui/success-dialog'
 import { toast }              from 'sonner'
 import { Button }             from '@/components/ui/button'
 import { Input }              from '@/components/ui/input'
@@ -96,7 +97,7 @@ interface MapboxFeature {
   geometry: { coordinates: [number, number] }
 }
 
-type FormState = { error?: string; success?: boolean; siteId?: string } | null
+type FormState = { error?: string; success?: boolean; siteId?: string; siteName?: string } | null
 
 interface OohSiteFormProps {
   action: (prev: FormState, formData: FormData) => Promise<FormState>
@@ -792,6 +793,18 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
       <Button type="submit" disabled={pending} className="w-full">
         {pending ? 'Saving…' : defaultValues ? 'Update site' : 'Create site'}
       </Button>
+
+      {state?.success && state.siteId && (
+        <SuccessDialog
+          open={true}
+          title={defaultValues ? 'Site updated' : 'Site created'}
+          description={state.siteName ?? siteName}
+          viewHref={`/dashboard/ooh/${state.siteId}`}
+          viewLabel="View site"
+          closeHref="/dashboard/ooh"
+          closeLabel="Back to OOH"
+        />
+      )}
     </form>
   )
 }
