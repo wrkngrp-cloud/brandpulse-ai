@@ -72,6 +72,65 @@ export async function fetchInstagramHashtagMentions(
   return mentions
 }
 
+export interface InstagramImage {
+  postId:          string
+  mediaUrl:        string
+  postUrl:         string
+  hashtag:         string
+  creatorUsername: string
+  caption:         string
+  likes:           number
+  comments:        number
+}
+
+// Fetches IMAGE posts for an event hashtag — returns only posts that have a usable media_url.
+// Used by E6 visual brand detection. Rate limit: 30 unique hashtags / 7 days per account.
+export async function fetchInstagramHashtagImages(
+  igUserId: string,
+  accessToken: string,
+  hashtag: string,
+  limit = 20
+): Promise<InstagramImage[]> {
+  const hashtagId = await getHashtagId(igUserId, accessToken, hashtag)
+  if (!hashtagId) return []
+
+  const res = await fetch(
+    `${GRAPH}/${hashtagId}/recent_media` +
+    `?user_id=${igUserId}` +
+    `&fields=id,caption,media_type,media_url,timestamp,like_count,comments_count,permalink,owner{username}` +
+    `&access_token=${accessToken}`
+  )
+  if (!res.ok) return []
+
+  const data = await res.json() as {
+    data?: Array<{
+      id: string
+      caption?: string
+      media_type?: string
+      media_url?: string
+      timestamp: string
+      like_count?: number
+      comments_count?: number
+      permalink?: string
+      owner?: { username?: string }
+    }>
+  }
+
+  return (data.data ?? [])
+    .filter(p => p.media_type === 'IMAGE' && p.media_url)
+    .slice(0, limit)
+    .map(p => ({
+      postId:          p.id,
+      mediaUrl:        p.media_url!,
+      postUrl:         p.permalink ?? '',
+      hashtag,
+      creatorUsername: p.owner?.username ?? '',
+      caption:         p.caption ?? '',
+      likes:           p.like_count ?? 0,
+      comments:        p.comments_count ?? 0,
+    }))
+}
+
 // Returns posts where the IG Business Account is @tagged by other users.
 // Free with Business account, no rate limit beyond standard Graph API limits.
 export async function fetchInstagramTaggedMedia(

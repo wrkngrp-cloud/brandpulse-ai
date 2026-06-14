@@ -56,7 +56,7 @@
 | Survey distribution (email + WhatsApp send) | High | Surveys exist; no dispatch UI. Need "Send survey" sheet with email list + WhatsApp share link + Inngest job |
 | Competitor management settings | High | API exists (`/api/brand/competitors`); no settings UI to add/edit/remove tracked competitors |
 | Campaign performance view | High | Campaign detail shows linked assets; no aggregated metrics (total spend vs reach, OOH visits rollup, cost-per-lead) |
-| E6 — Visual brand mention detector | Medium | Hashtag crawl + Claude Vision for logo/merch detection at events |
+| ~~E6 — Visual brand mention detector~~ | ~~Medium~~ | ✅ Done — Claude Haiku Vision; "Scan now" on event detail page |
 | ~~Unified Brand Funnel page~~ | ~~Medium~~ | ✅ Done — `/dashboard/funnel` |
 | ~~Survey templates (all 6)~~ | ~~High~~ | ✅ Done — template picker + `survey-templates.ts` |
 | ~~NPS & Advocacy Tracker~~ | ~~High~~ | ✅ Done — `/dashboard/surveys/nps` |
@@ -189,6 +189,10 @@ Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer
 | NPS diagnosis API | `src/app/api/surveys/nps-diagnosis/route.ts` |
 | Brand Funnel client | `src/app/dashboard/funnel/funnel-client.tsx` |
 | Funnel AI diagnosis API | `src/app/api/funnel/diagnose/route.ts` |
+| E6 visual scan API | `src/app/api/event/visual-scan/route.ts` |
+| E6 brand detector (vision) | `src/lib/vision/brand-detector.ts` |
+| E6 visual mentions component | `src/components/events/visual-mentions.tsx` |
+| Visual mentions migration | `supabase/migrations/20260622000000_visual_mentions.sql` |
 | Sentiment emotion wheel | `src/app/dashboard/sentiment/emotion-wheel.tsx` |
 | Sentiment topic clusters | `src/app/dashboard/sentiment/topic-clusters.tsx` |
 | Topic clusters API | `src/app/api/sentiment/clusters/route.ts` |
