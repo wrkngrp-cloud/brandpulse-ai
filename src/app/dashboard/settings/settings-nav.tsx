@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Building2, Link2, MapPin, Swords } from 'lucide-react'
+import { User, Building2, Link2, MapPin, Swords, Code2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
@@ -11,6 +11,7 @@ const links = [
   { label: 'Connected Accounts', href: '/dashboard/settings/connections',    icon: Link2     },
   { label: 'OOH Domain',         href: '/dashboard/settings/ooh-domain',    icon: MapPin    },
   { label: 'Competitors',        href: '/dashboard/settings/competitors',    icon: Swords    },
+  { label: 'Pixel & SDK',        href: '/dashboard/settings/pixel',          icon: Code2     },
 ]
 
 export function SettingsNav() {

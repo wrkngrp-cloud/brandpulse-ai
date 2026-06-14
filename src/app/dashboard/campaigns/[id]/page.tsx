@@ -71,6 +71,28 @@ export default async function CampaignDetailPage({
         .in('event_id', eventIds)
     : { data: [] }
 
+  // ── Performance tab extra data ────────────────────────────────────────────
+  // 1. Social posts linked to this campaign (via campaign_id) or within date range
+  const socialQuery = supabase
+    .from('social_posts')
+    .select('impressions, reach, likes, comments, shares, posted_at')
+    .eq('campaign_id', id)
+    .order('posted_at', { ascending: true })
+
+  // 2. Per-visit log for each OOH site in this campaign
+  const oohSiteIds = (oohSites ?? []).map(s => s.id)
+  const oohVisitsQuery = oohSiteIds.length > 0
+    ? supabase
+        .from('ooh_visits')
+        .select('site_id, visited_at')
+        .in('site_id', oohSiteIds)
+    : Promise.resolve({ data: [] })
+
+  const [{ data: socialPosts }, { data: oohVisits }] = await Promise.all([
+    socialQuery,
+    oohVisitsQuery,
+  ])
+
   return (
     <div className="max-w-4xl space-y-6">
       <div>
@@ -95,6 +117,8 @@ export default async function CampaignDetailPage({
         unlinkedSites={unlinkedSites ?? []}
         unlinkedEvents={unlinkedEvents ?? []}
         interactions={interactions ?? []}
+        socialPosts={socialPosts ?? []}
+        oohVisits={oohVisits ?? []}
       />
     </div>
   )

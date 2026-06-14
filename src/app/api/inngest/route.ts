@@ -6,11 +6,13 @@ import { eventRoiReport }              from '@/lib/inngest/functions/event-roi-r
 import { eventVisualDetect }           from '@/lib/inngest/functions/event-visual-detect'
 import { oohSearchUplift }             from '@/lib/inngest/functions/ooh-search-uplift'
 import { competitiveWeeklyBriefing }   from '@/lib/inngest/functions/competitive-weekly-briefing'
+import { ga4DailySync }                from '@/lib/inngest/functions/ga4-daily-sync'
+import { appReviewSync }               from '@/lib/inngest/functions/app-review-sync'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
-  functions: [syncSocialPosts, crawlMentions, eventRoiReport, eventVisualDetect, oohSearchUplift, competitiveWeeklyBriefing],
+  functions: [syncSocialPosts, crawlMentions, eventRoiReport, eventVisualDetect, oohSearchUplift, competitiveWeeklyBriefing, ga4DailySync, appReviewSync],
 })
