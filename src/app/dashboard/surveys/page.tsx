@@ -3,7 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 import { Skeleton }     from '@/components/ui/skeleton'
 import { NewSurveyDialog } from './new-survey-dialog'
 import { SurveysList }  from '@/components/surveys/surveys-list'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquare, TrendingUp } from 'lucide-react'
+import Link from 'next/link'
+import { buttonVariants } from '@/components/ui/button'
 
 const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -55,7 +57,16 @@ export default function SurveysPage() {
             Collect direct feedback from your audience
           </p>
         </div>
-        <NewSurveyDialog />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/surveys/nps"
+            className={buttonVariants({ size: 'sm', variant: 'outline' })}
+          >
+            <TrendingUp className="h-4 w-4 mr-1.5" />
+            NPS Tracker
+          </Link>
+          <NewSurveyDialog />
+        </div>
       </div>
       <Suspense fallback={<Skeleton className="h-48 rounded-xl" />}>
         <SurveyListServer />
