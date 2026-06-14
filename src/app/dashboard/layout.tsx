@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardNav } from '@/components/dashboard/dashboard-nav'
+import { MobileNav }    from '@/components/dashboard/mobile-nav'
 import { UserDropdown } from '@/components/dashboard/user-dropdown'
 import { AiCommand } from './ai-command'
 import { PrePostWidget } from './pre-post-widget'
@@ -25,8 +26,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Topbar */}
-      <header className="border-b px-6 h-14 flex items-center justify-between shrink-0">
-        <span className="font-semibold text-sm tracking-tight">BrandPulse</span>
+      <header className="border-b px-4 sm:px-6 h-14 flex items-center justify-between shrink-0 gap-3">
+        <div className="flex items-center gap-2">
+          <MobileNav />
+          <span className="font-semibold text-sm tracking-tight">BrandPulse</span>
+        </div>
         <UserDropdown name={userName} email={userEmail} brandName={brand.name} />
       </header>
       <div className="flex flex-1 overflow-hidden">
@@ -34,7 +38,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <nav className="w-56 border-r shrink-0 p-4 hidden md:block">
           <DashboardNav />
         </nav>
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-4 sm:p-6">{children}</main>
       </div>
       <PrePostWidget />
       <AiCommand />
