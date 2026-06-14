@@ -23,6 +23,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "framer-motion": "^12.40.0",
     "inngest": "^4.5.1",
     "lucide-react": "^1.17.0",
     "mapbox-gl": "^3.24.0",
