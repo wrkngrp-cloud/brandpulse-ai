@@ -6,14 +6,16 @@ import {
 } from 'recharts'
 
 interface TrendPoint {
-  day: string
-  score: number
+  day?:       string
+  weekLabel?: string
+  score:    number
   positive: number
   negative: number
 }
 
 interface Props {
-  data: TrendPoint[]
+  data:    TrendPoint[]
+  weekly?: boolean   // true → use weekLabel + abbreviated x-axis
 }
 
 function shortDate(d: string) {
@@ -39,7 +41,7 @@ function CustomTooltip({ active, payload, label }: {
   )
 }
 
-export function SentimentTrendChart({ data }: Props) {
+export function SentimentTrendChart({ data, weekly = false }: Props) {
   if (data.length < 2) return null
 
   return (
@@ -47,8 +49,9 @@ export function SentimentTrendChart({ data }: Props) {
       <LineChart data={data} margin={{ top: 4, right: 8, left: -24, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
         <XAxis
-          dataKey="day"
-          tickFormatter={shortDate}
+          dataKey={weekly ? 'weekLabel' : 'day'}
+          tickFormatter={weekly ? shortDate : shortDate}
+          interval={weekly ? 1 : 0}
           tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
           axisLine={false}
           tickLine={false}
