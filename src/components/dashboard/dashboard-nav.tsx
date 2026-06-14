@@ -10,9 +10,9 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ── Nav data ──────────────────────────────────────────────────────────────────
 
-const INTELLIGENCE_LINKS = [
+const INTELLIGENCE = [
   { label: 'Overview',     href: '/dashboard',              icon: LayoutDashboard },
   { label: 'Content',      href: '/dashboard/content',      icon: FileText        },
   { label: 'Sentiment',    href: '/dashboard/sentiment',    icon: BarChart2       },
@@ -23,8 +23,8 @@ const INTELLIGENCE_LINKS = [
 const CAMPAIGN_PATHS = ['/dashboard/campaigns', '/dashboard/ooh', '/dashboard/events']
 
 const CAMPAIGN_SUB = [
-  { label: 'All Campaigns', href: '/dashboard/campaigns', icon: Megaphone    },
-  { label: 'OOH Placements', href: '/dashboard/ooh',      icon: MapPin       },
+  { label: 'All Campaigns',  href: '/dashboard/campaigns', icon: Megaphone    },
+  { label: 'OOH Placements', href: '/dashboard/ooh',       icon: MapPin       },
   { label: 'Events',         href: '/dashboard/events',    icon: CalendarDays },
 ]
 
@@ -35,7 +35,7 @@ const CAMPAIGN_SOON = [
   { label: 'Print',   icon: Newspaper },
 ]
 
-const DEEP_INTEL_LINKS = [
+const DEEP_INTEL = [
   { label: 'Pre-Post',    href: '/dashboard/pre-post',    icon: Zap     },
   { label: 'Funnel',      href: '/dashboard/funnel',      icon: Filter  },
   { label: 'Cultural',    href: '/dashboard/cultural',    icon: Globe   },
@@ -44,179 +44,200 @@ const DEEP_INTEL_LINKS = [
   { label: 'Influencers', href: '/dashboard/influencers', icon: Users   },
 ]
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────────────────────
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function NavSeparator({ expanded }: { expanded: boolean }) {
   return (
-    <p className="px-2 pt-5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.09em] text-sidebar-foreground/35 select-none first:pt-1">
-      {children}
-    </p>
+    <div className={cn('my-2.5 flex items-center gap-2', expanded ? 'px-0' : 'px-0')}>
+      <div className="h-px flex-1 bg-sidebar-border/50" />
+    </div>
   )
 }
+
+function SectionLabel({ children, expanded }: { children: React.ReactNode; expanded: boolean }) {
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-2 px-[10px] pb-1.5 pt-1',
+        'transition-opacity duration-150',
+        expanded ? 'opacity-100 delay-75' : 'opacity-0 h-0 overflow-hidden py-0',
+      )}
+    >
+      <p className="text-[9.5px] font-semibold uppercase tracking-[0.1em] text-sidebar-foreground/30 whitespace-nowrap">
+        {children}
+      </p>
+    </div>
+  )
+}
+
+// ── Nav item ──────────────────────────────────────────────────────────────────
 
 function NavItem({
   href,
   icon: Icon,
   label,
   active,
+  expanded,
 }: {
   href: string
   icon: React.ElementType
   label: string
   active: boolean
+  expanded: boolean
 }) {
   return (
-    <li>
-      <Link
-        href={href}
+    <Link
+      href={href}
+      className={cn(
+        'flex items-center gap-3 h-9 px-[10px] rounded-lg transition-all duration-150 group relative',
+        active
+          ? 'bg-primary/10 text-primary'
+          : 'text-sidebar-foreground/45 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+      )}
+    >
+      {/* Icon with subtle active-state ring */}
+      <div
         className={cn(
-          'flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13.5px] font-medium transition-all duration-150 outline-none group',
-          active
-            ? 'bg-primary text-primary-foreground shadow-sm'
-            : 'text-sidebar-foreground/65 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+          'h-[26px] w-[26px] rounded-md flex items-center justify-center shrink-0 transition-all duration-150',
+          active ? 'bg-primary/15' : 'group-hover:bg-sidebar-accent',
         )}
       >
-        <Icon
-          className={cn(
-            'h-[15px] w-[15px] shrink-0 transition-colors',
-            active ? 'opacity-90' : 'opacity-70 group-hover:opacity-100',
-          )}
-        />
+        <Icon className={cn('h-[15px] w-[15px]', active ? 'opacity-100' : 'opacity-70 group-hover:opacity-100')} />
+      </div>
+
+      {/* Label — visible only when sidebar expanded */}
+      <span
+        className={cn(
+          'whitespace-nowrap text-[13px] font-medium transition-opacity duration-150',
+          expanded ? 'opacity-100 delay-75' : 'opacity-0',
+        )}
+      >
         {label}
-      </Link>
-    </li>
+      </span>
+    </Link>
   )
 }
 
-// ── Main component ─────────────────────────────────────────────────────────────
+// ── Main nav ──────────────────────────────────────────────────────────────────
 
-export function DashboardNav() {
+export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
   const pathname = usePathname()
 
-  const onCampaignPath = CAMPAIGN_PATHS.some(p => pathname.startsWith(p))
-  const [campaignOpen, setCampaignOpen] = useState(onCampaignPath)
+  const onCampaign = CAMPAIGN_PATHS.some(p => pathname.startsWith(p))
+  const [campaignOpen, setCampaignOpen] = useState(onCampaign)
 
   useEffect(() => {
-    if (onCampaignPath) setCampaignOpen(true)
-  }, [onCampaignPath])
+    if (onCampaign) setCampaignOpen(true)
+  }, [onCampaign])
 
   const isActive = (href: string) =>
     href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
 
   return (
-    <nav aria-label="Dashboard navigation">
-      {/* ── Intelligence ─────────────────────────────────────────────── */}
-      <SectionLabel>Intelligence</SectionLabel>
-      <ul className="space-y-0.5">
-        {INTELLIGENCE_LINKS.map(({ label, href, icon }) => (
-          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} />
-        ))}
-      </ul>
+    <nav className="space-y-0.5" aria-label="Dashboard navigation">
 
-      {/* ── Campaigns ────────────────────────────────────────────────── */}
-      <SectionLabel>Campaigns</SectionLabel>
-      <ul className="space-y-0.5">
-        <li>
-          <button
-            onClick={() => setCampaignOpen(o => !o)}
-            className={cn(
-              'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13.5px] font-medium transition-all duration-150 outline-none',
-              onCampaignPath
-                ? 'text-sidebar-foreground'
-                : 'text-sidebar-foreground/65 hover:text-sidebar-foreground hover:bg-sidebar-accent',
-            )}
-          >
-            <Megaphone className="h-[15px] w-[15px] shrink-0 opacity-70" />
-            <span className="flex-1 text-left">Campaigns</span>
-            <ChevronDown
-              className={cn(
-                'h-3.5 w-3.5 shrink-0 opacity-50 transition-transform duration-200',
-                campaignOpen && 'rotate-180',
-              )}
-            />
-          </button>
+      {/* Intelligence */}
+      <SectionLabel expanded={expanded}>Intelligence</SectionLabel>
+      {INTELLIGENCE.map(({ label, href, icon }) => (
+        <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
+      ))}
 
-          {campaignOpen && (
-            <ul className="mt-1 ml-4 pl-3 border-l border-sidebar-border/60 space-y-0.5">
-              {CAMPAIGN_SUB.map(({ label, href, icon: Icon }) => {
-                const active = href === '/dashboard/campaigns'
-                  ? pathname === '/dashboard/campaigns' || pathname.startsWith('/dashboard/campaigns/')
-                  : pathname.startsWith(href)
-                return (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      className={cn(
-                        'flex items-center gap-2 px-2 py-1.5 rounded-md text-[12.5px] font-medium transition-all duration-150',
-                        active
-                          ? 'text-primary font-semibold'
-                          : 'text-sidebar-foreground/55 hover:text-sidebar-foreground hover:bg-sidebar-accent',
-                      )}
-                    >
-                      <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
-                      {label}
-                    </Link>
-                  </li>
-                )
-              })}
+      <NavSeparator expanded={expanded} />
 
-              <li>
-                <p className="px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-sidebar-foreground/25">
-                  Coming soon
-                </p>
-              </li>
-
-              {CAMPAIGN_SOON.map(({ label, icon: Icon }) => (
-                <li key={label}>
-                  <span className="flex items-center gap-2 px-2 py-1.5 rounded-md text-[12.5px] text-sidebar-foreground/30 cursor-not-allowed select-none">
-                    <Icon className="h-3.5 w-3.5 shrink-0" />
-                    {label}
-                    <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded-full border border-sidebar-border/50 text-sidebar-foreground/30">
-                      Soon
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </li>
-      </ul>
-
-      {/* ── Deep Intelligence ─────────────────────────────────────────── */}
-      <SectionLabel>Deep Intelligence</SectionLabel>
-      <ul className="space-y-0.5">
-        {DEEP_INTEL_LINKS.map(({ label, href, icon }) => (
-          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} />
-        ))}
-      </ul>
-
-      {/* ── Ask AI — special CTA ──────────────────────────────────────── */}
-      <div className="pt-5 pb-2">
-        <Link
-          href="/dashboard/ask"
+      {/* Campaigns */}
+      <SectionLabel expanded={expanded}>Campaigns</SectionLabel>
+      <div>
+        <button
+          onClick={() => expanded && setCampaignOpen(o => !o)}
           className={cn(
-            'flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13.5px] font-semibold transition-all duration-150 outline-none',
-            pathname.startsWith('/dashboard/ask')
-              ? 'bg-primary text-primary-foreground shadow-md'
-              : [
-                  'border text-primary hover:bg-primary hover:text-primary-foreground',
-                  'border-primary/25 bg-primary/8',
-                  'hover:border-primary/40 hover:shadow-sm',
-                ].join(' '),
+            'w-full flex items-center gap-3 h-9 px-[10px] rounded-lg transition-all duration-150',
+            onCampaign
+              ? 'text-foreground bg-muted/50'
+              : 'text-sidebar-foreground/45 hover:text-sidebar-foreground hover:bg-sidebar-accent',
           )}
         >
-          <Sparkles className="h-4 w-4 shrink-0" />
-          Ask AI
-          {!pathname.startsWith('/dashboard/ask') && (
-            <span
-              className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-              style={{ background: 'oklch(0.55 0.25 258 / 15%)' }}
-            >
-              AI
-            </span>
-          )}
-        </Link>
+          <div className="h-[26px] w-[26px] rounded-md flex items-center justify-center shrink-0">
+            <Megaphone className="h-[15px] w-[15px] opacity-70" />
+          </div>
+          <span className={cn('flex-1 text-left text-[13px] font-medium whitespace-nowrap transition-opacity duration-150', expanded ? 'opacity-100 delay-75' : 'opacity-0')}>
+            Campaigns
+          </span>
+          <ChevronDown className={cn('h-3.5 w-3.5 shrink-0 opacity-50 transition-transform duration-200 transition-opacity', expanded ? 'opacity-50' : 'opacity-0', campaignOpen && 'rotate-180')} />
+        </button>
+
+        {/* Sub-items — only visible in expanded mode */}
+        {campaignOpen && expanded && (
+          <div className="mt-1 ml-3 pl-3 border-l border-sidebar-border/40 space-y-0.5">
+            {CAMPAIGN_SUB.map(({ label, href, icon: Icon }) => {
+              const active = href === '/dashboard/campaigns'
+                ? pathname === '/dashboard/campaigns' || pathname.startsWith('/dashboard/campaigns/')
+                : pathname.startsWith(href)
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    'flex items-center gap-2 h-8 px-2 rounded-md text-[12.5px] font-medium transition-all duration-150',
+                    active
+                      ? 'text-primary bg-primary/8'
+                      : 'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+                  )}
+                >
+                  <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                  {label}
+                </Link>
+              )
+            })}
+
+            {/* Soon items */}
+            <div className="pt-1 border-t border-sidebar-border/30 mt-1">
+              {CAMPAIGN_SOON.map(({ label, icon: Icon }) => (
+                <span
+                  key={label}
+                  className="flex items-center gap-2 h-8 px-2 rounded-md text-[12.5px] text-sidebar-foreground/25 cursor-not-allowed select-none"
+                >
+                  <Icon className="h-3.5 w-3.5 shrink-0" />
+                  {label}
+                  <span className="ml-auto text-[9px] font-medium border border-sidebar-border/30 rounded px-1 py-px">
+                    Soon
+                  </span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
+      <NavSeparator expanded={expanded} />
+
+      {/* Deep Intelligence */}
+      <SectionLabel expanded={expanded}>Deep Intel</SectionLabel>
+      {DEEP_INTEL.map(({ label, href, icon }) => (
+        <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
+      ))}
+
+      <NavSeparator expanded={expanded} />
+
+      {/* Ask AI — always highlighted */}
+      <Link
+        href="/dashboard/ask"
+        className={cn(
+          'flex items-center gap-3 h-9 px-[10px] rounded-lg transition-all duration-150 group',
+          pathname.startsWith('/dashboard/ask')
+            ? 'bg-primary/10 text-primary'
+            : 'text-primary/60 hover:text-primary hover:bg-primary/8',
+        )}
+      >
+        <div className={cn(
+          'h-[26px] w-[26px] rounded-md flex items-center justify-center shrink-0 transition-all',
+          pathname.startsWith('/dashboard/ask') ? 'bg-primary/15' : 'group-hover:bg-primary/10',
+        )}>
+          <Sparkles className="h-[15px] w-[15px]" />
+        </div>
+        <span className={cn('whitespace-nowrap text-[13px] font-semibold transition-opacity duration-150', expanded ? 'opacity-100 delay-75' : 'opacity-0')}>
+          Ask AI
+        </span>
+      </Link>
     </nav>
   )
 }
