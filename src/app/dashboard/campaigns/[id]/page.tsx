@@ -30,7 +30,12 @@ export default async function CampaignDetailPage({
 
   if (!campaign) notFound()
 
-  const [{ data: oohSites }, { data: events }, { data: unlinkedSites }, { data: unlinkedEvents }] = await Promise.all([
+  const [
+    { data: oohSites },
+    { data: events },
+    { data: unlinkedSites },
+    { data: unlinkedEvents },
+  ] = await Promise.all([
     supabase
       .from('ooh_sites')
       .select('id, site_name, city, state, format_type, visits, campaign_start, campaign_end, vanity_slug, lat, lng, monthly_cost, currency, lga')
@@ -57,6 +62,15 @@ export default async function CampaignDetailPage({
       .limit(30),
   ])
 
+  // Fetch event interaction counts for all events in this campaign
+  const eventIds = (events ?? []).map(e => e.id)
+  const { data: interactions } = eventIds.length > 0
+    ? await supabase
+        .from('event_interactions')
+        .select('event_id, interaction_type')
+        .in('event_id', eventIds)
+    : { data: [] }
+
   return (
     <div className="max-w-4xl space-y-6">
       <div>
@@ -80,6 +94,7 @@ export default async function CampaignDetailPage({
         activeTab={tab}
         unlinkedSites={unlinkedSites ?? []}
         unlinkedEvents={unlinkedEvents ?? []}
+        interactions={interactions ?? []}
       />
     </div>
   )
