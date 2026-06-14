@@ -37,11 +37,12 @@ const END   = ptOnArc(315) // {x:158.0, y:166.0}
 const TRACK_D = `M ${START.x} ${START.y} A ${R} ${R} 0 1 1 ${END.x} ${END.y}`
 
 // Zone colour + gradient stops for the arc
+// Elite uses brand true blue #2B59FF; never blend clay with blue
 const ZONE_STOPS: Record<string, { from: string; to: string; glow: string }> = {
-  critical: { from: '#ef4444', to: '#f97316', glow: 'rgba(239,68,68,0.4)' },
-  building: { from: '#f59e0b', to: '#eab308', glow: 'rgba(245,158,11,0.4)' },
-  strong:   { from: '#22c55e', to: '#10b981', glow: 'rgba(34,197,94,0.35)' },
-  elite:    { from: '#6366f1', to: '#8b5cf6', glow: 'rgba(99,102,241,0.4)' },
+  critical: { from: '#ef4444', to: '#f87171', glow: 'rgba(239,68,68,0.4)'  },
+  building: { from: '#f59e0b', to: '#fbbf24', glow: 'rgba(245,158,11,0.4)' },
+  strong:   { from: '#22c55e', to: '#4ade80', glow: 'rgba(34,197,94,0.35)' },
+  elite:    { from: '#2B59FF', to: '#4F79FF', glow: 'rgba(43,89,255,0.4)'  },
 }
 
 // Indicator dot position for a given score (0-100)
@@ -190,18 +191,17 @@ export function BHIGauge({ bhi, sparkline = [] }: Props) {
             />
           )}
 
-          {/* Score number (count-up) */}
+          {/* Score number (count-up) — DM Serif Display */}
           <text
             x={CX}
             y={CY - 14}
             textAnchor="middle"
             dominantBaseline="auto"
-            fontSize="42"
-            fontWeight="700"
-            fontFamily="inherit"
+            fontSize="46"
+            fontWeight="400"
+            fontFamily="var(--font-serif), Georgia, serif"
             letterSpacing="-1"
             fill="currentColor"
-            className="tabular-nums"
           >
             {score !== null ? <motion.tspan>{display}</motion.tspan> : '—'}
           </text>
