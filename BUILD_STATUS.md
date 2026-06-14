@@ -1,7 +1,7 @@
 # BrandPulse AI — Build Status
 
 > Feed this file into your project chat at the start of each session to bring it up to date.
-> Updated after every pushed session. Last updated: 2026-06-14.
+> Updated after every pushed session. Last updated: 2026-06-15.
 
 ---
 
@@ -57,7 +57,7 @@
 | Competitor management settings | High | API exists (`/api/brand/competitors`); no settings UI to add/edit/remove tracked competitors |
 | Campaign performance view | High | Campaign detail shows linked assets; no aggregated metrics (total spend vs reach, OOH visits rollup, cost-per-lead) |
 | E6 — Visual brand mention detector | Medium | Hashtag crawl + Claude Vision for logo/merch detection at events |
-| Unified Brand Funnel page | Medium | 6-stage waterfall (Recharts), drop-off %, green/amber/red, AI diagnosis |
+| ~~Unified Brand Funnel page~~ | ~~Medium~~ | ✅ Done this session — `/dashboard/funnel` |
 | Audio transcription module | Low | Whisper + Haiku pipeline |
 | Full survey system (all 6 templates, WhatsApp delivery) | Low | Current survey is single-template; need 6 templates + email/WhatsApp dispatch |
 | Full sentiment engine (timeline, clusters, emotion wheel) | Low | Basic sentiment live; topic clusters and emotion wheel pending |
@@ -85,32 +85,32 @@ Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer
 
 ---
 
-## Active session: 2026-06-14
+## Active session: 2026-06-15
 
-**What was just completed (committed and deployed):**
-1. AI conversation history fix — new `GET /api/ai/conversations/[id]` endpoint; page now loads full messages
-2. Debrief form — success screen + localStorage draft persistence + useActionState anti-double-submit
-3. BHI gauge redesign — semicircle arc, zone badge, component tiles, sparkline
-4. NIM removed from `lib/ai/client.ts` — Anthropic-only routing
-5. Competitive Intel UI — model name removed from display grid
-6. OOH maps — migrated to react-map-gl; Mapbox CSS served from CDN
+**What was built in the previous session (commits d2ae956, 9879510):**
+1. `BUILD_STATUS.md` created + CLAUDE.md AI routing updated (NIM removed)
+2. Campaigns nav restructured — expandable section with OOH + Events as sub-items; Digital/Radio/TV/Print as "Phase 3 — Soon" chips
+3. Survey distribution — "Send survey" panel with WhatsApp share link + email batch send (Resend, 50/batch)
+4. Competitor management settings page — full CRUD at `/dashboard/settings/competitors`
+5. Campaign performance tab — aggregated OOH visits, event leads, spend, CPV, CPL efficiency ratios
+
+**What was built this session (commit 34770bc):**
+1. **Unified Brand Funnel page** (`/dashboard/funnel`) — 6-stage waterfall with live data scoring:
+   - Awareness: SOV from `sov_snapshots.social_sov`
+   - Consideration: avg `engagement_rate` from `social_posts` (last 30 days), scaled × 10
+   - Preference: avg `sentiment_daily.social_score` (last 14 days)
+   - Action: event lead-capture rate (60pts) + OOH vanity visits (40pts)
+   - Loyalty: NPS from `survey_responses` rescaled 0-100
+   - Advocacy: organic share rate from `social_posts`
+   - Drop-off % between stages colour-coded (green ≤15%, amber 16-30%, red >30%)
+   - "Diagnose with AI" button → POST `/api/funnel/diagnose` → claude-sonnet-4-6 → 3 West-Africa-specific recommendations
+   - "Funnel" added to sidebar nav between Pre-Post and Competitive
 
 **Phase 3 channel architecture (planned — see PRD Document 2 sections 7.9–7.12):**
-- **Digital** (7.9): Meta Ads + X Ads + Google Ads OAuth connections; create/manage campaigns and ad creatives from BrandPulse; daily performance pull (ROAS/CTR/CPC/CPA/frequency); AI creative fatigue alerts, budget reallocation recommendations, anomaly detection
-- **Radio** (7.10): Excel/CSV media plan import (Claude reads and maps columns automatically); 40+ Nigerian station database with listenership benchmarks; per-spot schedule tracker; daypart efficiency AI analysis; delivery vs plan
-- **TV** (7.11): Same media plan import; NTA/AIT/Channels/DSTV channel database with TVR per daypart; GRP/CPRP tracking; underdelivery alerts with make-good negotiation recommendations
-- **Print** (7.12): Punch/Vanguard/Guardian/BusinessDay/etc. publication database with circulation and readership multipliers; QR is the PRIMARY attribution method for print (unlike OOH); per-placement QR auto-generation; CPT and scan-rate analytics
-
-**Nav restructure (implementing this session):**
-- Campaigns becomes an expandable sidebar section
-- OOH and Events move under Campaigns as sub-items
-- Digital / Radio / TV / Print appear as "Coming Soon" sub-items
-
-**Building this session:**
-1. Nav restructure — Campaigns expandable with OOH + Events as sub-items
-2. Survey distribution — "Send survey" UI with shareable link + email list + WhatsApp share link
-3. Competitor management settings — add/edit/remove tracked competitors
-4. Campaign performance view — aggregated metrics on campaign detail (OOH visits, event leads, spend vs reach)
+- **Digital** (7.9): Meta Ads + X Ads + Google Ads OAuth; create/manage campaigns from BrandPulse; daily ROAS/CTR/CPC pull; AI creative fatigue alerts + budget reallocation
+- **Radio** (7.10): Excel/CSV media plan import (Claude maps columns); 40+ Nigerian station DB; per-spot tracker; daypart efficiency ranking
+- **TV** (7.11): Same import flow; NTA/AIT/Channels/DSTV channel DB; GRP/CPRP tracking; underdelivery alerts
+- **Print** (7.12): Publication DB; QR is PRIMARY attribution; per-placement QR auto-generation; CPT analytics
 
 ---
 
@@ -131,6 +131,12 @@ Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer
 | Event debrief form | `src/components/events/debrief-form.tsx` |
 | Event actions (server) | `src/app/dashboard/events/actions.ts` |
 | Survey detail page | `src/app/dashboard/surveys/[id]/page.tsx` |
+| Survey send panel | `src/app/dashboard/surveys/[id]/send-survey.tsx` |
+| Competitor settings | `src/app/dashboard/settings/competitors/page.tsx` |
+| Campaign performance tab | `src/components/campaigns/campaign-detail-client.tsx` |
+| Brand Funnel page | `src/app/dashboard/funnel/page.tsx` |
+| Brand Funnel client | `src/app/dashboard/funnel/funnel-client.tsx` |
+| Funnel AI diagnosis API | `src/app/api/funnel/diagnose/route.ts` |
 | Competitive client | `src/app/dashboard/competitive/competitive-client.tsx` |
 | AI ask full page | `src/app/dashboard/ask/page.tsx` |
 | Root layout (Mapbox CSS link) | `src/app/layout.tsx` |
