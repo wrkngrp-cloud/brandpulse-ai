@@ -1,7 +1,7 @@
 # BrandPulse AI — Build Status
 
 > Feed this file into your project chat at the start of each session to bring it up to date.
-> Updated after every pushed session. Last updated: 2026-06-15.
+> Updated after every pushed session. Last updated: 2026-06-14.
 
 ---
 
@@ -65,8 +65,22 @@
 | ~~Full sentiment engine~~ | ~~Low~~ | ✅ Done — 12-week view, alerts, emotion wheel, topic clusters |
 | ~~Brand Equity Tracker~~ | ~~Low~~ | ✅ Done — `/dashboard/brand-equity` |
 
-### Phase 3+ — Not started
-Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer Intelligence, Creative Analysis, Competitive Intelligence deep build (scorecard, ESOV league, weekly briefing cron), AI Command Layer v2 (business case generator, PDF reports).
+### Phase 3 — Items 1-5 ✅ (this session)
+
+| Feature | Route / Key Files | Status |
+|---|---|---|
+| Cultural Intelligence Engine | `/dashboard/cultural`, `api/cultural/activation-ideas` | ✅ Done — CRS gauge, drift badge, emotion resonance bar, cultural calendar, activation ideas |
+| Influencer Intelligence | `/dashboard/influencers`, `api/influencers`, `api/influencers/[id]/score` | ✅ Done — add/score/track creators; Cultural IQ + risk scoring via Claude |
+| Creative Analysis | `/dashboard/creative`, `api/creative/{compare,identity,competitor}` | ✅ Done — A/B comparator, identity consistency check, competitor creative watch |
+| Competitive Intelligence deep build | `/dashboard/competitive` (rebuilt), `api/competitive/sightings`, `lib/inngest/functions/competitive-weekly-briefing.ts` | ✅ Done — 4-tab layout: Briefing, ESOV League, Sightings feed, Scorecard; Monday 8am Lagos cron + Resend email |
+| AI Command Layer v2 | `/dashboard/ask` (V2Tools section), `api/ai/{business-case,monthly-report,funnel-diagnostic}` | ✅ Done — Business Case (opus-4-8, board-ready), Monthly Report (sonnet, emails via Resend), Funnel Diagnostic (deep root-cause) |
+
+**Phase 3 migrations:**
+- `supabase/migrations/20260623000000_phase3_tables.sql` — influencers, competitor_sightings (`lat`/`lng`), weekly_briefings, creative_analyses (all with RLS)
+- `supabase/migrations/20260622000000_visual_mentions.sql` — visual_mentions (E6, from prior session)
+
+### Phase 3 — Not yet built (Items 6+)
+Audio Transcription Module (pending Whisper/ChatGPT subscription), SDK + Connector integrations (GA4, Paystack/Flutterwave webhooks, App Store reviews, Mailchimp/Brevo).
 
 ---
 
@@ -84,6 +98,51 @@ Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer
 | Button-as-link | `buttonVariants()` class on `<Link>`, not `<Button asChild>` | Button uses `@base-ui/react/button` which has no `asChild` prop |
 | Tenancy | RLS via `is_workspace_member()` only — never filter in app code | Security + simplicity |
 | Background jobs | Inngest for ALL async work | Handles retries, timeouts, step functions |
+
+---
+
+## Session: 2026-06-14 — Phase 3 Items 1-5 (commit TBD)
+
+**What was built (30+ files across 5 modules):**
+
+1. **Cultural Intelligence Engine** (`/dashboard/cultural`):
+   - CRS score (avg `cultural_score` from `pre_post_analyses`), drift badge (last 7d vs prior 23d), emotion resonance bar (joy+trust+anticipation / total)
+   - Cultural Calendar: 10 hardcoded 2026 Nigerian/West African moments, filtered to future dates, next 2 within 45 days shown with "Generate activation ideas" button
+   - Activation ideas → POST `/api/cultural/activation-ideas` → claude-sonnet-4-6 → 4 ideas with title, description, channel, effort
+   - "Cultural" nav link added (Globe icon) between Funnel and Competitive
+
+2. **Influencer Intelligence** (`/dashboard/influencers`):
+   - Add influencer form (name, handle, platform, category, followers)
+   - 4 stat tiles: total, active, avg Cultural IQ, high-risk count
+   - Per-influencer cards with status badges, CIQ badge (green ≥70, amber ≥50, red <50), risk badge (Low/Medium/High)
+   - "Score with AI" → POST `/api/influencers/[id]/score` → claude-sonnet-4-6 → cultural_iq, risk_score, ai_notes
+   - "Influencers" nav link added (Users icon)
+
+3. **Creative Analysis** (`/dashboard/creative`):
+   - 3-tab layout: Compare (A/B), Identity Check, Competitor Watch
+   - Compare: 5 scored dimensions per creative (engagement, cultural resonance, tone, clarity, risk), winner badge
+   - Identity: consistency score + strengths/drift warnings/adjustments across up to 3 captions
+   - Competitor Watch: tone, cultural fit, engagement potential, counter-positioning ideas
+   - History section showing last 5 analyses
+
+4. **Competitive Intelligence deep build** (`/dashboard/competitive`):
+   - Full rebuild: 4-tab layout (Briefing | ESOV League | Sightings | Scorecard)
+   - Sightings feed: log billboard/event/digital/print/tv/radio/activation/pr sightings with form; feeds competitive briefing
+   - ESOV League table: SOV% minus market share %, YOU badge, colour-coded
+   - Scorecard: side-by-side comparison table (SOV, sentiment, content volume, market position)
+   - Monday 8am Lagos cron (`TZ=Africa/Lagos 0 8 * * 1`) → AI briefing per brand + Resend email
+
+5. **AI Command Layer v2** (embedded in `/dashboard/ask`):
+   - Business Case: board-ready structured output (claude-opus-4-8) with outcomes, risk factors, Go/No-Go recommendation
+   - Monthly Report: pulls 30d sentiment/SOV/survey/social/pre-post data, generates narrative, emails via Resend
+   - Funnel Diagnostic: per-stage root cause diagnosis with effort-rated actions (wired to Funnel page)
+   - V2Tools grid rendered above chat input on Ask AI page
+
+**Migrations applied:**
+- `20260622000000_visual_mentions.sql` (prior session)
+- `20260623000000_phase3_tables.sql` (influencers, competitor_sightings, weekly_briefings, creative_analyses)
+
+**Build:** ✅ 82 routes, TypeScript clean, no warnings
 
 ---
 

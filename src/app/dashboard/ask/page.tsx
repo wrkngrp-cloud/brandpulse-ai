@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
+import { V2Tools } from './v2-tools'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -72,8 +74,17 @@ export default function AskPage() {
   const [convLoading,   setConvLoading]   = useState(false)
   const [histLoading,   setHistLoading]   = useState(false)
   const [conversationId, setConvId]       = useState<string | null>(cid)
+  const [userEmail,     setUserEmail]     = useState('')
   const bottomRef  = useRef<HTMLDivElement>(null)
   const textRef    = useRef<HTMLTextAreaElement>(null)
+
+  // Fetch user email for V2Tools
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.email) setUserEmail(data.user.email)
+    })
+  }, [])
 
   // Load conversation list
   const loadList = useCallback(async () => {
@@ -252,6 +263,9 @@ export default function AskPage() {
             </p>
           )}
         </div>
+
+        {/* V2 AI Power Tools */}
+        <V2Tools userEmail={userEmail} />
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto space-y-6 pr-1">

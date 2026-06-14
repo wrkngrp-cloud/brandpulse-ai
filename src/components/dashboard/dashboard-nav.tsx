@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, FileText, BarChart2, ClipboardList, Sparkles,
   CalendarDays, MapPin, Megaphone, Zap, Trophy, ChevronDown,
-  Monitor, Radio, Tv, Newspaper, Filter, Award,
+  Monitor, Radio, Tv, Newspaper, Filter, Award, Users, Palette, Globe,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -34,10 +34,13 @@ const topLinks = [
 ]
 
 const bottomLinks = [
-  { label: 'Pre-Post',    href: '/dashboard/pre-post',    icon: Zap                            },
-  { label: 'Funnel',      href: '/dashboard/funnel',      icon: Filter                         },
-  { label: 'Competitive', href: '/dashboard/competitive', icon: Trophy                         },
-  { label: 'Ask AI',      href: '/dashboard/ask',         icon: Sparkles, highlight: true as const },
+  { label: 'Pre-Post',    href: '/dashboard/pre-post',       icon: Zap                            },
+  { label: 'Funnel',      href: '/dashboard/funnel',         icon: Filter                         },
+  { label: 'Cultural',    href: '/dashboard/cultural',       icon: Globe                          },
+  { label: 'Competitive', href: '/dashboard/competitive',    icon: Trophy                         },
+  { label: 'Creative',    href: '/dashboard/creative',       icon: Palette                        },
+  { label: 'Influencers', href: '/dashboard/influencers',    icon: Users                          },
+  { label: 'Ask AI',      href: '/dashboard/ask',            icon: Sparkles, highlight: true as const },
 ]
 
 export function DashboardNav() {
