@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, FileText, BarChart2, ClipboardList, Sparkles,
   CalendarDays, MapPin, Megaphone, Zap, Trophy, ChevronDown,
-  Monitor, Radio, Tv, Newspaper,
+  Monitor, Radio, Tv, Newspaper, Filter,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -34,6 +34,7 @@ const topLinks = [
 
 const bottomLinks = [
   { label: 'Pre-Post',    href: '/dashboard/pre-post',    icon: Zap                            },
+  { label: 'Funnel',      href: '/dashboard/funnel',      icon: Filter                         },
   { label: 'Competitive', href: '/dashboard/competitive', icon: Trophy                         },
   { label: 'Ask AI',      href: '/dashboard/ask',         icon: Sparkles, highlight: true as const },
 ]
