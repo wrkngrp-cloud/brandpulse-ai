@@ -189,6 +189,8 @@ Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer
 | NPS diagnosis API | `src/app/api/surveys/nps-diagnosis/route.ts` |
 | Brand Funnel client | `src/app/dashboard/funnel/funnel-client.tsx` |
 | Funnel AI diagnosis API | `src/app/api/funnel/diagnose/route.ts` |
+| Public survey form | `src/app/survey/[id]/survey-form.tsx` |
+| Mobile nav drawer | `src/components/dashboard/mobile-nav.tsx` |
 | E6 visual scan API | `src/app/api/event/visual-scan/route.ts` |
 | E6 brand detector (vision) | `src/lib/vision/brand-detector.ts` |
 | E6 visual mentions component | `src/components/events/visual-mentions.tsx` |
