@@ -62,8 +62,8 @@
 | ~~NPS & Advocacy Tracker~~ | ~~High~~ | ✅ Done — `/dashboard/surveys/nps` |
 | Audio transcription module | Low | Whisper + Haiku pipeline |
 | Full survey system (all 6 templates, WhatsApp delivery) | Low | Current survey is single-template; need 6 templates + email/WhatsApp dispatch |
-| Full sentiment engine (timeline, clusters, emotion wheel) | Low | Basic sentiment live; topic clusters and emotion wheel pending |
-| Brand Equity Tracker (full ESOV, radar, EMV) | Low | BHI basic live; full weighted BHI + ESOV engine pending |
+| ~~Full sentiment engine~~ | ~~Low~~ | ✅ Done — 12-week view, alerts, emotion wheel, topic clusters |
+| ~~Brand Equity Tracker~~ | ~~Low~~ | ✅ Done — `/dashboard/brand-equity` |
 
 ### Phase 3+ — Not started
 Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer Intelligence, Creative Analysis, Competitive Intelligence deep build (scorecard, ESOV league, weekly briefing cron), AI Command Layer v2 (business case generator, PDF reports).
@@ -140,6 +140,29 @@ Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer
 
 ---
 
+## Session: 2026-06-14 — Full Sentiment Engine + Brand Equity Tracker (commit bc61244)
+
+**What was built (9 files, 1073 insertions):**
+
+5. **Full Sentiment Engine** (`/dashboard/sentiment` extended):
+   - Expanded from 7-day to 12-week view; `weeklyAggregate()` reduces 84 daily rows to 12 weekly points for clean chart
+   - `computeAlerts()` detects: crashes (delta ≤ -20 = critical, ≤ -10 = warning), spikes (≥ +20 = watch), sustained negativity (>60% negative for 3+ consecutive days = warning); last 4 alerts shown as severity-coded banners
+   - **Emotion Wheel** — Recharts PieChart donut using Plutchik 8-emotion palette; reads `emotion_distribution` JSONB from `sentiment_daily`
+   - **Topic Clusters** — "Analyse topics" button → POST `/api/sentiment/clusters` → claude-haiku-4-5-20251001 (Pidgin/Nigerian slang tier) → 3-5 thematic cluster cards with verbatim quotes
+   - `SentimentTrendChart` updated with optional `weekly` prop (switches XAxis dataKey to `weekLabel`)
+
+6. **Brand Equity Tracker** (`/dashboard/brand-equity`):
+   - Full 7-component BHI via `computeFullBHI()` in `src/lib/bhi.ts` with renormalized weights:
+     Awareness 20% (SOV), Salience 15% (survey aided awareness rate), Sentiment 20% (14-day avg), Perception 15% (perception_audit q2-q9), Cultural Resonance 15% (Phase 3 = null), Blended SOV 10%, EMV 5%
+   - **ESOV Engine**: live SOV card + editable market share % input + posture band badge (Growth Mode / Mild Growth / Parity / Decline Risk / Critical Decline)
+   - **Budget-to-ESOV Simulator**: user enters target ESOV % → estimated additional NGN spend + time-to-impact estimate
+   - **Perception Radar**: Recharts RadarChart across 8 brand dimensions (Quality, Trust, Innovation, Value, Cultural Relevance, Accessibility, Reliability, Emotional Connection)
+   - **EMV tile**: formatted as ₦X.XM with CPM/CPE benchmark notes
+   - NPS summary tile linking to full NPS Tracker
+   - "Brand Equity" nav item added between Sentiment and Surveys (Award icon)
+
+---
+
 ## Key file map (quick navigation)
 
 | Purpose | Path |
@@ -166,6 +189,12 @@ Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer
 | NPS diagnosis API | `src/app/api/surveys/nps-diagnosis/route.ts` |
 | Brand Funnel client | `src/app/dashboard/funnel/funnel-client.tsx` |
 | Funnel AI diagnosis API | `src/app/api/funnel/diagnose/route.ts` |
+| Sentiment emotion wheel | `src/app/dashboard/sentiment/emotion-wheel.tsx` |
+| Sentiment topic clusters | `src/app/dashboard/sentiment/topic-clusters.tsx` |
+| Topic clusters API | `src/app/api/sentiment/clusters/route.ts` |
+| Brand Equity page | `src/app/dashboard/brand-equity/page.tsx` |
+| Brand Equity client | `src/app/dashboard/brand-equity/brand-equity-client.tsx` |
+| Full BHI computation | `src/lib/bhi.ts` (computeFullBHI) |
 | Competitive client | `src/app/dashboard/competitive/competitive-client.tsx` |
 | AI ask full page | `src/app/dashboard/ask/page.tsx` |
 | Root layout (Mapbox CSS link) | `src/app/layout.tsx` |
