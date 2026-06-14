@@ -2,30 +2,9 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { TEMPLATE_MAP, type SurveyType } from '@/lib/survey-templates'
 
-const B2_QUESTIONS = [
-  {
-    id: 'q1',
-    type: 'single_choice',
-    text: 'How did you first hear about {brand}?',
-    required: true,
-    options: [
-      'Social media (Instagram, X or TikTok)',
-      'Friend or family',
-      'Online search',
-      'TV, radio or billboard',
-      'Other',
-    ],
-  },
-  {
-    id: 'q2',
-    type: 'nps',
-    text: 'How likely are you to recommend {brand} to a friend or colleague?',
-    required: true,
-  },
-]
-
-export async function createSurvey(name: string) {
+export async function createSurvey(name: string, templateId: SurveyType = 'b2_intercept') {
   const supabase = await createClient()
 
   const { data: brand } = await supabase
@@ -36,15 +15,18 @@ export async function createSurvey(name: string) {
 
   if (!brand) throw new Error('No brand found')
 
+  const template = TEMPLATE_MAP[templateId]
+  if (!template) throw new Error('Invalid template')
+
   const { data, error } = await supabase
     .from('surveys')
     .insert({
-      brand_id: brand.id,
+      brand_id:        brand.id,
       name,
-      type: 'b2_intercept',
-      questions: B2_QUESTIONS,
+      type:            templateId,
+      questions:       template.questions,
       deploy_channels: ['link', 'in-app', 'email'],
-      status: 'draft',
+      status:          'draft',
     })
     .select('id')
     .single()

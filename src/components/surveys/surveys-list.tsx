@@ -7,6 +7,7 @@ import Link          from 'next/link'
 import { ItemActions, type ItemAction } from '@/components/ui/item-actions'
 import { updateSurveyStatus, deleteSurvey } from '@/app/dashboard/surveys/actions'
 import { Link2, Play, PauseCircle, RotateCcw, Trash2, ExternalLink } from 'lucide-react'
+import { getTemplateLabel } from '@/lib/survey-templates'
 
 interface Survey {
   id:           string
@@ -98,6 +99,7 @@ function SurveyRow({ survey, appUrl }: { survey: Survey; appUrl: string }) {
         <div className="space-y-0.5 min-w-0">
           <p className="text-sm font-medium truncate">{survey.name}</p>
           <p className="text-xs text-muted-foreground">
+            {survey.type ? `${getTemplateLabel(survey.type)} · ` : ''}
             {new Date(survey.created_at).toLocaleDateString('en-NG', {
               day: 'numeric', month: 'short', year: 'numeric',
             })}
