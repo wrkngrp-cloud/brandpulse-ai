@@ -115,7 +115,7 @@ function StatCard({ children, className }: { children: React.ReactNode; classNam
     <motion.div
       variants={fadeUp}
       className={cn(
-        'rounded-2xl border bg-card p-5 space-y-1 card-hover',
+        'rounded-2xl border bg-card p-5 space-y-1 card-hover card-shadow',
         className,
       )}
     >
@@ -208,7 +208,7 @@ export function OverviewClient({
           {sentiment !== null ? (
             <div className="space-y-4">
               <div className="flex items-end gap-2">
-                <span className="text-5xl font-bold tabular-nums tracking-tight">
+                <span className="text-5xl metric">
                   {Math.round(sentiment.social_score)}
                 </span>
                 <div className="pb-2 flex items-center gap-1 text-muted-foreground">
@@ -257,7 +257,7 @@ export function OverviewClient({
             </div>
           ) : (
             <div className="py-6 text-center space-y-1.5">
-              <p className="text-4xl font-bold text-muted-foreground/20">—</p>
+              <p className="text-4xl metric text-muted-foreground/20">—</p>
               <p className="text-xs text-muted-foreground">No crawl data. Go to Sentiment → Run crawl.</p>
             </div>
           )}
@@ -274,7 +274,7 @@ export function OverviewClient({
           {sovScore !== null ? (
             <div className="space-y-4">
               <div className="flex items-end gap-2">
-                <span className="text-5xl font-bold tabular-nums tracking-tight">
+                <span className="text-5xl metric">
                   {Math.round(sovScore)}
                 </span>
                 <span className="pb-2 text-2xl font-medium text-muted-foreground">%</span>
@@ -284,7 +284,7 @@ export function OverviewClient({
                 <div className="h-2 bg-muted/60 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
-                    style={{ background: 'linear-gradient(90deg, #6366f1, #8b5cf6)' }}
+                    style={{ background: 'linear-gradient(90deg, #2B59FF, #4F79FF)' }}
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(sovScore, 100)}%` }}
                     transition={{ duration: 1, delay: 0.7, ease: 'easeOut' }}
@@ -299,7 +299,7 @@ export function OverviewClient({
             </div>
           ) : (
             <div className="py-6 text-center space-y-1.5">
-              <p className="text-4xl font-bold text-muted-foreground/20">—</p>
+              <p className="text-4xl metric text-muted-foreground/20">—</p>
               <p className="text-xs text-muted-foreground">SOV populates after first mention crawl.</p>
             </div>
           )}
