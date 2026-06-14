@@ -4,7 +4,7 @@ import Link           from 'next/link'
 import { useRouter }  from 'next/navigation'
 import { cn }         from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
-import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink } from 'lucide-react'
+import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, TrendingUp, Users, Eye, Percent } from 'lucide-react'
 import { CampaignOverview } from './campaign-overview'
 import { LinkOohSiteDialog, LinkEventDialog } from './link-existing-dialog'
 
@@ -62,6 +62,8 @@ interface Event {
 interface UnlinkedSite { id: string; site_name: string; city: string | null; state: string | null; format_type: string | null; visits: number }
 interface UnlinkedEvent { id: string; name: string; event_type: string | null; city: string; date_start: string; status: string }
 
+interface Interaction { event_id: string; interaction_type: string }
+
 interface Props {
   campaign: Campaign
   oohSites: OohSite[]
@@ -69,13 +71,15 @@ interface Props {
   activeTab: string
   unlinkedSites?: UnlinkedSite[]
   unlinkedEvents?: UnlinkedEvent[]
+  interactions?: Interaction[]
 }
 
 const TABS = [
-  { key: 'overview', label: 'Overview',       icon: BarChart2    },
-  { key: 'ooh',      label: 'OOH Placements', icon: MapPin       },
-  { key: 'events',   label: 'Events',          icon: CalendarDays },
-  { key: 'budget',   label: 'Budget',          icon: DollarSign   },
+  { key: 'overview',     label: 'Overview',       icon: BarChart2    },
+  { key: 'performance',  label: 'Performance',    icon: TrendingUp   },
+  { key: 'ooh',          label: 'OOH Placements', icon: MapPin       },
+  { key: 'events',       label: 'Events',          icon: CalendarDays },
+  { key: 'budget',       label: 'Budget',          icon: DollarSign   },
 ]
 
 const OBJECTIVE_LABELS: Record<string, string> = {
@@ -125,13 +129,22 @@ function fmtMoney(amount: number | null, currency = 'NGN') {
   return `${currency} ${Number(amount).toLocaleString('en-NG')}`
 }
 
-export function CampaignDetailClient({ campaign, oohSites, events, activeTab, unlinkedSites = [], unlinkedEvents = [] }: Props) {
+export function CampaignDetailClient({ campaign, oohSites, events, activeTab, unlinkedSites = [], unlinkedEvents = [], interactions = [] }: Props) {
   const router = useRouter()
 
-  const objectives    = campaign.objectives ?? []
-  const channelAlloc  = campaign.campaign_channels ?? []
+  const objectives     = campaign.objectives ?? []
+  const channelAlloc   = campaign.campaign_channels ?? []
   const totalAllocated = channelAlloc.reduce((s, c) => s + (Number(c.budget_allocation) || 0), 0)
   const totalOohSpend  = oohSites.reduce((s, site) => s + (Number(site.monthly_cost) || 0), 0)
+
+  // Performance aggregates
+  const totalOohVisits  = oohSites.reduce((s, site) => s + (site.visits ?? 0), 0)
+  const totalEventBudget = events.reduce((s, ev) => s + (Number(ev.budget) || 0), 0)
+  const totalLeads      = interactions.filter(i => i.interaction_type === 'new_lead').length
+  const totalEngaged    = interactions.filter(i => ['new_lead','new_customer','engaged'].includes(i.interaction_type)).length
+  const totalSpend      = totalOohSpend + totalEventBudget
+  const cpl             = totalLeads > 0 && totalSpend > 0 ? Math.round(totalSpend / totalLeads) : null
+  const cpv             = totalOohVisits > 0 && totalOohSpend > 0 ? Math.round(totalOohSpend / totalOohVisits) : null
 
   return (
     <div className="space-y-5">
@@ -184,6 +197,131 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
           }))}
           events={events.map(e => ({ status: e.status }))}
         />
+      )}
+
+      {/* ── Performance ── */}
+      {activeTab === 'performance' && (
+        <div className="space-y-5">
+          {/* KPI grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { label: 'OOH visits',       value: totalOohVisits.toLocaleString(),   icon: Eye,      sub: 'attribution links clicked' },
+              { label: 'Event leads',      value: totalLeads.toLocaleString(),        icon: Users,    sub: 'captured by ambassadors' },
+              { label: 'Total engaged',    value: totalEngaged.toLocaleString(),      icon: TrendingUp, sub: 'across all events' },
+              { label: 'Total spend',      value: fmtMoney(totalSpend, campaign.currency), icon: DollarSign, sub: 'OOH + event budgets' },
+            ].map(({ label, value, icon: Icon, sub }) => (
+              <div key={label} className="border rounded-xl p-4 bg-card space-y-1">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </div>
+                <p className="text-2xl font-bold tabular-nums">{value}</p>
+                <p className="text-xs text-muted-foreground">{sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Efficiency ratios */}
+          {(cpl !== null || cpv !== null) && (
+            <div className="grid grid-cols-2 gap-3">
+              {cpv !== null && (
+                <div className="border rounded-xl p-4 bg-card space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Percent className="h-3.5 w-3.5" />
+                    Cost per OOH visit
+                  </div>
+                  <p className="text-xl font-bold tabular-nums">{fmtMoney(cpv, campaign.currency)}</p>
+                  <p className="text-xs text-muted-foreground">OOH spend ÷ vanity-link visits</p>
+                </div>
+              )}
+              {cpl !== null && (
+                <div className="border rounded-xl p-4 bg-card space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Percent className="h-3.5 w-3.5" />
+                    Cost per lead
+                  </div>
+                  <p className="text-xl font-bold tabular-nums">{fmtMoney(cpl, campaign.currency)}</p>
+                  <p className="text-xs text-muted-foreground">total spend ÷ ambassador-captured leads</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* OOH breakdown */}
+          {oohSites.length > 0 && (
+            <div className="border rounded-xl p-5 bg-card space-y-3">
+              <p className="text-sm font-medium">OOH site performance</p>
+              <div className="space-y-2">
+                {oohSites
+                  .slice()
+                  .sort((a, b) => (b.visits ?? 0) - (a.visits ?? 0))
+                  .map(site => {
+                    const pct = totalOohVisits > 0 ? Math.round((site.visits / totalOohVisits) * 100) : 0
+                    return (
+                      <div key={site.id} className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground truncate mr-4">{site.site_name}</span>
+                          <span className="font-medium shrink-0">{site.visits.toLocaleString()} visits ({pct}%)</span>
+                        </div>
+                        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div className="h-full bg-foreground rounded-full" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
+            </div>
+          )}
+
+          {/* Events breakdown */}
+          {events.length > 0 && interactions.length > 0 && (
+            <div className="border rounded-xl p-5 bg-card space-y-3">
+              <p className="text-sm font-medium">Event interaction breakdown</p>
+              {(() => {
+                const byType: Record<string, number> = {}
+                interactions.forEach(i => { byType[i.interaction_type] = (byType[i.interaction_type] ?? 0) + 1 })
+                const total = Object.values(byType).reduce((a, b) => a + b, 0)
+                const labels: Record<string, string> = {
+                  engaged: 'Engaged', new_lead: 'New Lead', new_customer: 'New Customer',
+                  existing_customer: 'Existing Customer', merch_given: 'Merch Given',
+                  sample_given: 'Sample Given', prize_won: 'Prize Won', photo_moment: 'Photo Moment',
+                }
+                return (
+                  <div className="space-y-2">
+                    {Object.entries(byType)
+                      .sort((a, b) => b[1] - a[1])
+                      .map(([type, count]) => {
+                        const pct = total > 0 ? Math.round((count / total) * 100) : 0
+                        return (
+                          <div key={type} className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">{labels[type] ?? type}</span>
+                              <span className="font-medium">{count.toLocaleString()} ({pct}%)</span>
+                            </div>
+                            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-foreground rounded-full" style={{ width: `${pct}%` }} />
+                            </div>
+                          </div>
+                        )
+                      })}
+                  </div>
+                )
+              })()}
+            </div>
+          )}
+
+          {totalOohVisits === 0 && totalLeads === 0 && (
+            <div className="border rounded-xl p-10 text-center space-y-2">
+              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center mx-auto">
+                <TrendingUp className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <p className="text-sm font-medium">No performance data yet</p>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                Performance data appears once OOH vanity links receive visits or event ambassadors start capturing leads.
+              </p>
+            </div>
+          )}
+        </div>
       )}
 
       {/* ── OOH Placements ── */}

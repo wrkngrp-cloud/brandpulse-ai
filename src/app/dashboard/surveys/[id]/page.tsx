@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { StatusToggle } from './status-toggle'
+import { StatusToggle }   from './status-toggle'
 import { CopyLinkButton } from './copy-link-button'
 import { SurveyAiAnalysis } from './ai-analysis'
+import { SendSurvey }     from './send-survey'
 import { Badge } from '@/components/ui/badge'
 
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
@@ -86,9 +87,12 @@ export default async function SurveyDetailPage({
           <CopyLinkButton url={shareUrl} />
         </div>
         <p className="text-xs text-muted-foreground">
-          Drop this link into an email, WhatsApp message, Instagram bio, or anywhere your audience is.
+          Drop this link into Instagram bio, social posts, or embed anywhere your audience is.
         </p>
       </div>
+
+      {/* Send survey */}
+      <SendSurvey surveyId={survey.id} surveyName={survey.name} shareUrl={shareUrl} />
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">

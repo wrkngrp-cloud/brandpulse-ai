@@ -95,10 +95,22 @@ Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer
 5. Competitive Intel UI — model name removed from display grid
 6. OOH maps — migrated to react-map-gl; Mapbox CSS served from CDN
 
-**In planning (to build next, this session):**
-1. Survey distribution — "Send survey" UI with shareable link + email list + WhatsApp share link
-2. Competitor management settings — add/edit/remove tracked competitors
-3. Campaign performance view — analytics tab on campaign detail (aggregated OOH visits, event leads, spend vs reach)
+**Phase 3 channel architecture (planned — see PRD Document 2 sections 7.9–7.12):**
+- **Digital** (7.9): Meta Ads + X Ads + Google Ads OAuth connections; create/manage campaigns and ad creatives from BrandPulse; daily performance pull (ROAS/CTR/CPC/CPA/frequency); AI creative fatigue alerts, budget reallocation recommendations, anomaly detection
+- **Radio** (7.10): Excel/CSV media plan import (Claude reads and maps columns automatically); 40+ Nigerian station database with listenership benchmarks; per-spot schedule tracker; daypart efficiency AI analysis; delivery vs plan
+- **TV** (7.11): Same media plan import; NTA/AIT/Channels/DSTV channel database with TVR per daypart; GRP/CPRP tracking; underdelivery alerts with make-good negotiation recommendations
+- **Print** (7.12): Punch/Vanguard/Guardian/BusinessDay/etc. publication database with circulation and readership multipliers; QR is the PRIMARY attribution method for print (unlike OOH); per-placement QR auto-generation; CPT and scan-rate analytics
+
+**Nav restructure (implementing this session):**
+- Campaigns becomes an expandable sidebar section
+- OOH and Events move under Campaigns as sub-items
+- Digital / Radio / TV / Print appear as "Coming Soon" sub-items
+
+**Building this session:**
+1. Nav restructure — Campaigns expandable with OOH + Events as sub-items
+2. Survey distribution — "Send survey" UI with shareable link + email list + WhatsApp share link
+3. Competitor management settings — add/edit/remove tracked competitors
+4. Campaign performance view — aggregated metrics on campaign detail (OOH visits, event leads, spend vs reach)
 
 ---
 
