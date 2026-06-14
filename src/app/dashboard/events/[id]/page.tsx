@@ -7,6 +7,7 @@ import { AmbassadorList }      from '@/components/events/ambassador-list'
 import { computeEventMetrics, fmtNGN, fmtPct } from '@/lib/events/roi'
 import { ReportPoller }        from '@/components/events/report-poller'
 import { DebriefPromptCard }   from '@/components/events/debrief-prompt-card'
+import { VisualMentions }      from '@/components/events/visual-mentions'
 
 const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -33,11 +34,24 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     { data: interactions },
     { data: roiReport },
     { data: interceptCount },
+    { data: visualMentions },
+    { data: igConnection },
   ] = await Promise.all([
     supabase.from('event_ambassadors').select('id, name, phone, session_token').eq('event_id', id),
     supabase.from('event_interactions').select('id, interaction_type, ambassador_id, occurred_at').eq('event_id', id),
     supabase.from('event_roi_reports').select('metrics, narrative, generated_at').eq('event_id', id).maybeSingle(),
     supabase.from('event_intercept_responses').select('id').eq('event_id', id),
+    supabase.from('visual_mentions')
+      .select('id, post_url, media_url, hashtag, creator_username, post_caption, post_likes, post_comments, brand_visible, confidence, detected_elements, visual_sentiment, ai_description, detected_at')
+      .eq('event_id', id)
+      .order('brand_visible', { ascending: false })
+      .order('detected_at', { ascending: false }),
+    supabase.from('social_connections')
+      .select('id')
+      .eq('brand_id', event.brand_id as string)
+      .eq('platform', 'instagram')
+      .eq('sync_status', 'active')
+      .maybeSingle(),
   ])
 
   const metrics = computeEventMetrics(
@@ -199,6 +213,16 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           />
         </div>
       )}
+
+      {/* Visual brand mentions (E6) */}
+      <div className="border rounded-xl p-5 bg-card">
+        <VisualMentions
+          eventId={id}
+          initialData={visualMentions ?? []}
+          hasIgConnection={!!igConnection}
+          hasHashtags={(event.hashtags?.length ?? 0) > 0}
+        />
+      </div>
 
       {/* Event info */}
       <div className="border rounded-xl p-5 bg-card space-y-3">
