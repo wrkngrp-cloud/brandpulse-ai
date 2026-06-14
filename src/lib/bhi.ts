@@ -1,5 +1,6 @@
-// Phase 1 basic BHI — three inputs only.
-// Full 7-component weighted BHI comes in Phase 2 Brand Equity Tracker.
+// BHI computation — two modes:
+// 1. computeBHI()      — 3-component dashboard widget (Sentiment, SOV, Survey)
+// 2. computeFullBHI()  — 7-component Brand Equity Tracker (Phase 2+)
 
 export type BHIZone = 'at_risk' | 'building' | 'healthy' | 'leading'
 
@@ -66,4 +67,53 @@ export function computeBHI({
     zone: getBHIZone(score),
     components: { sentiment: sentimentScore, sov: sovScore, survey: surveyScore },
   }
+}
+
+// ── Full 7-component BHI ────────────────────────────────────────────────────
+
+export interface FullBHIComponents {
+  awareness:         number | null  // 20% — SOV %
+  salience:          number | null  // 15% — aided awareness rate from surveys
+  sentiment:         number | null  // 20% — sentiment_daily.social_score
+  perception:        number | null  // 15% — avg perception audit ratings (0-100)
+  culturalResonance: number | null  // 15% — Phase 3 only, null for now
+  blendedSov:        number | null  // 10% — sov_snapshots.social_sov
+  emv:               number | null  // 5%  — normalized EMV (0-100)
+}
+
+export interface FullBHIResult {
+  score:      number | null
+  coverage:   number
+  zone:       BHIZone | null
+  components: FullBHIComponents
+}
+
+const FULL_WEIGHTS: Record<keyof FullBHIComponents, number> = {
+  awareness:         20,
+  salience:          15,
+  sentiment:         20,
+  perception:        15,
+  culturalResonance: 15,
+  blendedSov:        10,
+  emv:                5,
+}
+
+export function computeFullBHI(components: FullBHIComponents): FullBHIResult {
+  const keys = Object.keys(components) as (keyof FullBHIComponents)[]
+  const available = keys.filter(k => components[k] !== null)
+
+  if (available.length === 0) {
+    return { score: null, coverage: 0, zone: null, components }
+  }
+
+  const totalBaseWeight = keys.reduce((s, k) => s + FULL_WEIGHTS[k], 0)
+  const activeWeight    = available.reduce((s, k) => s + FULL_WEIGHTS[k], 0)
+  const coverage        = Math.round((activeWeight / totalBaseWeight) * 100)
+
+  // Renormalise weights to available components
+  const score = Number((
+    available.reduce((s, k) => s + ((components[k] as number) * FULL_WEIGHTS[k]), 0) / activeWeight
+  ).toFixed(1))
+
+  return { score, coverage, zone: getBHIZone(score), components }
 }

@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, FileText, BarChart2, ClipboardList, Sparkles,
   CalendarDays, MapPin, Megaphone, Zap, Trophy, ChevronDown,
-  Monitor, Radio, Tv, Newspaper, Filter,
+  Monitor, Radio, Tv, Newspaper, Filter, Award,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -26,10 +26,11 @@ const campaignSoonItems = [
 ]
 
 const topLinks = [
-  { label: 'Overview',   href: '/dashboard',           icon: LayoutDashboard },
-  { label: 'Content',    href: '/dashboard/content',   icon: FileText        },
-  { label: 'Sentiment',  href: '/dashboard/sentiment', icon: BarChart2       },
-  { label: 'Surveys',    href: '/dashboard/surveys',   icon: ClipboardList   },
+  { label: 'Overview',     href: '/dashboard',                icon: LayoutDashboard },
+  { label: 'Content',      href: '/dashboard/content',        icon: FileText        },
+  { label: 'Sentiment',    href: '/dashboard/sentiment',      icon: BarChart2       },
+  { label: 'Brand Equity', href: '/dashboard/brand-equity',   icon: Award           },
+  { label: 'Surveys',      href: '/dashboard/surveys',        icon: ClipboardList   },
 ]
 
 const bottomLinks = [
