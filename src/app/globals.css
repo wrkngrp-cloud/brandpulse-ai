@@ -301,6 +301,42 @@
     font-variant-numeric: lining-nums;
   }
 
+  /* ── Bento overview grid ──────────────────────────────────── */
+  .bento-overview {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 768px) {
+    .bento-overview {
+      grid-template-columns: 1fr 1fr;
+    }
+    .bento-bhi       { grid-column: 1 / 3; } /* full-width on tablet */
+    .bento-sentiment { grid-column: 1; }
+    .bento-sov       { grid-column: 2; }
+    .bento-events    { grid-column: 1; }
+    .bento-campaigns { grid-column: 2; }
+    .bento-full      { grid-column: 1 / 3; }
+  }
+  @media (min-width: 1024px) {
+    .bento-overview {
+      grid-template-columns: minmax(260px, 300px) 1fr 1fr;
+    }
+    .bento-bhi       { grid-column: 1; grid-row: 1 / 3; }
+    .bento-sentiment { grid-column: 2 / 4; grid-row: 1; }
+    .bento-sov       { grid-column: 2; grid-row: 2; }
+    .bento-events    { grid-column: 3; grid-row: 2; }
+    .bento-campaigns { grid-column: 1 / 4; }
+    .bento-full      { grid-column: 1 / 4; }
+  }
+
+  /* ── Card accent top stripe ────────────────────────────────── */
+  .card-accent-blue  { box-shadow: inset 0 2px 0 0 oklch(0.55 0.25 258); }
+  .card-accent-green { box-shadow: inset 0 2px 0 0 oklch(0.65 0.18 142); }
+  .card-accent-amber { box-shadow: inset 0 2px 0 0 oklch(0.75 0.17 75);  }
+  .card-accent-clay  { box-shadow: inset 0 2px 0 0 oklch(0.585 0.163 37);}
+  .card-accent-red   { box-shadow: inset 0 2px 0 0 oklch(0.65 0.22 22);  }
+
   /* Status ring */
   .status-dot-blue  { background: oklch(0.55 0.25 258); box-shadow: 0 0 0 3px oklch(0.55 0.25 258 / 0.25); }
   .status-dot-green { background: oklch(0.65 0.18 142); box-shadow: 0 0 0 3px oklch(0.65 0.18 142 / 0.25); }
