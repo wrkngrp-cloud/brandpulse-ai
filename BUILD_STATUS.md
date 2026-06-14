@@ -57,7 +57,9 @@
 | Competitor management settings | High | API exists (`/api/brand/competitors`); no settings UI to add/edit/remove tracked competitors |
 | Campaign performance view | High | Campaign detail shows linked assets; no aggregated metrics (total spend vs reach, OOH visits rollup, cost-per-lead) |
 | E6 — Visual brand mention detector | Medium | Hashtag crawl + Claude Vision for logo/merch detection at events |
-| ~~Unified Brand Funnel page~~ | ~~Medium~~ | ✅ Done this session — `/dashboard/funnel` |
+| ~~Unified Brand Funnel page~~ | ~~Medium~~ | ✅ Done — `/dashboard/funnel` |
+| ~~Survey templates (all 6)~~ | ~~High~~ | ✅ Done — template picker + `survey-templates.ts` |
+| ~~NPS & Advocacy Tracker~~ | ~~High~~ | ✅ Done — `/dashboard/surveys/nps` |
 | Audio transcription module | Low | Whisper + Haiku pipeline |
 | Full survey system (all 6 templates, WhatsApp delivery) | Low | Current survey is single-template; need 6 templates + email/WhatsApp dispatch |
 | Full sentiment engine (timeline, clusters, emotion wheel) | Low | Basic sentiment live; topic clusters and emotion wheel pending |
@@ -94,8 +96,32 @@ Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer
 4. Competitor management settings page — full CRUD at `/dashboard/settings/competitors`
 5. Campaign performance tab — aggregated OOH visits, event leads, spend, CPV, CPL efficiency ratios
 
-**What was built this session (commit 34770bc):**
-1. **Unified Brand Funnel page** (`/dashboard/funnel`) — 6-stage waterfall with live data scoring:
+**What was built this session (commits 34770bc, d4baeaa):**
+
+1. **BrandPulse SDK + Lifecycle integrations — architecture decided (PRD updated, build Phase 3):**
+   - SDK-first approach: BrandPulse JS Pixel + React/Flutter SDK → `sdk_events` table feeds Action/Loyalty/Advocacy stages
+   - GA4 connector (OAuth, daily Inngest cron, maps GA4 events to funnel stages)
+   - Paystack/Flutterwave webhook connector (purchase → Action; repeat purchase → Loyalty)
+   - App Store / Google Play rating fetcher (weekly Inngest cron, haiku sentiment on reviews)
+   - Mailchimp/Brevo email connector for loyalty signals
+   - Looker explicitly excluded (wrong tier). Mixpanel/Amplitude optional Phase 4.
+   - PRD Documents 2 (new section 5.7) and 3 (Phase 3 items 9+10) fully updated.
+
+2. **Survey system — 6 templates + template picker** (commit d4baeaa):
+   - Template library at `src/lib/survey-templates.ts` — all 6 templates with full question sets
+   - New Survey dialog is now a 2-step flow: template picker → name → create
+   - Templates: Awareness Intercept (2Q/15s), Quick Pulse (3Q/45s), Awareness Check (5Q/90s), Post-Event (8Q/2min), Brand Perception Audit (12Q/3min), Post-Purchase NPS (5Q/60s)
+   - Survey list shows template label in subtitle row
+
+3. **NPS Tracker** (`/dashboard/surveys/nps`):
+   - 12-week rolling NPS trend chart (Recharts LineChart with ReferenceLine at 0)
+   - Promoter / Passive / Detractor KPI tiles with %
+   - Trend direction computed (rising/falling/stable: 4-week window comparison)
+   - "Diagnose with AI" → claude-sonnet-4-6 → detractor root causes, promoter archetype, 3 90-day recommendations grounded in Nigerian market
+   - Pulls verbatim text answers from survey_responses to enrich AI context
+   - Accessible via "NPS Tracker" button on the Surveys page header
+
+4. **Unified Brand Funnel page** (`/dashboard/funnel`) — 6-stage waterfall with live data scoring:
    - Awareness: SOV from `sov_snapshots.social_sov`
    - Consideration: avg `engagement_rate` from `social_posts` (last 30 days), scaled × 10
    - Preference: avg `sentiment_daily.social_score` (last 14 days)
@@ -135,6 +161,9 @@ Cultural Intelligence Engine (CRS, cultural calendar, drift monitor), Influencer
 | Competitor settings | `src/app/dashboard/settings/competitors/page.tsx` |
 | Campaign performance tab | `src/components/campaigns/campaign-detail-client.tsx` |
 | Brand Funnel page | `src/app/dashboard/funnel/page.tsx` |
+| Survey template library | `src/lib/survey-templates.ts` |
+| NPS Tracker page | `src/app/dashboard/surveys/nps/page.tsx` |
+| NPS diagnosis API | `src/app/api/surveys/nps-diagnosis/route.ts` |
 | Brand Funnel client | `src/app/dashboard/funnel/funnel-client.tsx` |
 | Funnel AI diagnosis API | `src/app/api/funnel/diagnose/route.ts` |
 | Competitive client | `src/app/dashboard/competitive/competitive-client.tsx` |
