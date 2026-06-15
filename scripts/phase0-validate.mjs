@@ -1,4 +1,4 @@
-// Phase 0 validation — runs 48 Kuda comments through the B.2 sentiment prompt
+// Phase 0 validation — runs 48 brand comments through the B.2 sentiment prompt
 // Gate: ≥85% correct (hand-grade the output). PRD Document 3, Phase 0.
 
 import Anthropic from '@anthropic-ai/sdk'
@@ -54,8 +54,8 @@ Code-switching is normal. Classify overall intent, not word-by-word.
 ─── SARCASM DETECTION ──────────────────────────────────────────────────────────
 Nigerian sarcasm uses ironic positive framing to express contempt or disappointment.
 Do not classify sarcasm as surprise or anticipation.
-Markers: absurdist exaggeration ("see kuda ad in your fridge"), 😭 with a complaint,
-reversal framing ("collect una shackles back", "who kuda've thought"), exaggerated
+Markers: absurdist exaggeration ("see opay ad in your fridge"), 😭 with a complaint,
+reversal framing ("collect una shackles back", "who could've thought"), exaggerated
 blessings used to mock.
 When sarcasm is the primary register → emotion: disgust (contempt).
 
@@ -108,54 +108,54 @@ const SYSTEM = [
 
 // ── 48 test comments ─────────────────────────────────────────────────────────
 const COMMENTS = [
-  { id: '01', text: "Let's start from the worst first, Kuda can make you wash plate after eating at a restaurant" },
-  { id: '02', text: "@Kuda I am highly disappointed with the delay in responding to my request. I have been trying to reset my transaction PIN since yesterday, and I was instructed to contact customer service. Unfortunately, despite reaching out, I have not received any response or assistance." },
-  { id: '03', text: "Na Kuda… and that's the only fintech I am using. Aside commercial banks." },
-  { id: '04', text: "My kuda don turn Akudaya😭" },
+  { id: '01', text: "Let's start from the worst first, OPay can make you wash plate after eating at a restaurant" },
+  { id: '02', text: "@OPay I am highly disappointed with the delay in responding to my request. I have been trying to reset my transaction PIN since yesterday, and I was instructed to contact customer service. Unfortunately, despite reaching out, I have not received any response or assistance." },
+  { id: '03', text: "Na OPay… and that's the only fintech I am using. Aside commercial banks." },
+  { id: '04', text: "My opay don turn Akudaya😭" },
   { id: '05', text: "Haaaa! Omo" },
-  { id: '06', text: "Kuda switched from \"Bank of the free\" to \"The Money App for Africans\". Dem say make una come collect una shackles back, na only Jesus dey give freedom. 😭" },
-  { id: '07', text: "Yet again, kuda fucks me up. Maso i enter supermart yesterday, immediately i showed my kuda card, the babe just went \"ah! This card no dey work\"" },
-  { id: '08', text: "Urgent 100k needed to handle an emergency for something important for a new born baby. 2086990729 Kuda. Treat as Urgent" },
-  { id: '09', text: "Not trays of fan yogo at the Kuda end of year party" },
-  { id: '10', text: "Opay and Moniepoint seem to have moved well past Kuda." },
-  { id: '11', text: "Face card...not Kuda 💀" },
-  { id: '12', text: "At this point you fit wake up one morning open your fridge see kuda advertisement." },
-  { id: '13', text: "2005653201 Kuda. I will engage always Thank you so much my leader, God bless you" },
-  { id: '14', text: "One day Kuda will make me wash plate." },
-  { id: '15', text: "Renew my blue tick 2014668595 kuda Bank Thank you" },
-  { id: '16', text: "What the f is going on with Kuda bank @joinkuda ???" },
-  { id: '17', text: "God bless you sir 2002639679 Kuda Modupe Omolara" },
-  { id: '18', text: "Open your kuda app now make you take screenshot na ewu" },
-  { id: '19', text: "You can't take this screenshot in kuda it's fake" },
-  { id: '20', text: "@joinkuda. please some peeps are calling claiming they are from kuda they want to confirm house address abeg oooo" },
-  { id: '21', text: "Currently owing kuda 40k+ I pray God send help" },
-  { id: '22', text: "I wan pay for blue tick now my Kuda card no work, any other way??" },
-  { id: '23', text: "Olorun joor…which kain agbako be this Kuda like this?" },
-  { id: '24', text: "Kuda bụ onye nzuzu , iberibe" },
+  { id: '06', text: "OPay switched from \"Bank of the free\" to \"The Money App for Africans\". Dem say make una come collect una shackles back, na only Jesus dey give freedom. 😭" },
+  { id: '07', text: "Yet again, opay fucks me up. Maso i enter supermart yesterday, immediately i showed my opay card, the babe just went \"ah! This card no dey work\"" },
+  { id: '08', text: "Urgent 100k needed to handle an emergency for something important for a new born baby. 2086990729 OPay. Treat as Urgent" },
+  { id: '09', text: "Not trays of fan yogo at the OPay end of year party" },
+  { id: '10', text: "Moniepoint and PalmPay seem to have moved well past OPay." },
+  { id: '11', text: "Face card...not OPay 💀" },
+  { id: '12', text: "At this point you fit wake up one morning open your fridge see opay advertisement." },
+  { id: '13', text: "2005653201 OPay. I will engage always Thank you so much my leader, God bless you" },
+  { id: '14', text: "One day OPay will make me wash plate." },
+  { id: '15', text: "Renew my blue tick 2014668595 OPay Thank you" },
+  { id: '16', text: "What the f is going on with OPay bank @OPay_NG ???" },
+  { id: '17', text: "God bless you sir 2002639679 OPay Modupe Omolara" },
+  { id: '18', text: "Open your opay app now make you take screenshot na ewu" },
+  { id: '19', text: "You can't take this screenshot in opay it's fake" },
+  { id: '20', text: "@OPay_NG. please some peeps are calling claiming they are from opay they want to confirm house address abeg oooo" },
+  { id: '21', text: "Currently owing opay 40k+ I pray God send help" },
+  { id: '22', text: "I wan pay for blue tick now my OPay card no work, any other way??" },
+  { id: '23', text: "Olorun joor…which kain agbako be this OPay like this?" },
+  { id: '24', text: "OPay bụ onye nzuzu , iberibe" },
   { id: '25', text: "U no go lack" },
-  { id: '26', text: "Grateful always Kuda bank 1101194531" },
-  { id: '27', text: "Una wey dey Kuda, una no go kpeme, una no go lack, like like Lola kunfayakun" },
-  { id: '28', text: "Kuda has finally added bank charges.....who kuda've thought." },
-  { id: '29', text: "I no get kuda" },
-  { id: '30', text: "Pls reconsider the referral campaign requirements  no be for this kind economy Btw  I've been a consistent amb or marketer for your bank and I've been preaching kuda bank to my friends, colleagues and families. Would love to hear a feedback fix on the referral criteria" },
-  { id: '31', text: "Omo. Shey ori yin ti daru ni? Everywhere just dey blur. Kuda wetin dey sup?" },
+  { id: '26', text: "Grateful always OPay 1101194531" },
+  { id: '27', text: "Una wey dey OPay, una no go kpeme, una no go lack, like like Lola kunfayakun" },
+  { id: '28', text: "OPay has finally added bank charges.....who could've thought." },
+  { id: '29', text: "I no get opay" },
+  { id: '30', text: "Pls reconsider the referral campaign requirements  no be for this kind economy Btw  I've been a consistent amb or marketer for your bank and I've been preaching opay to my friends, colleagues and families. Would love to hear a feedback fix on the referral criteria" },
+  { id: '31', text: "Omo. Shey ori yin ti daru ni? Everywhere just dey blur. OPay wetin dey sup?" },
   { id: '32', text: "Omo ope! Oshey! Jaiye lo" },
   { id: '33', text: "As u are making me suffer ur company will suffer" },
   { id: '34', text: "Omor after this month, no more. I thought you guys were reliable. Please just reverse my money." },
-  { id: '35', text: "God forbid for me to have kuda in my phone. They blocked  my account,  I tried logging in, but it's  not working.  I just deleted the app. I'll  never have it in my phone or encourage anyone around me to have it" },
-  { id: '36', text: "Kuda. Una no try oo. I put money inside my account. I wan transfer am comot . Una dey ask for OTP. me don lose my SIM since. Una no try for verification matter. Na so una do one certain time wey una go send OTP to only SIM instead of e-mail. Abeg how I go take comot my funds." },
-  { id: '37', text: "All the Kuda staff ogun kill all of you guys .. I chat you guys.  respond, I call no respond why nah." },
+  { id: '35', text: "God forbid for me to have opay in my phone. They blocked  my account,  I tried logging in, but it's  not working.  I just deleted the app. I'll  never have it in my phone or encourage anyone around me to have it" },
+  { id: '36', text: "OPay. Una no try oo. I put money inside my account. I wan transfer am comot . Una dey ask for OTP. me don lose my SIM since. Una no try for verification matter. Na so una do one certain time wey una go send OTP to only SIM instead of e-mail. Abeg how I go take comot my funds." },
+  { id: '37', text: "All the OPay staff ogun kill all of you guys .. I chat you guys.  respond, I call no respond why nah." },
   { id: '38', text: "It's more than 10days now the money I sent  is on pending.. you people want me to loose my job or what . Nobody is picking your calls .i feel very terrible" },
   { id: '39', text: "Why una put people money for air?" },
-  { id: '40', text: "@joinkuda una customer worst" },
-  { id: '41', text: "Ogun kill your family's kuda. You will never know peace in your life." },
-  { id: '42', text: "Kuda di you want me to respectfully call you out or you message me because what just happened now to my Kuda mobile account was just a total fraud" },
+  { id: '40', text: "@OPay_NG una customer worst" },
+  { id: '41', text: "Ogun kill your family's opay. You will never know peace in your life." },
+  { id: '42', text: "OPay do you want me to respectfully call you out or you message me because what just happened now to my OPay mobile account was just a total fraud" },
   { id: '43', text: "I don download this Bank App twice the sign up process stressful i vex delete the App una no serious at all. Without NIN you don't let new customers open account why?  Why To open mobile bank stressfull like this ?  No wonder una no popular" },
   { id: '44', text: "Na God Go punish Una Money oo let under refund Money way I see the alert then use am enter the all Ogoname go drown your papa" },
   { id: '45', text: "See costumer care service, Na 11 hours ago nai the one de active, smh Omo it been 24k house now Una still no wan return the money ???" },
-  { id: '46', text: "Omoor. Kudaz I no Sabi Una to dey like this oo. I removed money from my spend and save, and it's just gone... It's not letting me transfer anything, just popping error messages" },
-  { id: '47', text: "@joinkuda Wetin naaaa Reply me now I did not waste time when I was creating this account" },
-  { id: '48', text: "Gwanintar da na yi da Kuda Microfinance Bank ta yi matukar burge ni. Suna responding a kan lokaci, kuma network dinsu yana da matukar speed.Sun sanya banking ya zama easy sosai!" },
+  { id: '46', text: "Omoor. OPay I no Sabi Una to dey like this oo. I removed money from my spend and save, and it's just gone... It's not letting me transfer anything, just popping error messages" },
+  { id: '47', text: "@OPay_NG Wetin naaaa Reply me now I did not waste time when I was creating this account" },
+  { id: '48', text: "Gwanintar da na yi da OPay Microfinance Bank ta yi matukar burge ni. Suna responding a kan lokaci, kuma network dinsu yana da matukar speed.Sun sanya banking ya zama easy sosai!" },
 ]
 
 async function run() {
