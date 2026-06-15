@@ -469,12 +469,12 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <BarChart data={weeklyChartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                       <XAxis
                         dataKey="week"
-                        tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                        tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
                         axisLine={false}
                         tickLine={false}
                       />
                       <YAxis
-                        tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                        tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
                         axisLine={false}
                         tickLine={false}
                         width={36}
@@ -482,14 +482,17 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                       />
                       <Tooltip
                         contentStyle={{
+                          background: '#14182B',
+                          border: '1px solid rgba(255,255,255,0.10)',
+                          borderRadius: 12,
                           fontSize: 12,
-                          background: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: 8,
+                          color: '#fff',
                         }}
+                        labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
                         formatter={(value) => [Number(value).toLocaleString(), 'Impressions']}
+                        cursor={{ fill: 'currentColor', opacity: 0.05 }}
                       />
-                      <Bar dataKey="impressions" fill="hsl(var(--foreground))" radius={[3, 3, 0, 0]} />
+                      <Bar dataKey="impressions" fill="#2B59FF" radius={[4, 4, 0, 0]} opacity={0.85} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

@@ -118,13 +118,21 @@ export function SpendJustification({
                 <Tooltip
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${currency} ${Number(v).toFixed(2)}`, 'CPM']}
-                  contentStyle={{ fontSize: 11, borderRadius: 8 }}
+                  contentStyle={{
+                    background: '#14182B',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    borderRadius: 12,
+                    fontSize: 11,
+                    color: '#fff',
+                  }}
+                  labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                  cursor={{ fill: 'currentColor', opacity: 0.05 }}
                 />
-                <Bar dataKey="cpm" radius={3}>
+                <Bar dataKey="cpm" radius={[0, 4, 4, 0]}>
                   {[{ channel: 'This OOH' }, ...DIGITAL_BENCHMARKS].map((entry, i) => (
                     <Cell
                       key={entry.channel}
-                      fill={i === 0 ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.3)'}
+                      fill={i === 0 ? '#2B59FF' : 'rgba(43,89,255,0.18)'}
                     />
                   ))}
                 </Bar>

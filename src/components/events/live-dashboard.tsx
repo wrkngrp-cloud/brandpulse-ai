@@ -158,13 +158,20 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
           <p className="text-sm font-medium">Interactions per hour</p>
           <ResponsiveContainer width="100%" height={100}>
             <BarChart data={hourlyData} margin={{ top: 0, right: 0, bottom: 0, left: -30 }}>
-              <XAxis dataKey="hour" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+              <XAxis dataKey="hour" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
-                contentStyle={{ fontSize: 12, border: '1px solid hsl(var(--border))', borderRadius: 8 }}
-                cursor={{ fill: 'hsl(var(--muted))' }}
+                contentStyle={{
+                  background: '#14182B',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  borderRadius: 12,
+                  fontSize: 12,
+                  color: '#fff',
+                }}
+                labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                cursor={{ fill: 'currentColor', opacity: 0.05 }}
               />
-              <Bar dataKey="count" fill="hsl(var(--foreground))" radius={[3,3,0,0]} />
+              <Bar dataKey="count" fill="#2B59FF" radius={[4,4,0,0]} opacity={0.85} />
             </BarChart>
           </ResponsiveContainer>
         </div>

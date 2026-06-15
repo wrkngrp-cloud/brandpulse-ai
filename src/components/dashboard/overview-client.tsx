@@ -8,9 +8,10 @@ import {
   Plus, ArrowRight, Zap, ArrowUpRight, Activity,
   BarChart2, Radio, MessageSquare,
 } from 'lucide-react'
-import { BHIGauge } from '@/components/dashboard/bhi-gauge'
-import { StatCard } from '@/components/dashboard/stat-card'
-import { cn } from '@/lib/utils'
+import { BHIGauge }   from '@/components/dashboard/bhi-gauge'
+import { StatCard }   from '@/components/dashboard/stat-card'
+import { TrendChart } from '@/components/dashboard/trend-chart'
+import { cn }         from '@/lib/utils'
 import { fadeUp, stagger } from '@/lib/motion'
 import type { BHIResult } from '@/lib/bhi'
 
@@ -63,6 +64,7 @@ export interface OverviewProps {
   upcomingEvents:  Event[]
   recentMentions:  Mention[]
   hasAnyData:      boolean
+  trendData?:      { date: string; bhi: number | null; sentiment: number | null }[]
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -154,9 +156,11 @@ export function OverviewClient({
   upcomingEvents,
   recentMentions,
   hasAnyData,
+  trendData = [],
 }: OverviewProps) {
   // Sparkline data for BHI stat card
   const bhiSpark = sparkline.map(s => ({ date: s.date, value: s.score }))
+  const hasTrend = trendData.length > 1
 
   return (
     <div className="space-y-6 max-w-[1400px]">
@@ -235,6 +239,18 @@ export function OverviewClient({
           deltaLabel="last 7 days"
         />
       </motion.div>
+
+      {/* ── 30-Day Pulse trend chart ─────────────────────────────── */}
+      {hasTrend && (
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="rounded-2xl border bg-card card-shadow p-5 sm:p-6"
+        >
+          <TrendChart data={trendData} height={200} />
+        </motion.div>
+      )}
 
       {/* ── Main bento grid ──────────────────────────────────────── */}
       <motion.div

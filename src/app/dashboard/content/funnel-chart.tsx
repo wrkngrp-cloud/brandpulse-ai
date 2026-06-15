@@ -26,17 +26,22 @@ const STAGE_COLOURS: Record<string, string> = {
 
 function CustomTooltip({ active, payload, label }: {
   active?: boolean
-  payload?: { value: number; name: string }[]
+  payload?: { value: number; name: string; color?: string }[]
   label?: string
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-background border rounded-xl shadow-lg px-3 py-2 text-xs space-y-1">
-      <p className="font-medium">{label}</p>
+    <div className="bg-[#14182B] border border-white/10 rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[148px]">
+      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-white/40 mb-2">{label}</p>
       {payload.map(p => (
-        <div key={p.name} className="flex justify-between gap-4">
-          <span className="text-muted-foreground capitalize">{p.name.replace(/_/g, ' ')}</span>
-          <span className="font-semibold tabular-nums">{typeof p.value === 'number' ? (p.name === 'avg_engagement' ? `${p.value.toFixed(2)}%` : p.value.toLocaleString()) : p.value}</span>
+        <div key={p.name} className="flex items-center justify-between gap-4 mb-1 last:mb-0">
+          <div className="flex items-center gap-1.5">
+            <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: p.color ?? '#2B59FF' }} />
+            <span className="text-[11.5px] text-white/55 capitalize">{p.name.replace(/_/g, ' ')}</span>
+          </div>
+          <span className="text-[13px] font-semibold tabular-nums text-white">
+            {typeof p.value === 'number' ? (p.name === 'avg_engagement' ? `${p.value.toFixed(2)}%` : p.value.toLocaleString()) : p.value}
+          </span>
         </div>
       ))}
     </div>
@@ -53,7 +58,7 @@ export function FunnelChart({ data }: Props) {
           <p className="text-xs text-muted-foreground font-medium">Posts per funnel stage</p>
           <ResponsiveContainer width="100%" height={140}>
             <BarChart data={data} margin={{ top: 0, right: 0, left: -28, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+              <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
               <XAxis dataKey="stage" tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
@@ -71,7 +76,7 @@ export function FunnelChart({ data }: Props) {
           <p className="text-xs text-muted-foreground font-medium">Avg engagement rate %</p>
           <ResponsiveContainer width="100%" height={140}>
             <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+              <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
               <XAxis dataKey="stage" tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />

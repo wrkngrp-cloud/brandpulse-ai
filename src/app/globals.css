@@ -4,13 +4,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Fonts: Clash Grotesk (body) + Clash Display (headings/metrics) ──────── */
+/* Loaded via fontshare CDN in layout.tsx head */
+
 @theme inline {
   --color-background:            var(--background);
   --color-foreground:            var(--foreground);
   --font-sans:                   var(--font-sans);
   --font-mono:                   var(--font-mono);
-  --font-serif:                  var(--font-serif);
-  --font-heading:                var(--font-serif);
+  --font-display:                var(--font-display);
   --color-sidebar-ring:          var(--sidebar-ring);
   --color-sidebar-border:        var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,169 +51,208 @@
   --radius-4xl: calc(var(--radius) * 3.2);
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────────────────
+   COLOR PHILOSOPHY
+   ─────────────────────────────────────────────────────────────────────────────
+   Five colors. Four from the brand, one new:
+
+   1. WHITE   #FFFFFF  — The canvas. Cards, content surfaces, clarity.
+   2. NAVY    #14182B  — The chrome. Sidebar (ALWAYS), dark backgrounds, authority.
+   3. BLUE    #2B59FF  — The signal. Charts, data, interactive, links, primary.
+   4. CLAY    #D4602A  — The brand. CTAs, active nav, notifications, signature.
+   5. SAND    #EDE6D8  — The warmth. Muted surfaces, subtlety, African heritage.
+
+   HIERARCHY:
+   - Primary   → Blue  (interactive actions, trust layer)
+   - Accent    → Clay  (brand identity, the ONE warm moment per screen)
+   - Chrome    → Navy  (sidebar is permanently navy — never switches to light)
+   - Canvas    → White (content area cards, maximum clarity)
+   - Warmth    → Sand  (muted surfaces, empty states, breathing room)
+
+   SIDEBAR RULE: --sidebar is ALWAYS navy (#14182B) in both light AND dark mode.
+   This creates a permanent branded shell — the product has an identity.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ─────────────────────────────────────────────────────────────────────────────
    LIGHT MODE
-   Base: warm white  |  Brand: true blue #2B59FF
-   Accent: clay #D4602A (sparing)  |  Sand: #EDE6D8 surfaces
-   ───────────────────────────────────────────────────────────── */
+   Canvas: pure white  |  Chrome: navy  |  Signal: blue  |  Brand: clay
+   ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Backgrounds */
-  --background:         oklch(0.975 0.007 78);   /* warm white, barely tinted */
-  --foreground:         oklch(0.12 0.04 264);    /* #14182B blue-black */
-  --card:               oklch(1 0 0);            /* pure white */
-  --card-foreground:    oklch(0.12 0.04 264);
-  --popover:            oklch(1 0 0);
-  --popover-foreground: oklch(0.12 0.04 264);
+  /* Font families — Clash Grotesk (body) + Clash Display (display/metrics) */
+  --font-sans:    'Clash Grotesk', system-ui, -apple-system, sans-serif;
+  --font-display: 'Clash Display', system-ui, -apple-system, sans-serif;
+  --font-mono:    var(--font-mono, 'Geist Mono', monospace);
 
-  /* Primary — true blue #2B59FF */
-  --primary:            oklch(0.485 0.25 258);
-  --primary-foreground: oklch(1 0 0);
+  /* Content backgrounds — WHITE is the canvas */
+  --background:         #FFFFFF;
+  --foreground:         #14182B;   /* NAVY */
+  --card:               #FFFFFF;
+  --card-foreground:    #14182B;
+  --popover:            #FFFFFF;
+  --popover-foreground: #14182B;
 
-  /* Secondary — warm sand #EDE6D8 */
-  --secondary:          oklch(0.93 0.022 78);
-  --secondary-foreground: oklch(0.12 0.04 264);
+  /* Primary — BLUE (interactive, trust, data) */
+  --primary:            #2B59FF;
+  --primary-foreground: #FFFFFF;
 
-  /* Muted */
-  --muted:              oklch(0.955 0.01 78);
+  /* Secondary — warm SAND (muted surfaces) */
+  --secondary:          #EDE6D8;
+  --secondary-foreground: #14182B;
+
+  /* Muted — lighter sand */
+  --muted:              oklch(0.95 0.016 75);
   --muted-foreground:   oklch(0.50 0.022 264);
 
-  /* Accent — clay #D4602A (sparingly) */
-  --accent:             oklch(0.585 0.163 37);
-  --accent-foreground:  oklch(1 0 0);
+  /* Accent — CLAY (the brand, CTAs, signature moments) */
+  --accent:             #D4602A;
+  --accent-foreground:  #FFFFFF;
 
   /* Semantic */
   --destructive:        oklch(0.577 0.245 27.325);
-  --border:             oklch(0.875 0.015 78);
-  --input:              oklch(0.875 0.015 78);
-  --ring:               oklch(0.485 0.25 258);
+  --border:             oklch(0.895 0.012 75);
+  --input:              oklch(0.895 0.012 75);
+  --ring:               #2B59FF;
 
   /* Radius */
   --radius: 0.75rem;
 
-  /* Chart palette */
-  --chart-1:  oklch(0.485 0.25 258);
-  --chart-2:  oklch(0.75 0.17 75);
-  --chart-3:  oklch(0.65 0.18 142);
-  --chart-4:  oklch(0.65 0.2 300);
-  --chart-5:  oklch(0.585 0.163 37);
-
-  /* Sidebar */
-  --sidebar:                    oklch(0.995 0.004 78);  /* barely-warm white, distinct from bg */
-  --sidebar-foreground:         oklch(0.12 0.04 264);
-  --sidebar-primary:            oklch(0.485 0.25 258);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent:             oklch(0.955 0.01 78);
-  --sidebar-accent-foreground:  oklch(0.12 0.04 264);
-  --sidebar-border:             oklch(0.895 0.012 78);
-  --sidebar-ring:               oklch(0.485 0.25 258);
-}
-
-/* ─────────────────────────────────────────────────────────────
-   DARK MODE
-   ───────────────────────────────────────────────────────────── */
-.dark {
-  --background:         oklch(0.12 0.04 264);
-  --foreground:         oklch(0.93 0.022 78);
-  --card:               oklch(0.155 0.032 264);
-  --card-foreground:    oklch(0.93 0.022 78);
-  --popover:            oklch(0.145 0.032 264);
-  --popover-foreground: oklch(0.93 0.022 78);
-
-  --primary:            oklch(0.55 0.25 258);
-  --primary-foreground: oklch(1 0 0);
-
-  --secondary:          oklch(0.20 0.027 264);
-  --secondary-foreground: oklch(0.93 0.022 78);
-
-  --muted:              oklch(0.20 0.027 264);
-  --muted-foreground:   oklch(0.60 0.022 264);
-
-  --accent:             oklch(0.585 0.163 37);
-  --accent-foreground:  oklch(1 0 0);
-
-  --destructive:        oklch(0.65 0.22 22.216);
-  --border:             oklch(1 0 0 / 7%);
-  --input:              oklch(1 0 0 / 10%);
-  --ring:               oklch(0.55 0.25 258);
-
-  --chart-1: oklch(0.55 0.25 258);
-  --chart-2: oklch(0.75 0.17 75);
+  /* Chart palette
+     chart-1: Blue  (primary data, BHI)
+     chart-2: Clay  (secondary data, campaign)
+     chart-3: Green (positive sentiment)
+     chart-4: Violet (SOV, reach)
+     chart-5: Amber (neutral, pending) */
+  --chart-1: #2B59FF;
+  --chart-2: #D4602A;
   --chart-3: oklch(0.65 0.18 142);
   --chart-4: oklch(0.65 0.2 300);
-  --chart-5: oklch(0.65 0.163 37);
+  --chart-5: oklch(0.75 0.17 75);
 
-  /* Sidebar — richer, deeper than main bg */
-  --sidebar:                    oklch(0.085 0.038 264);
-  --sidebar-foreground:         oklch(0.85 0.018 78);
-  --sidebar-primary:            oklch(0.55 0.25 258);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent:             oklch(0.165 0.028 264);
-  --sidebar-accent-foreground:  oklch(0.85 0.018 78);
-  --sidebar-border:             oklch(1 0 0 / 6%);
-  --sidebar-ring:               oklch(0.55 0.25 258);
+  /* ─── SIDEBAR: ALWAYS NAVY ─── (never light, never white)
+     The sidebar is permanently navy in BOTH light and dark mode.
+     It is the branded chrome shell. */
+  --sidebar:                    #14182B;
+  --sidebar-foreground:         oklch(0.82 0.018 75);    /* warm off-white */
+  --sidebar-primary:            #2B59FF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent:             oklch(0.165 0.032 264);  /* slightly lighter navy */
+  --sidebar-accent-foreground:  oklch(0.85 0.016 75);
+  --sidebar-border:             oklch(1 0 0 / 8%);
+  --sidebar-ring:               #2B59FF;
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────────────────
+   DARK MODE
+   Canvas: deep navy  |  Text: warm sand  |  Cards: slightly lifted
+   Sidebar stays the same navy — barely noticeable in dark mode (intentional)
+   ───────────────────────────────────────────────────────────────────────────── */
+.dark {
+  --background:         oklch(0.105 0.038 264);   /* deep navy */
+  --foreground:         #EDE6D8;                  /* warm SAND as text */
+  --card:               oklch(0.145 0.032 264);   /* slightly lifted */
+  --card-foreground:    #EDE6D8;
+  --popover:            oklch(0.135 0.032 264);
+  --popover-foreground: #EDE6D8;
+
+  --primary:            oklch(0.60 0.24 258);     /* blue, +L for dark legibility */
+  --primary-foreground: #FFFFFF;
+
+  --secondary:          oklch(0.195 0.028 264);
+  --secondary-foreground: #EDE6D8;
+
+  --muted:              oklch(0.195 0.028 264);
+  --muted-foreground:   oklch(0.58 0.022 264);
+
+  --accent:             #D4602A;                  /* clay unchanged */
+  --accent-foreground:  #FFFFFF;
+
+  --destructive:        oklch(0.65 0.22 22.216);
+  --border:             oklch(1 0 0 / 8%);
+  --input:              oklch(1 0 0 / 10%);
+  --ring:               oklch(0.60 0.24 258);
+
+  --chart-1: oklch(0.62 0.24 258);
+  --chart-2: #D4602A;
+  --chart-3: oklch(0.68 0.18 142);
+  --chart-4: oklch(0.68 0.2 300);
+  --chart-5: oklch(0.78 0.17 75);
+
+  /* Sidebar in dark mode — same navy, barely perceptible depth difference */
+  --sidebar:                    oklch(0.085 0.038 264);
+  --sidebar-foreground:         oklch(0.80 0.016 75);
+  --sidebar-primary:            oklch(0.60 0.24 258);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent:             oklch(0.155 0.030 264);
+  --sidebar-accent-foreground:  oklch(0.82 0.016 75);
+  --sidebar-border:             oklch(1 0 0 / 7%);
+  --sidebar-ring:               oklch(0.60 0.24 258);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    BASE
-   ───────────────────────────────────────────────────────────── */
+   ───────────────────────────────────────────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-sans), system-ui, sans-serif;
+    font-family: var(--font-sans);
     font-size: 15px;
     line-height: 1.6;
+    font-feature-settings: "kern" 1, "liga" 1;
   }
   html {
-    font-family: var(--font-sans), system-ui, sans-serif;
+    font-family: var(--font-sans);
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-sans), system-ui, sans-serif;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
   }
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────────────────
    UTILITIES
-   ───────────────────────────────────────────────────────────── */
+   ───────────────────────────────────────────────────────────────────────────── */
 @layer utilities {
 
-  /* ── Typography ──────────────────────────────────────────── */
+  /* ── Typography ─────────────────────────────────────────────────────────── */
 
-  /* Display: DM Serif Display for page titles & big numbers */
+  /* Display: Clash Display for page titles */
   .h-display {
-    font-family: var(--font-serif), 'Georgia', serif;
-    font-weight: 400;
-    letter-spacing: -0.025em;
-    line-height: 1.05;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
   }
 
-  /* Metric numbers — DM Serif with tabular nums */
+  /* Metric: Clash Display for KPI numbers */
   .metric {
-    font-family: var(--font-serif), 'Georgia', serif;
-    font-weight: 400;
-    letter-spacing: -0.03em;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.04em;
     font-variant-numeric: lining-nums tabular-nums;
+    line-height: 1.0;
   }
 
   /* Eyebrow / section label */
   .eyebrow {
-    font-size: 10px;
+    font-family: var(--font-sans);
+    font-size: 10.5px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: oklch(0.50 0.022 264 / 0.6);
+    letter-spacing: 0.11em;
+    color: oklch(0.50 0.022 264 / 0.60);
+    line-height: 1;
   }
   .dark .eyebrow {
-    color: oklch(0.60 0.022 264 / 0.7);
+    color: oklch(0.60 0.022 264 / 0.65);
   }
 
-  /* ── Gradient text ────────────────────────────────────────── */
+  /* ── Gradient text ──────────────────────────────────────────────────────── */
 
   .text-gradient-blue {
-    background: linear-gradient(135deg, #4F79FF 0%, #2B59FF 50%, #1A3FCC 100%);
+    background: linear-gradient(135deg, #6B8FFF 0%, #2B59FF 60%, #1A3FCC 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -231,206 +272,197 @@
     background-clip: text;
   }
 
-  /* ── Glow effects ─────────────────────────────────────────── */
+  /* BrandPulse brand gradient — blue melts into clay (signature) */
+  .text-gradient-brand {
+    background: linear-gradient(135deg, #4F79FF 0%, #3D6AFF 40%, #C05525 80%, #D4602A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-  .glow-blue  { box-shadow: 0 0 40px -8px rgb(43 89 255 / 0.35);  }
-  .glow-clay  { box-shadow: 0 0 40px -8px rgb(212 96 42 / 0.35);  }
-  .glow-green { box-shadow: 0 0 40px -8px rgb(34 197 94 / 0.28);  }
+  /* ── Glow effects ───────────────────────────────────────────────────────── */
 
-  /* ── Stat card icon boxes ──────────────────────────────────── */
-  /* Vivid gradient icon boxes (Vuexy/Apex pattern) */
+  .glow-blue  { box-shadow: 0 0 40px -8px rgba(43, 89, 255, 0.40); }
+  .glow-clay  { box-shadow: 0 0 40px -8px rgba(212, 96, 42, 0.40); }
+  .glow-green { box-shadow: 0 0 40px -8px rgba(34, 197, 94, 0.30); }
+
+  /* ── Gradient icon boxes (stat cards, Vuexy/Apex pattern) ──────────────── */
 
   .icon-box-blue {
     background: linear-gradient(135deg, #6B8FFF 0%, #2B59FF 100%);
-    box-shadow: 0 8px 20px -6px oklch(0.485 0.25 258 / 0.55);
-  }
-  .icon-box-green {
-    background: linear-gradient(135deg, #34D17F 0%, #16A34A 100%);
-    box-shadow: 0 8px 20px -6px oklch(0.65 0.18 142 / 0.45);
-  }
-  .icon-box-amber {
-    background: linear-gradient(135deg, #F5B544 0%, #D97706 100%);
-    box-shadow: 0 8px 20px -6px oklch(0.75 0.17 75 / 0.45);
+    box-shadow: 0 8px 20px -6px rgba(43, 89, 255, 0.55);
   }
   .icon-box-clay {
     background: linear-gradient(135deg, #E8763E 0%, #C4501D 100%);
-    box-shadow: 0 8px 20px -6px oklch(0.585 0.163 37 / 0.50);
+    box-shadow: 0 8px 20px -6px rgba(212, 96, 42, 0.52);
+  }
+  .icon-box-green {
+    background: linear-gradient(135deg, #34D17F 0%, #16A34A 100%);
+    box-shadow: 0 8px 20px -6px rgba(22, 163, 74, 0.45);
+  }
+  .icon-box-amber {
+    background: linear-gradient(135deg, #F5B544 0%, #D97706 100%);
+    box-shadow: 0 8px 20px -6px rgba(217, 119, 6, 0.45);
   }
   .icon-box-violet {
     background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%);
-    box-shadow: 0 8px 20px -6px oklch(0.65 0.2 300 / 0.45);
+    box-shadow: 0 8px 20px -6px rgba(124, 58, 237, 0.45);
+  }
+  .icon-box-navy {
+    background: linear-gradient(135deg, #2A3458 0%, #14182B 100%);
+    box-shadow: 0 8px 20px -6px rgba(20, 24, 43, 0.45);
   }
 
-  /* ── Card system ──────────────────────────────────────────── */
+  /* ── Card system (3-tier elevation) ─────────────────────────────────────── */
 
-  /* Elevation 1: page surface cards */
   .card-e1 {
-    background: oklch(1 0 0);
-    border: 1px solid oklch(0.875 0.015 78);
-    box-shadow: 0 1px 3px oklch(0.12 0.04 264 / 0.06),
-                0 2px 8px  oklch(0.12 0.04 264 / 0.04);
+    background: #FFFFFF;
+    border: 1px solid oklch(0.895 0.012 75);
+    box-shadow: 0 1px 3px rgba(20, 24, 43, 0.06), 0 2px 8px rgba(20, 24, 43, 0.04);
   }
   .dark .card-e1 {
-    background: oklch(0.155 0.032 264);
-    border-color: oklch(1 0 0 / 7%);
+    background: oklch(0.145 0.032 264);
+    border-color: oklch(1 0 0 / 8%);
     box-shadow: none;
   }
 
-  /* Elevation 2: lifted / interactive cards */
   .card-e2 {
-    background: oklch(1 0 0);
-    border: 1px solid oklch(0.875 0.015 78);
-    box-shadow: 0 2px 6px  oklch(0.12 0.04 264 / 0.07),
-                0 4px 20px oklch(0.12 0.04 264 / 0.06);
+    background: #FFFFFF;
+    border: 1px solid oklch(0.895 0.012 75);
+    box-shadow: 0 2px 8px rgba(20, 24, 43, 0.07), 0 6px 24px rgba(20, 24, 43, 0.05);
   }
   .dark .card-e2 {
-    background: oklch(0.155 0.032 264);
-    border-color: oklch(1 0 0 / 7%);
-    box-shadow: 0 2px 12px oklch(0 0 0 / 0.25);
+    background: oklch(0.145 0.032 264);
+    border-color: oklch(1 0 0 / 8%);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.28);
   }
 
   /* Interactive card hover */
   .card-hover {
     transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
-    cursor: default;
   }
   .card-hover:hover {
-    border-color: oklch(0.485 0.25 258 / 20%);
-    box-shadow: 0 4px 16px oklch(0.12 0.04 264 / 0.10),
-                0 10px 40px oklch(0.12 0.04 264 / 0.08);
+    border-color: rgba(43, 89, 255, 0.22);
+    box-shadow: 0 4px 16px rgba(20, 24, 43, 0.10), 0 12px 40px rgba(20, 24, 43, 0.08);
     transform: translateY(-2px);
   }
   .dark .card-hover:hover {
-    border-color: oklch(1 0 0 / 14%);
-    box-shadow: 0 4px 24px oklch(0 0 0 / 0.35);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.38);
+    transform: translateY(-2px);
   }
 
-  /* Card shadow (keep for backwards compat) */
+  /* Legacy compat */
   .card-shadow {
-    box-shadow: 0 1px 3px oklch(0.12 0.04 264 / 0.07),
-                0 2px 12px oklch(0.12 0.04 264 / 0.05);
+    box-shadow: 0 1px 3px rgba(20, 24, 43, 0.07), 0 2px 12px rgba(20, 24, 43, 0.05);
   }
   .dark .card-shadow { box-shadow: none; }
 
-  /* Card accent top stripe */
-  .card-accent-blue  { box-shadow: inset 0 2px 0 0 oklch(0.55 0.25 258); }
+  /* Card accent stripes */
+  .card-accent-blue  { box-shadow: inset 0 2px 0 0 #2B59FF; }
   .card-accent-green { box-shadow: inset 0 2px 0 0 oklch(0.65 0.18 142); }
   .card-accent-amber { box-shadow: inset 0 2px 0 0 oklch(0.75 0.17 75);  }
-  .card-accent-clay  { box-shadow: inset 0 2px 0 0 oklch(0.585 0.163 37);}
+  .card-accent-clay  { box-shadow: inset 0 2px 0 0 #D4602A; }
   .card-accent-red   { box-shadow: inset 0 2px 0 0 oklch(0.65 0.22 22);  }
 
-  /* ── Navigation ───────────────────────────────────────────── */
+  /* ── Navigation ─────────────────────────────────────────────────────────── */
 
-  /* Active nav pill — solid filled */
+  /* Active nav pill: CLAY on NAVY — the BrandPulse signature
+     No other analytics tool does warm burnt orange on deep navy.
+     This is the one design choice that makes the entire product memorable. */
   .nav-pill-active {
-    background: oklch(0.485 0.25 258);
-    color: oklch(1 0 0);
-    box-shadow: 0 4px 14px -4px oklch(0.485 0.25 258 / 0.55);
-  }
-  .dark .nav-pill-active {
-    background: oklch(0.55 0.25 258);
-    box-shadow: 0 4px 14px -4px oklch(0.55 0.25 258 / 0.50),
-                inset 0 1px 0 0 oklch(1 0 0 / 0.15);
+    background: linear-gradient(135deg, #E8763E 0%, #D4602A 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 16px -4px rgba(212, 96, 42, 0.65);
   }
 
-  /* Ask AI gradient button */
+  /* Ask AI button — blue→clay gradient border */
   .ask-ai-btn {
     background: linear-gradient(135deg,
-      oklch(0.485 0.25 258 / 0.12) 0%,
-      oklch(0.585 0.163 37 / 0.08) 100%
+      rgba(43, 89, 255, 0.14) 0%,
+      rgba(212, 96, 42, 0.08) 100%
     );
-    border: 1px solid oklch(0.485 0.25 258 / 0.22);
-    color: oklch(0.485 0.25 258);
-  }
-  .dark .ask-ai-btn {
-    background: linear-gradient(135deg,
-      oklch(0.55 0.25 258 / 0.18) 0%,
-      oklch(0.585 0.163 37 / 0.10) 100%
-    );
-    border-color: oklch(0.55 0.25 258 / 0.30);
-    color: oklch(0.65 0.20 258);
+    border: 1px solid rgba(43, 89, 255, 0.25);
+    color: rgba(107, 143, 255, 1);
+    transition: background 150ms ease, border-color 150ms ease;
   }
   .ask-ai-btn:hover {
     background: linear-gradient(135deg,
-      oklch(0.485 0.25 258 / 0.18) 0%,
-      oklch(0.585 0.163 37 / 0.12) 100%
+      rgba(43, 89, 255, 0.20) 0%,
+      rgba(212, 96, 42, 0.12) 100%
     );
-    border-color: oklch(0.485 0.25 258 / 0.32);
-  }
-  .dark .ask-ai-btn:hover {
-    background: linear-gradient(135deg,
-      oklch(0.55 0.25 258 / 0.25) 0%,
-      oklch(0.585 0.163 37 / 0.15) 100%
-    );
-    border-color: oklch(0.55 0.25 258 / 0.40);
+    border-color: rgba(43, 89, 255, 0.38);
   }
 
-  /* ── Topbar search trigger ─────────────────────────────────── */
-
+  /* Topbar search trigger */
   .search-trigger {
-    background: oklch(0.955 0.01 78 / 0.9);
-    border: 1px solid oklch(0.875 0.015 78);
+    background: oklch(0.96 0.010 75 / 0.9);
+    border: 1px solid oklch(0.895 0.012 75);
     transition: background 150ms ease, border-color 150ms ease;
   }
   .dark .search-trigger {
-    background: oklch(0.17 0.028 264 / 0.9);
-    border-color: oklch(1 0 0 / 0.08);
+    background: oklch(0.175 0.028 264 / 0.9);
+    border-color: rgba(255, 255, 255, 0.08);
   }
   .search-trigger:hover {
-    background: oklch(0.94 0.015 78);
-    border-color: oklch(0.855 0.018 78);
+    background: oklch(0.94 0.014 75);
+    border-color: oklch(0.875 0.016 75);
   }
   .dark .search-trigger:hover {
     background: oklch(0.20 0.027 264);
-    border-color: oklch(1 0 0 / 0.12);
+    border-color: rgba(255, 255, 255, 0.12);
   }
 
-  /* ── Surfaces ────────────────────────────────────────────── */
+  /* ── Trend badges ────────────────────────────────────────────────────────── */
+
+  .trend-up   { background: rgba(34, 197, 94, 0.12);  color: oklch(0.55 0.18 142); }
+  .trend-down { background: rgba(239, 68, 68, 0.12);  color: oklch(0.60 0.22 22);  }
+  .dark .trend-up   { background: rgba(34, 197, 94, 0.18);  color: oklch(0.70 0.18 142); }
+  .dark .trend-down { background: rgba(239, 68, 68, 0.18);  color: oklch(0.70 0.22 22);  }
+
+  /* ── Surface utilities ───────────────────────────────────────────────────── */
 
   .surface-sand {
-    background: oklch(0.93 0.022 78);
-    color: oklch(0.12 0.04 264);
+    background: #EDE6D8;
+    color: #14182B;
   }
   .dark .surface-sand {
     background: oklch(0.175 0.03 264);
-    color: oklch(0.93 0.022 78);
+    color: #EDE6D8;
   }
 
-  /* Premium glass */
   .glass {
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
   }
 
-  /* Page background subtle gradient */
-  .bg-page {
-    background: linear-gradient(180deg,
-      oklch(0.975 0.007 78) 0%,
-      oklch(0.970 0.009 78) 100%
-    );
-  }
-  .dark .bg-page {
-    background: linear-gradient(180deg,
-      oklch(0.12 0.04 264)  0%,
-      oklch(0.115 0.038 264) 100%
-    );
-  }
+  /* ── Status dots ─────────────────────────────────────────────────────────── */
 
-  /* ── Status dots ─────────────────────────────────────────── */
-
-  .status-dot-blue  { background: oklch(0.55 0.25 258); box-shadow: 0 0 0 3px oklch(0.55 0.25 258 / 0.25); }
+  .status-dot-blue  { background: #2B59FF; box-shadow: 0 0 0 3px rgba(43, 89, 255, 0.25); }
+  .status-dot-clay  { background: #D4602A; box-shadow: 0 0 0 3px rgba(212, 96, 42, 0.25); }
   .status-dot-green { background: oklch(0.65 0.18 142); box-shadow: 0 0 0 3px oklch(0.65 0.18 142 / 0.25); }
   .status-dot-amber { background: oklch(0.75 0.17 75);  box-shadow: 0 0 0 3px oklch(0.75 0.17 75  / 0.25); }
-  .status-dot-clay  { background: oklch(0.585 0.163 37);box-shadow: 0 0 0 3px oklch(0.585 0.163 37/ 0.25); }
 
-  /* ── Trend badges ─────────────────────────────────────────── */
+  /* ── Chart gradient fills — standardized for Recharts <Area> ─────────────── */
 
-  .trend-up   { background: oklch(0.65 0.18 142 / 0.12); color: oklch(0.55 0.18 142); }
-  .trend-down { background: oklch(0.65 0.22 22  / 0.12); color: oklch(0.60 0.22 22);  }
-  .dark .trend-up   { background: oklch(0.65 0.18 142 / 0.18); color: oklch(0.70 0.18 142); }
-  .dark .trend-down { background: oklch(0.65 0.22 22  / 0.18); color: oklch(0.70 0.22 22);  }
+  /* Used as SVG linearGradient stops in chart components */
+  /* Blue (BHI, primary data) */
+  --chart-blue-0: rgba(43, 89, 255, 0.30);
+  --chart-blue-1: rgba(43, 89, 255, 0.00);
 
-  /* ── Bento grid (legacy, kept for overview) ──────────────── */
+  /* Clay (brand, campaigns) */
+  --chart-clay-0: rgba(212, 96, 42, 0.28);
+  --chart-clay-1: rgba(212, 96, 42, 0.00);
+
+  /* Green (sentiment positive) */
+  --chart-green-0: rgba(34, 197, 94, 0.25);
+  --chart-green-1: rgba(34, 197, 94, 0.00);
+
+  /* Violet (SOV, reach) */
+  --chart-violet-0: rgba(124, 58, 237, 0.25);
+  --chart-violet-1: rgba(124, 58, 237, 0.00);
+
+  /* ── Bento grid (overview layout) ───────────────────────────────────────── */
 
   .bento-overview {
     display: grid;
@@ -438,9 +470,7 @@
     gap: 1rem;
   }
   @media (min-width: 768px) {
-    .bento-overview {
-      grid-template-columns: 1fr 1fr;
-    }
+    .bento-overview { grid-template-columns: 1fr 1fr; }
     .bento-bhi       { grid-column: 1 / 3; }
     .bento-sentiment { grid-column: 1; }
     .bento-sov       { grid-column: 2; }
@@ -448,9 +478,7 @@
     .bento-full      { grid-column: 1 / 3; }
   }
   @media (min-width: 1024px) {
-    .bento-overview {
-      grid-template-columns: minmax(260px, 300px) 1fr 1fr;
-    }
+    .bento-overview  { grid-template-columns: minmax(260px, 300px) 1fr 1fr; }
     .bento-bhi       { grid-column: 1; grid-row: 1 / 3; }
     .bento-sentiment { grid-column: 2 / 4; grid-row: 1; }
     .bento-sov       { grid-column: 2; grid-row: 2; }

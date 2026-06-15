@@ -277,9 +277,9 @@ export function BrandEquityClient({
               <Radar
                 name={brandName}
                 dataKey="score"
-                stroke="hsl(var(--foreground))"
-                fill="hsl(var(--foreground))"
-                fillOpacity={0.15}
+                stroke="#2B59FF"
+                fill="#2B59FF"
+                fillOpacity={0.18}
                 strokeWidth={2}
               />
               <RechartTooltip
@@ -288,11 +288,13 @@ export function BrandEquityClient({
                   (props.payload as { fullLabel?: string })?.fullLabel ?? String(_name),
                 ]}
                 contentStyle={{
+                  background: '#14182B',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  borderRadius: 12,
                   fontSize: 12,
-                  borderRadius: 8,
-                  border: '1px solid hsl(var(--border))',
-                  backgroundColor: 'hsl(var(--card))',
+                  color: '#fff',
                 }}
+                labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
               />
             </RadarChart>
           </ResponsiveContainer>

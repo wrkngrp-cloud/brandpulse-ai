@@ -16,6 +16,7 @@ async function DashboardContent() {
     { data: recentMentions },
     { data: activeCampaigns },
     { data: upcomingEvents },
+    { data: sentimentTrendRaw },
   ] = await Promise.all([
     supabase.from('brands').select('id, name, category').limit(1).single(),
     supabase.from('sentiment_daily').select('social_score, day, positive_pct, negative_pct').order('day', { ascending: false }).limit(1).single(),
@@ -25,6 +26,7 @@ async function DashboardContent() {
     supabase.from('mentions').select('id, content, author_handle, platform, sentiment_label, created_at').order('created_at', { ascending: false }).limit(4),
     supabase.from('campaigns').select('id, name, status, objectives, start_date, total_budget, currency').in('status', ['active', 'paused']).order('created_at', { ascending: false }).limit(3),
     supabase.from('events').select('id, name, status, city, date_start, event_type').in('status', ['planned', 'live']).order('date_start', { ascending: true }).limit(3),
+    supabase.from('sentiment_daily').select('social_score, day').order('day', { ascending: true }).limit(30),
   ])
 
   const npsScores = (surveyResponses ?? [])
@@ -40,6 +42,16 @@ async function DashboardContent() {
   const sparkline = [...(bhiHistory ?? [])]
     .reverse()
     .map(r => ({ date: r.snapshot_date, score: Number(r.bhi) }))
+
+  // Build merged trend data: align BHI and Sentiment by date
+  const bhiByDate = new Map(sparkline.map(r => [r.date, r.score]))
+  const sentimentByDate = new Map((sentimentTrendRaw ?? []).map(r => [r.day, r.social_score]))
+  const allDates = [...new Set([...bhiByDate.keys(), ...sentimentByDate.keys()])].sort()
+  const trendData = allDates.map(date => ({
+    date,
+    bhi:       bhiByDate.get(date) ?? null,
+    sentiment: sentimentByDate.get(date) ?? null,
+  }))
 
   const hasAnyData = sentimentScore !== null || sovScore !== null || surveyScore !== null
 
@@ -59,6 +71,7 @@ async function DashboardContent() {
       upcomingEvents={upcomingEvents ?? []}
       recentMentions={recentMentions ?? []}
       hasAnyData={hasAnyData}
+      trendData={trendData}
     />
   )
 }

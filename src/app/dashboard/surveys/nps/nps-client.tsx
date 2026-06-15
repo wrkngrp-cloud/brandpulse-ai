@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine,
 } from 'recharts'
 import { Sparkles, Loader2, Users, TrendingUp, TrendingDown, Minus } from 'lucide-react'
@@ -42,17 +42,24 @@ interface DiagnosisResult {
 
 const CUSTOM_TOOLTIP = ({ active, payload, label }: {
   active?: boolean
-  payload?: { value: number }[]
+  payload?: { value: number; name: string; color: string }[]
   label?: string
 }) => {
   if (!active || !payload?.length) return null
   const val = payload[0].value
+  const isPositive = val >= 0
   return (
-    <div className="bg-card border rounded-lg shadow-md px-3 py-2 text-sm">
-      <p className="font-medium">{label}</p>
-      <p className={cn('font-bold', val >= 0 ? 'text-green-600' : 'text-red-500')}>
-        NPS {val >= 0 ? '+' : ''}{val}
-      </p>
+    <div className="bg-[#14182B] border border-white/10 rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[148px]">
+      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-white/40 mb-2">{label}</p>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-1.5">
+          <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: isPositive ? '#22c55e' : '#f87171' }} />
+          <span className="text-[11.5px] text-white/55">NPS Score</span>
+        </div>
+        <span className={cn('text-[13px] font-semibold tabular-nums', isPositive ? 'text-green-400' : 'text-red-400')}>
+          {isPositive ? '+' : ''}{Math.round(val)}
+        </span>
+      </div>
     </div>
   )
 }
@@ -115,61 +122,65 @@ export function NpsClient({
       {/* KPI row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {/* NPS score */}
-        <div className="border rounded-xl p-4 bg-card col-span-2 sm:col-span-1">
-          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">NPS Score</p>
+        <div className="border rounded-2xl p-5 bg-card card-shadow col-span-2 sm:col-span-1">
+          <p className="eyebrow mb-2">NPS Score</p>
           {currentNps != null ? (
             <div className="flex items-end gap-2 mt-1">
-              <p className={cn('text-4xl font-bold tabular-nums', npsColor)}>
+              <p className={cn('metric text-[38px]', npsColor)}>
                 {currentNps >= 0 ? '+' : ''}{currentNps}
               </p>
-              <div className={cn('flex items-center gap-0.5 mb-1', trendColor)}>
+              <div className={cn('flex items-center gap-0.5 mb-1.5', trendColor)}>
                 <TrendIcon className="h-4 w-4" />
               </div>
             </div>
           ) : (
-            <p className="text-2xl font-bold text-muted-foreground/50 mt-1">—</p>
+            <p className="metric text-[38px] text-muted-foreground/40 mt-1">—</p>
           )}
-          <p className="text-xs text-muted-foreground mt-0.5">{totalResponses} total responses</p>
+          <p className="text-xs text-muted-foreground mt-1">{totalResponses} total responses</p>
         </div>
 
         {/* Promoters */}
-        <div className="border rounded-xl p-4 bg-card">
-          <p className="text-xs text-muted-foreground font-medium">Promoters</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">
+        <div className="border rounded-2xl p-5 bg-card card-shadow">
+          <p className="eyebrow mb-2">Promoters</p>
+          <p className="metric text-[28px] text-green-500 mt-1">
             {totalResponses > 0 ? Math.round(totalPromoters / totalResponses * 100) : 0}%
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">{totalPromoters} people · score 9–10</p>
+          <p className="text-xs text-muted-foreground mt-1">{totalPromoters} people · 9–10</p>
         </div>
 
         {/* Passives */}
-        <div className="border rounded-xl p-4 bg-card">
-          <p className="text-xs text-muted-foreground font-medium">Passives</p>
-          <p className="text-2xl font-bold text-muted-foreground mt-1">
+        <div className="border rounded-2xl p-5 bg-card card-shadow">
+          <p className="eyebrow mb-2">Passives</p>
+          <p className="metric text-[28px] text-muted-foreground mt-1">
             {totalResponses > 0 ? Math.round(totalPassives / totalResponses * 100) : 0}%
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">{totalPassives} people · score 7–8</p>
+          <p className="text-xs text-muted-foreground mt-1">{totalPassives} people · 7–8</p>
         </div>
 
         {/* Detractors */}
-        <div className="border rounded-xl p-4 bg-card">
-          <p className="text-xs text-muted-foreground font-medium">Detractors</p>
-          <p className="text-2xl font-bold text-red-500 mt-1">
+        <div className="border rounded-2xl p-5 bg-card card-shadow">
+          <p className="eyebrow mb-2">Detractors</p>
+          <p className="metric text-[28px] text-red-500 mt-1">
             {totalResponses > 0 ? Math.round(totalDetractors / totalResponses * 100) : 0}%
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">{totalDetractors} people · score 0–6</p>
+          <p className="text-xs text-muted-foreground mt-1">{totalDetractors} people · 0–6</p>
         </div>
       </div>
 
       {/* 12-week trend chart */}
-      <div className="border rounded-xl bg-card p-5">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm font-semibold">12-week NPS trend</p>
+      <div className="border rounded-2xl bg-card card-shadow p-5">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <p className="eyebrow mb-1">12-Week Pulse</p>
+            <h3 className="text-[15px] font-semibold tracking-tight">NPS Trend</h3>
+          </div>
           {hasEnoughData && (
             <Button
               size="sm"
               variant="outline"
               onClick={handleDiagnose}
               disabled={isPending || currentNps == null}
+              className="rounded-xl"
             >
               {isPending ? (
                 <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Analysing…</>
@@ -181,40 +192,81 @@ export function NpsClient({
         </div>
 
         {chartData.length >= 2 ? (
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -24 }}>
+              <defs>
+                {/* Positive zone — green above 0 */}
+                <linearGradient id="npsGradPos" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stopColor="#22c55e" stopOpacity={0.30} />
+                  <stop offset="50%"  stopColor="#22c55e" stopOpacity={0.10} />
+                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0}    />
+                </linearGradient>
+                {/* Negative zone — red */}
+                <linearGradient id="npsGradNeg" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stopColor="#f87171" stopOpacity={0}    />
+                  <stop offset="100%" stopColor="#f87171" stopOpacity={0.22} />
+                </linearGradient>
+              </defs>
+
+              <CartesianGrid
+                strokeDasharray="0"
+                horizontal
+                vertical={false}
+                stroke="currentColor"
+                className="text-border opacity-35"
+              />
+
               <XAxis
                 dataKey="weekLabel"
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
                 tickLine={false}
                 axisLine={false}
-                className="fill-muted-foreground"
               />
               <YAxis
                 domain={[-100, 100]}
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
                 tickLine={false}
                 axisLine={false}
-                className="fill-muted-foreground"
+                tickCount={5}
               />
-              <Tooltip content={<CUSTOM_TOOLTIP />} />
-              <ReferenceLine y={0} stroke="currentColor" className="stroke-border" strokeDasharray="3 3" />
-              <Line
+
+              <Tooltip
+                content={<CUSTOM_TOOLTIP />}
+                cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }}
+              />
+
+              <ReferenceLine
+                y={0}
+                stroke="currentColor"
+                strokeDasharray="4 4"
+                strokeOpacity={0.25}
+              />
+              <ReferenceLine
+                y={50}
+                stroke="#22c55e"
+                strokeDasharray="4 4"
+                strokeOpacity={0.20}
+                label={{ value: 'Excellent', position: 'insideTopRight', fontSize: 9, fill: '#22c55e', opacity: 0.5 }}
+              />
+
+              <Area
                 type="monotone"
                 dataKey="nps"
-                strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
-                className="stroke-foreground"
+                name="NPS"
+                stroke="#2B59FF"
+                strokeWidth={2.5}
+                fill="url(#npsGradPos)"
+                dot={false}
+                activeDot={{ r: 4.5, fill: '#2B59FF', strokeWidth: 2, stroke: '#fff' }}
+                connectNulls={false}
               />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         ) : (
           <div className="h-48 flex items-center justify-center">
-            <div className="text-center space-y-1">
-              <Users className="h-6 w-6 text-muted-foreground/40 mx-auto" />
-              <p className="text-sm text-muted-foreground">
+            <div className="text-center space-y-2">
+              <Users className="h-7 w-7 text-muted-foreground/30 mx-auto" />
+              <p className="text-sm text-muted-foreground max-w-[280px]">
                 {totalResponses === 0
                   ? 'No responses yet — publish a survey with an NPS question to start tracking.'
                   : `${totalResponses} response${totalResponses !== 1 ? 's' : ''} collected — trend appears once data spans 2+ weeks.`}
@@ -225,53 +277,49 @@ export function NpsClient({
       </div>
 
       {/* Score guide */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-green-600 inline-block" />50+ Excellent</span>
-        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-foreground inline-block" />30–49 Good</span>
-        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-amber-500 inline-block" />0–29 Needs work</span>
-        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-red-500 inline-block" />Below 0 Critical</span>
-        <span className="ml-auto">NPS = % Promoters − % Detractors</span>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-muted-foreground px-1">
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-green-500 inline-block" />50+ Excellent</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-blue-500 inline-block" />30–49 Good</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-amber-500 inline-block" />0–29 Needs work</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-red-500 inline-block" />Below 0 Critical</span>
+        <span className="ml-auto opacity-50">NPS = % Promoters − % Detractors</span>
       </div>
 
       {/* AI Diagnosis */}
       {diagnosis && (
-        <div className="border rounded-xl p-5 bg-card space-y-5">
+        <div className="border rounded-2xl p-5 bg-card card-shadow space-y-5">
           <div className="flex items-start gap-3">
-            <div className="h-7 w-7 rounded-full bg-foreground flex items-center justify-center shrink-0">
-              <Sparkles className="h-3.5 w-3.5 text-background" />
+            <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: 'linear-gradient(135deg, #E8763E 0%, #D4602A 100%)', boxShadow: '0 4px 12px -4px rgba(212,96,42,0.5)' }}>
+              <Sparkles className="h-4 w-4 text-white" />
             </div>
             <div>
-              <p className="text-sm font-semibold">NPS diagnosis</p>
-              <p className="text-xs text-muted-foreground">{diagnosis.npsContext}</p>
+              <p className="text-sm font-semibold tracking-tight">NPS diagnosis</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{diagnosis.npsContext}</p>
             </div>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                Why people are detracting
-              </p>
+            <div className="space-y-2 rounded-xl border bg-muted/30 p-4">
+              <p className="eyebrow">Why people are detracting</p>
               <p className="text-sm leading-relaxed">{diagnosis.detractorDiagnosis}</p>
             </div>
-            <div className="space-y-1.5">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                Your promoter archetype
-              </p>
+            <div className="space-y-2 rounded-xl border bg-muted/30 p-4">
+              <p className="eyebrow">Your promoter archetype</p>
               <p className="text-sm leading-relaxed">{diagnosis.promoterArchetype}</p>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              90-day recommendations
-            </p>
+          <div className="space-y-2.5">
+            <p className="eyebrow">90-day recommendations</p>
             <ul className="space-y-2">
               {diagnosis.recommendations.map((rec, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm">
-                  <span className="shrink-0 h-5 w-5 rounded-full bg-muted text-muted-foreground text-xs flex items-center justify-center font-semibold">
+                <li key={i} className="flex items-start gap-3 text-sm">
+                  <span className="shrink-0 h-5 w-5 rounded-full text-[11px] flex items-center justify-center font-semibold text-white mt-0.5"
+                    style={{ background: 'linear-gradient(135deg, #E8763E 0%, #D4602A 100%)' }}>
                     {i + 1}
                   </span>
-                  <span>{rec}</span>
+                  <span className="leading-relaxed">{rec}</span>
                 </li>
               ))}
             </ul>

@@ -135,22 +135,34 @@ export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId, tota
           <div className="h-52">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="week" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                <YAxis yAxisId="left"  tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
+                <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
+                <XAxis dataKey="week" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} tickLine={false} axisLine={false} />
+                <YAxis yAxisId="left"  tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} tickLine={false} axisLine={false} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} tickLine={false} axisLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    background: '#14182B',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    borderRadius: 12,
+                    fontSize: 11,
+                    color: '#fff',
+                  }}
+                  labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                  cursor={{ fill: 'currentColor', opacity: 0.05 }}
+                />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
                 <Bar
                   yAxisId="right" dataKey="OOH visits"
-                  fill="hsl(var(--primary) / 0.25)"
-                  radius={[3,3,0,0]}
+                  fill="#2B59FF"
+                  fillOpacity={0.22}
+                  radius={[4,4,0,0]}
                 />
                 <Line
                   yAxisId="left" type="monotone"
                   dataKey="Search index"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2} dot={false}
+                  stroke="#E8763E"
+                  strokeWidth={2.5} dot={false}
+                  activeDot={{ r: 4, fill: '#E8763E', strokeWidth: 2, stroke: '#fff' }}
                 />
               </ComposedChart>
             </ResponsiveContainer>
