@@ -106,6 +106,12 @@ export function CampaignOverview({ campaign, oohSites, events }: CampaignOvervie
         ))}
       </div>
 
+      {/* ── AI summary (top of overview) ── */}
+      <CampaignAiSummary
+        campaignId={campaign.id}
+        initialSummary={campaign.ai_summary ?? null}
+      />
+
       {/* ── Objectives ── */}
       {objectives.length > 0 && (
         <div className="border rounded-xl p-5 bg-card space-y-3">
@@ -325,11 +331,6 @@ export function CampaignOverview({ campaign, oohSites, events }: CampaignOvervie
         </div>
       )}
 
-      {/* ── AI summary ── */}
-      <CampaignAiSummary
-        campaignId={campaign.id}
-        initialSummary={campaign.ai_summary ?? null}
-      />
     </div>
   )
 }

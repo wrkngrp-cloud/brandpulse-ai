@@ -100,6 +100,7 @@ export function DashboardShell({ children, userName, userEmail, brandName }: Das
             <button
               className="search-trigger w-full flex items-center gap-2 h-9 rounded-xl px-3 cursor-pointer"
               aria-label="Search"
+              onClick={() => document.dispatchEvent(new CustomEvent('bp:open-command', { detail: '' }))}
             >
               <Search className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
               <span className="text-[13px] text-muted-foreground/50 flex-1 text-left">Search or ask anything…</span>

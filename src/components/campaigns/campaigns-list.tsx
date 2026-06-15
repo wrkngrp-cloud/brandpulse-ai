@@ -71,16 +71,14 @@ export function CampaignsList({ campaigns }: CampaignsListProps) {
         return (
           <div
             key={c.id}
-            className="flex items-center gap-4 px-4 py-3.5 bg-card hover:bg-muted/30 transition-colors"
+            onClick={() => router.push(`/dashboard/campaigns/${c.id}`)}
+            className="flex items-center gap-4 px-4 py-3.5 bg-card hover:bg-muted/30 transition-colors cursor-pointer"
           >
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <Link
-                  href={`/dashboard/campaigns/${c.id}`}
-                  className="text-sm font-medium hover:underline truncate"
-                >
+                <span className="text-sm font-medium truncate">
                   {c.name}
-                </Link>
+                </span>
                 <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', STATUS_STYLES[c.status] ?? STATUS_STYLES.draft)}>
                   {c.status.charAt(0).toUpperCase() + c.status.slice(1)}
                 </span>
@@ -97,6 +95,7 @@ export function CampaignsList({ campaigns }: CampaignsListProps) {
               </p>
             </div>
 
+            <div onClick={e => e.stopPropagation()}>
             <ItemActions
               actions={[
                 {
@@ -135,6 +134,7 @@ export function CampaignsList({ campaigns }: CampaignsListProps) {
                 },
               ]}
             />
+            </div>
           </div>
         )
       })}

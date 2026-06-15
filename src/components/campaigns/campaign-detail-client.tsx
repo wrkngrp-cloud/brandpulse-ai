@@ -1,13 +1,15 @@
 'use client'
 
-import Link           from 'next/link'
-import { useRouter }  from 'next/navigation'
-import { cn }         from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
-import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, TrendingUp, Users, Eye, Percent } from 'lucide-react'
+import Link                from 'next/link'
+import { useRouter }       from 'next/navigation'
+import { useState, useTransition } from 'react'
+import { cn }              from '@/lib/utils'
+import { buttonVariants, Button } from '@/components/ui/button'
+import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, TrendingUp, Users, Eye, Percent, Sparkles, RefreshCw } from 'lucide-react'
 import { CampaignOverview } from './campaign-overview'
 import { LinkOohSiteDialog, LinkEventDialog } from './link-existing-dialog'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { toast } from 'sonner'
 
 interface Channel {
   id: string
@@ -148,6 +150,26 @@ function fmtMoney(amount: number | null, currency = 'NGN') {
 
 export function CampaignDetailClient({ campaign, oohSites, events, activeTab, unlinkedSites = [], unlinkedEvents = [], interactions = [], socialPosts = [], oohVisits = [] }: Props) {
   const router = useRouter()
+  const [analysing, startAnalyse] = useTransition()
+  const [headerSummary, setHeaderSummary] = useState<string | null>(campaign.ai_summary ?? null)
+
+  function runAnalysis() {
+    startAnalyse(async () => {
+      try {
+        const res = await fetch(`/api/campaigns/${campaign.id}/analyse`, { method: 'POST' })
+        if (!res.ok) {
+          const { error } = await res.json().catch(() => ({}))
+          throw new Error(error ?? 'Analysis failed')
+        }
+        const { summary } = await res.json()
+        setHeaderSummary(summary)
+        toast.success('Campaign analysis complete.')
+        router.refresh()
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : 'Analysis failed')
+      }
+    })
+  }
 
   const objectives     = campaign.objectives ?? []
   const channelAlloc   = campaign.campaign_channels ?? []
@@ -198,23 +220,37 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
 
   return (
     <div className="space-y-5">
-      {/* Status + objectives pills */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', STATUS_STYLES[campaign.status] ?? STATUS_STYLES.draft)}>
-          {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
-        </span>
-        {objectives.map(obj => (
-          <span key={obj} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className={cn('h-2 w-2 rounded-full', OBJECTIVE_COLOR[obj] ?? 'bg-muted-foreground')} />
-            {OBJECTIVE_LABELS[obj] ?? obj}
+      {/* Status + objectives pills + AI Analyse button */}
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', STATUS_STYLES[campaign.status] ?? STATUS_STYLES.draft)}>
+            {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
           </span>
-        ))}
-        <span className="text-xs text-muted-foreground">
-          {campaign.start_date ? fmtDate(campaign.start_date) : ''}
-          {campaign.end_date
-            ? ` – ${fmtDate(campaign.end_date)}`
-            : campaign.start_date ? ' · Always On' : ''}
-        </span>
+          {objectives.map(obj => (
+            <span key={obj} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className={cn('h-2 w-2 rounded-full', OBJECTIVE_COLOR[obj] ?? 'bg-muted-foreground')} />
+              {OBJECTIVE_LABELS[obj] ?? obj}
+            </span>
+          ))}
+          <span className="text-xs text-muted-foreground">
+            {campaign.start_date ? fmtDate(campaign.start_date) : ''}
+            {campaign.end_date
+              ? ` – ${fmtDate(campaign.end_date)}`
+              : campaign.start_date ? ' · Always On' : ''}
+          </span>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 text-xs gap-1.5 shrink-0"
+          onClick={runAnalysis}
+          disabled={analysing}
+        >
+          {analysing
+            ? <><RefreshCw className="h-3 w-3 animate-spin" /> Analysing…</>
+            : <><Sparkles className="h-3 w-3" /> {headerSummary ? 'Re-analyse' : 'AI Analysis'}</>
+          }
+        </Button>
       </div>
 
       {/* Tabs */}
@@ -239,7 +275,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
       {/* ── Overview ── */}
       {activeTab === 'overview' && (
         <CampaignOverview
-          campaign={campaign}
+          campaign={{ ...campaign, ai_summary: headerSummary }}
           oohSites={oohSites.map(s => ({
             visits:       s.visits,
             monthly_cost: s.monthly_cost,
