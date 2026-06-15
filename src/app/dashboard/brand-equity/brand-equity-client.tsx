@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip as RechartTooltip,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, ReferenceLine,
 } from 'recharts'
 import { Info, Link as LinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { BHIGauge } from '@/components/dashboard/bhi-gauge'
 import { cn } from '@/lib/utils'
-import { computeFullBHI, ZONE_META, type FullBHIComponents, type FullBHIResult } from '@/lib/bhi'
+import { computeFullBHI, ZONE_META, type FullBHIComponents, type FullBHIResult, type BHIZone } from '@/lib/bhi'
 
 interface PerceptionDimension {
   dimension: string
@@ -41,6 +42,13 @@ const COMPONENT_META: {
   { key: 'culturalResonance', label: 'Cultural Resonance',  weight: 15, source: 'Cultural survey',  phase: 'Phase 3' },
   { key: 'blendedSov',        label: 'Blended SOV',         weight: 10, source: 'Social SOV'                },
   { key: 'emv',               label: 'EMV Score',           weight:  5, source: 'Social posts (14d)'        },
+]
+
+const ZONE_GUIDE: { zone: BHIZone; range: string; description: string }[] = [
+  { zone: 'at_risk',  range: '0–39',   description: 'Brand is under pressure. Sentiment is low, visibility is weak, or both. Needs urgent attention.' },
+  { zone: 'building', range: '40–64',  description: 'Growing but not yet stable. Positive signals are present — sustain the momentum with consistency.' },
+  { zone: 'healthy',  range: '65–79',  description: 'Strong brand position with good sentiment and awareness. Focus on competitive differentiation.' },
+  { zone: 'leading',  range: '80–100', description: 'Market-leading brand strength. Defend by innovating and maintaining emotional resonance.' },
 ]
 
 const ESOV_POSTURE = (esov: number) =>
@@ -163,6 +171,108 @@ export function BrandEquityClient({
           </div>
         </div>
       </div>
+
+      {/* Zone Guide */}
+      <div className="border rounded-xl p-5 bg-card space-y-3">
+        <div className="flex items-center gap-1.5">
+          <p className="text-sm font-semibold">Brand Health Zones</p>
+          <Info className="h-3.5 w-3.5 text-muted-foreground/40" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {ZONE_GUIDE.map(({ zone, range, description }) => {
+            const meta = ZONE_META[zone]
+            return (
+              <div
+                key={zone}
+                className={cn(
+                  'rounded-lg border p-3 space-y-1',
+                  bhi.zone === zone ? 'ring-1' : 'opacity-75',
+                )}
+                style={{
+                  borderColor: `${meta.color}30`,
+                  backgroundColor: `${meta.color}08`,
+                  ...(bhi.zone === zone ? { ringColor: meta.color } : {}),
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: meta.color }} />
+                    <span className="text-xs font-semibold" style={{ color: meta.color }}>{meta.label}</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-muted-foreground/50 tabular-nums">{range}</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
+                {bhi.zone === zone && (
+                  <p className="text-[10px] font-semibold" style={{ color: meta.color }}>← You are here</p>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* BHI 30-day trend with tooltips */}
+      {sparkline.length > 1 && (
+        <div className="border rounded-xl p-5 bg-card space-y-3">
+          <div>
+            <p className="text-sm font-semibold">Brand Health Trend</p>
+            <p className="text-xs text-muted-foreground">30-day history — hover data points for details</p>
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
+            <LineChart data={sparkline} margin={{ top: 4, right: 8, left: -28, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
+                tickLine={false}
+                axisLine={false}
+                interval="preserveStartEnd"
+                tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+                fontFamily="var(--font-sans)"
+              />
+              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }} tickLine={false} axisLine={false} tickCount={5} fontFamily="var(--font-sans)" />
+              <ReferenceLine y={80} stroke="#14b8a6" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Leading', fontSize: 9, fill: '#14b8a6', opacity: 0.5 }} />
+              <ReferenceLine y={65} stroke="#22c55e" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Healthy', fontSize: 9, fill: '#22c55e', opacity: 0.5 }} />
+              <ReferenceLine y={40} stroke="#f59e0b" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Building', fontSize: 9, fill: '#f59e0b', opacity: 0.5 }} />
+              <RechartTooltip
+                formatter={(v) => [typeof v === 'number' ? Math.round(v) : v, 'BHI Score']}
+                labelFormatter={(v) => typeof v === 'string' ? new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' }) : String(v)}
+                contentStyle={{
+                  background: '#14182B',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  borderRadius: 12,
+                  fontSize: 12,
+                  color: '#fff',
+                }}
+                labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="score"
+                name="BHI"
+                stroke="#2B59FF"
+                strokeWidth={2.5}
+                dot={false}
+                activeDot={{ r: 5, fill: '#2B59FF', strokeWidth: 2, stroke: '#fff' }}
+                connectNulls={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+          <div className="flex items-center gap-4 flex-wrap">
+            {[
+              { label: 'Leading', color: '#14b8a6', range: '80–100' },
+              { label: 'Healthy', color: '#22c55e', range: '65–79' },
+              { label: 'Building', color: '#f59e0b', range: '40–64' },
+              { label: 'At Risk', color: '#ef4444', range: '0–39' },
+            ].map(z => (
+              <div key={z.label} className="flex items-center gap-1.5">
+                <span className="h-[2px] w-4 rounded-full" style={{ background: z.color, opacity: 0.5 }} />
+                <span className="text-[10px] text-muted-foreground">{z.label} ({z.range})</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ESOV Engine */}
       <div className="border rounded-xl p-5 bg-card space-y-4">

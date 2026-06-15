@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Send, Loader2, Sparkles, Plus, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -62,14 +62,15 @@ function timeAgo(iso: string): string {
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-export default function AskPage() {
+function AskPageContent() {
   const router       = useRouter()
   const searchParams = useSearchParams()
   const cid          = searchParams.get('cid')
+  const initialQ     = searchParams.get('q') ?? ''
 
   const [conversations, setConversations] = useState<ConversationSummary[]>([])
   const [messages,      setMessages]      = useState<Message[]>([])
-  const [input,         setInput]         = useState('')
+  const [input,         setInput]         = useState(initialQ)
   const [loading,       setLoading]       = useState(false)
   const [convLoading,   setConvLoading]   = useState(false)
   const [histLoading,   setHistLoading]   = useState(false)
@@ -85,6 +86,15 @@ export default function AskPage() {
       if (data.user?.email) setUserEmail(data.user.email)
     })
   }, [])
+
+  // Auto-send when navigated here with ?q=
+  const autoSentRef = useRef(false)
+  useEffect(() => {
+    if (initialQ && !autoSentRef.current) {
+      autoSentRef.current = true
+      send(initialQ)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load conversation list
   const loadList = useCallback(async () => {
@@ -381,5 +391,17 @@ export default function AskPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AskPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-[calc(100vh-7rem)] items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    }>
+      <AskPageContent />
+    </Suspense>
   )
 }

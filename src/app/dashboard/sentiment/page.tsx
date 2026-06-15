@@ -1,7 +1,9 @@
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { Skeleton } from '@/components/ui/skeleton'
-import { TrendingUp, TrendingDown, Minus, MessageCircle, AlertTriangle, Info } from 'lucide-react'
+import { TrendingUp, TrendingDown, Minus, MessageCircle, AlertTriangle, Info, Search } from 'lucide-react'
+import Link from 'next/link'
+import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { TriggerCrawlButton } from './trigger-crawl-button'
 import { CrawlHistory } from './crawl-history'
 import { SentimentTrendChart } from './sentiment-trend-chart'
@@ -98,7 +100,7 @@ function weeklyAggregate(daily: DayRow[]): { weekLabel: string; score: number; p
   return weeks
 }
 
-async function SentimentData() {
+async function SentimentData({ days = 84 }: { days: number }) {
   const supabase = await createClient()
 
   const [{ data: daily }, { data: mentions }, { data: lastRun }, { data: heatmapRaw }] = await Promise.all([
@@ -106,7 +108,7 @@ async function SentimentData() {
       .from('sentiment_daily')
       .select('day, social_score, positive_pct, neutral_pct, negative_pct, emotion_distribution, platform_breakdown')
       .order('day', { ascending: false })
-      .limit(84),   // 12 weeks
+      .limit(days),
     supabase
       .from('mentions')
       .select('id, content, author_handle, platform, sentiment_label, emotion_tags, reach, created_at')
@@ -182,10 +184,25 @@ async function SentimentData() {
               a.severity === 'critical' ? 'border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400' :
               a.severity === 'warning'  ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-400' :
               'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-400'
+            const aiQuestion =
+              a.type === 'spike'
+                ? `What drove the positive sentiment surge on ${new Date(a.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}? What can we do to sustain it?`
+                : a.type === 'crash'
+                  ? `Why did our sentiment score drop on ${new Date(a.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}? What caused this and how do we recover?`
+                  : `We have had sustained negative sentiment for several days. What is driving this and what actions should we take?`
             return (
-              <div key={i} className={`flex items-start gap-2.5 border rounded-lg px-3.5 py-2.5 text-sm ${colorClass}`}>
-                <Icon className="h-4 w-4 shrink-0 mt-0.5" />
-                <p>{a.message}</p>
+              <div key={i} className={`flex items-start justify-between gap-3 border rounded-lg px-3.5 py-2.5 text-sm ${colorClass}`}>
+                <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                  <Icon className="h-4 w-4 shrink-0 mt-0.5" />
+                  <p>{a.message}</p>
+                </div>
+                <Link
+                  href={`/dashboard/ask?q=${encodeURIComponent(aiQuestion)}`}
+                  className="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border border-current/20 bg-white/30 hover:bg-white/50 dark:bg-black/20 dark:hover:bg-black/30 transition-colors whitespace-nowrap"
+                >
+                  <Search className="h-3 w-3" />
+                  Find out why
+                </Link>
               </div>
             )
           })}
@@ -341,17 +358,29 @@ async function SentimentData() {
   )
 }
 
-export default function SentimentPage() {
+export default async function SentimentPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>
+}) {
+  const params = await searchParams
+  const days = Math.min(180, Math.max(7, Number(params.days ?? 84)))
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Sentiment</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Public perception · X and Instagram · 12-week view · nightly at 4 AM Lagos time
+            Public perception · X and Instagram · nightly at 4 AM Lagos time
           </p>
         </div>
-        <CrawlHistory />
+        <div className="flex items-center gap-3">
+          <Suspense fallback={null}>
+            <DateRangeFilter defaultDays={84} />
+          </Suspense>
+          <CrawlHistory />
+        </div>
       </div>
 
       <Suspense fallback={
@@ -362,7 +391,7 @@ export default function SentimentPage() {
           <Skeleton className="h-56 rounded-xl" />
         </div>
       }>
-        <SentimentData />
+        <SentimentData days={days} />
       </Suspense>
     </div>
   )

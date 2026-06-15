@@ -8,11 +8,13 @@ import { ContentTableSkeleton } from '@/components/dashboard/content-table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { FunnelChart } from './funnel-chart'
+import { SovHistoryChart } from '@/components/dashboard/sov-history-chart'
+import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 
 async function ContentData() {
   const supabase = await createClient()
 
-  const [{ data: posts }, { data: connections }, { data: competitors }, { data: sovSnap }] =
+  const [{ data: posts }, { data: connections }, { data: competitors }, { data: sovSnap }, { data: sovHistory }] =
     await Promise.all([
       supabase
         .from('social_posts')
@@ -31,6 +33,11 @@ async function ContentData() {
         .order('snapshot_date', { ascending: false })
         .limit(1)
         .maybeSingle(),
+      supabase
+        .from('sov_snapshots')
+        .select('snapshot_date,social_sov')
+        .order('snapshot_date', { ascending: true })
+        .limit(60),
     ])
 
   const competitorData = sovSnap?.competitor_data as {
@@ -44,6 +51,10 @@ async function ContentData() {
     sov_pct:            sovSnap?.social_sov                ?? null,
   }
 
+  const sovHistoryPoints = (sovHistory ?? [])
+    .filter(s => s.social_sov != null)
+    .map(s => ({ date: s.snapshot_date as string, sov_pct: s.social_sov as number }))
+
   return (
     <div className="space-y-6">
       {/* Top row */}
@@ -56,6 +67,11 @@ async function ContentData() {
           competitors={competitors ?? []}
         />
       </div>
+
+      {/* SOV history chart */}
+      {sovHistoryPoints.length >= 2 && (
+        <SovHistoryChart data={sovHistoryPoints} />
+      )}
 
       {/* Funnel breakdown charts */}
       {(posts ?? []).some(p => p.funnel_stage) && (() => {
@@ -169,9 +185,14 @@ export default async function ContentPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Owned Performance</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Your content, reach, and share of voice</p>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Owned Performance</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Your content, reach, and share of voice</p>
+        </div>
+        <Suspense fallback={null}>
+          <DateRangeFilter defaultDays={30} />
+        </Suspense>
       </div>
 
       {/* Success banner */}

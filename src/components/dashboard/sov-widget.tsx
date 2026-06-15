@@ -77,11 +77,29 @@ export function SovWidget({
 
       {/* Competitor breakdown */}
       <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Competitors tracked</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Competitor breakdown</p>
         {competitors.length === 0 ? (
-          <p className="text-xs text-muted-foreground">None added yet.</p>
+          <p className="text-xs text-muted-foreground">Add competitors below to compare your SOV.</p>
         ) : (
           <div className="space-y-2.5">
+            {/* Your brand row */}
+            {total > 0 && (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium text-foreground truncate max-w-[140px]">Your brand</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="tabular-nums text-muted-foreground text-[10px]">{sov.brand_mentions.toLocaleString()} mentions</span>
+                    <span className="tabular-nums font-semibold text-primary">{sovPct !== null ? `${sovPct.toFixed(1)}%` : '—'}</span>
+                  </div>
+                </div>
+                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-500"
+                    style={{ width: `${sovPct ?? 0}%` }}
+                  />
+                </div>
+              </div>
+            )}
             {competitors.map(c => {
               const count  = sov.competitor_mentions[c.name] ?? 0
               const pct    = total > 0 ? (count / total) * 100 : 0
@@ -90,8 +108,13 @@ export function SovWidget({
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground truncate max-w-[140px]">{c.name}</span>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      {count > 0 && (
-                        <span className="tabular-nums text-muted-foreground">{pct.toFixed(1)}%</span>
+                      {count > 0 ? (
+                        <>
+                          <span className="tabular-nums text-muted-foreground text-[10px]">{count.toLocaleString()} mentions</span>
+                          <span className="tabular-nums font-medium text-foreground/70">{pct.toFixed(1)}%</span>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground/40 text-[10px]">no data</span>
                       )}
                       <Button
                         variant="ghost" size="icon"
@@ -102,14 +125,12 @@ export function SovWidget({
                       </Button>
                     </div>
                   </div>
-                  {count > 0 && (
-                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-muted-foreground/40 rounded-full transition-all duration-500"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  )}
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-muted-foreground/40 rounded-full transition-all duration-500"
+                      style={{ width: count > 0 ? `${pct}%` : '0%' }}
+                    />
+                  </div>
                 </div>
               )
             })}
