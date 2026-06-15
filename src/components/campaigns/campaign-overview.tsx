@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { CampaignAiSummary } from './campaign-ai-summary'
 
 const OBJECTIVE_META: Record<string, { label: string; color: string }> = {
   awareness:     { label: 'Brand Awareness',  color: 'bg-blue-500' },
@@ -27,6 +28,7 @@ interface Channel {
 
 interface CampaignOverviewProps {
   campaign: {
+    id: string
     name: string
     objectives: string[]
     start_date: string | null
@@ -323,20 +325,11 @@ export function CampaignOverview({ campaign, oohSites, events }: CampaignOvervie
         </div>
       )}
 
-      {/* ── AI summary placeholder ── */}
-      <div className="border rounded-xl p-5 bg-card space-y-2">
-        <p className="text-sm font-medium">AI campaign summary</p>
-        {campaign.ai_summary ? (
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {campaign.ai_summary}
-          </p>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            AI analysis will appear here once OOH sites accumulate visit data or events start logging interactions.
-            Ask the AI Command ("How is my {campaign.name} campaign performing?") for an on-demand narrative.
-          </p>
-        )}
-      </div>
+      {/* ── AI summary ── */}
+      <CampaignAiSummary
+        campaignId={campaign.id}
+        initialSummary={campaign.ai_summary ?? null}
+      />
     </div>
   )
 }

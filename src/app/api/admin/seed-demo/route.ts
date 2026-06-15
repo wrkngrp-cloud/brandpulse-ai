@@ -392,7 +392,8 @@ export async function POST(req: NextRequest) {
   }
 
   /* ── 11. OOH sites ────────────────────────────────────────────────────── */
-  await sb.from('ooh_sites').insert([
+  // Insert active Summer Vibes (camp3) sites first — need IDs for visit logs + search uplift
+  const { data: oohSummerVibes } = await sb.from('ooh_sites').insert([
     {
       brand_id: brandId, campaign_id: camp3Id,
       site_name: 'Lekki Toll Gate Mega Billboard',
@@ -417,7 +418,43 @@ export async function POST(req: NextRequest) {
       cultural_zone: 'Lagos Mainland Mass Market',
       vanity_slug: 'jara-surulere', landing_url: 'https://jarafoods.com/summer',
       visits: 1234, qr_scan_count: 289,
+      notes: 'Mainland mass-market reach. Strong Jara Rice brand recall zone.',
     },
+    {
+      brand_id: brandId, campaign_id: camp3Id,
+      site_name: 'Transcorp Hilton LED Screen, Abuja',
+      lat: 9.0574, lng: 7.4898, city: 'Abuja', state: 'FCT',
+      format_type: 'digital_screen', illuminated: true,
+      daily_traffic: 22_000, operator: 'Ooh! Media',
+      monthly_cost: 480_000, currency: 'NGN',
+      campaign_start: dAgo(14), campaign_end: dAgo(-76),
+      cultural_zone: 'Abuja CBD Professional Zone',
+      vanity_slug: 'jara-transcorp', landing_url: 'https://jarafoods.com/summer',
+      visits: 1482, qr_scan_count: 312,
+      notes: 'Rotating 10-second slot. High C-suite and diplomat footfall in the CBD.',
+    },
+    {
+      brand_id: brandId, campaign_id: camp3Id,
+      site_name: 'Oshodi Overhead Bridge Banners',
+      lat: 6.5547, lng: 3.3500, city: 'Lagos', state: 'Lagos',
+      format_type: 'lamppost', illuminated: false,
+      daily_traffic: 110_000, operator: 'LASAA (Lagos State)',
+      monthly_cost: 180_000, currency: 'NGN',
+      campaign_start: dAgo(14), campaign_end: dAgo(-76),
+      cultural_zone: 'Lagos Mainland Mass Market',
+      vanity_slug: 'jara-oshodi', landing_url: 'https://jarafoods.com/summer',
+      visits: 3612, qr_scan_count: 941,
+      notes: 'Highest raw footfall of all Lagos placements. Mass-market audience — best performing for Jara Rice SKU.',
+    },
+  ]).select('id')
+
+  const lekkiId     = oohSummerVibes?.[0]?.id
+  const surulereId  = oohSummerVibes?.[1]?.id
+  const transcorpId = oohSummerVibes?.[2]?.id
+  const oshodiId    = oohSummerVibes?.[3]?.id
+
+  // Insert completed-campaign + standalone sites
+  await sb.from('ooh_sites').insert([
     {
       brand_id: brandId, campaign_id: camp1Id,
       site_name: 'Murtala Muhammed International Airport',
@@ -443,7 +480,85 @@ export async function POST(req: NextRequest) {
       vanity_slug: 'jara-abuja', landing_url: 'https://jarafoods.com/nourish',
       visits: 2291, qr_scan_count: 412,
     },
+    {
+      brand_id: brandId, campaign_id: null,
+      site_name: 'Zoo Road Billboard, Kano',
+      lat: 11.9944, lng: 8.5082, city: 'Kano', state: 'Kano',
+      format_type: 'billboard', illuminated: true,
+      daily_traffic: 48_000, operator: 'Prime Outdoor',
+      monthly_cost: 120_000, currency: 'NGN',
+      campaign_start: dAgo(90), campaign_end: dAgo(-30),
+      cultural_zone: 'Northern Mass Market',
+      vanity_slug: 'jara-kano', landing_url: 'https://jarafoods.com',
+      visits: 891, qr_scan_count: 198,
+      notes: 'First northern placement. Hausa creative variant live. Performance below Lagos average — consider Pidgin/Hausa copy split test.',
+    },
+    {
+      brand_id: brandId, campaign_id: null,
+      site_name: 'GRA Flyover, Port Harcourt',
+      lat: 4.8242, lng: 7.0336, city: 'Port Harcourt', state: 'Rivers',
+      format_type: 'unipole', illuminated: true,
+      daily_traffic: 31_000, operator: 'Rivers State SEMTRAC',
+      monthly_cost: 165_000, currency: 'NGN',
+      campaign_start: dAgo(60), campaign_end: dAgo(-30),
+      cultural_zone: 'South-South Oil Belt Professionals',
+      vanity_slug: 'jara-ph', landing_url: 'https://jarafoods.com',
+      visits: 1124, qr_scan_count: 267,
+      notes: 'South-South market entry. Oil-belt professional audience — good premium SKU potential.',
+    },
   ])
+
+  /* ── 11b. OOH visit logs (last 14 days, active Summer Vibes sites) ──────── */
+  const oohVisitInserts: { site_id: string; brand_id: string; visited_at: string; device_type: string; ip_region: string }[] = []
+  const visitDevices = ['mobile', 'mobile', 'mobile', 'desktop', 'tablet']
+  const visitRegions = ['Lagos', 'Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Lagos', 'Kano']
+  for (const { id: siteId, count } of [
+    { id: lekkiId,     count: 120 },
+    { id: surulereId,  count: 70  },
+    { id: transcorpId, count: 85  },
+    { id: oshodiId,    count: 140 },
+  ]) {
+    if (!siteId) continue
+    for (let i = 0; i < count; i++) {
+      oohVisitInserts.push({
+        site_id:     siteId,
+        brand_id:    brandId,
+        visited_at:  tsAgo(i % 14, 7 + (i % 15)),
+        device_type: visitDevices[i % visitDevices.length],
+        ip_region:   visitRegions[i % visitRegions.length],
+      })
+    }
+  }
+  if (oohVisitInserts.length > 0) await sb.from('ooh_visits').insert(oohVisitInserts)
+
+  /* ── 11c. OOH search uplift — Lekki site, 8 weeks of data ──────────────── */
+  if (lekkiId) {
+    const upliftInterpretations = [
+      'Early correlation emerging as campaign launches.',
+      'Moderate positive correlation — awareness building.',
+      'Positive correlation strengthening week-on-week.',
+      'Consistent uplift: OOH visits preceded search spikes by 2 days.',
+      'Strong signal — search intent rising with sustained OOH presence.',
+      'OOH halo effect confirmed. Branded search at 8-week high.',
+      'Peak correlation. Campaign driving both physical and digital brand recall.',
+      'Strong positive correlation — OOH visit spikes precede branded search increases by 2-3 days.',
+    ]
+    await sb.from('ooh_search_uplift').insert(
+      Array.from({ length: 8 }, (_, i) => {
+        const w = 7 - i
+        return {
+          brand_id:       brandId,
+          site_id:        lekkiId,
+          keyword:        'Jara Foods',
+          week_start:     dAgo(w * 7 + 6),
+          search_index:   +(52 + i * 4.8 + Math.sin(i * 1.3) * 4).toFixed(1),
+          ooh_visits:     Math.round(55 + i * 17 + (i % 3) * 12),
+          correlation:    +(0.48 + i * 0.037).toFixed(4),
+          interpretation: upliftInterpretations[i],
+        }
+      })
+    )
+  }
 
   /* ── 12. Mentions ─────────────────────────────────────────────────────── */
   const mentionData = [
@@ -611,34 +726,39 @@ export async function POST(req: NextRequest) {
   /* ── 15. Competitor sightings ─────────────────────────────────────────── */
   await sb.from('competitor_sightings').insert([
     {
-      brand_id: brandId, competitor_id: comp1Id,
-      lat: 6.4698, lng: 3.5852, observation_type: 'billboard',
-      scale: 'major', occurred_at: tsAgo(12),
-      notes: 'ChowMate mega billboard at Lekki Toll Gate, 15m wide. "Taste the Difference" creative. Directly competing with our Lekki placement.',
+      brand_id: brandId, competitor_name: 'ChowMate',
+      lat: 6.4698, lng: 3.5852, sighting_type: 'billboard',
+      city: 'Lagos', state: 'Lagos',
+      spotted_at: dAgo(12),
+      description: 'ChowMate mega billboard at Lekki Toll Gate, 15m wide. "Taste the Difference" creative. Directly competing with our Lekki placement.',
     },
     {
-      brand_id: brandId, competitor_id: comp1Id,
-      lat: 6.5055, lng: 3.3576, observation_type: 'activation',
-      scale: 'moderate', occurred_at: tsAgo(18),
-      notes: 'ChowMate pop-up sampling stand at Adeniran Ogunsanya Mall. 2 ambassadors, ~200 samples distributed.',
+      brand_id: brandId, competitor_name: 'ChowMate',
+      lat: 6.5055, lng: 3.3576, sighting_type: 'activation',
+      city: 'Lagos', state: 'Lagos',
+      spotted_at: dAgo(18),
+      description: 'ChowMate pop-up sampling stand at Adeniran Ogunsanya Mall. 2 ambassadors, ~200 samples distributed.',
     },
     {
-      brand_id: brandId, competitor_id: comp1Id,
-      lat: 9.0063, lng: 7.4631, observation_type: 'billboard',
-      scale: 'major', occurred_at: tsAgo(30),
-      notes: 'ChowMate digital screen at Abuja Airport. High-footfall location. 6-week rotation running.',
+      brand_id: brandId, competitor_name: 'ChowMate',
+      lat: 9.0063, lng: 7.4631, sighting_type: 'billboard',
+      city: 'Abuja', state: 'FCT',
+      spotted_at: dAgo(30),
+      description: 'ChowMate digital screen at Abuja Airport. High-footfall location. 6-week rotation running.',
     },
     {
-      brand_id: brandId, competitor_id: comp2Id,
-      lat: 6.4281, lng: 3.4219, observation_type: 'billboard',
-      scale: 'small', occurred_at: tsAgo(45),
-      notes: 'NutriNg Foods small format banner at Ikeja City Mall. Limited budget play.',
+      brand_id: brandId, competitor_name: 'NutriNg Foods',
+      lat: 6.4281, lng: 3.4219, sighting_type: 'billboard',
+      city: 'Lagos', state: 'Lagos',
+      spotted_at: dAgo(45),
+      description: 'NutriNg Foods small format banner at Ikeja City Mall. Limited budget play.',
     },
     {
-      brand_id: brandId, competitor_id: comp1Id,
-      lat: 6.6018, lng: 3.3515, observation_type: 'activation',
-      scale: 'moderate', occurred_at: tsAgo(7),
-      notes: 'ChowMate campus activation at UNILAG. Targeting Gen-Z. Free tasting + Spotify playlist collab. Smart cultural play — monitor closely.',
+      brand_id: brandId, competitor_name: 'ChowMate',
+      lat: 6.6018, lng: 3.3515, sighting_type: 'activation',
+      city: 'Lagos', state: 'Lagos',
+      spotted_at: dAgo(7),
+      description: 'ChowMate campus activation at UNILAG. Targeting Gen-Z. Free tasting + Spotify playlist collab. Smart cultural play — monitor closely.',
     },
   ])
 
@@ -858,7 +978,9 @@ export async function POST(req: NextRequest) {
       campaignChannels:    5,
       events:              2,
       eventInteractions:   60,
-      oohSites:            4,
+      oohSites:            8,
+      oohVisits:           415,
+      oohSearchUplift:     8,
       mentions:            mentionInserts.length,
       surveyResponses:     npsScores.length,
       npsRecords:          100,

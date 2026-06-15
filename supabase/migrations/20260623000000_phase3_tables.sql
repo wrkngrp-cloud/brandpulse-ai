@@ -32,33 +32,20 @@ create policy influencers_workspace_member on influencers
     )
   );
 
--- ── competitor_sightings ──────────────────────────────────────────────────────
-create table if not exists competitor_sightings (
-  id               uuid        primary key default gen_random_uuid(),
-  brand_id         uuid        not null references brands(id) on delete cascade,
-  competitor_name  text        not null,
-  sighting_type    text        not null
-                               check (sighting_type in ('billboard','event','digital','print','tv','radio','activation','pr')),
-  city             text,
-  state            text,
-  lat              numeric(9,6),
-  lng              numeric(9,6),
-  description      text,
-  spotted_at       date        not null default current_date,
-  created_at       timestamptz not null default now()
-);
-create index if not exists idx_sightings_brand on competitor_sightings(brand_id);
-create index if not exists idx_sightings_date  on competitor_sightings(brand_id, spotted_at desc);
+-- ── competitor_sightings: add phase-3 columns to existing table ───────────────
+-- The base table was created in initial_schema with occurred_at / observation_type / notes.
+-- The competitive module now uses competitor_name, sighting_type, city, state, description, spotted_at.
+alter table competitor_sightings
+  add column if not exists competitor_name text,
+  add column if not exists sighting_type   text
+                                           check (sighting_type is null or sighting_type in
+                                             ('billboard','event','digital','print','tv','radio','activation','pr')),
+  add column if not exists city            text,
+  add column if not exists state           text,
+  add column if not exists description     text,
+  add column if not exists spotted_at      date not null default current_date;
 
-alter table competitor_sightings enable row level security;
-create policy sightings_workspace_member on competitor_sightings
-  for all using (
-    brand_id in (
-      select b.id from brands b
-      join workspace_members wm on wm.workspace_id = b.workspace_id
-      where wm.user_id = auth.uid()
-    )
-  );
+create index if not exists idx_sightings_date on competitor_sightings(brand_id, spotted_at desc);
 
 -- ── weekly_briefings ──────────────────────────────────────────────────────────
 create table if not exists weekly_briefings (
@@ -82,24 +69,6 @@ create policy briefings_workspace_member on weekly_briefings
     )
   );
 
--- ── creative_analyses ─────────────────────────────────────────────────────────
-create table if not exists creative_analyses (
-  id               uuid        primary key default gen_random_uuid(),
-  brand_id         uuid        not null references brands(id) on delete cascade,
-  analysis_type    text        not null default 'compare'
-                               check (analysis_type in ('compare','identity','competitor')),
-  input_data       jsonb       not null default '{}'::jsonb,
-  result           jsonb       not null default '{}'::jsonb,
-  created_at       timestamptz not null default now()
-);
-create index if not exists idx_creative_brand on creative_analyses(brand_id, created_at desc);
-
-alter table creative_analyses enable row level security;
-create policy creative_analyses_workspace_member on creative_analyses
-  for all using (
-    brand_id in (
-      select b.id from brands b
-      join workspace_members wm on wm.workspace_id = b.workspace_id
-      where wm.user_id = auth.uid()
-    )
-  );
+-- ── creative_analyses: already exists in initial_schema with asset_type columns ─
+-- The phase-3 redesign (analysis_type / input_data / result) is NOT used.
+-- No-op: table is correct as-is.
