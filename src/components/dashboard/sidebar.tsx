@@ -167,7 +167,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName }: Si
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-20 hidden md:flex flex-col',
+        'fixed inset-y-0 left-0 z-40 hidden md:flex flex-col',
         'bg-sidebar border-r border-sidebar-border',
         'overflow-hidden transition-[width] duration-200 ease-out',
         /* subtle shadow when expanded as overlay (collapsed mode) */
@@ -179,7 +179,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName }: Si
     >
 
       {/* ── Logo area ──────────────────────────────────────────── */}
-      <div className="h-16 shrink-0 flex items-center gap-3 border-b border-sidebar-border/70 px-[18px]">
+      <div className="h-14 shrink-0 flex items-center gap-3 border-b border-sidebar-border/70 px-[18px]">
         <PulseMark size={32} />
 
         {/* Wordmark */}
