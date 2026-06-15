@@ -1,6 +1,7 @@
 'use client'
 
 import { useId } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -130,18 +131,20 @@ export function StatCard({
   tone = 'blue',
   icon: Icon,
   spark,
+  href,
   loading,
 }: StatCardProps) {
-  const uid   = useId()
-  const isUp  = delta != null && delta >= 0
+  const uid    = useId()
+  const isUp   = delta != null && delta >= 0
   const isDown = delta != null && delta < 0
 
-  return (
+  const inner = (
     <motion.div
       variants={fadeUp}
       className={cn(
-        'relative rounded-2xl overflow-hidden card-e2 card-hover p-5',
+        'relative rounded-2xl overflow-hidden card-e2 p-5',
         'flex flex-col gap-0',
+        href ? 'card-hover cursor-pointer' : '',
         TONE_SURFACE[tone],
       )}
     >
@@ -201,4 +204,9 @@ export function StatCard({
       )}
     </motion.div>
   )
+
+  if (href) {
+    return <Link href={href} className="block">{inner}</Link>
+  }
+  return inner
 }
