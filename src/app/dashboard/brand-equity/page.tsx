@@ -3,6 +3,7 @@ import { redirect }      from 'next/navigation'
 import { computeFullBHI, type FullBHIComponents } from '@/lib/bhi'
 import { BrandEquityClient } from './brand-equity-client'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
+import { SeedDemoPanel } from './seed-demo-panel'
 
 export const dynamic = 'force-dynamic'
 
@@ -216,6 +217,10 @@ export default async function BrandEquityPage({
         industry={brand?.industry ?? null}
         days={days}
       />
+
+      {process.env.NODE_ENV !== 'production' && (
+        <SeedDemoPanel />
+      )}
     </div>
   )
 }

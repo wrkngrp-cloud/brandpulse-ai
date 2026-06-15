@@ -10,6 +10,7 @@ import {
   LayoutDashboard, FileText, BarChart2, ClipboardList, CalendarDays,
   MapPin, Megaphone, Zap, Trophy, Filter, Award, Users, Palette, Globe,
   Plus, Settings, TrendingUp, Sparkles, Radio, Search, ArrowRight,
+  Monitor, Tv, Newspaper,
 } from 'lucide-react'
 
 // ── Nav items ──────────────────────────────────────────────────────────────
@@ -24,6 +25,10 @@ const PAGES = [
   { label: 'Campaigns',           href: '/dashboard/campaigns',         icon: Megaphone,        group: 'Campaigns'    },
   { label: 'OOH Placements',      href: '/dashboard/ooh',               icon: MapPin,           group: 'Campaigns'    },
   { label: 'Events',              href: '/dashboard/events',            icon: CalendarDays,     group: 'Campaigns'    },
+  { label: 'Digital Campaigns',   href: '/dashboard/digital',           icon: Monitor,          group: 'Campaigns'    },
+  { label: 'Radio Intelligence',  href: '/dashboard/radio',             icon: Radio,            group: 'Campaigns'    },
+  { label: 'TV Intelligence',     href: '/dashboard/tv',                icon: Tv,               group: 'Campaigns'    },
+  { label: 'Print Intelligence',  href: '/dashboard/print',             icon: Newspaper,        group: 'Campaigns'    },
   { label: 'Pre-Post Analysis',   href: '/dashboard/pre-post',          icon: Zap,              group: 'Deep Intel'   },
   { label: 'Funnel Intelligence', href: '/dashboard/funnel',            icon: Filter,           group: 'Deep Intel'   },
   { label: 'Cultural Intelligence',href: '/dashboard/cultural',         icon: Globe,            group: 'Deep Intel'   },
@@ -50,9 +55,12 @@ const ACTIONS = [
 const GROUPS = ['Intelligence', 'Campaigns', 'Deep Intel', 'Settings'] as const
 
 export function CommandPalette() {
-  const [open, setOpen] = useState(false)
-  const [query, setQuery] = useState('')
+  const [open, setOpen]       = useState(false)
+  const [query, setQuery]     = useState('')
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
+
+  useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -81,6 +89,8 @@ export function CommandPalette() {
   }, [router])
 
   const askAiHref = `/dashboard/ask?q=${encodeURIComponent(query.trim())}`
+
+  if (!mounted) return null
 
   return (
     <CommandDialog open={open} onOpenChange={v => { setOpen(v); if (!v) setQuery('') }}>

@@ -8,6 +8,7 @@ import {
   LayoutDashboard, FileText, BarChart2, ClipboardList, Sparkles,
   CalendarDays, MapPin, Megaphone, Zap, Trophy, ChevronDown,
   Monitor, Radio, Tv, Newspaper, Filter, Award, Users, Palette, Globe,
+  Target, FileSearch,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -21,7 +22,7 @@ const INTELLIGENCE = [
   { label: 'Surveys',      href: '/dashboard/surveys',      icon: ClipboardList   },
 ]
 
-const CAMPAIGN_PATHS = ['/dashboard/campaigns', '/dashboard/ooh', '/dashboard/events']
+const CAMPAIGN_PATHS = ['/dashboard/campaigns', '/dashboard/ooh', '/dashboard/events', '/dashboard/digital', '/dashboard/radio', '/dashboard/tv', '/dashboard/print']
 
 const CAMPAIGN_SUB = [
   { label: 'All Campaigns',  href: '/dashboard/campaigns', icon: Megaphone    },
@@ -29,20 +30,22 @@ const CAMPAIGN_SUB = [
   { label: 'Events',         href: '/dashboard/events',    icon: CalendarDays },
 ]
 
-const CAMPAIGN_SOON = [
-  { label: 'Digital', icon: Monitor   },
-  { label: 'Radio',   icon: Radio     },
-  { label: 'TV',      icon: Tv        },
-  { label: 'Print',   icon: Newspaper },
+const CAMPAIGN_PAID = [
+  { label: 'Digital', href: '/dashboard/digital', icon: Monitor   },
+  { label: 'Radio',   href: '/dashboard/radio',   icon: Radio     },
+  { label: 'TV',      href: '/dashboard/tv',      icon: Tv        },
+  { label: 'Print',   href: '/dashboard/print',   icon: Newspaper },
 ]
 
 const DEEP_INTEL = [
-  { label: 'Pre-Post',    href: '/dashboard/pre-post',    icon: Zap     },
-  { label: 'Funnel',      href: '/dashboard/funnel',      icon: Filter  },
-  { label: 'Cultural',    href: '/dashboard/cultural',    icon: Globe   },
-  { label: 'Competitive', href: '/dashboard/competitive', icon: Trophy  },
-  { label: 'Creative',    href: '/dashboard/creative',    icon: Palette },
-  { label: 'Influencers', href: '/dashboard/influencers', icon: Users   },
+  { label: 'Pre-Post',    href: '/dashboard/pre-post',    icon: Zap        },
+  { label: 'Funnel',      href: '/dashboard/funnel',      icon: Filter     },
+  { label: 'Cultural',    href: '/dashboard/cultural',    icon: Globe      },
+  { label: 'Competitive', href: '/dashboard/competitive', icon: Trophy     },
+  { label: 'Creative',    href: '/dashboard/creative',    icon: Palette    },
+  { label: 'Influencers', href: '/dashboard/influencers', icon: Users      },
+  { label: 'Geo-Lift',    href: '/dashboard/geo-lift',    icon: Target     },
+  { label: 'PR Tracking', href: '/dashboard/pr',          icon: FileSearch },
 ]
 
 // ── Primitives ─────────────────────────────────────────────────────────────
@@ -178,18 +181,24 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
             })}
 
             <div className="pt-1.5 border-t border-sidebar-border/30 mt-0.5 flex flex-col gap-0.5">
-              {CAMPAIGN_SOON.map(({ label, icon: Icon }) => (
-                <span
-                  key={label}
-                  className="flex items-center gap-2 h-8 px-2.5 rounded-lg text-[12.5px] text-sidebar-foreground/22 cursor-not-allowed select-none"
-                >
-                  <Icon className="h-3.5 w-3.5 shrink-0 opacity-50" />
-                  {label}
-                  <span className="ml-auto text-[9px] font-semibold tracking-wide border border-sidebar-border/35 rounded px-1.5 py-px text-sidebar-foreground/30">
-                    Soon
-                  </span>
-                </span>
-              ))}
+              {CAMPAIGN_PAID.map(({ label, href, icon: Icon }) => {
+                const active = pathname.startsWith(href)
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      'flex items-center gap-2 h-8 px-2.5 rounded-lg text-[12.5px] font-medium transition-colors duration-150',
+                      active
+                        ? 'text-primary bg-primary/10'
+                        : 'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+                    )}
+                  >
+                    <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                    {label}
+                  </Link>
+                )
+              })}
             </div>
           </div>
         )}

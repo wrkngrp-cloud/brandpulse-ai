@@ -220,6 +220,7 @@ export function OverviewClient({
           icon={Activity}
           spark={bhiSpark.length > 1 ? bhiSpark : undefined}
           deltaLabel={`${rl.toLowerCase()} trend`}
+          href="/dashboard/brand-equity"
         />
         <StatCard
           label="Sentiment Score"
@@ -228,6 +229,7 @@ export function OverviewClient({
           tone={sentiment && sentiment.social_score >= 60 ? 'green' : sentiment && sentiment.social_score <= 40 ? 'clay' : 'amber'}
           icon={BarChart2}
           deltaLabel={sentiment ? `from ${fmtDate(sentiment.day)}` : undefined}
+          href="/dashboard/sentiment"
         />
         <StatCard
           label="Share of Voice"
@@ -236,6 +238,7 @@ export function OverviewClient({
           tone="violet"
           icon={Radio}
           deltaLabel={sovDate ? `as of ${fmtDate(sovDate)}` : undefined}
+          href="/dashboard/content"
         />
         <StatCard
           label="Recent Mentions"
@@ -243,6 +246,7 @@ export function OverviewClient({
           tone="amber"
           icon={MessageSquare}
           deltaLabel="last 7 days"
+          href="/dashboard/sentiment"
         />
       </motion.div>
 

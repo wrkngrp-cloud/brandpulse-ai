@@ -55,6 +55,12 @@ export function AmbassadorList({ eventId, ambassadors, appUrl }: Props) {
     window.location.reload()
   }
 
+  const DEMO_AMBASSADORS = [
+    { id: 'demo-1', name: 'Chiamaka Obi', role: 'Brand Ambassador', interactions: 45, leads: 12, conversions: 3, status: 'Active' as const },
+    { id: 'demo-2', name: 'Seun Adeyemi', role: 'Brand Ambassador', interactions: 23, leads: 8, conversions: 2, status: 'On break' as const },
+    { id: 'demo-3', name: 'Babatunde Lawal', role: 'Brand Ambassador', interactions: 67, leads: 19, conversions: 5, status: 'Active' as const },
+  ]
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -64,6 +70,46 @@ export function AmbassadorList({ eventId, ambassadors, appUrl }: Props) {
           Add
         </Button>
       </div>
+
+      {/* Demo mode when no real ambassadors */}
+      {list.length === 0 && (
+        <div className="space-y-3">
+          <div className="border rounded-xl px-4 py-3 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 text-xs">
+            Demo data — add ambassadors using the + button above
+          </div>
+          {DEMO_AMBASSADORS.map(amb => (
+            <div key={amb.id} className="border rounded-xl p-4 bg-card space-y-3 opacity-80">
+              <div className="flex items-start justify-between gap-2">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium">{amb.name}</p>
+                  <p className="text-xs text-muted-foreground">{amb.role}</p>
+                </div>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                  amb.status === 'Active'
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                }`}>
+                  {amb.status}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-3 pt-1 border-t">
+                <div className="space-y-0.5">
+                  <p className="text-xs text-muted-foreground">Interactions</p>
+                  <p className="text-sm font-semibold">{amb.interactions}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-xs text-muted-foreground">Leads</p>
+                  <p className="text-sm font-semibold">{amb.leads}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-xs text-muted-foreground">Conversions</p>
+                  <p className="text-sm font-semibold">{amb.conversions}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {list.map(amb => {
         const url = sessionUrl(amb.session_token)

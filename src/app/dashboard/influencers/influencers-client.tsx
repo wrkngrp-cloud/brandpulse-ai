@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import {
   Users, Star, AlertCircle, TrendingUp, Loader2,
-  Plus, X, Globe, ChevronDown,
+  Plus, X, Globe, ChevronDown, DollarSign, Eye,
+  MousePointerClick, Megaphone, Filter,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { CampaignConversionsChart } from './campaign-conversions-chart'
 
 export interface Influencer {
   id: string
@@ -218,13 +220,154 @@ interface SocialEntry {
   platform: Platform | ''
 }
 
+// ── Campaign tab types & data ───────────────────────────────────────────────
+
+type CampaignStatus = 'Active' | 'Completed' | 'Paused'
+
+interface CampaignRecord {
+  influencerId: string        // links to Influencer.id (or demo placeholder)
+  influencerName: string
+  handle: string
+  platform: string
+  niche: string
+  campaignName: string
+  status: CampaignStatus
+  reach: number
+  engagements: number
+  conversions: number
+  costNGN: number            // in Naira
+  emvNGN: number             // Earned Media Value in Naira
+  attributionWindow: string
+}
+
+const DEMO_CAMPAIGNS: CampaignRecord[] = [
+  {
+    influencerId: 'demo-1',
+    influencerName: 'Tunde Fashola Jr.',
+    handle: '@tundefashola_',
+    platform: 'Instagram',
+    niche: 'Afrobeats & Lifestyle',
+    campaignName: 'Ramadan 2025',
+    status: 'Completed',
+    reach: 820000,
+    engagements: 47200,
+    conversions: 412,
+    costNGN: 280000,
+    emvNGN: 1400000,
+    attributionWindow: '14-day last touch',
+  },
+  {
+    influencerId: 'demo-2',
+    influencerName: 'Adaeze Obi',
+    handle: '@adaezeobi',
+    platform: 'TikTok',
+    niche: 'Fashion & Beauty',
+    campaignName: 'Q2 Awareness Push',
+    status: 'Active',
+    reach: 560000,
+    engagements: 38100,
+    conversions: 298,
+    costNGN: 180000,
+    emvNGN: 920000,
+    attributionWindow: '14-day last touch',
+  },
+  {
+    influencerId: 'demo-3',
+    influencerName: 'Emeka Tech',
+    handle: '@emekatech_ng',
+    platform: 'YouTube',
+    niche: 'Tech Reviews',
+    campaignName: 'Product Launch',
+    status: 'Active',
+    reach: 430000,
+    engagements: 22600,
+    conversions: 310,
+    costNGN: 220000,
+    emvNGN: 1100000,
+    attributionWindow: '14-day last touch',
+  },
+  {
+    influencerId: 'demo-4',
+    influencerName: 'Chef Ngozi',
+    handle: '@chefngozi',
+    platform: 'Instagram',
+    niche: 'Food & Culture',
+    campaignName: 'Ramadan 2025',
+    status: 'Completed',
+    reach: 310000,
+    engagements: 19400,
+    conversions: 155,
+    costNGN: 110000,
+    emvNGN: 540000,
+    attributionWindow: '14-day last touch',
+  },
+  {
+    influencerId: 'demo-5',
+    influencerName: 'DJ Spinall Lagos',
+    handle: '@djspinallng',
+    platform: 'Twitter',
+    niche: 'Music & Entertainment',
+    campaignName: 'Q2 Awareness Push',
+    status: 'Paused',
+    reach: 180000,
+    engagements: 9800,
+    conversions: 65,
+    costNGN: 60000,
+    emvNGN: 240000,
+    attributionWindow: '14-day last touch',
+  },
+]
+
+function formatNGN(n: number): string {
+  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `₦${(n / 1_000).toFixed(0)}K`
+  return `₦${n.toLocaleString()}`
+}
+
+function formatCount(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
+  return String(n)
+}
+
+function CampaignStatusBadge({ status }: { status: CampaignStatus }) {
+  const map: Record<CampaignStatus, string> = {
+    Active:    'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    Completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    Paused:    'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+  }
+  return (
+    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', map[status])}>
+      {status}
+    </span>
+  )
+}
+
+function ConversionRatePill({ rate }: { rate: number }) {
+  const color = rate >= 3
+    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+    : rate >= 1.5
+    ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+  return (
+    <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold', color)}>
+      {rate.toFixed(1)}% CVR
+    </span>
+  )
+}
+
 export function InfluencersClient({ brandId, brandName, initialInfluencers }: Props) {
+  const [activeTab, setActiveTab] = useState<'intelligence' | 'campaigns'>('intelligence')
   const [influencers, setInfluencers] = useState<Influencer[]>(initialInfluencers)
   const [showForm, setShowForm] = useState(false)
   const [scoringId, setScoringId] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [analysing, setAnalysing] = useState(false)
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null)
+
+  // Campaign filters
+  const [campaignFilter, setCampaignFilter] = useState<string>('all')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
 
   // Form state
   const [name, setName] = useState('')
@@ -375,6 +518,35 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers }: Pr
   const _ = brandId // used by parent for RLS context
   void brandName
 
+  // Build campaign data: use real influencers if available, else use DEMO_CAMPAIGNS
+  const campaignData: CampaignRecord[] = influencers.length > 0
+    ? DEMO_CAMPAIGNS.map((c, i) => {
+        const inf = influencers[i % influencers.length]
+        return {
+          ...c,
+          influencerId: inf.id,
+          influencerName: inf.name,
+          handle: `@${inf.handle.replace(/^@/, '')}`,
+          platform: toTitleCase(inf.platform),
+        }
+      })
+    : DEMO_CAMPAIGNS
+
+  const uniqueCampaigns = Array.from(new Set(campaignData.map(c => c.campaignName)))
+
+  const filteredCampaigns = campaignData.filter(c => {
+    const matchesCampaign = campaignFilter === 'all' || c.campaignName === campaignFilter
+    const matchesStatus   = statusFilter === 'all' || c.status === statusFilter
+    return matchesCampaign && matchesStatus
+  })
+
+  // Summary stats
+  const totalSpend = campaignData.reduce((s, c) => s + c.costNGN, 0)
+  const totalReach = campaignData.reduce((s, c) => s + c.reach, 0)
+  const totalConversions = campaignData.reduce((s, c) => s + c.conversions, 0)
+  const totalEMV = campaignData.reduce((s, c) => s + c.emvNGN, 0)
+  const blendedCVR = totalReach > 0 ? (totalConversions / totalReach) * 100 : 0
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -385,171 +557,402 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers }: Pr
             Discover, score, and track creators for your brand.
           </p>
         </div>
-        <Button
-          size="sm"
-          onClick={() => { setShowForm(v => !v); if (showForm) resetForm() }}
-          variant={showForm ? 'outline' : 'default'}
-          className="shrink-0"
-        >
-          {showForm ? (
-            <><X className="h-4 w-4 mr-1.5" /> Cancel</>
-          ) : (
-            <><Plus className="h-4 w-4 mr-1.5" /> Add influencer</>
-          )}
-        </Button>
+        {activeTab === 'intelligence' && (
+          <Button
+            size="sm"
+            onClick={() => { setShowForm(v => !v); if (showForm) resetForm() }}
+            variant={showForm ? 'outline' : 'default'}
+            className="shrink-0"
+          >
+            {showForm ? (
+              <><X className="h-4 w-4 mr-1.5" /> Cancel</>
+            ) : (
+              <><Plus className="h-4 w-4 mr-1.5" /> Add influencer</>
+            )}
+          </Button>
+        )}
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Tabs */}
+      <div className="flex gap-1 border-b">
+        <button
+          onClick={() => setActiveTab('intelligence')}
+          className={cn(
+            'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+            activeTab === 'intelligence'
+              ? 'border-primary text-foreground'
+              : 'border-transparent text-muted-foreground hover:text-foreground',
+          )}
+        >
+          <span className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5" />Intelligence</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('campaigns')}
+          className={cn(
+            'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+            activeTab === 'campaigns'
+              ? 'border-primary text-foreground'
+              : 'border-transparent text-muted-foreground hover:text-foreground',
+          )}
+        >
+          <span className="flex items-center gap-1.5"><Megaphone className="h-3.5 w-3.5" />Campaigns</span>
+        </button>
+      </div>
+
+      {/* ── Intelligence Tab ── */}
+      {activeTab === 'intelligence' && (
+        <>
+          {/* Stats row */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="border rounded-xl p-4 bg-card space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Users className="h-4 w-4" />
+                <span className="text-xs font-medium">Total</span>
+              </div>
+              <p className="text-2xl font-bold">{total}</p>
+            </div>
+            <div className="border rounded-xl p-4 bg-card space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-xs font-medium">Active</span>
+              </div>
+              <p className="text-2xl font-bold">{activeCount}</p>
+            </div>
+            <div className="border rounded-xl p-4 bg-card space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Star className="h-4 w-4" />
+                <span className="text-xs font-medium">Avg Cultural IQ</span>
+              </div>
+              <p className="text-2xl font-bold">{avgCulturalIQ !== null ? avgCulturalIQ : '—'}</p>
+            </div>
+            <div className="border rounded-xl p-4 bg-card space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <AlertCircle className="h-4 w-4" />
+                <span className="text-xs font-medium">High risk</span>
+              </div>
+              <p className="text-2xl font-bold">{highRiskCount}</p>
+            </div>
+          </div>
+
+          {/* Add influencer form */}
+          {showForm && (
+            <div className="border rounded-xl p-5 bg-card space-y-5">
+              <h2 className="text-sm font-semibold">Add influencer</h2>
+
+              {/* Social profile inputs */}
+              <div className="space-y-3">
+                <Label>Social profiles</Label>
+                {entries.map((entry, i) => (
+                  <div key={i} className="flex gap-2 items-center">
+                    <Input
+                      placeholder="instagram.com/handle or @handle"
+                      value={entry.input}
+                      onChange={e => updateEntry(i, 'input', e.target.value)}
+                      className="flex-1"
+                    />
+                    <Select
+                      value={entry.platform}
+                      onValueChange={v => updateEntry(i, 'platform', v ?? '')}
+                    >
+                      <SelectTrigger className="w-[130px] shrink-0">
+                        <SelectValue placeholder="Platform">
+                          {entry.platform ? toTitleCase(entry.platform) : <span className="text-muted-foreground flex items-center gap-1">Platform <ChevronDown className="h-3 w-3" /></span>}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PLATFORMS.map(p => (
+                          <SelectItem key={p} value={p}>{toTitleCase(p)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {entries.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
+                        onClick={() => removeEntry(i)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button type="button" variant="ghost" size="sm" onClick={addEntry} className="text-xs h-7 px-2">
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Add another platform
+                </Button>
+              </div>
+
+              {/* Analyse button */}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAnalyse}
+                disabled={analysing}
+                className="w-full"
+              >
+                {analysing && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+                {analysing ? 'Analysing...' : 'Analyse Profile'}
+              </Button>
+
+              {/* Analysis preview */}
+              {analysis && <AnalysisPreview analysis={analysis} />}
+
+              {/* Name input */}
+              <div className="space-y-1.5">
+                <Label htmlFor="inf-name">Name</Label>
+                <Input
+                  id="inf-name"
+                  placeholder="Creator name"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                />
+              </div>
+
+              {/* Save button */}
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={submitting}
+                  onClick={handleSave}
+                >
+                  {submitting && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+                  {submitting ? 'Saving...' : 'Save Influencer'}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Influencer list */}
+          {influencers.length === 0 ? (
+            <div className="border rounded-xl p-12 text-center space-y-3">
+              <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mx-auto">
+                <Users className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="font-medium text-sm">No influencers yet</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Add your first creator to get started.
+                </p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => setShowForm(true)}>
+                <Plus className="h-4 w-4 mr-1.5" /> Add influencer
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {influencers.map(inf => (
+                <InfluencerCard
+                  key={inf.id}
+                  inf={inf}
+                  scoringId={scoringId}
+                  onScore={handleScore}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── Campaigns Tab ── */}
+      {activeTab === 'campaigns' && (
+        <CampaignsTab
+          campaigns={filteredCampaigns}
+          allCampaigns={campaignData}
+          uniqueCampaigns={uniqueCampaigns}
+          campaignFilter={campaignFilter}
+          statusFilter={statusFilter}
+          onCampaignFilter={(v) => setCampaignFilter(v ?? 'all')}
+          onStatusFilter={(v) => setStatusFilter(v ?? 'all')}
+          totalSpend={totalSpend}
+          totalReach={totalReach}
+          totalConversions={totalConversions}
+          blendedCVR={blendedCVR}
+          totalEMV={totalEMV}
+        />
+      )}
+    </div>
+  )
+}
+
+// ── Campaigns Tab Component ────────────────────────────────────────────────
+
+function CampaignsTab({
+  campaigns,
+  uniqueCampaigns,
+  campaignFilter,
+  statusFilter,
+  onCampaignFilter,
+  onStatusFilter,
+  totalSpend,
+  totalReach,
+  totalConversions,
+  blendedCVR,
+  totalEMV,
+}: {
+  campaigns: CampaignRecord[]
+  allCampaigns: CampaignRecord[]
+  uniqueCampaigns: string[]
+  campaignFilter: string
+  statusFilter: string
+  onCampaignFilter: (v: string) => void
+  onStatusFilter: (v: string) => void
+  totalSpend: number
+  totalReach: number
+  totalConversions: number
+  blendedCVR: number
+  totalEMV: number
+}) {
+  return (
+    <div className="space-y-6">
+      {/* Performance summary row */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <div className="border rounded-xl p-4 bg-card space-y-1">
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Users className="h-4 w-4" />
-            <span className="text-xs font-medium">Total</span>
+            <DollarSign className="h-4 w-4" />
+            <span className="text-xs font-medium">Total Spend</span>
           </div>
-          <p className="text-2xl font-bold">{total}</p>
+          <p className="text-xl font-bold">{formatNGN(totalSpend)}</p>
+        </div>
+        <div className="border rounded-xl p-4 bg-card space-y-1">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Eye className="h-4 w-4" />
+            <span className="text-xs font-medium">Total Reach</span>
+          </div>
+          <p className="text-xl font-bold">{formatCount(totalReach)}</p>
+        </div>
+        <div className="border rounded-xl p-4 bg-card space-y-1">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <MousePointerClick className="h-4 w-4" />
+            <span className="text-xs font-medium">Conversions</span>
+          </div>
+          <p className="text-xl font-bold">{totalConversions.toLocaleString()}</p>
         </div>
         <div className="border rounded-xl p-4 bg-card space-y-1">
           <div className="flex items-center gap-2 text-muted-foreground">
             <TrendingUp className="h-4 w-4" />
-            <span className="text-xs font-medium">Active</span>
+            <span className="text-xs font-medium">Blended CVR</span>
           </div>
-          <p className="text-2xl font-bold">{activeCount}</p>
+          <p className="text-xl font-bold">{blendedCVR.toFixed(1)}%</p>
         </div>
-        <div className="border rounded-xl p-4 bg-card space-y-1">
+        <div className="border rounded-xl p-4 bg-card space-y-1 col-span-2 sm:col-span-1">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Star className="h-4 w-4" />
-            <span className="text-xs font-medium">Avg Cultural IQ</span>
+            <span className="text-xs font-medium">Total EMV</span>
           </div>
-          <p className="text-2xl font-bold">{avgCulturalIQ !== null ? avgCulturalIQ : '—'}</p>
-        </div>
-        <div className="border rounded-xl p-4 bg-card space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <AlertCircle className="h-4 w-4" />
-            <span className="text-xs font-medium">High risk</span>
-          </div>
-          <p className="text-2xl font-bold">{highRiskCount}</p>
+          <p className="text-xl font-bold">{formatNGN(totalEMV)}</p>
         </div>
       </div>
 
-      {/* Add influencer form */}
-      {showForm && (
-        <div className="border rounded-xl p-5 bg-card space-y-5">
-          <h2 className="text-sm font-semibold">Add influencer</h2>
+      {/* Trend chart */}
+      <div className="border rounded-xl p-5 bg-card space-y-3">
+        <div>
+          <p className="text-sm font-semibold">Weekly Conversions from Influencers</p>
+          <p className="text-xs text-muted-foreground">8-week rolling window across all campaigns</p>
+        </div>
+        <CampaignConversionsChart />
+      </div>
 
-          {/* Social profile inputs */}
+      {/* Influencer Campaign Tracker */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h2 className="text-sm font-semibold">Influencer Campaign Tracker</h2>
+          <div className="flex items-center gap-2">
+            <Filter className="h-3.5 w-3.5 text-muted-foreground" />
+            <Select value={campaignFilter} onValueChange={v => v && onCampaignFilter(v)}>
+              <SelectTrigger className="h-8 text-xs w-[160px]">
+                <SelectValue placeholder="All Campaigns" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Campaigns</SelectItem>
+                {uniqueCampaigns.map(c => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={v => v && onStatusFilter(v)}>
+              <SelectTrigger className="h-8 text-xs w-[120px]">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Completed">Completed</SelectItem>
+                <SelectItem value="Paused">Paused</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {campaigns.length === 0 ? (
+          <div className="border rounded-xl p-8 text-center">
+            <p className="text-sm text-muted-foreground">No campaigns match the selected filters.</p>
+          </div>
+        ) : (
           <div className="space-y-3">
-            <Label>Social profiles</Label>
-            {entries.map((entry, i) => (
-              <div key={i} className="flex gap-2 items-center">
-                <Input
-                  placeholder="instagram.com/handle or @handle"
-                  value={entry.input}
-                  onChange={e => updateEntry(i, 'input', e.target.value)}
-                  className="flex-1"
-                />
-                <Select
-                  value={entry.platform}
-                  onValueChange={v => updateEntry(i, 'platform', v ?? '')}
-                >
-                  <SelectTrigger className="w-[130px] shrink-0">
-                    <SelectValue placeholder="Platform">
-                      {entry.platform ? toTitleCase(entry.platform) : <span className="text-muted-foreground flex items-center gap-1">Platform <ChevronDown className="h-3 w-3" /></span>}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PLATFORMS.map(p => (
-                      <SelectItem key={p} value={p}>{toTitleCase(p)}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {entries.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
-                    onClick={() => removeEntry(i)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button type="button" variant="ghost" size="sm" onClick={addEntry} className="text-xs h-7 px-2">
-              <Plus className="h-3.5 w-3.5 mr-1" /> Add another platform
-            </Button>
-          </div>
+            {campaigns.map((c, i) => {
+              const cvr = c.reach > 0 ? (c.conversions / c.reach) * 100 : 0
+              return (
+                <div key={`${c.influencerId}-${c.campaignName}-${i}`} className="border rounded-xl p-4 bg-card space-y-3">
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-sm">{c.influencerName}</span>
+                        <span className="text-xs text-muted-foreground">{c.handle}</span>
+                        <span className="text-xs bg-muted px-1.5 py-0.5 rounded font-medium">{c.platform}</span>
+                        <span className="text-xs text-muted-foreground">{c.niche}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Campaign: <span className="font-medium text-foreground">{c.campaignName}</span>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CampaignStatusBadge status={c.status} />
+                      <ConversionRatePill rate={cvr} />
+                    </div>
+                  </div>
 
-          {/* Analyse button */}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleAnalyse}
-            disabled={analysing}
-            className="w-full"
-          >
-            {analysing && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-            {analysing ? 'Analysing...' : 'Analyse Profile'}
-          </Button>
+                  {/* Metrics grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="space-y-0.5">
+                      <p className="text-xs text-muted-foreground">Reach</p>
+                      <p className="text-sm font-semibold">{formatCount(c.reach)}</p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-xs text-muted-foreground">Engagements</p>
+                      <p className="text-sm font-semibold">{formatCount(c.engagements)}</p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-xs text-muted-foreground">Conversions</p>
+                      <p className="text-sm font-semibold">{c.conversions.toLocaleString()}</p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-xs text-muted-foreground">Cost</p>
+                      <p className="text-sm font-semibold">{formatNGN(c.costNGN)}</p>
+                    </div>
+                  </div>
 
-          {/* Analysis preview */}
-          {analysis && <AnalysisPreview analysis={analysis} />}
-
-          {/* Name input */}
-          <div className="space-y-1.5">
-            <Label htmlFor="inf-name">Name</Label>
-            <Input
-              id="inf-name"
-              placeholder="Creator name"
-              value={name}
-              onChange={e => setName(e.target.value)}
-            />
+                  <div className="flex items-center justify-between gap-3 pt-1 border-t flex-wrap">
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs text-muted-foreground">
+                        EMV: <span className="font-semibold text-foreground">{formatNGN(c.emvNGN)}</span>
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        Attribution: <span className="font-medium text-foreground">{c.attributionWindow}</span>
+                      </span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      CPConv: <span className="font-medium text-foreground">{c.conversions > 0 ? formatNGN(Math.round(c.costNGN / c.conversions)) : '—'}</span>
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
           </div>
-
-          {/* Save button */}
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              size="sm"
-              disabled={submitting}
-              onClick={handleSave}
-            >
-              {submitting && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-              {submitting ? 'Saving...' : 'Save Influencer'}
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Influencer list */}
-      {influencers.length === 0 ? (
-        <div className="border rounded-xl p-12 text-center space-y-3">
-          <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mx-auto">
-            <Users className="h-6 w-6 text-muted-foreground" />
-          </div>
-          <div>
-            <p className="font-medium text-sm">No influencers yet</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Add your first creator to get started.
-            </p>
-          </div>
-          <Button size="sm" variant="outline" onClick={() => setShowForm(true)}>
-            <Plus className="h-4 w-4 mr-1.5" /> Add influencer
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {influencers.map(inf => (
-            <InfluencerCard
-              key={inf.id}
-              inf={inf}
-              scoringId={scoringId}
-              onScore={handleScore}
-            />
-          ))}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
