@@ -1,7 +1,9 @@
 import { createClient }  from '@/lib/supabase/server'
 import { redirect }      from 'next/navigation'
+import { Suspense }      from 'react'
 import { computeFullBHI, type FullBHIComponents } from '@/lib/bhi'
 import { BrandEquityClient } from './brand-equity-client'
+import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,13 +11,22 @@ const NGN_CPM_BENCHMARK = 500    // ₦ per 1,000 impressions (organic social)
 const NGN_CPE_BENCHMARK = 50     // ₦ per engagement
 const EMV_SCALE_MAX     = 10_000_000  // ₦10M EMV → score 100
 
-export default async function BrandEquityPage() {
+export default async function BrandEquityPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>
+}) {
+  const params = await searchParams
+  const days = Math.min(180, Math.max(7, Number(params.days ?? 30)))
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const fourteenDaysAgo = new Date()
-  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14)
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - days)
+  const cutoffDate = cutoff.toISOString().split('T')[0]
+  const cutoffISO  = cutoff.toISOString()
 
   const [
     { data: sentDays },
@@ -29,7 +40,7 @@ export default async function BrandEquityPage() {
     supabase
       .from('sentiment_daily')
       .select('social_score, day')
-      .gte('day', fourteenDaysAgo.toISOString().split('T')[0])
+      .gte('day', cutoffDate)
       .order('day', { ascending: false }),
     supabase
       .from('sov_snapshots')
@@ -48,7 +59,7 @@ export default async function BrandEquityPage() {
     supabase
       .from('social_posts')
       .select('impressions, reach, likes, comments, shares')
-      .gte('posted_at', fourteenDaysAgo.toISOString()),
+      .gte('posted_at', cutoffISO),
     supabase
       .from('brands')
       .select('name, industry')
@@ -58,7 +69,7 @@ export default async function BrandEquityPage() {
       .from('sentiment_daily')
       .select('social_score, day')
       .order('day', { ascending: false })
-      .limit(30),
+      .limit(days),
   ])
 
   // ── 1. Awareness (20%) — SOV %
@@ -175,7 +186,7 @@ export default async function BrandEquityPage() {
     ? Math.round(((promoters - detractors) / npsScores.length) * 100)
     : null
 
-  // ── BHI history sparkline (30 days)
+  // ── BHI history sparkline
   const sparkline = (bhiHistory ?? [])
     .filter(d => d.social_score != null)
     .reverse()
@@ -183,12 +194,17 @@ export default async function BrandEquityPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">Brand Equity Tracker</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Full 7-component Brand Health Index, ESOV engine, and perception analysis for{' '}
-          {brand?.name ?? 'your brand'}.
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-xl font-semibold">Brand Equity Tracker</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Full 7-component Brand Health Index, ESOV engine, and perception analysis for{' '}
+            {brand?.name ?? 'your brand'}.
+          </p>
+        </div>
+        <Suspense fallback={null}>
+          <DateRangeFilter defaultDays={30} />
+        </Suspense>
       </div>
 
       <BrandEquityClient
@@ -201,6 +217,7 @@ export default async function BrandEquityPage() {
         perceptionDimensions={dimensionAvgs}
         brandName={brand?.name ?? 'your brand'}
         industry={brand?.industry ?? null}
+        days={days}
       />
     </div>
   )

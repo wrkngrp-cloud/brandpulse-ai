@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { BHIGauge } from '@/components/dashboard/bhi-gauge'
 import { cn } from '@/lib/utils'
 import { computeFullBHI, ZONE_META, type FullBHIComponents, type FullBHIResult, type BHIZone } from '@/lib/bhi'
+import { rangeLabelShort, rangeLabelLong } from '@/lib/range-label'
 
 interface PerceptionDimension {
   dimension: string
@@ -26,6 +27,7 @@ interface Props {
   perceptionDimensions: PerceptionDimension[]
   brandName:            string
   industry:             string | null
+  days?:                number
 }
 
 const COMPONENT_META: {
@@ -65,10 +67,12 @@ function formatNGN(n: number): string {
 }
 
 export function BrandEquityClient({
-  bhi, sparkline, sovPct, currentNps, npsTotal, emvRaw, perceptionDimensions, brandName,
+  bhi, sparkline, sovPct, currentNps, npsTotal, emvRaw, perceptionDimensions, brandName, days = 30,
 }: Props) {
-  const [marketShare, setMarketShare] = useState<number>(5)   // user-entered %
-  const [targetEsov,  setTargetEsov]  = useState<number>(10)  // target ESOV %
+  const [marketShare, setMarketShare] = useState<number>(5)
+  const [targetEsov,  setTargetEsov]  = useState<number>(10)
+  const rlShort = rangeLabelShort(days)
+  const rlLong  = rangeLabelLong(days)
 
   const esov = sovPct != null ? Number((sovPct - marketShare).toFixed(1)) : null
   const posture = esov != null ? ESOV_POSTURE(esov) : null
@@ -125,7 +129,7 @@ export function BrandEquityClient({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {/* Gauge */}
           <div className="sm:col-span-1">
-            <BHIGauge bhi={gaugeProps} sparkline={sparkline} />
+            <BHIGauge bhi={gaugeProps} sparkline={sparkline} trendLabel={rlLong} />
           </div>
 
           {/* Component breakdown */}
@@ -211,12 +215,12 @@ export function BrandEquityClient({
         </div>
       </div>
 
-      {/* BHI 30-day trend with tooltips */}
+      {/* BHI trend chart with tooltips */}
       {sparkline.length > 1 && (
         <div className="border rounded-xl p-5 bg-card space-y-3">
           <div>
             <p className="text-sm font-semibold">Brand Health Trend</p>
-            <p className="text-xs text-muted-foreground">30-day history — hover data points for details</p>
+            <p className="text-xs text-muted-foreground">{rlShort} history — hover data points for details</p>
           </div>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={sparkline} margin={{ top: 4, right: 8, left: -28, bottom: 0 }}>
@@ -427,7 +431,7 @@ export function BrandEquityClient({
           <p className="text-sm font-semibold">Estimated Media Value</p>
           <p className="text-3xl font-bold">{emvRaw > 0 ? formatNGN(emvRaw) : '—'}</p>
           <p className="text-xs text-muted-foreground">
-            Last 14 days · based on organic social impressions, reach, and engagements
+            {rlShort} · based on organic social impressions, reach, and engagements
             using Nigerian market CPM (₦500/K) and CPE (₦50) benchmarks.
           </p>
           <p className="text-[10px] text-muted-foreground/60">

@@ -8,12 +8,14 @@ import {
   Plus, ArrowRight, Zap, ArrowUpRight, Activity,
   BarChart2, Radio, MessageSquare,
 } from 'lucide-react'
-import { BHIGauge }   from '@/components/dashboard/bhi-gauge'
-import { StatCard }   from '@/components/dashboard/stat-card'
-import { TrendChart } from '@/components/dashboard/trend-chart'
-import { cn }         from '@/lib/utils'
-import { fadeUp, stagger } from '@/lib/motion'
-import type { BHIResult } from '@/lib/bhi'
+import { BHIGauge }         from '@/components/dashboard/bhi-gauge'
+import { StatCard }         from '@/components/dashboard/stat-card'
+import { TrendChart }       from '@/components/dashboard/trend-chart'
+import { DateRangeFilter }  from '@/components/dashboard/date-range-filter'
+import { cn }               from '@/lib/utils'
+import { fadeUp, stagger }  from '@/lib/motion'
+import { rangeLabelShort }  from '@/lib/range-label'
+import type { BHIResult }   from '@/lib/bhi'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -65,6 +67,7 @@ export interface OverviewProps {
   recentMentions:  Mention[]
   hasAnyData:      boolean
   trendData?:      { date: string; bhi: number | null; sentiment: number | null }[]
+  days?:           number
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -157,10 +160,12 @@ export function OverviewClient({
   recentMentions,
   hasAnyData,
   trendData = [],
+  days = 30,
 }: OverviewProps) {
   // Sparkline data for BHI stat card
   const bhiSpark = sparkline.map(s => ({ date: s.date, value: s.score }))
   const hasTrend = trendData.length > 1
+  const rl = rangeLabelShort(days)
 
   return (
     <div className="space-y-6 max-w-[1400px]">
@@ -180,8 +185,9 @@ export function OverviewClient({
           )}
         </div>
 
-        {/* ONE clay CTA */}
-        <div className="hidden sm:flex items-center gap-2 shrink-0">
+        {/* Date filter + CTA */}
+        <div className="hidden sm:flex items-center gap-3 shrink-0">
+          <DateRangeFilter defaultDays={30} />
           <Link
             href="/dashboard/campaigns"
             className="text-[12.5px] text-muted-foreground hover:text-foreground border border-border rounded-xl px-3.5 py-2 transition-colors hover:bg-muted/50"
@@ -213,7 +219,7 @@ export function OverviewClient({
           tone="blue"
           icon={Activity}
           spark={bhiSpark.length > 1 ? bhiSpark : undefined}
-          deltaLabel="30-day trend"
+          deltaLabel={`${rl.toLowerCase()} trend`}
         />
         <StatCard
           label="Sentiment Score"
@@ -248,7 +254,7 @@ export function OverviewClient({
           animate="visible"
           className="rounded-2xl border bg-card card-shadow p-5 sm:p-6"
         >
-          <TrendChart data={trendData} height={200} />
+          <TrendChart data={trendData} height={200} rangeLabel={rl} />
         </motion.div>
       )}
 
@@ -271,7 +277,7 @@ export function OverviewClient({
 
           {hasAnyData ? (
             <div className="flex-1 flex items-center justify-center">
-              <BHIGauge bhi={bhi} sparkline={sparkline} />
+              <BHIGauge bhi={bhi} sparkline={sparkline} trendLabel={rl.toLowerCase()} />
             </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 py-8">

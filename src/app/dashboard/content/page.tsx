@@ -10,17 +10,23 @@ import { AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { FunnelChart } from './funnel-chart'
 import { SovHistoryChart } from '@/components/dashboard/sov-history-chart'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
+import { rangeLabelLong } from '@/lib/range-label'
 
-async function ContentData() {
+async function ContentData({ days }: { days: number }) {
   const supabase = await createClient()
+
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - days)
+  const cutoffStr = cutoff.toISOString()
 
   const [{ data: posts }, { data: connections }, { data: competitors }, { data: sovSnap }, { data: sovHistory }] =
     await Promise.all([
       supabase
         .from('social_posts')
         .select('id,platform,content,content_type,reach,impressions,likes,comments,shares,engagement_rate,funnel_stage,ai_performance_score,posted_at')
+        .gte('posted_at', cutoffStr)
         .order('posted_at', { ascending: false })
-        .limit(200),
+        .limit(500),
       supabase
         .from('social_connections')
         .select('platform,account_name,sync_status,last_synced_at'),
@@ -110,7 +116,7 @@ async function ContentData() {
         <div>
           <h2 className="text-base font-semibold">Content Performance</h2>
           <p className="text-sm text-muted-foreground">
-            Last 7 days · syncs nightly at 3 AM Lagos time
+            {rangeLabelLong(days).charAt(0).toUpperCase() + rangeLabelLong(days).slice(1)} · syncs nightly at 3 AM Lagos time
           </p>
         </div>
         <ContentTableClient posts={posts ?? []} />
@@ -178,6 +184,7 @@ export default async function ContentPage({
   searchParams: Promise<Record<string, string | undefined>>
 }) {
   const params = await searchParams
+  const days = Math.min(180, Math.max(7, Number(params.days ?? 30)))
   const oauthError = params.error
   const connected = params.connected
   const needsPageId = params.action === 'needs-page-id' ? params.key : null
@@ -232,7 +239,7 @@ export default async function ContentPage({
           <ContentTableSkeleton />
         </div>
       }>
-        <ContentData />
+        <ContentData days={days} />
       </Suspense>
     </div>
   )

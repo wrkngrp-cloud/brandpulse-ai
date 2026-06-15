@@ -4,8 +4,12 @@ import { Suspense } from 'react'
 import { computeBHI } from '@/lib/bhi'
 import { OverviewClient } from '@/components/dashboard/overview-client'
 
-async function DashboardContent() {
+async function DashboardContent({ days }: { days: number }) {
   const supabase = await createClient()
+
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - days)
+  const cutoffStr = cutoff.toISOString().split('T')[0]
 
   const [
     { data: brand },
@@ -22,11 +26,11 @@ async function DashboardContent() {
     supabase.from('sentiment_daily').select('social_score, day, positive_pct, negative_pct').order('day', { ascending: false }).limit(1).single(),
     supabase.from('sov_snapshots').select('social_sov, snapshot_date').order('snapshot_date', { ascending: false }).limit(1).single(),
     supabase.from('survey_responses').select('answers, quality_flag').eq('quality_flag', 'ok'),
-    supabase.from('brand_health_snapshots').select('bhi, snapshot_date').order('snapshot_date', { ascending: false }).limit(30),
+    supabase.from('brand_health_snapshots').select('bhi, snapshot_date').order('snapshot_date', { ascending: false }).limit(days),
     supabase.from('mentions').select('id, content, author_handle, platform, sentiment_label, created_at').order('created_at', { ascending: false }).limit(4),
     supabase.from('campaigns').select('id, name, status, objectives, start_date, total_budget, currency').in('status', ['active', 'paused']).order('created_at', { ascending: false }).limit(3),
     supabase.from('events').select('id, name, status, city, date_start, event_type').in('status', ['planned', 'live']).order('date_start', { ascending: true }).limit(3),
-    supabase.from('sentiment_daily').select('social_score, day').order('day', { ascending: true }).limit(30),
+    supabase.from('sentiment_daily').select('social_score, day').gte('day', cutoffStr).order('day', { ascending: true }),
   ])
 
   const npsScores = (surveyResponses ?? [])
@@ -72,11 +76,19 @@ async function DashboardContent() {
       recentMentions={recentMentions ?? []}
       hasAnyData={hasAnyData}
       trendData={trendData}
+      days={days}
     />
   )
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>
+}) {
+  const params = await searchParams
+  const days = Math.min(180, Math.max(7, Number(params.days ?? 30)))
+
   return (
     <Suspense fallback={
       <div className="space-y-5">
@@ -92,7 +104,7 @@ export default function DashboardPage() {
         </div>
       </div>
     }>
-      <DashboardContent />
+      <DashboardContent days={days} />
     </Suspense>
   )
 }

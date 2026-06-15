@@ -7,8 +7,9 @@ import { ZONE_META } from '@/lib/bhi'
 import { cn } from '@/lib/utils'
 
 interface Props {
-  bhi: BHIResult
-  sparkline?: { date: string; score: number }[]
+  bhi:          BHIResult
+  sparkline?:   { date: string; score: number }[]
+  trendLabel?:  string
 }
 
 // ── Gauge geometry ────────────────────────────────────────────────────────────
@@ -65,7 +66,7 @@ function useCountUp(target: number, duration = 1.4) {
   return display
 }
 
-export function BHIGauge({ bhi, sparkline = [] }: Props) {
+export function BHIGauge({ bhi, sparkline = [], trendLabel = '30-day' }: Props) {
   const gradId  = useId()
   const glowId  = useId()
   const maskId  = useId()
@@ -279,7 +280,7 @@ export function BHIGauge({ bhi, sparkline = [] }: Props) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.5 }}
         >
-          <p className="text-[10px] text-muted-foreground">30-day trend</p>
+          <p className="text-[10px] text-muted-foreground">{trendLabel} trend</p>
           <svg
             width="100%"
             height={SH}

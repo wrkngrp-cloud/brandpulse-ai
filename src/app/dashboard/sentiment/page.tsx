@@ -3,8 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TrendingUp, TrendingDown, Minus, MessageCircle, AlertTriangle, Info, Search } from 'lucide-react'
 import Link from 'next/link'
-import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
-import { TriggerCrawlButton } from './trigger-crawl-button'
+import { DateRangeFilter }             from '@/components/dashboard/date-range-filter'
+import { rangeLabelShort, rangeLabelLong } from '@/lib/range-label'
+import { TriggerCrawlButton }           from './trigger-crawl-button'
 import { CrawlHistory } from './crawl-history'
 import { SentimentTrendChart } from './sentiment-trend-chart'
 import { EmotionWheel } from './emotion-wheel'
@@ -146,14 +147,16 @@ async function SentimentData({ days = 84 }: { days: number }) {
     )
   }
 
-  const dailyRows = (daily ?? []) as DayRow[]
-  const alerts    = computeAlerts(dailyRows)
-  const weekly    = weeklyAggregate(dailyRows)
+  const dailyRows  = (daily ?? []) as DayRow[]
+  const alerts     = computeAlerts(dailyRows)
+  const weekly     = weeklyAggregate(dailyRows)
+  const rlShort    = rangeLabelShort(days)
+  const rlLong     = rangeLabelLong(days)
 
   const platformBreakdown = (latest?.platform_breakdown ?? {}) as NonNullable<DayRow['platform_breakdown']>
   const platformEntries   = Object.entries(platformBreakdown).sort((a, b) => b[1].volume - a[1].volume)
 
-  // Aggregate emotion distribution across all 12 weeks
+  // Aggregate emotion distribution across the selected window
   const emotionTotals: Record<string, number> = {}
   for (const day of dailyRows) {
     const dist = day.emotion_distribution ?? {}
@@ -263,12 +266,12 @@ async function SentimentData({ days = 84 }: { days: number }) {
         </div>
       </div>
 
-      {/* 12-week trend */}
+      {/* Sentiment trend */}
       {weekly.length >= 2 && (
         <div className="border rounded-2xl bg-card card-shadow p-5 sm:p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="eyebrow mb-1">12-Week Trend</p>
+              <p className="eyebrow mb-1">{rlShort} Trend</p>
               <h3 className="text-[15px] font-semibold tracking-tight">Sentiment over time</h3>
             </div>
             <div className="flex items-center gap-4">
@@ -335,7 +338,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
         {Object.keys(emotionTotals).length > 0 && (
           <div className="border rounded-xl p-4 space-y-3">
             <p className="text-sm font-semibold">Emotion distribution</p>
-            <p className="text-xs text-muted-foreground -mt-1">Aggregated across 12 weeks</p>
+            <p className="text-xs text-muted-foreground -mt-1">Aggregated across {rlLong}</p>
             <EmotionWheel distribution={emotionTotals} />
           </div>
         )}
@@ -372,7 +375,7 @@ export default async function SentimentPage({
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Sentiment</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Public perception · X and Instagram · nightly at 4 AM Lagos time
+            Public perception · X and Instagram · {days <= 7 ? 'last 7 days' : days <= 30 ? 'last 30 days' : days <= 84 ? 'last 12 weeks' : 'last 6 months'} · nightly at 4 AM Lagos time
           </p>
         </div>
         <div className="flex items-center gap-3">

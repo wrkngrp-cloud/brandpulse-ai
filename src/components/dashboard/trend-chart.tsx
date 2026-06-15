@@ -16,9 +16,10 @@ interface DataPoint {
 }
 
 interface Props {
-  data:       DataPoint[]
-  className?: string
-  height?:    number
+  data:         DataPoint[]
+  className?:   string
+  height?:      number
+  rangeLabel?:  string
 }
 
 // ── Custom tooltip ─────────────────────────────────────────────────────────
@@ -87,7 +88,7 @@ function Legend({ items }: { items: { label: string; color: string }[] }) {
 
 // ── Main component ─────────────────────────────────────────────────────────
 
-export function TrendChart({ data, className, height = 200 }: Props) {
+export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day' }: Props) {
   const hasBHI       = data.some(d => d.bhi != null)
   const hasSentiment = data.some(d => d.sentiment != null)
 
@@ -108,7 +109,7 @@ export function TrendChart({ data, className, height = 200 }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="eyebrow mb-1">30-Day Pulse</p>
+          <p className="eyebrow mb-1">{rangeLabel} Pulse</p>
           <h3 className="text-[15px] font-semibold tracking-tight">Brand Signal Trend</h3>
         </div>
         <Legend items={legendItems} />
