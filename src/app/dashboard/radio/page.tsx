@@ -1,196 +1,236 @@
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Radio, Users, TrendingUp, Volume2 } from 'lucide-react'
-import { RadioReachChart } from './radio-charts'
+import { createClient }   from '@/lib/supabase/server'
+import { redirect }        from 'next/navigation'
+import { Card }            from '@/components/ui/card'
+import { Badge }           from '@/components/ui/badge'
+import { Radio, Users, TrendingUp, Volume2, Download } from 'lucide-react'
+import { MediaPlanUploadDialog } from '@/components/offline-media/media-plan-upload-dialog'
+import { buttonVariants }  from '@/components/ui/button'
+import { cn }              from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
-const STATIONS = [
-  {
-    name:    'Cool FM Lagos',
-    freq:    '96.9 FM',
-    slots:   '14 spots/week',
-    grp:     '68',
-    reach:   '420,000',
-    cost:    '₦380,000',
-    status:  'Active',
-    color:   'bg-indigo-500/10 text-indigo-500',
-  },
-  {
-    name:    'Beat FM',
-    freq:    '99.9 FM',
-    slots:   '10 spots/week',
-    grp:     '44',
-    reach:   '265,000',
-    cost:    '₦240,000',
-    status:  'Active',
-    color:   'bg-emerald-500/10 text-emerald-500',
-  },
-  {
-    name:    'Wazobia FM',
-    freq:    '94.1 FM',
-    slots:   '12 spots/week',
-    grp:     '58',
-    reach:   '350,000',
-    cost:    '₦310,000',
-    status:  'Active',
-    color:   'bg-amber-500/10 text-amber-500',
-  },
-]
-
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-const SLOTS: Record<string, Record<string, string | null>> = {
-  Morning: {
-    Mon: 'Cool FM', Tue: 'Wazobia', Wed: 'Cool FM', Thu: 'Beat FM', Fri: 'Cool FM', Sat: null, Sun: null,
-  },
-  Afternoon: {
-    Mon: 'Wazobia', Tue: null, Wed: 'Beat FM', Thu: 'Wazobia', Fri: 'Beat FM', Sat: 'Cool FM', Sun: null,
-  },
-  Evening: {
-    Mon: 'Cool FM', Tue: 'Cool FM', Wed: 'Wazobia', Thu: 'Cool FM', Fri: 'Cool FM', Sat: 'Wazobia', Sun: 'Beat FM',
-  },
+// Daypart → reach column
+const REACH_COLUMN: Record<string, 'reach_am' | 'reach_pm' | 'reach_day'> = {
+  morning_drive:    'reach_am',
+  evening:          'reach_pm',
+  daytime:          'reach_day',
+  early_morning:    'reach_am',
+  afternoon_drive:  'reach_pm',
+  late_night:       'reach_day',
 }
 
-const SLOT_COLORS: Record<string, string> = {
-  'Cool FM':  'bg-indigo-500/15 text-indigo-600 border-indigo-200',
-  'Beat FM':  'bg-emerald-500/15 text-emerald-600 border-emerald-200',
-  'Wazobia':  'bg-amber-500/15 text-amber-600 border-amber-200',
+const DAYPART_LABEL: Record<string, string> = {
+  early_morning:    'Early Morning',
+  morning_drive:    'Morning Drive',
+  daytime:          'Daytime',
+  afternoon_drive:  'Afternoon Drive',
+  evening:          'Evening',
+  late_night:       'Late Night',
 }
 
-const KEY_METRICS = [
-  { label: 'Total Airtime Cost', value: '₦930K',   sub: 'Across 3 stations', icon: Volume2,    color: 'text-indigo-500' },
-  { label: 'Total Weekly GRP',   value: '170',      sub: 'Gross Rating Points', icon: TrendingUp, color: 'text-emerald-500' },
-  { label: 'Estimated Reach',    value: '1.03M',    sub: 'Unduplicated audience', icon: Users,    color: 'text-blue-500' },
-  { label: 'Brand Recall Lift',  value: '+12%',     sub: 'Post-campaign survey', icon: Radio,     color: 'text-violet-500' },
-]
+const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive'> = {
+  scheduled:  'secondary',
+  aired:      'default',
+  missed:     'destructive',
+  make_good:  'secondary',
+}
 
-export default function RadioPage() {
+function fmt(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`
+  return String(n)
+}
+
+function fmtCurrency(n: number): string {
+  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000)     return `₦${(n / 1_000).toFixed(0)}K`
+  return `₦${n.toFixed(0)}`
+}
+
+type RadioStation = {
+  reach_am: number | null
+  reach_pm: number | null
+  reach_day: number | null
+} | null
+
+type RadioScheduleRow = {
+  id: string
+  station_name: string
+  daypart: string
+  spot_date: string
+  duration_sec: number
+  spots_planned: number
+  spots_aired: number | null
+  net_cost: number | null
+  rate_card: number | null
+  currency: string
+  status: string
+  radio_stations: RadioStation
+}
+
+export default async function RadioPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
+
+  const { data: brand } = await supabase.from('brands').select('id, name').limit(1).single()
+  if (!brand) redirect('/onboarding')
+
+  const since = new Date()
+  since.setDate(since.getDate() - 90)
+
+  const { data: schedulesRaw } = await supabase
+    .from('radio_schedules')
+    .select(`
+      id, station_name, daypart, spot_date, duration_sec,
+      spots_planned, spots_aired, net_cost, rate_card, currency, status,
+      radio_stations ( reach_am, reach_pm, reach_day )
+    `)
+    .eq('brand_id', brand.id)
+    .gte('spot_date', since.toISOString().slice(0, 10))
+    .order('spot_date', { ascending: false })
+
+  const schedules = (schedulesRaw ?? []) as unknown as RadioScheduleRow[]
+  const hasData = schedules.length > 0
+
+  // Aggregate metrics
+  let totalSpotPlanned = 0
+  let totalSpotAired   = 0
+  let totalSpend       = 0
+  let totalReach       = 0
+
+  for (const s of schedules) {
+    totalSpotPlanned += s.spots_planned
+    totalSpotAired   += s.spots_aired ?? 0
+    totalSpend       += Number(s.net_cost ?? 0)
+
+    const station = s.radio_stations
+    if (station) {
+      const col = REACH_COLUMN[s.daypart] ?? 'reach_day'
+      totalReach += (station[col] ?? 0) * s.spots_planned
+    }
+  }
+
+  const cpt = totalReach > 0 ? (totalSpend / (totalReach / 1000)) : 0
+  const deliveryPct = totalSpotPlanned > 0 ? Math.round(totalSpotAired / totalSpotPlanned * 100) : 0
+
   return (
     <div className="max-w-5xl space-y-6">
 
       {/* Header */}
-      <div className="flex items-start gap-3">
-        <div className="h-10 w-10 rounded-xl bg-violet-500/10 flex items-center justify-center shrink-0 mt-0.5">
-          <Radio className="h-5 w-5 text-violet-500" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Radio Intelligence</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Monitor airtime, GRP, and brand recall lift across Nigeria&apos;s top radio stations.
-          </p>
-        </div>
-      </div>
-
-      {/* Key metrics */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {KEY_METRICS.map(m => (
-          <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{m.label}</span>
-              <m.icon className={`h-4 w-4 ${m.color}`} />
-            </div>
-            <p className="text-2xl font-bold tracking-tight">{m.value}</p>
-            <p className="text-xs text-muted-foreground">{m.sub}</p>
-          </Card>
-        ))}
-      </div>
-
-      {/* Station breakdown */}
-      <Card className="border rounded-xl p-5 bg-card space-y-4">
-        <h2 className="text-xl font-semibold">Station Breakdown</h2>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {STATIONS.map(s => (
-            <div key={s.name} className="border border-border/50 rounded-lg p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-sm">{s.name}</p>
-                  <p className="text-xs text-muted-foreground">{s.freq}</p>
-                </div>
-                <Badge variant="default" className="text-[10px]">{s.status}</Badge>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Airtime slots</span>
-                  <span className="font-medium">{s.slots}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">GRP</span>
-                  <span className="font-medium">{s.grp}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Est. reach</span>
-                  <span className="font-medium">{s.reach}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Weekly cost</span>
-                  <span className="font-medium">{s.cost}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Airtime calendar */}
-      <Card className="border rounded-xl p-5 bg-card space-y-4">
-        <h2 className="text-xl font-semibold">Airtime Calendar</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr>
-                <th className="text-left pb-2 pr-3 font-semibold text-muted-foreground uppercase tracking-wide w-24">Slot</th>
-                {DAYS.map(d => (
-                  <th key={d} className="pb-2 px-1.5 font-semibold text-muted-foreground uppercase tracking-wide text-center">{d}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {(['Morning', 'Afternoon', 'Evening'] as const).map(period => (
-                <tr key={period} className="border-t border-border/30">
-                  <td className="py-2.5 pr-3 font-medium text-muted-foreground">{period}</td>
-                  {DAYS.map(d => {
-                    const station = SLOTS[period][d]
-                    return (
-                      <td key={d} className="py-2.5 px-1 text-center">
-                        {station ? (
-                          <span className={`inline-block px-1.5 py-0.5 rounded border text-[10px] font-medium ${SLOT_COLORS[station]}`}>
-                            {station}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground/30">—</span>
-                        )}
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
-      {/* Reach & Frequency chart */}
-      <Card className="border rounded-xl p-5 bg-card space-y-3">
-        <div>
-          <h2 className="text-xl font-semibold">Weekly Reach by Station (8 Weeks)</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Estimated unduplicated audience per station per week</p>
-        </div>
-        <RadioReachChart />
-      </Card>
-
-      {/* AI insight */}
-      <Card className="border rounded-xl p-5 bg-card space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-md bg-violet-500/10 flex items-center justify-center shrink-0">
-            <Radio className="h-3.5 w-3.5 text-violet-500" />
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <div className="h-10 w-10 rounded-xl bg-violet-500/10 flex items-center justify-center shrink-0 mt-0.5">
+            <Radio className="h-5 w-5 text-violet-500" />
           </div>
-          <h2 className="text-sm font-semibold">AI Insight</h2>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Radio Intelligence</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Track airtime, reach, and spend across Nigeria&apos;s top radio stations.
+            </p>
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Evening drive-time slots (5pm-8pm) on Cool FM Lagos are delivering 40% more brand recall than morning slots at similar cost. The Wazobia FM audience shows stronger resonance in Pidgin-language markets — consider adapting your ad copy to Pidgin for that slot. Combining radio with same-day digital retargeting has shown a 22% uplift in conversion for FMCG brands in the Lagos market.
-        </p>
-      </Card>
+        <div className="flex items-center gap-2 shrink-0">
+          <a
+            href="/api/templates/radio"
+            download
+            className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2')}
+          >
+            <Download className="h-4 w-4" />
+            Template
+          </a>
+          <MediaPlanUploadDialog type="radio" templateUrl="/api/templates/radio" />
+        </div>
+      </div>
 
+      {!hasData ? (
+        /* ── Empty state ──────────────────────────────────────────────────── */
+        <Card className="border rounded-xl p-10 bg-card flex flex-col items-center gap-4 text-center">
+          <div className="h-14 w-14 rounded-2xl bg-violet-500/10 flex items-center justify-center">
+            <Radio className="h-7 w-7 text-violet-500" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">No radio schedules yet</h2>
+            <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+              Upload your radio buy plan from your media agency to start tracking airtime,
+              reach, and CPT across Nigerian stations.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <a
+              href="/api/templates/radio"
+              download
+              className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}
+            >
+              <Download className="h-4 w-4" />
+              Download template
+            </a>
+            <MediaPlanUploadDialog type="radio" templateUrl="/api/templates/radio" />
+          </div>
+          <p className="text-xs text-muted-foreground max-w-xs">
+            Fill in the .xlsx template with your station bookings, then upload it here.
+            The system matches station names and calculates reach and CPT automatically.
+          </p>
+        </Card>
+      ) : (
+        <>
+          {/* Key metrics */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              { label: 'Spots Planned',  value: totalSpotPlanned.toLocaleString(), sub: 'Last 90 days',          icon: Radio,      color: 'text-violet-500' },
+              { label: 'Spots Aired',    value: totalSpotAired.toLocaleString(),   sub: `${deliveryPct}% delivery`, icon: Volume2, color: 'text-emerald-500' },
+              { label: 'Est. Reach',     value: fmt(totalReach),                   sub: 'Total listener-spots',  icon: Users,      color: 'text-blue-500' },
+              { label: 'Total Spend',    value: fmtCurrency(totalSpend),           sub: `CPT: ${fmtCurrency(cpt)}/k`, icon: TrendingUp, color: 'text-indigo-500' },
+            ].map(m => (
+              <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{m.label}</span>
+                  <m.icon className={`h-4 w-4 ${m.color}`} />
+                </div>
+                <p className="text-2xl font-bold tracking-tight">{m.value}</p>
+                <p className="text-xs text-muted-foreground">{m.sub}</p>
+              </Card>
+            ))}
+          </div>
+
+          {/* Schedule table */}
+          <Card className="border rounded-xl p-5 bg-card space-y-4">
+            <h2 className="text-xl font-semibold">Schedule (last 90 days)</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border/50">
+                    {['Station', 'Date', 'Daypart', 'Dur.', 'Planned', 'Aired', 'Net Cost', 'Status'].map(h => (
+                      <th key={h} className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {schedules.slice(0, 50).map(s => (
+                    <tr key={s.id} className="border-b border-border/30 last:border-0">
+                      <td className="py-2.5 pr-4 font-medium whitespace-nowrap">{s.station_name}</td>
+                      <td className="py-2.5 pr-4 text-muted-foreground whitespace-nowrap">{s.spot_date}</td>
+                      <td className="py-2.5 pr-4 text-muted-foreground whitespace-nowrap">{DAYPART_LABEL[s.daypart] ?? s.daypart}</td>
+                      <td className="py-2.5 pr-4 text-muted-foreground">{s.duration_sec}s</td>
+                      <td className="py-2.5 pr-4">{s.spots_planned}</td>
+                      <td className="py-2.5 pr-4 text-muted-foreground">{s.spots_aired ?? '–'}</td>
+                      <td className="py-2.5 pr-4 font-medium">{s.net_cost ? fmtCurrency(Number(s.net_cost)) : '–'}</td>
+                      <td className="py-2.5">
+                        <Badge variant={STATUS_VARIANT[s.status] ?? 'secondary'} className="text-[10px] capitalize">
+                          {s.status.replace('_', ' ')}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {schedules.length > 50 && (
+                <p className="text-xs text-muted-foreground pt-3">Showing 50 of {schedules.length} rows</p>
+              )}
+            </div>
+          </Card>
+        </>
+      )}
     </div>
   )
 }

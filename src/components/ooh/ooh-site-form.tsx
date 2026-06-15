@@ -7,10 +7,11 @@ import { Button }             from '@/components/ui/button'
 import { Input }              from '@/components/ui/input'
 import { Label }              from '@/components/ui/label'
 import { Textarea }           from '@/components/ui/textarea'
-import { Copy, RefreshCw, Link2, QrCode, MapPin, Sparkles, Loader2, Settings, Zap, Map, X } from 'lucide-react'
-import { estimateTraffic }    from '@/app/dashboard/ooh/actions'
+import { Copy, RefreshCw, Link2, QrCode, MapPin, Sparkles, Loader2, Settings, Zap, Map, X, Users } from 'lucide-react'
+import { estimateTraffic, inferSiteDemographics } from '@/app/dashboard/ooh/actions'
 import { UrlLengthAdvisor }   from '@/components/ooh/url-length-advisor'
 import Link                   from 'next/link'
+import type { PlaceDemographics } from '@/lib/ooh/places-demographics'
 
 // ── Nigerian states + LGAs ────────────────────────────────────────────────────
 const LGAS_BY_STATE: Record<string, string[]> = {
@@ -158,6 +159,11 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
   const [trafficAiEst, setTrafficAiEst] = useState(Boolean(dv.traffic_ai_estimated ?? draft?.traffic_ai_estimated))
   const [estimating,   setEstimating]   = useState(false)
 
+  // Demographics inference state
+  const [demographics,     setDemographics]     = useState<PlaceDemographics | null>(null)
+  const [inferringDemogs,  setInferringDemogs]  = useState(false)
+  const demogDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   // Autocomplete state
   const [suggestions,    setSuggestions]    = useState<MapboxFeature[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -177,6 +183,27 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
   const [draftSaving,    setDraftSaving]    = useState(false)
   const [draftSavedAt,   setDraftSavedAt]   = useState<Date | null>(null)
   const draftTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Auto-fetch demographics when lat/lng are set
+  useEffect(() => {
+    if (lat === '' || lng === '') return
+    if (demogDebounceRef.current) clearTimeout(demogDebounceRef.current)
+    demogDebounceRef.current = setTimeout(async () => {
+      setInferringDemogs(true)
+      try {
+        const result = await inferSiteDemographics(Number(lat), Number(lng))
+        setDemographics(result)
+      } catch {
+        // graceful fallback — demographics are non-critical
+      } finally {
+        setInferringDemogs(false)
+      }
+    }, 800)
+    return () => {
+      if (demogDebounceRef.current) clearTimeout(demogDebounceRef.current)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lat, lng])
 
   // Auto-derive slug from site name + city (only for new sites)
   useEffect(() => {
@@ -571,6 +598,62 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
         <input type="hidden" name="lat" value={lat === '' ? '' : String(lat)} />
         <input type="hidden" name="lng" value={lng === '' ? '' : String(lng)} />
+        <input type="hidden" name="place_demographics" value={demographics ? JSON.stringify(demographics) : ''} />
+
+        {/* Audience of Place card — inferred from Google Places */}
+        {(inferringDemogs || demographics) && (
+          <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Audience of Place</span>
+              {inferringDemogs && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground ml-auto" />}
+            </div>
+            {demographics && !inferringDemogs && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-semibold">
+                    {demographics.primary_audience}
+                  </span>
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium capitalize">
+                    {demographics.income_tier.replace('_', ' ')} income
+                  </span>
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium">
+                    {demographics.age_skew}
+                  </span>
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium capitalize">
+                    {demographics.gender_split.replace('_', ' ')}
+                  </span>
+                </div>
+                {demographics.poi_types.length > 0 && (
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Detected nearby</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {demographics.poi_types.map(t => (
+                        <span key={t} className="text-xs px-2 py-0.5 rounded bg-background border text-muted-foreground capitalize">
+                          {t.replace(/_/g, ' ')}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 rounded-full bg-muted overflow-hidden flex-1">
+                    <div
+                      className="h-full bg-primary/60 rounded-full"
+                      style={{ width: `${Math.round(demographics.confidence * 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-muted-foreground shrink-0">
+                    {Math.round(demographics.confidence * 100)}% confidence
+                  </span>
+                </div>
+              </div>
+            )}
+            {inferringDemogs && (
+              <p className="text-xs text-muted-foreground">Checking nearby points of interest…</p>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">

@@ -5,15 +5,21 @@ import {
   ResponsiveContainer, Legend,
 } from 'recharts'
 
-const weeklyData = [
-  { week: 'Wk 1', spend: 280000, impressions: 480000 },
-  { week: 'Wk 2', spend: 320000, impressions: 560000 },
-  { week: 'Wk 3', spend: 295000, impressions: 510000 },
-  { week: 'Wk 4', spend: 410000, impressions: 720000 },
-  { week: 'Wk 5', spend: 380000, impressions: 650000 },
-  { week: 'Wk 6', spend: 450000, impressions: 810000 },
-  { week: 'Wk 7', spend: 390000, impressions: 680000 },
-  { week: 'Wk 8', spend: 425000, impressions: 745000 },
+export interface SpendDataPoint {
+  label:       string
+  spend:       number
+  impressions: number
+}
+
+const DEFAULT_DATA: SpendDataPoint[] = [
+  { label: 'Wk 1', spend: 280000, impressions: 480000 },
+  { label: 'Wk 2', spend: 320000, impressions: 560000 },
+  { label: 'Wk 3', spend: 295000, impressions: 510000 },
+  { label: 'Wk 4', spend: 410000, impressions: 720000 },
+  { label: 'Wk 5', spend: 380000, impressions: 650000 },
+  { label: 'Wk 6', spend: 450000, impressions: 810000 },
+  { label: 'Wk 7', spend: 390000, impressions: 680000 },
+  { label: 'Wk 8', spend: 425000, impressions: 745000 },
 ]
 
 function formatNGN(val: number) {
@@ -28,10 +34,16 @@ function formatImpr(val: number) {
   return `${val}`
 }
 
-export function DigitalSpendChart() {
+interface Props {
+  data?: SpendDataPoint[]
+}
+
+export function DigitalSpendChart({ data }: Props) {
+  const chartData = data && data.length > 0 ? data : DEFAULT_DATA
+
   return (
     <ResponsiveContainer width="100%" height={260}>
-      <AreaChart data={weeklyData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+      <AreaChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="spendGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
@@ -43,7 +55,7 @@ export function DigitalSpendChart() {
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
-        <XAxis dataKey="week" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+        <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
         <YAxis yAxisId="spend" tickFormatter={formatNGN} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={56} />
         <YAxis yAxisId="impr" orientation="right" tickFormatter={formatImpr} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={52} />
         <Tooltip

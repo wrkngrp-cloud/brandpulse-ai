@@ -1,182 +1,345 @@
-import { FileSearch, Globe, TrendingUp, BarChart2, Zap } from 'lucide-react'
-import { PrMentionsChart } from './pr-mentions-chart'
+import { createClient }      from '@/lib/supabase/server'
+import { redirect }          from 'next/navigation'
+import { Globe, TrendingUp, FileSearch, BarChart2, ExternalLink, Clock, Rss } from 'lucide-react'
+import { PrMentionsChart }   from './pr-mentions-chart'
+import { DateRangeFilter }   from '@/components/dashboard/date-range-filter'
 
-const PR_MENTIONS = [
-  {
-    publication: 'TechCabal',
-    headline: 'Jara Foods disrupts Nigeria\'s food delivery market with AI-powered meal planning',
-    sentiment: 'Positive' as const,
-    reach: 45000,
-    domainAuthority: 78,
-    date: '12 Jun 2025',
-  },
-  {
-    publication: 'BusinessDay',
-    headline: 'Q2 results: Jara Foods revenue grows 34% YoY amid tough consumer market',
-    sentiment: 'Very Positive' as const,
-    reach: 120000,
-    domainAuthority: 85,
-    date: '9 Jun 2025',
-  },
-  {
-    publication: 'Nairametrics',
-    headline: 'Analysis: Can Jara Foods compete with established players in Nigeria\'s food sector?',
-    sentiment: 'Neutral' as const,
-    reach: 67000,
-    domainAuthority: 72,
-    date: '5 Jun 2025',
-  },
-  {
-    publication: 'Pulse Nigeria',
-    headline: 'Jara Foods partners with Lagos State for school feeding program rollout',
-    sentiment: 'Positive' as const,
-    reach: 38000,
-    domainAuthority: 65,
-    date: '2 Jun 2025',
-  },
-  {
-    publication: 'TechPoint Africa',
-    headline: 'Startup spotlight: Jara Foods\' tech-first approach to food distribution in West Africa',
-    sentiment: 'Positive' as const,
-    reach: 22000,
-    domainAuthority: 70,
-    date: '28 May 2025',
-  },
-]
-
-type Sentiment = 'Very Positive' | 'Positive' | 'Neutral' | 'Negative'
-
-const SENTIMENT_STYLES: Record<Sentiment, string> = {
-  'Very Positive': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  'Positive':      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  'Neutral':       'bg-muted text-muted-foreground',
-  'Negative':      'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+interface PressMention {
+  id:              string
+  headline:        string
+  publication:     string
+  url:             string | null
+  published_at:    string
+  sentiment_score: number | null
+  sentiment_label: string | null
+  estimated_reach: number | null
+  emv:             number | null
+  is_competitor:   boolean
+  competitor_name: string | null
 }
 
-function formatReach(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(0)}K`
-  return String(n)
+interface SovSnapshot {
+  press_sov:     number | null
+  snapshot_date: string
 }
 
-export default function PRTrackingPage() {
-  const totalReach = PR_MENTIONS.reduce((s, m) => s + m.reach, 0)
+const SENTIMENT_STYLE: Record<string, string> = {
+  positive: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  neutral:  'bg-muted text-muted-foreground',
+  negative: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+}
+
+function fmtReach(n: number | null): string {
+  if (!n) return '—'
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1000)      return `${Math.round(n / 1000)}K`
+  return n.toLocaleString()
+}
+
+function fmtEmv(n: number | null): string {
+  if (!n) return '—'
+  if (n >= 1_000_000) return `NGN ${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1000)      return `NGN ${Math.round(n / 1000)}K`
+  return `NGN ${n.toLocaleString()}`
+}
+
+function fmtDate(d: string): string {
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+export default async function PRTrackingPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>
+}) {
+  const params = await searchParams
+  const days   = Math.min(180, Math.max(7, Number(params.days ?? 30)))
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
+
+  const { data: brand } = await supabase
+    .from('brands')
+    .select('id, name')
+    .limit(1)
+    .single()
+
+  if (!brand) redirect('/dashboard')
+
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+
+  const [{ data: mentions }, { data: sovSnaps }] = await Promise.all([
+    supabase
+      .from('press_mentions')
+      .select('id, headline, publication, url, published_at, sentiment_score, sentiment_label, estimated_reach, emv, is_competitor, competitor_name')
+      .eq('brand_id', brand.id)
+      .gte('published_at', since)
+      .order('published_at', { ascending: false })
+      .limit(100),
+    supabase
+      .from('sov_snapshots')
+      .select('press_sov, snapshot_date')
+      .eq('brand_id', brand.id)
+      .order('snapshot_date', { ascending: false })
+      .limit(30),
+  ])
+
+  const brandMentions      = (mentions ?? []).filter(m => !m.is_competitor) as PressMention[]
+  const competitorMentions = (mentions ?? []).filter(m => m.is_competitor)  as PressMention[]
+
+  const hasData = brandMentions.length > 0
+
+  // Aggregate stats
+  const totalEmv   = brandMentions.reduce((s, m) => s + (m.emv ?? 0), 0)
+  const totalReach = brandMentions.reduce((s, m) => s + (m.estimated_reach ?? 0), 0)
+  const sentCounts = { positive: 0, neutral: 0, negative: 0 }
+  for (const m of brandMentions) {
+    const l = m.sentiment_label as 'positive' | 'neutral' | 'negative' | null
+    if (l && l in sentCounts) sentCounts[l]++
+  }
+  const total     = brandMentions.length
+  const latestSov = (sovSnaps ?? []).find(s => s.press_sov !== null) as SovSnapshot | undefined
+
+  // Monthly data for chart
+  const monthlyMap: Record<string, number> = {}
+  const sixMonthsAgo = new Date()
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+  for (const m of brandMentions) {
+    const d = new Date(m.published_at)
+    if (d < sixMonthsAgo) continue
+    const label = d.toLocaleDateString('en-NG', { month: 'short' })
+    monthlyMap[label] = (monthlyMap[label] ?? 0) + 1
+  }
+  const monthlyData = Object.entries(monthlyMap).map(([month, mentions]) => ({ month, mentions }))
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-semibold">PR & Earned Media Tracking</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Monitor press coverage and understand how earned media shapes your brand health.
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-xl font-semibold">PR &amp; Earned Media Tracking</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Monitor press coverage and understand how earned media shapes your brand health.
+          </p>
+        </div>
+        <DateRangeFilter currentDays={days} defaultDays={30} />
       </div>
 
-      {/* EMV summary metrics */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="border rounded-xl p-4 bg-card space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Globe className="h-4 w-4" />
-            <span className="text-xs font-medium">PR Reach (month)</span>
+      {!hasData ? (
+        /* ── Empty state ── */
+        <div className="border rounded-xl p-10 text-center space-y-4">
+          <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mx-auto">
+            <Rss className="h-5 w-5 text-muted-foreground" />
           </div>
-          <p className="text-2xl font-bold">292K</p>
-        </div>
-        <div className="border rounded-xl p-4 bg-card space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <TrendingUp className="h-4 w-4" />
-            <span className="text-xs font-medium">Estimated EMV</span>
+          <div className="space-y-1">
+            <p className="text-sm font-medium">Monitoring your press mentions</p>
+            <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+              BrandPulse crawls Nigerian publications nightly at 7 AM Lagos time — searching for {brand.name} across The Punch, Vanguard, BusinessDay, TechCabal, Nairametrics, and 6 more outlets.
+            </p>
           </div>
-          <p className="text-2xl font-bold">₦4.8M</p>
-        </div>
-        <div className="border rounded-xl p-4 bg-card space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <FileSearch className="h-4 w-4" />
-            <span className="text-xs font-medium">Articles Published</span>
+          <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="h-3.5 w-3.5" />
+            Next crawl at 7 AM Lagos time
           </div>
-          <p className="text-2xl font-bold">12</p>
         </div>
-        <div className="border rounded-xl p-4 bg-card space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <BarChart2 className="h-4 w-4" />
-            <span className="text-xs font-medium">Avg Sentiment</span>
-          </div>
-          <p className="text-2xl font-bold">72<span className="text-sm font-normal text-muted-foreground">/100</span></p>
-        </div>
-      </div>
-
-      {/* PR Mentions feed */}
-      <div className="space-y-3">
-        <h2 className="text-sm font-semibold">Recent Press Mentions</h2>
-        <div className="space-y-2">
-          {PR_MENTIONS.map((mention, i) => (
-            <div key={i} className="border rounded-xl p-4 bg-card space-y-2">
-              <div className="flex items-start justify-between gap-3 flex-wrap">
-                <div className="space-y-0.5 flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-semibold">{mention.publication}</span>
-                    <span className="text-xs text-muted-foreground">{mention.date}</span>
-                  </div>
-                  <p className="text-sm text-foreground/90 leading-snug line-clamp-2">{mention.headline}</p>
-                </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${SENTIMENT_STYLES[mention.sentiment]}`}>
-                  {mention.sentiment}
-                </span>
+      ) : (
+        <>
+          {/* EMV summary */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="border rounded-xl p-4 bg-card space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-xs font-medium">Total EMV</span>
               </div>
-              <div className="flex items-center gap-4 pt-1 border-t text-xs text-muted-foreground flex-wrap">
-                <span>Reach: <span className="font-medium text-foreground">{formatReach(mention.reach)} readers</span></span>
-                <span>Domain authority: <span className="font-medium text-foreground">{mention.domainAuthority}</span></span>
+              <p className="text-2xl font-bold">{fmtEmv(totalEmv)}</p>
+              <p className="text-xs text-muted-foreground">earned media value</p>
+            </div>
+            <div className="border rounded-xl p-4 bg-card space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Globe className="h-4 w-4" />
+                <span className="text-xs font-medium">Total Reach</span>
+              </div>
+              <p className="text-2xl font-bold">{fmtReach(totalReach)}</p>
+              <p className="text-xs text-muted-foreground">estimated readers</p>
+            </div>
+            <div className="border rounded-xl p-4 bg-card space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <FileSearch className="h-4 w-4" />
+                <span className="text-xs font-medium">Press Mentions</span>
+              </div>
+              <p className="text-2xl font-bold">{total}</p>
+              <p className="text-xs text-muted-foreground">last {days} days</p>
+            </div>
+            <div className="border rounded-xl p-4 bg-card space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <BarChart2 className="h-4 w-4" />
+                <span className="text-xs font-medium">Positive Rate</span>
+              </div>
+              <p className="text-2xl font-bold">
+                {total > 0 ? Math.round((sentCounts.positive / total) * 100) : 0}
+                <span className="text-sm font-normal text-muted-foreground">%</span>
+              </p>
+              <p className="text-xs text-muted-foreground">of mentions</p>
+            </div>
+          </div>
+
+          {/* Sentiment breakdown */}
+          <div className="border rounded-xl p-5 bg-card space-y-3">
+            <p className="text-sm font-semibold">Sentiment breakdown</p>
+            <div className="grid grid-cols-3 gap-3">
+              {(['positive', 'neutral', 'negative'] as const).map(label => (
+                <div
+                  key={label}
+                  className={`rounded-lg p-3 space-y-1 ${
+                    label === 'positive' ? 'bg-green-50 dark:bg-green-900/10'
+                    : label === 'negative' ? 'bg-red-50 dark:bg-red-900/10'
+                    : 'bg-muted/40'
+                  }`}
+                >
+                  <p className="text-xs text-muted-foreground capitalize">{label}</p>
+                  <p className="text-xl font-bold">{sentCounts[label]}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {total > 0 ? Math.round((sentCounts[label] / total) * 100) : 0}%
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="h-2 rounded-full overflow-hidden flex">
+              {sentCounts.positive > 0 && (
+                <div className="bg-green-500" style={{ width: `${(sentCounts.positive / total) * 100}%` }} />
+              )}
+              {sentCounts.neutral > 0 && (
+                <div className="bg-muted-foreground/30" style={{ width: `${(sentCounts.neutral / total) * 100}%` }} />
+              )}
+              {sentCounts.negative > 0 && (
+                <div className="bg-red-400" style={{ width: `${(sentCounts.negative / total) * 100}%` }} />
+              )}
+            </div>
+          </div>
+
+          {/* Brand mention cards */}
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold">Recent Press Mentions</h2>
+            <div className="space-y-2">
+              {brandMentions.map(mention => (
+                <div key={mention.id} className="border rounded-xl p-4 bg-card space-y-2">
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="space-y-0.5 flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-semibold">{mention.publication}</span>
+                        <span className="text-xs text-muted-foreground">{fmtDate(mention.published_at)}</span>
+                      </div>
+                      <p className="text-sm text-foreground/90 leading-snug line-clamp-2">{mention.headline}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {mention.sentiment_label && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${SENTIMENT_STYLE[mention.sentiment_label] ?? SENTIMENT_STYLE.neutral}`}>
+                          {mention.sentiment_label.charAt(0).toUpperCase() + mention.sentiment_label.slice(1)}
+                        </span>
+                      )}
+                      {mention.url && (
+                        <a href={mention.url} target="_blank" rel="noopener noreferrer"
+                          className="text-muted-foreground hover:text-foreground transition-colors">
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 pt-1 border-t text-xs text-muted-foreground flex-wrap">
+                    <span>Reach: <span className="font-medium text-foreground">{fmtReach(mention.estimated_reach)}</span></span>
+                    <span>EMV: <span className="font-medium text-foreground">{fmtEmv(mention.emv)}</span></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Monthly chart */}
+          {monthlyData.length > 0 && (
+            <div className="border rounded-xl p-5 bg-card space-y-3">
+              <div>
+                <p className="text-sm font-semibold">Monthly PR Mentions</p>
+                <p className="text-xs text-muted-foreground">Total press articles tracked over 6 months</p>
+              </div>
+              <PrMentionsChart data={monthlyData} />
+            </div>
+          )}
+
+          {/* Competitor section */}
+          {competitorMentions.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold">
+                Competitor Mentions
+                <span className="text-xs font-normal text-muted-foreground ml-2">{competitorMentions.length} articles</span>
+              </h2>
+              <div className="space-y-2">
+                {competitorMentions.slice(0, 10).map(mention => (
+                  <div key={mention.id} className="border rounded-xl p-4 bg-card opacity-80 space-y-2">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div className="space-y-0.5 flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-semibold">{mention.publication}</span>
+                          <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                            {mention.competitor_name}
+                          </span>
+                          <span className="text-xs text-muted-foreground">{fmtDate(mention.published_at)}</span>
+                        </div>
+                        <p className="text-sm text-foreground/80 leading-snug line-clamp-2">{mention.headline}</p>
+                      </div>
+                      {mention.url && (
+                        <a href={mention.url} target="_blank" rel="noopener noreferrer"
+                          className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 pt-1 border-t text-xs text-muted-foreground">
+                      <span>Reach: {fmtReach(mention.estimated_reach)}</span>
+                      {mention.sentiment_label && (
+                        <span className={`px-1.5 py-0.5 rounded-full font-medium ${SENTIMENT_STYLE[mention.sentiment_label] ?? SENTIMENT_STYLE.neutral}`}>
+                          {mention.sentiment_label}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
 
-      {/* Monthly trend chart */}
-      <div className="border rounded-xl p-5 bg-card space-y-3">
-        <div>
-          <p className="text-sm font-semibold">Monthly PR Mentions</p>
-          <p className="text-xs text-muted-foreground">Total press articles tracked over 6 months</p>
-        </div>
-        <PrMentionsChart />
-      </div>
-
-      {/* PR influence explanations */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* PR → SOV */}
-        <div className="border rounded-xl p-5 bg-card space-y-2">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-semibold">PR and Share of Voice</h3>
-          </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Press mentions contribute to your Share of Voice through earned backlinks and publication authority. A single high-DA publication (80+) mention can lift your digital SOV by 0.5-2% within 30 days. BrandPulse tracks PR coverage and attributes SOV changes to earned media.
-          </p>
-          <div className="pt-1 border-t">
+          {/* SOV Contribution card */}
+          <div className="border rounded-xl p-5 bg-card space-y-3">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <h3 className="text-sm font-semibold">Press SOV Contribution</h3>
+            </div>
+            {latestSov ? (
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="space-y-0.5">
+                  <p className="text-xs text-muted-foreground">
+                    Share of press coverage voice · {fmtDate(latestSov.snapshot_date)}
+                  </p>
+                  <p className="text-3xl font-bold">{latestSov.press_sov?.toFixed(1)}%</p>
+                </div>
+                <div className="h-2.5 flex-1 min-w-[120px] rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full"
+                    style={{ width: `${latestSov.press_sov ?? 0}%` }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Press SOV appears here after the nightly crawl runs. It shows {brand.name}&apos;s share of press coverage versus tracked competitors.
+              </p>
+            )}
             <p className="text-xs text-muted-foreground">
-              Current highest-DA mention: <span className="font-semibold text-foreground">BusinessDay (DA 85)</span>
+              Calculated nightly at 7 AM Lagos time. Based on estimated readership across all monitored publications.
             </p>
           </div>
-        </div>
-
-        {/* PR → Brand Health */}
-        <div className="border rounded-xl p-5 bg-card space-y-2">
-          <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-semibold">PR and Brand Health Index</h3>
-          </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Positive PR creates a halo effect on brand sentiment. Our model applies a 7-day sentiment boost (weighted by publication authority) to your Brand Health Index when significant coverage occurs. This explains why BHI can move without social media activity.
-          </p>
-          <div className="pt-1 border-t">
-            <p className="text-xs text-muted-foreground">
-              Estimated sentiment halo from this month's coverage: <span className="font-semibold text-foreground">+3.2 BHI points</span>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <p className="text-xs text-muted-foreground text-center pb-2">
-        Total tracked reach this month: {formatReach(totalReach)} readers across {PR_MENTIONS.length} publications shown
-      </p>
+        </>
+      )}
     </div>
   )
 }

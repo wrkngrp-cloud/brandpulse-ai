@@ -4,19 +4,30 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 
-const MONTHLY_DATA = [
-  { month: 'Jan', mentions: 4 },
-  { month: 'Feb', mentions: 7 },
-  { month: 'Mar', mentions: 5 },
-  { month: 'Apr', mentions: 9 },
-  { month: 'May', mentions: 12 },
-  { month: 'Jun', mentions: 8 },
+const FALLBACK_DATA = [
+  { month: 'Jan', mentions: 0 },
+  { month: 'Feb', mentions: 0 },
+  { month: 'Mar', mentions: 0 },
+  { month: 'Apr', mentions: 0 },
+  { month: 'May', mentions: 0 },
+  { month: 'Jun', mentions: 0 },
 ]
 
-export function PrMentionsChart() {
+interface MentionDataPoint {
+  month:    string
+  mentions: number
+}
+
+interface Props {
+  data?: MentionDataPoint[]
+}
+
+export function PrMentionsChart({ data }: Props) {
+  const chartData = data && data.length > 0 ? data : FALLBACK_DATA
+
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={MONTHLY_DATA} margin={{ top: 4, right: 12, left: -16, bottom: 0 }}>
+      <BarChart data={chartData} margin={{ top: 4, right: 12, left: -16, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
         <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
         <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" allowDecimals={false} />

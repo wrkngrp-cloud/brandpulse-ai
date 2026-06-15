@@ -8,6 +8,36 @@ export async function GET(
   const { slug } = await params
   const supabase  = await createServiceClient()
 
+  // ── 1. Check print_placements first ──────────────────────────────────────
+  const { data: placement } = await supabase
+    .from('print_placements')
+    .select('id, brand_id, attribution_url')
+    .eq('vanity_slug', slug)
+    .maybeSingle()
+
+  if (placement?.attribution_url) {
+    const printUa         = request.headers.get('user-agent') ?? ''
+    const printDeviceType = /mobile|android|iphone|ipad/i.test(printUa) ? 'mobile'
+      : /tablet/i.test(printUa) ? 'tablet' : 'desktop'
+    const printIpRegion = request.headers.get('x-vercel-ip-country-region')
+      ?? request.headers.get('cf-ipcountry')
+      ?? null
+
+    await Promise.allSettled([
+      supabase.from('print_visits').insert({
+        placement_id: placement.id,
+        brand_id:     placement.brand_id,
+        ip_region:    printIpRegion,
+        device_type:  printDeviceType,
+        referrer:     request.headers.get('referer') ?? null,
+      }),
+      supabase.rpc('increment_print_scans', { placement_id: placement.id }),
+    ])
+
+    return NextResponse.redirect(placement.attribution_url, 302)
+  }
+
+  // ── 2. Fall through to existing OOH redirect logic ────────────────────────
   const { data: site } = await supabase
     .from('ooh_sites')
     .select('id, brand_id, landing_url')

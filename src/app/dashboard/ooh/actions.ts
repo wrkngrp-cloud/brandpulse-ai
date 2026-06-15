@@ -5,6 +5,7 @@ import { redirect }      from 'next/navigation'
 import { z }             from 'zod'
 import { revalidatePath } from 'next/cache'
 import { callAi }         from '@/lib/ai/client'
+import { inferDemographics, type PlaceDemographics } from '@/lib/ooh/places-demographics'
 
 const SiteSchema = z.object({
   site_name:            z.string().min(2, 'Site name required'),
@@ -36,6 +37,7 @@ const SiteSchema = z.object({
   pole_count:           z.coerce.number().int().min(1).default(1).optional(),
   notes:                z.string().optional(),
   qr_enabled:           z.boolean().default(false),
+  place_demographics:   z.string().optional(), // JSON string, parsed manually
 })
 
 type FormState = { error?: string; success?: boolean; siteId?: string; siteName?: string } | null
@@ -149,7 +151,7 @@ export async function createSite(
     return { error: parsed.error.issues[0].message }
   }
 
-  const { qr_enabled, short_code: rawShortCode, ...siteData } = parsed.data
+  const { qr_enabled, short_code: rawShortCode, place_demographics: rawDemographics, ...siteData } = parsed.data
 
   const qrToken  = qr_enabled
     ? `qr-${Math.random().toString(36).slice(2, 10)}`
@@ -158,6 +160,11 @@ export async function createSite(
   const shortCode = rawShortCode || await generateShortCode(supabase)
 
   const campaignId = typeof raw.campaign_id === 'string' && raw.campaign_id ? raw.campaign_id : null
+
+  let parsedDemographics: unknown | null = null
+  if (rawDemographics) {
+    try { parsedDemographics = JSON.parse(rawDemographics) } catch { /* ignore */ }
+  }
 
   const { data: site, error } = await supabase
     .from('ooh_sites')
@@ -175,6 +182,7 @@ export async function createSite(
       campaign_start:       siteData.campaign_start ?? null,
       campaign_end:         siteData.campaign_end   ?? null,
       pole_count:           siteData.pole_count    ?? 1,
+      place_demographics:   parsedDemographics ?? null,
     })
     .select('id')
     .single()
@@ -207,18 +215,24 @@ export async function updateSite(
     return { error: parsed.error.issues[0].message }
   }
 
-  const { qr_enabled, short_code: rawShortCode, ...siteData } = parsed.data
+  const { qr_enabled, short_code: rawShortCode, place_demographics: rawDemographics2, ...siteData } = parsed.data
+
+  let parsedDemographics2: unknown | null = null
+  if (rawDemographics2) {
+    try { parsedDemographics2 = JSON.parse(rawDemographics2) } catch { /* ignore */ }
+  }
 
   const updatePayload: Record<string, unknown> = {
     ...siteData,
-    status:        'active',
-    lat:           siteData.lat           ?? null,
-    lng:           siteData.lng           ?? null,
-    daily_traffic: siteData.daily_traffic ?? null,
-    monthly_cost:  siteData.monthly_cost  ?? null,
-    campaign_start: siteData.campaign_start ?? null,
-    campaign_end:  siteData.campaign_end   ?? null,
-    pole_count:    siteData.pole_count    ?? 1,
+    status:             'active',
+    lat:                siteData.lat           ?? null,
+    lng:                siteData.lng           ?? null,
+    daily_traffic:      siteData.daily_traffic ?? null,
+    monthly_cost:       siteData.monthly_cost  ?? null,
+    campaign_start:     siteData.campaign_start ?? null,
+    campaign_end:       siteData.campaign_end   ?? null,
+    pole_count:         siteData.pole_count    ?? 1,
+    place_demographics: parsedDemographics2 ?? null,
   }
   // Only update short_code if the user explicitly changed it
   if (rawShortCode) updatePayload.short_code = rawShortCode
@@ -310,4 +324,13 @@ export async function saveDraft(
 export async function discardDraft(draftId: string): Promise<void> {
   const supabase = await createClient()
   await supabase.from('ooh_sites').delete().eq('id', draftId).eq('status', 'draft')
+}
+
+// ── A3. Demographic inference server action ────────────────────────────────────
+
+export async function inferSiteDemographics(
+  lat: number,
+  lng: number,
+): Promise<PlaceDemographics | null> {
+  return inferDemographics(lat, lng)
 }

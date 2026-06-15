@@ -1,57 +1,254 @@
+import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Monitor, TrendingUp, Eye, MousePointerClick, Coins } from 'lucide-react'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import {
+  Monitor, TrendingUp, Eye, MousePointerClick, Coins,
+  CheckCircle, AlertCircle, Link as LinkIcon,
+} from 'lucide-react'
 import { DigitalSpendChart } from './digital-charts'
+import type { SpendDataPoint } from './digital-charts'
+import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
-const CAMPAIGNS = [
-  {
-    platform: 'Meta Ads',
-    budget:   '₦800,000',
-    spend:    '₦742,000',
-    impressions: '1,840,000',
-    clicks:   '42,320',
-    ctr:      '2.3%',
-    cpm:      '₦403',
-    status:   'Active',
-  },
-  {
-    platform: 'Google Display',
-    budget:   '₦600,000',
-    spend:    '₦558,000',
-    impressions: '1,200,000',
-    clicks:   '24,600',
-    ctr:      '2.05%',
-    cpm:      '₦465',
-    status:   'Active',
-  },
-  {
-    platform: 'Programmatic (DV360)',
-    budget:   '₦1,000,000',
-    spend:    '₦880,000',
-    impressions: '1,160,000',
-    clicks:   '16,820',
-    ctr:      '1.45%',
-    cpm:      '₦759',
-    status:   'Paused',
-  },
-]
+// ── types ────────────────────────────────────────────────────────────────────
 
-const CREATIVES = [
-  { platform: 'Meta', format: 'Video (15s)', impressions: '820,000', ctr: '3.1%', spend: '₦310,000' },
-  { platform: 'Google', format: 'Responsive Display', impressions: '640,000', ctr: '2.4%', spend: '₦220,000' },
-  { platform: 'Meta', format: 'Carousel', impressions: '380,000', ctr: '2.8%', spend: '₦212,000' },
-]
+interface AdAccount {
+  id:          string
+  platform:    string
+  account_name: string | null
+  sync_status: string
+  last_synced_at: string | null
+}
 
-const KEY_METRICS = [
-  { label: 'Total Spend',    value: '₦2.4M',  sub: 'vs ₦2.4M budget',   icon: Coins,          color: 'text-indigo-500' },
-  { label: 'Impressions',    value: '4.2M',    sub: '+18% vs last month', icon: Eye,            color: 'text-emerald-500' },
-  { label: 'Avg CTR',        value: '2.3%',    sub: 'Industry avg 1.8%',  icon: MousePointerClick, color: 'text-blue-500' },
-  { label: 'Cost per Lead',  value: '₦1,200',  sub: '−₦80 vs last month', icon: TrendingUp,     color: 'text-violet-500' },
-]
+interface PerfRow {
+  platform:    string
+  date:        string
+  spend:       number
+  impressions: number
+  clicks:      number
+  ctr:         number | null
+  cpm:         number | null
+  conversions: number
+}
 
-export default function DigitalPage() {
+interface PlatformSummary {
+  platform:    string
+  spend:       number
+  impressions: number
+  clicks:      number
+  avgCtr:      number
+  avgCpm:      number
+  conversions: number
+}
+
+// ── helpers ──────────────────────────────────────────────────────────────────
+
+function fmtNGN(val: number): string {
+  if (val >= 1_000_000) return `₦${(val / 1_000_000).toFixed(1)}M`
+  if (val >= 1_000)     return `₦${(val / 1_000).toFixed(0)}K`
+  return `₦${Math.round(val)}`
+}
+
+function fmtNum(val: number): string {
+  if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`
+  if (val >= 1_000)     return `${(val / 1_000).toFixed(0)}K`
+  return `${Math.round(val)}`
+}
+
+function fmtPct(val: number): string {
+  return `${(val * 100).toFixed(2)}%`
+}
+
+function platformLabel(p: string): string {
+  const map: Record<string, string> = {
+    meta:     'Meta Ads',
+    google:   'Google Ads',
+    tiktok:   'TikTok Ads',
+    linkedin: 'LinkedIn Ads',
+    twitter:  'X (Twitter) Ads',
+  }
+  return map[p] ?? p
+}
+
+// ── page ─────────────────────────────────────────────────────────────────────
+
+export default async function DigitalPage() {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  let adAccounts: AdAccount[] = []
+  let perfRows:   PerfRow[]   = []
+  let brandId:    string | null = null
+
+  if (user) {
+    // Resolve brand
+    const { data: brand } = await supabase
+      .from('brands')
+      .select('id')
+      .limit(1)
+      .single()
+
+    if (brand) {
+      brandId = brand.id
+
+      // Fetch connected ad accounts
+      const { data: accounts } = await supabase
+        .from('digital_ad_accounts')
+        .select('id, platform, account_name, sync_status, last_synced_at')
+        .eq('brand_id', brand.id)
+        .neq('sync_status', 'disconnected')
+
+      adAccounts = accounts ?? []
+
+      // Fetch last 30 days of performance data
+      const thirtyDaysAgo = new Date()
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+      const { data: rows } = await supabase
+        .from('digital_performance_daily')
+        .select('platform, date, spend, impressions, clicks, ctr, cpm, conversions')
+        .eq('brand_id', brand.id)
+        .gte('date', thirtyDaysAgo.toISOString().slice(0, 10))
+        .order('date', { ascending: true })
+
+      perfRows = (rows ?? []) as PerfRow[]
+    }
+  }
+
+  const hasRealData = perfRows.length > 0
+  const isDemo      = !hasRealData
+
+  // ── seed demo data if nothing connected ──────────────────────────────────
+  if (isDemo && brandId) {
+    // Trigger seed in a fire-and-forget: next page load will show data
+    // (we don't await here because it would block the render)
+    void fetch(`${process.env.APP_URL ?? ''}/api/demo/seed-digital`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    }).catch(() => null)
+  }
+
+  // ── aggregates ───────────────────────────────────────────────────────────
+  const totalSpend       = perfRows.reduce((s, r) => s + (r.spend ?? 0), 0)
+  const totalImpressions = perfRows.reduce((s, r) => s + (r.impressions ?? 0), 0)
+  const totalClicks      = perfRows.reduce((s, r) => s + (r.clicks ?? 0), 0)
+  const totalConversions = perfRows.reduce((s, r) => s + (r.conversions ?? 0), 0)
+
+  const ctrRows  = perfRows.filter(r => r.ctr  !== null && r.ctr  !== 0)
+  const avgCtr   = ctrRows.length  > 0 ? ctrRows.reduce((s, r)  => s + (r.ctr  ?? 0), 0) / ctrRows.length  : 0
+  const avgRoas  = totalSpend > 0 && totalConversions > 0
+    ? (totalConversions * 1200) / totalSpend   // Approx: each conversion ~₦1,200 revenue
+    : 0
+
+  // ── per-platform breakdown ────────────────────────────────────────────────
+  const platformMap: Record<string, PlatformSummary> = {}
+  for (const row of perfRows) {
+    if (!platformMap[row.platform]) {
+      platformMap[row.platform] = { platform: row.platform, spend: 0, impressions: 0, clicks: 0, avgCtr: 0, avgCpm: 0, conversions: 0 }
+    }
+    const p = platformMap[row.platform]
+    p.spend       += row.spend       ?? 0
+    p.impressions += row.impressions ?? 0
+    p.clicks      += row.clicks      ?? 0
+    p.conversions += row.conversions ?? 0
+  }
+  for (const p of Object.values(platformMap)) {
+    const pRows = perfRows.filter(r => r.platform === p.platform)
+    const ctrR  = pRows.filter(r => r.ctr !== null && r.ctr !== 0)
+    const cpmR  = pRows.filter(r => r.cpm !== null && r.cpm !== 0)
+    p.avgCtr = ctrR.length > 0 ? ctrR.reduce((s, r) => s + (r.ctr ?? 0), 0) / ctrR.length : 0
+    p.avgCpm = cpmR.length > 0 ? cpmR.reduce((s, r) => s + (r.cpm ?? 0), 0) / cpmR.length : 0
+  }
+  const platformSummaries = Object.values(platformMap).sort((a, b) => b.spend - a.spend)
+
+  // ── chart data: daily totals grouped into weeks ───────────────────────────
+  const dailyMap: Record<string, { spend: number; impressions: number }> = {}
+  for (const row of perfRows) {
+    if (!dailyMap[row.date]) dailyMap[row.date] = { spend: 0, impressions: 0 }
+    dailyMap[row.date].spend       += row.spend       ?? 0
+    dailyMap[row.date].impressions += row.impressions ?? 0
+  }
+
+  // Group into 7-day buckets
+  const sortedDates = Object.keys(dailyMap).sort()
+  const chartData: SpendDataPoint[] = []
+  for (let i = 0; i < sortedDates.length; i += 7) {
+    const bucket = sortedDates.slice(i, i + 7)
+    const spend       = bucket.reduce((s, d) => s + dailyMap[d].spend,       0)
+    const impressions = bucket.reduce((s, d) => s + dailyMap[d].impressions, 0)
+    const weekNum = Math.floor(i / 7) + 1
+    chartData.push({ label: `Wk ${weekNum}`, spend, impressions })
+  }
+
+  // ── platform connection cards config ─────────────────────────────────────
+  const PLATFORMS = [
+    {
+      key:         'meta',
+      label:       'Meta Ads',
+      description: 'Facebook & Instagram campaigns',
+      connectHref: '/api/ads/meta/connect',
+      available:   true,
+    },
+    {
+      key:         'google',
+      label:       'Google Ads',
+      description: 'Search, Display & Shopping',
+      connectHref: '/api/ads/google/connect',
+      available:   true,
+    },
+    {
+      key:         'tiktok',
+      label:       'TikTok Ads',
+      description: 'Short-form video advertising',
+      connectHref: '#',
+      available:   false,
+    },
+    {
+      key:         'linkedin',
+      label:       'LinkedIn Ads',
+      description: 'B2B and professional audiences',
+      connectHref: '#',
+      available:   false,
+    },
+  ]
+
+  const connectedPlatforms = new Set(adAccounts.map(a => a.platform))
+
+  const kpis = [
+    {
+      label: 'Total Spend',
+      value: hasRealData ? fmtNGN(totalSpend) : '₦2.4M',
+      sub:   hasRealData ? 'Last 30 days' : 'Demo data',
+      icon:  Coins,
+      color: 'text-indigo-500',
+    },
+    {
+      label: 'Impressions',
+      value: hasRealData ? fmtNum(totalImpressions) : '4.2M',
+      sub:   hasRealData ? 'Last 30 days' : 'Demo data',
+      icon:  Eye,
+      color: 'text-emerald-500',
+    },
+    {
+      label: 'Avg CTR',
+      value: hasRealData ? fmtPct(avgCtr) : '2.3%',
+      sub:   hasRealData ? 'Across all platforms' : 'Industry avg 1.8%',
+      icon:  MousePointerClick,
+      color: 'text-blue-500',
+    },
+    {
+      label: 'Avg ROAS',
+      value: hasRealData ? (avgRoas > 0 ? `${avgRoas.toFixed(1)}x` : 'N/A') : '3.4x',
+      sub:   hasRealData ? 'Return on ad spend' : 'Demo data',
+      icon:  TrendingUp,
+      color: 'text-violet-500',
+    },
+  ]
+
   return (
     <div className="max-w-5xl space-y-6">
 
@@ -63,14 +260,73 @@ export default function DigitalPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Digital Campaigns</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Track display, programmatic, and social paid media performance across all platforms.
+            Track your paid media performance across all connected ad platforms.
           </p>
         </div>
       </div>
 
-      {/* Key metrics row */}
+      {/* Demo banner */}
+      {isDemo && (
+        <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/30 px-4 py-3">
+          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <p className="text-sm text-amber-800 dark:text-amber-300">
+            You are viewing demo data for Jara Foods. Connect a real ad account below to see your actual performance.
+          </p>
+        </div>
+      )}
+
+      {/* Platform connection cards */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {PLATFORMS.map(p => {
+          const isConnected = connectedPlatforms.has(p.key)
+          const acct        = adAccounts.find(a => a.platform === p.key)
+
+          return (
+            <Card key={p.key} className="border rounded-xl p-4 bg-card space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm font-semibold">{p.label}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{p.description}</p>
+                </div>
+                {isConnected ? (
+                  <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                ) : p.available ? (
+                  <LinkIcon className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                ) : null}
+              </div>
+
+              {isConnected && acct ? (
+                <div className="space-y-1">
+                  <Badge variant="default" className="text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-0">
+                    Connected
+                  </Badge>
+                  {acct.last_synced_at && (
+                    <p className="text-[10px] text-muted-foreground">
+                      Synced {new Date(acct.last_synced_at).toLocaleDateString('en-NG')}
+                    </p>
+                  )}
+                  {acct.sync_status === 'error' && (
+                    <p className="text-[10px] text-rose-500">Sync error — check connection</p>
+                  )}
+                </div>
+              ) : p.available ? (
+                <Link
+                  href={p.connectHref}
+                  className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'w-full text-xs h-7 justify-center')}
+                >
+                  Connect
+                </Link>
+              ) : (
+                <Badge variant="secondary" className="text-[10px]">Coming soon</Badge>
+              )}
+            </Card>
+          )
+        })}
+      </div>
+
+      {/* KPI cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {KEY_METRICS.map(m => (
+        {kpis.map(m => (
           <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{m.label}</span>
@@ -82,89 +338,49 @@ export default function DigitalPage() {
         ))}
       </div>
 
-      {/* Campaign spend tracker */}
-      <Card className="border rounded-xl p-5 bg-card space-y-4">
-        <h2 className="text-xl font-semibold">Campaign Spend Tracker</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border/50">
-                {['Platform', 'Budget', 'Spend', 'Impressions', 'Clicks', 'CTR', 'CPM', 'Status'].map(h => (
-                  <th key={h} className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {CAMPAIGNS.map(c => (
-                <tr key={c.platform} className="border-b border-border/30 last:border-0">
-                  <td className="py-3 pr-4 font-medium whitespace-nowrap">{c.platform}</td>
-                  <td className="py-3 pr-4 text-muted-foreground">{c.budget}</td>
-                  <td className="py-3 pr-4 font-medium">{c.spend}</td>
-                  <td className="py-3 pr-4 text-muted-foreground">{c.impressions}</td>
-                  <td className="py-3 pr-4 text-muted-foreground">{c.clicks}</td>
-                  <td className="py-3 pr-4 font-medium text-emerald-600">{c.ctr}</td>
-                  <td className="py-3 pr-4 text-muted-foreground">{c.cpm}</td>
-                  <td className="py-3">
-                    <Badge variant={c.status === 'Active' ? 'default' : 'secondary'} className="text-[10px]">
-                      {c.status}
-                    </Badge>
-                  </td>
+      {/* Per-platform breakdown */}
+      {platformSummaries.length > 0 && (
+        <Card className="border rounded-xl p-5 bg-card space-y-4">
+          <h2 className="text-base font-semibold">Platform Breakdown</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/50">
+                  {['Platform', 'Spend', 'Impressions', 'Clicks', 'Avg CTR', 'Avg CPM', 'Conversions'].map(h => (
+                    <th key={h} className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+              </thead>
+              <tbody>
+                {platformSummaries.map(p => (
+                  <tr key={p.platform} className="border-b border-border/30 last:border-0">
+                    <td className="py-3 pr-4 font-medium whitespace-nowrap">{platformLabel(p.platform)}</td>
+                    <td className="py-3 pr-4 font-medium">{fmtNGN(p.spend)}</td>
+                    <td className="py-3 pr-4 text-muted-foreground">{fmtNum(p.impressions)}</td>
+                    <td className="py-3 pr-4 text-muted-foreground">{fmtNum(p.clicks)}</td>
+                    <td className="py-3 pr-4 font-medium text-emerald-600">{fmtPct(p.avgCtr)}</td>
+                    <td className="py-3 pr-4 text-muted-foreground">{fmtNGN(p.avgCpm)}</td>
+                    <td className="py-3">{p.conversions}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
 
-      {/* Performance chart */}
+      {/* Spend vs Impressions chart */}
       <Card className="border rounded-xl p-5 bg-card space-y-3">
         <div>
-          <h2 className="text-xl font-semibold">Spend vs Impressions (8 Weeks)</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Weekly digital ad spend correlated with impression delivery</p>
+          <h2 className="text-base font-semibold">Spend vs Impressions (30 Days)</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Weekly digital ad spend correlated with impression delivery
+            {isDemo && ' · Demo data'}
+          </p>
         </div>
-        <DigitalSpendChart />
-      </Card>
-
-      {/* Top performing creatives */}
-      <Card className="border rounded-xl p-5 bg-card space-y-4">
-        <h2 className="text-xl font-semibold">Top Performing Creatives</h2>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {CREATIVES.map((cr, i) => (
-            <div key={i} className="border border-border/50 rounded-lg p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{cr.platform}</span>
-                <Badge variant="outline" className="text-[10px]">{cr.format}</Badge>
-              </div>
-              <div className="space-y-1">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Impressions</span>
-                  <span className="font-medium">{cr.impressions}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">CTR</span>
-                  <span className="font-medium text-emerald-600">{cr.ctr}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Spend</span>
-                  <span className="font-medium">{cr.spend}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* AI insight */}
-      <Card className="border rounded-xl p-5 bg-card space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-md bg-indigo-500/10 flex items-center justify-center shrink-0">
-            <Monitor className="h-3.5 w-3.5 text-indigo-500" />
-          </div>
-          <h2 className="text-sm font-semibold">AI Insight</h2>
-        </div>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Your Meta video creatives are outperforming display by 35% on CTR. The Lagos-audience segment (25-34 age band) shows the strongest engagement during evening hours (6pm-9pm). Consider shifting 20% of your DV360 budget to Meta video to capitalise on this pattern. Cost per lead is trending down month-on-month — a strong signal that audience targeting refinements are working.
-        </p>
+        <DigitalSpendChart data={chartData.length > 0 ? chartData : undefined} />
       </Card>
 
     </div>
