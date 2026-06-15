@@ -462,22 +462,16 @@
 
   /* ── Chart gradient fills — standardized for Recharts <Area> ─────────────── */
 
-  /* Used as SVG linearGradient stops in chart components */
-  /* Blue (BHI, primary data) */
-  --chart-blue-0: rgba(43, 89, 255, 0.30);
-  --chart-blue-1: rgba(43, 89, 255, 0.00);
-
-  /* Clay (brand, campaigns) */
-  --chart-clay-0: rgba(212, 96, 42, 0.28);
-  --chart-clay-1: rgba(212, 96, 42, 0.00);
-
-  /* Green (sentiment positive) */
-  --chart-green-0: rgba(34, 197, 94, 0.25);
-  --chart-green-1: rgba(34, 197, 94, 0.00);
-
-  /* Violet (SOV, reach) */
-  --chart-violet-0: rgba(124, 58, 237, 0.25);
-  --chart-violet-1: rgba(124, 58, 237, 0.00);
+  :root {
+    --chart-blue-0: rgba(43,89,255,0.30);
+    --chart-blue-1: rgba(43,89,255,0.00);
+    --chart-clay-0: rgba(212,96,42,0.28);
+    --chart-clay-1: rgba(212,96,42,0.00);
+    --chart-green-0: rgba(34,197,94,0.25);
+    --chart-green-1: rgba(34,197,94,0.00);
+    --chart-violet-0: rgba(124,58,237,0.25);
+    --chart-violet-1: rgba(124,58,237,0.00);
+  }
 
   /* ── Bento grid (overview layout) ───────────────────────────────────────── */
 
