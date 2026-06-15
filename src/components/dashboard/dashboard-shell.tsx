@@ -1,16 +1,17 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { Menu, X, Sparkles, Search } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Search } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Sidebar }            from './sidebar'
 import { BreadcrumbNav }      from './breadcrumb-nav'
 import { ThemeToggle }        from './theme-toggle'
 import { NotificationBell }   from './notification-bell'
 import { UserDropdown }       from './user-dropdown'
 import { MobileNav }          from './mobile-nav'
-import { DashboardNav }       from './dashboard-nav'
+import { CommandPalette }     from './command-palette'
 import { cn }                 from '@/lib/utils'
 
 const LS_KEY = 'bp-sidebar'
@@ -23,6 +24,8 @@ interface DashboardShellProps {
 }
 
 export function DashboardShell({ children, userName, userEmail, brandName }: DashboardShellProps) {
+  const pathname = usePathname()
+
   // Default pinned=true (expanded sidebar), hydrate from localStorage
   const [pinned, setPinned] = useState(true)
   const [hydrated, setHydrated] = useState(false)
@@ -47,6 +50,9 @@ export function DashboardShell({ children, userName, userEmail, brandName }: Das
 
   return (
     <div className="min-h-screen flex bg-background">
+
+      {/* Global command palette — ⌘K anywhere */}
+      <CommandPalette />
 
       {/* Desktop sidebar */}
       <Sidebar
@@ -118,9 +124,19 @@ export function DashboardShell({ children, userName, userEmail, brandName }: Das
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-7">
-          {children}
+        {/* Page content — route-keyed AnimatePresence for cross-page transitions */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-7 overflow-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.20, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>

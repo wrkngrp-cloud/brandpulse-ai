@@ -191,16 +191,16 @@ export function BHIGauge({ bhi, sparkline = [] }: Props) {
             />
           )}
 
-          {/* Score number (count-up) — DM Serif Display */}
+          {/* Score number (count-up) — Satoshi Bold */}
           <text
             x={CX}
             y={CY - 14}
             textAnchor="middle"
             dominantBaseline="auto"
-            fontSize="46"
-            fontWeight="400"
-            fontFamily="var(--font-serif), Georgia, serif"
-            letterSpacing="-1"
+            fontSize="48"
+            fontWeight="700"
+            fontFamily="var(--font-display), system-ui, sans-serif"
+            letterSpacing="-2"
             fill="currentColor"
           >
             {score !== null ? <motion.tspan>{display}</motion.tspan> : '—'}

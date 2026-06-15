@@ -7,6 +7,7 @@ import { CrawlHistory } from './crawl-history'
 import { SentimentTrendChart } from './sentiment-trend-chart'
 import { EmotionWheel } from './emotion-wheel'
 import { TopicClusters } from './topic-clusters'
+import { SentimentHeatmap } from '@/components/dashboard/sentiment-heatmap'
 
 const SENTIMENT_BAR: Record<string, string> = {
   positive: 'bg-green-500',
@@ -99,7 +100,7 @@ function weeklyAggregate(daily: DayRow[]): { weekLabel: string; score: number; p
 async function SentimentData() {
   const supabase = await createClient()
 
-  const [{ data: daily }, { data: mentions }, { data: lastRun }] = await Promise.all([
+  const [{ data: daily }, { data: mentions }, { data: lastRun }, { data: heatmapRaw }] = await Promise.all([
     supabase
       .from('sentiment_daily')
       .select('day, social_score, positive_pct, neutral_pct, negative_pct, emotion_distribution, platform_breakdown')
@@ -116,6 +117,11 @@ async function SentimentData() {
       .order('started_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
+    supabase
+      .from('sentiment_daily')
+      .select('day, social_score, positive_pct, negative_pct')
+      .order('day', { ascending: true })
+      .limit(400),   // ~13 months for heatmap
   ])
 
   const latest       = daily?.[0] ?? null
@@ -157,6 +163,13 @@ async function SentimentData() {
     .filter(m => m.content && m.content.length > 10)
     .map(m => m.content as string)
 
+  const heatmapData = (heatmapRaw ?? []).map(r => ({
+    date:         r.day as string,
+    score:        r.social_score as number | null,
+    positive_pct: r.positive_pct as number | null,
+    negative_pct: r.negative_pct as number | null,
+  }))
+
   return (
     <div className="space-y-6">
       {/* Alert feed */}
@@ -180,24 +193,27 @@ async function SentimentData() {
 
       {/* KPI tiles */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="border rounded-xl p-4 space-y-1">
-          <p className="text-xs text-muted-foreground">Sentiment score</p>
-          <div className="flex items-center gap-1.5">
-            <p className="text-2xl font-bold">
+        <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
+          <p className="eyebrow">Sentiment score</p>
+          <div className="flex items-baseline gap-1.5">
+            <p className={`metric text-[34px] ${latest
+              ? latest.social_score >= 60 ? 'text-green-500'
+                : latest.social_score <= 40 ? 'text-red-500' : 'text-amber-500'
+              : 'text-muted-foreground/30'}`}>
               {latest ? Math.round(latest.social_score) : '—'}
             </p>
             {latest && (
               latest.social_score >= 60
-                ? <TrendingUp   className="h-4 w-4 text-green-600" />
+                ? <TrendingUp   className="h-4 w-4 text-green-500 mb-1" />
                 : latest.social_score <= 40
-                  ? <TrendingDown className="h-4 w-4 text-red-500" />
-                  : <Minus        className="h-4 w-4 text-muted-foreground" />
+                  ? <TrendingDown className="h-4 w-4 text-red-500 mb-1" />
+                  : <Minus        className="h-4 w-4 text-muted-foreground/40 mb-1" />
             )}
           </div>
           {platformEntries.length > 0 && (
-            <div className="flex flex-wrap gap-1 pt-1">
+            <div className="flex flex-wrap gap-1 pt-0.5">
               {platformEntries.map(([p, s]) => (
-                <span key={p} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium border bg-muted/40 text-muted-foreground">
+                <span key={p} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border bg-muted/40 text-muted-foreground">
                   {PLATFORM_LABEL[p] ?? p}
                   <span className="font-bold text-foreground">{Math.round(s.score)}</span>
                 </span>
@@ -206,41 +222,58 @@ async function SentimentData() {
           )}
         </div>
 
-        <div className="border rounded-xl p-4 space-y-1">
-          <p className="text-xs text-muted-foreground">Positive</p>
-          <p className="text-2xl font-bold text-green-600">
+        <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
+          <p className="eyebrow">Positive</p>
+          <p className="metric text-[34px] text-green-500">
             {latest ? `${Math.round(latest.positive_pct)}%` : '—'}
           </p>
-          <p className="text-xs text-muted-foreground">of mentions</p>
+          <p className="text-[11px] text-muted-foreground/50">of mentions</p>
         </div>
 
-        <div className="border rounded-xl p-4 space-y-1">
-          <p className="text-xs text-muted-foreground">Negative</p>
-          <p className="text-2xl font-bold text-red-500">
+        <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
+          <p className="eyebrow">Negative</p>
+          <p className="metric text-[34px] text-red-500">
             {latest ? `${Math.round(latest.negative_pct)}%` : '—'}
           </p>
-          <p className="text-xs text-muted-foreground">of mentions</p>
+          <p className="text-[11px] text-muted-foreground/50">of mentions</p>
         </div>
 
-        <div className="border rounded-xl p-4 space-y-1">
-          <p className="text-xs text-muted-foreground">Mentions crawled</p>
-          <p className="text-2xl font-bold">{mentions?.length ?? 0}</p>
-          <p className="text-xs text-muted-foreground">shown (latest 50)</p>
+        <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
+          <p className="eyebrow">Mentions</p>
+          <p className="metric text-[34px]">{mentions?.length ?? 0}</p>
+          <p className="text-[11px] text-muted-foreground/50">latest 50 shown</p>
         </div>
       </div>
 
       {/* 12-week trend */}
       {weekly.length >= 2 && (
-        <div className="border rounded-xl p-5 space-y-3">
+        <div className="border rounded-2xl bg-card card-shadow p-5 sm:p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold">12-week sentiment trend</p>
-            <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
-              <span className="flex items-center gap-1"><span className="inline-block w-3 h-0.5 bg-foreground" />score</span>
-              <span className="flex items-center gap-1"><span className="inline-block w-3 h-0.5 bg-green-500 opacity-70" />positive</span>
-              <span className="flex items-center gap-1"><span className="inline-block w-3 h-0.5 bg-red-400 opacity-70" />negative</span>
+            <div>
+              <p className="eyebrow mb-1">12-Week Trend</p>
+              <h3 className="text-[15px] font-semibold tracking-tight">Sentiment over time</h3>
+            </div>
+            <div className="flex items-center gap-4">
+              {[
+                { label: 'Score', color: '#2B59FF' },
+                { label: 'Positive', color: '#22c55e' },
+                { label: 'Negative', color: '#f87171' },
+              ].map(l => (
+                <div key={l.label} className="hidden sm:flex items-center gap-1.5">
+                  <span className="h-[3px] w-4 rounded-full" style={{ background: l.color }} />
+                  <span className="text-[11px] text-muted-foreground/55 font-medium">{l.label}</span>
+                </div>
+              ))}
             </div>
           </div>
           <SentimentTrendChart data={weekly} weekly />
+        </div>
+      )}
+
+      {/* Sentiment calendar heatmap */}
+      {heatmapData.length > 0 && (
+        <div className="border rounded-2xl bg-card card-shadow p-5 sm:p-6">
+          <SentimentHeatmap data={heatmapData} />
         </div>
       )}
 
