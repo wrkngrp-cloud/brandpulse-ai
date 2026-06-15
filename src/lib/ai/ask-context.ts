@@ -58,10 +58,10 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
       .limit(1)
       .maybeSingle(),
     supabase
-      .from('survey_responses')
-      .select('nps_score')
+      .from('nps_records')
+      .select('score')
       .eq('brand_id', brandId)
-      .not('nps_score', 'is', null)
+      .not('score', 'is', null)
       .gte('created_at', new Date(Date.now() - 30 * 86_400_000).toISOString()),
     supabase
       .from('social_connections')
@@ -95,7 +95,7 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
   }>
 
   // Compute NPS
-  const npsScores = (surveyNPS ?? []).map(r => r.nps_score as number)
+  const npsScores = (surveyNPS ?? []).map(r => r.score as number)
   const avgNPS = npsScores.length
     ? Number((npsScores.reduce((a, b) => a + b, 0) / npsScores.length).toFixed(1))
     : null

@@ -8,6 +8,7 @@ import { SentimentTrendChart } from './sentiment-trend-chart'
 import { EmotionWheel } from './emotion-wheel'
 import { TopicClusters } from './topic-clusters'
 import { SentimentHeatmap } from '@/components/dashboard/sentiment-heatmap'
+import { MentionsList } from './mentions-list'
 
 const SENTIMENT_BAR: Record<string, string> = {
   positive: 'bg-green-500',
@@ -328,43 +329,9 @@ async function SentimentData() {
         <TopicClusters mentions={mentionTexts} />
       )}
 
-      {/* Recent mentions */}
+      {/* Recent mentions with dispute feedback */}
       {mentions && mentions.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">Recent mentions</p>
-          <div className="border rounded-xl divide-y overflow-hidden">
-            {mentions.slice(0, 20).map(m => (
-              <div key={m.id} className="px-4 py-3 space-y-1">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
-                      {PLATFORM_LABEL[m.platform as string] ?? m.platform}
-                    </span>
-                    <span className="text-xs text-muted-foreground truncate">
-                      {m.author_handle ? `@${m.author_handle}` : 'unknown'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {m.sentiment_label && (
-                      <span className={`text-xs font-medium capitalize ${
-                        m.sentiment_label === 'positive' ? 'text-green-600' :
-                        m.sentiment_label === 'negative' ? 'text-red-500' :
-                        m.sentiment_label === 'mixed'    ? 'text-amber-500' :
-                        'text-muted-foreground'
-                      }`}>
-                        {m.sentiment_label}
-                      </span>
-                    )}
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(m.created_at as string).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
-                    </span>
-                  </div>
-                </div>
-                <p className="text-sm leading-snug line-clamp-2">{m.content}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <MentionsList initialMentions={mentions as Parameters<typeof MentionsList>[0]['initialMentions']} />
       )}
 
       <div className="flex justify-end">

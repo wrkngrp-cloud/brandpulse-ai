@@ -1,5 +1,6 @@
 import { callAi } from '@/lib/ai/client'
 import { buildBrandContext } from '@/lib/ai/brand-context'
+import { createServiceClient } from '@/lib/supabase/server'
 import {
   buildSentimentSystemPrompt,
   buildSentimentUserMessage,
@@ -58,14 +59,50 @@ function parseResults(raw: string, items: SentimentItem[]): SentimentResult[] {
 // Batch size kept at 50 to stay within Haiku's context and match Phase-0 gate sample size
 const BATCH_SIZE = 50
 
+async function loadDisputeExamples(brandId: string): Promise<string> {
+  try {
+    const service = await createServiceClient()
+    const { data } = await service
+      .from('sentiment_disputes')
+      .select('mention_id, original_label, corrected_label, reason, mentions(content)')
+      .eq('brand_id', brandId)
+      .eq('status', 'applied')
+      .order('created_at', { ascending: false })
+      .limit(15)
+
+    if (!data || data.length === 0) return ''
+
+    const lines = data
+      .filter(d => {
+        const m = d.mentions as unknown
+        return m && typeof m === 'object' && !Array.isArray(m) && (m as { content?: string }).content
+      })
+      .map(d => {
+        const content = ((d.mentions as unknown) as { content: string }).content.slice(0, 120)
+        const reason  = d.reason ? ` (User note: ${d.reason})` : ''
+        return `  • "${content}" — was "${d.original_label}", correct label is "${d.corrected_label}"${reason}`
+      })
+      .join('\n')
+
+    if (!lines) return ''
+
+    return `\n\n─── USER CORRECTIONS FOR THIS BRAND ────────────────────────────────────────────\nThese are past misclassifications corrected by the brand team. Apply the same logic to similar new items:\n${lines}`
+  } catch {
+    return ''
+  }
+}
+
 export async function classifySentiment(
   brandId: string,
   items: SentimentItem[]
 ): Promise<SentimentResult[]> {
   if (items.length === 0) return []
 
-  const ctx = await buildBrandContext(brandId)
-  const system = buildSentimentSystemPrompt(ctx)
+  const [ctx, correctionBlock] = await Promise.all([
+    buildBrandContext(brandId),
+    loadDisputeExamples(brandId),
+  ])
+  const system = buildSentimentSystemPrompt(ctx, correctionBlock)
 
   const results: SentimentResult[] = []
 

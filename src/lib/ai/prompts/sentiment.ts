@@ -95,13 +95,14 @@ Respond in JSON only — no prose, no markdown fences, preserving input order:
 [{"id":"","sentiment":"","emotion":"","confidence":0.0}]
 `.trim()
 
-export function buildSentimentSystemPrompt(ctx: BrandContext): string {
-  // Layer 1 + cultural block + Layer 2 — all go in the system turn
+export function buildSentimentSystemPrompt(ctx: BrandContext, correctionBlock = ''): string {
+  // Layer 1 + cultural block + Layer 2 + optional correction block — all go in the system turn
   return [
     `You classify sentiment of social media content for ${ctx.brandName}.`,
     formatBrandContextBlock(ctx),
     '',
     CULTURAL_BLOCK,
+    correctionBlock,
     '',
     TASK_BLOCK,
   ].join('\n')
