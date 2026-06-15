@@ -69,7 +69,7 @@ Return exactly this JSON shape with no other text:
       temperature: 0.2,
     })
 
-    parsed = JSON.parse(text)
+    parsed = JSON.parse(text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim())
 
     // Clamp values to valid range
     const cultural_iq = Math.min(100, Math.max(0, Math.round(parsed.cultural_iq)))

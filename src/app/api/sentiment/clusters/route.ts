@@ -53,14 +53,15 @@ Return exactly this JSON shape:
 }`
 
   try {
-    const text = await callAi({
+    const raw = await callAi({
       tier:        'cultural',
       system:      systemPrompt,
       messages:    [{ role: 'user', content: userPrompt }],
       maxTokens:   1200,
       temperature: 0.2,
     })
-    const result = JSON.parse(text)
+    const cleaned = raw.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim()
+    const result = JSON.parse(cleaned)
     return NextResponse.json(result)
   } catch {
     return NextResponse.json({ error: 'Clustering failed — please try again.' }, { status: 500 })

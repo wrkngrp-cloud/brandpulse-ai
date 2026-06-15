@@ -81,7 +81,7 @@ Return exactly this JSON shape:
       maxTokens:   900,
       temperature: 0.3,
     })
-    const result = JSON.parse(text)
+    const result = JSON.parse(text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim())
     return NextResponse.json(result)
   } catch {
     return NextResponse.json({ error: 'Diagnosis failed — please try again.' }, { status: 500 })

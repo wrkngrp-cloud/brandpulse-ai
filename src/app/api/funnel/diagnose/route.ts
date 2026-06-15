@@ -100,7 +100,7 @@ Return exactly this JSON shape:
       temperature: 0.3,
     })
 
-    const result = JSON.parse(text) as {
+    const result = JSON.parse(text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim()) as {
       biggestGap: string
       diagnosis: string
       recommendations: string[]
