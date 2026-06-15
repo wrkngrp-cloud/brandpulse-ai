@@ -43,11 +43,11 @@ export default async function CampaignsPage({
     { key: 'events', label: 'Events',        built: true },
   ] as const
 
-  const COMING_TABS = [
-    { key: 'digital', label: 'Digital' },
-    { key: 'radio',   label: 'Radio' },
-    { key: 'tv',      label: 'TV' },
-    { key: 'print',   label: 'Print' },
+  const CHANNEL_PAGES = [
+    { key: 'digital', label: 'Digital', href: '/dashboard/digital' },
+    { key: 'radio',   label: 'Radio',   href: '/dashboard/radio'   },
+    { key: 'tv',      label: 'TV',      href: '/dashboard/tv'      },
+    { key: 'print',   label: 'Print',   href: '/dashboard/print'   },
   ]
 
   return (
@@ -84,14 +84,14 @@ export default async function CampaignsPage({
             {tab.label}
           </Link>
         ))}
-        {COMING_TABS.map(tab => (
-          <span
+        {CHANNEL_PAGES.map(tab => (
+          <Link
             key={tab.key}
-            className="px-3 py-2 text-sm text-muted-foreground/50 border-b-2 border-transparent -mb-px whitespace-nowrap cursor-not-allowed select-none"
-            title="Coming soon"
+            href={tab.href}
+            className="px-3 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors -mb-px whitespace-nowrap"
           >
             {tab.label}
-          </span>
+          </Link>
         ))}
       </div>
 

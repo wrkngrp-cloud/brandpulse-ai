@@ -29,18 +29,20 @@ function CustomTooltip({ active, payload, label }: {
   )
 }
 
-export function SovHistoryChart({ data }: { data: SovPoint[] }) {
+export function SovHistoryChart({ data, days }: { data: SovPoint[]; days?: number }) {
   if (data.length < 2) return null
 
   const min = Math.max(0, Math.min(...data.map(d => d.sov_pct)) - 5)
   const max = Math.min(100, Math.max(...data.map(d => d.sov_pct)) + 5)
+
+  const rangeLabel = days === 7 ? 'Last 7 days' : days === 84 ? 'Last 12 weeks' : days === 180 ? 'Last 6 months' : 'Last 30 days'
 
   return (
     <div className="border rounded-xl p-5 bg-card space-y-3">
       <div>
         <p className="text-sm font-semibold">SOV Over Time</p>
         <p className="text-xs text-muted-foreground">
-          Social share of voice trend — {data.length} snapshots
+          {rangeLabel} · {data.length} snapshots
         </p>
       </div>
       <ResponsiveContainer width="100%" height={180}>

@@ -42,8 +42,9 @@ async function ContentData({ days }: { days: number }) {
       supabase
         .from('sov_snapshots')
         .select('snapshot_date,social_sov')
+        .gte('snapshot_date', cutoffStr)
         .order('snapshot_date', { ascending: true })
-        .limit(60),
+        .limit(180),
     ])
 
   const competitorData = sovSnap?.competitor_data as {
@@ -76,7 +77,7 @@ async function ContentData({ days }: { days: number }) {
 
       {/* SOV history chart */}
       {sovHistoryPoints.length >= 2 && (
-        <SovHistoryChart data={sovHistoryPoints} />
+        <SovHistoryChart data={sovHistoryPoints} days={days} />
       )}
 
       {/* Funnel breakdown charts */}
