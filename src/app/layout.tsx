@@ -4,8 +4,8 @@ import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
-// Clash Grotesk (body) + Clash Display (headings/metrics) — loaded via fontshare CDN
-// Geist Mono for code blocks only
+// Satoshi (body + display, weights 300–900) — loaded via fontshare CDN
+// Geist Mono for code/tabular data only
 const geistMono = Geist_Mono({ variable: '--font-mono', subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -21,10 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <head>
-        {/* Clash Grotesk + Clash Display — Indian Type Foundry via fontshare */}
+        {/* Satoshi — fontshare CDN, weights 300/400/500/700/900 */}
         <link rel="preconnect" href="https://api.fontshare.com" />
         <link
-          href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&f[]=clash-display@400,500,600,700&display=swap"
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap"
           rel="stylesheet"
         />
         <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.css" />

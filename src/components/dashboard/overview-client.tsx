@@ -308,7 +308,11 @@ export function OverviewClient({
           {sentiment !== null ? (
             <div className="flex items-start gap-6">
               <div className="shrink-0">
-                <div className="metric text-[60px] leading-none">
+                <div className={cn('metric text-[58px] leading-none tabular-nums',
+                  sentiment.social_score >= 60 ? 'text-green-500'
+                  : sentiment.social_score <= 40 ? 'text-red-500'
+                  : 'text-amber-500'
+                )}>
                   {Math.round(sentiment.social_score)}
                 </div>
                 <div className="flex items-center gap-1.5 mt-2">
@@ -318,39 +322,41 @@ export function OverviewClient({
                     ? <TrendingDown className="h-3.5 w-3.5 text-red-500" />
                     : <Minus className="h-3.5 w-3.5 text-muted-foreground/40" />
                   }
-                  <span className="text-[12px] text-muted-foreground/55">/ 100</span>
+                  <span className="text-[11px] font-medium text-muted-foreground/45">/ 100</span>
                 </div>
               </div>
 
-              <div className="flex-1 space-y-3 pt-1.5">
+              <div className="flex-1 space-y-3 pt-1">
                 {[
-                  { label: 'Positive', pct: sentiment.positive_pct, color: 'bg-green-500' },
-                  { label: 'Negative', pct: sentiment.negative_pct, color: 'bg-red-500'   },
+                  { label: 'Positive', pct: sentiment.positive_pct, bar: 'from-green-500 to-green-400', text: 'text-green-500' },
+                  { label: 'Negative', pct: sentiment.negative_pct, bar: 'from-red-500 to-red-400',     text: 'text-red-500'   },
                 ].map(row => (
                   <div key={row.label} className="space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <span className="text-[12px] text-muted-foreground">{row.label}</span>
-                      <span className={cn('text-[12px] font-semibold', row.label === 'Positive' ? 'text-green-500' : 'text-red-500')}>
+                      <span className="text-[12px] text-muted-foreground/65">{row.label}</span>
+                      <span className={cn('text-[12px] font-semibold tabular-nums', row.text)}>
                         {Math.round(row.pct)}%
                       </span>
                     </div>
-                    <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                    <div className="h-[3px] bg-muted/40 rounded-full overflow-hidden">
                       <motion.div
-                        className={cn('h-full rounded-full', row.color)}
+                        className={cn('h-full rounded-full bg-gradient-to-r', row.bar)}
                         initial={{ width: 0 }}
                         animate={{ width: `${row.pct}%` }}
-                        transition={{ duration: 1.1, delay: 0.5, ease: 'easeOut' }}
+                        transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
                       />
                     </div>
                   </div>
                 ))}
-                <p className="text-[10.5px] text-muted-foreground/40 pt-0.5">from {fmtDate(sentiment.day)}</p>
+                <p className="text-[10px] text-muted-foreground/38 pt-0.5 tracking-wide uppercase">
+                  {fmtDate(sentiment.day)}
+                </p>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col justify-center gap-1 py-3">
-              <span className="metric text-[60px] leading-none text-muted-foreground/12">—</span>
-              <p className="text-[12.5px] text-muted-foreground mt-1">No crawl data yet. Run a crawl from Sentiment.</p>
+            <div className="flex flex-col justify-center gap-1.5 py-3">
+              <span className="metric text-[58px] leading-none text-muted-foreground/10">—</span>
+              <p className="text-[12px] text-muted-foreground/60 mt-1">No crawl data yet. Run a crawl from Sentiment.</p>
             </div>
           )}
         </Card>
@@ -375,13 +381,13 @@ export function OverviewClient({
                   Social share of voice{sovDate ? ` · ${fmtDate(sovDate)}` : ''}
                 </p>
               </div>
-              <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden mt-4">
+              <div className="h-[3px] bg-muted/40 rounded-full overflow-hidden mt-4">
                 <motion.div
                   className="h-full rounded-full"
                   style={{ background: 'linear-gradient(90deg, #6B8FFF 0%, #2B59FF 100%)' }}
                   initial={{ width: 0 }}
                   animate={{ width: `${Math.min(sovScore, 100)}%` }}
-                  transition={{ duration: 1.1, delay: 0.6, ease: 'easeOut' }}
+                  transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 />
               </div>
             </>
@@ -502,22 +508,27 @@ export function OverviewClient({
               {recentMentions.map(m => (
                 <div
                   key={m.id}
-                  className="rounded-xl border border-border/50 bg-muted/20 px-3.5 py-3 space-y-2 hover:bg-muted/35 transition-colors"
+                  className="group rounded-xl border border-border/40 bg-muted/15 px-3.5 py-3.5 space-y-2.5 hover:bg-muted/30 hover:border-border/70 transition-all duration-200 cursor-default"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground shrink-0 uppercase tracking-wider">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-foreground/8 text-foreground/50 shrink-0 uppercase tracking-[0.12em]">
                       {PLATFORM_LABEL[m.platform] ?? m.platform}
                     </span>
-                    <span className="text-[11px] text-muted-foreground truncate">
-                      {m.author_handle ? `@${m.author_handle}` : 'unknown'}
+                    <span className="text-[11px] text-muted-foreground/65 truncate font-medium">
+                      {m.author_handle ? `@${m.author_handle}` : '—'}
                     </span>
                     {m.sentiment_label && (
-                      <span className={cn('text-[11px] font-semibold capitalize ml-auto shrink-0', SENTIMENT_COLOUR[m.sentiment_label] ?? '')}>
+                      <span className={cn('text-[10px] font-semibold capitalize ml-auto shrink-0 px-1.5 py-0.5 rounded-md', {
+                        'bg-green-500/10 text-green-600 dark:text-green-400': m.sentiment_label === 'positive',
+                        'bg-red-500/10 text-red-600 dark:text-red-400':       m.sentiment_label === 'negative',
+                        'bg-muted text-muted-foreground':                      m.sentiment_label === 'neutral',
+                        'bg-amber-500/10 text-amber-600 dark:text-amber-400': m.sentiment_label === 'mixed',
+                      })}>
                         {m.sentiment_label}
                       </span>
                     )}
                   </div>
-                  <p className="text-[12px] leading-relaxed line-clamp-2 text-muted-foreground/80">{m.content}</p>
+                  <p className="text-[12.5px] leading-[1.55] line-clamp-2 text-foreground/65">{m.content}</p>
                 </div>
               ))}
             </div>

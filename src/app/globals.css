@@ -4,8 +4,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ── Fonts: Clash Grotesk (body) + Clash Display (headings/metrics) ──────── */
-/* Loaded via fontshare CDN in layout.tsx head */
+/* ── Font: Satoshi (all weights 300–900) ─────────────────────────────────── */
+/* Loaded via fontshare CDN in layout.tsx head                                */
 
 @theme inline {
   --color-background:            var(--background);
@@ -78,9 +78,9 @@
    Canvas: pure white  |  Chrome: navy  |  Signal: blue  |  Brand: clay
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Font families — Clash Grotesk (body) + Clash Display (display/metrics) */
-  --font-sans:    'Clash Grotesk', system-ui, -apple-system, sans-serif;
-  --font-display: 'Clash Display', system-ui, -apple-system, sans-serif;
+  /* Font family — Satoshi for everything; weight does the hierarchy work */
+  --font-sans:    'Satoshi', system-ui, -apple-system, sans-serif;
+  --font-display: 'Satoshi', system-ui, -apple-system, sans-serif;
   --font-mono:    var(--font-mono, 'Geist Mono', monospace);
 
   /* Content backgrounds — WHITE is the canvas */
@@ -198,16 +198,21 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
-    font-size: 15px;
-    line-height: 1.6;
-    font-feature-settings: "kern" 1, "liga" 1;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.57;
+    font-feature-settings: "kern" 1, "liga" 1, "ss01" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     font-family: var(--font-sans);
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    letter-spacing: -0.025em;
+    font-weight: 700;
+    letter-spacing: -0.028em;
+    line-height: 1.1;
   }
 }
 
@@ -218,35 +223,38 @@
 
   /* ── Typography ─────────────────────────────────────────────────────────── */
 
-  /* Display: Clash Display for page titles */
+  /* Display: Satoshi Bold for page titles */
   .h-display {
     font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.03em;
+    font-weight: 700;
+    letter-spacing: -0.030em;
     line-height: 1.0;
   }
 
-  /* Metric: Clash Display for KPI numbers */
+  /* Metric: Satoshi Bold/Black for KPI numbers — weight 700 is the key
+     Satoshi 700 at large sizes has geometric confidence; tight tracking
+     makes multi-digit numbers read as a single unit */
   .metric {
     font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.04em;
+    font-weight: 700;
+    letter-spacing: -0.035em;
     font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
     line-height: 1.0;
   }
 
   /* Eyebrow / section label */
   .eyebrow {
     font-family: var(--font-sans);
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.11em;
-    color: oklch(0.50 0.022 264 / 0.60);
+    letter-spacing: 0.12em;
+    color: oklch(0.50 0.022 264 / 0.55);
     line-height: 1;
   }
   .dark .eyebrow {
-    color: oklch(0.60 0.022 264 / 0.65);
+    color: oklch(0.65 0.018 264 / 0.60);
   }
 
   /* ── Gradient text ──────────────────────────────────────────────────────── */
@@ -354,9 +362,18 @@
 
   /* Legacy compat */
   .card-shadow {
-    box-shadow: 0 1px 3px rgba(20, 24, 43, 0.07), 0 2px 12px rgba(20, 24, 43, 0.05);
+    box-shadow: 0 1px 2px rgba(20, 24, 43, 0.05), 0 2px 8px rgba(20, 24, 43, 0.04);
   }
-  .dark .card-shadow { box-shadow: none; }
+  .dark .card-shadow { box-shadow: 0 1px 16px rgba(0,0,0,0.24); }
+
+  /* ── Tone surface backgrounds (subtle radial per-tone tint) ─────────────── */
+  /* Applied to stat cards. Faint "whisper of color" at top-right — barely
+     there but creates intentionality. Apple uses this in dark mode cards. */
+  .tone-surface-blue   { background-image: radial-gradient(ellipse 160px 120px at 90% 0%, rgba(43,89,255,0.055) 0%, transparent 100%); }
+  .tone-surface-green  { background-image: radial-gradient(ellipse 160px 120px at 90% 0%, rgba(34,197,94,0.055) 0%, transparent 100%); }
+  .tone-surface-amber  { background-image: radial-gradient(ellipse 160px 120px at 90% 0%, rgba(245,158,11,0.055) 0%, transparent 100%); }
+  .tone-surface-clay   { background-image: radial-gradient(ellipse 160px 120px at 90% 0%, rgba(212,96,42,0.055) 0%, transparent 100%); }
+  .tone-surface-violet { background-image: radial-gradient(ellipse 160px 120px at 90% 0%, rgba(124,58,237,0.055) 0%, transparent 100%); }
 
   /* Card accent stripes */
   .card-accent-blue  { box-shadow: inset 0 2px 0 0 #2B59FF; }

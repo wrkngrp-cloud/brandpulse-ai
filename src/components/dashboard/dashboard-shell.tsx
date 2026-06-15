@@ -66,7 +66,7 @@ export function DashboardShell({ children, userName, userEmail, brandName }: Das
         style={{ paddingLeft: hydrated ? `${contentPad}px` : '256px' }}
       >
         {/* Topbar */}
-        <header className="sticky top-0 z-30 h-14 border-b border-border flex items-center gap-3 px-4 sm:px-5 shrink-0 bg-background/90 backdrop-blur-xl">
+        <header className="sticky top-0 z-30 h-14 border-b border-border/60 flex items-center gap-3 px-4 sm:px-5 shrink-0 bg-background/92 backdrop-blur-xl backdrop-saturate-150">
 
           {/* Mobile: hamburger + brand mark */}
           <div className="flex items-center gap-2.5 md:hidden">

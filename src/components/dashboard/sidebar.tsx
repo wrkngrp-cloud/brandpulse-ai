@@ -22,25 +22,32 @@ import { cn } from '@/lib/utils'
 
 function PulseMark({ size = 32 }: { size?: number }) {
   return (
-    <div
+    <motion.div
       className="shrink-0 grid place-items-center rounded-xl"
+      animate={{
+        boxShadow: [
+          '0 4px 14px -4px rgba(43,89,255,0.50)',
+          '0 4px 22px -2px rgba(43,89,255,0.78)',
+          '0 4px 14px -4px rgba(43,89,255,0.50)',
+        ],
+      }}
+      transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
       style={{
         height: size,
         width:  size,
-        background: 'linear-gradient(135deg, #6B8FFF 0%, #2B59FF 100%)',
-        boxShadow: '0 4px 14px -4px oklch(0.485 0.25 258 / 0.60)',
+        background: 'linear-gradient(135deg, #5E7FFF 0%, #2B59FF 100%)',
       }}
     >
-      <svg viewBox="0 0 20 20" fill="none" style={{ height: size * 0.45, width: size * 0.45 }} aria-hidden>
+      <svg viewBox="0 0 20 20" fill="none" style={{ height: size * 0.46, width: size * 0.46 }} aria-hidden>
         <polyline
           points="2,10 6,6 9.5,13 13.5,7.5 18,10"
           stroke="white"
-          strokeWidth="2.4"
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </svg>
-    </div>
+    </motion.div>
   )
 }
 
