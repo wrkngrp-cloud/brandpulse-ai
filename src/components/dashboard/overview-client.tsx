@@ -6,12 +6,15 @@ import {
   TrendingUp, TrendingDown, Minus,
   Megaphone, CalendarDays, MapPin, ClipboardList,
   Plus, ArrowRight, Zap, ArrowUpRight, Activity,
+  BarChart2, Radio, MessageSquare,
 } from 'lucide-react'
 import { BHIGauge } from '@/components/dashboard/bhi-gauge'
+import { StatCard } from '@/components/dashboard/stat-card'
 import { cn } from '@/lib/utils'
+import { fadeUp, stagger } from '@/lib/motion'
 import type { BHIResult } from '@/lib/bhi'
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ── Types ──────────────────────────────────────────────────────────────────
 
 interface Campaign {
   id: string
@@ -62,7 +65,7 @@ export interface OverviewProps {
   hasAnyData:      boolean
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────────────────
 
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
@@ -72,6 +75,13 @@ function fmtCompact(n: number, currency = 'NGN') {
   if (n >= 1_000_000) return `${currency} ${(n / 1_000_000).toFixed(1)}M`
   if (n >= 1_000)     return `${currency} ${(n / 1_000).toFixed(0)}k`
   return `${currency} ${n}`
+}
+
+function getGreeting() {
+  const h = new Date().getHours()
+  if (h < 12) return 'Good morning'
+  if (h < 17) return 'Good afternoon'
+  return 'Good evening'
 }
 
 const STATUS_DOT: Record<string, string> = {
@@ -91,25 +101,13 @@ const EVENT_STATUS_DOT: Record<string, string> = {
 const PLATFORM_LABEL: Record<string, string> = { twitter: 'X', instagram: 'IG' }
 
 const SENTIMENT_COLOUR: Record<string, string> = {
-  positive: 'text-green-400',
+  positive: 'text-green-500',
   neutral:  'text-muted-foreground',
-  negative: 'text-red-400',
-  mixed:    'text-amber-400',
+  negative: 'text-red-500',
+  mixed:    'text-amber-500',
 }
 
-// ── Animation ─────────────────────────────────────────────────────────────────
-
-const fadeUp = {
-  hidden:  { opacity: 0, y: 14 },
-  visible: { opacity: 1, y: 0 },
-}
-
-const stagger = (delay = 0) => ({
-  hidden:  {},
-  visible: { transition: { staggerChildren: 0.06, delayChildren: delay } },
-})
-
-// ── Card shell ─────────────────────────────────────────────────────────────────
+// ── Card shell ─────────────────────────────────────────────────────────────
 
 function Card({
   children,
@@ -124,7 +122,7 @@ function Card({
     <motion.div
       variants={fadeUp}
       className={cn(
-        'rounded-2xl border bg-card overflow-hidden relative card-hover card-shadow',
+        'rounded-2xl border bg-card overflow-hidden card-shadow card-hover',
         accent && `card-accent-${accent}`,
         className,
       )}
@@ -134,17 +132,15 @@ function Card({
   )
 }
 
-// ── Mini label ────────────────────────────────────────────────────────────────
-
 function Label({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <p className={cn('text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50 select-none', className)}>
+    <p className={cn('eyebrow select-none', className)}>
       {children}
     </p>
   )
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
+// ── Main ───────────────────────────────────────────────────────────────────
 
 export function OverviewClient({
   brandName,
@@ -159,35 +155,39 @@ export function OverviewClient({
   recentMentions,
   hasAnyData,
 }: OverviewProps) {
-  return (
-    <div className="space-y-5 max-w-[1360px]">
+  // Sparkline data for BHI stat card
+  const bhiSpark = sparkline.map(s => ({ date: s.date, value: s.score }))
 
-      {/* ── Editorial header ─────────────────────────────────────── */}
+  return (
+    <div className="space-y-6 max-w-[1400px]">
+
+      {/* ── Page header ──────────────────────────────────────────── */}
       <motion.div
-        className="flex items-end justify-between gap-4 pb-1"
-        initial={{ opacity: 0, y: -8 }}
+        initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="flex items-end justify-between gap-4"
       >
         <div>
-          <p className="text-[10px] uppercase tracking-[0.13em] text-muted-foreground/50 mb-0.5 select-none">
-            {category ?? 'Dashboard'}
-          </p>
-          <h1 className="metric text-3xl leading-none">{brandName}</h1>
+          <p className="eyebrow mb-1.5">{getGreeting()}</p>
+          <h1 className="h-display text-[30px] sm:text-[34px] leading-none">{brandName}</h1>
+          {category && (
+            <p className="mt-2 text-[13px] text-muted-foreground/60">{category}</p>
+          )}
         </div>
 
-        {/* Quick actions — ONE clay CTA */}
+        {/* ONE clay CTA */}
         <div className="hidden sm:flex items-center gap-2 shrink-0">
           <Link
             href="/dashboard/campaigns"
-            className="text-xs text-muted-foreground hover:text-foreground border rounded-lg px-3 py-1.5 transition-colors hover:bg-muted/50"
+            className="text-[12.5px] text-muted-foreground hover:text-foreground border border-border rounded-xl px-3.5 py-2 transition-colors hover:bg-muted/50"
           >
             View all
           </Link>
           <Link
             href="/dashboard/campaigns/new"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white rounded-lg px-3.5 py-1.5 transition-all hover:opacity-90"
-            style={{ background: 'oklch(0.585 0.163 37)' }}
+            className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-white rounded-xl px-4 py-2 transition-all hover:opacity-90 active:scale-[0.98]"
+            style={{ background: 'linear-gradient(135deg, #E8763E 0%, #C4501D 100%)', boxShadow: '0 4px 14px -4px oklch(0.585 0.163 37 / 0.55)' }}
           >
             <Plus className="h-3.5 w-3.5" />
             Campaign
@@ -195,15 +195,56 @@ export function OverviewClient({
         </div>
       </motion.div>
 
-      {/* ── Bento grid ────────────────────────────────────────────── */}
+      {/* ── KPI stat row ─────────────────────────────────────────── */}
       <motion.div
-        className="bento-overview"
+        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
         variants={stagger(0.05)}
         initial="hidden"
         animate="visible"
       >
+        <StatCard
+          label="Brand Health"
+          value={bhi.score !== null ? Math.round(bhi.score) : null}
+          suffix="/100"
+          tone="blue"
+          icon={Activity}
+          spark={bhiSpark.length > 1 ? bhiSpark : undefined}
+          deltaLabel="30-day trend"
+        />
+        <StatCard
+          label="Sentiment Score"
+          value={sentiment ? Math.round(sentiment.social_score) : null}
+          suffix="/100"
+          tone={sentiment && sentiment.social_score >= 60 ? 'green' : sentiment && sentiment.social_score <= 40 ? 'clay' : 'amber'}
+          icon={BarChart2}
+          deltaLabel={sentiment ? `from ${fmtDate(sentiment.day)}` : undefined}
+        />
+        <StatCard
+          label="Share of Voice"
+          value={sovScore !== null ? Math.round(sovScore) : null}
+          suffix="%"
+          tone="violet"
+          icon={Radio}
+          deltaLabel={sovDate ? `as of ${fmtDate(sovDate)}` : undefined}
+        />
+        <StatCard
+          label="Recent Mentions"
+          value={recentMentions.length}
+          tone="amber"
+          icon={MessageSquare}
+          deltaLabel="last 7 days"
+        />
+      </motion.div>
 
-        {/* ─── BHI — tall left card ──────────────────────────── */}
+      {/* ── Main bento grid ──────────────────────────────────────── */}
+      <motion.div
+        className="bento-overview"
+        variants={stagger(0.08)}
+        initial="hidden"
+        animate="visible"
+      >
+
+        {/* BHI gauge — tall left card */}
         <Card accent="blue" className="bento-bhi p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <Label>Brand Health Index</Label>
@@ -219,11 +260,11 @@ export function OverviewClient({
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 py-8">
               <div className="h-14 w-14 rounded-full bg-muted/40 flex items-center justify-center">
-                <Activity className="h-6 w-6 text-muted-foreground/30" />
+                <Activity className="h-6 w-6 text-muted-foreground/25" />
               </div>
               <div className="text-center space-y-1">
                 <p className="text-xs font-medium text-muted-foreground">No data yet</p>
-                <p className="text-[11px] text-muted-foreground/60 max-w-[160px] leading-relaxed">
+                <p className="text-[11px] text-muted-foreground/55 max-w-[160px] leading-relaxed">
                   Connect social accounts and run a survey to see your BHI.
                 </p>
               </div>
@@ -231,7 +272,7 @@ export function OverviewClient({
           )}
         </Card>
 
-        {/* ─── Sentiment — wide horizontal layout ────────────── */}
+        {/* Sentiment */}
         <Card
           accent={
             sentiment === null ? undefined
@@ -241,7 +282,7 @@ export function OverviewClient({
           }
           className="bento-sentiment p-5"
         >
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-4">
             <Label>Sentiment Score</Label>
             <Link href="/dashboard/sentiment" className="text-muted-foreground/40 hover:text-foreground transition-colors">
               <ArrowUpRight className="h-3.5 w-3.5" />
@@ -250,64 +291,55 @@ export function OverviewClient({
 
           {sentiment !== null ? (
             <div className="flex items-start gap-6">
-              {/* Big number */}
               <div className="shrink-0">
-                <div className="metric text-[64px] leading-none">
+                <div className="metric text-[60px] leading-none">
                   {Math.round(sentiment.social_score)}
                 </div>
                 <div className="flex items-center gap-1.5 mt-2">
                   {sentiment.social_score >= 60
-                    ? <TrendingUp className="h-3.5 w-3.5 text-green-400" />
+                    ? <TrendingUp className="h-3.5 w-3.5 text-green-500" />
                     : sentiment.social_score <= 40
-                    ? <TrendingDown className="h-3.5 w-3.5 text-red-400" />
+                    ? <TrendingDown className="h-3.5 w-3.5 text-red-500" />
                     : <Minus className="h-3.5 w-3.5 text-muted-foreground/40" />
                   }
-                  <span className="text-xs text-muted-foreground/60">/ 100</span>
+                  <span className="text-[12px] text-muted-foreground/55">/ 100</span>
                 </div>
               </div>
 
-              {/* Breakdown bars */}
-              <div className="flex-1 space-y-3 pt-2">
-                <div className="space-y-1.5">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Positive</span>
-                    <span className="text-xs font-semibold text-green-400">{Math.round(sentiment.positive_pct)}%</span>
+              <div className="flex-1 space-y-3 pt-1.5">
+                {[
+                  { label: 'Positive', pct: sentiment.positive_pct, color: 'bg-green-500' },
+                  { label: 'Negative', pct: sentiment.negative_pct, color: 'bg-red-500'   },
+                ].map(row => (
+                  <div key={row.label} className="space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[12px] text-muted-foreground">{row.label}</span>
+                      <span className={cn('text-[12px] font-semibold', row.label === 'Positive' ? 'text-green-500' : 'text-red-500')}>
+                        {Math.round(row.pct)}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                      <motion.div
+                        className={cn('h-full rounded-full', row.color)}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${row.pct}%` }}
+                        transition={{ duration: 1.1, delay: 0.5, ease: 'easeOut' }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full rounded-full bg-green-500"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${sentiment.positive_pct}%` }}
-                      transition={{ duration: 1.1, delay: 0.5, ease: 'easeOut' }}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Negative</span>
-                    <span className="text-xs font-semibold text-red-400">{Math.round(sentiment.negative_pct)}%</span>
-                  </div>
-                  <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full rounded-full bg-red-500"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${sentiment.negative_pct}%` }}
-                      transition={{ duration: 1.1, delay: 0.6, ease: 'easeOut' }}
-                    />
-                  </div>
-                </div>
-                <p className="text-[10px] text-muted-foreground/40 pt-1">from {fmtDate(sentiment.day)}</p>
+                ))}
+                <p className="text-[10.5px] text-muted-foreground/40 pt-0.5">from {fmtDate(sentiment.day)}</p>
               </div>
             </div>
           ) : (
             <div className="flex flex-col justify-center gap-1 py-3">
-              <span className="metric text-[64px] leading-none text-muted-foreground/15">—</span>
-              <p className="text-xs text-muted-foreground">No crawl data. Go to Sentiment → Run crawl.</p>
+              <span className="metric text-[60px] leading-none text-muted-foreground/12">—</span>
+              <p className="text-[12.5px] text-muted-foreground mt-1">No crawl data yet. Run a crawl from Sentiment.</p>
             </div>
           )}
         </Card>
 
-        {/* ─── SOV — square, giant number ────────────────────── */}
+        {/* SOV */}
         <Card accent="blue" className="bento-sov p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <Label>Share of Voice</Label>
@@ -319,18 +351,18 @@ export function OverviewClient({
           {sovScore !== null ? (
             <>
               <div className="mt-2">
-                <div className="flex items-end gap-1.5">
-                  <span className="metric text-[56px] leading-none">{Math.round(sovScore)}</span>
-                  <span className="text-2xl text-muted-foreground/50 pb-1 metric">%</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="metric text-[52px] leading-none">{Math.round(sovScore)}</span>
+                  <span className="metric text-[24px] text-muted-foreground/40 pb-1">%</span>
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-1">
+                <p className="text-[11.5px] text-muted-foreground mt-1.5">
                   Social share of voice{sovDate ? ` · ${fmtDate(sovDate)}` : ''}
                 </p>
               </div>
               <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden mt-4">
                 <motion.div
                   className="h-full rounded-full"
-                  style={{ background: 'oklch(0.55 0.25 258)' }}
+                  style={{ background: 'linear-gradient(90deg, #6B8FFF 0%, #2B59FF 100%)' }}
                   initial={{ width: 0 }}
                   animate={{ width: `${Math.min(sovScore, 100)}%` }}
                   transition={{ duration: 1.1, delay: 0.6, ease: 'easeOut' }}
@@ -339,17 +371,17 @@ export function OverviewClient({
             </>
           ) : (
             <>
-              <span className="metric text-[56px] leading-none text-muted-foreground/15 mt-2">—</span>
-              <p className="text-xs text-muted-foreground mt-2">
+              <span className="metric text-[52px] leading-none text-muted-foreground/12 mt-2">—</span>
+              <p className="text-[12px] text-muted-foreground mt-2">
                 SOV populates after first mention crawl.
               </p>
             </>
           )}
         </Card>
 
-        {/* ─── Events mini ───────────────────────────────────── */}
+        {/* Events */}
         <Card className="bento-events p-5 flex flex-col">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-4">
             <Label>Upcoming Events</Label>
             <Link href="/dashboard/events" className="text-muted-foreground/40 hover:text-foreground transition-colors">
               <ArrowRight className="h-3 w-3" />
@@ -358,27 +390,27 @@ export function OverviewClient({
 
           {upcomingEvents.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center py-4">
-              <CalendarDays className="h-7 w-7 text-muted-foreground/20" />
-              <p className="text-xs text-muted-foreground">No planned or live events.</p>
+              <CalendarDays className="h-7 w-7 text-muted-foreground/18" />
+              <p className="text-[12.5px] text-muted-foreground">No planned or live events.</p>
               <Link
                 href="/dashboard/events/new"
-                className="inline-flex items-center gap-1 text-[11px] border rounded-lg px-2.5 py-1 hover:bg-muted/60 transition-colors text-muted-foreground hover:text-foreground"
+                className="inline-flex items-center gap-1 text-[11px] border border-border rounded-xl px-2.5 py-1.5 hover:bg-muted/60 transition-colors text-muted-foreground hover:text-foreground mt-1"
               >
-                <Plus className="h-3 w-3" /> Create
+                <Plus className="h-3 w-3" /> Create event
               </Link>
             </div>
           ) : (
-            <div className="space-y-1 flex-1">
+            <div className="space-y-0.5 flex-1">
               {upcomingEvents.slice(0, 4).map(ev => (
                 <Link
                   key={ev.id}
                   href={`/dashboard/events/${ev.id}`}
-                  className="flex items-start gap-2.5 py-2 border-b border-border/50 last:border-0 hover:bg-muted/30 -mx-5 px-5 transition-colors group"
+                  className="flex items-start gap-2.5 py-2.5 border-b border-border/40 last:border-0 hover:bg-muted/30 -mx-5 px-5 transition-colors group"
                 >
-                  <div className={cn('h-2 w-2 rounded-full mt-1.5 shrink-0', EVENT_STATUS_DOT[ev.status] ?? 'bg-muted-foreground/30')} />
+                  <div className={cn('h-2 w-2 rounded-full mt-[5px] shrink-0', EVENT_STATUS_DOT[ev.status] ?? 'bg-muted-foreground/30')} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-medium truncate group-hover:text-foreground transition-colors">{ev.name}</p>
-                    <p className="text-[11px] text-muted-foreground truncate">
+                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">
                       {ev.city ? `${ev.city} · ` : ''}{fmtDate(ev.date_start)}
                     </p>
                   </div>
@@ -388,82 +420,76 @@ export function OverviewClient({
           )}
         </Card>
 
-        {/* ─── Campaigns — full width list ───────────────────── */}
+        {/* Campaigns */}
         <Card accent="clay" className="bento-campaigns p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Megaphone className="h-4 w-4 text-muted-foreground/60" />
+              <Megaphone className="h-3.5 w-3.5 text-muted-foreground/50" />
               <Label>Active Campaigns</Label>
             </div>
-            <Link href="/dashboard/campaigns" className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-              All <ArrowRight className="h-3 w-3" />
+            <Link href="/dashboard/campaigns" className="flex items-center gap-0.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors">
+              All <ArrowRight className="h-3 w-3 ml-0.5" />
             </Link>
           </div>
 
           {activeCampaigns.length === 0 ? (
             <div className="py-6 flex flex-col items-center gap-3 text-center">
-              <p className="text-xs text-muted-foreground">No active campaigns. Create your first one.</p>
+              <p className="text-[12.5px] text-muted-foreground">No active campaigns. Create your first one.</p>
               <Link
                 href="/dashboard/campaigns/new"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-white rounded-lg px-3.5 py-1.5"
-                style={{ background: 'oklch(0.585 0.163 37)' }}
+                className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-white rounded-xl px-4 py-2 transition-all hover:opacity-90"
+                style={{ background: 'linear-gradient(135deg, #E8763E 0%, #C4501D 100%)' }}
               >
                 <Plus className="h-3.5 w-3.5" /> New campaign
               </Link>
             </div>
           ) : (
-            <div className="divide-y divide-border/50">
+            <div className="divide-y divide-border/40">
               {activeCampaigns.map(c => (
                 <Link
                   key={c.id}
                   href={`/dashboard/campaigns/${c.id}`}
                   className="flex items-center gap-3 py-3 hover:bg-muted/30 -mx-5 px-5 transition-colors group"
                 >
-                  {/* Status dot */}
                   <div className={cn('h-2 w-2 rounded-full shrink-0', STATUS_DOT[c.status] ?? 'bg-muted-foreground/30')} />
-
-                  {/* Name + objectives */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13.5px] font-medium truncate group-hover:text-foreground transition-colors">
+                    <p className="text-[13px] font-medium truncate group-hover:text-foreground transition-colors">
                       {c.name}
                     </p>
-                    <p className="text-[11px] text-muted-foreground truncate">
+                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">
                       {(c.objectives ?? []).slice(0, 2).join(' · ')}
                       {c.start_date ? ` · from ${fmtDate(c.start_date)}` : ''}
                     </p>
                   </div>
-
-                  {/* Budget */}
                   {c.total_budget !== null && c.total_budget > 0 && (
-                    <span className="metric text-[15px] text-muted-foreground shrink-0">
+                    <span className="metric text-[14px] text-muted-foreground/70 shrink-0">
                       {fmtCompact(c.total_budget, c.currency ?? 'NGN')}
                     </span>
                   )}
-
-                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors shrink-0" />
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/25 group-hover:text-muted-foreground transition-colors shrink-0" />
                 </Link>
               ))}
             </div>
           )}
         </Card>
 
-        {/* ─── Recent mentions ────────────────────────────────── */}
+        {/* Recent mentions */}
         {recentMentions.length > 0 && (
           <Card className="bento-full p-5">
             <div className="flex items-center justify-between mb-4">
               <Label>Recent Mentions</Label>
-              <Link href="/dashboard/sentiment" className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-                All <ArrowRight className="h-3 w-3" />
+              <Link href="/dashboard/sentiment" className="flex items-center gap-0.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors">
+                All <ArrowRight className="h-3 w-3 ml-0.5" />
               </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {recentMentions.map(m => (
                 <div
                   key={m.id}
-                  className="rounded-xl border border-border/60 bg-muted/20 px-3.5 py-3 space-y-2 hover:bg-muted/30 transition-colors"
+                  className="rounded-xl border border-border/50 bg-muted/20 px-3.5 py-3 space-y-2 hover:bg-muted/35 transition-colors"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0 uppercase tracking-wide">
+                    <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground shrink-0 uppercase tracking-wider">
                       {PLATFORM_LABEL[m.platform] ?? m.platform}
                     </span>
                     <span className="text-[11px] text-muted-foreground truncate">
@@ -475,41 +501,42 @@ export function OverviewClient({
                       </span>
                     )}
                   </div>
-                  <p className="text-xs leading-relaxed line-clamp-2 text-muted-foreground">{m.content}</p>
+                  <p className="text-[12px] leading-relaxed line-clamp-2 text-muted-foreground/80">{m.content}</p>
                 </div>
               ))}
             </div>
           </Card>
         )}
 
-        {/* ─── Empty state quick actions ───────────────────────── */}
+        {/* Empty state */}
         {!hasAnyData && (
-          <Card className="bento-full p-5">
-            <Label className="mb-4">Get started</Label>
+          <Card className="bento-full p-6">
+            <p className="eyebrow mb-4">Let&apos;s get your first signal in</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { icon: MapPin,        label: 'Add OOH Site',  href: '/dashboard/ooh/new',    desc: 'Track outdoor placements'  },
-                { icon: CalendarDays,  label: 'Create Event',  href: '/dashboard/events/new', desc: 'Log activations & events'  },
-                { icon: ClipboardList, label: 'Launch Survey', href: '/dashboard/surveys',    desc: 'Collect consumer feedback' },
-                { icon: Zap,           label: 'Pre-Post Check',href: '/dashboard/pre-post',   desc: 'Score content before live' },
+                { icon: MapPin,        label: 'Add OOH Site',   href: '/dashboard/ooh/new',    desc: 'Track outdoor placements'   },
+                { icon: CalendarDays,  label: 'Create Event',   href: '/dashboard/events/new', desc: 'Log activations and events' },
+                { icon: ClipboardList, label: 'Launch Survey',  href: '/dashboard/surveys',    desc: 'Collect consumer feedback'  },
+                { icon: Zap,           label: 'Pre-Post Check', href: '/dashboard/pre-post',   desc: 'Score content before live'  },
               ].map(({ icon: Icon, label, href, desc }) => (
                 <Link
                   key={label}
                   href={href}
-                  className="flex flex-col gap-3 rounded-xl border border-border/60 bg-muted/20 p-4 hover:bg-muted/30 hover:border-border transition-all card-hover"
+                  className="flex flex-col gap-3 rounded-xl border border-border/60 bg-muted/20 p-4 hover:bg-muted/35 hover:border-border transition-all card-hover"
                 >
-                  <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center">
-                    <Icon className="h-4 w-4 text-muted-foreground/70" />
+                  <div className="h-9 w-9 rounded-xl bg-muted/70 flex items-center justify-center">
+                    <Icon className="h-4 w-4 text-muted-foreground/65" />
                   </div>
                   <div>
-                    <p className="text-[13px] font-medium">{label}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">{desc}</p>
+                    <p className="text-[13px] font-semibold">{label}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{desc}</p>
                   </div>
                 </Link>
               ))}
             </div>
           </Card>
         )}
+
       </motion.div>
     </div>
   )
