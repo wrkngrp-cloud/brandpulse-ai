@@ -379,9 +379,7 @@ export default async function SentimentPage({
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Suspense fallback={null}>
-            <DateRangeFilter defaultDays={84} />
-          </Suspense>
+          <DateRangeFilter currentDays={days} defaultDays={84} />
           <CrawlHistory />
         </div>
       </div>

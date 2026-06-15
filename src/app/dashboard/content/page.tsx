@@ -197,9 +197,7 @@ export default async function ContentPage({
           <h1 className="text-2xl font-semibold tracking-tight">Owned Performance</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Your content, reach, and share of voice</p>
         </div>
-        <Suspense fallback={null}>
-          <DateRangeFilter defaultDays={30} />
-        </Suspense>
+        <DateRangeFilter currentDays={days} defaultDays={30} />
       </div>
 
       {/* Success banner */}

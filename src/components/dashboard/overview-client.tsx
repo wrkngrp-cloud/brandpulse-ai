@@ -187,7 +187,7 @@ export function OverviewClient({
 
         {/* Date filter + CTA */}
         <div className="hidden sm:flex items-center gap-3 shrink-0">
-          <DateRangeFilter defaultDays={30} />
+          <DateRangeFilter currentDays={days ?? 30} defaultDays={30} />
           <Link
             href="/dashboard/campaigns"
             className="text-[12.5px] text-muted-foreground hover:text-foreground border border-border rounded-xl px-3.5 py-2 transition-colors hover:bg-muted/50"

@@ -1,29 +1,31 @@
 'use client'
 
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const PRESETS = [
-  { label: '7d',    days: 7,   title: 'Last 7 days'  },
-  { label: '30d',   days: 30,  title: 'Last 30 days' },
-  { label: '12wk',  days: 84,  title: '12 weeks'     },
-  { label: '6mo',   days: 180, title: '6 months'     },
+  { label: '7d',   days: 7,   title: 'Last 7 days'  },
+  { label: '30d',  days: 30,  title: 'Last 30 days' },
+  { label: '12wk', days: 84,  title: '12 weeks'     },
+  { label: '6mo',  days: 180, title: '6 months'     },
 ]
 
-export function DateRangeFilter({ defaultDays = 84 }: { defaultDays?: number }) {
-  const router = useRouter()
+export function DateRangeFilter({
+  currentDays,
+  defaultDays = 30,
+}: {
+  currentDays: number
+  defaultDays?: number
+}) {
+  const router   = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const currentDays = Number(searchParams.get('days') ?? defaultDays)
 
   function select(days: number) {
-    const params = new URLSearchParams(searchParams.toString())
     if (days === defaultDays) {
-      params.delete('days')
+      router.push(pathname)
     } else {
-      params.set('days', String(days))
+      router.push(`${pathname}?days=${days}`)
     }
-    router.push(`${pathname}?${params.toString()}`)
   }
 
   return (

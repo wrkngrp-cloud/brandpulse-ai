@@ -1,6 +1,5 @@
 import { createClient }  from '@/lib/supabase/server'
 import { redirect }      from 'next/navigation'
-import { Suspense }      from 'react'
 import { computeFullBHI, type FullBHIComponents } from '@/lib/bhi'
 import { BrandEquityClient } from './brand-equity-client'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
@@ -202,9 +201,7 @@ export default async function BrandEquityPage({
             {brand?.name ?? 'your brand'}.
           </p>
         </div>
-        <Suspense fallback={null}>
-          <DateRangeFilter defaultDays={30} />
-        </Suspense>
+        <DateRangeFilter currentDays={days} defaultDays={30} />
       </div>
 
       <BrandEquityClient
