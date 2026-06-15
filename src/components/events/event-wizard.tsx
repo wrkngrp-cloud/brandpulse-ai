@@ -233,7 +233,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2 space-y-2">
                 <Label htmlFor="name">Event name *</Label>
-                <Input id="name" value={data.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Kuda Surulere Activation" />
+                <Input id="name" value={data.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Jara Surulere Activation" />
               </div>
               <div className="space-y-2">
                 <Label>Event type</Label>

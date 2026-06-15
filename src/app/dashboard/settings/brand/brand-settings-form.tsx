@@ -132,7 +132,7 @@ export function BrandSettingsForm({ initial }: { initial: BrandSettingsData }) {
       <SectionCard title="Monitored Hashtags">
         <TagInput
           label="Extra hashtags to track"
-          placeholder="e.g. kudabank"
+          placeholder="e.g. jarafoods"
           values={data.monitoredHashtags}
           onChange={v => patch('monitoredHashtags', v)}
           hint="In addition to your brand name, the crawl will search for these hashtags on X and Instagram. Enter without the # symbol."

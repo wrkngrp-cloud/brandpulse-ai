@@ -221,12 +221,12 @@ export async function fetchTwitterUserMentions(
 // Excludes retweets and the brand's own tweets so results are third-party mentions only.
 export async function fetchTwitterKeywordMentions(
   brandName: string,
-  excludeUsername: string,   // handle WITHOUT @, e.g. "kudabank"
+  excludeUsername: string,   // handle WITHOUT @, e.g. "jarafoods"
   accessToken: string,
   since: Date,
   extraHashtags: string[] = []
 ): Promise<TwitterMention[]> {
-  // Build base hashtag from brand name: "Kuda Bank" → "#kudabank"
+  // Build base hashtag from brand name: "Jara Foods" → "#jarafoods"
   const baseSlug = brandName.toLowerCase().replace(/[^a-z0-9]/g, '')
   const allHashtags = [...new Set([baseSlug, ...extraHashtags.map(h => h.replace(/^#/, '').toLowerCase())])]
   const hashtagPart = allHashtags.map(h => `#${h}`).join(' OR ')

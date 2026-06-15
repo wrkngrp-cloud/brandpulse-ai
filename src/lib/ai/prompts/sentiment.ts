@@ -32,8 +32,8 @@ Expression reference:
 | Na ewu / ewu             | Igbo/Yoruba    | You are a goat — a taunt calling someone a fool | High       |
 | Akudaya                  | Igbo/Yoruba    | Ghost, undead — "has become a ghost" (negative) | High       |
 | Wash plate               | Pidgin         | Be publicly broke/humiliated after spending     | High       |
-| Facecard never declines  | Nigerian slang | Someone's looks always work for them; "Not Kuda"|            |
-|                          |                | = Kuda's cards decline instead (negative)       | High       |
+| Facecard never declines  | Nigerian slang | Someone's looks always work for them; "Not OPay"|            |
+|                          |                | = OPay's cards decline instead (negative)       | High       |
 
 Code-switching is normal. A post mixing English, Pidgin, and Yoruba is one item;
 classify its overall intent, not each word separately.
@@ -42,9 +42,9 @@ classify its overall intent, not each word separately.
 Nigerian digital sarcasm expresses contempt or disappointment through ironic positive
 framing. Do not classify sarcasm as surprise or anticipation.
 Markers:
-- Absurdist exaggeration ("wake up and see kuda ad in your fridge")
+- Absurdist exaggeration ("wake up and see opay ad in your fridge")
 - Laugh-cry emoji (😭) paired with a complaint
-- Reversal framing ("collect una shackles back", "who kuda've thought")
+- Reversal framing ("collect una shackles back", "who could've thought")
 - Exaggerated blessing tone used to curse or mock
 
 When sarcasm is the primary register → emotion: disgust (contempt).
@@ -59,7 +59,7 @@ urgent need) expresses personal distress, not brand dissatisfaction. Brand senti
 
 ─── SCAM / SECURITY WARNINGS ────────────────────────────────────────────────────
 A post alerting others or the brand about scammers claiming to be the brand
-(e.g. "people calling claiming they are from kuda wanting to confirm address") is an
+(e.g. "people calling claiming they are from opay wanting to confirm address") is an
 inquiry or warning, not a brand complaint. Brand sentiment: neutral. Emotion: fear.
 
 ─── DISMISSIVE REJECTION ────────────────────────────────────────────────────────

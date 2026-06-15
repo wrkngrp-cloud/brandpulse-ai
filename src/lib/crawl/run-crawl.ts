@@ -30,7 +30,7 @@ interface PlatformStats {
   negative_pct: number
 }
 
-// 'Kuda Bank' → ['kudabank', 'kuda']
+// 'Jara Foods' → ['jarafoods', 'jara']
 function deriveHashtags(brandName: string): string[] {
   const slug = brandName.toLowerCase().replace(/[^a-z0-9]/g, '')
   const first = brandName.toLowerCase().split(/\s+/)[0].replace(/[^a-z0-9]/g, '')

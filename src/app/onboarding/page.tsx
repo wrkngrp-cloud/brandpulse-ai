@@ -175,7 +175,7 @@ export default function OnboardingPage() {
                 id="brandName"
                 value={brandName}
                 onChange={e => setBrandName(e.target.value)}
-                placeholder="e.g. Sweetness Studios, Kuda, Flutterwave"
+                placeholder="e.g. Sweetness Studios, Paystack, Flutterwave"
                 autoFocus
               />
             </div>
