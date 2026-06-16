@@ -19,9 +19,11 @@ export default async function BrandEquityPage({
   const params = await searchParams
   const days = Math.min(180, Math.max(7, Number(params.days ?? 30)))
 
+  const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
+  const isDemoUser = user.email === DEMO_EMAIL
 
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - days)
@@ -218,7 +220,7 @@ export default async function BrandEquityPage({
         days={days}
       />
 
-      {process.env.NODE_ENV !== 'production' && (
+      {isDemoUser && (
         <SeedDemoPanel />
       )}
     </div>

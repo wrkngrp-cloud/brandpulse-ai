@@ -16,11 +16,17 @@ const AWARENESS_ANSWERS = Array.from({ length: 20 }, (_, i) =>
   i < 16 ? 'Yes — I know them well' : 'I have heard of them'
 )
 
+const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
+
 export async function POST() {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  if (user.email !== DEMO_EMAIL) {
+    return NextResponse.json({ error: 'Not a demo account' }, { status: 403 })
+  }
 
   // Get the brand
   const { data: brand } = await supabase

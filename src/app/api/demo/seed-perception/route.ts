@@ -24,11 +24,17 @@ function varyScore(base: number): number {
   return Math.round(clamp(base + variance) * 2) / 2  // round to nearest 0.5
 }
 
+const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
+
 export async function POST() {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  if (user.email !== DEMO_EMAIL) {
+    return NextResponse.json({ error: 'Not a demo account' }, { status: 403 })
+  }
 
   // Get the brand
   const { data: brand } = await supabase

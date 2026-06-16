@@ -48,9 +48,9 @@ export default async function EventsPage() {
             <div className="border rounded-xl p-4 bg-muted/30 space-y-3 opacity-80 pointer-events-none">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-0.5">
-                  <p className="font-medium text-sm">Jara Foods Lagos Consumer Fair</p>
+                  <p className="font-medium text-sm">Brand Activation — Example Event</p>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-                    <span className="flex items-center gap-1"><CalendarDays className="h-3 w-3" /> 14 Jun 2025 — 16 Jun 2025</span>
+                    <span className="flex items-center gap-1"><CalendarDays className="h-3 w-3" /> 14 Jun — 16 Jun</span>
                     <span>Lagos, Lagos State</span>
                     <span>Product Activation</span>
                   </div>
@@ -62,15 +62,15 @@ export default async function EventsPage() {
               <div className="grid grid-cols-3 gap-3 pt-2 border-t">
                 <div className="space-y-0.5">
                   <p className="text-xs text-muted-foreground">Ambassadors</p>
-                  <p className="text-sm font-semibold">8</p>
+                  <p className="text-sm font-semibold">—</p>
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-xs text-muted-foreground">Interactions</p>
-                  <p className="text-sm font-semibold">247</p>
+                  <p className="text-sm font-semibold">—</p>
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-xs text-muted-foreground">Leads captured</p>
-                  <p className="text-sm font-semibold">63</p>
+                  <p className="text-sm font-semibold">—</p>
                 </div>
               </div>
             </div>
