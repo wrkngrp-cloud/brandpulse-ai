@@ -6,6 +6,7 @@ import { Newspaper, BookOpen, TrendingUp, BarChart2, Download, QrCode, ExternalL
 import { MediaPlanUploadDialog } from '@/components/offline-media/media-plan-upload-dialog'
 import { buttonVariants }  from '@/components/ui/button'
 import { cn }              from '@/lib/utils'
+import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 
 export const dynamic = 'force-dynamic'
 
@@ -66,7 +67,18 @@ type PrintPlacementRow = {
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://brandpulse.ai'
 
-export default async function PrintPage() {
+export default async function PrintPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>
+}) {
+  const params = await searchParams
+  const days   = Math.min(180, Math.max(7, Number(params.days ?? 30)))
+
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - days)
+  const cutoffStr = cutoff.toISOString().split('T')[0]
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
@@ -82,6 +94,7 @@ export default async function PrintPage() {
       print_publications ( circulation, readership_mult )
     `)
     .eq('brand_id', brand.id)
+    .gte('edition_date', cutoffStr)
     .order('edition_date', { ascending: false })
     .limit(200)
 
@@ -111,7 +124,7 @@ export default async function PrintPage() {
     <div className="max-w-5xl space-y-6">
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
             <Newspaper className="h-5 w-5 text-amber-600" />
@@ -124,7 +137,8 @@ export default async function PrintPage() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          <DateRangeFilter currentDays={days} defaultDays={30} />
           <a
             href="/api/templates/print"
             download
@@ -171,7 +185,7 @@ export default async function PrintPage() {
           {/* Key metrics */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { label: 'Total Insertions',   value: totalInsertions.toLocaleString(), sub: 'All time',                 icon: Newspaper,  color: 'text-amber-600' },
+              { label: 'Total Insertions',   value: totalInsertions.toLocaleString(), sub: `Last ${days} days`,           icon: Newspaper,  color: 'text-amber-600' },
               { label: 'Total Spend',        value: fmtCurrency(totalSpend),          sub: 'Net cost across all buys', icon: TrendingUp,  color: 'text-indigo-500' },
               { label: 'Est. Readership',    value: fmt(totalReadership),             sub: 'Circ. × pass-along',      icon: BookOpen,    color: 'text-emerald-500' },
               { label: 'QR Scans',           value: totalQrScans.toLocaleString(),    sub: `${qrScanRate}% scan rate`, icon: BarChart2,  color: 'text-blue-500' },

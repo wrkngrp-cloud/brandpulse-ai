@@ -18,6 +18,13 @@ export default async function CampaignDetailPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
+  // Get brand for tenant scoping
+  const { data: brand } = await supabase
+    .from('brands')
+    .select('id')
+    .limit(1)
+    .single()
+
   const { data: campaign } = await supabase
     .from('campaigns')
     .select(`
@@ -88,9 +95,32 @@ export default async function CampaignDetailPage({
         .in('site_id', oohSiteIds)
     : Promise.resolve({ data: [] })
 
-  const [{ data: socialPosts }, { data: oohVisits }] = await Promise.all([
+  // 3. Influencers linked to this campaign
+  const influencersQuery = brand
+    ? supabase
+        .from('influencers')
+        .select('id, name, handle, platform, category, followers, cultural_iq, risk_score, status, campaign_id')
+        .eq('brand_id', brand.id)
+        .eq('campaign_id', id)
+    : Promise.resolve({ data: [] })
+
+  // 4. Unlinked active influencers (to populate the link dialog)
+  const unlinkedInfluencersQuery = brand
+    ? supabase
+        .from('influencers')
+        .select('id, name, handle, platform, category, followers, cultural_iq, risk_score, status, campaign_id')
+        .eq('brand_id', brand.id)
+        .is('campaign_id', null)
+        .eq('status', 'active')
+        .order('cultural_iq', { ascending: false })
+        .limit(50)
+    : Promise.resolve({ data: [] })
+
+  const [{ data: socialPosts }, { data: oohVisits }, { data: influencers }, { data: unlinkedInfluencers }] = await Promise.all([
     socialQuery,
     oohVisitsQuery,
+    influencersQuery,
+    unlinkedInfluencersQuery,
   ])
 
   return (
@@ -119,6 +149,8 @@ export default async function CampaignDetailPage({
         interactions={interactions ?? []}
         socialPosts={socialPosts ?? []}
         oohVisits={oohVisits ?? []}
+        influencers={influencers ?? []}
+        unlinkedInfluencers={unlinkedInfluencers ?? []}
       />
     </div>
   )

@@ -6,6 +6,7 @@ import { Radio, Users, TrendingUp, Volume2, Download } from 'lucide-react'
 import { MediaPlanUploadDialog } from '@/components/offline-media/media-plan-upload-dialog'
 import { buttonVariants }  from '@/components/ui/button'
 import { cn }              from '@/lib/utils'
+import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,16 +69,24 @@ type RadioScheduleRow = {
   radio_stations: RadioStation
 }
 
-export default async function RadioPage() {
+export default async function RadioPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>
+}) {
+  const params = await searchParams
+  const days   = Math.min(180, Math.max(7, Number(params.days ?? 30)))
+
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - days)
+  const cutoffStr = cutoff.toISOString().split('T')[0]
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
   const { data: brand } = await supabase.from('brands').select('id, name').limit(1).single()
   if (!brand) redirect('/onboarding')
-
-  const since = new Date()
-  since.setDate(since.getDate() - 90)
 
   const { data: schedulesRaw } = await supabase
     .from('radio_schedules')
@@ -87,7 +96,7 @@ export default async function RadioPage() {
       radio_stations ( reach_am, reach_pm, reach_day )
     `)
     .eq('brand_id', brand.id)
-    .gte('spot_date', since.toISOString().slice(0, 10))
+    .gte('spot_date', cutoffStr)
     .order('spot_date', { ascending: false })
 
   const schedules = (schedulesRaw ?? []) as unknown as RadioScheduleRow[]
@@ -118,7 +127,7 @@ export default async function RadioPage() {
     <div className="max-w-5xl space-y-6">
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 rounded-xl bg-violet-500/10 flex items-center justify-center shrink-0 mt-0.5">
             <Radio className="h-5 w-5 text-violet-500" />
@@ -130,7 +139,8 @@ export default async function RadioPage() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          <DateRangeFilter currentDays={days} defaultDays={30} />
           <a
             href="/api/templates/radio"
             download
@@ -177,7 +187,7 @@ export default async function RadioPage() {
           {/* Key metrics */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { label: 'Spots Planned',  value: totalSpotPlanned.toLocaleString(), sub: 'Last 90 days',          icon: Radio,      color: 'text-violet-500' },
+              { label: 'Spots Planned',  value: totalSpotPlanned.toLocaleString(), sub: `Last ${days} days`,          icon: Radio,      color: 'text-violet-500' },
               { label: 'Spots Aired',    value: totalSpotAired.toLocaleString(),   sub: `${deliveryPct}% delivery`, icon: Volume2, color: 'text-emerald-500' },
               { label: 'Est. Reach',     value: fmt(totalReach),                   sub: 'Total listener-spots',  icon: Users,      color: 'text-blue-500' },
               { label: 'Total Spend',    value: fmtCurrency(totalSpend),           sub: `CPT: ${fmtCurrency(cpt)}/k`, icon: TrendingUp, color: 'text-indigo-500' },
@@ -195,7 +205,7 @@ export default async function RadioPage() {
 
           {/* Schedule table */}
           <Card className="border rounded-xl p-5 bg-card space-y-4">
-            <h2 className="text-xl font-semibold">Schedule (last 90 days)</h2>
+            <h2 className="text-xl font-semibold">Schedule (last {days} days)</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>

@@ -10,6 +10,7 @@ import { CampaignOverview } from './campaign-overview'
 import { LinkOohSiteDialog, LinkEventDialog } from './link-existing-dialog'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { toast } from 'sonner'
+import { linkInfluencerToCampaign } from '@/app/dashboard/campaigns/[id]/link-influencer-action'
 
 interface Channel {
   id: string
@@ -65,6 +66,19 @@ interface Event {
 interface UnlinkedSite { id: string; site_name: string; city: string | null; state: string | null; format_type: string | null; visits: number }
 interface UnlinkedEvent { id: string; name: string; event_type: string | null; city: string; date_start: string; status: string }
 
+export interface CampaignInfluencer {
+  id: string
+  name: string
+  handle: string
+  platform: string
+  category: string | null
+  followers: number | null
+  cultural_iq: number | null
+  risk_score: number | null
+  status: string
+  campaign_id: string | null
+}
+
 interface Interaction { event_id: string; interaction_type: string }
 
 interface SocialPost {
@@ -91,6 +105,8 @@ interface Props {
   interactions?: Interaction[]
   socialPosts?: SocialPost[]
   oohVisits?: OohVisit[]
+  influencers?: CampaignInfluencer[]
+  unlinkedInfluencers?: CampaignInfluencer[]
 }
 
 const TABS = [
@@ -98,6 +114,7 @@ const TABS = [
   { key: 'performance',  label: 'Performance',    icon: TrendingUp   },
   { key: 'ooh',          label: 'OOH Placements', icon: MapPin       },
   { key: 'events',       label: 'Events',          icon: CalendarDays },
+  { key: 'influencers',  label: 'Influencers',    icon: Users        },
   { key: 'budget',       label: 'Budget',          icon: DollarSign   },
 ]
 
@@ -148,10 +165,43 @@ function fmtMoney(amount: number | null, currency = 'NGN') {
   return `${currency} ${Number(amount).toLocaleString('en-NG')}`
 }
 
-export function CampaignDetailClient({ campaign, oohSites, events, activeTab, unlinkedSites = [], unlinkedEvents = [], interactions = [], socialPosts = [], oohVisits = [] }: Props) {
+function formatFollowers(n: number | null): string {
+  if (n == null) return '—'
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
+  return String(n)
+}
+
+const PLATFORM_COLORS: Record<string, string> = {
+  instagram: 'bg-pink-100 text-pink-800',
+  tiktok:    'bg-black/10 text-black dark:bg-white/10 dark:text-white',
+  youtube:   'bg-red-100 text-red-800',
+  twitter:   'bg-sky-100 text-sky-800',
+  facebook:  'bg-blue-100 text-blue-800',
+}
+
+const INF_STATUS_STYLES: Record<string, string> = {
+  active:   'bg-green-100 text-green-800',
+  paused:   'bg-amber-100 text-amber-800',
+  prospect: 'bg-muted text-muted-foreground',
+  rejected: 'bg-red-100 text-red-800',
+}
+
+function CulturalIQBadge({ score }: { score: number | null }) {
+  if (score === null) return <span className="text-xs text-muted-foreground">—</span>
+  const color = score >= 70 ? 'text-green-700 bg-green-100'
+    : score >= 50 ? 'text-amber-700 bg-amber-100'
+    : 'text-red-700 bg-red-100'
+  return <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold', color)}>{score}</span>
+}
+
+export function CampaignDetailClient({ campaign, oohSites, events, activeTab, unlinkedSites = [], unlinkedEvents = [], interactions = [], socialPosts = [], oohVisits = [], influencers = [], unlinkedInfluencers = [] }: Props) {
   const router = useRouter()
   const [analysing, startAnalyse] = useTransition()
   const [headerSummary, setHeaderSummary] = useState<string | null>(campaign.ai_summary ?? null)
+  const [linkingOpen, setLinkingOpen] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [linking, startLinking] = useTransition()
 
   function runAnalysis() {
     startAnalyse(async () => {
@@ -282,6 +332,14 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
             currency:     s.currency,
           }))}
           events={events.map(e => ({ status: e.status }))}
+          influencers={influencers.map(inf => ({
+            id:          inf.id,
+            name:        inf.name,
+            handle:      inf.handle,
+            platform:    inf.platform,
+            followers:   inf.followers,
+            cultural_iq: inf.cultural_iq,
+          }))}
         />
       )}
 
@@ -721,6 +779,147 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                   </Link>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Influencers ── */}
+      {activeTab === 'influencers' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <p className="text-sm text-muted-foreground">
+              {influencers.length} influencer{influencers.length !== 1 ? 's' : ''} linked to this campaign
+            </p>
+            {unlinkedInfluencers.length > 0 && (
+              <Button size="sm" variant="outline" onClick={() => setLinkingOpen(true)}>
+                <Plus className="h-4 w-4 mr-1.5" />
+                Link influencer
+              </Button>
+            )}
+          </div>
+
+          {influencers.length === 0 ? (
+            <div className="border rounded-xl p-10 text-center space-y-3">
+              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center mx-auto">
+                <Users className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">No influencers linked yet</p>
+                <p className="text-xs text-muted-foreground mt-1">Link influencers to this campaign to track their contribution.</p>
+              </div>
+              {unlinkedInfluencers.length > 0 && (
+                <Button size="sm" variant="outline" onClick={() => setLinkingOpen(true)}>
+                  Link influencer
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {influencers.map(inf => (
+                <div key={inf.id} className="border rounded-xl p-4 bg-card space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold truncate">{inf.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">@{inf.handle}</p>
+                    </div>
+                    <span className={cn(
+                      'text-xs px-2 py-0.5 rounded-full font-medium shrink-0 capitalize',
+                      INF_STATUS_STYLES[inf.status] ?? 'bg-muted text-muted-foreground',
+                    )}>
+                      {inf.status}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', PLATFORM_COLORS[inf.platform] ?? 'bg-muted text-muted-foreground')}>
+                      {inf.platform === 'tiktok' ? 'TikTok' : inf.platform === 'youtube' ? 'YouTube' : inf.platform.charAt(0).toUpperCase() + inf.platform.slice(1)}
+                    </span>
+                    {inf.category && (
+                      <span className="text-xs text-muted-foreground">{inf.category}</span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-muted/40 rounded-lg p-2 space-y-0.5">
+                      <p className="text-xs text-muted-foreground">Followers</p>
+                      <p className="text-sm font-semibold tabular-nums">{formatFollowers(inf.followers)}</p>
+                    </div>
+                    <div className="bg-muted/40 rounded-lg p-2 space-y-0.5">
+                      <p className="text-xs text-muted-foreground">Cultural IQ</p>
+                      <div className="mt-0.5">
+                        <CulturalIQBadge score={inf.cultural_iq} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Link influencer dialog */}
+          {linkingOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setLinkingOpen(false)}>
+              <div className="bg-background border rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold">Link influencer to campaign</p>
+                  <button onClick={() => setLinkingOpen(false)} className="text-muted-foreground hover:text-foreground">
+                    <span className="sr-only">Close</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground">Select one or more active influencers to link to this campaign.</p>
+                <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                  {unlinkedInfluencers.map(inf => (
+                    <label key={inf.id} className="flex items-center gap-3 border rounded-lg p-3 cursor-pointer hover:bg-muted/40 transition-colors">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded border"
+                        checked={selectedIds.has(inf.id)}
+                        onChange={e => {
+                          const next = new Set(selectedIds)
+                          if (e.target.checked) next.add(inf.id)
+                          else next.delete(inf.id)
+                          setSelectedIds(next)
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{inf.name}</p>
+                        <p className="text-xs text-muted-foreground">@{inf.handle} · {inf.platform} · {formatFollowers(inf.followers)}</p>
+                      </div>
+                      <CulturalIQBadge score={inf.cultural_iq} />
+                    </label>
+                  ))}
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => { setLinkingOpen(false); setSelectedIds(new Set()) }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    disabled={selectedIds.size === 0 || linking}
+                    onClick={() => {
+                      startLinking(async () => {
+                        try {
+                          await Promise.all(
+                            Array.from(selectedIds).map(id => linkInfluencerToCampaign(id, campaign.id))
+                          )
+                          toast.success(`${selectedIds.size} influencer${selectedIds.size !== 1 ? 's' : ''} linked.`)
+                          setLinkingOpen(false)
+                          setSelectedIds(new Set())
+                          router.refresh()
+                        } catch {
+                          toast.error('Failed to link influencers. Please try again.')
+                        }
+                      })
+                    }}
+                  >
+                    {linking ? 'Linking…' : `Link ${selectedIds.size > 0 ? selectedIds.size : ''}`}
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -97,10 +97,17 @@ interface AnalysisResult {
   brand_fit: BrandFit
 }
 
+interface CampaignOption {
+  id: string
+  name: string
+  status: string
+}
+
 interface Props {
   brandId: string
   brandName: string
   initialInfluencers: Influencer[]
+  campaigns?: CampaignOption[]
 }
 
 const PLATFORMS = ['instagram', 'tiktok', 'twitter', 'youtube', 'facebook'] as const
@@ -356,7 +363,7 @@ function ConversionRatePill({ rate }: { rate: number }) {
   )
 }
 
-export function InfluencersClient({ brandId, brandName, initialInfluencers }: Props) {
+export function InfluencersClient({ brandId, brandName, initialInfluencers, campaigns = [] }: Props) {
   const [activeTab, setActiveTab] = useState<'intelligence' | 'campaigns'>('intelligence')
   const [influencers, setInfluencers] = useState<Influencer[]>(initialInfluencers)
   const [showForm, setShowForm] = useState(false)
@@ -749,6 +756,12 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers }: Pr
                   inf={inf}
                   scoringId={scoringId}
                   onScore={handleScore}
+                  availableCampaigns={campaigns}
+                  onLinked={(influencerId, campaignId) => {
+                    setInfluencers(prev => prev.map(i =>
+                      i.id === influencerId ? { ...i, campaign_id: campaignId } : i
+                    ))
+                  }}
                 />
               ))}
             </div>
@@ -1106,11 +1119,16 @@ function InfluencerCard({
   inf,
   scoringId,
   onScore,
+  availableCampaigns = [],
+  onLinked,
 }: {
   inf: Influencer
   scoringId: string | null
   onScore: (id: string) => void
+  availableCampaigns?: CampaignOption[]
+  onLinked?: (influencerId: string, campaignId: string | null) => void
 }) {
+  const [linking, setLinking] = useState(false)
   const platforms = inf.social_urls?.length
     ? inf.social_urls.map(s => s.platform)
     : [inf.platform]
@@ -1132,6 +1150,23 @@ function InfluencerCard({
             {brandFit?.recommendation && (
               <RecommendationBadge recommendation={brandFit.recommendation} />
             )}
+            {inf.campaign_id && availableCampaigns.length === 0 && (
+              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400">
+                In campaign
+              </span>
+            )}
+            {inf.campaign_id && availableCampaigns.length > 0 && (() => {
+              const linkedCampaign = availableCampaigns.find(c => c.id === inf.campaign_id)
+              return linkedCampaign ? (
+                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400 truncate max-w-[180px]">
+                  {linkedCampaign.name}
+                </span>
+              ) : (
+                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400">
+                  In campaign
+                </span>
+              )
+            })()}
           </div>
 
           {/* Platform chips */}
@@ -1215,6 +1250,40 @@ function InfluencerCard({
               'Score with AI'
             )}
           </Button>
+          {availableCampaigns.length > 0 && (
+            <Select
+              value={inf.campaign_id ?? 'none'}
+              disabled={linking}
+              onValueChange={async (val) => {
+                const newCampaignId = val === 'none' ? null : val
+                setLinking(true)
+                try {
+                  const res = await fetch(`/api/influencers/${inf.id}/link-campaign`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ campaign_id: newCampaignId }),
+                  })
+                  if (!res.ok) throw new Error('Failed to link')
+                  onLinked?.(inf.id, newCampaignId)
+                  toast.success(newCampaignId ? 'Linked to campaign.' : 'Removed from campaign.')
+                } catch {
+                  toast.error('Could not update campaign link.')
+                } finally {
+                  setLinking(false)
+                }
+              }}
+            >
+              <SelectTrigger className="h-7 text-xs w-[160px]">
+                <SelectValue placeholder="Link to campaign" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No campaign</SelectItem>
+                {availableCampaigns.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
       </div>
     </div>

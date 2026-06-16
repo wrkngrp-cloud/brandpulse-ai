@@ -694,7 +694,7 @@ export async function POST(req: NextRequest) {
   /* ── 14. Influencers ──────────────────────────────────────────────────── */
   await sb.from('influencers').insert([
     {
-      brand_id: brandId, campaign_id: camp2Id,
+      brand_id: brandId, campaign_id: null,
       name: 'Funmi Afolabi', handle: 'foodie_naija', platform: 'instagram',
       category: 'Food & Lifestyle', followers: 485_000,
       cultural_iq: 88.5, risk_score: 12.0, status: 'active',
@@ -732,7 +732,7 @@ export async function POST(req: NextRequest) {
       },
     },
     {
-      brand_id: brandId, campaign_id: camp3Id,
+      brand_id: brandId, campaign_id: camp1Id,
       name: 'Chef Kemisola Adeyemi', handle: 'chefkemisola', platform: 'instagram',
       category: 'Chef / Food Creator', followers: 312_000,
       cultural_iq: 94.2, risk_score: 8.5, status: 'active',
@@ -808,7 +808,7 @@ export async function POST(req: NextRequest) {
       },
     },
     {
-      brand_id: brandId, campaign_id: null,
+      brand_id: brandId, campaign_id: camp2Id,
       name: 'Emeka Ogu', handle: 'abuja_foodie', platform: 'instagram',
       category: 'Food Critic / Blogger', followers: 78_000,
       cultural_iq: 79.0, risk_score: 15.0, status: 'paused',

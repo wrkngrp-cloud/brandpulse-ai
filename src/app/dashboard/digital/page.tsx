@@ -10,6 +10,7 @@ import {
 import { DigitalSpendChart } from './digital-charts'
 import type { SpendDataPoint } from './digital-charts'
 import { createClient } from '@/lib/supabase/server'
+import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 
 export const dynamic = 'force-dynamic'
 
@@ -75,7 +76,18 @@ function platformLabel(p: string): string {
 
 // ── page ─────────────────────────────────────────────────────────────────────
 
-export default async function DigitalPage() {
+export default async function DigitalPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>
+}) {
+  const params = await searchParams
+  const days   = Math.min(180, Math.max(7, Number(params.days ?? 30)))
+
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - days)
+  const cutoffStr = cutoff.toISOString().split('T')[0]
+
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -104,15 +116,12 @@ export default async function DigitalPage() {
 
       adAccounts = accounts ?? []
 
-      // Fetch last 30 days of performance data
-      const thirtyDaysAgo = new Date()
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-
+      // Fetch performance data for selected range
       const { data: rows } = await supabase
         .from('digital_performance_daily')
         .select('platform, date, spend, impressions, clicks, ctr, cpm, conversions')
         .eq('brand_id', brand.id)
-        .gte('date', thirtyDaysAgo.toISOString().slice(0, 10))
+        .gte('date', cutoffStr)
         .order('date', { ascending: true })
 
       perfRows = (rows ?? []) as PerfRow[]
@@ -222,14 +231,14 @@ export default async function DigitalPage() {
     {
       label: 'Total Spend',
       value: hasRealData ? fmtNGN(totalSpend) : '₦2.4M',
-      sub:   hasRealData ? 'Last 30 days' : 'Demo data',
+      sub:   hasRealData ? `Last ${days} days` : 'Demo data',
       icon:  Coins,
       color: 'text-indigo-500',
     },
     {
       label: 'Impressions',
       value: hasRealData ? fmtNum(totalImpressions) : '4.2M',
-      sub:   hasRealData ? 'Last 30 days' : 'Demo data',
+      sub:   hasRealData ? `Last ${days} days` : 'Demo data',
       icon:  Eye,
       color: 'text-emerald-500',
     },
@@ -253,16 +262,19 @@ export default async function DigitalPage() {
     <div className="max-w-5xl space-y-6">
 
       {/* Header */}
-      <div className="flex items-start gap-3">
-        <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0 mt-0.5">
-          <Monitor className="h-5 w-5 text-indigo-500" />
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-start gap-3">
+          <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0 mt-0.5">
+            <Monitor className="h-5 w-5 text-indigo-500" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Digital Campaigns</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Track your paid media performance across all connected ad platforms.
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Digital Campaigns</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Track your paid media performance across all connected ad platforms.
-          </p>
-        </div>
+        <DateRangeFilter currentDays={days} defaultDays={30} />
       </div>
 
       {/* Demo banner */}
@@ -374,7 +386,7 @@ export default async function DigitalPage() {
       {/* Spend vs Impressions chart */}
       <Card className="border rounded-xl p-5 bg-card space-y-3">
         <div>
-          <h2 className="text-base font-semibold">Spend vs Impressions (30 Days)</h2>
+          <h2 className="text-base font-semibold">Spend vs Impressions ({days} Days)</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             Weekly digital ad spend correlated with impression delivery
             {isDemo && ' · Demo data'}

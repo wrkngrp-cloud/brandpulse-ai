@@ -17,17 +17,26 @@ export default async function InfluencersPage() {
 
   if (!brand) redirect('/onboarding')
 
-  const { data: influencers } = await supabase
-    .from('influencers')
-    .select('id, brand_id, name, handle, platform, category, followers, cultural_iq, risk_score, ai_notes, status, campaign_id, created_at, updated_at')
-    .eq('brand_id', brand.id)
-    .order('created_at', { ascending: false })
+  const [{ data: influencers }, { data: campaigns }] = await Promise.all([
+    supabase
+      .from('influencers')
+      .select('id, brand_id, name, handle, platform, category, followers, cultural_iq, risk_score, ai_notes, status, campaign_id, created_at, updated_at')
+      .eq('brand_id', brand.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('campaigns')
+      .select('id, name, status')
+      .eq('brand_id', brand.id)
+      .in('status', ['draft', 'active', 'paused'])
+      .order('created_at', { ascending: false }),
+  ])
 
   return (
     <InfluencersClient
       brandId={brand.id}
       brandName={brand.name}
       initialInfluencers={influencers ?? []}
+      campaigns={campaigns ?? []}
     />
   )
 }

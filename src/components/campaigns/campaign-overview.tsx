@@ -26,6 +26,15 @@ interface Channel {
   objectives: string[]
 }
 
+interface InfluencerSummary {
+  id: string
+  name: string
+  handle: string
+  platform: string
+  followers: number | null
+  cultural_iq: number | null
+}
+
 interface CampaignOverviewProps {
   campaign: {
     id: string
@@ -41,6 +50,7 @@ interface CampaignOverviewProps {
   }
   oohSites: { visits: number; monthly_cost: number | null; currency: string | null }[]
   events:   { status: string }[]
+  influencers?: InfluencerSummary[]
   today?: string
 }
 
@@ -75,7 +85,22 @@ function fmtDateShort(d: string | null) {
   return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
 }
 
-export function CampaignOverview({ campaign, oohSites, events }: CampaignOverviewProps) {
+function formatFollowers(n: number | null): string {
+  if (n == null) return '—'
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
+  return String(n)
+}
+
+const PLATFORM_BADGE: Record<string, string> = {
+  instagram: 'bg-pink-100 text-pink-800',
+  tiktok:    'bg-muted text-muted-foreground',
+  youtube:   'bg-red-100 text-red-800',
+  twitter:   'bg-sky-100 text-sky-800',
+  facebook:  'bg-blue-100 text-blue-800',
+}
+
+export function CampaignOverview({ campaign, oohSites, events, influencers = [] }: CampaignOverviewProps) {
   const { objectives = [], campaign_channels: channels = [], start_date, end_date } = campaign
 
   const totalVisits   = oohSites.reduce((s, s2) => s + (s2.visits ?? 0), 0)
@@ -327,6 +352,37 @@ export function CampaignOverview({ campaign, oohSites, events }: CampaignOvervie
                 })}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── Influencer Partners ── */}
+      {influencers.length > 0 && (
+        <div className="border rounded-xl p-5 bg-card space-y-3">
+          <p className="text-sm font-medium">Influencer partners</p>
+          <div className="divide-y">
+            {influencers.map(inf => (
+              <div key={inf.id} className="flex items-center gap-3 py-2 first:pt-0 last:pb-0">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{inf.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">@{inf.handle}</p>
+                </div>
+                <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize shrink-0', PLATFORM_BADGE[inf.platform] ?? 'bg-muted text-muted-foreground')}>
+                  {inf.platform === 'tiktok' ? 'TikTok' : inf.platform === 'youtube' ? 'YouTube' : inf.platform.charAt(0).toUpperCase() + inf.platform.slice(1)}
+                </span>
+                <span className="text-xs tabular-nums shrink-0 text-muted-foreground">{formatFollowers(inf.followers)}</span>
+                {inf.cultural_iq !== null && (
+                  <span className={cn(
+                    'text-xs px-1.5 py-0.5 rounded-full font-semibold shrink-0',
+                    inf.cultural_iq >= 70 ? 'text-green-700 bg-green-100'
+                    : inf.cultural_iq >= 50 ? 'text-amber-700 bg-amber-100'
+                    : 'text-red-700 bg-red-100',
+                  )}>
+                    IQ {inf.cultural_iq}
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       )}
