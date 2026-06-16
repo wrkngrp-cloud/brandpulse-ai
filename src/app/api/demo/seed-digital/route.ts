@@ -168,11 +168,18 @@ function generateDays(brandId: string): DailyRow[] {
   return rows
 }
 
+const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
+
 export async function POST() {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Demo data is strictly for the Jara Foods demo account only
+  if (user.email !== DEMO_EMAIL) {
+    return NextResponse.json({ error: 'Not a demo account' }, { status: 403 })
+  }
 
   const { data: brand } = await supabase
     .from('brands')

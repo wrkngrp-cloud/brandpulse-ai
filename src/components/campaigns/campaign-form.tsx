@@ -18,12 +18,12 @@ const OBJECTIVES = [
 ]
 
 const CHANNELS = [
-  { value: 'ooh',     label: 'OOH / Outdoor',       built: true  },
-  { value: 'events',  label: 'Events & Activations', built: true  },
-  { value: 'digital', label: 'Digital',              built: false },
-  { value: 'radio',   label: 'Radio',                built: false },
-  { value: 'tv',      label: 'TV',                   built: false },
-  { value: 'print',   label: 'Print',                built: false },
+  { value: 'ooh',     label: 'OOH / Outdoor',       built: true },
+  { value: 'events',  label: 'Events & Activations', built: true },
+  { value: 'digital', label: 'Digital',              built: true },
+  { value: 'radio',   label: 'Radio',                built: true },
+  { value: 'tv',      label: 'TV',                   built: true },
+  { value: 'print',   label: 'Print',                built: true },
 ]
 
 interface ChannelConfig {

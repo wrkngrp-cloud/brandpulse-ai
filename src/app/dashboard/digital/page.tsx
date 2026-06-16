@@ -81,8 +81,11 @@ export default async function DigitalPage({
 }: {
   searchParams: Promise<Record<string, string | undefined>>
 }) {
-  const params = await searchParams
-  const days   = Math.min(180, Math.max(7, Number(params.days ?? 30)))
+  const params    = await searchParams
+  const days      = Math.min(180, Math.max(7, Number(params.days ?? 30)))
+  const connected = params.connected   // e.g. 'meta'
+  const setupNeeded = params.setup     // e.g. 'google' — env var not configured
+  const oauthError  = params.error
 
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - days)
@@ -128,13 +131,13 @@ export default async function DigitalPage({
     }
   }
 
+  const DEMO_EMAIL  = 'demo@jarafoods.brandpulse.ai'
+  const isDemoUser  = user?.email === DEMO_EMAIL
   const hasRealData = perfRows.length > 0
-  const isDemo      = !hasRealData
+  const isDemo      = !hasRealData && isDemoUser
 
-  // ── seed demo data if nothing connected ──────────────────────────────────
+  // ── seed demo data only for the Jara Foods demo account ──────────────────
   if (isDemo && brandId) {
-    // Trigger seed in a fire-and-forget: next page load will show data
-    // (we don't await here because it would block the render)
     void fetch(`${process.env.APP_URL ?? ''}/api/demo/seed-digital`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -276,6 +279,52 @@ export default async function DigitalPage({
         </div>
         <DateRangeFilter currentDays={days} defaultDays={30} />
       </div>
+
+      {/* Connected success banner */}
+      {connected && (
+        <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 dark:border-green-800/40 dark:bg-green-950/30 px-4 py-3">
+          <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
+          <p className="text-sm text-green-800 dark:text-green-300 capitalize">
+            {connected} Ads connected. Data will appear after tonight&apos;s sync at 5 AM Lagos time.
+          </p>
+        </div>
+      )}
+
+      {/* Setup required banner — env vars not yet configured */}
+      {setupNeeded && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50 dark:border-blue-800/40 dark:bg-blue-950/30 px-4 py-3 space-y-1">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-blue-600 shrink-0" />
+            <p className="text-sm font-medium text-blue-800 dark:text-blue-300 capitalize">{setupNeeded} Ads: environment variables needed</p>
+          </div>
+          <p className="text-xs text-blue-700 dark:text-blue-400 ml-6">
+            Add <code className="bg-blue-100 dark:bg-blue-900/40 px-1 rounded">
+              {setupNeeded === 'google' ? 'GOOGLE_ADS_CLIENT_ID + GOOGLE_ADS_CLIENT_SECRET' :
+               setupNeeded === 'tiktok' ? 'TIKTOK_ADS_APP_ID + TIKTOK_ADS_SECRET' :
+               setupNeeded === 'linkedin' ? 'LINKEDIN_CLIENT_ID + LINKEDIN_CLIENT_SECRET' : `${setupNeeded.toUpperCase()}_CLIENT_ID`}
+            </code> to your Vercel environment variables, then redeploy.
+          </p>
+        </div>
+      )}
+
+      {/* Meta OAuth redirect URI instruction banner */}
+      {oauthError === 'oauth_cancelled' && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/30 px-4 py-3 space-y-2">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+            <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Meta Ads: Redirect URI not whitelisted</p>
+          </div>
+          <p className="text-xs text-amber-700 dark:text-amber-400">
+            In your <strong>Meta for Developers</strong> app, go to <strong>Facebook Login → Settings</strong> and add this exact URL to <strong>Valid OAuth Redirect URIs</strong>:
+          </p>
+          <code className="block text-xs bg-amber-100 dark:bg-amber-900/40 px-3 py-1.5 rounded font-mono">
+            {process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'}/api/ads/meta/callback
+          </code>
+          <p className="text-xs text-amber-700 dark:text-amber-400">
+            Also ensure your app has <strong>Marketing API</strong> enabled and that <strong>Client OAuth Login</strong> and <strong>Web OAuth Login</strong> are both turned on.
+          </p>
+        </div>
+      )}
 
       {/* Demo banner */}
       {isDemo && (

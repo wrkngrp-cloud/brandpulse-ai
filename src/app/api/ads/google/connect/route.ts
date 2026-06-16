@@ -14,7 +14,7 @@ const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
 
 export async function GET() {
   if (!process.env.GOOGLE_ADS_CLIENT_ID) {
-    return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=google_not_configured`)
+    return NextResponse.redirect(`${APP_URL}/dashboard/digital?setup=google`)
   }
 
   const supabase = await createClient()
