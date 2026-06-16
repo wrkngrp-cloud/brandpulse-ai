@@ -233,29 +233,29 @@ export default async function DigitalPage({
   const kpis = [
     {
       label: 'Total Spend',
-      value: hasRealData ? fmtNGN(totalSpend) : '₦2.4M',
-      sub:   hasRealData ? `Last ${days} days` : 'Demo data',
+      value: hasRealData ? fmtNGN(totalSpend) : isDemo ? '₦2.4M' : '—',
+      sub:   hasRealData ? `Last ${days} days` : isDemo ? 'Demo data' : 'Connect an ad account',
       icon:  Coins,
       color: 'text-indigo-500',
     },
     {
       label: 'Impressions',
-      value: hasRealData ? fmtNum(totalImpressions) : '4.2M',
-      sub:   hasRealData ? `Last ${days} days` : 'Demo data',
+      value: hasRealData ? fmtNum(totalImpressions) : isDemo ? '4.2M' : '—',
+      sub:   hasRealData ? `Last ${days} days` : isDemo ? 'Demo data' : 'No data yet',
       icon:  Eye,
       color: 'text-emerald-500',
     },
     {
       label: 'Avg CTR',
-      value: hasRealData ? fmtPct(avgCtr) : '2.3%',
-      sub:   hasRealData ? 'Across all platforms' : 'Industry avg 1.8%',
+      value: hasRealData ? fmtPct(avgCtr) : isDemo ? '2.3%' : '—',
+      sub:   hasRealData ? 'Across all platforms' : isDemo ? 'Industry avg 1.8%' : 'No data yet',
       icon:  MousePointerClick,
       color: 'text-blue-500',
     },
     {
       label: 'Avg ROAS',
-      value: hasRealData ? (avgRoas > 0 ? `${avgRoas.toFixed(1)}x` : 'N/A') : '3.4x',
-      sub:   hasRealData ? 'Return on ad spend' : 'Demo data',
+      value: hasRealData ? (avgRoas > 0 ? `${avgRoas.toFixed(1)}x` : 'N/A') : isDemo ? '3.4x' : '—',
+      sub:   hasRealData ? 'Return on ad spend' : isDemo ? 'Demo data' : 'No data yet',
       icon:  TrendingUp,
       color: 'text-violet-500',
     },
@@ -441,7 +441,7 @@ export default async function DigitalPage({
             {isDemo && ' · Demo data'}
           </p>
         </div>
-        <DigitalSpendChart data={chartData.length > 0 ? chartData : undefined} />
+        <DigitalSpendChart data={chartData.length > 0 ? chartData : undefined} demo={isDemo} />
       </Card>
 
     </div>

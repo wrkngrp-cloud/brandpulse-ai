@@ -36,10 +36,19 @@ function formatImpr(val: number) {
 
 interface Props {
   data?: SpendDataPoint[]
+  demo?: boolean
 }
 
-export function DigitalSpendChart({ data }: Props) {
-  const chartData = data && data.length > 0 ? data : DEFAULT_DATA
+export function DigitalSpendChart({ data, demo }: Props) {
+  const chartData = data && data.length > 0 ? data : demo ? DEFAULT_DATA : null
+
+  if (!chartData) {
+    return (
+      <div className="h-[260px] flex items-center justify-center text-sm text-muted-foreground">
+        Connect an ad account to see spend data here.
+      </div>
+    )
+  }
 
   return (
     <ResponsiveContainer width="100%" height={260}>

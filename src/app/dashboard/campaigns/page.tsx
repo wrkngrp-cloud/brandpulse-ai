@@ -44,10 +44,11 @@ export default async function CampaignsPage({
   ] as const
 
   const CHANNEL_PAGES = [
-    { key: 'digital', label: 'Digital', href: '/dashboard/digital' },
-    { key: 'radio',   label: 'Radio',   href: '/dashboard/radio'   },
-    { key: 'tv',      label: 'TV',      href: '/dashboard/tv'      },
-    { key: 'print',   label: 'Print',   href: '/dashboard/print'   },
+    { key: 'digital',     label: 'Digital',     href: '/dashboard/digital'     },
+    { key: 'influencers', label: 'Influencers', href: '/dashboard/influencers' },
+    { key: 'radio',       label: 'Radio',       href: '/dashboard/radio'       },
+    { key: 'tv',          label: 'TV',          href: '/dashboard/tv'          },
+    { key: 'print',       label: 'Print',       href: '/dashboard/print'       },
   ]
 
   return (
