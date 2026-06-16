@@ -2,10 +2,10 @@
 
 import Link                from 'next/link'
 import { useRouter }       from 'next/navigation'
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import { cn }              from '@/lib/utils'
 import { buttonVariants, Button } from '@/components/ui/button'
-import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, TrendingUp, Users, Eye, Percent, Sparkles, RefreshCw } from 'lucide-react'
+import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, TrendingUp, Users, Eye, Percent, Sparkles, RefreshCw, Upload, X, Loader2, ImageIcon } from 'lucide-react'
 import { CampaignOverview } from './campaign-overview'
 import { LinkOohSiteDialog, LinkEventDialog } from './link-existing-dialog'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
@@ -17,6 +17,7 @@ interface Channel {
   channel: string
   budget_allocation: number | null
   objectives: string[]
+  creative_urls?: string[] | null
 }
 
 interface Campaign {
@@ -202,6 +203,51 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
   const [linkingOpen, setLinkingOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [linking, startLinking] = useTransition()
+
+  // Channel creative assets state: channelId → urls
+  const [channelCreatives, setChannelCreatives] = useState<Record<string, string[]>>(
+    Object.fromEntries((campaign.campaign_channels ?? []).map(ch => [ch.id, ch.creative_urls ?? []]))
+  )
+  const [uploadingChannel, setUploadingChannel] = useState<string | null>(null)
+  const creativeInputRef = useRef<HTMLInputElement>(null)
+  const [pendingChannelId, setPendingChannelId] = useState<string | null>(null)
+
+  async function handleCreativeUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !pendingChannelId) return
+    setUploadingChannel(pendingChannelId)
+    try {
+      const form = new FormData()
+      form.set('file', file)
+      const res  = await fetch(`/api/campaigns/${campaign.id}/channels/${pendingChannelId}/creatives`, { method: 'POST', body: form })
+      const data = await res.json()
+      if (!res.ok) { toast.error(data.error ?? 'Upload failed'); return }
+      setChannelCreatives(prev => ({ ...prev, [pendingChannelId]: data.creative_urls }))
+      toast.success('Creative uploaded')
+    } catch {
+      toast.error('Upload failed')
+    } finally {
+      setUploadingChannel(null)
+      setPendingChannelId(null)
+      if (creativeInputRef.current) creativeInputRef.current.value = ''
+    }
+  }
+
+  async function handleCreativeDelete(channelId: string, url: string) {
+    const res  = await fetch(`/api/campaigns/${campaign.id}/channels/${channelId}/creatives`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    })
+    const data = await res.json()
+    if (!res.ok) { toast.error(data.error ?? 'Delete failed'); return }
+    setChannelCreatives(prev => ({ ...prev, [channelId]: data.creative_urls }))
+  }
+
+  function triggerCreativeUpload(channelId: string) {
+    setPendingChannelId(channelId)
+    setTimeout(() => creativeInputRef.current?.click(), 0)
+  }
 
   function runAnalysis() {
     startAnalyse(async () => {
@@ -1028,6 +1074,81 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     })}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {/* Channel creative assets */}
+          {channelAlloc.length > 0 && (
+            <div className="border rounded-xl p-5 bg-card space-y-4">
+              <div>
+                <p className="text-sm font-medium">Channel creative assets</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Optional. Upload channel-specific creatives (posters, digital banners, activation photos) so E6 visual detection can spot this campaign&apos;s branded materials in event photos.
+                </p>
+              </div>
+              {/* Hidden file input */}
+              <input
+                ref={creativeInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="sr-only"
+                onChange={handleCreativeUpload}
+              />
+              <div className="space-y-4">
+                {channelAlloc.map(ch => {
+                  const meta    = CHANNEL_META[ch.channel]
+                  const urls    = channelCreatives[ch.id] ?? []
+                  const loading = uploadingChannel === ch.id
+                  return (
+                    <div key={ch.id} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-sm">
+                          <span className={cn('h-2 w-2 rounded-full shrink-0', meta?.color ?? 'bg-muted-foreground')} />
+                          <span className="font-medium">{meta?.label ?? ch.channel}</span>
+                          {urls.length > 0 && (
+                            <span className="text-xs text-muted-foreground">· {urls.length} asset{urls.length !== 1 ? 's' : ''}</span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => triggerCreativeUpload(ch.id)}
+                          disabled={loading || uploadingChannel !== null}
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                        >
+                          {loading
+                            ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />Uploading…</>
+                            : <><Upload className="h-3.5 w-3.5" />Add creative</>}
+                        </button>
+                      </div>
+                      {urls.length > 0 && (
+                        <div className="flex flex-wrap gap-2 pl-3.5">
+                          {urls.map(url => (
+                            <div key={url} className="relative group h-16 w-16 rounded-lg border overflow-hidden bg-muted">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={url} alt="Creative asset" className="h-full w-full object-cover" loading="lazy" />
+                              <button
+                                type="button"
+                                onClick={() => handleCreativeDelete(ch.id, url)}
+                                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                              >
+                                <X className="h-4 w-4 text-white" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {urls.length === 0 && (
+                        <div className="pl-3.5">
+                          <div className="h-12 rounded-lg border border-dashed flex items-center justify-center gap-2 text-xs text-muted-foreground/50">
+                            <ImageIcon className="h-4 w-4" />
+                            No creatives yet — add one above
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}

@@ -6,7 +6,7 @@ export default async function BrandSettingsPage() {
   const supabase = await createClient()
   const { data: brand } = await supabase
     .from('brands')
-    .select('name, website_url, category, brand_values, monitored_hashtags, brand_voice, cultural_profile, target_segments')
+    .select('name, website_url, category, brand_values, monitored_hashtags, brand_voice, cultural_profile, target_segments, logo_url, brand_colors')
     .limit(1)
     .single()
 
@@ -39,5 +39,11 @@ export default async function BrandSettingsPage() {
     })),
   }
 
-  return <BrandSettingsForm initial={initial} />
+  return (
+    <BrandSettingsForm
+      initial={initial}
+      logoUrl={brand?.logo_url ?? null}
+      brandColors={(brand?.brand_colors as string[] | null) ?? []}
+    />
+  )
 }

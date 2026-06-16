@@ -30,7 +30,7 @@ export default async function CampaignDetailPage({
     .select(`
       id, name, description, objectives, start_date, end_date,
       total_budget, currency, status, ai_summary,
-      campaign_channels ( id, channel, budget_allocation, objectives )
+      campaign_channels ( id, channel, budget_allocation, objectives, creative_urls )
     `)
     .eq('id', id)
     .single()
