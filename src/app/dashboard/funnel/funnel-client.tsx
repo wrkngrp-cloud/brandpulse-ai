@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import {
   Globe, Eye, Heart, Zap, Shield, Share2,
-  ChevronDown, Sparkles, Loader2, AlertCircle,
+  ChevronDown, Sparkles, Loader2, AlertCircle, ChevronRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -27,6 +27,13 @@ interface DiagnosisResult {
   biggestGap: string
   diagnosis: string
   recommendations: string[]
+}
+
+interface StageAnalysis {
+  channels:    string[]
+  initiatives: string[]
+  explanation: string
+  topActions:  string[]
 }
 
 const STAGES: {
@@ -59,8 +66,11 @@ function dropOffMeta(from: number | null, to: number | null) {
 }
 
 export function FunnelClient({ scores, brandName, industry }: Props) {
-  const [diagnosis, setDiagnosis] = useState<DiagnosisResult | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const [diagnosis, setDiagnosis]       = useState<DiagnosisResult | null>(null)
+  const [isPending, startTransition]    = useTransition()
+  const [analyses, setAnalyses]         = useState<Partial<Record<StageKey, StageAnalysis>>>({})
+  const [loadingStage, setLoadingStage] = useState<StageKey | null>(null)
+  const [openStage, setOpenStage]       = useState<StageKey | null>(null)
 
   const stageScores = STAGES.map(s => scores[s.key].score)
 
@@ -75,6 +85,42 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
       if ('error' in data) { toast.error(data.error); return }
       setDiagnosis(data)
     })
+  }
+
+  async function handleStageAnalysis(stage: StageKey, score: number | null) {
+    if (loadingStage) return
+
+    // Toggle off if already open and loaded
+    if (openStage === stage && analyses[stage]) {
+      setOpenStage(null)
+      return
+    }
+
+    setOpenStage(stage)
+
+    // If we already have the analysis, just show it
+    if (analyses[stage]) return
+
+    setLoadingStage(stage)
+    try {
+      const res = await fetch('/api/funnel/stage-analysis', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ stage, score, brandName, industry }),
+      })
+      const data = await res.json() as StageAnalysis | { error: string }
+      if ('error' in data) {
+        toast.error(data.error)
+        setOpenStage(null)
+        return
+      }
+      setAnalyses(prev => ({ ...prev, [stage]: data }))
+    } catch {
+      toast.error('Analysis failed — please try again.')
+      setOpenStage(null)
+    } finally {
+      setLoadingStage(null)
+    }
   }
 
   return (
@@ -102,9 +148,12 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
       <div className="border rounded-xl overflow-hidden bg-card">
         {STAGES.map((stage, idx) => {
           const { score, source, dataPoints } = scores[stage.key]
-          const Icon = stage.icon
-          const drop = dropOffMeta(stageScores[idx], stageScores[idx + 1])
-          const isLast = idx === STAGES.length - 1
+          const Icon      = stage.icon
+          const drop      = dropOffMeta(stageScores[idx], stageScores[idx + 1])
+          const isLast    = idx === STAGES.length - 1
+          const isOpen    = openStage === stage.key
+          const isLoading = loadingStage === stage.key
+          const analysis  = analyses[stage.key]
 
           return (
             <div key={stage.key} className={cn(idx > 0 && 'border-t border-border')}>
@@ -140,15 +189,115 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       />
                     </div>
 
-                    <p className="text-[11px] text-muted-foreground/50 mt-1.5">
-                      {source} ·{' '}
-                      {dataPoints > 0
-                        ? `${dataPoints} data point${dataPoints !== 1 ? 's' : ''}`
-                        : 'waiting for data'}
-                    </p>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <p className="text-[11px] text-muted-foreground/50">
+                        {source} ·{' '}
+                        {dataPoints > 0
+                          ? `${dataPoints} data point${dataPoints !== 1 ? 's' : ''}`
+                          : 'waiting for data'}
+                      </p>
+                      {/* Why this score button */}
+                      <button
+                        type="button"
+                        onClick={() => handleStageAnalysis(stage.key, score)}
+                        disabled={isLoading && loadingStage !== stage.key}
+                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {isLoading ? (
+                          <><Loader2 className="h-3 w-3 animate-spin" />Analysing…</>
+                        ) : (
+                          <>
+                            <Sparkles className="h-3 w-3" />
+                            Why this score?
+                            <ChevronRight className={cn('h-3 w-3 transition-transform', isOpen && 'rotate-90')} />
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* Analysis panel */}
+              {isOpen && analysis && (
+                <div className="border-t border-dashed border-border bg-muted/20 px-5 py-4 space-y-4">
+                  {/* Channels */}
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      Channels informing this stage
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {analysis.channels.map(ch => (
+                        <span
+                          key={ch}
+                          className="text-xs px-2 py-0.5 rounded-full bg-foreground/8 border border-border font-medium"
+                        >
+                          {ch}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Initiatives */}
+                  {analysis.initiatives.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Initiatives powering it
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {analysis.initiatives.map(init => (
+                          <span
+                            key={init}
+                            className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40"
+                          >
+                            {init}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI explanation */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-4 w-4 rounded-full bg-foreground flex items-center justify-center shrink-0">
+                        <Sparkles className="h-2.5 w-2.5 text-background" />
+                      </div>
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Why this score
+                      </p>
+                    </div>
+                    <p className="text-sm leading-relaxed">{analysis.explanation}</p>
+                  </div>
+
+                  {/* Top actions */}
+                  {analysis.topActions.length > 0 && (
+                    <div className="space-y-2 pt-1 border-t border-border/50">
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Top actions to improve this stage
+                      </p>
+                      <ol className="space-y-2">
+                        {analysis.topActions.map((action, i) => (
+                          <li key={i} className="flex items-start gap-2.5 text-sm">
+                            <span className="shrink-0 h-5 w-5 rounded-full bg-muted text-muted-foreground text-xs flex items-center justify-center font-semibold">
+                              {i + 1}
+                            </span>
+                            <span>{action}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Loading state for analysis */}
+              {isOpen && isLoading && (
+                <div className="border-t border-dashed border-border bg-muted/20 px-5 py-6 flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                  Fetching signals and generating analysis…
+                </div>
+              )}
 
               {/* Drop-off connector */}
               {!isLast && (
@@ -178,7 +327,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
         })}
       </div>
 
-      {/* AI Diagnosis result */}
+      {/* Overall AI Diagnosis result */}
       {diagnosis && (
         <div className="border rounded-xl p-5 bg-card space-y-4">
           <div className="flex items-start gap-3">
