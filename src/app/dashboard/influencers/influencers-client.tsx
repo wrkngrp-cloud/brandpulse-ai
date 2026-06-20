@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import { PostTracker } from '@/components/influencers/post-tracker'
 
@@ -966,7 +967,12 @@ function InfluencerCard({
         {/* Left: name + handle + meta */}
         <div className="flex-1 min-w-0 space-y-1.5">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-medium text-sm">{inf.name}</span>
+            <Link
+              href={`/dashboard/influencers/${inf.id}`}
+              className="font-medium text-sm hover:underline hover:text-primary transition-colors"
+            >
+              {inf.name}
+            </Link>
             <StatusBadge status={inf.status} />
             {brandFit?.recommendation && (
               <RecommendationBadge recommendation={brandFit.recommendation} />

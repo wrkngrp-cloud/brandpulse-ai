@@ -41,32 +41,39 @@ export async function POST(
     ? (brand.brand_values as string[]).join(', ')
     : null
 
-  const brandContext = [
-    brandCategory ? `Industry: ${brandCategory}` : null,
-    brandValues   ? `Brand values: ${brandValues}` : null,
-  ].filter(Boolean).join('. ')
+  const industryClause = brandCategory
+    ? `The brand operates in the ${brandCategory} industry.`
+    : 'The brand industry is not specified — do not assume any industry from the brand name.'
 
-  const systemPrompt = `You are a brand safety and cultural intelligence analyst for Nigerian brands. Score influencers for cultural fit and brand safety risk within the specific industry of the client brand. Return ONLY valid JSON.`
+  const systemPrompt = `You are a brand safety and cultural intelligence analyst for Nigerian brands. Score influencers for cultural fit and brand safety risk within the explicitly provided industry of the client brand.
 
-  const userPrompt = `Score the following influencer for a Nigerian brand called "${brand.name}"${brandContext ? ` (${brandContext})` : ''}.
+CRITICAL RULE: The brand name is irrelevant to industry classification. "Sweetness" could be a fintech, "Lion" could be a beauty brand. Evaluate ONLY based on the explicitly stated industry/category field, never from the brand name. If no industry is stated, acknowledge that and base your scoring on general brand safety, not any assumed industry.`
 
-Influencer details:
+  const userPrompt = `Score this influencer for a Nigerian brand.
+
+BRAND DETAILS:
+- Brand name: ${brand.name}
+- ${industryClause}${brandValues ? `\n- Brand values: ${brandValues}` : ''}
+
+INFLUENCER DETAILS:
 - Name: ${influencer.name}
 - Handle: @${influencer.handle}
 - Platform: ${influencer.platform}
 - Content category: ${influencer.category ?? 'not specified'}
 - Audience size: ${followersText}
 
-Scoring criteria — evaluate strictly within the context of ${brand.name}'s industry (${brandCategory ?? 'as described'}), not generic food/FMCG assumptions:
-1. cultural_iq (0-100): How culturally resonant this creator is for Nigerian audiences in the ${brandCategory ?? 'brand'} space. Consider language, content style, local relevance, audience demographics for the ${brandCategory ?? 'relevant'} category on ${influencer.platform} in Nigeria.
-2. risk_score (0-100): Brand safety risk (0 = very safe, 100 = very risky). Consider content risks relevant to ${brand.name}'s industry and reputation, audience fit, and any known controversy patterns for this content type.
-3. ai_notes: 2-3 sentences specific to ${brand.name}'s industry. Explain what makes them culturally relevant (or not) for the ${brandCategory ?? 'brand'} space and what drives the risk score. Do not reference unrelated industries.
+SCORING INSTRUCTIONS:
+Do NOT make assumptions about the brand's industry from its name. Use ONLY the explicitly provided industry above.
 
-Return exactly this JSON shape with no other text:
+1. cultural_iq (0-100): How culturally resonant is this creator for Nigerian audiences in the ${brandCategory ? `${brandCategory} space` : "brand's context"}? Consider language/tone, content style, Nigerian cultural relevance, and audience demographics on ${influencer.platform}.
+2. risk_score (0-100): Brand safety risk (0 = very safe, 100 = very risky). Consider content controversies, audience misalignment, and reputational risks specific to the ${brandCategory ?? 'brand'} context. Do not bring in food/FMCG/unrelated industry risks unless the brand is explicitly in that space.
+3. ai_notes: 2-3 sentences. Explain the cultural fit and risk assessment in the context of ${brandCategory ? `the ${brandCategory} industry` : 'this brand'}. Do not reference food, FMCG, or any other industry unless it is explicitly stated above.
+
+Return ONLY this JSON — no markdown, no explanation:
 {
   "cultural_iq": <number 0-100>,
   "risk_score": <number 0-100>,
-  "ai_notes": "<2-3 sentence assessment specific to ${brand.name} and the ${brandCategory ?? 'brand'} industry>"
+  "ai_notes": "<2-3 sentences specific to the stated industry>"
 }`
 
   let parsed: { cultural_iq: number; risk_score: number; ai_notes: string }

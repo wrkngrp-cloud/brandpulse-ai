@@ -478,11 +478,41 @@ interface PostFormProps {
 }
 
 function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormProps) {
-  const [form, setForm]         = useState<FormState>(EMPTY_FORM)
+  const [form, setForm]             = useState<FormState>(EMPTY_FORM)
   const [submitting, setSubmitting] = useState(false)
+  const [fetching, setFetching]     = useState(false)
+  const [metaNote, setMetaNote]     = useState<string | null>(null)
 
   function setField(key: keyof FormState, value: string) {
     setForm(prev => ({ ...prev, [key]: value }))
+  }
+
+  async function fetchMetadata(url: string) {
+    if (!url.trim() || !url.startsWith('http')) return
+    setFetching(true)
+    setMetaNote(null)
+    try {
+      const res = await fetch(`/api/influencers/${influencerId}/posts/metadata?url=${encodeURIComponent(url)}`)
+      if (!res.ok) return
+      const data = await res.json() as {
+        author_name?: string | null
+        caption?: string | null
+        thumbnail_url?: string | null
+        note?: string | null
+      }
+      // Pre-fill comment_samples with the caption if present and field is empty
+      if (data.caption && !form.commentSamples.trim()) {
+        setForm(prev => ({
+          ...prev,
+          commentSamples: `Post caption:\n${data.caption}`,
+        }))
+      }
+      if (data.note) setMetaNote(data.note)
+    } catch {
+      // silently fail — metadata is optional
+    } finally {
+      setFetching(false)
+    }
   }
 
   async function handleSubmit() {
@@ -527,13 +557,22 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
       {/* Post URL */}
       <div className="space-y-1.5">
         <Label className="text-xs">Post URL <span className="text-rose-500">*</span></Label>
-        <Input
-          placeholder="https://instagram.com/reel/abc123"
-          value={form.postUrl}
-          onChange={e => setField('postUrl', e.target.value)}
-          className="text-sm h-8"
-        />
-        <p className="text-[10px] text-muted-foreground">Instagram, TikTok, X, YouTube, or Facebook</p>
+        <div className="relative">
+          <Input
+            placeholder="https://instagram.com/reel/abc123"
+            value={form.postUrl}
+            onChange={e => setField('postUrl', e.target.value)}
+            onBlur={e => void fetchMetadata(e.target.value)}
+            className="text-sm h-8 pr-8"
+          />
+          {fetching && (
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground absolute right-2.5 top-1/2 -translate-y-1/2" />
+          )}
+        </div>
+        <p className="text-[10px] text-muted-foreground">Instagram, TikTok, X, YouTube, or Facebook — caption auto-fetches for TikTok, YouTube, and X</p>
+        {metaNote && (
+          <p className="text-[10px] text-amber-600 dark:text-amber-400">{metaNote}</p>
+        )}
       </div>
 
       {/* Engagement metrics */}
@@ -561,7 +600,7 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
       <div className="space-y-1.5">
         <div className="space-y-0.5">
           <Label className="text-xs">Comment Samples <span className="text-muted-foreground font-normal">(optional but improves accuracy)</span></Label>
-          <p className="text-[10px] text-muted-foreground">Paste 5–10 representative comments for deeper sentiment analysis</p>
+          <p className="text-[10px] text-muted-foreground">Auto-filled with post caption where available. Add actual audience comments for deeper sentiment analysis.</p>
         </div>
         <Textarea
           placeholder={'"This is exactly what I needed!"\n"Where can I get this? 😍"\n"Looks amazing, trying this week"'}
