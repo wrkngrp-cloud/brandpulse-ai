@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { PostTracker } from '@/components/influencers/post-tracker'
 
 export interface Influencer {
   id: string
@@ -948,6 +949,7 @@ function InfluencerCard({
   onLinked?: (influencerId: string, campaignId: string | null) => void
 }) {
   const [linking, setLinking] = useState(false)
+  const [showTracker, setShowTracker] = useState(false)
   const platforms = inf.social_urls?.length
     ? inf.social_urls.map(s => s.platform)
     : [inf.platform]
@@ -1103,8 +1105,28 @@ function InfluencerCard({
               </SelectContent>
             </Select>
           )}
+          {inf.campaign_id && (
+            <button
+              onClick={() => setShowTracker(v => !v)}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors h-7 px-2 rounded border border-transparent hover:border-border"
+            >
+              {showTracker ? 'Hide posts' : 'Track posts'}
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Post Tracker — only when linked to a campaign */}
+      {inf.campaign_id && showTracker && (
+        <div className="border-t mt-3 pt-3">
+          <PostTracker
+            influencerId={inf.id}
+            campaignId={inf.campaign_id}
+            influencerHandle={inf.handle}
+            influencerPlatform={inf.platform}
+          />
+        </div>
+      )}
     </div>
   )
 }

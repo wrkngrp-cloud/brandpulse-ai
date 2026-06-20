@@ -11,6 +11,7 @@ import { LinkOohSiteDialog, LinkEventDialog } from './link-existing-dialog'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { toast } from 'sonner'
 import { linkInfluencerToCampaign } from '@/app/dashboard/campaigns/[id]/link-influencer-action'
+import { PostTracker } from '@/components/influencers/post-tracker'
 
 interface Channel {
   id: string
@@ -194,6 +195,64 @@ function CulturalIQBadge({ score }: { score: number | null }) {
     : score >= 50 ? 'text-amber-700 bg-amber-100'
     : 'text-red-700 bg-red-100'
   return <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold', color)}>{score}</span>
+}
+
+function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; campaignId: string }) {
+  const [showTracker, setShowTracker] = useState(false)
+  return (
+    <div className="border rounded-xl p-4 bg-card space-y-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold truncate">{inf.name}</p>
+          <p className="text-xs text-muted-foreground truncate">@{inf.handle}</p>
+        </div>
+        <span className={cn(
+          'text-xs px-2 py-0.5 rounded-full font-medium shrink-0 capitalize',
+          INF_STATUS_STYLES[inf.status] ?? 'bg-muted text-muted-foreground',
+        )}>
+          {inf.status}
+        </span>
+      </div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', PLATFORM_COLORS[inf.platform] ?? 'bg-muted text-muted-foreground')}>
+          {inf.platform === 'tiktok' ? 'TikTok' : inf.platform === 'youtube' ? 'YouTube' : inf.platform.charAt(0).toUpperCase() + inf.platform.slice(1)}
+        </span>
+        {inf.category && (
+          <span className="text-xs text-muted-foreground">{inf.category}</span>
+        )}
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="bg-muted/40 rounded-lg p-2 space-y-0.5">
+          <p className="text-xs text-muted-foreground">Followers</p>
+          <p className="text-sm font-semibold tabular-nums">{formatFollowers(inf.followers)}</p>
+        </div>
+        <div className="bg-muted/40 rounded-lg p-2 space-y-0.5">
+          <p className="text-xs text-muted-foreground">Cultural IQ</p>
+          <div className="mt-0.5">
+            <CulturalIQBadge score={inf.cultural_iq} />
+          </div>
+        </div>
+      </div>
+      <div className="border-t pt-2">
+        <button
+          onClick={() => setShowTracker(v => !v)}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {showTracker ? 'Hide post tracker' : 'Track posts for this influencer'}
+        </button>
+        {showTracker && (
+          <div className="mt-3">
+            <PostTracker
+              influencerId={inf.id}
+              campaignId={campaignId}
+              influencerHandle={inf.handle}
+              influencerPlatform={inf.platform}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export function CampaignDetailClient({ campaign, oohSites, events, activeTab, unlinkedSites = [], unlinkedEvents = [], interactions = [], socialPosts = [], oohVisits = [], influencers = [], unlinkedInfluencers = [] }: Props) {
@@ -861,42 +920,9 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-3">
               {influencers.map(inf => (
-                <div key={inf.id} className="border rounded-xl p-4 bg-card space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold truncate">{inf.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">@{inf.handle}</p>
-                    </div>
-                    <span className={cn(
-                      'text-xs px-2 py-0.5 rounded-full font-medium shrink-0 capitalize',
-                      INF_STATUS_STYLES[inf.status] ?? 'bg-muted text-muted-foreground',
-                    )}>
-                      {inf.status}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', PLATFORM_COLORS[inf.platform] ?? 'bg-muted text-muted-foreground')}>
-                      {inf.platform === 'tiktok' ? 'TikTok' : inf.platform === 'youtube' ? 'YouTube' : inf.platform.charAt(0).toUpperCase() + inf.platform.slice(1)}
-                    </span>
-                    {inf.category && (
-                      <span className="text-xs text-muted-foreground">{inf.category}</span>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-muted/40 rounded-lg p-2 space-y-0.5">
-                      <p className="text-xs text-muted-foreground">Followers</p>
-                      <p className="text-sm font-semibold tabular-nums">{formatFollowers(inf.followers)}</p>
-                    </div>
-                    <div className="bg-muted/40 rounded-lg p-2 space-y-0.5">
-                      <p className="text-xs text-muted-foreground">Cultural IQ</p>
-                      <div className="mt-0.5">
-                        <CulturalIQBadge score={inf.cultural_iq} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <CampaignInfluencerCard key={inf.id} inf={inf} campaignId={campaign.id} />
               ))}
             </div>
           )}
