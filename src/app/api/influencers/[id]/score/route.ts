@@ -12,10 +12,10 @@ export async function POST(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // Get brand for ownership check
+  // Fetch brand with enough context to score accurately for this specific brand
   const { data: brand } = await supabase
     .from('brands')
-    .select('id, name')
+    .select('id, name, category, brand_values, target_segments')
     .limit(1)
     .single()
 
@@ -35,27 +35,38 @@ export async function POST(
     ? `${influencer.followers.toLocaleString('en-NG')} followers`
     : 'unknown follower count'
 
-  const systemPrompt = `You are a brand safety and cultural intelligence analyst for Nigerian brands. Score influencers for cultural fit and brand safety risk. Return ONLY valid JSON.`
+  // Build brand context so the model evaluates within the correct industry
+  const brandCategory = brand.category ?? null
+  const brandValues   = Array.isArray(brand.brand_values) && brand.brand_values.length > 0
+    ? (brand.brand_values as string[]).join(', ')
+    : null
 
-  const userPrompt = `Score the following influencer for a Nigerian brand called "${brand.name}".
+  const brandContext = [
+    brandCategory ? `Industry: ${brandCategory}` : null,
+    brandValues   ? `Brand values: ${brandValues}` : null,
+  ].filter(Boolean).join('. ')
+
+  const systemPrompt = `You are a brand safety and cultural intelligence analyst for Nigerian brands. Score influencers for cultural fit and brand safety risk within the specific industry of the client brand. Return ONLY valid JSON.`
+
+  const userPrompt = `Score the following influencer for a Nigerian brand called "${brand.name}"${brandContext ? ` (${brandContext})` : ''}.
 
 Influencer details:
 - Name: ${influencer.name}
 - Handle: @${influencer.handle}
 - Platform: ${influencer.platform}
-- Category: ${influencer.category ?? 'not specified'}
+- Content category: ${influencer.category ?? 'not specified'}
 - Audience size: ${followersText}
 
-Scoring criteria:
-1. cultural_iq (0-100): How culturally resonant this creator is likely to be for Nigerian audiences. Consider language, content style, local relevance, audience demographics, and engagement patterns typical for their category on ${influencer.platform} in Nigeria.
-2. risk_score (0-100): Brand safety risk score (0 = very safe, 100 = very risky). Consider the platform's controversy history for this content category, typical content risks, audience fit with a reputable brand, and any known patterns in the category.
-3. ai_notes: 2-3 sentences summarising your assessment. Be specific about what makes them culturally relevant (or not) and what drives the risk score.
+Scoring criteria — evaluate strictly within the context of ${brand.name}'s industry (${brandCategory ?? 'as described'}), not generic food/FMCG assumptions:
+1. cultural_iq (0-100): How culturally resonant this creator is for Nigerian audiences in the ${brandCategory ?? 'brand'} space. Consider language, content style, local relevance, audience demographics for the ${brandCategory ?? 'relevant'} category on ${influencer.platform} in Nigeria.
+2. risk_score (0-100): Brand safety risk (0 = very safe, 100 = very risky). Consider content risks relevant to ${brand.name}'s industry and reputation, audience fit, and any known controversy patterns for this content type.
+3. ai_notes: 2-3 sentences specific to ${brand.name}'s industry. Explain what makes them culturally relevant (or not) for the ${brandCategory ?? 'brand'} space and what drives the risk score. Do not reference unrelated industries.
 
 Return exactly this JSON shape with no other text:
 {
   "cultural_iq": <number 0-100>,
   "risk_score": <number 0-100>,
-  "ai_notes": "<2-3 sentence assessment>"
+  "ai_notes": "<2-3 sentence assessment specific to ${brand.name} and the ${brandCategory ?? 'brand'} industry>"
 }`
 
   let parsed: { cultural_iq: number; risk_score: number; ai_notes: string }
