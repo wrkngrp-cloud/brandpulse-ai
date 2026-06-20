@@ -3,6 +3,7 @@ import { SocialConnectCard } from '@/components/dashboard/social-connect-card'
 import { GA4ConnectCard, type GA4ConnectionData } from '@/components/dashboard/ga4-connect-card'
 import { PaymentConnectCard, type PaymentConfigStatus } from '@/components/dashboard/payment-connect-card'
 import { AppStoreConnectCard, type AppStoreConfigData } from '@/components/dashboard/app-store-connect-card'
+import { EmailConnectCard, type EmailConnectorStatus } from '@/components/dashboard/email-connect-card'
 
 export default async function ConnectionsSettingsPage() {
   const supabase = await createClient()
@@ -20,6 +21,7 @@ export default async function ConnectionsSettingsPage() {
   let ga4Connection: GA4ConnectionData | null = null
   let paymentStatus: PaymentConfigStatus = { paystack: false, flutterwave: false }
   let appStoreConfig: AppStoreConfigData | null = null
+  let emailStatus: EmailConnectorStatus = { mailchimp: false, brevo: false }
 
   if (brand) {
     const { data: ga4Data } = await supabase
@@ -41,7 +43,7 @@ export default async function ConnectionsSettingsPage() {
       }
     }
 
-    const [{ data: appCfg }, { data: reviewStats }] = await Promise.all([
+    const [{ data: appCfg }, { data: reviewStats }, { data: emailRows }] = await Promise.all([
       supabase
         .from('app_store_configs')
         .select('apple_app_id, google_pkg_name')
@@ -53,6 +55,10 @@ export default async function ConnectionsSettingsPage() {
         .eq('brand_id', brand.id)
         .order('reviewed_at', { ascending: false })
         .limit(30),
+      supabase
+        .from('email_connectors')
+        .select('provider, last_synced_at')
+        .eq('brand_id', brand.id),
     ])
 
     if (appCfg) {
@@ -69,6 +75,14 @@ export default async function ConnectionsSettingsPage() {
         review_count:    reviewStats?.length ?? 0,
       }
     }
+
+    if (emailRows) {
+      emailStatus = {
+        mailchimp:     emailRows.some(r => r.provider === 'mailchimp'),
+        brevo:         emailRows.some(r => r.provider === 'brevo'),
+        last_synced_at: emailRows[0]?.last_synced_at ?? null,
+      }
+    }
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
@@ -83,6 +97,8 @@ export default async function ConnectionsSettingsPage() {
 
       <AppStoreConnectCard config={appStoreConfig} />
 
+      <EmailConnectCard status={emailStatus} />
+
       <div className="border rounded-xl p-5 bg-card space-y-2">
         <p className="text-sm font-semibold">About connections</p>
         <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
@@ -93,6 +109,7 @@ export default async function ConnectionsSettingsPage() {
           <li>GA4 data syncs daily at 6 AM Lagos time. Use Sync now to pull the latest 30-day totals on demand.</li>
           <li>Payment webhooks fire in real time. Each successful charge adds an Action signal to the funnel; ten or more purchases from the same customer count toward Loyalty.</li>
           <li>App Store reviews sync every Sunday at 7 AM Lagos time. Apple reviews are fetched automatically. Google Play reviews need the official Publisher API.</li>
+          <li>Email campaign metrics (open rate, click rate) sync daily at 7 AM Lagos time and feed the Loyalty stage in the Brand Funnel.</li>
         </ul>
       </div>
     </div>

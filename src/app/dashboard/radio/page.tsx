@@ -7,6 +7,7 @@ import { MediaPlanUploadDialog } from '@/components/offline-media/media-plan-upl
 import { buttonVariants }  from '@/components/ui/button'
 import { cn }              from '@/lib/utils'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
+import { RadioAiAnalysis } from './radio-ai-analysis'
 
 export const dynamic = 'force-dynamic'
 
@@ -202,6 +203,9 @@ export default async function RadioPage({
               </Card>
             ))}
           </div>
+
+          {/* AI analysis */}
+          <RadioAiAnalysis days={days} brandName={brand.name} hasData={hasData} />
 
           {/* Schedule table */}
           <Card className="border rounded-xl p-5 bg-card space-y-4">

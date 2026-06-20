@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Zap, X, ChevronDown, Send, Loader2, AlertTriangle, Copy, Check, ImagePlus, XCircle } from 'lucide-react'
+import { Zap, X, ChevronDown, Send, Loader2, AlertTriangle, Copy, Check, ImagePlus, Video, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -21,6 +21,7 @@ interface ImageAttachment {
   previewUrl: string
   fileName: string
   sizeKb: number
+  isVideo?: boolean
 }
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -112,8 +113,33 @@ function ScoreCard({ label, dim, isRisk = false }: {
 
 // ── Widget ────────────────────────────────────────────────────────────────────
 
-const ALLOWED_TYPES: SupportedMediaType[] = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-const MAX_SIZE_BYTES = 4 * 1024 * 1024 // 4 MB
+const ALLOWED_IMAGE_TYPES: SupportedMediaType[] = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm']
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024  // 10 MB
+const MAX_VIDEO_BYTES = 200 * 1024 * 1024 // 200 MB
+
+function extractVideoFrame(file: File): Promise<{ base64: string; previewUrl: string }> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const video = document.createElement('video')
+    video.preload = 'metadata'
+    video.muted = true
+    video.src = url
+    video.onloadeddata = () => { video.currentTime = 0 }
+    video.onseeked = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width  = video.videoWidth
+      canvas.height = video.videoHeight
+      const ctx = canvas.getContext('2d')
+      if (!ctx) { URL.revokeObjectURL(url); reject(new Error('Canvas error')); return }
+      ctx.drawImage(video, 0, 0)
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
+      URL.revokeObjectURL(url)
+      resolve({ base64: dataUrl.split(',')[1], previewUrl: dataUrl })
+    }
+    video.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Video load error')) }
+  })
+}
 
 export function PrePostWidget() {
   const [open, setOpen]           = useState(false)
@@ -123,31 +149,33 @@ export function PrePostWidget() {
   const [funnel, setFunnel]       = useState('')
   const [image, setImage]         = useState<ImageAttachment | null>(null)
   const [imageError, setImageError] = useState<string | null>(null)
+  const [extracting, setExtracting] = useState(false)
   const [loading, setLoading]     = useState(false)
   const [result, setResult]       = useState<AnalysisResult | null>(null)
   const [error, setError]         = useState<string | null>(null)
   const [copiedRewrite, setCopied] = useState(false)
-  const fileInputRef              = useRef<HTMLInputElement>(null)
+  const imageInputRef             = useRef<HTMLInputElement>(null)
+  const videoInputRef             = useRef<HTMLInputElement>(null)
 
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    if (!ALLOWED_TYPES.includes(file.type as SupportedMediaType)) {
-      setImageError('Unsupported file type. Use JPEG, PNG, WEBP, or GIF.')
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type as SupportedMediaType)) {
+      setImageError('Unsupported file type. Use JPEG, PNG, WebP, or GIF.')
+      e.target.value = ''
       return
     }
-    if (file.size > MAX_SIZE_BYTES) {
-      setImageError('Image too large. Max size is 4 MB.')
+    if (file.size > MAX_IMAGE_BYTES) {
+      setImageError('Image too large. Max 10 MB.')
+      e.target.value = ''
       return
     }
     setImageError(null)
     const reader = new FileReader()
     reader.onload = ev => {
       const dataUrl = ev.target?.result as string
-      // dataUrl = 'data:image/jpeg;base64,<data>'
-      const base64 = dataUrl.split(',')[1]
       setImage({
-        base64,
+        base64: dataUrl.split(',')[1],
         mediaType: file.type as SupportedMediaType,
         previewUrl: dataUrl,
         fileName: file.name,
@@ -155,7 +183,32 @@ export function PrePostWidget() {
       })
     }
     reader.readAsDataURL(file)
-    // Reset input so re-selecting the same file triggers onChange
+    e.target.value = ''
+  }
+
+  async function handleVideoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+      setImageError('Unsupported video. Use MP4, MOV, or WebM.')
+      e.target.value = ''
+      return
+    }
+    if (file.size > MAX_VIDEO_BYTES) {
+      setImageError('Video too large. Max 200 MB.')
+      e.target.value = ''
+      return
+    }
+    setImageError(null)
+    setExtracting(true)
+    try {
+      const { base64, previewUrl } = await extractVideoFrame(file)
+      setImage({ base64, mediaType: 'image/jpeg', previewUrl, fileName: file.name, sizeKb: Math.round(file.size / 1024), isVideo: true })
+    } catch {
+      setImageError('Could not read video. Try a shorter clip.')
+    } finally {
+      setExtracting(false)
+    }
     e.target.value = ''
   }
 
@@ -212,6 +265,7 @@ export function PrePostWidget() {
     setFunnel('')
     setImage(null)
     setImageError(null)
+    setExtracting(false)
   }
 
   function copyRewrite() {
@@ -274,13 +328,20 @@ export function PrePostWidget() {
             {!result ? (
               /* Input form */
               <div className="p-4 space-y-3">
-                {/* Image attachment */}
+                {/* Media attachment */}
                 <input
-                  ref={fileInputRef}
+                  ref={imageInputRef}
                   type="file"
                   accept="image/jpeg,image/png,image/gif,image/webp"
                   className="hidden"
-                  onChange={handleFileSelect}
+                  onChange={handleImageSelect}
+                />
+                <input
+                  ref={videoInputRef}
+                  type="file"
+                  accept="video/mp4,video/quicktime,video/webm"
+                  className="hidden"
+                  onChange={handleVideoSelect}
                 />
                 {image ? (
                   <div className="relative rounded-xl overflow-hidden border bg-muted group">
@@ -288,12 +349,12 @@ export function PrePostWidget() {
                     <img src={image.previewUrl} alt="Visual to analyse" className="w-full max-h-48 object-cover" />
                     <div className="absolute top-2 right-2 flex items-center gap-1.5">
                       <span className="text-[10px] bg-background/80 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-full border font-mono">
-                        {image.mediaType.split('/')[1].toUpperCase()} · {image.sizeKb}KB
+                        {image.isVideo ? 'VIDEO' : image.mediaType.split('/')[1].toUpperCase()} · {image.sizeKb}KB
                       </span>
                       <button
                         onClick={() => { setImage(null); setImageError(null) }}
                         className="bg-background/80 backdrop-blur-sm rounded-full p-0.5 hover:bg-red-50 transition-colors"
-                        title="Remove image"
+                        title="Remove"
                       >
                         <XCircle className="h-4 w-4 text-red-500" />
                       </button>
@@ -302,14 +363,28 @@ export function PrePostWidget() {
                       <span className="text-[10px] bg-foreground text-background px-2 py-0.5 rounded-full font-medium">Visual attached</span>
                     </div>
                   </div>
+                ) : extracting ? (
+                  <div className="w-full flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Extracting video frame...
+                  </div>
                 ) : (
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
-                  >
-                    <ImagePlus className="h-4 w-4" />
-                    Add image for visual analysis (optional)
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => imageInputRef.current?.click()}
+                      className="flex-1 flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                    >
+                      <ImagePlus className="h-4 w-4" />
+                      Add image
+                    </button>
+                    <button
+                      onClick={() => videoInputRef.current?.click()}
+                      className="flex-1 flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                    >
+                      <Video className="h-4 w-4" />
+                      Add video
+                    </button>
+                  </div>
                 )}
                 {imageError && <p className="text-xs text-red-500">{imageError}</p>}
 
@@ -348,12 +423,12 @@ export function PrePostWidget() {
                 >
                   {loading
                     ? <><Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> Analysing...</>
-                    : <><Send className="h-3.5 w-3.5 mr-2" /> {image ? 'Analyse visual + copy' : 'Analyse content'}</>
+                    : <><Send className="h-3.5 w-3.5 mr-2" /> {image ? (image.isVideo ? 'Analyse video + copy' : 'Analyse image + copy') : 'Analyse content'}</>
                   }
                 </Button>
                 {loading && (
                   <p className="text-center text-[11px] text-muted-foreground animate-pulse">
-                    {image ? 'Reading image and cultural context, scoring your content...' : 'Reading cultural context and scoring your content...'}
+                    {image ? (image.isVideo ? 'Analysing video frame and content...' : 'Reading image and cultural context, scoring your content...') : 'Reading cultural context and scoring your content...'}
                   </p>
                 )}
               </div>

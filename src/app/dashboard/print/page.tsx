@@ -7,6 +7,7 @@ import { MediaPlanUploadDialog } from '@/components/offline-media/media-plan-upl
 import { buttonVariants }  from '@/components/ui/button'
 import { cn }              from '@/lib/utils'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
+import { PrintAiAnalysis } from './print-ai-analysis'
 
 export const dynamic = 'force-dynamic'
 
@@ -200,6 +201,9 @@ export default async function PrintPage({
               </Card>
             ))}
           </div>
+
+          {/* AI analysis */}
+          <PrintAiAnalysis days={days} brandName={brand.name} hasData={hasData} />
 
           {/* Placements table */}
           <Card className="border rounded-xl p-5 bg-card space-y-4">
