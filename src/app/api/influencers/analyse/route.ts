@@ -40,34 +40,42 @@ export async function POST(request: NextRequest) {
     ? (brand.brand_values as string[]).join(', ')
     : null
 
+  const industryClause = brandCategory
+    ? `The brand operates in the ${brandCategory} industry.`
+    : 'The brand industry is NOT specified. Do NOT infer industry from the brand name under any circumstances.'
+
   const brandDesc = [
-    brandCategory ? `a Nigerian ${brandCategory} brand` : 'a Nigerian brand',
-    brandValues   ? `Brand values: ${brandValues}`      : null,
+    brandCategory ? `a Nigerian ${brandCategory} brand` : 'a Nigerian brand (industry unspecified)',
+    brandValues   ? `Values: ${brandValues}` : null,
   ].filter(Boolean).join('. ')
 
   const system = `You are a Nigerian brand intelligence analyst specialising in influencer marketing.
 When given social media handles, you produce a realistic, data-driven profile estimate for each influencer.
 You understand Nigerian social media culture: Lagos/Abuja/Port Harcourt audience demographics, Pidgin English content,
 local culture and community dynamics, and typical engagement benchmarks for Nigerian creators.
-The client brand is ${brand.name} — ${brandDesc}.
-Evaluate influencer fit strictly within the context of ${brand.name}'s industry and audience — do not assume food, FMCG, or any other category unless it matches the brand's actual category.
+
+CRITICAL RULE — INDUSTRY INFERENCE:
+Brand names NEVER indicate industry. "Sweetness" is NOT food. "Lion" is NOT beverages. "Bloom" is NOT agriculture.
+You MUST use ONLY the explicitly provided industry field below. If no industry is given, evaluate on general brand safety and audience quality — never fabricate an industry from the name.
 Always respond with valid JSON only. No markdown fences, no explanation — just the raw JSON object.`
 
   const handlesDesc = handles
     .map(h => `Platform: ${h.platform}, Handle: ${h.handle}${h.url ? `, URL: ${h.url}` : ''}`)
     .join('\n')
 
-  const userPrompt = `Analyse the following Nigerian social media influencer profile(s) and provide a realistic estimate for ${brand.name} brand partnership consideration.
+  const userPrompt = `Analyse the following Nigerian social media influencer(s) for brand partnership consideration.
 
-Brand context: ${brand.name} is ${brandDesc}.
+BRAND DETAILS (use ONLY these facts — do not infer anything else from the brand name):
+- Brand name: ${brand.name}
+- ${industryClause}${brandValues ? `\n- Brand values: ${brandValues}` : ''}
 
-Social handles provided:
+INFLUENCER HANDLES:
 ${handlesDesc}
 
 Return a single JSON object with this exact shape:
 {
   "name": "auto-detected full name or null if unknown",
-  "category": "content niche that matches the influencer's actual content (e.g. Beauty & Lifestyle, Fashion, Tech, Finance, Comedy, etc.)",
+  "category": "the influencer's actual content niche based on their handle/content (e.g. Beauty & Lifestyle, Fashion, Tech, Finance, Comedy, Food — based on THEIR content, not the brand)",
   "estimated_followers": {
     "instagram": <number>,
     "tiktok": <number>,
@@ -76,34 +84,34 @@ Return a single JSON object with this exact shape:
     "total": <number>
   },
   "profile_data": {
-    "bio": "realistic estimated bio based on the influencer's actual niche",
-    "content_types": ["array of content types relevant to the influencer's actual niche"],
+    "bio": "realistic estimated bio based on the influencer's own niche, not the brand",
+    "content_types": ["content types the influencer actually creates"],
     "posting_frequency": "e.g. 4-5x per week",
     "audience_demographics": {
       "age_range": "e.g. 18-34",
       "primary_location": "e.g. Lagos, Nigeria",
-      "interests": ["array of interests relevant to the influencer's actual niche"]
+      "interests": ["interests of the influencer's actual audience"]
     },
     "engagement_rate_estimate": <number between 0.01 and 0.15>,
     "online_reputation": {
-      "positive_signals": ["array of positive signals"],
-      "negative_signals": ["array of negative signals or empty array"],
-      "controversy_flags": ["array of controversy flags or empty array"],
-      "summary": "brief reputation summary"
+      "positive_signals": ["actual positive signals about this influencer"],
+      "negative_signals": ["actual negative signals or empty array"],
+      "controversy_flags": ["actual controversy flags or empty array"],
+      "summary": "brief, factual reputation summary — no industry assumptions from brand name"
     }
   },
   "brand_fit": {
     "score": <integer 0-100>,
     "audience_overlap": <integer 0-100>,
-    "value_alignment": "how the influencer's content and audience align with ${brand.name}'s industry and values",
-    "risk_factors": ["array of risk factors relevant to ${brand.name}"],
-    "positive_indicators": ["array of positive indicators specific to ${brand.name}'s industry"],
+    "value_alignment": "how the influencer's content and audience align with ${brand.name} given the EXPLICITLY STATED industry: ${brandCategory ?? 'unspecified — evaluate on general fit only'}",
+    "risk_factors": ["risk factors relevant to ${brandCategory ? `the ${brandCategory} industry` : 'general brand safety'} — do NOT mention food, FMCG, or any industry not stated above"],
+    "positive_indicators": ["positive indicators for ${brandCategory ? `the ${brandCategory} space` : 'this brand partnership'}"],
     "recommendation": "strong_fit or potential_fit or poor_fit",
-    "recommendation_notes": "actionable recommendation for ${brand.name} — be specific about why this creator fits or doesn't fit the ${brandCategory ?? 'brand'} space"
+    "recommendation_notes": "specific recommendation for ${brand.name} in the ${brandCategory ?? 'stated'} context — no food/FMCG references unless ${brandCategory ?? 'x'} === 'food' or 'fmcg'"
   }
 }
 
-Base all estimates on realistic Nigerian influencer benchmarks. Evaluate brand fit based on ${brand.name}'s actual industry (${brandCategory ?? 'as described above'}), not on generic food or FMCG assumptions.`
+IMPORTANT: risk_factors, positive_indicators, value_alignment, and recommendation_notes must all be written for the ${brandCategory ? `${brandCategory} industry` : 'brand as described (no assumed industry)'}. Never reference food, beverages, FMCG, or flavors unless the brand category explicitly says so.`
 
   let raw: string
   try {

@@ -79,7 +79,7 @@ export default async function CulturalPage() {
       .single(),
     supabase
       .from('pre_post_analyses')
-      .select('cultural_score, created_at')
+      .select('id, content_text, platform, funnel_goal, cultural_score, tone_score, engagement_score, risk_score, created_at')
       .gte('created_at', thirtyDaysAgo.toISOString())
       .order('created_at', { ascending: false }),
     supabase
@@ -89,9 +89,21 @@ export default async function CulturalPage() {
       .order('day', { ascending: false }),
   ])
 
+  type AnalysisRow = {
+    id: string
+    cultural_score: number
+    created_at: string
+    content_text: string | null
+    platform: string | null
+    funnel_goal: string | null
+    tone_score: number | null
+    engagement_score: number | null
+    risk_score: number | null
+  }
+
   const validAnalyses = (analyses ?? []).filter(
     r => typeof r.cultural_score === 'number',
-  ) as Array<{ cultural_score: number; created_at: string }>
+  ) as AnalysisRow[]
 
   const crsScore = avg(validAnalyses.map(r => r.cultural_score))
   const drift = computeDrift(validAnalyses, today)
@@ -115,6 +127,7 @@ export default async function CulturalPage() {
       today={today.toISOString().slice(0, 10)}
       analysisCount={validAnalyses.length}
       brandValues={brandValues}
+      analyses={validAnalyses}
     />
   )
 }

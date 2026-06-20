@@ -188,8 +188,9 @@ function RecommendationBadge({ rec }: { rec: string }) {
 export function InfluencerDetailClient({ influencer, initialPosts, campaigns, brandCategory }: Props) {
   const router = useRouter()
   const [inf, setInf]       = useState(influencer)
-  const [scoring, setScoring] = useState(false)
-  const [linking, setLinking] = useState(false)
+  const [scoring, setScoring]       = useState(false)
+  const [reanalysing, setReanalysing] = useState(false)
+  const [linking, setLinking]       = useState(false)
 
   const pd    = inf.profile_data as ProfileData | undefined
   const bf    = inf.brand_fit   as BrandFit    | undefined
@@ -213,6 +214,24 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
       toast.error(err instanceof Error ? err.message : 'Scoring failed.')
     } finally {
       setScoring(false)
+    }
+  }
+
+  async function handleReanalyse() {
+    setReanalysing(true)
+    try {
+      const res = await fetch(`/api/influencers/${inf.id}/reanalyse`, { method: 'POST' })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(err.error ?? 'Re-analysis failed.')
+      }
+      const { influencer: updated } = await res.json() as { influencer: InfluencerDetail }
+      setInf(updated)
+      toast.success('Profile re-analysed.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Re-analysis failed.')
+    } finally {
+      setReanalysing(false)
     }
   }
 
@@ -321,11 +340,37 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           </div>
 
           {/* Brand Fit */}
+          {!bf && (
+            <div className="border rounded-2xl p-5 bg-card space-y-3">
+              <h2 className="text-sm font-semibold">Brand Fit Analysis</h2>
+              <p className="text-xs text-muted-foreground">No brand fit analysis yet.</p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleReanalyse}
+                disabled={reanalysing}
+                className="gap-1.5"
+              >
+                {reanalysing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                {reanalysing ? 'Analysing…' : 'Run brand fit analysis'}
+              </Button>
+            </div>
+          )}
           {bf && (
             <div className="border rounded-2xl p-5 bg-card space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold">Brand Fit Analysis</h2>
                 <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleReanalyse}
+                    disabled={reanalysing}
+                    className="h-7 px-2 gap-1 text-xs text-muted-foreground"
+                  >
+                    {reanalysing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+                    {reanalysing ? 'Re-analysing…' : 'Re-analyse'}
+                  </Button>
                   <span className="text-xs text-muted-foreground">Score</span>
                   <span className={cn('text-lg font-bold tabular-nums',
                     bf.score >= 70 ? 'text-emerald-600 dark:text-emerald-400'

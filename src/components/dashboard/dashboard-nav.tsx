@@ -121,7 +121,7 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
   useEffect(() => { if (onCampaign) setCampaignOpen(true) }, [onCampaign])
 
   const isActive = (href: string) =>
-    href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
+    pathname === href || pathname.startsWith(`${href}/`)
 
   return (
     <LayoutGroup>

@@ -10,6 +10,7 @@ import {
   Loader2,
   AlertTriangle,
   ChevronRight,
+  ChevronDown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,18 @@ interface CulturalMoment {
   brandRelevance: string
 }
 
+interface AnalysisRow {
+  id: string
+  cultural_score: number
+  created_at: string
+  content_text: string | null
+  platform: string | null
+  funnel_goal: string | null
+  tone_score: number | null
+  engagement_score: number | null
+  risk_score: number | null
+}
+
 interface Props {
   brandName: string
   category: string | null
@@ -41,6 +54,7 @@ interface Props {
   today: string // YYYY-MM-DD from server
   analysisCount: number
   brandValues: string[]
+  analyses: AnalysisRow[]
 }
 
 // ---------------------------------------------------------------------------
@@ -425,7 +439,10 @@ export function CulturalClient({
   today,
   analysisCount,
   brandValues,
+  analyses,
 }: Props) {
+  const [crsOpen, setCrsOpen] = useState(false)
+
   // Filter to future moments only, sorted by date, max 6
   const upcomingMoments = buildCalendar(today)
     .sort((a, b) => a.date.localeCompare(b.date))
@@ -463,7 +480,14 @@ export function CulturalClient({
 
       {/* CRS score card */}
       <div className="border rounded-xl p-5 bg-card space-y-2">
-        <div className="flex items-center justify-between">
+        <button
+          className={cn(
+            'flex items-center justify-between w-full text-left',
+            crsScore !== null && 'cursor-pointer hover:opacity-80 transition-opacity',
+          )}
+          onClick={() => crsScore !== null && setCrsOpen(o => !o)}
+          disabled={crsScore === null}
+        >
           <div>
             <p className="text-sm font-medium text-muted-foreground">
               Cultural Resonance Score
@@ -475,9 +499,11 @@ export function CulturalClient({
             </p>
           </div>
           {crsScore !== null && (
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            crsOpen
+              ? <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              : <ChevronRight className="h-4 w-4 text-muted-foreground" />
           )}
-        </div>
+        </button>
 
         <CRSGauge score={crsScore} drift={drift} />
 
@@ -485,6 +511,68 @@ export function CulturalClient({
           <p className="text-center text-xs text-muted-foreground pb-2">
             Use the Pre-Post widget to analyse content and build your Cultural Resonance Score.
           </p>
+        )}
+
+        {/* Analysis breakdown — shown when expanded */}
+        {crsOpen && analyses.length > 0 && (
+          <div className="border-t pt-4 mt-2 space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              Breakdown — last 30 days
+            </p>
+            {analyses.map(a => {
+              const date = new Date(a.created_at).toLocaleDateString('en-NG', {
+                day: 'numeric', month: 'short',
+              })
+              const preview = a.content_text
+                ? a.content_text.slice(0, 80) + (a.content_text.length > 80 ? '…' : '')
+                : null
+              return (
+                <div key={a.id} className="rounded-lg border bg-muted/30 px-3 py-2.5 space-y-1.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {a.platform && (
+                        <span className="text-[10px] font-medium bg-background border rounded px-1.5 py-0.5">
+                          {a.platform}
+                        </span>
+                      )}
+                      {a.funnel_goal && (
+                        <span className="text-[10px] text-muted-foreground">
+                          {a.funnel_goal}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px] text-muted-foreground shrink-0">{date}</span>
+                  </div>
+                  {preview && (
+                    <p className="text-xs text-muted-foreground leading-snug">{preview}</p>
+                  )}
+                  <div className="flex items-center gap-3 pt-0.5">
+                    <span className={cn('text-xs font-semibold tabular-nums', crsColor(a.cultural_score))}>
+                      Cultural {Math.round(a.cultural_score)}
+                    </span>
+                    {a.engagement_score != null && (
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        Eng {Math.round(a.engagement_score)}
+                      </span>
+                    )}
+                    {a.tone_score != null && (
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        Tone {Math.round(a.tone_score)}
+                      </span>
+                    )}
+                    {a.risk_score != null && (
+                      <span className={cn(
+                        'text-xs tabular-nums',
+                        a.risk_score > 50 ? 'text-red-500' : a.risk_score > 20 ? 'text-amber-500' : 'text-muted-foreground',
+                      )}>
+                        Risk {Math.round(a.risk_score)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         )}
       </div>
 
