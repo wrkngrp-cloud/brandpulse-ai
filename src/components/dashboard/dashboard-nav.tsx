@@ -5,10 +5,10 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion, LayoutGroup } from 'framer-motion'
 import {
-  LayoutDashboard, FileText, BarChart2, ClipboardList, Sparkles,
+  LayoutDashboard, FileText, BarChart2, ClipboardList,
   CalendarDays, MapPin, Megaphone, Zap, Trophy, ChevronDown,
   Monitor, Radio, Tv, Newspaper, Filter, Award, Users, Palette, Globe,
-  Target, FileSearch,
+  Target, FileSearch, BookOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -210,6 +210,10 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
         {DEEP_INTEL.map(({ label, href, icon }) => (
           <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
         ))}
+
+        {/* Platform */}
+        <SectionLabel expanded={expanded}>Platform</SectionLabel>
+        <NavItem href="/dashboard/methodology" icon={BookOpen} label="Methodology" active={isActive('/dashboard/methodology')} expanded={expanded} />
 
       </nav>
     </LayoutGroup>

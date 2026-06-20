@@ -1,7 +1,7 @@
 # BrandPulse AI — Build Status
 
 > Feed this file into your project chat at the start of each session to bring it up to date.
-> Updated after every pushed session. Last updated: 2026-06-14.
+> Updated after every pushed session. Last updated: 2026-06-20.
 
 ---
 
@@ -79,8 +79,41 @@
 - `supabase/migrations/20260623000000_phase3_tables.sql` — influencers, competitor_sightings (`lat`/`lng`), weekly_briefings, creative_analyses (all with RLS)
 - `supabase/migrations/20260622000000_visual_mentions.sql` — visual_mentions (E6, from prior session)
 
-### Phase 3 — Not yet built (Items 6+)
-Audio Transcription Module (pending Whisper/ChatGPT subscription), SDK + Connector integrations (GA4, Paystack/Flutterwave webhooks, App Store reviews, Mailchimp/Brevo).
+### Phase 3 — Items 2–5 ✅ (session 2026-06-19, commit 74f6bc6)
+
+| Feature | Route / Key Files | Status |
+|---|---|---|
+| Email Connectors | `/api/connectors/mailchimp`, `/api/connectors/brevo`, `email-connect-card.tsx`, `email-connector-sync.ts` (Inngest) | ✅ Done — AES-256 encrypted keys, daily cron sync, `email_campaign_snapshots` table, settings UI |
+| Radio AI Analysis | `/api/radio/analyse`, `radio-ai-analysis.tsx` | ✅ Done — Sonnet 4.6 daypart efficiency ranking, delivery alerts, budget reallocation |
+| TV AI Analysis | `/api/tv/analyse`, `tv-ai-analysis.tsx` | ✅ Done — GRP/CPRP, prime time vs fringe, programme ranking |
+| Print AI Analysis | `/api/print/analyse`, `print-ai-analysis.tsx` | ✅ Done — CPT ranking, QR attribution vs 0.3% Nigerian benchmark, position/size insights |
+| Video Creative Framework | `/api/creative/video`, `use-media-upload.ts` | ✅ Done — first-frame canvas extraction, hook/visual/sound-off/CTA scoring via vision |
+| Creative Compare Vision | `/api/creative/compare` (updated) | ✅ Done — base64 image/video frames passed to Sonnet 4.6 vision |
+| Creative Client media upload | `creative-client.tsx` (updated) | ✅ Done — image + video upload in Compare tab; new Video Analysis tab (4th tab) |
+| Pre-Post media upload | `pre-post-widget.tsx` (updated) | ✅ Done — split image/video buttons, canvas frame extraction, video-aware UI |
+| Influencer Re-analyse | `influencers-client.tsx` (updated), `/api/influencers/[id]/reanalyse` | ✅ Done — Re-analyse button on list card regenerates brand_fit.risk_factors; fixes stale food-industry inference |
+
+**Migration applied:** `supabase/migrations/20260629000001_email_connectors.sql` — `email_connectors` + `email_campaign_snapshots` tables with RLS
+
+### Methodology page ✅ (session 2026-06-20, commit pending)
+
+| Feature | Route | Status |
+|---|---|---|
+| Methodology page | `/dashboard/methodology` | ✅ Done — 15 methodology sections, readable for marketing professionals |
+| Detailed methodology doc | `METHODOLOGY.md` | ✅ Done — exact formulas, calibration rationale, benchmarks, limitations |
+| Nav update | `dashboard-nav.tsx` — Platform section | ✅ Done |
+
+### Phase 3 — Not yet built
+
+| Feature | Notes |
+|---|---|
+| Audio Transcription Module | Whisper pipeline for radio spot transcription; pending API access |
+| BrandPulse JS Pixel / SDK | Website pixel for Action/Loyalty direct data capture |
+| WhatsApp Broadcasting | Campaign-level message sends for survey distribution |
+| Competitive SOV auto-discovery | Automated competitor handle detection from social conversation |
+| Brand Tracking Panel | Monthly recurring survey panel for longitudinal awareness tracking |
+| Sector Benchmarking | BHI/SOV/NPS vs Nigerian category averages (requires peer data aggregation) |
+| Media Mix Modelling (MMM) Lite | Regression-based multi-channel attribution — top CMO request |
 
 ---
 
