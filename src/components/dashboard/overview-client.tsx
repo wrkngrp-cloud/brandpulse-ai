@@ -205,6 +205,35 @@ export function OverviewClient({
         </div>
       </motion.div>
 
+      {/* ── First signal strip ───────────────────────────────────── */}
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+      >
+        {[
+          { icon: MapPin,        label: 'Add OOH Site',   href: '/dashboard/ooh/new',    desc: 'Track outdoor placements'   },
+          { icon: CalendarDays,  label: 'Create Event',   href: '/dashboard/events/new', desc: 'Log activations and events' },
+          { icon: ClipboardList, label: 'Launch Survey',  href: '/dashboard/surveys',    desc: 'Collect consumer feedback'  },
+          { icon: Zap,           label: 'Pre-Post Check', href: '/dashboard/pre-post',   desc: 'Score content before live'  },
+        ].map(({ icon: Icon, label, href, desc }) => (
+          <Link
+            key={label}
+            href={href}
+            className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 hover:bg-muted/40 hover:border-border transition-all card-hover"
+          >
+            <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center shrink-0">
+              <Icon className="h-3.5 w-3.5 text-muted-foreground/70" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[12.5px] font-semibold leading-tight truncate">{label}</p>
+              <p className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">{desc}</p>
+            </div>
+          </Link>
+        ))}
+      </motion.div>
+
       {/* ── KPI stat row ─────────────────────────────────────────── */}
       <motion.div
         className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
@@ -540,35 +569,6 @@ export function OverviewClient({
                   </div>
                   <p className="text-[12.5px] leading-[1.55] line-clamp-2 text-foreground/65">{m.content}</p>
                 </div>
-              ))}
-            </div>
-          </Card>
-        )}
-
-        {/* Empty state */}
-        {!hasAnyData && (
-          <Card className="bento-full p-6">
-            <p className="eyebrow mb-4">Let&apos;s get your first signal in</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { icon: MapPin,        label: 'Add OOH Site',   href: '/dashboard/ooh/new',    desc: 'Track outdoor placements'   },
-                { icon: CalendarDays,  label: 'Create Event',   href: '/dashboard/events/new', desc: 'Log activations and events' },
-                { icon: ClipboardList, label: 'Launch Survey',  href: '/dashboard/surveys',    desc: 'Collect consumer feedback'  },
-                { icon: Zap,           label: 'Pre-Post Check', href: '/dashboard/pre-post',   desc: 'Score content before live'  },
-              ].map(({ icon: Icon, label, href, desc }) => (
-                <Link
-                  key={label}
-                  href={href}
-                  className="flex flex-col gap-3 rounded-xl border border-border/60 bg-muted/20 p-4 hover:bg-muted/35 hover:border-border transition-all card-hover"
-                >
-                  <div className="h-9 w-9 rounded-xl bg-muted/70 flex items-center justify-center">
-                    <Icon className="h-4 w-4 text-muted-foreground/65" />
-                  </div>
-                  <div>
-                    <p className="text-[13px] font-semibold">{label}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{desc}</p>
-                  </div>
-                </Link>
               ))}
             </div>
           </Card>
