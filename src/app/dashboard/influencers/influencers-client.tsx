@@ -413,6 +413,26 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
     }
   }
 
+  const [reanalysingId, setReanalysingId] = useState<string | null>(null)
+
+  async function handleReanalyse(id: string) {
+    setReanalysingId(id)
+    try {
+      const res = await fetch(`/api/influencers/${id}/reanalyse`, { method: 'POST' })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'Re-analysis failed.')
+      }
+      const { influencer: updated } = await res.json()
+      setInfluencers(prev => prev.map(i => (i.id === id ? updated : i)))
+      toast.success('Profile re-analysed.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Re-analysis failed.')
+    } finally {
+      setReanalysingId(null)
+    }
+  }
+
   const _ = brandId // used by parent for RLS context
   void brandName
 
@@ -643,6 +663,8 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
                   inf={inf}
                   scoringId={scoringId}
                   onScore={handleScore}
+                  reanalysingId={reanalysingId}
+                  onReanalyse={handleReanalyse}
                   availableCampaigns={campaigns}
                   onLinked={(influencerId, campaignId) => {
                     setInfluencers(prev => prev.map(i =>
@@ -940,12 +962,16 @@ function InfluencerCard({
   inf,
   scoringId,
   onScore,
+  reanalysingId,
+  onReanalyse,
   availableCampaigns = [],
   onLinked,
 }: {
   inf: Influencer
   scoringId: string | null
   onScore: (id: string) => void
+  reanalysingId?: string | null
+  onReanalyse?: (id: string) => void
   availableCampaigns?: CampaignOption[]
   onLinked?: (influencerId: string, campaignId: string | null) => void
 }) {
@@ -1064,19 +1090,37 @@ function InfluencerCard({
             </div>
             <RiskBadge score={inf.risk_score} />
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="text-xs h-7 px-2.5"
-            disabled={scoringId === inf.id}
-            onClick={() => onScore(inf.id)}
-          >
-            {scoringId === inf.id ? (
-              <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Scoring...</>
-            ) : (
-              'Score with AI'
+          <div className="flex gap-1.5">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs h-7 px-2.5"
+              disabled={scoringId === inf.id || reanalysingId === inf.id}
+              onClick={() => onScore(inf.id)}
+            >
+              {scoringId === inf.id ? (
+                <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Scoring...</>
+              ) : (
+                'Score with AI'
+              )}
+            </Button>
+            {onReanalyse && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-xs h-7 px-2"
+                disabled={reanalysingId === inf.id || scoringId === inf.id}
+                onClick={() => onReanalyse(inf.id)}
+                title="Re-analyse full profile and brand fit"
+              >
+                {reanalysingId === inf.id ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  'Re-analyse'
+                )}
+              </Button>
             )}
-          </Button>
+          </div>
           {availableCampaigns.length > 0 && (
             <Select
               value={inf.campaign_id ?? 'none'}
