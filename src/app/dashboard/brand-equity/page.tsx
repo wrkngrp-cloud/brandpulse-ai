@@ -38,6 +38,7 @@ export default async function BrandEquityPage({
     { data: socialPosts },
     { data: brand },
     { data: bhiHistory },
+    { data: culturalScores },
   ] = await Promise.all([
     supabase
       .from('sentiment_daily')
@@ -68,10 +69,16 @@ export default async function BrandEquityPage({
       .limit(1)
       .maybeSingle(),
     supabase
-      .from('sentiment_daily')
-      .select('social_score, day')
-      .order('day', { ascending: false })
+      .from('brand_health_snapshots')
+      .select('bhi, snapshot_date')
+      .order('snapshot_date', { ascending: false })
       .limit(days),
+    supabase
+      .from('pre_post_analyses')
+      .select('cultural_score')
+      .not('cultural_score', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(30),
   ])
 
   // ── 1. Awareness (20%) — SOV %
@@ -129,8 +136,13 @@ export default async function BrandEquityPage({
     }
   }
 
-  // ── 5. Cultural Resonance (15%) — Phase 3
-  const culturalResonance: number | null = null
+  // ── 5. Cultural Resonance (15%) — average of pre/post cultural scores
+  const validCultural = (culturalScores ?? []).filter(r => r.cultural_score != null)
+  const culturalResonance: number | null = validCultural.length > 0
+    ? Math.round(
+        validCultural.reduce((s, r) => s + (r.cultural_score ?? 0), 0) / validCultural.length
+      )
+    : null
 
   // ── 6. Blended SOV (10%) — same source as awareness for now
   const blendedSov: number | null = sovSnap?.social_sov ?? null
@@ -188,11 +200,11 @@ export default async function BrandEquityPage({
     ? Math.round(((promoters - detractors) / npsScores.length) * 100)
     : null
 
-  // ── BHI history sparkline
+  // ── BHI history sparkline — uses brand_health_snapshots.bhi (real BHI, not sentiment)
   const sparkline = (bhiHistory ?? [])
-    .filter(d => d.social_score != null)
+    .filter(d => d.bhi != null)
     .reverse()
-    .map(d => ({ date: d.day, score: d.social_score }))
+    .map(d => ({ date: d.snapshot_date, score: d.bhi }))
 
   return (
     <div className="max-w-3xl space-y-6">

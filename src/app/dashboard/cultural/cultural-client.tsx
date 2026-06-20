@@ -47,68 +47,42 @@ interface Props {
 // 2026 Nigerian / West African cultural calendar
 // ---------------------------------------------------------------------------
 
-const CULTURAL_CALENDAR: CulturalMoment[] = [
-  {
-    name: "Valentine's Day",
-    date: '2026-02-14',
-    type: 'Cultural',
-    brandRelevance: 'High gifting and affinity moment across age groups',
-  },
-  {
-    name: 'Ramadan Start',
-    date: '2026-03-18',
-    type: 'Religious',
-    brandRelevance: 'Reach Muslim consumers with values-led and community content',
-  },
-  {
-    name: 'Easter',
-    date: '2026-04-05',
-    type: 'Religious',
-    brandRelevance: 'Family gatherings and celebration drive spending',
-  },
-  {
-    name: 'Eid al-Fitr',
-    date: '2026-04-17',
-    type: 'Religious',
-    brandRelevance: 'Celebratory gifting and premium experiences resonate',
-  },
-  {
-    name: "Workers' Day",
-    date: '2026-05-01',
-    type: 'National',
-    brandRelevance: 'Opportunity to celebrate your workforce and community',
-  },
-  {
-    name: 'Africa Day',
-    date: '2026-05-25',
-    type: 'Cultural',
-    brandRelevance: 'Pan-African identity and pride — strong cultural storytelling moment',
-  },
-  {
-    name: 'Eid al-Adha',
-    date: '2026-06-26',
-    type: 'Religious',
-    brandRelevance: 'Sacrifice, generosity, and community themes',
-  },
-  {
-    name: 'Independence Day',
-    date: '2026-10-01',
-    type: 'National',
-    brandRelevance: 'National pride — connect brand to Nigeria identity',
-  },
-  {
-    name: 'Detty December',
-    date: '2026-12-01',
-    type: 'Seasonal',
-    brandRelevance: 'Biggest entertainment and spending season in West Africa',
-  },
-  {
-    name: 'Christmas',
-    date: '2026-12-25',
-    type: 'Religious',
-    brandRelevance: 'Peak gifting, family, and celebration campaigns',
-  },
+// Base calendar as MM-DD patterns — year computed dynamically at runtime
+// For floating Islamic holidays, approximate dates are set per year for up to 2027.
+type BaseMoment = Omit<CulturalMoment, 'date'> & { mmdd: string; floatingDates?: Record<string, string> }
+
+const BASE_CALENDAR: BaseMoment[] = [
+  { name: "Valentine's Day",  mmdd: '02-14', type: 'Cultural',  brandRelevance: 'High gifting and affinity moment across age groups' },
+  { name: 'Ramadan Start',    mmdd: '03-18', type: 'Religious', brandRelevance: 'Reach Muslim consumers with values-led and community content',
+    floatingDates: { '2026': '2026-03-18', '2027': '2027-03-08' } },
+  { name: 'Easter',           mmdd: '04-05', type: 'Religious', brandRelevance: 'Family gatherings and celebration drive spending',
+    floatingDates: { '2026': '2026-04-05', '2027': '2027-03-28' } },
+  { name: 'Eid al-Fitr',     mmdd: '04-17', type: 'Religious', brandRelevance: 'Celebratory gifting and premium experiences resonate',
+    floatingDates: { '2026': '2026-04-17', '2027': '2027-04-06' } },
+  { name: "Workers' Day",     mmdd: '05-01', type: 'National',  brandRelevance: 'Opportunity to celebrate your workforce and community' },
+  { name: 'Africa Day',       mmdd: '05-25', type: 'Cultural',  brandRelevance: 'Pan-African identity and pride — strong cultural storytelling moment' },
+  { name: 'Eid al-Adha',     mmdd: '06-26', type: 'Religious', brandRelevance: 'Sacrifice, generosity, and community themes',
+    floatingDates: { '2026': '2026-06-26', '2027': '2027-06-16' } },
+  { name: 'Independence Day', mmdd: '10-01', type: 'National',  brandRelevance: 'National pride — connect brand to Nigeria identity' },
+  { name: 'Detty December',   mmdd: '12-01', type: 'Seasonal',  brandRelevance: 'Biggest entertainment and spending season in West Africa' },
+  { name: 'Christmas',        mmdd: '12-25', type: 'Religious', brandRelevance: 'Peak gifting, family, and celebration campaigns' },
 ]
+
+function buildCalendar(today: string): CulturalMoment[] {
+  const currentYear = new Date(today).getFullYear()
+  const moments: CulturalMoment[] = []
+  for (const yr of [currentYear, currentYear + 1]) {
+    for (const base of BASE_CALENDAR) {
+      const date = base.floatingDates?.[String(yr)] ?? `${yr}-${base.mmdd}`
+      moments.push({ name: base.name, date, type: base.type, brandRelevance: base.brandRelevance })
+    }
+  }
+  // Dedupe by name+date, remove past moments except keep one full year of upcoming
+  return moments
+    .filter(m => m.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .filter((m, i, arr) => i === 0 || arr[i - 1].name !== m.name)
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -453,7 +427,7 @@ export function CulturalClient({
   brandValues,
 }: Props) {
   // Filter to future moments only, sorted by date, max 6
-  const upcomingMoments = CULTURAL_CALENDAR.filter(m => daysUntil(m.date, today) >= 0)
+  const upcomingMoments = buildCalendar(today)
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, 6)
 

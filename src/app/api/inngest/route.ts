@@ -11,6 +11,7 @@ import { appReviewSync }               from '@/lib/inngest/functions/app-review-
 import { metaAdsDailySync }            from '@/lib/inngest/functions/meta-ads-daily-sync'
 import { prCrawl }                     from '@/lib/inngest/functions/pr-crawl'
 import { geoLiftStudy }                from '@/lib/inngest/functions/geo-lift-study'
+import { campaignTargetMonitor }       from '@/lib/inngest/functions/campaign-target-monitor'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -20,6 +21,6 @@ export const { GET, POST, PUT } = serve({
   functions: [
     syncSocialPosts, crawlMentions, eventRoiReport, eventVisualDetect,
     oohSearchUplift, competitiveWeeklyBriefing, ga4DailySync, appReviewSync,
-    metaAdsDailySync, prCrawl, geoLiftStudy,
+    metaAdsDailySync, prCrawl, geoLiftStudy, campaignTargetMonitor,
   ],
 })

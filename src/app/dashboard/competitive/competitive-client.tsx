@@ -3,10 +3,52 @@
 import { useState } from 'react'
 import {
   Trophy, TrendingUp, TrendingDown, MapPin, Plus, Loader2, RefreshCw,
-  ChevronDown, ChevronUp, AlertCircle, Lightbulb, Eye,
+  ChevronDown, ChevronUp, AlertCircle, Lightbulb, Eye, CheckCircle2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+
+function TriggerCompetitiveCrawlButton() {
+  const [phase, setPhase] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
+
+  async function trigger() {
+    setPhase('running')
+    try {
+      const res = await fetch('/api/inngest/trigger-competitive', { method: 'POST' })
+      setPhase(res.ok ? 'done' : 'error')
+    } catch {
+      setPhase('error')
+    }
+  }
+
+  if (phase === 'running') {
+    return (
+      <Button size="sm" variant="outline" disabled>
+        <RefreshCw className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Starting…
+      </Button>
+    )
+  }
+  if (phase === 'done') {
+    return (
+      <span className="text-xs text-emerald-600 flex items-center gap-1">
+        <CheckCircle2 className="h-3.5 w-3.5" /> Crawl started — data appears in a few minutes.
+      </span>
+    )
+  }
+  if (phase === 'error') {
+    return (
+      <span className="text-xs text-rose-500 flex items-center gap-1">
+        <AlertCircle className="h-3.5 w-3.5" /> Failed to start crawl.
+        <button onClick={trigger} className="underline">Retry</button>
+      </span>
+    )
+  }
+  return (
+    <Button size="sm" variant="outline" onClick={trigger}>
+      <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Run crawl now
+    </Button>
+  )
+}
 
 // ─── Interfaces ─────────────────────────────────────────────────────────────
 
@@ -349,6 +391,7 @@ function EsovLeagueTab({
           <p className="text-xs text-muted-foreground max-w-xs">
             Run a competitor crawl to populate share-of-voice data. Once that completes, this table will fill in automatically.
           </p>
+          <TriggerCompetitiveCrawlButton />
         </div>
       </div>
     )

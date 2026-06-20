@@ -28,6 +28,7 @@ interface InsightRecord {
   cpm?:           string
   cpc?:           string
   frequency?:     string
+  objective?:     string
   video_p25_watched_actions?: InsightValue[]
   actions?: InsightAction[]
 }
@@ -110,6 +111,7 @@ export const metaAdsDailySync = inngest.createFunction(
             'campaign_name',
             'adset_id',
             'adset_name',
+            'objective',
             'spend',
             'impressions',
             'reach',
@@ -174,12 +176,32 @@ export const metaAdsDailySync = inngest.createFunction(
             // Video views from video_p25_watched_actions
             const videoViews  = parseInt(insight.video_p25_watched_actions?.[0]?.value ?? '0', 10)
 
-            // Conversions from actions (purchase or lead)
-            const conversions = (insight.actions ?? [])
-              .filter(a => a.action_type === 'offsite_conversion.fb_pixel_purchase' || a.action_type === 'lead')
-              .reduce((sum, a) => sum + parseInt(a.value, 10), 0)
+            // Full actions map (keyed by normalized action type)
+            const actionsMap: Record<string, number> = {}
+            for (const a of insight.actions ?? []) {
+              const val = parseInt(a.value, 10)
+              if (isNaN(val)) continue
+              // Normalize common action types
+              const key =
+                a.action_type === 'offsite_conversion.fb_pixel_purchase' ? 'purchase' :
+                a.action_type === 'lead'                                  ? 'lead' :
+                a.action_type === 'mobile_app_install'                    ? 'mobile_app_install' :
+                a.action_type === 'link_click'                            ? 'link_click' :
+                a.action_type === 'landing_page_view'                     ? 'landing_page_view' :
+                a.action_type === 'post_engagement'                       ? 'post_engagement' :
+                a.action_type
+              actionsMap[key] = (actionsMap[key] ?? 0) + val
+            }
 
+            // Primary conversions count (purchase + lead)
+            const conversions = (actionsMap.purchase ?? 0) + (actionsMap.lead ?? 0)
             const cpa = conversions > 0 ? spend / conversions : null
+
+            // Normalize Meta objective string
+            const rawObjective = insight.objective ?? null
+            const objective = rawObjective
+              ? rawObjective.replace('OUTCOME_', '').toLowerCase()
+              : null
 
             return {
               brand_id:      account.brand_id,
@@ -201,6 +223,8 @@ export const metaAdsDailySync = inngest.createFunction(
               frequency:     isNaN(frequency)   ? null : frequency,
               video_views:   isNaN(videoViews)  ? null : videoViews,
               conversions,
+              objective,
+              actions:       Object.keys(actionsMap).length > 0 ? actionsMap : null,
               currency:      'NGN',
             }
           })

@@ -1,8 +1,9 @@
-import { createClient }      from '@/lib/supabase/server'
-import { redirect }          from 'next/navigation'
+import { createClient }         from '@/lib/supabase/server'
+import { redirect }             from 'next/navigation'
 import { Globe, TrendingUp, FileSearch, BarChart2, ExternalLink, Clock, Rss } from 'lucide-react'
-import { PrMentionsChart }   from './pr-mentions-chart'
-import { DateRangeFilter }   from '@/components/dashboard/date-range-filter'
+import { PrMentionsChart }      from './pr-mentions-chart'
+import { DateRangeFilter }      from '@/components/dashboard/date-range-filter'
+import { TriggerPrCrawlButton } from './trigger-pr-crawl-button'
 
 interface PressMention {
   id:              string
@@ -138,9 +139,12 @@ export default async function PRTrackingPage({
               BrandPulse crawls Nigerian publications nightly at 7 AM Lagos time — searching for {brand.name} across The Punch, Vanguard, BusinessDay, TechCabal, Nairametrics, and 6 more outlets.
             </p>
           </div>
-          <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-            <Clock className="h-3.5 w-3.5" />
-            Next crawl at 7 AM Lagos time
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Clock className="h-3.5 w-3.5" />
+              Next crawl at 7 AM Lagos time
+            </div>
+            <TriggerPrCrawlButton />
           </div>
         </div>
       ) : (

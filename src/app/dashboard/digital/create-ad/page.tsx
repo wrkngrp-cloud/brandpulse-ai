@@ -42,12 +42,13 @@ interface CarouselCard {
 }
 
 interface CreativeConfig {
-  format?:        AdFormat
-  cards?:         CarouselCard[]
-  rsa_headlines?: string[]
+  format?:           AdFormat
+  cards?:            CarouselCard[]
+  rsa_headlines?:    string[]
   rsa_descriptions?: string[]
-  video_url?:     string
-  logo_url?:      string
+  video_url?:        string
+  logo_url?:         string
+  thumbnail_url?:    string
 }
 
 interface TargetAudience {
@@ -120,14 +121,14 @@ const FORMATS_BY_PLATFORM: Record<Platform, { value: AdFormat; label: string; de
   meta: [
     { value: 'single_image', label: 'Single Image',  desc: 'One image with caption and link' },
     { value: 'carousel',     label: 'Carousel',      desc: '2–10 cards, each with its own image and link' },
-    { value: 'video',        label: 'Video',          desc: 'A single video asset',                          soon: true },
+    { value: 'video',        label: 'Video',          desc: 'A single video asset — MP4, MOV, or WebM up to 500 MB' },
   ],
   google: [
     { value: 'responsive_search',  label: 'Responsive Search',  desc: 'Up to 15 headlines + 4 descriptions — Google assembles the best combination' },
     { value: 'responsive_display', label: 'Responsive Display', desc: 'Image + headlines — Google adapts to any placement size' },
   ],
   tiktok: [
-    { value: 'tiktok_video', label: 'In-Feed Video', desc: 'Full-screen vertical video in the TikTok feed', soon: true },
+    { value: 'tiktok_video', label: 'In-Feed Video', desc: 'Full-screen vertical video in the TikTok feed — MP4 or WebM' },
   ],
   linkedin: [
     { value: 'linkedin_image',     label: 'Single Image',  desc: 'Sponsored content with one image' },
@@ -340,6 +341,83 @@ function ImageUploadZone({
       <div className="text-center">
         <p className="text-sm font-medium">{uploading ? 'Uploading…' : (label ?? 'Click or drag image here')}</p>
         {hint && <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>}
+      </div>
+    </button>
+  )
+}
+
+// ── video upload zone ─────────────────────────────────────────────────────────
+
+function VideoUploadZone({
+  url, onUpload, onRemove,
+}: {
+  url?: string
+  onUpload: (url: string) => void
+  onRemove?: () => void
+}) {
+  const [uploading, setUploading] = useState(false)
+  const [progress, setProgress]   = useState(0)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  async function uploadFile(file: File) {
+    setUploading(true)
+    setProgress(0)
+    try {
+      const form = new FormData()
+      form.set('file', file)
+      const res = await fetch('/api/ads/creatives/upload', { method: 'POST', body: form })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        toast.error((err as { error?: string }).error ?? 'Upload failed.')
+        return
+      }
+      const data = await res.json() as { url: string }
+      onUpload(data.url)
+      setProgress(100)
+    } catch {
+      toast.error('Upload failed.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  if (url) {
+    return (
+      <div className="border rounded-xl overflow-hidden relative">
+        <video src={url} controls className="w-full max-h-56 bg-black" />
+        {onRemove && (
+          <button
+            type="button"
+            onClick={onRemove}
+            className="absolute top-2 right-2 bg-black/60 rounded-full p-1 hover:bg-black/80 transition-colors"
+          >
+            <X className="h-3.5 w-3.5 text-white" />
+          </button>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => inputRef.current?.click()}
+      className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 py-10 px-4 transition-colors cursor-pointer hover:border-primary/50 hover:bg-muted/30 w-full"
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept="video/mp4,video/quicktime,video/x-msvideo,video/webm"
+        className="sr-only"
+        onChange={e => { if (e.target.files?.[0]) void uploadFile(e.target.files[0]) }}
+      />
+      {uploading
+        ? <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
+        : <Upload className="h-7 w-7 text-muted-foreground" />
+      }
+      <div className="text-center">
+        <p className="text-sm font-medium">{uploading ? `Uploading… ${progress > 0 ? `${progress}%` : ''}` : 'Click to upload video'}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">MP4, MOV, AVI, or WebM · Max 500 MB</p>
       </div>
     </button>
   )
@@ -855,6 +933,95 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
           />
         </div>
         <AdCopyFields state={state} set={set} headlineLabel="Headline (up to 25 chars)" headlineMax={25} bodyLabel="Description (up to 75 chars)" bodyMax={75} />
+      </div>
+    )
+  }
+
+  // ── video (Meta) and TikTok in-feed video ────────────────────────────────────
+  if (state.ad_format === 'video' || state.ad_format === 'tiktok_video') {
+    const isTikTok = state.ad_format === 'tiktok_video'
+    return (
+      <div className="space-y-5">
+        <div>
+          <h2 className="text-base font-semibold">{isTikTok ? 'TikTok In-Feed Video' : 'Video Ad'}</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {isTikTok
+              ? 'Full-screen vertical video (9:16). MP4 or WebM, up to 500 MB.'
+              : 'Single video with copy. MP4, MOV, or WebM, up to 500 MB. Recommended ratio: 4:5 (Feed) or 9:16 (Stories/Reels).'}
+          </p>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>Video file <span className="text-rose-500">*</span></Label>
+          <VideoUploadZone
+            url={state.media_urls[0]}
+            onUpload={url => set('media_urls', [url])}
+            onRemove={() => set('media_urls', [])}
+          />
+        </div>
+
+        {!isTikTok && (
+          <>
+            <div className="space-y-1.5">
+              <Label>Thumbnail image (optional — auto-generated if omitted)</Label>
+              <ImageUploadZone
+                url={state.creative_config.thumbnail_url}
+                onUpload={url => updateCreativeConfig({ thumbnail_url: url })}
+                onRemove={() => updateCreativeConfig({ thumbnail_url: undefined })}
+                hint="1200 × 628 px recommended"
+              />
+            </div>
+            <AdCopyFields state={state} set={set} />
+          </>
+        )}
+
+        {isTikTok && (
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Caption / Primary text</Label>
+              <Textarea
+                placeholder="What your video is about — shown as the caption…"
+                value={state.body}
+                onChange={e => set('body', e.target.value)}
+                rows={3}
+                maxLength={150}
+                className="text-sm resize-none"
+              />
+              <p className="text-xs text-muted-foreground text-right tabular-nums">{state.body.length}/150</p>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Display name / Brand name</Label>
+              <Input
+                placeholder="Your brand name as shown on TikTok"
+                value={state.headline}
+                onChange={e => set('headline', e.target.value)}
+                maxLength={40}
+                className="text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Destination URL</Label>
+              <Input
+                type="url"
+                placeholder="https://example.com/landing-page"
+                value={state.destination_url}
+                onChange={e => set('destination_url', e.target.value)}
+                className="text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Call to action</Label>
+              <Select value={state.cta} onValueChange={v => set('cta', v ?? 'Learn More')}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {['Learn More', 'Shop Now', 'Sign Up', 'Download', 'Contact Us', 'Watch More'].map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -1590,8 +1757,8 @@ export default function CreateAdPage() {
         throw new Error(err.error ?? 'Failed to save draft')
       }
 
-      toast.success('Ad draft saved.')
-      router.push('/dashboard/digital')
+      toast.success('Ad draft saved. View it in Ad Drafts.')
+      router.push('/dashboard/digital/drafts')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Something went wrong')
     } finally {

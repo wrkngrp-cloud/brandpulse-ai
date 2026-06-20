@@ -65,7 +65,7 @@ type PrintPlacementRow = {
   print_publications: PrintPublication
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://brandpulse.ai'
+const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
 export default async function PrintPage({
   searchParams,

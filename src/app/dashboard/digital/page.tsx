@@ -5,7 +5,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import {
   Monitor, TrendingUp, Eye, MousePointerClick, Coins, Users, Target,
-  CheckCircle, AlertCircle, Link as LinkIcon,
+  CheckCircle, AlertCircle, Link as LinkIcon, ChevronRight,
 } from 'lucide-react'
 import {
   DigitalSpendChart,
@@ -15,6 +15,11 @@ import {
 import type { SpendDataPoint, FunnelData, FrequencyPoint } from './digital-charts'
 import { createClient } from '@/lib/supabase/server'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
+import {
+  getBenchmarks,
+  benchCTR, benchCPC, benchCPM, benchROAS, benchFreq, benchCVR,
+  OBJECTIVE_METRIC_LABELS,
+} from '@/lib/benchmarks/digital'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,6 +49,9 @@ interface PerfRow {
   video_views:     number | null
   video_view_rate: number | null
   conversions:     number
+  campaign_id:     string | null
+  campaign_name:   string | null
+  objective:       string | null
 }
 
 interface PlatformSummary {
@@ -60,6 +68,25 @@ interface PlatformSummary {
   avgRoas:      number
   avgFrequency: number
   cvr:          number
+}
+
+interface CampaignSummary {
+  campaign_id:   string
+  campaign_name: string
+  platform:      string
+  objective:     string | null
+  spend:         number
+  impressions:   number
+  reach:         number
+  clicks:        number
+  conversions:   number
+  avgCtr:        number
+  avgCpm:        number
+  avgCpc:        number
+  avgCpa:        number
+  avgRoas:       number
+  cvr:           number
+  days:          number
 }
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -91,54 +118,18 @@ function platformLabel(p: string): string {
   return map[p] ?? p
 }
 
-// ── benchmark helpers (Nigerian digital market context) ────────────────────────
-
-type Bench = { label: string; cls: string }
-
-function benchCTR(v: number): Bench {   // decimal — 0.023 = 2.3%
-  if (v >= 0.025) return { label: 'Strong',  cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v >= 0.018) return { label: 'Good',    cls: 'text-emerald-500' }
-  if (v >= 0.010) return { label: 'Average', cls: 'text-amber-500' }
-  return               { label: 'Low',      cls: 'text-rose-500' }
-}
-
-function benchCPC(v: number): Bench {   // NGN
-  if (v > 0 && v <= 80)  return { label: 'Great',   cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v <= 150)           return { label: 'Good',    cls: 'text-emerald-500' }
-  if (v <= 300)           return { label: 'Average', cls: 'text-amber-500' }
-  return                        { label: 'High',     cls: 'text-rose-500' }
-}
-
-function benchCPM(v: number): Bench {   // NGN
-  if (v > 0 && v <= 500) return { label: 'Great',   cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v <= 1000)          return { label: 'Good',    cls: 'text-emerald-500' }
-  if (v <= 2000)          return { label: 'Average', cls: 'text-amber-500' }
-  return                        { label: 'High',     cls: 'text-rose-500' }
-}
-
-function benchROAS(v: number): Bench {
-  if (v >= 4)   return { label: 'Excellent',    cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v >= 2)   return { label: 'Good',         cls: 'text-emerald-500' }
-  if (v >= 1.5) return { label: 'Marginal',     cls: 'text-amber-500' }
-  return              { label: 'Below target',  cls: 'text-rose-500' }
-}
-
-function benchFreq(v: number): Bench {
-  if (v <= 3) return { label: 'Healthy',      cls: 'text-emerald-500' }
-  if (v <= 6) return { label: 'Watch',        cls: 'text-amber-500' }
-  return            { label: 'Fatigue risk',  cls: 'text-rose-500' }
-}
-
-function benchCVR(v: number): Bench {  // percentage — 2.5 = 2.5%
-  if (v >= 3)   return { label: 'Strong',  cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v >= 1.5) return { label: 'Good',    cls: 'text-emerald-500' }
-  if (v >= 1)   return { label: 'Average', cls: 'text-amber-500' }
-  return              { label: 'Low',      cls: 'text-rose-500' }
+function objectiveLabel(o: string | null): string {
+  if (!o) return '—'
+  return OBJECTIVE_METRIC_LABELS[o]?.label ?? o
 }
 
 // ── server-component sub-components ──────────────────────────────────────────
 
-function MetricRow({ label, value, bench }: { label: string; value: string; bench?: Bench | null }) {
+function MetricRow({ label, value, bench }: {
+  label: string
+  value: string
+  bench?: { label: string; cls: string } | null
+}) {
   return (
     <div className="flex items-center justify-between gap-3">
       <span className="text-xs text-muted-foreground">{label}</span>
@@ -172,19 +163,21 @@ export default async function DigitalPage({
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  let adAccounts: AdAccount[] = []
-  let perfRows:   PerfRow[]   = []
-  let brandId:    string | null = null
+  let adAccounts:  AdAccount[] = []
+  let perfRows:    PerfRow[]   = []
+  let brandId:     string | null = null
+  let brandIndustry: string | null = null
 
   if (user) {
     const { data: brand } = await supabase
       .from('brands')
-      .select('id')
+      .select('id, category')
       .limit(1)
       .single()
 
     if (brand) {
-      brandId = brand.id
+      brandId       = brand.id
+      brandIndustry = brand.category ?? null
 
       const { data: accounts } = await supabase
         .from('digital_ad_accounts')
@@ -195,7 +188,7 @@ export default async function DigitalPage({
 
       const { data: rows } = await supabase
         .from('digital_performance_daily')
-        .select('platform, date, spend, impressions, reach, clicks, ctr, cpm, cpc, cpa, roas, frequency, video_views, video_view_rate, conversions')
+        .select('platform, date, spend, impressions, reach, clicks, ctr, cpm, cpc, cpa, roas, frequency, video_views, video_view_rate, conversions, campaign_id, campaign_name, objective')
         .eq('brand_id', brand.id)
         .gte('date', cutoffStr)
         .order('date', { ascending: true })
@@ -208,12 +201,14 @@ export default async function DigitalPage({
   const hasRealData = perfRows.length > 0
   const isDemo      = !hasRealData && isDemoUser
 
-  if (isDemo && brandId) {
-    void fetch(`${process.env.APP_URL ?? ''}/api/demo/seed-digital`, {
+  if (isDemo && brandId && process.env.APP_URL) {
+    void fetch(`${process.env.APP_URL}/api/demo/seed-digital`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     }).catch(() => null)
   }
+
+  const bench = getBenchmarks(brandIndustry)
 
   // ── core aggregates ───────────────────────────────────────────────────────
 
@@ -245,6 +240,47 @@ export default async function DigitalPage({
       ? (totalConversions * 1200) / totalSpend
       : 0
 
+  // ── per-campaign breakdown ────────────────────────────────────────────────
+
+  const campaignMap: Record<string, CampaignSummary> = {}
+  for (const row of perfRows) {
+    const key = row.campaign_id ?? `__no_id_${row.platform}`
+    if (!campaignMap[key]) {
+      campaignMap[key] = {
+        campaign_id:   row.campaign_id ?? key,
+        campaign_name: row.campaign_name ?? 'Unknown Campaign',
+        platform:      row.platform,
+        objective:     row.objective ?? null,
+        spend: 0, impressions: 0, reach: 0, clicks: 0, conversions: 0,
+        avgCtr: 0, avgCpm: 0, avgCpc: 0, avgCpa: 0, avgRoas: 0, cvr: 0, days: 0,
+      }
+    }
+    const c = campaignMap[key]
+    c.spend       += row.spend       ?? 0
+    c.impressions += row.impressions ?? 0
+    c.reach       += row.reach       ?? 0
+    c.clicks      += row.clicks      ?? 0
+    c.conversions += row.conversions ?? 0
+    c.days        += 1
+    if (!c.objective && row.objective) c.objective = row.objective
+  }
+
+  for (const c of Object.values(campaignMap)) {
+    const pr = perfRows.filter(r => (r.campaign_id ?? `__no_id_${r.platform}`) === c.campaign_id)
+    const avgOf = (fn: (r: PerfRow) => number | null) => {
+      const valid = pr.filter(r => { const v = fn(r); return v !== null && v > 0 })
+      return valid.length > 0 ? valid.reduce((s, r) => s + (fn(r) ?? 0), 0) / valid.length : 0
+    }
+    c.avgCtr  = avgOf(r => r.ctr)
+    c.avgCpm  = avgOf(r => r.cpm)
+    c.avgCpc  = avgOf(r => r.cpc)
+    c.avgCpa  = avgOf(r => r.cpa)
+    c.avgRoas = avgOf(r => r.roas)
+    c.cvr     = c.clicks > 0 ? (c.conversions / c.clicks) * 100 : 0
+  }
+
+  const campaignSummaries = Object.values(campaignMap).sort((a, b) => b.spend - a.spend)
+
   // ── per-platform breakdown ────────────────────────────────────────────────
 
   const platformMap: Record<string, PlatformSummary> = {}
@@ -265,18 +301,18 @@ export default async function DigitalPage({
   }
   for (const p of Object.values(platformMap)) {
     const pr    = perfRows.filter(r => r.platform === p.platform)
-    const _ctr  = pr.filter(r => r.ctr            !== null && (r.ctr            ?? 0) !== 0)
-    const _cpm  = pr.filter(r => r.cpm            !== null && (r.cpm            ?? 0) !== 0)
-    const _cpc  = pr.filter(r => r.cpc            !== null && (r.cpc            ?? 0) !== 0)
-    const _cpa  = pr.filter(r => r.cpa            !== null && (r.cpa            ?? 0) !== 0)
-    const _roas = pr.filter(r => r.roas           !== null && (r.roas           ?? 0) !== 0)
-    const _freq = pr.filter(r => r.frequency      !== null && (r.frequency      ?? 0) !== 0)
-    p.avgCtr      = _ctr.length  > 0 ? _ctr.reduce((s, r)  => s + (r.ctr            ?? 0), 0) / _ctr.length  : 0
-    p.avgCpm      = _cpm.length  > 0 ? _cpm.reduce((s, r)  => s + (r.cpm            ?? 0), 0) / _cpm.length  : 0
-    p.avgCpc      = _cpc.length  > 0 ? _cpc.reduce((s, r)  => s + (r.cpc            ?? 0), 0) / _cpc.length  : 0
-    p.avgCpa      = _cpa.length  > 0 ? _cpa.reduce((s, r)  => s + (r.cpa            ?? 0), 0) / _cpa.length  : 0
-    p.avgRoas     = _roas.length > 0 ? _roas.reduce((s, r) => s + (r.roas           ?? 0), 0) / _roas.length : 0
-    p.avgFrequency = _freq.length > 0 ? _freq.reduce((s, r) => s + (r.frequency     ?? 0), 0) / _freq.length : 0
+    const _ctr  = pr.filter(r => r.ctr  !== null && (r.ctr  ?? 0) !== 0)
+    const _cpm  = pr.filter(r => r.cpm  !== null && (r.cpm  ?? 0) !== 0)
+    const _cpc  = pr.filter(r => r.cpc  !== null && (r.cpc  ?? 0) !== 0)
+    const _cpa  = pr.filter(r => r.cpa  !== null && (r.cpa  ?? 0) !== 0)
+    const _roas = pr.filter(r => r.roas !== null && (r.roas ?? 0) !== 0)
+    const _freq = pr.filter(r => r.frequency !== null && (r.frequency ?? 0) !== 0)
+    p.avgCtr      = _ctr.length  > 0 ? _ctr.reduce((s, r)  => s + (r.ctr  ?? 0), 0) / _ctr.length  : 0
+    p.avgCpm      = _cpm.length  > 0 ? _cpm.reduce((s, r)  => s + (r.cpm  ?? 0), 0) / _cpm.length  : 0
+    p.avgCpc      = _cpc.length  > 0 ? _cpc.reduce((s, r)  => s + (r.cpc  ?? 0), 0) / _cpc.length  : 0
+    p.avgCpa      = _cpa.length  > 0 ? _cpa.reduce((s, r)  => s + (r.cpa  ?? 0), 0) / _cpa.length  : 0
+    p.avgRoas     = _roas.length > 0 ? _roas.reduce((s, r) => s + (r.roas ?? 0), 0) / _roas.length : 0
+    p.avgFrequency = _freq.length > 0 ? _freq.reduce((s, r) => s + (r.frequency ?? 0), 0) / _freq.length : 0
     p.cvr         = p.clicks > 0 ? (p.conversions / p.clicks) * 100 : 0
   }
   const platformSummaries = Object.values(platformMap).sort((a, b) => b.spend - a.spend)
@@ -313,15 +349,16 @@ export default async function DigitalPage({
   // ── platform connection config ────────────────────────────────────────────
 
   const PLATFORMS = [
-    { key: 'meta',     label: 'Meta Ads',     description: 'Facebook & Instagram campaigns', connectHref: '/api/ads/meta/connect',   available: true  },
-    { key: 'google',   label: 'Google Ads',   description: 'Search, Display & Shopping',     connectHref: '/api/ads/google/connect', available: true  },
-    { key: 'tiktok',   label: 'TikTok Ads',   description: 'Short-form video advertising',   connectHref: '#',                      available: false },
-    { key: 'linkedin', label: 'LinkedIn Ads', description: 'B2B and professional audiences', connectHref: '#',                      available: false },
+    { key: 'meta',     label: 'Meta Ads',     description: 'Facebook & Instagram campaigns', connectHref: '/api/ads/meta/connect',     available: true  },
+    { key: 'google',   label: 'Google Ads',   description: 'Search, Display & Shopping',     connectHref: '/api/ads/google/connect',   available: true  },
+    { key: 'twitter',  label: 'X (Twitter)',  description: 'Promoted posts and campaigns',   connectHref: '/api/ads/twitter/connect',  available: true  },
+    { key: 'tiktok',   label: 'TikTok Ads',   description: 'Short-form video advertising',   connectHref: '#',                        available: false },
+    { key: 'linkedin', label: 'LinkedIn Ads', description: 'B2B and professional audiences', connectHref: '#',                        available: false },
   ]
 
   const connectedPlatforms = new Set(adAccounts.map(a => a.platform))
 
-  // ── 8-tile KPI grid ───────────────────────────────────────────────────────
+  // ── KPI grid ──────────────────────────────────────────────────────────────
 
   const kpis = [
     {
@@ -345,19 +382,19 @@ export default async function DigitalPage({
     {
       label: 'Avg CTR',
       value: hasRealData ? fmtPct(avgCtr)           : isDemo ? '2.30%'  : '—',
-      sub:   'Benchmark: >1.8%',
+      sub:   'Est. benchmark: >1.8%',
       icon: MousePointerClick, color: 'text-blue-500',
     },
     {
       label: 'Avg CPC',
       value: hasRealData ? (avgCpc > 0 ? fmtNGN(avgCpc) : 'N/A') : isDemo ? '₦127'   : '—',
-      sub:   'Benchmark: <₦150',
+      sub:   'Est. benchmark: <₦150',
       icon: MousePointerClick, color: 'text-violet-500',
     },
     {
       label: 'Avg CPM',
       value: hasRealData ? (avgCpm > 0 ? fmtNGN(avgCpm) : 'N/A') : isDemo ? '₦462'   : '—',
-      sub:   'Benchmark: <₦1,000',
+      sub:   'Est. benchmark: <₦1,000',
       icon: Eye,              color: 'text-teal-500',
     },
     {
@@ -369,7 +406,7 @@ export default async function DigitalPage({
     {
       label: 'Avg ROAS',
       value: hasRealData ? (avgRoas > 0 ? `${avgRoas.toFixed(1)}x` : 'N/A') : isDemo ? '3.4x' : '—',
-      sub:   'Benchmark: >2.0x',
+      sub:   'Est. benchmark: >2.0x',
       icon: TrendingUp,       color: 'text-rose-500',
     },
   ]
@@ -385,7 +422,7 @@ export default async function DigitalPage({
         {
           label: 'CPM',
           value: hasRealData ? (avgCpm > 0 ? fmtNGN(avgCpm) : 'N/A') : isDemo ? '₦462'  : '—',
-          bench: hasRealData && avgCpm > 0 ? benchCPM(avgCpm) : null,
+          bench: hasRealData && avgCpm > 0 ? benchCPM(avgCpm, bench) : null,
         },
         {
           label: 'Reach',
@@ -395,7 +432,7 @@ export default async function DigitalPage({
         {
           label: 'Frequency',
           value: hasRealData ? (avgFrequency > 0 ? avgFrequency.toFixed(1) : 'N/A') : isDemo ? '1.5' : '—',
-          bench: hasRealData && avgFrequency > 0 ? benchFreq(avgFrequency) : null,
+          bench: hasRealData && avgFrequency > 0 ? benchFreq(avgFrequency, bench) : null,
         },
       ],
     },
@@ -407,12 +444,12 @@ export default async function DigitalPage({
         {
           label: 'CPC',
           value: hasRealData ? (avgCpc > 0 ? fmtNGN(avgCpc) : 'N/A') : isDemo ? '₦127'  : '—',
-          bench: hasRealData && avgCpc > 0 ? benchCPC(avgCpc) : null,
+          bench: hasRealData && avgCpc > 0 ? benchCPC(avgCpc, bench) : null,
         },
         {
           label: 'CTR',
           value: hasRealData ? fmtPct(avgCtr) : isDemo ? '2.30%' : '—',
-          bench: hasRealData && avgCtr > 0 ? benchCTR(avgCtr) : null,
+          bench: hasRealData && avgCtr > 0 ? benchCTR(avgCtr, bench) : null,
         },
         {
           label: 'Video View Rate',
@@ -434,12 +471,12 @@ export default async function DigitalPage({
         {
           label: 'CVR',
           value: hasRealData ? (totalClicks > 0 ? `${cvr.toFixed(2)}%` : 'N/A') : isDemo ? '1.40%' : '—',
-          bench: hasRealData && cvr > 0 ? benchCVR(cvr) : null,
+          bench: hasRealData && cvr > 0 ? benchCVR(cvr, bench) : null,
         },
         {
           label: 'ROAS',
           value: hasRealData ? (avgRoas > 0 ? `${avgRoas.toFixed(1)}x` : 'N/A') : isDemo ? '3.4x' : '—',
-          bench: hasRealData && avgRoas > 0 ? benchROAS(avgRoas) : null,
+          bench: hasRealData && avgRoas > 0 ? benchROAS(avgRoas, bench) : null,
         },
       ],
     },
@@ -465,6 +502,12 @@ export default async function DigitalPage({
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <DateRangeFilter currentDays={days} defaultDays={30} />
+          <Link
+            href="/dashboard/digital/drafts"
+            className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-8 text-xs')}
+          >
+            Ad Drafts
+          </Link>
           <Link
             href="/dashboard/digital/create-ad"
             className={cn(buttonVariants({ size: 'sm' }), 'h-8 text-xs')}
@@ -541,7 +584,7 @@ export default async function DigitalPage({
       )}
 
       {/* Platform connection cards */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {PLATFORMS.map(p => {
           const isConnected = connectedPlatforms.has(p.key)
           const acct        = adAccounts.find(a => a.platform === p.key)
@@ -589,7 +632,7 @@ export default async function DigitalPage({
         })}
       </div>
 
-      {/* Core KPI grid — 8 tiles */}
+      {/* Core KPI grid */}
       <div className="space-y-2">
         <h2 className="text-base font-semibold">Core Metrics</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -608,12 +651,95 @@ export default async function DigitalPage({
         </div>
       </div>
 
+      {/* Campaign Breakdown — main new section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-semibold">Campaigns</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Click any campaign to see objective-specific metrics and set performance targets
+            </p>
+          </div>
+        </div>
+
+        {campaignSummaries.length > 0 ? (
+          <Card className="border rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border/50 bg-muted/30">
+                    {['Campaign', 'Platform', 'Objective', 'Spend', 'ROAS', 'CPA', 'CTR', 'Conversions', ''].map(h => (
+                      <th
+                        key={h}
+                        className="text-left py-3 px-4 text-[11px] font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {campaignSummaries.map(c => (
+                    <tr key={c.campaign_id} className="border-b border-border/30 last:border-0 hover:bg-muted/20 transition-colors">
+                      <td className="py-3 px-4">
+                        <Link
+                          href={`/dashboard/digital/campaigns/${encodeURIComponent(c.campaign_id)}`}
+                          className="font-medium hover:text-indigo-500 transition-colors line-clamp-1 max-w-[180px]"
+                        >
+                          {c.campaign_name}
+                        </Link>
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <Badge variant="secondary" className="text-[10px]">{platformLabel(c.platform)}</Badge>
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap text-xs text-muted-foreground">
+                        {objectiveLabel(c.objective)}
+                      </td>
+                      <td className="py-3 px-4 font-medium whitespace-nowrap">{fmtNGN(c.spend)}</td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        {c.avgRoas > 0 ? (
+                          <span className={benchROAS(c.avgRoas, bench).cls}>{c.avgRoas.toFixed(1)}x</span>
+                        ) : '—'}
+                      </td>
+                      <td className="py-3 px-4 text-muted-foreground whitespace-nowrap">
+                        {c.avgCpa > 0 ? fmtNGN(c.avgCpa) : '—'}
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        {c.avgCtr > 0 ? (
+                          <span className={benchCTR(c.avgCtr, bench).cls}>{fmtPct(c.avgCtr)}</span>
+                        ) : '—'}
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap">{c.conversions > 0 ? fmtNum(c.conversions) : '—'}</td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <Link
+                          href={`/dashboard/digital/campaigns/${encodeURIComponent(c.campaign_id)}`}
+                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          View <ChevronRight className="h-3 w-3" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        ) : (
+          <Card className="border rounded-xl p-8 text-center space-y-2">
+            <p className="text-sm text-muted-foreground">No campaign data in this period.</p>
+            <p className="text-xs text-muted-foreground">Connect an ad account above to see per-campaign breakdowns.</p>
+          </Card>
+        )}
+      </div>
+
       {/* 3-Pillar Performance Framework */}
       <div className="space-y-3">
         <div>
           <h2 className="text-base font-semibold">Performance Framework</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Three-tier view benchmarked against Nigerian digital market averages
+          <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
+            Three-tier view across all campaigns
+            <span className="inline-block px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium">Estimated</span>
+            <span>Benchmarks are directional West African market estimates, not sourced data.</span>
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
@@ -642,7 +768,7 @@ export default async function DigitalPage({
         <div>
           <h2 className="text-base font-semibold">Conversion Funnel</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Impressions to conversions cascade — where your audience drops off
+            Impressions to conversions cascade across all campaigns
             {isDemo ? ' · Demo data' : ''}
           </p>
         </div>
@@ -689,18 +815,18 @@ export default async function DigitalPage({
                     <td className="py-3 pr-4 font-medium">{fmtNGN(p.spend)}</td>
                     <td className="py-3 pr-4">
                       {p.avgRoas > 0 ? (
-                        <span className={benchROAS(p.avgRoas).cls}>{p.avgRoas.toFixed(1)}x</span>
+                        <span className={benchROAS(p.avgRoas, bench).cls}>{p.avgRoas.toFixed(1)}x</span>
                       ) : '—'}
                     </td>
                     <td className="py-3 pr-4 text-muted-foreground">
                       {p.avgCpa > 0 ? fmtNGN(p.avgCpa) : '—'}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={benchCTR(p.avgCtr).cls}>{fmtPct(p.avgCtr)}</span>
+                      <span className={benchCTR(p.avgCtr, bench).cls}>{fmtPct(p.avgCtr)}</span>
                     </td>
                     <td className="py-3 pr-4">
                       {p.cvr > 0 ? (
-                        <span className={benchCVR(p.cvr).cls}>{p.cvr.toFixed(2)}%</span>
+                        <span className={benchCVR(p.cvr, bench).cls}>{p.cvr.toFixed(2)}%</span>
                       ) : '—'}
                     </td>
                     <td className="py-3">{p.conversions}</td>

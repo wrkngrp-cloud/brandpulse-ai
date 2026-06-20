@@ -125,7 +125,7 @@ export async function GET() {
   // Use RLS-aware client — policy enforces brand membership
   const { data: drafts, error } = await supabase
     .from('ad_drafts')
-    .select('id, platform, headline, status, budget_daily, budget_total, start_date, end_date, created_at, updated_at')
+    .select('id, platform, headline, campaign_name, ad_name, objective, ad_format, status, budget_daily, budget_total, start_date, end_date, created_at, updated_at')
     .order('created_at', { ascending: false })
     .limit(50)
 
@@ -135,4 +135,18 @@ export async function GET() {
   }
 
   return NextResponse.json({ drafts: drafts ?? [] })
+}
+
+// DELETE /api/ads/drafts?id={draftId}
+export async function DELETE(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
+
+  const id = req.nextUrl.searchParams.get('id')
+  if (!id) return NextResponse.json({ error: 'id param required' }, { status: 400 })
+
+  const { error } = await supabase.from('ad_drafts').delete().eq('id', id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
 }
