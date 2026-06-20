@@ -17,6 +17,13 @@ interface PerceptionDimension {
   score:     number | null  // 1-5 raw, or null
 }
 
+interface BenchmarkBand {
+  p25: number
+  p50: number
+  p75: number
+  top_decile: number
+}
+
 interface Props {
   bhi:                  FullBHIResult
   sparkline:            { date: string; score: number }[]
@@ -28,6 +35,8 @@ interface Props {
   brandName:            string
   industry:             string | null
   days?:                number
+  sector?:              string
+  benchmarks?:          Record<string, BenchmarkBand>
 }
 
 const COMPONENT_META: {
@@ -68,6 +77,7 @@ function formatNGN(n: number): string {
 
 export function BrandEquityClient({
   bhi, sparkline, sovPct, currentNps, npsTotal, emvRaw, perceptionDimensions, brandName, days = 30,
+  sector = 'FMCG', benchmarks = {},
 }: Props) {
   const [marketShare, setMarketShare] = useState<number>(5)
   const [targetEsov,  setTargetEsov]  = useState<number>(10)
@@ -214,6 +224,82 @@ export function BrandEquityClient({
           })}
         </div>
       </div>
+
+      {/* Sector benchmark comparison */}
+      {Object.keys(benchmarks).length > 0 && (
+        <div className="border rounded-xl p-5 bg-card space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Sector Benchmarks</p>
+              <p className="text-xs text-muted-foreground">{sector} — Nigerian market percentiles</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {([
+              { key: 'bhi',       label: 'Brand Health Index', value: bhi.score,   suffix: '/100' },
+              { key: 'sov',       label: 'Share of Voice',     value: sovPct,      suffix: '%'    },
+              { key: 'nps',       label: 'NPS',                value: currentNps,  suffix: ''     },
+              { key: 'sentiment', label: 'Sentiment',          value: bhi.components.sentiment, suffix: '/100' },
+            ] as const).map(({ key, label, value, suffix }) => {
+              const b = benchmarks[key]
+              if (!b) return null
+              const pctile = value == null ? null
+                : value >= b.top_decile ? 'Top 10%'
+                : value >= b.p75       ? 'Top 25%'
+                : value >= b.p50       ? 'Above median'
+                : value >= b.p25       ? 'Below median'
+                : 'Bottom 25%'
+              const colour = pctile === 'Top 10%' || pctile === 'Top 25%' ? 'text-green-600'
+                : pctile === 'Above median' ? 'text-blue-500'
+                : pctile === 'Below median' ? 'text-amber-500'
+                : 'text-red-500'
+              return (
+                <div key={key} className="rounded-lg border border-border/60 p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium">{label}</p>
+                    {pctile && <span className={cn('text-[10px] font-bold uppercase tracking-wide', colour)}>{pctile}</span>}
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-lg font-bold tabular-nums">
+                      {value != null ? `${Math.round(value)}${suffix}` : '—'}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      median {Math.round(b.p50)}{suffix}
+                    </span>
+                  </div>
+                  {/* Percentile bar */}
+                  <div className="relative h-1.5 bg-muted rounded-full overflow-hidden">
+                    {/* p25 marker */}
+                    <div className="absolute top-0 bottom-0 w-px bg-border/60" style={{ left: '25%' }} />
+                    {/* median marker */}
+                    <div className="absolute top-0 bottom-0 w-px bg-border" style={{ left: '50%' }} />
+                    {/* p75 marker */}
+                    <div className="absolute top-0 bottom-0 w-px bg-border/60" style={{ left: '75%' }} />
+                    {/* Brand position dot */}
+                    {value != null && (() => {
+                      const range = b.top_decile - (b.p25 - (b.p50 - b.p25))
+                      const min   = b.p25 - (b.p50 - b.p25)
+                      const pos   = Math.min(100, Math.max(0, ((value - min) / range) * 100))
+                      return (
+                        <div
+                          className="absolute top-1/2 -translate-y-1/2 h-3 w-3 rounded-full border-2 border-background shadow"
+                          style={{ left: `${pos}%`, transform: `translateX(-50%) translateY(-50%)`, backgroundColor: '#3b82f6' }}
+                        />
+                      )
+                    })()}
+                  </div>
+                  <div className="flex justify-between text-[10px] text-muted-foreground/50">
+                    <span>P25: {Math.round(b.p25)}</span>
+                    <span>P50: {Math.round(b.p50)}</span>
+                    <span>P75: {Math.round(b.p75)}</span>
+                    <span>Top: {Math.round(b.top_decile)}</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* BHI trend chart with tooltips */}
       {sparkline.length > 1 && (

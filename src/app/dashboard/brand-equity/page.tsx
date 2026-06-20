@@ -183,6 +183,25 @@ export default async function BrandEquityPage({
     }
   })
 
+  // ── Sector benchmarks
+  const sectorMap: Record<string, string> = {
+    'fmcg':'FMCG','consumer goods':'FMCG','fintech':'Fintech','financial services':'Fintech',
+    'banking':'Fintech','telecommunications':'Telecommunications','telecom':'Telecommunications',
+    'entertainment':'Entertainment','media':'Entertainment','e-commerce':'E-commerce',
+    'retail':'E-commerce','fashion':'Fashion','lifestyle':'Fashion','food & beverage':'Food & Beverage',
+    'food':'Food & Beverage','healthcare':'Healthcare','technology':'Technology','tech':'Technology',
+    'real estate':'Real Estate',
+  }
+  const sector = sectorMap[(brand?.industry ?? '').toLowerCase().trim()] ?? 'FMCG'
+  const { data: benchmarkRows } = await supabase
+    .from('sector_benchmarks')
+    .select('metric, p25, p50, p75, top_decile')
+    .eq('sector', sector)
+  const benchmarks: Record<string, { p25: number; p50: number; p75: number; top_decile: number }> = {}
+  for (const b of benchmarkRows ?? []) {
+    benchmarks[b.metric] = { p25: b.p25, p50: b.p50, p75: b.p75, top_decile: b.top_decile }
+  }
+
   // ── NPS for ESOV (also shown in BHI)
   const npsScores: number[] = []
   for (const r of allResponses ?? []) {
@@ -230,6 +249,8 @@ export default async function BrandEquityPage({
         brandName={brand?.name ?? 'your brand'}
         industry={brand?.industry ?? null}
         days={days}
+        sector={sector}
+        benchmarks={benchmarks}
       />
 
       {isDemoUser && (

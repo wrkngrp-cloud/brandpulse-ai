@@ -8,7 +8,7 @@ import {
   LayoutDashboard, FileText, BarChart2, ClipboardList,
   CalendarDays, MapPin, Megaphone, Zap, Trophy, ChevronDown,
   Monitor, Radio, Tv, Newspaper, Filter, Award, Users, Palette, Globe,
-  Target, FileSearch, BookOpen,
+  Target, FileSearch, BookOpen, PieChart, Code2, RefreshCw,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -40,6 +40,7 @@ const CAMPAIGN_PAID = [
 const DEEP_INTEL = [
   { label: 'Pre-Post',    href: '/dashboard/pre-post',    icon: Zap        },
   { label: 'Funnel',      href: '/dashboard/funnel',      icon: Filter     },
+  { label: 'Media Mix',   href: '/dashboard/mmm',         icon: PieChart   },
   { label: 'Cultural',    href: '/dashboard/cultural',    icon: Globe      },
   { label: 'Competitive', href: '/dashboard/competitive', icon: Trophy     },
   { label: 'Creative',    href: '/dashboard/creative',    icon: Palette    },
@@ -213,7 +214,9 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
 
         {/* Platform */}
         <SectionLabel expanded={expanded}>Platform</SectionLabel>
-        <NavItem href="/dashboard/methodology" icon={BookOpen} label="Methodology" active={isActive('/dashboard/methodology')} expanded={expanded} />
+        <NavItem href="/dashboard/surveys/panels"  icon={RefreshCw}    label="Tracking Panels"  active={isActive('/dashboard/surveys/panels')}  expanded={expanded} />
+        <NavItem href="/dashboard/settings/pixel"  icon={Code2}        label="Website Pixel"    active={isActive('/dashboard/settings/pixel')}  expanded={expanded} />
+        <NavItem href="/dashboard/methodology"     icon={BookOpen}     label="Methodology"      active={isActive('/dashboard/methodology')}     expanded={expanded} />
 
       </nav>
     </LayoutGroup>
