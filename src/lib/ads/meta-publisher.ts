@@ -12,17 +12,22 @@ export interface AdDraftPayload {
   id:             string
   brand_id:       string
   platform:       'meta'
+  campaign_name?: string | null
   headline:       string
   body:           string | null
   cta:            string | null
   destination_url: string
   media_urls:     string[]
+  creative_config?: Record<string, unknown>
   target_audience: Record<string, unknown>
   placement:      string[] | null
   budget_daily:   number | null
   budget_total:   number | null
   start_date:     string | null
   end_date:       string | null
+  objective?:     string | null
+  ad_format?:     string | null
+  optimization_goal?: string | null
 }
 
 export interface MetaPublishResult {
@@ -74,9 +79,10 @@ export async function publishToMeta(
   const token = decrypt(encryptedToken)
 
   // 1. Create campaign
+  const metaObjective = mapObjective(draft.objective ?? 'awareness')
   const campaignBody: Record<string, unknown> = {
-    name:             `[BP] ${draft.headline}`,
-    objective:        'OUTCOME_AWARENESS',
+    name:             `[BP] ${draft.campaign_name ?? draft.headline}`,
+    objective:        metaObjective,
     status:           'PAUSED',
     special_ad_categories: [],
   }
@@ -197,6 +203,18 @@ function buildStorySpec(draft: AdDraftPayload): Record<string, unknown> {
       call_to_action: callToAction,
     },
   }
+}
+
+function mapObjective(objective: string): string {
+  const m: Record<string, string> = {
+    awareness:   'OUTCOME_AWARENESS',
+    traffic:     'OUTCOME_TRAFFIC',
+    engagement:  'OUTCOME_ENGAGEMENT',
+    leads:       'OUTCOME_LEADS',
+    app:         'OUTCOME_APP_PROMOTION',
+    sales:       'OUTCOME_SALES',
+  }
+  return m[objective] ?? 'OUTCOME_AWARENESS'
 }
 
 function mapCta(label: string): string {
