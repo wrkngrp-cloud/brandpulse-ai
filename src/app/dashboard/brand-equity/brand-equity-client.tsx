@@ -34,6 +34,7 @@ interface Props {
   perceptionDimensions: PerceptionDimension[]
   brandName:            string
   industry:             string | null
+  marketSharePct?:      number | null
   days?:                number
   sector?:              string
   benchmarks?:          Record<string, BenchmarkBand>
@@ -47,7 +48,7 @@ const COMPONENT_META: {
   phase?: string
 }[] = [
   { key: 'awareness',         label: 'Brand Awareness',     weight: 20, source: 'Share of Voice'          },
-  { key: 'salience',          label: 'Brand Salience',      weight: 15, source: 'Awareness surveys'        },
+  { key: 'salience',          label: 'Brand Salience',      weight: 15, source: 'Awareness Check surveys (q1)' },
   { key: 'sentiment',         label: 'Brand Sentiment',     weight: 20, source: 'Sentiment score (14d avg)' },
   { key: 'perception',        label: 'Brand Perception',    weight: 15, source: 'Perception Audit surveys'  },
   { key: 'culturalResonance', label: 'Cultural Resonance',  weight: 15, source: 'Cultural survey',  phase: 'Phase 3' },
@@ -77,9 +78,9 @@ function formatNGN(n: number): string {
 
 export function BrandEquityClient({
   bhi, sparkline, sovPct, currentNps, npsTotal, emvRaw, perceptionDimensions, brandName, days = 30,
-  sector = 'FMCG', benchmarks = {},
+  sector = 'FMCG', benchmarks = {}, marketSharePct,
 }: Props) {
-  const [marketShare, setMarketShare] = useState<number>(5)
+  const [marketShare, setMarketShare] = useState<number>(marketSharePct ?? 5)
   const [targetEsov,  setTargetEsov]  = useState<number>(10)
   const rlShort = rangeLabelShort(days)
   const rlLong  = rangeLabelLong(days)

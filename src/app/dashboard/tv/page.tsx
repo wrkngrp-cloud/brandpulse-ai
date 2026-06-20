@@ -185,7 +185,7 @@ export default async function TVPage({
             {[
               { label: 'GRPs Planned',   value: totalGrpPlanned.toFixed(1),    sub: `Last ${days} days`,          icon: TrendingUp, color: 'text-blue-500' },
               { label: 'GRPs Delivered', value: totalGrpDelivered.toFixed(1),  sub: `${deliveryPct}% delivery`, icon: Activity, color: 'text-emerald-500' },
-              { label: 'Est. Reach',     value: fmt(totalReach),               sub: 'Total viewer-spots',    icon: Users,      color: 'text-indigo-500' },
+              { label: 'Gross Impressions', value: fmt(totalReach),            sub: 'Total viewer-spots',    icon: Users,      color: 'text-indigo-500' },
               { label: 'Total Spend',    value: fmtCurrency(totalSpend),       sub: `CPRP: ${fmtCurrency(cprp)}`, icon: Tv, color: 'text-violet-500' },
             ].map(m => (
               <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">

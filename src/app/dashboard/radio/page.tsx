@@ -190,7 +190,7 @@ export default async function RadioPage({
             {[
               { label: 'Spots Planned',  value: totalSpotPlanned.toLocaleString(), sub: `Last ${days} days`,          icon: Radio,      color: 'text-violet-500' },
               { label: 'Spots Aired',    value: totalSpotAired.toLocaleString(),   sub: `${deliveryPct}% delivery`, icon: Volume2, color: 'text-emerald-500' },
-              { label: 'Est. Reach',     value: fmt(totalReach),                   sub: 'Total listener-spots',  icon: Users,      color: 'text-blue-500' },
+              { label: 'Gross Impressions', value: fmt(totalReach),                sub: 'Total listener-spots',  icon: Users,      color: 'text-blue-500' },
               { label: 'Total Spend',    value: fmtCurrency(totalSpend),           sub: `CPT: ${fmtCurrency(cpt)}/k`, icon: TrendingUp, color: 'text-indigo-500' },
             ].map(m => (
               <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">

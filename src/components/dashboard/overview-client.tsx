@@ -65,6 +65,7 @@ export interface OverviewProps {
   activeCampaigns: Campaign[]
   upcomingEvents:  Event[]
   recentMentions:  Mention[]
+  mentionCount7d:  number
   hasAnyData:      boolean
   trendData?:      { date: string; bhi: number | null; sentiment: number | null }[]
   days?:           number
@@ -158,6 +159,7 @@ export function OverviewClient({
   activeCampaigns,
   upcomingEvents,
   recentMentions,
+  mentionCount7d,
   hasAnyData,
   trendData = [],
   days = 30,
@@ -270,8 +272,8 @@ export function OverviewClient({
           href="/dashboard/content"
         />
         <StatCard
-          label="Recent Mentions"
-          value={recentMentions.length}
+          label="Mentions"
+          value={mentionCount7d}
           tone="amber"
           icon={MessageSquare}
           deltaLabel="last 7 days"

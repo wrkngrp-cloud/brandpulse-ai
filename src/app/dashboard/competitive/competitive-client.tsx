@@ -773,13 +773,16 @@ function ScorecardTab({
               ))}
             </tr>
             <tr className="hover:bg-muted/20">
-              <td className="px-4 py-3 text-muted-foreground font-medium text-xs">Market position</td>
+              <td className="px-4 py-3 text-muted-foreground font-medium text-xs">Your ESOV</td>
               <td className="text-center px-4 py-3 font-medium bg-muted/10">
                 {marketPosition(brandEsov)}
+                {brandEsov !== null && (
+                  <span className="ml-1 text-[10px] text-muted-foreground">({brandEsov > 0 ? '+' : ''}{brandEsov}%)</span>
+                )}
               </td>
               {competitors.map(c => (
-                <td key={c.name} className="text-center px-4 py-3 text-muted-foreground">
-                  {c.sov !== null ? marketPosition(c.sov - 0) : '—'}
+                <td key={c.name} className="text-center px-4 py-3 text-muted-foreground text-[11px]">
+                  ESOV needs market share data
                 </td>
               ))}
             </tr>

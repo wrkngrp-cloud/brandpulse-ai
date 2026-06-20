@@ -8,6 +8,19 @@ const Body = z.object({
   phones: z.array(z.string().min(6)).min(1).max(500),
 })
 
+// Africa's Talking WhatsApp response shape (per-recipient status)
+interface ATRecipient {
+  number:        string
+  status:        string   // 'Success' | 'Failed' | ...
+  statusCode?:   number
+  messageId?:    string
+}
+interface ATResponse {
+  SMSMessageData?: {
+    Recipients?: ATRecipient[]
+  }
+}
+
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -35,6 +48,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const { phones } = parsed.data
   let sent = 0
+  let failed = 0
   let lastError: string | null = null
 
   // Send in batches of 20 (AT recommendation)
@@ -55,13 +69,26 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         }),
       })
       if (res.ok) {
-        sent += batch.length
+        const body = await res.json().catch(() => null) as ATResponse | null
+        const recipients = body?.SMSMessageData?.Recipients ?? []
+        if (recipients.length > 0) {
+          // Count by actual per-recipient status
+          for (const r of recipients) {
+            if (r.status === 'Success') sent++
+            else failed++
+          }
+        } else {
+          // Fallback: AT returned 200 but no recipients — assume batch delivered
+          sent += batch.length
+        }
       } else {
         const body = await res.json().catch(() => ({}))
         lastError = (body as { errorMessage?: string }).errorMessage ?? `HTTP ${res.status}`
+        failed += batch.length
       }
     } catch (err) {
       lastError = err instanceof Error ? err.message : 'Network error'
+      failed += batch.length
     }
   }
 
@@ -69,5 +96,5 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: lastError }, { status: 502 })
   }
 
-  return NextResponse.json({ sent, failed: phones.length - sent })
+  return NextResponse.json({ sent, failed })
 }

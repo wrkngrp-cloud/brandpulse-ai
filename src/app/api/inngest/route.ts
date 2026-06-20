@@ -13,7 +13,8 @@ import { prCrawl }                     from '@/lib/inngest/functions/pr-crawl'
 import { geoLiftStudy }                from '@/lib/inngest/functions/geo-lift-study'
 import { campaignTargetMonitor }       from '@/lib/inngest/functions/campaign-target-monitor'
 import { emailConnectorSync }          from '@/lib/inngest/functions/email-connector-sync'
-import { panelDailyCheck, panelDispatch } from '@/lib/inngest/functions/panel-dispatch'
+import { panelDailyCheck, panelDispatch }       from '@/lib/inngest/functions/panel-dispatch'
+import { monthlyReportCron, weeklyDigestCron }  from '@/lib/inngest/functions/scheduled-reports'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -25,5 +26,6 @@ export const { GET, POST, PUT } = serve({
     oohSearchUplift, competitiveWeeklyBriefing, ga4DailySync, appReviewSync,
     metaAdsDailySync, prCrawl, geoLiftStudy, campaignTargetMonitor,
     emailConnectorSync, panelDailyCheck, panelDispatch,
+    monthlyReportCron, weeklyDigestCron,
   ],
 })

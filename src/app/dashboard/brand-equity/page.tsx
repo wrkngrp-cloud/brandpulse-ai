@@ -17,7 +17,7 @@ export default async function BrandEquityPage({
   searchParams: Promise<Record<string, string | undefined>>
 }) {
   const params = await searchParams
-  const days = Math.min(180, Math.max(7, Number(params.days ?? 30)))
+  const days = Math.min(365, Math.max(7, Number(params.days ?? 30)))
 
   const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
   const supabase = await createClient()
@@ -65,7 +65,7 @@ export default async function BrandEquityPage({
       .gte('posted_at', cutoffISO),
     supabase
       .from('brands')
-      .select('name, industry')
+      .select('name, industry, market_share_pct')
       .limit(1)
       .maybeSingle(),
     supabase
@@ -100,7 +100,8 @@ export default async function BrandEquityPage({
   if (awarenessResponses.length >= 3) {
     const knownCount = awarenessResponses.filter(r => {
       const answers = r.answers as Record<string, unknown>
-      return Object.values(answers).some(v => typeof v === 'string' && v.toLowerCase().startsWith('yes'))
+      const q1 = answers['q1']
+      return typeof q1 === 'string' && q1.toLowerCase().startsWith('yes')
     }).length
     salienceScore = Math.round((knownCount / awarenessResponses.length) * 100)
   }
@@ -248,6 +249,7 @@ export default async function BrandEquityPage({
         perceptionDimensions={dimensionAvgs}
         brandName={brand?.name ?? 'your brand'}
         industry={brand?.industry ?? null}
+        marketSharePct={brand?.market_share_pct ?? null}
         days={days}
         sector={sector}
         benchmarks={benchmarks}

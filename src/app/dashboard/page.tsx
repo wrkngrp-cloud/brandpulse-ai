@@ -23,6 +23,7 @@ async function DashboardContent({ days }: { days: number }) {
     { data: allSurveyResponses },
     { data: bhiHistory },
     { data: recentMentions },
+    { count: mentionCount7d },
     { data: activeCampaigns },
     { data: upcomingEvents },
     { data: sentimentTrendRaw },
@@ -36,6 +37,7 @@ async function DashboardContent({ days }: { days: number }) {
     supabase.from('survey_responses').select('answers, survey_id, quality_flag').eq('quality_flag', 'ok'),
     supabase.from('brand_health_snapshots').select('bhi, snapshot_date').order('snapshot_date', { ascending: false }).limit(days),
     supabase.from('mentions').select('id, content, author_handle, platform, sentiment_label, created_at').order('created_at', { ascending: false }).limit(4),
+    supabase.from('mentions').select('id', { count: 'exact', head: true }).gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
     supabase.from('campaigns').select('id, name, status, objectives, start_date, total_budget, currency').in('status', ['active', 'paused']).order('created_at', { ascending: false }).limit(3),
     supabase.from('events').select('id, name, status, city, date_start, event_type').in('status', ['planned', 'live']).order('date_start', { ascending: true }).limit(3),
     supabase.from('sentiment_daily').select('social_score, day').gte('day', cutoffStr).order('day', { ascending: true }),
@@ -48,14 +50,16 @@ async function DashboardContent({ days }: { days: number }) {
   const sentimentScore = sentimentRow?.social_score ?? null
   const sovScore       = sovRow?.social_sov ?? null
 
-  // ── Salience (aided awareness %) from awareness surveys ──────────────────
+  // ── Salience (aided awareness %) from awareness_check / b2_intercept surveys
+  // Reads q1 specifically — the "Have you heard of [brand]?" question.
   const awarenessIds = new Set((awarenessCheckSurveys ?? []).map(s => s.id))
   const awarenessResponses = (allSurveyResponses ?? []).filter(r => awarenessIds.has(r.survey_id))
   let salienceScore: number | null = null
   if (awarenessResponses.length >= 3) {
     const knownCount = awarenessResponses.filter(r => {
       const a = r.answers as Record<string, unknown>
-      return Object.values(a).some(v => typeof v === 'string' && v.toLowerCase().startsWith('yes'))
+      const q1 = a['q1']
+      return typeof q1 === 'string' && q1.toLowerCase().startsWith('yes')
     }).length
     salienceScore = Math.round((knownCount / awarenessResponses.length) * 100)
   }
@@ -140,6 +144,7 @@ async function DashboardContent({ days }: { days: number }) {
       }))}
       upcomingEvents={upcomingEvents ?? []}
       recentMentions={recentMentions ?? []}
+      mentionCount7d={mentionCount7d ?? 0}
       hasAnyData={hasAnyData}
       trendData={trendData}
       days={days}
@@ -153,7 +158,7 @@ export default async function DashboardPage({
   searchParams: Promise<Record<string, string | undefined>>
 }) {
   const params = await searchParams
-  const days = Math.min(180, Math.max(7, Number(params.days ?? 30)))
+  const days = Math.min(365, Math.max(7, Number(params.days ?? 30)))
 
   return (
     <Suspense fallback={

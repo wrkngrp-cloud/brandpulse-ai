@@ -73,6 +73,7 @@ const brandSchema = z.object({
   brandName:          z.string().min(1, 'Brand name is required'),
   websiteUrl:         z.string().optional().default(''),
   category:           z.string().min(1, 'Category is required'),
+  marketSharePct:     z.number().min(0).max(100).nullable().default(null),
   brandValues:        z.array(z.string()).default([]),
   monitoredHashtags:  z.array(z.string()).default([]),
   brandVoice: z.object({
@@ -129,6 +130,7 @@ export async function updateBrand(
     name:                d.brandName,
     website_url:         d.websiteUrl || null,
     category:            d.category,
+    market_share_pct:    d.marketSharePct,
     brand_values:        d.brandValues,
     monitored_hashtags:  d.monitoredHashtags,
     brand_voice:         d.brandVoice,

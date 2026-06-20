@@ -218,6 +218,23 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="marketSharePct">Estimated market share (%)</Label>
+            <p className="text-xs text-muted-foreground">
+              Used in ESOV calculations on Brand Equity and Competitive pages. Enter your best estimate.
+            </p>
+            <Input
+              id="marketSharePct"
+              type="number"
+              min="0"
+              max="100"
+              step="0.1"
+              value={data.marketSharePct ?? ''}
+              onChange={e => patch('marketSharePct', e.target.value === '' ? null : Number(e.target.value))}
+              placeholder="e.g. 12.5"
+              className="max-w-[160px]"
+            />
+          </div>
         </div>
       </SectionCard>
 

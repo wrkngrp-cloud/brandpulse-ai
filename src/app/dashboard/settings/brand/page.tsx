@@ -6,7 +6,7 @@ export default async function BrandSettingsPage() {
   const supabase = await createClient()
   const { data: brand } = await supabase
     .from('brands')
-    .select('name, website_url, category, brand_values, monitored_hashtags, brand_voice, cultural_profile, target_segments, logo_url, brand_colors')
+    .select('name, website_url, category, market_share_pct, brand_values, monitored_hashtags, brand_voice, cultural_profile, target_segments, logo_url, brand_colors')
     .limit(1)
     .single()
 
@@ -17,6 +17,7 @@ export default async function BrandSettingsPage() {
     brandName:         brand?.name ?? '',
     websiteUrl:        brand?.website_url ?? '',
     category:          brand?.category ?? '',
+    marketSharePct:    brand?.market_share_pct ?? null,
     brandValues:       (brand?.brand_values as string[]) ?? [],
     monitoredHashtags: (brand?.monitored_hashtags as string[]) ?? [],
     brandVoice: {
