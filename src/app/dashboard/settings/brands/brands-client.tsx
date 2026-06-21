@@ -22,9 +22,10 @@ interface Props {
   activeBrandId:  string | null
   plan:           string
   brandLimit:     number
+  isDemoUser?:    boolean
 }
 
-export function BrandsClient({ brands: initial, activeBrandId: initialActive, plan, brandLimit }: Props) {
+export function BrandsClient({ brands: initial, activeBrandId: initialActive, plan, brandLimit, isDemoUser }: Props) {
   const router = useRouter()
   const [brands, setBrands]         = useState(initial)
   const [activeBrandId, setActive]  = useState(initialActive ?? initial[0]?.id ?? null)
@@ -32,6 +33,7 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
   const [editingId, setEditingId]   = useState<string | null>(null)
   const [editName, setEditName]     = useState('')
   const [pending, startTransition]  = useTransition()
+  const [seeding, setSeeding]       = useState(false)
 
   const atLimit = brandLimit !== -1 && brands.length >= brandLimit
 
@@ -97,6 +99,21 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
     toast.success(`${name} deleted`)
   }
 
+  async function seedDemo() {
+    setSeeding(true)
+    try {
+      const res  = await fetch('/api/demo/seed', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      toast.success(`Demo data seeded: ${data.secondBrand} created with ${data.seeded.length} data sets`)
+      router.refresh()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Seed failed')
+    } finally {
+      setSeeding(false)
+    }
+  }
+
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
@@ -107,6 +124,21 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
           {brandLimit === -1 ? 'unlimited brands' : `up to ${brandLimit} brand${brandLimit === 1 ? '' : 's'}`}.
         </p>
       </div>
+
+      {/* Demo seed banner — only for demo account */}
+      {isDemoUser && (
+        <div className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/60 dark:bg-amber-950/20 p-4 flex items-center gap-3 flex-wrap">
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-semibold text-amber-800 dark:text-amber-300">Demo Mode</p>
+            <p className="text-[12px] text-amber-700/80 dark:text-amber-400/70">
+              Seed a second brand (Jara Express) with 90 days of BHI, sentiment, SOV, and competitive intelligence data.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={seedDemo} disabled={seeding} className="border-amber-400 text-amber-800 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/30 shrink-0">
+            {seeding ? 'Seeding…' : 'Seed demo data'}
+          </Button>
+        </div>
+      )}
 
       {/* Brand list */}
       <div className="rounded-2xl border bg-card divide-y divide-border/50 overflow-hidden">

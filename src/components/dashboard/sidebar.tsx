@@ -215,16 +215,6 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
         </button>
       </div>
 
-      {/* ── Brand switcher ─────────────────────────────────────── */}
-      {brands.length > 0 && (
-        <div className={cn(
-          'px-2.5 pt-2 pb-1 transition-opacity duration-150',
-          expanded ? 'opacity-100' : 'opacity-0 pointer-events-none h-0 overflow-hidden'
-        )}>
-          <BrandSwitcher brands={brands} activeBrandId={activeBrandId} />
-        </div>
-      )}
-
       {/* ── Navigation ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 px-2.5">
         <DashboardNav expanded={expanded} />
@@ -252,6 +242,16 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
           )}
         </Link>
       </div>
+
+      {/* ── Brand switcher — only shown when multiple brands exist ── */}
+      {brands.length > 1 && (
+        <div className={cn(
+          'px-2.5 pb-2 transition-opacity duration-150',
+          expanded ? 'opacity-100' : 'opacity-0 pointer-events-none h-0 overflow-hidden'
+        )}>
+          <BrandSwitcher brands={brands} activeBrandId={activeBrandId} />
+        </div>
+      )}
 
       {/* ── User block ─────────────────────────────────────────── */}
       <div className="border-t border-sidebar-border/70 p-2">

@@ -30,17 +30,20 @@ interface Props {
 }
 
 const SECTION_OPTIONS = [
-  { value: 'bhi',           label: 'Brand Health Index' },
-  { value: 'sentiment',     label: 'Sentiment' },
-  { value: 'sov',           label: 'Share of Voice' },
-  { value: 'monthly_report',label: 'Monthly Report' },
+  { value: 'executive_summary', label: 'Executive Summary (AI)' },
+  { value: 'bhi',               label: 'Brand Health Index'     },
+  { value: 'sentiment',         label: 'Sentiment'              },
+  { value: 'sov',               label: 'Share of Voice'         },
+  { value: 'campaigns',         label: 'Campaign Performance'   },
+  { value: 'nps',               label: 'NPS Score'              },
+  { value: 'insights',          label: 'Wins, Concerns & Priorities (AI)' },
 ]
 
 export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit, appUrl }: Props) {
   const [tokens, setTokens]     = useState(initial)
   const [brandId, setBrandId]   = useState(brands[0]?.id ?? '')
   const [label, setLabel]       = useState('Client portal')
-  const [sections, setSections] = useState(['bhi', 'sentiment', 'sov'])
+  const [sections, setSections] = useState(['executive_summary', 'bhi', 'sentiment', 'sov', 'campaigns', 'insights'])
   const [creating, setCreating] = useState(false)
 
   const atLimit = portalLimit !== -1 && tokens.length >= portalLimit

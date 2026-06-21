@@ -4,6 +4,8 @@ import { BrandsClient } from './brands-client'
 export default async function BrandsSettingsPage() {
   const supabase = await createClient()
 
+  const { data: { user } } = await supabase.auth.getUser()
+
   const [
     { data: brands },
     { data: workspace },
@@ -24,6 +26,7 @@ export default async function BrandsSettingsPage() {
       activeBrandId={workspace?.active_brand_id ?? null}
       plan={workspace?.plan ?? 'starter'}
       brandLimit={planRow?.brand_count ?? 1}
+      isDemoUser={user?.email === 'demo@jarafoods.brandpulse.ai'}
     />
   )
 }
