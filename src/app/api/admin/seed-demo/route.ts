@@ -262,8 +262,11 @@ export async function POST(req: NextRequest) {
       blended_sov: +(16 + t * 10).toFixed(1),
       esov:        +((16 + t * 10) - 14.7).toFixed(2),
       competitor_data: {
-        ChowMate:     { social_sov: +(22 - t * 5).toFixed(1), blended_sov: +(20 - t * 4).toFixed(1) },
-        NutriNgFoods: { social_sov: +(9  + Math.sin(d * 0.1) * 1.5).toFixed(1), blended_sov: 8.2 },
+        brand_volume:       Math.round(8000 + t * 4000),
+        competitor_volumes: {
+          'ChowMate':      Math.round(9000 - t * 2000),
+          'NutriNg Foods': Math.round(3000 + Math.sin(d * 0.1) * 500),
+        },
       },
     })
   }
@@ -1181,22 +1184,198 @@ export async function POST(req: NextRequest) {
 
   /* ── 21. Weekly briefings ─────────────────────────────────────────────── */
   const briefings = [
-    { daysBack: 28, summary: 'Reconnect campaign nearing completion. Sentiment at 71/100. ChowMate UNILAG activation flagged — recommend Gen-Z counter-narrative.' },
-    { daysBack: 21, summary: 'Summer Vibes pre-launch. OOH placements confirmed. @chefkemisola seeding driving Instagram saves above benchmark.' },
-    { daysBack: 14, summary: 'Campaign launch week. Lekki + Surulere OOH live. Early Meta signals positive — 4.1% CTR on awareness creative.' },
-    { daysBack:  7, summary: 'Week 2 of Summer Vibes. Sentiment at 73/100, above 90-day average. ChowMate Lekki counter-placement confirmed.' },
+    {
+      daysBack: 28,
+      content: {
+        title: 'Jara Foods Competitive Briefing — Reconnect Campaign Closeout',
+        executive_summary: 'Reconnect campaign nearing completion with sentiment stabilising at 71/100. ChowMate has launched a Gen-Z activation at UNILAG requiring an urgent counter-narrative before the Summer Vibes launch.',
+        sov_analysis: 'Jara holds 48.3% share of voice among tracked FMCG competitors, up 2.1 points week-on-week. ChowMate has retreated slightly to 36.4% after its Reconnect-period counter-spend. NutriNg Foods remains steady at 15.3%. Jara\'s ESOV of +3.6% signals positive investment efficiency ahead of the upcoming campaign.',
+        sentiment_vs_market: 'Jara\'s 14-day average sentiment (71.0/100) is 6.8 points above the estimated category average. ChowMate\'s UNILAG activation has not yet dented Jara\'s sentiment but is generating awareness among the 18-24 segment — monitor closely.',
+        porter_forces: {
+          competitive_rivalry: 'HIGH. ChowMate is increasing spend targeting student campuses. NutriNg Foods is repositioning toward health-conscious consumers in Lagos Island.',
+          threat_of_new_entrants: 'MEDIUM. Distribution barriers remain high, but D2C food brands are gaining traction on Instagram and WhatsApp commerce.',
+          bargaining_power_buyers: 'MEDIUM-HIGH. Price sensitivity elevated post-school resumption. Promoter NPS base (57%) provides a buffer against churn.',
+          threat_of_substitutes: 'MEDIUM. Imported snack brands growing in Shoprite and Hubmart premium shelves.',
+          overall_intensity: 'High',
+        },
+        brand_strengths: [
+          'SOV leadership (48.3%) — 12 points ahead of ChowMate',
+          'Sentiment premium of 6.8 points above estimated category average',
+          'Reconnect campaign built strong southern Nigeria consideration — Ibadan geo-lift +18.4%',
+        ],
+        brand_vulnerabilities: [
+          'Gen-Z consideration gap — ChowMate UNILAG activation is filling an uncontested space',
+          'Northern distribution gaps remain unresolved (Kano, Maiduguri)',
+          'No TikTok presence — blind spot on the fastest-growing Gen-Z platform',
+        ],
+        competitor_threats: [
+          'ChowMate UNILAG activation targets 18-24 segment with brand sampling and student ambassador programme',
+          'NutriNg Foods "Clean Label" rebrand launching next quarter — credibility play in health segment',
+          'ChowMate planning 8 new Lekki-Ajah billboards starting July 2026',
+        ],
+        opportunities: [
+          'Summer Vibes pre-launch: seeding @chefkemisola ahead of competitors closes the Gen-Z gap',
+          'Kano restocking ahead of Sallah — first mover beats ChowMate in Northern recovery',
+          'TikTok trial: 4-week campaign during Summer Vibes could capture organic Gen-Z attention at low cost',
+        ],
+        recommendations: [
+          { action: 'Brief @chefkemisola for Summer Vibes Reel by end of week', rationale: 'Influencer seeding 2 weeks before paid launch historically drives 40% lower CPM for Jara campaigns.', priority: 'High' as const },
+          { action: 'Prepare Gen-Z counter-narrative social pack for UNILAG/LASU audiences', rationale: 'ChowMate campus activation will start generating UGC within 10 days — preemptive content is cheaper than defensive response.', priority: 'High' as const },
+          { action: 'Restock Kano and Maiduguri to 120% before Sallah', rationale: 'October 2025 stockout threads cost 8 points of SOV. Distribution consistency is the fastest brand health lever.', priority: 'Medium' as const },
+        ],
+        data_gaps: [
+          'No TikTok listening — ChowMate Gen-Z activity on platform unmonitored',
+          'Competitor market share estimates unconfirmed — ESOV uses proxies',
+        ],
+        confidence: 'Medium' as const,
+      },
+    },
+    {
+      daysBack: 21,
+      content: {
+        title: 'Jara Foods Competitive Briefing — Summer Vibes Pre-Launch',
+        executive_summary: 'Summer Vibes pre-launch week. OOH placements confirmed across Lekki and Surulere. @chefkemisola seeding is driving Instagram saves 47% above benchmark, signalling strong organic momentum heading into paid activation.',
+        sov_analysis: 'Jara SOV has climbed to 49.8% among tracked competitors as pre-launch content begins circulating. ChowMate has pulled back slightly (35.1%) — likely conserving budget ahead of a planned counter-campaign. NutriNg Foods holds 15.1%.',
+        sentiment_vs_market: 'Jara\'s 14-day sentiment average is 72.1/100, rising 1.1 points from last week. The @chefkemisola content is generating strong joy and anticipation signals in emotion analysis. ChowMate sentiment remains stable at an estimated 62/100.',
+        porter_forces: {
+          competitive_rivalry: 'HIGH. ChowMate budget draw-down suggests a planned counter-activation in the next 2-3 weeks. Competitive response window is narrow.',
+          threat_of_new_entrants: 'MEDIUM. Influencer-first food brands are gaining distribution through Instagram and Jumia — monitor Chow Express and FreshMade.',
+          bargaining_power_buyers: 'MEDIUM. Summer season is a high-purchase window. Brand preference decisions are being made now.',
+          threat_of_substitutes: 'LOW-MEDIUM. Jara\'s cultural positioning inoculates against imported substitute pressure during Nigerian summer.',
+          overall_intensity: 'High',
+        },
+        brand_strengths: [
+          'SOV at 49.8% — approaching majority share among tracked competitors',
+          'Influencer saves benchmark exceeded by 47% on pre-launch content',
+          'OOH placements secured in high-footfall Lekki and Surulere corridors',
+          'Geo-lift from Reconnect campaign still active: Lagos sentiment elevated +4.2 points',
+        ],
+        brand_vulnerabilities: [
+          'Heavy reliance on single influencer (@chefkemisola) — diversification needed for Q3',
+          'ChowMate counter-campaign likely imminent based on spend patterns',
+          'NPS promoter base not yet activated for Summer Vibes amplification',
+        ],
+        competitor_threats: [
+          'ChowMate spend reduction this week suggests a planned burst in weeks 2-3 of Summer Vibes',
+          'NutriNg Foods partnering with fitness influencers — tangential health narrative building',
+        ],
+        opportunities: [
+          'Activate NPS promoter base with Summer Vibes shareable kits this week — 200 promoters could generate 1.8M impressions',
+          'NPC (Nigerian Pop Culture) moment: tie Summer Vibes to Afrobeats season for earned media',
+          'OOH halo effect: geo-targeted digital ads near Lekki and Surulere boards will amplify recall',
+        ],
+        recommendations: [
+          { action: 'Send Summer Vibes shareable kit to top 200 NPS promoters by Friday', rationale: 'Promoter UGC converts 3x better than paid creative and is free. This is the highest-ROI action this week.', priority: 'High' as const },
+          { action: 'Brief a backup influencer (mid-tier, 80-150k) for Week 2 amplification', rationale: 'Single influencer dependency is a risk. A second voice diversifies and doubles reach at modest cost.', priority: 'Medium' as const },
+          { action: 'Set up OOH geo-targeted Instagram retargeting within 500m of billboards', rationale: 'OOH + digital pairing lifts recall by ~22% vs OOH alone in Lagos market.', priority: 'Medium' as const },
+        ],
+        data_gaps: [
+          'No ChowMate spend data — counter-campaign timing is inferred from past patterns',
+          'TikTok listening still inactive — Gen-Z signals incomplete',
+        ],
+        confidence: 'Medium' as const,
+      },
+    },
+    {
+      daysBack: 14,
+      content: {
+        title: 'Jara Foods Competitive Briefing — Summer Vibes Launch Week',
+        executive_summary: 'Campaign launch week delivering strong early signals. Lekki and Surulere OOH live. Meta awareness creative achieving 4.1% CTR — well above the 1.8% FMCG benchmark. Sentiment trending upward.',
+        sov_analysis: 'Jara SOV surged to 52.4% on launch day on the back of OOH + digital + influencer overlap. ChowMate fell to 33.2% — no visible counter-campaign yet. NutriNg Foods at 14.4%. Jara ESOV now +7.7%, above the growth threshold.',
+        sentiment_vs_market: 'Jara\'s 14-day average sentiment climbed to 72.8/100 — the highest recorded since the Nourish Nigeria campaign peak. The emotion distribution shows joy (38%), anticipation (27%), trust (21%), which is the healthiest mix in 90 days.',
+        porter_forces: {
+          competitive_rivalry: 'HIGH. ChowMate has not responded yet, which is unusual. Expect a counter-move in weeks 2-3. NutriNg is gaining micro-influence traction on X.',
+          threat_of_new_entrants: 'MEDIUM. The Summer Vibes campaign is reinforcing Jara\'s category leadership before any new entrant can capitalise.',
+          bargaining_power_buyers: 'MEDIUM. Strong brand momentum typically shifts price negotiation power back toward the brand.',
+          threat_of_substitutes: 'LOW-MEDIUM. Jara cultural presence is at its strongest — substitutes struggle during high-brand-equity windows.',
+          overall_intensity: 'Medium',
+        },
+        brand_strengths: [
+          'SOV at 52.4% — majority share among tracked competitors for the first time in 6 months',
+          'Meta CTR 4.1% vs 1.8% FMCG benchmark — creative is outperforming',
+          'Sentiment at 72.8/100, 90-day high — strong equity foundation',
+          'OOH + digital overlap in Lekki and Surulere creating recall multiplier effect',
+        ],
+        brand_vulnerabilities: [
+          'ChowMate silence may precede a significant burst — do not reduce monitoring',
+          'Campaign budget concentrated in weeks 1-2 — tail-off risk in weeks 3-4 if not refreshed',
+        ],
+        competitor_threats: [
+          'ChowMate likely preparing a counter-campaign — monitor OOH booking sites and influencer brief activity',
+          'NutriNg Foods gaining X (Twitter) share in health conversation — niche but growing',
+        ],
+        opportunities: [
+          'Capture launch week UGC for retargeting — high-sentiment content performs well as paid posts',
+          'OOH halo effect: expand geo-targeting to Ajah and Yaba corridors while CPM is low',
+          'Sentiment is high — good time to run an NPS pulse to capture promoters at peak satisfaction',
+        ],
+        recommendations: [
+          { action: 'Capture and boost top UGC from launch week as paid posts', rationale: 'UGC-as-paid performs 2.4x better on authenticity metrics and reuses existing social proof.', priority: 'High' as const },
+          { action: 'Run a 48-hour NPS pulse survey to active customers this week', rationale: 'Sentiment is at a 90-day high — capturing promoters now maximises advocacy programme pipeline.', priority: 'Medium' as const },
+          { action: 'Prepare Week 3 creative refresh ahead of expected ChowMate counter-campaign', rationale: 'Brands that maintain consistent spend through competitor bursts recover SOV faster.', priority: 'Medium' as const },
+        ],
+        data_gaps: [
+          'ChowMate next move unknown — no spend transparency on OOH bookings',
+          'TikTok listening inactive — missing Gen-Z signals during a high-engagement week',
+        ],
+        confidence: 'High' as const,
+      },
+    },
+    {
+      daysBack: 7,
+      content: {
+        title: 'Jara Foods Competitive Briefing — Summer Vibes Week 2',
+        executive_summary: 'Week 2 of Summer Vibes. Sentiment at 73.0/100, above the 90-day average. ChowMate Lekki counter-placement confirmed — 6 new billboards. Campaign momentum remains strong with influencer content outperforming paid 3:1 on saves.',
+        sov_analysis: 'Jara holds 51.2% share of voice among tracked competitors. ChowMate recovered slightly to 33.8% on the back of its Lekki OOH placement. NutriNg Foods at 15.0%. Jara\'s ESOV of +6.5% remains firmly in growth territory above the +5% threshold.',
+        sentiment_vs_market: 'Jara\'s 14-day average sentiment (73.0/100) sits 8.2 points above the estimated category average. ChowMate\'s Lekki counter-placement has generated some competitor noise on X but has not yet affected Jara\'s sentiment trajectory. Influencer content (joy + trust dominant) is the primary driver.',
+        porter_forces: {
+          competitive_rivalry: 'HIGH. ChowMate\'s Lekki OOH placement is a direct geographic challenge. 6 billboards across Victoria Island and Lekki Phase 1 corridor compete for identical audiences.',
+          threat_of_new_entrants: 'MEDIUM. No new significant entrants detected. D2C brands continue building social audiences but lack distribution scale.',
+          bargaining_power_buyers: 'MEDIUM. Jara\'s brand momentum and cultural presence are reducing price sensitivity among core Lagos consumers.',
+          threat_of_substitutes: 'LOW-MEDIUM. Jara\'s Summer Vibes campaign is effectively inoculating against substitute consideration during the campaign window.',
+          overall_intensity: 'High',
+        },
+        brand_strengths: [
+          'SOV at 51.2% — market-leading position sustained into Week 2',
+          'Influencer content outperforming paid creative 3:1 on Instagram saves',
+          'Sentiment at 73.0/100, 8.2 points above estimated category average',
+          'Nourish Nigeria geo-lift still active in Southwest — adds earned lift to campaign',
+        ],
+        brand_vulnerabilities: [
+          'ChowMate OOH directly competing in Jara\'s strongest Lagos corridors',
+          'Northern distribution gap persists — Kano and Maiduguri under-served ahead of Sallah',
+          'No TikTok presence — Gen-Z voice gap while ChowMate earns 22% of its SOV there',
+        ],
+        competitor_threats: [
+          'ChowMate 6-board Lekki-VI OOH placement targets Jara\'s highest-value demographic',
+          'NutriNg Foods partnering with @FitNaija and @HealthyLagos for a clean-label campaign in Q3',
+          'ChowMate reportedly in talks with two Gen-Z TikTok creators (500k+ followers each)',
+        ],
+        opportunities: [
+          'Sallah seeding: brief @AdaezeFoods and @HijabChic for July cultural content — exclusivity window closes soon',
+          'Kano restocking ahead of Sallah creates first-mover advantage in Northern market recovery',
+          'NPS promoter micro-advocacy campaign: 200 promoters at 57% NPS promoter rate = est. 2M organic impressions',
+          'TikTok trial: 4-week Summer Vibes extension at ₦400k could close Gen-Z gap before ChowMate locks creator relationships',
+        ],
+        recommendations: [
+          { action: 'Brief Sallah creators by July 1 (2 weeks away)', rationale: 'Cultural moments drive 2.4x engagement vs standard ads for Jara\'s audience. ChowMate has not booked Sallah talent — first mover wins.', priority: 'High' as const },
+          { action: 'Restock Kano and Maiduguri to 120% ahead of Sallah window', rationale: 'October 2025 stockout threads amplified ChowMate\'s SOV gain by 8 points. Prevention is cheaper than recovery.', priority: 'High' as const },
+          { action: 'Launch TikTok account with 4-week Summer Vibes extension (₦400k trial)', rationale: 'ChowMate earns 22% of its SOV on TikTok. Jara has zero presence. Low cost to test before Q4 budget lock.', priority: 'Medium' as const },
+          { action: 'Activate 200 NPS promoters with Summer Vibes shareable kits', rationale: 'Promoter UGC converts at 3x paid CTR. The Summer Vibes high-sentiment window is the ideal moment to capture organic amplification.', priority: 'Medium' as const },
+        ],
+        data_gaps: [
+          'No TikTok listening — ChowMate and NutriNg activity on platform is a blind spot',
+          'Competitor market share not confirmed — ESOV calculation uses indicative estimates',
+          'No sentiment tracking for NutriNg Foods or ChowMate at individual post level',
+        ],
+        confidence: 'High' as const,
+      },
+    },
   ]
   for (const b of briefings) {
     await sb.from('weekly_briefings').insert({
       brand_id: brandId, week_start: dAgo(b.daysBack),
-      content: {
-        summary:           b.summary,
-        top_wins:          ['Sentiment above 90-day average', 'Influencer content outperforming paid 3:1'],
-        watch_items:       ['ChowMate OOH expansion in Lagos', 'Northern distribution gap widening'],
-        ai_recommendation: 'Maintain momentum on digital while leveraging OOH halo for brand health. Prioritise NPS follow-up with event leads.',
-        sentiment_change:  2.3,
-        bhi_change:        1.1,
-      },
+      content: b.content,
       sent_at: tsAgo(b.daysBack - 1, 9),
     })
   }
