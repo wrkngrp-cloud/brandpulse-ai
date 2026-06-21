@@ -19,6 +19,7 @@ const INTELLIGENCE = [
   { label: 'Overview',     href: '/dashboard',              icon: LayoutDashboard },
   { label: 'Sentiment',    href: '/dashboard/sentiment',    icon: BarChart2       },
   { label: 'Brand Equity', href: '/dashboard/brand-equity', icon: Award           },
+  { label: 'Funnel',       href: '/dashboard/funnel',       icon: Filter          },
   { label: 'Content',      href: '/dashboard/content',      icon: FileText        },
 ]
 
@@ -44,13 +45,12 @@ const CAMPAIGN_PAID = [
 ]
 
 // Creative Analysis — Voice Builder is the required first step
-const CREATIVE_PATHS = ['/dashboard/pre-post', '/dashboard/creative', '/dashboard/funnel', '/dashboard/settings/voice-builder']
+const CREATIVE_PATHS = ['/dashboard/pre-post', '/dashboard/creative', '/dashboard/settings/voice-builder']
 
 const CREATIVE_SUB = [
-  { label: 'Voice Builder', href: '/dashboard/settings/voice-builder', icon: Sparkles, badge: 'Setup' },
-  { label: 'Pre-Post Intel', href: '/dashboard/pre-post',              icon: Zap  },
-  { label: 'Creative Library', href: '/dashboard/creative',            icon: Palette },
-  { label: 'Funnel',          href: '/dashboard/funnel',               icon: Filter  },
+  { label: 'Voice Builder',    href: '/dashboard/settings/voice-builder', icon: Sparkles, badge: 'Setup' },
+  { label: 'Pre-Post Intel',   href: '/dashboard/pre-post',               icon: Zap     },
+  { label: 'Creative Library', href: '/dashboard/creative',               icon: Palette },
 ]
 
 // Surveys — panels live here now
