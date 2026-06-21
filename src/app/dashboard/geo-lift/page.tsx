@@ -2,6 +2,7 @@ import { createClient }        from '@/lib/supabase/server'
 import { redirect }            from 'next/navigation'
 import { TrendingUp, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react'
 import { GeoLiftStartForm }    from './geo-lift-start-form'
+import { getActiveBrand }      from '@/lib/active-brand'
 
 interface GeoLiftStudy {
   id:                 string
@@ -152,11 +153,7 @@ export default async function GeoLiftPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{ id: string; name: string }>(supabase, 'id, name')
 
   if (!brand) redirect('/dashboard')
 

@@ -1,6 +1,7 @@
 import { createClient }         from '@/lib/supabase/server'
 import { redirect }             from 'next/navigation'
 import { Globe, TrendingUp, FileSearch, BarChart2, ExternalLink, Clock, Rss } from 'lucide-react'
+import { getActiveBrand }       from '@/lib/active-brand'
 import { PrMentionsChart }      from './pr-mentions-chart'
 import { DateRangeFilter }      from '@/components/dashboard/date-range-filter'
 import { TriggerPrCrawlButton } from './trigger-pr-crawl-button'
@@ -60,11 +61,7 @@ export default async function PRTrackingPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{ id: string; name: string }>(supabase, 'id, name')
 
   if (!brand) redirect('/dashboard')
 

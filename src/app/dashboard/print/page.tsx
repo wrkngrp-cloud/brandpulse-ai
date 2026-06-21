@@ -8,6 +8,7 @@ import { buttonVariants }  from '@/components/ui/button'
 import { cn }              from '@/lib/utils'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { PrintAiAnalysis } from './print-ai-analysis'
+import { getActiveBrand }  from '@/lib/active-brand'
 
 export const dynamic = 'force-dynamic'
 
@@ -84,7 +85,7 @@ export default async function PrintPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase.from('brands').select('id, name').limit(1).single()
+  const brand = await getActiveBrand<{ id: string; name: string }>(supabase, 'id, name')
   if (!brand) redirect('/onboarding')
 
   const { data: placementsRaw } = await supabase
