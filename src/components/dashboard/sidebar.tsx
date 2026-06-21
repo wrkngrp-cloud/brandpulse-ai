@@ -16,6 +16,8 @@ import {
   DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { DashboardNav } from './dashboard-nav'
+import { BrandSwitcher } from './brand-switcher'
+import type { BrandOption } from './brand-switcher'
 import { cn } from '@/lib/utils'
 
 // ── Logo / pulse mark ─────────────────────────────────────────────────────
@@ -147,14 +149,16 @@ function SidebarUserBlock({
 // ── Sidebar ────────────────────────────────────────────────────────────────
 
 interface SidebarProps {
-  pinned:    boolean
-  onToggle:  () => void
-  userName:  string
-  userEmail: string
-  brandName: string
+  pinned:        boolean
+  onToggle:      () => void
+  userName:      string
+  userEmail:     string
+  brandName:     string
+  brands?:       BrandOption[]
+  activeBrandId?: string | null
 }
 
-export function Sidebar({ pinned, onToggle, userName, userEmail, brandName }: SidebarProps) {
+export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, brands = [], activeBrandId = null }: SidebarProps) {
   const [hovering, setHovering] = useState(false)
   const pathname = usePathname()
 
@@ -210,6 +214,16 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName }: Si
           }
         </button>
       </div>
+
+      {/* ── Brand switcher ─────────────────────────────────────── */}
+      {brands.length > 0 && (
+        <div className={cn(
+          'px-2.5 pt-2 pb-1 transition-opacity duration-150',
+          expanded ? 'opacity-100' : 'opacity-0 pointer-events-none h-0 overflow-hidden'
+        )}>
+          <BrandSwitcher brands={brands} activeBrandId={activeBrandId} />
+        </div>
+      )}
 
       {/* ── Navigation ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 px-2.5">

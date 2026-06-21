@@ -2,16 +2,20 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Building2, Link2, MapPin, Swords, Code2 } from 'lucide-react'
+import { User, Building2, Link2, MapPin, Swords, Code2, Sparkles, Share2, CreditCard, Layers } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
-  { label: 'Profile',            href: '/dashboard/settings/profile',       icon: User      },
-  { label: 'Brand',              href: '/dashboard/settings/brand',          icon: Building2 },
-  { label: 'Connected Accounts', href: '/dashboard/settings/connections',    icon: Link2     },
-  { label: 'OOH Domain',         href: '/dashboard/settings/ooh-domain',    icon: MapPin    },
-  { label: 'Competitors',        href: '/dashboard/settings/competitors',    icon: Swords    },
-  { label: 'Pixel & SDK',        href: '/dashboard/settings/pixel',          icon: Code2     },
+  { label: 'Profile',            href: '/dashboard/settings/profile',        icon: User      },
+  { label: 'Brands',             href: '/dashboard/settings/brands',          icon: Layers    },
+  { label: 'Brand',              href: '/dashboard/settings/brand',           icon: Building2 },
+  { label: 'Voice Builder',      href: '/dashboard/settings/voice-builder',   icon: Sparkles  },
+  { label: 'Connected Accounts', href: '/dashboard/settings/connections',     icon: Link2     },
+  { label: 'OOH Domain',         href: '/dashboard/settings/ooh-domain',     icon: MapPin    },
+  { label: 'Competitors',        href: '/dashboard/settings/competitors',     icon: Swords    },
+  { label: 'Pixel & SDK',        href: '/dashboard/settings/pixel',           icon: Code2     },
+  { label: 'Client Portal',      href: '/dashboard/settings/portal',          icon: Share2    },
+  { label: 'Billing & Plan',     href: '/dashboard/settings/billing',         icon: CreditCard },
 ]
 
 export function SettingsNav() {

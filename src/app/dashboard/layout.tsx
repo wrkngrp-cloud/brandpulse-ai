@@ -1,21 +1,27 @@
 import { redirect }         from 'next/navigation'
+import { cookies }           from 'next/headers'
 import { createClient }      from '@/lib/supabase/server'
 import { DashboardShell }    from '@/components/dashboard/dashboard-shell'
 import { AiCommand }         from './ai-command'
 import { PrePostWidget }     from './pre-post-widget'
+import type { BrandOption }  from '@/components/dashboard/brand-switcher'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
+  const { data: brands } = await supabase
     .from('brands')
-    .select('name')
-    .limit(1)
-    .single()
+    .select('id, name, category, logo_url')
+    .order('created_at', { ascending: true })
 
-  if (!brand?.name) redirect('/onboarding')
+  if (!brands?.length) redirect('/onboarding')
+
+  // Resolve active brand (cookie → first brand)
+  const cookieStore = await cookies()
+  const storedId = cookieStore.get('active_brand_id')?.value
+  const activeBrand = (storedId ? brands.find(b => b.id === storedId) : null) ?? brands[0]
 
   const userName  = (user.user_metadata?.full_name as string | undefined) ?? ''
   const userEmail = user.email ?? ''
@@ -25,7 +31,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <DashboardShell
         userName={userName}
         userEmail={userEmail}
-        brandName={brand.name}
+        brandName={activeBrand.name}
+        brands={brands as BrandOption[]}
+        activeBrandId={activeBrand.id}
       >
         {children}
       </DashboardShell>

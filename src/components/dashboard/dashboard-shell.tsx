@@ -13,17 +13,20 @@ import { UserDropdown }       from './user-dropdown'
 import { MobileNav }          from './mobile-nav'
 import { CommandPalette }     from './command-palette'
 import { cn }                 from '@/lib/utils'
+import type { BrandOption }   from './brand-switcher'
 
 const LS_KEY = 'bp-sidebar'
 
 interface DashboardShellProps {
-  children:   React.ReactNode
-  userName:   string
-  userEmail:  string
-  brandName:  string
+  children:      React.ReactNode
+  userName:      string
+  userEmail:     string
+  brandName:     string
+  brands?:       BrandOption[]
+  activeBrandId?: string | null
 }
 
-export function DashboardShell({ children, userName, userEmail, brandName }: DashboardShellProps) {
+export function DashboardShell({ children, userName, userEmail, brandName, brands = [], activeBrandId = null }: DashboardShellProps) {
   const pathname = usePathname()
 
   // Default pinned=true (expanded sidebar), hydrate from localStorage
@@ -61,6 +64,8 @@ export function DashboardShell({ children, userName, userEmail, brandName }: Das
         userName={userName}
         userEmail={userEmail}
         brandName={brandName}
+        brands={brands}
+        activeBrandId={activeBrandId}
       />
 
       {/* Content column */}
