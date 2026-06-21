@@ -3,11 +3,21 @@ import { createClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
 import { z } from 'zod'
 
+const segmentSchema = z.object({
+  name:      z.string(),
+  age_range: z.string().optional(),
+  income:    z.string().optional(),
+  location:  z.string().optional(),
+  interests: z.array(z.string()).optional(),
+})
+
 const bodySchema = z.object({
-  momentName:  z.string(),
-  brandName:   z.string(),
-  category:    z.string().optional(),
-  brandValues: z.array(z.string()).optional(),
+  momentName:     z.string(),
+  momentDate:     z.string().optional(),
+  brandName:      z.string(),
+  category:       z.string().optional(),
+  brandValues:    z.array(z.string()).optional(),
+  targetSegments: z.array(segmentSchema).optional(),
 })
 
 export async function POST(request: NextRequest) {
@@ -22,27 +32,33 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
   }
 
-  const { momentName, brandName, category, brandValues } = parsed.data
+  const { momentName, momentDate, brandName, category, brandValues, targetSegments } = parsed.data
 
-  const valuesLine =
-    brandValues && brandValues.length
-      ? `Brand values: ${brandValues.join(', ')}`
-      : ''
+  const valuesLine = brandValues?.length ? `Brand values: ${brandValues.join(', ')}` : ''
+  const segmentsLine = targetSegments?.length
+    ? `Target audience segments:\n${targetSegments.map(s =>
+        `  - ${s.name}${s.age_range ? `, age ${s.age_range}` : ''}${s.income ? `, ${s.income} income` : ''}${s.location ? `, ${s.location}` : ''}${s.interests?.length ? `, interests: ${s.interests.join(', ')}` : ''}`
+      ).join('\n')}`
+    : ''
 
   const userPrompt = `Brand: ${brandName}
 Category: ${category ?? 'not specified'}
 ${valuesLine}
-Cultural moment: ${momentName}
+${segmentsLine}
+Cultural moment: ${momentName}${momentDate ? ` (${momentDate})` : ''}
 
-Generate 4 practical brand activation ideas for this moment targeted at Nigerian and West African consumers.
+Generate 4 practical brand activation ideas for this moment. Ideas must be:
+- Grounded in the brand's specific audience segments above (not generic)
+- Rooted in genuine Nigerian and West African cultural context
+- Varied across channels and effort levels
 
 Return ONLY valid JSON in this exact shape — no markdown, no explanation:
 {
   "ideas": [
     {
       "title": "short idea title",
-      "description": "2-3 sentence description of the activation, including specific Nigerian cultural context",
-      "channel": "e.g. Instagram, WhatsApp, Events, OOH, Influencer",
+      "description": "2-3 sentences — include specific audience angle and Nigerian cultural context",
+      "channel": "e.g. Instagram, WhatsApp, Events, OOH, Influencer, Radio, TV",
       "effort": "Low" | "Medium" | "High"
     }
   ]

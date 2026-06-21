@@ -77,8 +77,8 @@ export default async function CulturalPage() {
     { data: sentimentRows },
   ] = await Promise.all([
     bid
-      ? supabase.from('brands').select('id, name, category, cultural_profile, brand_values').eq('id', bid).maybeSingle()
-      : supabase.from('brands').select('id, name, category, cultural_profile, brand_values').limit(1).maybeSingle(),
+      ? supabase.from('brands').select('id, name, category, cultural_profile, brand_values, target_segments, brand_voice').eq('id', bid).maybeSingle()
+      : supabase.from('brands').select('id, name, category, cultural_profile, brand_values, target_segments, brand_voice').limit(1).maybeSingle(),
     supabase
       .from('pre_post_analyses')
       .select('id, content_text, platform, funnel_goal, cultural_score, tone_score, engagement_score, risk_score, created_at')
@@ -119,6 +119,24 @@ export default async function CulturalPage() {
     ? ((brandRow as { brand_values: string[] }).brand_values as string[])
     : []
 
+  const targetSegments = Array.isArray(
+    (brandRow as { target_segments?: unknown } | null)?.target_segments,
+  )
+    ? ((brandRow as { target_segments: unknown[] }).target_segments as Record<string, unknown>[])
+    : []
+
+  const culturalProfile =
+    (typeof (brandRow as { cultural_profile?: unknown } | null)?.cultural_profile === 'object' &&
+      (brandRow as { cultural_profile?: unknown } | null)?.cultural_profile !== null)
+      ? ((brandRow as { cultural_profile: Record<string, unknown> }).cultural_profile as Record<string, number>)
+      : {}
+
+  const brandVoice =
+    (typeof (brandRow as { brand_voice?: unknown } | null)?.brand_voice === 'object' &&
+      (brandRow as { brand_voice?: unknown } | null)?.brand_voice !== null)
+      ? ((brandRow as { brand_voice: Record<string, unknown> }).brand_voice)
+      : {}
+
   return (
     <CulturalClient
       brandName={brandRow?.name ?? 'Your brand'}
@@ -132,6 +150,9 @@ export default async function CulturalPage() {
       analysisCount={validAnalyses.length}
       brandValues={brandValues}
       analyses={validAnalyses}
+      targetSegments={targetSegments as Array<{ name: string; age_range?: string; income?: string; location?: string; interests?: string[] }>}
+      culturalProfile={culturalProfile}
+      brandVoice={brandVoice}
     />
   )
 }
