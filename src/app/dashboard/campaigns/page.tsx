@@ -5,6 +5,7 @@ import { buttonVariants }    from '@/components/ui/button'
 import { cn }                from '@/lib/utils'
 import { Megaphone, Plus }   from 'lucide-react'
 import { CampaignsList }     from '@/components/campaigns/campaigns-list'
+import { getActiveBrand }    from '@/lib/active-brand'
 
 export default async function CampaignsPage({
   searchParams,
@@ -17,7 +18,7 @@ export default async function CampaignsPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
+  const brand = await getActiveBrand<{ id: string }>(supabase, 'id')
   if (!brand) redirect('/onboarding')
 
   const { data: campaigns } = await supabase

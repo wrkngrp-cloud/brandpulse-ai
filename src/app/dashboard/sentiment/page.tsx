@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { TrendingUp, TrendingDown, Minus, MessageCircle, AlertTriangle, Info, Search } from 'lucide-react'
 import Link from 'next/link'
 import { DateRangeFilter }             from '@/components/dashboard/date-range-filter'
@@ -103,27 +104,33 @@ function weeklyAggregate(daily: DayRow[]): { weekLabel: string; score: number; p
 
 async function SentimentData({ days = 84 }: { days: number }) {
   const supabase = await createClient()
+  const brandId = await getActiveBrandId(supabase)
+  const bid = brandId ?? ''
 
   const [{ data: daily }, { data: mentions }, { data: lastRun }, { data: heatmapRaw }] = await Promise.all([
     supabase
       .from('sentiment_daily')
       .select('day, social_score, positive_pct, neutral_pct, negative_pct, emotion_distribution, platform_breakdown')
+      .eq('brand_id', bid)
       .order('day', { ascending: false })
       .limit(days),
     supabase
       .from('mentions')
       .select('id, content, author_handle, platform, sentiment_label, emotion_tags, reach, created_at')
+      .eq('brand_id', bid)
       .order('created_at', { ascending: false })
       .limit(50),
     supabase
       .from('crawl_runs')
       .select('id, status, mentions_found')
+      .eq('brand_id', bid)
       .order('started_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
     supabase
       .from('sentiment_daily')
       .select('day, social_score, positive_pct, negative_pct')
+      .eq('brand_id', bid)
       .order('day', { ascending: true })
       .limit(400),   // ~13 months for heatmap
   ])

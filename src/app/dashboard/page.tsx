@@ -3,6 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Suspense } from 'react'
 import { computeFullBHI, type BHIResult } from '@/lib/bhi'
 import { OverviewClient } from '@/components/dashboard/overview-client'
+import { getActiveBrandId } from '@/lib/active-brand'
 
 const NGN_CPM_BENCHMARK = 500
 const NGN_CPE_BENCHMARK = 50
@@ -15,6 +16,8 @@ async function DashboardContent({ days }: { days: number }) {
   cutoff.setDate(cutoff.getDate() - days)
   const cutoffStr = cutoff.toISOString().split('T')[0]
   const cutoffISO = cutoff.toISOString()
+
+  const brandId = await getActiveBrandId(supabase)
 
   const [
     { data: brand },
@@ -31,19 +34,21 @@ async function DashboardContent({ days }: { days: number }) {
     { data: awarenessCheckSurveys },
     { data: perceptionSurveys },
   ] = await Promise.all([
-    supabase.from('brands').select('id, name, category').limit(1).single(),
-    supabase.from('sentiment_daily').select('social_score, day, positive_pct, negative_pct').order('day', { ascending: false }).limit(1).single(),
-    supabase.from('sov_snapshots').select('social_sov, snapshot_date').order('snapshot_date', { ascending: false }).limit(1).single(),
+    brandId
+      ? supabase.from('brands').select('id, name, category').eq('id', brandId).single()
+      : supabase.from('brands').select('id, name, category').limit(1).single(),
+    supabase.from('sentiment_daily').select('social_score, day, positive_pct, negative_pct').eq('brand_id', brandId ?? '').order('day', { ascending: false }).limit(1).maybeSingle(),
+    supabase.from('sov_snapshots').select('social_sov, snapshot_date').eq('brand_id', brandId ?? '').order('snapshot_date', { ascending: false }).limit(1).maybeSingle(),
     supabase.from('survey_responses').select('answers, survey_id, quality_flag').eq('quality_flag', 'ok'),
-    supabase.from('brand_health_snapshots').select('bhi, snapshot_date').order('snapshot_date', { ascending: false }).limit(days),
-    supabase.from('mentions').select('id, content, author_handle, platform, sentiment_label, created_at').order('created_at', { ascending: false }).limit(4),
-    supabase.from('mentions').select('id', { count: 'exact', head: true }).gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
-    supabase.from('campaigns').select('id, name, status, objectives, start_date, total_budget, currency').in('status', ['active', 'paused']).order('created_at', { ascending: false }).limit(3),
-    supabase.from('events').select('id, name, status, city, date_start, event_type').in('status', ['planned', 'live']).order('date_start', { ascending: true }).limit(3),
-    supabase.from('sentiment_daily').select('social_score, day').gte('day', cutoffStr).order('day', { ascending: true }),
-    supabase.from('social_posts').select('impressions, reach, likes, comments, shares').gte('posted_at', cutoffISO),
-    supabase.from('surveys').select('id').in('type', ['awareness_check', 'b2_intercept']),
-    supabase.from('surveys').select('id').eq('type', 'perception_audit'),
+    supabase.from('brand_health_snapshots').select('bhi, snapshot_date').eq('brand_id', brandId ?? '').order('snapshot_date', { ascending: false }).limit(days),
+    supabase.from('mentions').select('id, content, author_handle, platform, sentiment_label, created_at').eq('brand_id', brandId ?? '').order('created_at', { ascending: false }).limit(4),
+    supabase.from('mentions').select('id', { count: 'exact', head: true }).eq('brand_id', brandId ?? '').gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+    supabase.from('campaigns').select('id, name, status, objectives, start_date, total_budget, currency').eq('brand_id', brandId ?? '').in('status', ['active', 'paused']).order('created_at', { ascending: false }).limit(3),
+    supabase.from('events').select('id, name, status, city, date_start, event_type').eq('brand_id', brandId ?? '').in('status', ['planned', 'live']).order('date_start', { ascending: true }).limit(3),
+    supabase.from('sentiment_daily').select('social_score, day').eq('brand_id', brandId ?? '').gte('day', cutoffStr).order('day', { ascending: true }),
+    supabase.from('social_posts').select('impressions, reach, likes, comments, shares').eq('brand_id', brandId ?? '').gte('posted_at', cutoffISO),
+    supabase.from('surveys').select('id').eq('brand_id', brandId ?? '').in('type', ['awareness_check', 'b2_intercept']),
+    supabase.from('surveys').select('id').eq('brand_id', brandId ?? '').eq('type', 'perception_audit'),
   ])
 
   // ── Sentiment score ──────────────────────────────────────────────────────

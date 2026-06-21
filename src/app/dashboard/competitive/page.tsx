@@ -1,17 +1,14 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { CompetitiveClient } from './competitive-client'
+import { getActiveBrand } from '@/lib/active-brand'
 
 export default async function CompetitivePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name, category, market_share_pct')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{ id: string; name: string; category: string | null; market_share_pct: number | null }>(supabase, 'id, name, category, market_share_pct')
 
   if (!brand) redirect('/dashboard')
 

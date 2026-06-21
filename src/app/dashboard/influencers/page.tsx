@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { InfluencersClient } from './influencers-client'
 import { InfluencerRoiTracker } from '@/components/influencers/roi-tracker'
+import { getActiveBrand } from '@/lib/active-brand'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,11 +11,7 @@ export default async function InfluencersPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{ id: string; name: string }>(supabase, 'id, name')
 
   if (!brand) redirect('/onboarding')
 

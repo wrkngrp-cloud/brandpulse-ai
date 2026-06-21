@@ -4,6 +4,7 @@ import { computeFullBHI, type FullBHIComponents } from '@/lib/bhi'
 import { BrandEquityClient } from './brand-equity-client'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { SeedDemoPanel } from './seed-demo-panel'
+import { getActiveBrandId } from '@/lib/active-brand'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,6 +31,9 @@ export default async function BrandEquityPage({
   const cutoffDate = cutoff.toISOString().split('T')[0]
   const cutoffISO  = cutoff.toISOString()
 
+  const brandId = await getActiveBrandId(supabase)
+  const bid = brandId ?? ''
+
   const [
     { data: sentDays },
     { data: sovSnap },
@@ -43,11 +47,13 @@ export default async function BrandEquityPage({
     supabase
       .from('sentiment_daily')
       .select('social_score, day')
+      .eq('brand_id', bid)
       .gte('day', cutoffDate)
       .order('day', { ascending: false }),
     supabase
       .from('sov_snapshots')
       .select('social_sov, snapshot_date')
+      .eq('brand_id', bid)
       .order('snapshot_date', { ascending: false })
       .limit(1)
       .maybeSingle(),
@@ -58,24 +64,26 @@ export default async function BrandEquityPage({
     supabase
       .from('surveys')
       .select('id')
+      .eq('brand_id', bid)
       .eq('type', 'perception_audit'),
     supabase
       .from('social_posts')
       .select('impressions, reach, likes, comments, shares')
+      .eq('brand_id', bid)
       .gte('posted_at', cutoffISO),
-    supabase
-      .from('brands')
-      .select('name, industry, market_share_pct')
-      .limit(1)
-      .maybeSingle(),
+    bid
+      ? supabase.from('brands').select('name, industry, market_share_pct').eq('id', bid).maybeSingle()
+      : supabase.from('brands').select('name, industry, market_share_pct').limit(1).maybeSingle(),
     supabase
       .from('brand_health_snapshots')
       .select('bhi, snapshot_date')
+      .eq('brand_id', bid)
       .order('snapshot_date', { ascending: false })
       .limit(days),
     supabase
       .from('pre_post_analyses')
       .select('cultural_score')
+      .eq('brand_id', bid)
       .not('cultural_score', 'is', null)
       .order('created_at', { ascending: false })
       .limit(30),

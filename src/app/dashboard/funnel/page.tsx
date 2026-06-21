@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { FunnelClient } from './funnel-client'
+import { getActiveBrandId } from '@/lib/active-brand'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +16,9 @@ export default async function FunnelPage() {
   const fourteenDaysAgo = new Date(now)
   fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14)
 
+  const brandId = await getActiveBrandId(supabase)
+  const bid = brandId ?? ''
+
   const [
     { data: sovSnap },
     { data: recentPosts },
@@ -27,16 +31,19 @@ export default async function FunnelPage() {
     supabase
       .from('sov_snapshots')
       .select('social_sov, snapshot_date')
+      .eq('brand_id', bid)
       .order('snapshot_date', { ascending: false })
       .limit(1)
       .maybeSingle(),
     supabase
       .from('social_posts')
       .select('engagement_rate, likes, comments, shares')
+      .eq('brand_id', bid)
       .gte('posted_at', thirtyDaysAgo.toISOString()),
     supabase
       .from('sentiment_daily')
       .select('social_score, day')
+      .eq('brand_id', bid)
       .gte('day', fourteenDaysAgo.toISOString().split('T')[0]),
     supabase
       .from('event_interactions')
@@ -44,16 +51,15 @@ export default async function FunnelPage() {
     supabase
       .from('ooh_sites')
       .select('visits')
+      .eq('brand_id', bid)
       .eq('status', 'active'),
     supabase
       .from('survey_responses')
       .select('answers')
       .eq('quality_flag', 'ok'),
-    supabase
-      .from('brands')
-      .select('name, industry')
-      .limit(1)
-      .maybeSingle(),
+    bid
+      ? supabase.from('brands').select('name, industry').eq('id', bid).maybeSingle()
+      : supabase.from('brands').select('name, industry').limit(1).maybeSingle(),
   ])
 
   // ── 1. Awareness: SOV % (direct, already 0-100)

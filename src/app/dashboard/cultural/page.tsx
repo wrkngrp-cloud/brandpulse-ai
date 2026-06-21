@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { CulturalClient } from './cultural-client'
+import { getActiveBrandId } from '@/lib/active-brand'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,24 +68,27 @@ export default async function CulturalPage() {
   const fourteenDaysAgo = new Date(today)
   fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14)
 
+  const brandId = await getActiveBrandId(supabase)
+  const bid = brandId ?? ''
+
   const [
     { data: brandRow },
     { data: analyses },
     { data: sentimentRows },
   ] = await Promise.all([
-    supabase
-      .from('brands')
-      .select('id, name, category, cultural_profile, brand_values')
-      .limit(1)
-      .single(),
+    bid
+      ? supabase.from('brands').select('id, name, category, cultural_profile, brand_values').eq('id', bid).maybeSingle()
+      : supabase.from('brands').select('id, name, category, cultural_profile, brand_values').limit(1).maybeSingle(),
     supabase
       .from('pre_post_analyses')
       .select('id, content_text, platform, funnel_goal, cultural_score, tone_score, engagement_score, risk_score, created_at')
+      .eq('brand_id', bid)
       .gte('created_at', thirtyDaysAgo.toISOString())
       .order('created_at', { ascending: false }),
     supabase
       .from('sentiment_daily')
       .select('day, emotion_distribution, social_score')
+      .eq('brand_id', bid)
       .gte('day', fourteenDaysAgo.toISOString().slice(0, 10))
       .order('day', { ascending: false }),
   ])
