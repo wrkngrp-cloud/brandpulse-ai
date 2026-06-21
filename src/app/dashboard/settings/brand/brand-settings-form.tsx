@@ -6,10 +6,10 @@ import { updateBrand, type BrandSettingsData } from '../actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
-import { Upload, X, Loader2, ImageIcon } from 'lucide-react'
+import { Upload, X, Loader2, ImageIcon, Sparkles, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 
 type CulturalKey = 'community_corporate' | 'traditional_modern' | 'religious_secular' | 'mass_premium' | 'local_global'
 
@@ -38,9 +38,6 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
 
   function patch<K extends keyof BrandSettingsData>(key: K, value: BrandSettingsData[K]) {
     setData(d => ({ ...d, [key]: value }))
-  }
-  function patchVoice<K extends keyof BrandSettingsData['brandVoice']>(key: K, value: BrandSettingsData['brandVoice'][K]) {
-    setData(d => ({ ...d, brandVoice: { ...d.brandVoice, [key]: value } }))
   }
   function patchCulture(key: CulturalKey, value: number) {
     setData(d => ({ ...d, culturalProfile: { ...d.culturalProfile, [key]: value } }))
@@ -249,20 +246,58 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
       </SectionCard>
 
       <SectionCard title="Brand Voice">
-        <TagInput label="Voice adjectives" placeholder="e.g. Bold, Warm" values={data.brandVoice.adjectives} onChange={v => patchVoice('adjectives', v)} />
-        <div className="space-y-2">
-          <Label>Tone description</Label>
-          <Textarea
-            value={data.brandVoice.tone}
-            onChange={e => patchVoice('tone', e.target.value)}
-            placeholder="Describe your brand's tone in a sentence..."
-            rows={2}
-            className="resize-none text-sm"
-          />
-        </div>
-        <TagInput label="Dos" placeholder="e.g. use simple language" values={data.brandVoice.dos} onChange={v => patchVoice('dos', v)} />
-        <TagInput label="Don'ts" placeholder="e.g. avoid jargon" values={data.brandVoice.donts} onChange={v => patchVoice('donts', v)} />
-        <TagInput label="Signature phrases" placeholder="e.g. Built for you" values={data.brandVoice.signaturePhrases} onChange={v => patchVoice('signaturePhrases', v)} />
+        {data.brandVoice.adjectives.length > 0 || data.brandVoice.tone ? (
+          <div className="space-y-4">
+            {data.brandVoice.tone && (
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Tone</p>
+                <p className="text-sm">{data.brandVoice.tone}</p>
+              </div>
+            )}
+            {data.brandVoice.adjectives.length > 0 && (
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Voice adjectives</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {data.brandVoice.adjectives.map(a => (
+                    <span key={a} className="text-xs px-2 py-0.5 rounded-full bg-muted border border-border font-medium">{a}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {data.brandVoice.signaturePhrases.length > 0 && (
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Signature phrases</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {data.brandVoice.signaturePhrases.map(p => (
+                    <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium italic">{p}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <Link
+              href="/dashboard/voice-builder"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Edit in Voice Builder
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        ) : (
+          <div className="flex flex-col items-start gap-3 py-2">
+            <p className="text-sm text-muted-foreground">
+              No brand voice set yet. Use the AI-powered Voice Builder to generate tone guidelines, dos and don&apos;ts, and your Kapferer Prism profile.
+            </p>
+            <Link
+              href="/dashboard/voice-builder"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Open Voice Builder
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        )}
       </SectionCard>
 
       <SectionCard title="Cultural Positioning">
