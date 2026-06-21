@@ -58,11 +58,20 @@ interface Recommendation {
   priority: 'High' | 'Medium' | 'Low'
 }
 
+interface PorterForces {
+  competitive_rivalry: string
+  threat_of_new_entrants: string
+  bargaining_power_buyers: string
+  threat_of_substitutes: string
+  overall_intensity: 'High' | 'Medium' | 'Low'
+}
+
 interface BriefingResult {
   title: string
   executive_summary: string
   sov_analysis: string
   sentiment_vs_market: string
+  porter_forces?: PorterForces
   brand_strengths: string[]
   brand_vulnerabilities: string[]
   competitor_threats: string[]
@@ -312,13 +321,40 @@ function BriefingTab({
             <p className="text-sm leading-relaxed">{result.executive_summary}</p>
           </div>
 
-          <Section title="Share of voice" icon={Trophy}>
+          <Section title="Share of voice & ESOV" icon={Trophy}>
             <p className="text-sm leading-relaxed">{result.sov_analysis}</p>
           </Section>
 
           <Section title="Sentiment vs market" icon={TrendingUp}>
             <p className="text-sm leading-relaxed">{result.sentiment_vs_market}</p>
           </Section>
+
+          {result.porter_forces && (
+            <Section title="Porter's Five Forces" icon={AlertCircle} defaultOpen>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold border', {
+                    'bg-red-50 text-red-700 border-red-200':    result.porter_forces.overall_intensity === 'High',
+                    'bg-amber-50 text-amber-700 border-amber-200': result.porter_forces.overall_intensity === 'Medium',
+                    'bg-green-50 text-green-700 border-green-200':  result.porter_forces.overall_intensity === 'Low',
+                  })}>
+                    Competitive intensity: {result.porter_forces.overall_intensity}
+                  </span>
+                </div>
+                {([
+                  { key: 'competitive_rivalry',      label: 'Competitive Rivalry' },
+                  { key: 'threat_of_new_entrants',   label: 'Threat of New Entrants' },
+                  { key: 'bargaining_power_buyers',  label: 'Buyer Bargaining Power' },
+                  { key: 'threat_of_substitutes',    label: 'Threat of Substitutes' },
+                ] as const).map(({ key, label }) => (
+                  <div key={key} className="rounded-lg border bg-muted/20 px-4 py-3">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">{label}</p>
+                    <p className="text-sm leading-relaxed">{result.porter_forces![key]}</p>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Section title="Brand strengths" icon={TrendingUp} defaultOpen>

@@ -378,6 +378,79 @@ export default function MethodologyPage() {
         )
       })}
 
+      {/* Marketing Frameworks */}
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Marketing Frameworks Behind BrandPulse</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Every metric in BrandPulse is grounded in established academic and practitioner frameworks. Here is how we apply them — in plain terms.
+          </p>
+        </div>
+
+        {[
+          {
+            name: "Aaker's Brand Equity Model",
+            where: 'Brand Equity Tracker, BHI, Voice Builder',
+            body: "David Aaker defines brand equity as the premium a brand adds to a product beyond its functional value. He identifies five sources: Brand Loyalty, Brand Awareness, Perceived Quality, Brand Associations, and Other Proprietary Assets. BrandPulse maps these directly: Loyalty → NPS and repeat survey responses; Awareness → Share of Voice; Perceived Quality → Brand Perception Audit ratings; Associations → Cultural Resonance and Voice Builder alignment; Proprietary Assets → EMV from earned media. When your BHI is high, you are building Aaker equity — not just vanity metrics.",
+          },
+          {
+            name: "Kapferer Brand Identity Prism",
+            where: 'Brand Voice Builder',
+            body: "Jean-Noël Kapferer's prism has six facets: Physique (visual identity), Personality (tone of voice), Culture (values and origin), Relationship (how the brand interacts with consumers), Reflection (the customer archetype the brand projects), and Self-image (how customers see themselves when they use the brand). BrandPulse's Brand Voice Builder translates this into the five fields you fill in: tone adjectives map to Personality, dos and don'ts map to Culture and Relationship, and signature phrases reflect your Physique and Self-image. Every piece of content reviewed by BrandPulse AI is scored against this prism.",
+          },
+          {
+            name: 'ESOV — Binet & Field Model',
+            where: 'Business Case, Share of Voice',
+            body: "Les Binet and Peter Field, in 'The Long and Short of It' (2013, IPA Databank, 1,400 campaigns), established that Excess Share of Voice — your SOV minus your market share — is the single strongest predictor of long-run market share growth. A positive ESOV of +5 to +10 points, sustained over 12–18 months, corresponds to roughly +1 point of market share gain per year in FMCG. BrandPulse calculates your ESOV in real time and flags it prominently in the Business Case and SOV dashboards. The benchmark holds in Nigerian FMCG and QSR categories — the mechanism (mental salience via repeated exposure) is universal.",
+          },
+          {
+            name: "7Ps of Marketing Mix",
+            where: 'Campaigns, Business Case',
+            body: "The original 4Ps (Product, Price, Place, Promotion) were extended to 7Ps by Booms and Bitner for service businesses by adding People, Process, and Physical Evidence. BrandPulse touches all seven through its campaign architecture: Promotion maps to social and paid campaigns; Place maps to OOH, radio, and digital channel tracking; People maps to Influencer and Ambassador tracking; Process maps to Survey and Funnel diagnostics. When the Business Case AI identifies gaps, it frames them in 7Ps language so your board presentation has a recognised strategic structure.",
+          },
+          {
+            name: "Porter's Five Forces",
+            where: 'Competitive Intelligence',
+            body: "Michael Porter's Five Forces — Competitive Rivalry, Threat of New Entrants, Supplier Power, Buyer Power, and Threat of Substitutes — is the standard framework for understanding industry attractiveness and competitive position. BrandPulse uses it as the lens for Competitive Intelligence: Rival SOV and sighting frequency signal Competitive Rivalry intensity; new competitor appearances in your category signal New Entrant threats. When the Competitive AI briefing warns you about an escalating competitor, it is Porter's Rivalry lens applied to your real-time SOV and sighting data.",
+          },
+          {
+            name: 'BCG Matrix — Campaign Portfolio',
+            where: 'Business Case — Channel Investment',
+            body: "The Boston Consulting Group Matrix classifies business units (here: channels) by two axes — relative market share and growth rate. Applied to marketing channels: Stars (high share of your spend, high engagement returns) are digital and social — invest here. Cash Cows (proven ROI, lower growth ceiling) are TV and radio for brand awareness — maintain. Question Marks (unclear returns, potential upside) are influencer and OOH — test and scale selectively. Dogs (low share, low return) are untargeted print — cut unless brand-specific evidence proves otherwise. The Business Case page uses this classification to surface your highest-leverage channel.",
+          },
+          {
+            name: 'Ansoff Growth Matrix',
+            where: 'Business Case, AI Strategic Recommendations',
+            body: "Igor Ansoff's matrix maps growth strategy on two axes: Markets (existing vs new) and Products (existing vs new). Market Penetration (existing product, existing market) — grow BHI and SOV in your current category; this is where most of BrandPulse's diagnostics point first. Market Development (existing product, new market) — expand to a new city or demographic; Cultural Intelligence and Survey segmentation support this. Product Development (new product, existing market) — launch a new SKU; Pre-Post Intelligence can measure how well it lands. Diversification (new product, new market) — highest risk, highest reward. When BrandPulse AI identifies opportunities, it references which quadrant the opportunity sits in.",
+          },
+          {
+            name: 'SWOT Analysis',
+            where: 'AI Insights, Business Case',
+            body: "SWOT (Strengths, Weaknesses, Opportunities, Threats) is the most widely-used strategic planning tool. BrandPulse generates SWOT inputs automatically: Strengths — high BHI components, positive sentiment drivers, high NPS; Weaknesses — low-scoring BHI components, negative sentiment themes, low survey perception scores; Opportunities — positive ESOV position, underserved audience segments (survey data), cultural moments your competitors are missing; Threats — negative ESOV, rising competitor SOV, competitor sightings in your core category. The Business Case AI synthesises these into the Risks and Asks sections of the board report.",
+          },
+          {
+            name: 'Ehrenberg-Bass Mental Availability',
+            where: 'Share of Voice, Sentiment, Creative Analysis',
+            body: "Byron Sharp's 'How Brands Grow' (2010) established that brand growth comes primarily from reaching all buyers in the category with distinctive brand assets — not from loyalty programs or narrow targeting. Mental Availability (being thought of in a buying situation) is driven by the number of category entry points you own. BrandPulse tracks this through SOV (how much of the category conversation you own), Sentiment (are those mentions positive enough to build memory structures), Creative Distinctiveness (via Creative Analysis scoring), and Cultural Resonance (are your distinctive assets landing in the right cultural context). A rising BHI at consistent SOV = growing mental availability.",
+          },
+          {
+            name: 'Perceptual Mapping',
+            where: 'Competitive Intelligence, Brand Perception Audit',
+            body: "Perceptual maps plot brands in a two-dimensional space defined by attributes that consumers use to differentiate them — e.g., Premium vs Affordable on one axis, Traditional vs Modern on the other. BrandPulse's Brand Perception Audit survey captures eight dimensions that can be plotted as a radar chart against competitor perceptions. The Competitive Intelligence sightings and SOV data anchor your position in the category conversation relative to rivals. Over time, you can see whether your brand is moving toward or away from the position you want to own.",
+          },
+        ].map(fw => (
+          <div key={fw.name} className="rounded-2xl border bg-card overflow-hidden">
+            <div className="px-5 py-4 border-b bg-muted/20">
+              <p className="text-[13.5px] font-semibold">{fw.name}</p>
+              <p className="text-[11px] text-primary font-medium mt-0.5">Used in: {fw.where}</p>
+            </div>
+            <div className="px-5 py-4">
+              <p className="text-sm leading-relaxed text-foreground/90">{fw.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Footer note */}
       <div className="border rounded-xl p-5 space-y-2 bg-muted/20">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">A note on AI usage</p>

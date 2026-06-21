@@ -3,19 +3,18 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 
 const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
 
-// All seed data is scoped to the demo workspace only.
-// This endpoint is idempotent — safe to call multiple times.
+// Idempotent — safe to call multiple times. Upserts data so re-running
+// extends all series up to today without duplicating rows.
 export async function POST() {
-  const supabase   = await createClient()
-  const svcClient  = await createServiceClient()
+  const supabase  = await createClient()
+  const svc       = await createServiceClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.email !== DEMO_EMAIL) {
     return NextResponse.json({ error: 'Demo-only endpoint' }, { status: 403 })
   }
 
-  // Resolve demo workspace
-  const { data: member } = await svcClient
+  const { data: member } = await svc
     .from('workspace_members')
     .select('workspace_id')
     .eq('user_id', user.id)
@@ -24,8 +23,7 @@ export async function POST() {
   if (!member) return NextResponse.json({ error: 'No workspace found' }, { status: 400 })
   const wsId = member.workspace_id
 
-  // Resolve primary brand (Jara Foods)
-  const { data: primaryBrand } = await svcClient
+  const { data: primaryBrand } = await svc
     .from('brands')
     .select('id, name')
     .eq('workspace_id', wsId)
@@ -34,9 +32,162 @@ export async function POST() {
 
   if (!primaryBrand) return NextResponse.json({ error: 'No primary brand found' }, { status: 400 })
 
-  // ── Second brand: Jara Express ──────────────────────────────────────────
+  const today  = new Date()
+  const fmt    = (d: Date) => d.toISOString().slice(0, 10)
+  const ago    = (n: number) => { const d = new Date(today); d.setDate(d.getDate() - n); return d }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  function makeBhiRows(brandId: string, dayCount: number, baseScore: number, growthRate: number) {
+    return Array.from({ length: dayCount }, (_, i) => {
+      const base  = baseScore + Math.sin(i / 10) * 5 + (i / dayCount) * growthRate
+      const noise = (Math.random() - 0.5) * 3
+      const bhi   = Math.min(100, Math.max(20, base + noise))
+      return {
+        brand_id:      brandId,
+        snapshot_date: fmt(ago(dayCount - 1 - i)),
+        bhi,
+        components: {
+          sentiment: Math.min(100, Math.max(0, bhi * 0.85 + (Math.random() - 0.5) * 6)),
+          sov:       Math.min(100, Math.max(0, bhi * 0.75 + (Math.random() - 0.5) * 8)),
+          survey:    Math.min(100, Math.max(0, bhi * 0.9  + (Math.random() - 0.5) * 5)),
+        },
+      }
+    })
+  }
+
+  function makeSentimentRows(brandId: string, dayCount: number, baseScore: number) {
+    return Array.from({ length: dayCount }, (_, i) => {
+      const base = baseScore + Math.cos(i / 12) * 7 + (i / dayCount) * 8
+      const score = Math.min(100, Math.max(20, base + (Math.random() - 0.5) * 5))
+      const pos   = Math.min(95, score + 8)
+      const neg   = Math.max(5, 100 - pos - 22)
+      const neu   = Math.max(0, 100 - pos - neg)
+      return {
+        brand_id:     brandId,
+        day:          fmt(ago(dayCount - 1 - i)),
+        social_score: score,
+        positive_pct: pos,
+        negative_pct: neg,
+        neutral_pct:  neu,
+        platform_breakdown: {
+          twitter:   { volume: 60  + Math.floor(Math.random() * 50), score: score * 0.94, positive_pct: pos,     negative_pct: neg,     neutral_pct: neu     },
+          instagram: { volume: 110 + Math.floor(Math.random() * 70), score: score * 1.06, positive_pct: pos + 4, negative_pct: neg - 3, neutral_pct: neu - 1 },
+        },
+      }
+    })
+  }
+
+  function makeSovRows(brandId: string, dayCount: number, baseSov: number, compData: Record<string, number>) {
+    return Array.from({ length: dayCount }, (_, i) => ({
+      brand_id:        brandId,
+      snapshot_date:   fmt(ago(dayCount - 1 - i)),
+      social_sov:      Math.min(50, Math.max(2, baseSov + Math.sin(i / 7) * 2 + (Math.random() - 0.5))),
+      competitor_data: Object.fromEntries(
+        Object.entries(compData).map(([k, v]) => [k, Math.max(2, v + Math.sin(i / 9) * 2 + (Math.random() - 0.5) * 1.5)])
+      ),
+    }))
+  }
+
+  const results: string[] = []
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // PRIMARY BRAND: Jara Foods — 180 days BHI + 180 days sentiment + 90 days SOV
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const jaraFoodsBhi = makeBhiRows(primaryBrand.id, 180, 58, 12)
+  const { error: jfBhiErr } = await svc
+    .from('brand_health_snapshots')
+    .upsert(jaraFoodsBhi, { onConflict: 'brand_id,snapshot_date', ignoreDuplicates: false })
+  if (!jfBhiErr) results.push('jara_foods_bhi_180d')
+
+  const jaraFoodsSentiment = makeSentimentRows(primaryBrand.id, 180, 60)
+  const { error: jfSentErr } = await svc
+    .from('sentiment_daily')
+    .upsert(jaraFoodsSentiment, { onConflict: 'brand_id,day', ignoreDuplicates: false })
+  if (!jfSentErr) results.push('jara_foods_sentiment_180d')
+
+  const jaraFoodsSov = makeSovRows(primaryBrand.id, 90, 18.5, {
+    'Shoprite Nigeria':  31,
+    'Chicken Republic':  23,
+    'Kilimanjaro':       14,
+    'Dominos Nigeria':   9,
+    'HealthyFood.ng':    3.5,
+  })
+  const { error: jfSovErr } = await svc
+    .from('sov_snapshots')
+    .upsert(jaraFoodsSov, { onConflict: 'brand_id,snapshot_date', ignoreDuplicates: false })
+  if (!jfSovErr) results.push('jara_foods_sov_90d')
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // COMPETITORS for primary brand
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const { data: existingComps } = await svc
+    .from('competitors')
+    .select('id, name')
+    .eq('brand_id', primaryBrand.id)
+
+  if (!existingComps || existingComps.length === 0) {
+    await svc.from('competitors').insert([
+      { brand_id: primaryBrand.id, name: 'Shoprite Nigeria',  website_url: 'https://shoprite.com.ng',     social_handles: { twitter: '@ShopriteSA',       instagram: '@shopritenigeria'  } },
+      { brand_id: primaryBrand.id, name: 'Chicken Republic',  website_url: 'https://chickenrepublic.com', social_handles: { twitter: '@ChickenRepublic',  instagram: '@chickenrepublic'  } },
+      { brand_id: primaryBrand.id, name: 'Kilimanjaro',       website_url: null,                          social_handles: { twitter: '@KilimanjaroNG' } },
+      { brand_id: primaryBrand.id, name: 'Dominos Nigeria',   website_url: 'https://dominos.com.ng',      social_handles: { instagram: '@dominospizzang' } },
+      { brand_id: primaryBrand.id, name: 'HealthyFood.ng',    website_url: null,                          social_handles: {} },
+    ])
+    results.push('jara_foods_competitors')
+  }
+
+  // Fetch competitors for sightings
+  const { data: comps } = await svc
+    .from('competitors')
+    .select('id, name')
+    .eq('brand_id', primaryBrand.id)
+
+  // Competitor sightings
+  const { data: existingSightings } = await svc
+    .from('competitor_sightings')
+    .select('id').eq('brand_id', primaryBrand.id).limit(1).maybeSingle()
+
+  if (!existingSightings && comps && comps.length > 0) {
+    const noteTemplates = [
+      '{comp} launched a loyalty programme via WhatsApp — 200+ sign-ups seen on social in 48 hrs',
+      'Saw {comp} billboard at Maryland overhead bridge and Ojodu Berger. Heavy Q2 OOH push.',
+      '{comp} running 50% off promo on Instagram — high engagement, 3k+ comments in first hour',
+      '@foodlovers_ng (180k followers) posted a paid review of {comp}. Likely NGN 400k+ placement.',
+      '{comp} paused TV spots for 3 weeks — probable budget shift to digital for the quarter',
+      '{comp} receiving delivery-delay complaints on X — potential window for our operational messaging',
+      '{comp} activated a mega activation at Lekki Festival — crowd sampling + influencer presence',
+      '{comp} launched a new loyalty app with cashback scheme — targeting our repeat-purchase segment',
+    ]
+    const scaleOpts: ('major' | 'moderate' | 'small')[] = ['major', 'moderate', 'small']
+    const typeOpts = ['campaign', 'pricing', 'ooh', 'influencer', 'social', 'activation', 'pr']
+
+    const sightings = []
+    for (const comp of comps.slice(0, 4)) {
+      for (let i = 0; i < 3; i++) {
+        const tpl = noteTemplates[Math.floor(Math.random() * noteTemplates.length)]
+        sightings.push({
+          brand_id:        primaryBrand.id,
+          competitor_id:   comp.id,
+          observation_type: typeOpts[Math.floor(Math.random() * typeOpts.length)],
+          scale:           scaleOpts[Math.floor(Math.random() * scaleOpts.length)],
+          notes:           tpl.replace('{comp}', comp.name),
+          occurred_at:     ago(Math.floor(Math.random() * 75)).toISOString(),
+        })
+      }
+    }
+    await svc.from('competitor_sightings').insert(sightings)
+    results.push('jara_foods_sightings')
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // SECOND BRAND: Jara Express
+  // ─────────────────────────────────────────────────────────────────────────
+
   let expressId: string
-  const { data: existingExpress } = await svcClient
+  const { data: existingExpress } = await svc
     .from('brands')
     .select('id')
     .eq('workspace_id', wsId)
@@ -46,193 +197,65 @@ export async function POST() {
   if (existingExpress) {
     expressId = existingExpress.id
   } else {
-    const { data: newBrand, error: brandErr } = await svcClient
+    const { data: newBrand, error: brandErr } = await svc
       .from('brands')
       .insert({
-        workspace_id:      wsId,
-        name:              'Jara Express',
-        category:          'Quick-Service Restaurant',
-        market_share_pct:  4.2,
-        brand_voice: JSON.stringify({
-          adjectives:        ['Fresh', 'Fast', 'Everyday'],
-          tone:              'Friendly and relatable — the food brand that feels like home delivery from mum',
-          dos:               ['Use casual Lagos-friendly language', 'Celebrate Nigerian occasions', 'Lead with value and speed'],
-          donts:             ['Avoid corporate jargon', 'Never promise delivery times you cannot keep', 'Do not use stock-photo food imagery'],
-          signaturePhrases:  ['Order in, enjoy out', 'Good food, faster', 'Your hunger sorted'],
-          confidenceNote:    'Demo brand voice — update with real content samples for live accuracy',
-        }),
-        connected_channels: ['instagram', 'twitter'],
+        workspace_id:     wsId,
+        name:             'Jara Express',
+        category:         'Quick-Service Restaurant',
+        market_share_pct: 4.2,
+        // brand_voice is jsonb — pass object directly, NOT JSON.stringify
+        brand_voice: {
+          adjectives:       ['Fresh', 'Fast', 'Everyday'],
+          tone:             'Friendly and relatable — the food brand that feels like home delivery from mum',
+          dos:              ['Use casual Lagos-friendly language', 'Celebrate Nigerian occasions', 'Lead with value and speed'],
+          donts:            ['Avoid corporate jargon', 'Never promise delivery times you cannot keep', 'Do not use stock-photo food imagery'],
+          signaturePhrases: ['Order in, enjoy out', 'Good food, faster', 'Your hunger sorted'],
+          confidenceNote:   'Demo brand voice — update with real content samples for live accuracy',
+        },
+        cultural_profile: { community_corporate: 30, traditional_modern: 65, religious_secular: 50, mass_premium: 35, local_global: 25 },
       })
       .select('id').single()
 
-    if (brandErr || !newBrand) return NextResponse.json({ error: 'Failed to create second brand' }, { status: 500 })
+    if (brandErr || !newBrand) {
+      return NextResponse.json({ error: `Failed to create Jara Express: ${brandErr?.message ?? 'unknown'}` }, { status: 500 })
+    }
     expressId = newBrand.id
+    results.push('jara_express_brand_created')
   }
 
-  const today = new Date()
-  const fmt   = (d: Date) => d.toISOString().slice(0, 10)
+  // BHI + sentiment + SOV for Jara Express (90 days up to today)
+  const expressBhi = makeBhiRows(expressId, 90, 52, 10)
+  await svc.from('brand_health_snapshots')
+    .upsert(expressBhi, { onConflict: 'brand_id,snapshot_date', ignoreDuplicates: false })
+  results.push('jara_express_bhi_90d')
 
-  // Helper to generate a date n days ago
-  const daysAgo = (n: number) => {
-    const d = new Date(today)
-    d.setDate(d.getDate() - n)
-    return d
-  }
+  const expressSentiment = makeSentimentRows(expressId, 90, 55)
+  await svc.from('sentiment_daily')
+    .upsert(expressSentiment, { onConflict: 'brand_id,day', ignoreDuplicates: false })
+  results.push('jara_express_sentiment_90d')
 
-  // ── Seed BHI snapshots for Jara Express ────────────────────────────────
-  const { data: existingBhi } = await svcClient
-    .from('brand_health_snapshots')
-    .select('id').eq('brand_id', expressId).limit(1).maybeSingle()
+  const expressSov = makeSovRows(expressId, 60, 8, {
+    'Chicken Republic': 29,
+    'Mr Biggs':         13,
+    'Kilimanjaro':      19,
+    'Dominos Nigeria':  9,
+  })
+  await svc.from('sov_snapshots')
+    .upsert(expressSov, { onConflict: 'brand_id,snapshot_date', ignoreDuplicates: false })
+  results.push('jara_express_sov_60d')
 
-  if (!existingBhi) {
-    const bhiRows = Array.from({ length: 90 }, (_, i) => {
-      const base = 52 + Math.sin(i / 8) * 6 + (i / 90) * 10
-      const noise = (Math.random() - 0.5) * 4
-      const bhi = Math.min(100, Math.max(0, base + noise))
-      return {
-        brand_id:      expressId,
-        snapshot_date: fmt(daysAgo(89 - i)),
-        bhi,
-        components:    { sentiment: bhi * 0.9, sov: 8 + Math.random() * 4, reach: 12000 + Math.floor(Math.random() * 5000) },
-      }
-    })
-    await svcClient.from('brand_health_snapshots').insert(bhiRows)
-  }
-
-  // ── Seed sentiment daily for Jara Express ──────────────────────────────
-  const { data: existingSentiment } = await svcClient
-    .from('sentiment_daily')
-    .select('id').eq('brand_id', expressId).limit(1).maybeSingle()
-
-  if (!existingSentiment) {
-    const sentRows = Array.from({ length: 90 }, (_, i) => {
-      const base = 58 + Math.cos(i / 12) * 8 + (i / 90) * 7
-      const pos  = Math.min(95, base + 10)
-      const neg  = Math.max(5, 100 - pos - 20)
-      const neu  = Math.max(0, 100 - pos - neg)
-      return {
-        brand_id:     expressId,
-        day:          fmt(daysAgo(89 - i)),
-        social_score: Math.min(100, Math.max(0, base + (Math.random() - 0.5) * 5)),
-        positive_pct: pos,
-        negative_pct: neg,
-        neutral_pct:  neu,
-        platform_breakdown: {
-          twitter:   { volume: 80 + Math.floor(Math.random() * 40),  score: base * 0.95, positive_pct: pos,     negative_pct: neg,     neutral_pct: neu     },
-          instagram: { volume: 120 + Math.floor(Math.random() * 60), score: base * 1.05, positive_pct: pos + 3, negative_pct: neg - 2, neutral_pct: neu - 1 },
-        },
-      }
-    })
-    await svcClient.from('sentiment_daily').insert(sentRows)
-  }
-
-  // ── Seed SOV snapshots for Jara Express ────────────────────────────────
-  const { data: existingSov } = await svcClient
-    .from('sov_snapshots')
-    .select('id').eq('brand_id', expressId).limit(1).maybeSingle()
-
-  if (!existingSov) {
-    const sovRows = Array.from({ length: 30 }, (_, i) => ({
-      brand_id:      expressId,
-      snapshot_date: fmt(daysAgo(29 - i)),
-      social_sov:    7 + Math.sin(i / 5) * 2 + (Math.random() - 0.5),
-      competitor_data: {
-        'Chicken Republic': 28 + Math.random() * 3,
-        'Kilimanjaro':      18 + Math.random() * 4,
-        'Mr Biggs':         12 + Math.random() * 3,
-        'Dominos Nigeria':  8  + Math.random() * 2,
-      },
-    }))
-    await svcClient.from('sov_snapshots').insert(sovRows)
-  }
-
-  // ── Seed competitors for primary brand (Jara Foods) ────────────────────
-  const { data: existingComp } = await svcClient
-    .from('competitors')
-    .select('id').eq('brand_id', primaryBrand.id).limit(1).maybeSingle()
-
-  if (!existingComp) {
-    await svcClient.from('competitors').insert([
-      { brand_id: primaryBrand.id, name: 'Shoprite Nigeria',  website_url: 'https://shoprite.com.ng',     social_handles: { twitter: '@ShopriteSA', instagram: '@shopritenigeria' } },
-      { brand_id: primaryBrand.id, name: 'Chicken Republic',  website_url: 'https://chickenrepublic.com', social_handles: { twitter: '@ChickenRepublic', instagram: '@chickenrepublic' } },
-      { brand_id: primaryBrand.id, name: 'Kilimanjaro',       website_url: null,                          social_handles: { twitter: '@KilimanjaroNG' } },
-      { brand_id: primaryBrand.id, name: 'Dominos Nigeria',   website_url: 'https://dominos.com.ng',      social_handles: { instagram: '@dominospizzang' } },
-      { brand_id: primaryBrand.id, name: 'HealthyFood.ng',    website_url: null,                          social_handles: {} },
-    ])
-  }
-
-  // ── Seed competitors for Jara Express ─────────────────────────────────
-  const { data: existingExpressComp } = await svcClient
-    .from('competitors')
-    .select('id').eq('brand_id', expressId).limit(1).maybeSingle()
-
-  if (!existingExpressComp) {
-    await svcClient.from('competitors').insert([
+  // Competitors for Jara Express
+  const { data: expComps } = await svc
+    .from('competitors').select('id').eq('brand_id', expressId).limit(1).maybeSingle()
+  if (!expComps) {
+    await svc.from('competitors').insert([
       { brand_id: expressId, name: 'Chicken Republic', website_url: 'https://chickenrepublic.com', social_handles: { twitter: '@ChickenRepublic' } },
       { brand_id: expressId, name: 'Mr Biggs',         website_url: null,                          social_handles: {} },
       { brand_id: expressId, name: 'Kilimanjaro',      website_url: null,                          social_handles: { twitter: '@KilimanjaroNG' } },
       { brand_id: expressId, name: 'Dominos Nigeria',  website_url: 'https://dominos.com.ng',      social_handles: { instagram: '@dominospizzang' } },
     ])
-  }
-
-  // ── Seed competitive sightings for primary brand ───────────────────────
-  const { data: primaryComps } = await svcClient
-    .from('competitors').select('id, name').eq('brand_id', primaryBrand.id)
-
-  if (primaryComps && primaryComps.length > 0) {
-    const { data: existingSightings } = await svcClient
-      .from('competitor_sightings')
-      .select('id').eq('brand_id', primaryBrand.id).limit(1).maybeSingle()
-
-    if (!existingSightings) {
-      const noteTemplates = [
-        '{comp} launched a loyalty rewards programme targeting Lagos Island — push notification + WhatsApp blast observed',
-        'Saw {comp} billboard at Maryland overhead bridge. Heavy OOH spend this quarter.',
-        '{comp} ran 50% off promo via WhatsApp broadcast. ~200 leads in 48 hours based on social noise.',
-        '@foodlovers_ng (180k) posted a positive review of {comp}. Likely paid placement.',
-        '{comp} appears to have paused TV ads this month — possible budget reallocation to digital.',
-        '{comp} received multiple delivery-delay complaints on Twitter. Window of opportunity for service differentiation.',
-      ]
-
-      const scaleOptions: ('major' | 'moderate' | 'small')[] = ['major', 'moderate', 'small']
-      const typeOptions = ['campaign', 'pricing', 'ooh', 'influencer', 'social', 'pr']
-
-      const sightings = []
-      for (const comp of primaryComps.slice(0, 3)) {
-        for (let i = 0; i < 2; i++) {
-          const noteTemplate = noteTemplates[Math.floor(Math.random() * noteTemplates.length)]
-          sightings.push({
-            brand_id:        primaryBrand.id,
-            competitor_id:   comp.id,
-            observation_type: typeOptions[Math.floor(Math.random() * typeOptions.length)],
-            scale:           scaleOptions[Math.floor(Math.random() * scaleOptions.length)],
-            notes:           noteTemplate.replace('{comp}', comp.name),
-            occurred_at:     daysAgo(Math.floor(Math.random() * 60)).toISOString(),
-          })
-        }
-      }
-      await svcClient.from('competitor_sightings').insert(sightings)
-    }
-  }
-
-  // ── Seed SOV for primary brand if missing ─────────────────────────────
-  const { data: primarySov } = await svcClient
-    .from('sov_snapshots').select('id').eq('brand_id', primaryBrand.id).limit(1).maybeSingle()
-
-  if (!primarySov) {
-    const primarySovRows = Array.from({ length: 30 }, (_, i) => ({
-      brand_id:      primaryBrand.id,
-      snapshot_date: fmt(daysAgo(29 - i)),
-      social_sov:    18 + Math.sin(i / 5) * 3 + (Math.random() - 0.5) * 2,
-      competitor_data: {
-        'Shoprite Nigeria':  32 + Math.random() * 4,
-        'Chicken Republic':  22 + Math.random() * 5,
-        'Kilimanjaro':       14 + Math.random() * 3,
-        'Dominos Nigeria':   10 + Math.random() * 2,
-        'HealthyFood.ng':    3  + Math.random(),
-      },
-    }))
-    await svcClient.from('sov_snapshots').insert(primarySovRows)
+    results.push('jara_express_competitors')
   }
 
   return NextResponse.json({
@@ -240,6 +263,6 @@ export async function POST() {
     primaryBrand: primaryBrand.name,
     secondBrand: 'Jara Express',
     expressId,
-    seeded:      ['bhi_snapshots', 'sentiment_daily', 'sov_snapshots', 'competitors', 'competitor_sightings'],
+    seeded:      results,
   })
 }

@@ -42,12 +42,12 @@ const STAGES: {
   description: string
   icon: React.ComponentType<{ className?: string }>
 }[] = [
-  { key: 'awareness',     label: 'Awareness',     description: 'People who know your brand exists',          icon: Globe  },
-  { key: 'consideration', label: 'Consideration', description: 'Actively engaging with your content',         icon: Eye    },
-  { key: 'preference',    label: 'Preference',    description: 'Positive sentiment toward your brand',        icon: Heart  },
-  { key: 'action',        label: 'Action',        description: 'Visiting, attending, or converting',          icon: Zap    },
-  { key: 'loyalty',       label: 'Loyalty',       description: 'Satisfied customers who would recommend you', icon: Shield },
-  { key: 'advocacy',      label: 'Advocacy',      description: 'Actively sharing and promoting your brand',   icon: Share2 },
+  { key: 'awareness',     label: 'Awareness',     description: 'Share of Voice → Mental Availability (Ehrenberg-Bass)',     icon: Globe  },
+  { key: 'consideration', label: 'Consideration', description: 'Engagement rate → Brand Salience signal',                       icon: Eye    },
+  { key: 'preference',    label: 'Preference',    description: 'Sentiment score → Brand Association quality (Aaker)',            icon: Heart  },
+  { key: 'action',        label: 'Action',        description: 'Lead capture + OOH → 7Ps: Place, Promotion, Process',           icon: Zap    },
+  { key: 'loyalty',       label: 'Loyalty',       description: 'NPS → People, Process, Physical Evidence (7Ps)',                icon: Shield },
+  { key: 'advocacy',      label: 'Advocacy',      description: 'Share rate → Word-of-mouth / Distinctive Assets (Ehrenberg-Bass)', icon: Share2 },
 ]
 
 function scoreColor(score: number) {

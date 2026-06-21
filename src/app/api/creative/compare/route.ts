@@ -29,10 +29,11 @@ const schema = z.object({
 
 const JSON_SCHEMA = `{
   "winner": "A" or "B",
-  "why_winner": "1-2 sentence explanation of why this creative is stronger for this platform and market",
+  "why_winner": "1-2 sentence explanation referencing cultural resonance and brand fit",
   "creative_a": {
     "engagement": 0-100,
     "cultural_resonance": 0-100,
+    "brand_fit": 0-100,
     "tone": 0-100,
     "clarity": 0-100,
     "risk": 0-100,
@@ -41,6 +42,7 @@ const JSON_SCHEMA = `{
   "creative_b": {
     "engagement": 0-100,
     "cultural_resonance": 0-100,
+    "brand_fit": 0-100,
     "tone": 0-100,
     "clarity": 0-100,
     "risk": 0-100,
@@ -71,7 +73,7 @@ export async function POST(req: NextRequest) {
 
   const brandValues = Array.isArray(brand.brand_values) ? (brand.brand_values as string[]).join(', ') : ''
 
-  const systemPrompt = `You are a creative performance analyst for Nigerian/West African brands. Score creatives honestly and return only valid JSON.`
+  const systemPrompt = `You are a creative performance analyst for Nigerian/West African brands. You apply Kapferer's Brand Identity Prism to measure brand fit — specifically the Reflection facet (does this creative reflect the aspirational self-image of the target consumer?) and the Culture facet (does it embody the brand's values?). Score creatives honestly. Return only valid JSON.`
 
   const promptText = `Compare these two ${platform} creatives for ${brand.name} (${brand.category ?? 'brand'}).
 Brand values: ${brandValues || 'not specified'}
@@ -82,7 +84,15 @@ ${imageBase64A ? creativeA || '(image only)' : ''}
 ${imageBase64B ? 'Creative B (image above):' : `Creative B:\n${creativeB}${imageUrlB ? `\nImage reference: ${imageUrlB}` : ''}`}
 ${imageBase64B ? creativeB || '(image only)' : ''}
 
-Score each creative from 0 to 100 on five dimensions relevant to the Nigerian/West African market. Be specific and honest — one creative must score higher than the other overall.
+Score each creative on SIX dimensions (0-100):
+1. ENGAGEMENT — likelihood of stopping scroll and driving interaction on ${platform}
+2. CULTURAL_RESONANCE — how authentically Nigerian/West African this feels; does it use local cues, language, or contexts correctly?
+3. BRAND_FIT — Kapferer Prism lens: does this creative reflect the brand's identity facets (Personality, Culture, Relationship, Reflection)? Does the portrayed consumer archetype match who the brand wants to represent?
+4. TONE — does the voice/register match the brand's established personality?
+5. CLARITY — is the message or CTA immediately clear for the intended audience?
+6. RISK — inverse risk score (100 = safe; low score = cultural misstep, brand safety, or regulation risk)
+
+Be specific and honest — one creative must score higher than the other overall.
 
 Return ONLY this JSON, no markdown fences, no preamble:
 ${JSON_SCHEMA}`

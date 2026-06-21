@@ -18,10 +18,9 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
 
   const { samples, brandName, category } = parsed.data
-
   const samplesText = samples.map((s, i) => `Sample ${i + 1}:\n${s}`).join('\n\n---\n\n')
 
-  const prompt = `You are a brand strategist analysing sample content to extract a brand voice profile.
+  const prompt = `You are a brand strategist applying Jean-Noël Kapferer's Brand Identity Prism to extract a brand voice profile.
 
 Brand: ${brandName}
 Category: ${category ?? 'unspecified'}
@@ -29,28 +28,44 @@ Category: ${category ?? 'unspecified'}
 CONTENT SAMPLES:
 ${samplesText}
 
-Analyse these samples deeply. Look for:
-- Recurring adjectives and tone patterns
-- How the brand addresses its audience (formal/informal, second person, etc.)
-- Language patterns specific to Nigerian/West African context (local idioms, Pidgin, code-switching)
-- What the brand consistently does vs. what it avoids
-- Signature phrases or expressions that appear repeatedly
+Analyse these samples through Kapferer's six prism facets:
+
+PRISM FACETS — read each sample against each of these:
+
+1. PHYSIQUE — What tangible, visible cues appear? (product attributes, packaging language, visual references)
+2. PERSONALITY — What character traits does the brand project? (tone, adjectives, how it speaks)
+3. CULTURE — What values and beliefs underpin the brand? (origin, principles, what it stands for)
+4. RELATIONSHIP — How does the brand interact with its consumer? (formal/informal, advice-giving, peer-like, authority figure)
+5. REFLECTION — Who does the brand portray as its ideal customer? (who appears in content, aspirational archetype)
+6. SELF-IMAGE — How does using/following this brand make the consumer feel about themselves?
+
+Nigerian/West African lens: note any Pidgin, Yoruba, Igbo, or Hausa patterns. Note code-switching as a deliberate relationship signal.
+
+Based on this Kapferer analysis, derive the practical brand voice profile.
 
 Return ONLY this JSON, no preamble:
 {
   "adjectives": ["string", "string", "string", "string", "string"],
-  "tone": "string — 1-2 sentences describing the overall voice and register",
+  "tone": "string — 1-2 sentences: the Personality + Relationship facets expressed as a voice register",
   "dos": ["string", "string", "string"],
   "donts": ["string", "string", "string"],
   "signaturePhrases": ["string", "string"],
-  "confidenceNote": "string — honest note on how many samples were analysed and confidence level"
+  "confidenceNote": "string — honest note on sample count and confidence",
+  "kapferer_prism": {
+    "physique": "string — concrete physical/visual cues the brand uses",
+    "personality": "string — character traits the brand projects",
+    "culture": "string — underlying values and belief system",
+    "relationship": "string — how the brand engages its audience",
+    "reflection": "string — the type of person the brand portrays",
+    "self_image": "string — how the brand makes its user feel about themselves"
+  }
 }`
 
   const raw = await callAi({
     tier: 'structural',
-    system: 'Brand voice strategist. Nigerian/West African market expert. Return ONLY valid JSON.',
+    system: 'Brand strategist applying Kapferer Brand Identity Prism. Nigerian/West African market expert. Return ONLY valid JSON.',
     messages: [{ role: 'user', content: prompt }],
-    maxTokens: 1000,
+    maxTokens: 1200,
     temperature: 0.3,
   })
 
@@ -61,6 +76,10 @@ Return ONLY this JSON, no preamble:
     donts: string[]
     signaturePhrases: string[]
     confidenceNote: string
+    kapferer_prism?: {
+      physique: string; personality: string; culture: string
+      relationship: string; reflection: string; self_image: string
+    }
   }
 
   try {
@@ -70,7 +89,7 @@ Return ONLY this JSON, no preamble:
     return NextResponse.json({ error: 'Failed to parse AI response. Please try again.' }, { status: 500 })
   }
 
-  // Save to brand_voice
+  // Save to brand_voice (store prism data in existing jsonb field alongside core fields)
   const { data: brand } = await supabase.from('brands').select('id').limit(1).maybeSingle()
   if (brand) {
     const service = await createServiceClient()
@@ -81,6 +100,7 @@ Return ONLY this JSON, no preamble:
         dos:              result.dos,
         donts:            result.donts,
         signaturePhrases: result.signaturePhrases,
+        kapferer_prism:   result.kapferer_prism ?? null,
       },
     }).eq('id', brand.id)
   }

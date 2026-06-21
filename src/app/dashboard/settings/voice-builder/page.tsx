@@ -8,6 +8,15 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
+interface KapfererPrism {
+  physique:     string
+  personality:  string
+  culture:      string
+  relationship: string
+  reflection:   string
+  self_image:   string
+}
+
 interface VoiceResult {
   adjectives:      string[]
   tone:            string
@@ -15,6 +24,7 @@ interface VoiceResult {
   donts:           string[]
   signaturePhrases: string[]
   confidenceNote:  string
+  kapferer_prism?: KapfererPrism
   saved:           boolean
 }
 
@@ -150,6 +160,35 @@ export default function VoiceBuilderPage() {
                   <span key={i} className="px-3 py-1.5 rounded-full bg-muted text-[12.5px] italic">"{p}"</span>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Kapferer Brand Identity Prism */}
+          {result.kapferer_prism && (
+            <div className="p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <p className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">Kapferer Brand Identity Prism</p>
+                <span className="text-[10px] text-muted-foreground/50 border rounded px-1.5 py-0.5">derived from your content</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {([
+                  { key: 'physique',     label: 'Physique',     desc: 'Physical & visual cues' },
+                  { key: 'personality',  label: 'Personality',  desc: 'Character traits projected' },
+                  { key: 'culture',      label: 'Culture',      desc: 'Values & belief system' },
+                  { key: 'relationship', label: 'Relationship', desc: 'How the brand engages' },
+                  { key: 'reflection',   label: 'Reflection',   desc: 'Who the brand portrays' },
+                  { key: 'self_image',   label: 'Self-Image',   desc: 'How users feel about themselves' },
+                ] as const).map(({ key, label, desc }) => (
+                  <div key={key} className="rounded-xl border bg-muted/20 p-3.5 space-y-1">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-primary">{label}</p>
+                    <p className="text-[10px] text-muted-foreground">{desc}</p>
+                    <p className="text-[12.5px] leading-snug">{result.kapferer_prism![key]}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-3">
+                Kapferer's Brand Identity Prism ensures your voice is internally consistent across all six facets — from how the brand looks to how consumers feel about themselves when they engage with it.
+              </p>
             </div>
           )}
 
