@@ -6,9 +6,9 @@ import {
   CartesianGrid, AreaChart, Area, BarChart, Bar, Legend,
 } from 'recharts'
 import {
-  TrendingUp, TrendingDown, Minus, Activity, Radio, MessageSquare,
+  TrendingUp, TrendingDown, Activity, Radio, MessageSquare,
   DollarSign, Target, Award, AlertCircle, CheckCircle2, ChevronRight,
-  RefreshCw, Calendar, BarChart3,
+  RefreshCw, Calendar, BarChart3, Eye, Newspaper,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -27,31 +27,53 @@ interface Campaign {
   end_date:   string | null
 }
 
+interface CompetitorSighting {
+  id:              string
+  competitor_name: string | null
+  sighting_type:   string | null
+  city:            string | null
+  state:           string | null
+  description:     string | null
+  scale:           string | null
+  spotted_at:      string
+}
+
+interface CompetitorMention {
+  id:              string
+  headline:        string
+  publication:     string
+  published_at:    string
+  sentiment_label: string | null
+  competitor_name: string | null
+}
+
 interface PortalData {
-  brand:            { name: string; category: string | null; logo_url: string | null; market_share_pct: number | null }
-  sections:         string[]
-  range:            Range
-  days:             number
-  bhiHistory:       { bhi: number; snapshot_date: string }[]
-  bhiDelta:         number | null
-  sentimentData:    { social_score: number; day: string; positive_pct: number; negative_pct: number }[]
-  sentimentDelta:   number | null
-  latestSentiment:  number | null
-  avgSentiment:     number | null
-  latestSov:        { social_sov: number; snapshot_date: string } | null
-  sovTrend:         { social_sov: number; snapshot_date: string }[]
-  campaigns:        Campaign[]
-  totalBudget:      number
-  totalSpend:       number
-  activeCampaigns:  number
-  npsResponses:     { nps_score: number; created_at: string }[]
-  avgNps:           number | null
-  mentionCount:     number
-  competitors:      { name: string; type: string }[]
-  sovCompetitor:    { competitor_breakdown: unknown } | null
-  executiveSummary: string | null
-  winsAndConcerns:  { wins: string[]; concerns: string[]; priorities: string[] } | null
-  asOf:             string
+  brand:                { name: string; category: string | null; logo_url: string | null; market_share_pct: number | null }
+  sections:             string[]
+  range:                Range
+  days:                 number
+  bhiHistory:           { bhi: number; snapshot_date: string }[]
+  bhiDelta:             number | null
+  sentimentData:        { social_score: number; day: string; positive_pct: number; negative_pct: number }[]
+  sentimentDelta:       number | null
+  latestSentiment:      number | null
+  avgSentiment:         number | null
+  latestSov:            { social_sov: number; snapshot_date: string } | null
+  sovTrend:             { social_sov: number; snapshot_date: string }[]
+  campaigns:            Campaign[]
+  totalBudget:          number
+  totalSpend:           number
+  activeCampaigns:      number
+  npsResponses:         { nps_score: number; created_at: string }[]
+  avgNps:               number | null
+  mentionCount:         number
+  competitors:          { name: string; type: string }[]
+  sovCompetitor:        { competitor_breakdown: unknown } | null
+  competitorSightings:  CompetitorSighting[]
+  competitorMentions:   CompetitorMention[]
+  executiveSummary:     string | null
+  winsAndConcerns:      { wins: string[]; concerns: string[]; priorities: string[] } | null
+  asOf:                 string
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -158,7 +180,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
     }
   }, [token])
 
-  const { brand, sections, bhiHistory, bhiDelta, sentimentData, sentimentDelta, latestSentiment, latestSov, sovTrend, campaigns, totalBudget, totalSpend, activeCampaigns, npsResponses, avgNps, mentionCount, competitors, executiveSummary, winsAndConcerns, days } = data
+  const { brand, sections, bhiHistory, bhiDelta, sentimentData, sentimentDelta, latestSentiment, latestSov, sovTrend, campaigns, totalBudget, totalSpend, activeCampaigns, npsResponses, avgNps, mentionCount, competitors, competitorSightings, competitorMentions, executiveSummary, winsAndConcerns, days } = data
 
   const latestBhi = bhiHistory.length > 0 ? Number(bhiHistory[bhiHistory.length - 1].bhi) : null
   const zone      = latestBhi != null ? bhiZone(latestBhi) : null
@@ -521,6 +543,86 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                 ))}
               </div>
               <p className="text-[11px] text-muted-foreground mt-3">Competitive SOV data updates weekly from social listening.</p>
+            </div>
+          </section>
+        )}
+
+        {/* ── Competitor Activity ────────────────────────────────── */}
+        {(competitorSightings.length > 0 || competitorMentions.length > 0) && (
+          <section>
+            <SectionHeading icon={Eye}>Competitor Activity</SectionHeading>
+            <div className="space-y-4">
+
+              {/* Field intelligence sightings */}
+              {competitorSightings.length > 0 && (
+                <div className="rounded-2xl border bg-card overflow-hidden">
+                  <div className="px-5 py-3.5 border-b bg-muted/30">
+                    <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Field Intelligence</p>
+                  </div>
+                  <ul className="divide-y">
+                    {competitorSightings.map(s => (
+                      <li key={s.id} className="px-5 py-3.5 flex items-start gap-3">
+                        <span className={cn(
+                          'shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full',
+                          s.scale === 'major'    ? 'bg-red-500'    :
+                          s.scale === 'moderate' ? 'bg-amber-500'  :
+                          'bg-muted-foreground/40'
+                        )} />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                            <span className="text-[13px] font-semibold">{s.competitor_name ?? 'Unknown competitor'}</span>
+                            {s.sighting_type && (
+                              <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded uppercase font-semibold text-muted-foreground">
+                                {s.sighting_type}
+                              </span>
+                            )}
+                            {s.city && (
+                              <span className="text-[11px] text-muted-foreground">{s.city}{s.state ? `, ${s.state}` : ''}</span>
+                            )}
+                          </div>
+                          {s.description && (
+                            <p className="text-[12.5px] text-muted-foreground leading-snug">{s.description}</p>
+                          )}
+                          <p className="text-[11px] text-muted-foreground/60 mt-1">{new Date(s.spotted_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Competitor press mentions */}
+              {competitorMentions.length > 0 && (
+                <div className="rounded-2xl border bg-card overflow-hidden">
+                  <div className="px-5 py-3.5 border-b bg-muted/30">
+                    <div className="flex items-center gap-1.5">
+                      <Newspaper className="h-3.5 w-3.5 text-muted-foreground" />
+                      <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Recent Competitor Coverage</p>
+                    </div>
+                  </div>
+                  <ul className="divide-y">
+                    {competitorMentions.map(m => (
+                      <li key={m.id} className="px-5 py-3.5 flex items-start gap-3">
+                        <span className={cn(
+                          'shrink-0 mt-1 h-1.5 w-1.5 rounded-full',
+                          m.sentiment_label === 'positive' ? 'bg-emerald-500' :
+                          m.sentiment_label === 'negative' ? 'bg-red-500' :
+                          'bg-muted-foreground/40'
+                        )} />
+                        <div className="min-w-0">
+                          <p className="text-[13px] font-medium leading-snug">{m.headline}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[11px] text-muted-foreground">{m.publication}</span>
+                            <span className="text-muted-foreground/30">·</span>
+                            <span className="text-[11px] text-muted-foreground">{new Date(m.published_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</span>
+                            {m.competitor_name && <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded font-medium text-muted-foreground">{m.competitor_name}</span>}
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </section>
         )}

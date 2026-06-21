@@ -40,6 +40,8 @@ export async function GET(request: NextRequest) {
     mentionsRes,
     competitorsRes,
     sovCompetitorsRes,
+    competitorSightingsRes,
+    competitorPressRes,
   ] = await Promise.all([
     supabase.from('brands')
       .select('name, category, logo_url, market_share_pct, brand_voice')
@@ -110,6 +112,21 @@ export async function GET(request: NextRequest) {
           .order('snapshot_date', { ascending: false })
           .limit(1).maybeSingle()
       : { data: null },
+
+    supabase.from('competitor_sightings')
+      .select('id, competitor_name, sighting_type, city, state, description, scale, spotted_at')
+      .eq('brand_id', brandId)
+      .gte('spotted_at', since.slice(0, 10))
+      .order('spotted_at', { ascending: false })
+      .limit(8),
+
+    supabase.from('press_mentions')
+      .select('id, headline, publication, published_at, sentiment_label, competitor_name')
+      .eq('brand_id', brandId)
+      .eq('is_competitor', true)
+      .gte('published_at', since.slice(0, 10))
+      .order('published_at', { ascending: false })
+      .limit(6),
   ])
 
   const brand = brandRes.data
@@ -122,6 +139,8 @@ export async function GET(request: NextRequest) {
   const mentionCount = mentionsRes.count ?? 0
   const competitors = competitorsRes.data ?? []
   const sovCompetitor = sovCompetitorsRes.data
+  const competitorSightings = competitorSightingsRes.data ?? []
+  const competitorMentions = competitorPressRes.data ?? []
 
   // Compute derived metrics
   const latestBhi = bhiHistory.length > 0 ? bhiHistory[bhiHistory.length - 1].bhi : null
@@ -230,6 +249,8 @@ Keep each item under 12 words. Be specific and actionable.`
     mentionCount,
     competitors,
     sovCompetitor,
+    competitorSightings,
+    competitorMentions,
     executiveSummary,
     winsAndConcerns,
     asOf: new Date().toISOString(),

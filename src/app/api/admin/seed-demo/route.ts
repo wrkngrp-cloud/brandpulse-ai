@@ -1234,6 +1234,226 @@ export async function POST(req: NextRequest) {
     ],
   })
 
+  /* ── 23. TV channels + schedules ─────────────────────────────────────── */
+  const tvChannelInserts = [
+    { name: 'NTA 1',             type: 'fta_national',  platform: 'Free-to-air', reach_prime: 4_200_000, reach_day: 1_800_000 },
+    { name: 'Channels TV',       type: 'fta_national',  platform: 'Free-to-air', reach_prime: 3_100_000, reach_day: 1_200_000 },
+    { name: 'TVC',               type: 'fta_regional',  platform: 'Free-to-air', reach_prime: 1_900_000, reach_day:   700_000 },
+    { name: 'Africa Magic Family', type: 'pay_tv',       platform: 'DSTV',        reach_prime: 2_800_000, reach_day:   900_000 },
+    { name: 'Wazobia Max',       type: 'pay_tv',         platform: 'GOtv',        reach_prime: 1_400_000, reach_day:   450_000 },
+  ]
+
+  const { data: existingTvCh } = await sb.from('tv_channels').select('id, name').in('name', tvChannelInserts.map(c => c.name))
+  const existingTvNames = new Set((existingTvCh ?? []).map(c => c.name))
+  const tvChToInsert = tvChannelInserts.filter(c => !existingTvNames.has(c.name))
+  if (tvChToInsert.length) await sb.from('tv_channels').insert(tvChToInsert)
+  const { data: tvChRows } = await sb.from('tv_channels').select('id, name').in('name', tvChannelInserts.map(c => c.name))
+  const tvChMap: Record<string, string> = {}
+  for (const r of tvChRows ?? []) tvChMap[r.name] = r.id
+
+  const tvSpots = [
+    { ch: 'Channels TV', prog: 'Morning Brief',        dp: 'breakfast',    dOff: 3,  dur: 30, sp: 2, sa: 2, grpP: 4.8,  grpD: 4.6,  cost: 620_000,  st: 'aired'     },
+    { ch: 'Africa Magic Family', prog: 'Home & Family',dp: 'prime_time',   dOff: 5,  dur: 30, sp: 3, sa: 3, grpP: 9.2,  grpD: 9.0,  cost: 2_100_000,st: 'aired'     },
+    { ch: 'NTA 1',       prog: 'NTA Network News',     dp: 'prime_time',   dOff: 8,  dur: 30, sp: 2, sa: 2, grpP: 8.0,  grpD: 7.8,  cost: 1_500_000,st: 'aired'     },
+    { ch: 'TVC',         prog: 'Lunch Break',          dp: 'daytime',      dOff: 12, dur: 15, sp: 3, sa: 3, grpP: 3.5,  grpD: 3.4,  cost: 420_000,  st: 'aired'     },
+    { ch: 'Wazobia Max', prog: 'Comedy Night',         dp: 'prime_time',   dOff: 15, dur: 30, sp: 2, sa: 1, grpP: 5.1,  grpD: 2.6,  cost: 780_000,  st: 'make_good' },
+    { ch: 'Channels TV', prog: 'Business Morning',     dp: 'breakfast',    dOff: 18, dur: 30, sp: 2, sa: 2, grpP: 4.5,  grpD: 4.5,  cost: 620_000,  st: 'aired'     },
+    { ch: 'Africa Magic Family', prog: 'Telenovela Tue',dp:'prime_time',   dOff: 22, dur: 30, sp: 3, sa: 3, grpP: 10.1, grpD: 10.0, cost: 2_100_000,st: 'aired'     },
+    { ch: 'NTA 1',       prog: 'Midday News',          dp: 'daytime',      dOff: 26, dur: 15, sp: 2, sa: 2, grpP: 3.2,  grpD: 3.1,  cost: 480_000,  st: 'aired'     },
+    { ch: 'TVC',         prog: 'Drive Time',           dp: 'early_fringe', dOff: 30, dur: 30, sp: 2, sa: 0, grpP: 4.0,  grpD: 0,    cost: 560_000,  st: 'scheduled' },
+    { ch: 'Channels TV', prog: 'Sunrise Daily',        dp: 'breakfast',    dOff: 45, dur: 30, sp: 3, sa: 3, grpP: 4.8,  grpD: 4.8,  cost: 930_000,  st: 'aired'     },
+    { ch: 'NTA 1',       prog: 'NTA Sports',           dp: 'late_fringe',  dOff: 50, dur: 15, sp: 2, sa: 2, grpP: 2.8,  grpD: 2.7,  cost: 350_000,  st: 'aired'     },
+    { ch: 'Africa Magic Family', prog: 'Weekend Movie', dp: 'prime_time',  dOff: 58, dur: 30, sp: 3, sa: 3, grpP: 11.2, grpD: 11.0, cost: 2_100_000,st: 'aired'     },
+  ]
+
+  await sb.from('tv_schedules').insert(tvSpots.map(s => ({
+    brand_id:       brandId,
+    campaign_id:    camp3Id,
+    channel_id:     tvChMap[s.ch] ?? null,
+    channel_name:   s.ch,
+    programme:      s.prog,
+    daypart:        s.dp,
+    spot_date:      dAgo(s.dOff),
+    duration_sec:   s.dur,
+    spots_planned:  s.sp,
+    spots_aired:    s.sa,
+    grp_planned:    s.grpP,
+    grp_delivered:  s.grpD,
+    net_cost:       s.cost,
+    currency:       'NGN',
+    status:         s.st,
+    material_name:  'Jara Nourish Nigeria :30s',
+  })))
+
+  /* ── 24. Radio stations + schedules ──────────────────────────────────── */
+  const radioStationInserts = [
+    { name: 'Beat 99.9 FM', frequency: '99.9 FM', city: 'Lagos',  state: 'Lagos',  reach_am: 420_000, reach_pm: 380_000, reach_day: 190_000, network: 'Beat FM',    is_national: false },
+    { name: 'Cool FM 96.9', frequency: '96.9 FM', city: 'Lagos',  state: 'Lagos',  reach_am: 510_000, reach_pm: 470_000, reach_day: 210_000, network: 'Cool FM',    is_national: true  },
+    { name: 'Wazobia FM Lagos', frequency: '94.1 FM', city: 'Lagos', state: 'Lagos', reach_am: 680_000, reach_pm: 590_000, reach_day: 310_000, network: 'Wazobia', is_national: true  },
+    { name: 'Naija FM',     frequency: '102.7 FM',city: 'Lagos',  state: 'Lagos',  reach_am: 290_000, reach_pm: 260_000, reach_day: 140_000, network: 'Naija FM',   is_national: false },
+    { name: 'Smooth FM 98.1', frequency: '98.1 FM', city: 'Lagos', state: 'Lagos', reach_am: 320_000, reach_pm: 300_000, reach_day: 160_000, network: 'Smooth FM', is_national: false },
+    { name: 'Rhythm FM Abuja', frequency: '93.7 FM', city: 'Abuja', state: 'FCT', reach_am: 180_000, reach_pm: 160_000, reach_day:  80_000, network: 'Rhythm FM',  is_national: false },
+  ]
+
+  const { data: existingRs } = await sb.from('radio_stations').select('id, name').in('name', radioStationInserts.map(s => s.name))
+  const existingRsNames = new Set((existingRs ?? []).map(s => s.name))
+  const rsToInsert = radioStationInserts.filter(s => !existingRsNames.has(s.name))
+  if (rsToInsert.length) await sb.from('radio_stations').insert(rsToInsert)
+  const { data: rsRows } = await sb.from('radio_stations').select('id, name').in('name', radioStationInserts.map(s => s.name))
+  const rsMap: Record<string, string> = {}
+  for (const r of rsRows ?? []) rsMap[r.name] = r.id
+
+  const radioSpots = [
+    { stn: 'Cool FM 96.9',     dp: 'morning_drive',   dOff: 2,  dur: 30, sp: 3, sa: 3, rc: 350_000, nc: 315_000, st: 'aired'     },
+    { stn: 'Wazobia FM Lagos', dp: 'morning_drive',   dOff: 3,  dur: 30, sp: 5, sa: 5, rc: 210_000, nc: 189_000, st: 'aired'     },
+    { stn: 'Beat 99.9 FM',     dp: 'evening',         dOff: 5,  dur: 30, sp: 3, sa: 3, rc: 280_000, nc: 252_000, st: 'aired'     },
+    { stn: 'Smooth FM 98.1',   dp: 'daytime',         dOff: 7,  dur: 15, sp: 4, sa: 4, rc: 160_000, nc: 144_000, st: 'aired'     },
+    { stn: 'Naija FM',         dp: 'morning_drive',   dOff: 10, dur: 30, sp: 3, sa: 3, rc: 190_000, nc: 171_000, st: 'aired'     },
+    { stn: 'Rhythm FM Abuja',  dp: 'morning_drive',   dOff: 12, dur: 30, sp: 3, sa: 2, rc: 120_000, nc: 108_000, st: 'make_good' },
+    { stn: 'Cool FM 96.9',     dp: 'afternoon_drive', dOff: 15, dur: 30, sp: 4, sa: 4, rc: 300_000, nc: 270_000, st: 'aired'     },
+    { stn: 'Wazobia FM Lagos', dp: 'evening',         dOff: 18, dur: 30, sp: 5, sa: 5, rc: 200_000, nc: 180_000, st: 'aired'     },
+    { stn: 'Beat 99.9 FM',     dp: 'morning_drive',   dOff: 22, dur: 30, sp: 3, sa: 3, rc: 280_000, nc: 252_000, st: 'aired'     },
+    { stn: 'Cool FM 96.9',     dp: 'morning_drive',   dOff: 30, dur: 30, sp: 3, sa: 3, rc: 350_000, nc: 315_000, st: 'aired'     },
+    { stn: 'Wazobia FM Lagos', dp: 'morning_drive',   dOff: 35, dur: 30, sp: 5, sa: 5, rc: 210_000, nc: 189_000, st: 'aired'     },
+    { stn: 'Smooth FM 98.1',   dp: 'early_morning',   dOff: 40, dur: 15, sp: 3, sa: 3, rc: 130_000, nc: 117_000, st: 'aired'     },
+    { stn: 'Naija FM',         dp: 'late_night',      dOff: 45, dur: 30, sp: 2, sa: 0, rc: 90_000,  nc: 81_000,  st: 'scheduled' },
+  ]
+
+  await sb.from('radio_schedules').insert(radioSpots.map(s => ({
+    brand_id:       brandId,
+    campaign_id:    camp1Id,
+    station_id:     rsMap[s.stn] ?? null,
+    station_name:   s.stn,
+    daypart:        s.dp,
+    spot_date:      dAgo(s.dOff),
+    duration_sec:   s.dur,
+    spots_planned:  s.sp,
+    spots_aired:    s.sa,
+    rate_card:      s.rc,
+    net_cost:       s.nc,
+    currency:       'NGN',
+    status:         s.st,
+    material_name:  'Jara "Cook Better" :30s',
+  })))
+
+  /* ── 25. Print publications + placements ──────────────────────────────── */
+  const printPubInserts = [
+    { name: 'The Punch',   type: 'newspaper',     circulation: 80_000,  readership_mult: 4.5, primary_demo: 'mass market' },
+    { name: 'Vanguard',    type: 'newspaper',     circulation: 65_000,  readership_mult: 4.2, primary_demo: 'mass market' },
+    { name: 'BusinessDay', type: 'newspaper',     circulation: 35_000,  readership_mult: 2.8, primary_demo: 'business/professional' },
+    { name: 'The Nation',  type: 'newspaper',     circulation: 50_000,  readership_mult: 4.0, primary_demo: 'mass market' },
+    { name: 'TW Magazine', type: 'magazine',      circulation: 22_000,  readership_mult: 5.5, primary_demo: 'youth' },
+    { name: 'City People', type: 'magazine',      circulation: 45_000,  readership_mult: 6.0, primary_demo: 'mass market' },
+  ]
+
+  const { data: existingPubs } = await sb.from('print_publications').select('id, name').in('name', printPubInserts.map(p => p.name))
+  const existingPubNames = new Set((existingPubs ?? []).map(p => p.name))
+  const pubsToInsert = printPubInserts.filter(p => !existingPubNames.has(p.name))
+  if (pubsToInsert.length) await sb.from('print_publications').insert(pubsToInsert)
+  const { data: pubRows } = await sb.from('print_publications').select('id, name').in('name', printPubInserts.map(p => p.name))
+  const pubMap: Record<string, string> = {}
+  for (const r of pubRows ?? []) pubMap[r.name] = r.id
+
+  await sb.from('print_placements').insert([
+    { brand_id: brandId, campaign_id: camp3Id, publication_id: pubMap['The Punch'],   publication_name: 'The Punch',   edition_date: dAgo(5),  position: 'back_page',    size: 'full_page',    colour: 'full_colour', rate_card: 1_800_000, discount_pct: 10, net_cost: 1_620_000, insertions: 1, currency: 'NGN', status: 'published', qr_scan_count: 142, vanity_slug: 'jara-punch-jun', attribution_url: 'https://jarafoods.com/nourish' },
+    { brand_id: brandId, campaign_id: camp3Id, publication_id: pubMap['Vanguard'],    publication_name: 'Vanguard',    edition_date: dAgo(8),  position: 'page_3',       size: 'full_page',    colour: 'full_colour', rate_card: 1_400_000, discount_pct: 10, net_cost: 1_260_000, insertions: 1, currency: 'NGN', status: 'published', qr_scan_count: 89,  vanity_slug: 'jara-vanguard-jun', attribution_url: 'https://jarafoods.com/nourish' },
+    { brand_id: brandId, campaign_id: camp1Id, publication_id: pubMap['TW Magazine'], publication_name: 'TW Magazine', edition_date: dAgo(15), position: 'centrespread',  size: 'full_page',    colour: 'full_colour', rate_card: 900_000,  discount_pct: 15, net_cost:   765_000, insertions: 1, currency: 'NGN', status: 'published', qr_scan_count: 211, vanity_slug: 'jara-tw-may', attribution_url: 'https://jarafoods.com/summer' },
+    { brand_id: brandId, campaign_id: camp2Id, publication_id: pubMap['BusinessDay'], publication_name: 'BusinessDay', edition_date: dAgo(22), position: 'rop_interior',  size: 'half_page',    colour: 'full_colour', rate_card: 850_000,  discount_pct: 0,  net_cost:   850_000, insertions: 1, currency: 'NGN', status: 'published', qr_scan_count: 34,  vanity_slug: 'jara-bd-may', attribution_url: 'https://jarafoods.com/reconnect' },
+    { brand_id: brandId, campaign_id: camp1Id, publication_id: pubMap['The Punch'],   publication_name: 'The Punch',   edition_date: dAgo(30), position: 'front_page',   size: 'strip',        colour: 'full_colour', rate_card: 600_000,  discount_pct: 10, net_cost:   540_000, insertions: 3, currency: 'NGN', status: 'published', qr_scan_count: 318, vanity_slug: 'jara-punch-may', attribution_url: 'https://jarafoods.com/nourish' },
+    { brand_id: brandId, campaign_id: camp1Id, publication_id: pubMap['City People'], publication_name: 'City People', edition_date: dAgo(38), position: 'rop_interior',  size: 'full_page',    colour: 'full_colour', rate_card: 750_000,  discount_pct: 5,  net_cost:   712_500, insertions: 1, currency: 'NGN', status: 'published', qr_scan_count: 167, vanity_slug: 'jara-cp-may', attribution_url: 'https://jarafoods.com/nourish' },
+    { brand_id: brandId, campaign_id: camp2Id, publication_id: pubMap['The Nation'],  publication_name: 'The Nation',  edition_date: dAgo(45), position: 'back_page',    size: 'half_page',    colour: 'full_colour', rate_card: 1_200_000,discount_pct: 10, net_cost: 1_080_000, insertions: 1, currency: 'NGN', status: 'published', qr_scan_count: 72,  vanity_slug: 'jara-nation-apr', attribution_url: 'https://jarafoods.com/reconnect' },
+    { brand_id: brandId, campaign_id: camp2Id, publication_id: pubMap['Vanguard'],    publication_name: 'Vanguard',    edition_date: dAgo(60), position: 'rop_interior',  size: 'quarter_page', colour: 'black_white', rate_card: 350_000,  discount_pct: 15, net_cost:   297_500, insertions: 2, currency: 'NGN', status: 'published', qr_scan_count: 28,  vanity_slug: 'jara-van-apr', attribution_url: 'https://jarafoods.com/reconnect' },
+  ])
+
+  /* ── 26. Geo-Lift studies ─────────────────────────────────────────────── */
+  const makeWeekly = (weeks: number, baseT: number, baseC: number, liftPct: number) =>
+    Array.from({ length: weeks }, (_, i) => ({
+      week: dAgo((weeks - i) * 7),
+      treatment_index: Math.round(baseT + (liftPct * i / weeks) * baseT * 0.01 + Math.sin(i * 0.9) * 2),
+      control_index:   Math.round(baseC + Math.sin(i * 1.1) * 1.5),
+    }))
+
+  await sb.from('geo_lift_studies').insert([
+    {
+      brand_id:          brandId,
+      campaign_id:       camp3Id,
+      treatment_city:    'Lagos',
+      control_city:      'Ibadan',
+      keyword:           'Jara Foods',
+      study_start:       dAgo(84),
+      study_end:         dAgo(14),
+      lift_pct:          18.4,
+      confidence:        94.2,
+      correlation:       0.8812,
+      status:            'complete',
+      weekly_data:       makeWeekly(10, 78, 55, 18.4),
+      ai_interpretation: 'The Nourish Nigeria campaign produced significant incremental search uplift in Lagos (+18.4%) vs the Ibadan control market. The lift signal is strongest in weeks 4-7, correlating with the peak of OOH and TV spend. 94% confidence confirms this is above statistical noise. Estimated 14,000 incremental branded searches attributable to the campaign.',
+    },
+    {
+      brand_id:          brandId,
+      campaign_id:       camp1Id,
+      treatment_city:    'Abuja',
+      control_city:      'Kaduna',
+      keyword:           'Jara Rice',
+      study_start:       dAgo(120),
+      study_end:         dAgo(50),
+      lift_pct:          11.2,
+      confidence:        87.8,
+      correlation:       0.8240,
+      status:            'complete',
+      weekly_data:       makeWeekly(10, 52, 44, 11.2),
+      ai_interpretation: 'Abuja market showed 11.2% incremental brand search uplift for "Jara Rice" during the Reconnect campaign. TV and radio were the primary drivers — OOH contributed less at this stage. Confidence at 87.8% is strong but below the 90% threshold. Recommend extending the next Abuja study by 2 additional weeks for higher confidence.',
+    },
+    {
+      brand_id:          brandId,
+      campaign_id:       camp2Id,
+      treatment_city:    'Port Harcourt',
+      control_city:      'Enugu',
+      keyword:           'Jara Foods',
+      study_start:       dAgo(45),
+      study_end:         dAgo(5),
+      lift_pct:          7.3,
+      confidence:        81.1,
+      correlation:       0.7690,
+      status:            'complete',
+      weekly_data:       makeWeekly(6, 38, 35, 7.3),
+      ai_interpretation: 'Moderate but statistically meaningful lift in Port Harcourt (+7.3%). Spend levels in this market were 40% below Lagos — the lift-to-spend ratio is actually superior, suggesting PH is an under-invested high-ROI market. Recommend increasing budget allocation here in Q3.',
+    },
+  ])
+
+  /* ── 27. Press mentions (PR tracking) ────────────────────────────────── */
+  const pressMentions = [
+    { headline: 'Jara Foods Launches "Nourish Nigeria" Campaign Targeting 5 Million Families', publication: 'The Punch', url: 'https://punchng.com/jara-nourish-nigeria-campaign', pub_date: dAgo(2),  sent_score: 0.82, sent_label: 'positive', reach: 280_000, emv: 1_540_000, is_comp: false, comp: null,       snippet: 'Jara Foods has launched an ambitious campaign to reach five million Nigerian families with its premium food products, investing over ₦500 million in a 90-day ATL push.' },
+    { headline: 'Jara Community Kitchen Initiative Gets Thumbs-Up from Lagos Residents', publication: 'Vanguard', url: 'https://vanguardngr.com/jara-community-kitchen', pub_date: dAgo(8),  sent_score: 0.91, sent_label: 'positive', reach: 240_000, emv: 1_320_000, is_comp: false, comp: null,       snippet: 'The Jara Community Kitchen pop-up, which visited five LGAs in Lagos over two weeks, fed over 8,000 residents and generated significant goodwill for the brand.' },
+    { headline: 'FMCG Brands Double Down on TV Spend as Digital Costs Rise', publication: 'BusinessDay', url: 'https://businessday.ng/fmcg-tv-spend-2026', pub_date: dAgo(12), sent_score: 0.10, sent_label: 'neutral',  reach: 85_000,  emv:   468_000, is_comp: false, comp: null,       snippet: 'Brands including Jara Foods, NutriNg, and ChowMate have increased TV and radio allocations by 30% as social media CPMs climb above ₦3,000.' },
+    { headline: 'ChowMate Raises $8M Series B, Plans Nationwide Expansion', publication: 'TechCabal', url: 'https://techcabal.com/chowmate-series-b-2026', pub_date: dAgo(15), sent_score: 0.65, sent_label: 'positive', reach: 120_000, emv:   660_000, is_comp: true,  comp: 'ChowMate', snippet: 'ChowMate, the food-tech challenger brand, announced an $8M Series B round to expand distribution to 12 new states and launch a loyalty programme targeting 500,000 users.' },
+    { headline: 'Jara Foods Wins Nigeria Food Brand of the Year Award', publication: 'The Nation', url: 'https://thenationonlineng.net/jara-brand-award-2026', pub_date: dAgo(18), sent_score: 0.95, sent_label: 'positive', reach: 190_000, emv: 1_045_000, is_comp: false, comp: null,       snippet: 'For the third consecutive year, Jara Foods has been recognised as Nigeria\'s most loved food brand, citing its community-first approach and consistent product quality.' },
+    { headline: 'Jara Rice Shortage Reported in Kano, Maiduguri — Distributors Speak Out', publication: 'Daily Trust', url: 'https://dailytrust.com/jara-rice-shortage-north', pub_date: dAgo(25), sent_score: -0.62, sent_label: 'negative', reach: 160_000, emv: -640_000, is_comp: false, comp: null,       snippet: 'Distributors in Kano and Maiduguri have reported stockouts of Jara Long Grain Rice, with some noting gaps of up to two weeks. The brand has not responded publicly.' },
+    { headline: 'NutriNg Foods Expands to School Feeding Programme with Federal Contract', publication: 'The Punch', url: 'https://punchng.com/nutring-school-feeding', pub_date: dAgo(28), sent_score: 0.70, sent_label: 'positive', reach: 260_000, emv:   910_000, is_comp: true,  comp: 'NutriNg Foods', snippet: 'NutriNg Foods has secured a federal government school feeding contract covering 3 states, displacing established FMCG players in the institutional segment.' },
+    { headline: 'How Jara Foods Is Using AI to Track Brand Health in Real Time', publication: 'Techpoint Africa', url: 'https://techpoint.africa/jara-foods-brand-health-ai', pub_date: dAgo(32), sent_score: 0.88, sent_label: 'positive', reach: 95_000,  emv:   522_500, is_comp: false, comp: null,       snippet: 'Jara Foods marketing director shared insights on how the brand uses real-time sentiment tracking and Share of Voice analysis to make faster campaign decisions.' },
+    { headline: 'ChowMate\'s "Taste the Difference" OOH Blitz Divides Lagos Opinion', publication: 'BellaNaija', url: 'https://bellanaija.com/chowmate-ooh-lagos', pub_date: dAgo(38), sent_score: -0.20, sent_label: 'neutral',  reach: 320_000, emv:  -64_000, is_comp: true,  comp: 'ChowMate', snippet: 'ChowMate\'s aggressive billboard spend at Lekki Toll Gate and Ikeja has been noticed, but brand sentiment among focus groups remains mixed — consumers question whether quality matches the bold claims.' },
+    { headline: 'Jara Summer Vibes Campaign Drives 22% Sales Uplift in Lagos', publication: 'Marketing Edge', url: 'https://marketingedge.com.ng/jara-summer-vibes-uplift', pub_date: dAgo(42), sent_score: 0.89, sent_label: 'positive', reach: 45_000,  emv:   247_500, is_comp: false, comp: null,       snippet: 'Internal figures from Jara Foods show the Summer Vibes campaign drove a 22% sales uplift in Lagos trade channels during its 6-week run, with digital contributing 38% of attributed revenue.' },
+    { headline: 'Northern Nigeria FMCG Market Heats Up as Brands Battle for Distribution', publication: 'Blueprint', url: 'https://blueprint.ng/fmcg-northern-nigeria-battle', pub_date: dAgo(50), sent_score: 0.05, sent_label: 'neutral',  reach: 80_000,  emv:    32_000, is_comp: false, comp: null,       snippet: 'Jara Foods, ChowMate and NutriNg are all ramping up northern Nigeria investment, with Kano and Abuja seen as key battlegrounds for the next three years.' },
+    { headline: 'Jara Foods to Expand to East Africa — CEO Confirms 2027 Plans', publication: 'BusinessDay', url: 'https://businessday.ng/jara-east-africa-expansion', pub_date: dAgo(55), sent_score: 0.83, sent_label: 'positive', reach: 85_000,  emv:   467_500, is_comp: false, comp: null,       snippet: 'The CEO of Jara Foods confirmed at a Lagos business summit that the company intends to enter East Africa through Kenya and Ethiopia, leveraging the "Nourish" brand positioning.' },
+  ]
+
+  await sb.from('press_mentions').insert(pressMentions.map(m => ({
+    brand_id:        brandId,
+    headline:        m.headline,
+    publication:     m.publication,
+    url:             m.url,
+    published_at:    m.pub_date,
+    sentiment_score: m.sent_score,
+    sentiment_label: m.sent_label,
+    estimated_reach: m.reach,
+    emv:             m.emv,
+    mention_type:    'press' as const,
+    is_competitor:   m.is_comp,
+    competitor_name: m.comp,
+    raw_snippet:     m.snippet,
+    crawl_source:    'manual',
+  })))
+
   /* ── Done ─────────────────────────────────────────────────────────────── */
   return NextResponse.json({
     success: true,
@@ -1268,6 +1488,14 @@ export async function POST(req: NextRequest) {
       crawlRuns:           10,
       weeklyBriefings:     4,
       aiConversations:     1,
+      tvChannels:          5,
+      tvSpots:             12,
+      radioStations:       6,
+      radioSpots:          13,
+      printPublications:   6,
+      printPlacements:     8,
+      geoLiftStudies:      3,
+      pressMentions:       12,
     },
   })
 }
