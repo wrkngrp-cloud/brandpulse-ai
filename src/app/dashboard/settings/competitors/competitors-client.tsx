@@ -10,8 +10,7 @@ import { cn }     from '@/lib/utils'
 interface Competitor { id: string; name: string; created_at: string }
 
 interface Props {
-  brandId:              string
-  initialCompetitors:   Competitor[]
+  initialCompetitors: Competitor[]
 }
 
 export function CompetitorsClient({ initialCompetitors }: Props) {

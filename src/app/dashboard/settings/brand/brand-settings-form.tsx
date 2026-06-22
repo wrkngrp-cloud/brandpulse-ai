@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState, useEffect, useTransition, useRef } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import { toast } from 'sonner'
 import { updateBrand, type BrandSettingsData } from '../actions'
 import { Button } from '@/components/ui/button'
@@ -21,8 +21,7 @@ interface BrandSettingsFormProps {
 
 export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColors: initialColors }: BrandSettingsFormProps) {
   const [data, setData] = useState<BrandSettingsData>(initial)
-  const [state, , pending] = useActionState(updateBrand, null)
-  const [, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition()
 
   // Visual identity state
   const [logoUrl, setLogoUrl]         = useState<string | null>(initialLogoUrl)
@@ -30,11 +29,6 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
   const [colors, setColors]           = useState<string[]>(initialColors)
   const [colorInput, setColorInput]   = useState('')
   const logoInputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (state?.success) toast.success('Brand profile saved.')
-    if (state?.error)   toast.error(state.error)
-  }, [state])
 
   function patch<K extends keyof BrandSettingsData>(key: K, value: BrandSettingsData[K]) {
     setData(d => ({ ...d, [key]: value }))
@@ -352,8 +346,8 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
       </SectionCard>
 
       <div className="flex justify-end pt-2">
-        <Button onClick={handleSave} disabled={pending}>
-          {pending ? 'Saving…' : 'Save brand profile'}
+        <Button onClick={handleSave} disabled={isPending}>
+          {isPending ? 'Saving…' : 'Save brand profile'}
         </Button>
       </div>
     </div>

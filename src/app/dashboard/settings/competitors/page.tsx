@@ -4,9 +4,6 @@ import { CompetitorsClient } from './competitors-client'
 export default async function CompetitorsSettingsPage() {
   const supabase = await createClient()
 
-  const { data: brand } = await supabase
-    .from('brands').select('id').limit(1).single()
-
   const { data: competitors } = await supabase
     .from('competitors')
     .select('id, name, created_at')
@@ -22,7 +19,6 @@ export default async function CompetitorsSettingsPage() {
       </div>
 
       <CompetitorsClient
-        brandId={brand?.id ?? ''}
         initialCompetitors={competitors ?? []}
       />
 
