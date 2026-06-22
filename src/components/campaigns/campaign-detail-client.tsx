@@ -5,7 +5,7 @@ import { useRouter }       from 'next/navigation'
 import { useState, useTransition, useRef } from 'react'
 import { cn }              from '@/lib/utils'
 import { buttonVariants, Button } from '@/components/ui/button'
-import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, TrendingUp, Users, Eye, Percent, Sparkles, RefreshCw, Upload, X, Loader2, ImageIcon } from 'lucide-react'
+import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, TrendingUp, Users, Eye, Percent, Sparkles, RefreshCw, Upload, X, Loader2, ImageIcon, ShoppingCart } from 'lucide-react'
 import { CampaignOverview } from './campaign-overview'
 import { LinkOohSiteDialog, LinkEventDialog } from './link-existing-dialog'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
@@ -109,6 +109,7 @@ interface Props {
   oohVisits?: OohVisit[]
   influencers?: CampaignInfluencer[]
   unlinkedInfluencers?: CampaignInfluencer[]
+  attributedRevenue?: number
 }
 
 const TABS = [
@@ -255,7 +256,7 @@ function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; 
   )
 }
 
-export function CampaignDetailClient({ campaign, oohSites, events, activeTab, unlinkedSites = [], unlinkedEvents = [], interactions = [], socialPosts = [], oohVisits = [], influencers = [], unlinkedInfluencers = [] }: Props) {
+export function CampaignDetailClient({ campaign, oohSites, events, activeTab, unlinkedSites = [], unlinkedEvents = [], interactions = [], socialPosts = [], oohVisits = [], influencers = [], unlinkedInfluencers = [], attributedRevenue = 0 }: Props) {
   const router = useRouter()
   const [analysing, startAnalyse] = useTransition()
   const [headerSummary, setHeaderSummary] = useState<string | null>(campaign.ai_summary ?? null)
@@ -489,6 +490,34 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                 <p className="text-xs text-muted-foreground">{sub}</p>
               </div>
             ))}
+          </div>
+
+          {/* ── Attributed revenue row ── */}
+          <div className="border rounded-xl p-4 bg-card space-y-1">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <ShoppingCart className="h-3.5 w-3.5" />
+              Attributed revenue
+            </div>
+            {attributedRevenue > 0 ? (
+              <>
+                <p className="text-2xl font-bold tabular-nums">
+                  {attributedRevenue >= 1_000_000
+                    ? `₦${(attributedRevenue / 1_000_000).toFixed(1)}M`
+                    : `₦${attributedRevenue.toLocaleString('en-NG')}`}
+                </p>
+                <p className="text-xs text-muted-foreground">from sales imports linked to this campaign</p>
+              </>
+            ) : (
+              <>
+                <p className="text-2xl font-bold tabular-nums">—</p>
+                <p className="text-xs text-muted-foreground">
+                  Link a sales import to track revenue ·{' '}
+                  <Link href="/dashboard/connectors/ecommerce" className="underline hover:text-foreground transition-colors">
+                    Import now
+                  </Link>
+                </p>
+              </>
+            )}
           </div>
 
           {/* ── Efficiency ratios row ── */}

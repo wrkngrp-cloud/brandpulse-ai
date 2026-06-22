@@ -17,10 +17,19 @@ import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
 const FORMAT_TYPES = [
   'Billboard', 'Unipole', 'Bridge Panel', 'Transit Shelter',
   'Digital Billboard', 'Wall Mural', 'Mall Display', 'Lamp Post Banner',
-  'Lamppole', 'Other',
+  'Lamppole', 'Keke Fleet', 'Wall Painting', 'Branded Vehicle', 'Other',
 ]
 
 const LAMPPOLE_FORMATS = new Set(['Lamppole', 'Lamp Post Banner'])
+const FLEET_FORMATS    = new Set(['Keke Fleet', 'Branded Vehicle'])
+const MURAL_FORMATS    = new Set(['Wall Painting'])
+
+const VEHICLE_TYPES = ['Truck', 'Tanker', 'Bus', 'Van']
+const URBAN_CLASSES = [
+  { value: 'urban',      label: 'Urban' },
+  { value: 'semi_urban', label: 'Semi-urban' },
+  { value: 'rural',      label: 'Rural' },
+]
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 60)
@@ -106,6 +115,14 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
   const [dailyTraffic, setDailyTraffic] = useState<number | ''>(dv.daily_traffic != null ? Number(dv.daily_traffic) : (draft?.daily_traffic != null ? Number(draft.daily_traffic) : ''))
   const [trafficAiEst, setTrafficAiEst] = useState(Boolean(dv.traffic_ai_estimated ?? draft?.traffic_ai_estimated))
   const [estimating,   setEstimating]   = useState(false)
+
+  // Extended format fields
+  const [fleetSize,          setFleetSize]          = useState<number | ''>('')
+  const [routeLgas,          setRouteLgas]          = useState('')
+  const [surfaceWidthM,      setSurfaceWidthM]      = useState<number | ''>('')
+  const [surfaceHeightM,     setSurfaceHeightM]     = useState<number | ''>('')
+  const [urbanClassification, setUrbanClassification] = useState('')
+  const [vehicleType,        setVehicleType]        = useState('')
 
   // Demographics inference state
   const [demographics,     setDemographics]     = useState<PlaceDemographics | null>(null)
@@ -360,6 +377,10 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
   }
 
   const isLamppole = LAMPPOLE_FORMATS.has(formatType)
+  const isFleet    = FLEET_FORMATS.has(formatType)
+  const isMural    = MURAL_FORMATS.has(formatType)
+  const isKeke     = formatType === 'Keke Fleet'
+  const isVehicle  = formatType === 'Branded Vehicle'
 
   // Short domain: platform-level (bp.ng in future), falls back to app URL
   const shortBase  = process.env.NEXT_PUBLIC_SHORT_DOMAIN
@@ -506,28 +527,33 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             )}
           </div>
 
-          <div className="flex items-center justify-between mt-1.5">
-            {lat !== '' && lng !== '' ? (
-              <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {Number(lat).toFixed(5)}, {Number(lng).toFixed(5)}
-              </p>
-            ) : (
-              <p className="text-xs text-muted-foreground">No coordinates yet — type an address above or pin on map.</p>
-            )}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-7 px-2.5 text-xs gap-1.5 shrink-0"
-              onClick={() => setShowPinMap(v => !v)}
-            >
-              {showPinMap ? <X className="h-3 w-3" /> : <Map className="h-3 w-3" />}
-              {showPinMap ? 'Close map' : 'Pin on map'}
-            </Button>
-          </div>
+          {!isFleet && (
+            <div className="flex items-center justify-between mt-1.5">
+              {lat !== '' && lng !== '' ? (
+                <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  {Number(lat).toFixed(5)}, {Number(lng).toFixed(5)}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">No coordinates yet — type an address above or pin on map.</p>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 px-2.5 text-xs gap-1.5 shrink-0"
+                onClick={() => setShowPinMap(v => !v)}
+              >
+                {showPinMap ? <X className="h-3 w-3" /> : <Map className="h-3 w-3" />}
+                {showPinMap ? 'Close map' : 'Pin on map'}
+              </Button>
+            </div>
+          )}
+          {isFleet && (
+            <p className="text-xs text-muted-foreground mt-1.5">Fleet-based format — no fixed GPS coordinates needed.</p>
+          )}
 
-          {showPinMap && (
+          {showPinMap && !isFleet && (
             <div className="rounded-xl border overflow-hidden">
               <div className="bg-muted/50 px-3 py-2 text-xs text-muted-foreground border-b">
                 Click anywhere on the map to drop a pin, or drag the marker to adjust. The address fields will auto-fill.
@@ -537,8 +563,8 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           )}
         </div>
 
-        <input type="hidden" name="lat" value={lat === '' ? '' : String(lat)} />
-        <input type="hidden" name="lng" value={lng === '' ? '' : String(lng)} />
+        <input type="hidden" name="lat" value={isFleet ? '' : (lat === '' ? '' : String(lat))} />
+        <input type="hidden" name="lng" value={isFleet ? '' : (lng === '' ? '' : String(lng))} />
         <input type="hidden" name="place_demographics" value={demographics ? JSON.stringify(demographics) : ''} />
 
         {/* Audience of Place card — inferred from Google Places */}
@@ -641,6 +667,124 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             </p>
           </div>
         </div>
+
+        {/* Keke Fleet: fleet size + routes */}
+        {isKeke && (
+          <div className="space-y-4 rounded-lg border border-orange-200 bg-orange-50/40 dark:border-orange-900/40 dark:bg-orange-950/10 p-4">
+            <p className="text-xs font-semibold text-orange-700 dark:text-orange-400 uppercase tracking-wider">Keke Fleet Details</p>
+            <div className="space-y-1.5">
+              <Label htmlFor="fleet_size">Number of keke units</Label>
+              <Input
+                id="fleet_size" name="fleet_size" type="number" min="1"
+                placeholder="e.g. 50"
+                value={fleetSize === '' ? '' : String(fleetSize)}
+                onChange={e => setFleetSize(e.target.value === '' ? '' : Number(e.target.value))}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="route_lgas">LGAs covered (comma-separated)</Label>
+              <Input
+                id="route_lgas_input" name="route_lgas_input"
+                placeholder="e.g. Ikeja, Surulere, Lagos Island"
+                value={routeLgas}
+                onChange={e => setRouteLgas(e.target.value)}
+              />
+              <input type="hidden" name="route_lgas" value={routeLgas} />
+              <p className="text-xs text-muted-foreground">Comma-separated list of LGAs this fleet covers.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Wall Painting: dimensions + classification */}
+        {isMural && (
+          <div className="space-y-4 rounded-lg border border-green-200 bg-green-50/40 dark:border-green-900/40 dark:bg-green-950/10 p-4">
+            <p className="text-xs font-semibold text-green-700 dark:text-green-400 uppercase tracking-wider">Wall Painting Details</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="surface_width_m">Width (metres)</Label>
+                <Input
+                  id="surface_width_m" name="surface_width_m" type="number" min="0" step="0.1"
+                  placeholder="e.g. 6"
+                  value={surfaceWidthM === '' ? '' : String(surfaceWidthM)}
+                  onChange={e => setSurfaceWidthM(e.target.value === '' ? '' : Number(e.target.value))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="surface_height_m">Height (metres)</Label>
+                <Input
+                  id="surface_height_m" name="surface_height_m" type="number" min="0" step="0.1"
+                  placeholder="e.g. 4"
+                  value={surfaceHeightM === '' ? '' : String(surfaceHeightM)}
+                  onChange={e => setSurfaceHeightM(e.target.value === '' ? '' : Number(e.target.value))}
+                />
+              </div>
+            </div>
+            {surfaceWidthM !== '' && surfaceHeightM !== '' && (
+              <p className="text-xs text-muted-foreground">
+                Surface area: {(Number(surfaceWidthM) * Number(surfaceHeightM)).toFixed(1)} m²
+                · Est. impressions: {(Number(surfaceWidthM) * Number(surfaceHeightM) * 150).toLocaleString()}/day
+              </p>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="urban_classification">Area classification</Label>
+              <select
+                id="urban_classification" name="urban_classification"
+                value={urbanClassification}
+                onChange={e => setUrbanClassification(e.target.value)}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="">Select classification…</option>
+                {URBAN_CLASSES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* Branded Vehicle: fleet size + vehicle type + routes */}
+        {isVehicle && (
+          <div className="space-y-4 rounded-lg border border-blue-200 bg-blue-50/40 dark:border-blue-900/40 dark:bg-blue-950/10 p-4">
+            <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Branded Vehicle Details</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="fleet_size_v">Number of vehicles</Label>
+                <Input
+                  id="fleet_size_v" name="fleet_size" type="number" min="1"
+                  placeholder="e.g. 20"
+                  value={fleetSize === '' ? '' : String(fleetSize)}
+                  onChange={e => setFleetSize(e.target.value === '' ? '' : Number(e.target.value))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="vehicle_type">Vehicle type</Label>
+                <select
+                  id="vehicle_type" name="vehicle_type"
+                  value={vehicleType}
+                  onChange={e => setVehicleType(e.target.value)}
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <option value="">Select type…</option>
+                  {VEHICLE_TYPES.map(t => <option key={t} value={t.toLowerCase()}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="route_lgas_v">LGAs covered (comma-separated)</Label>
+              <Input
+                id="route_lgas_v" name="route_lgas_input"
+                placeholder="e.g. Ikeja, Surulere, Lagos Island"
+                value={routeLgas}
+                onChange={e => setRouteLgas(e.target.value)}
+              />
+              <input type="hidden" name="route_lgas" value={routeLgas} />
+            </div>
+            {fleetSize !== '' && (
+              <p className="text-xs text-muted-foreground">
+                Est. impressions: {(Number(fleetSize) * 2000).toLocaleString()}/day
+                ({Number(fleetSize).toLocaleString()} vehicles × 2,000 per vehicle)
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Lamppole: pole count field */}
         {isLamppole && (

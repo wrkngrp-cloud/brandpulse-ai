@@ -129,6 +129,10 @@ export default async function OohSitePage({
         campaignEnd={site.campaign_end}
         illuminated={site.illuminated}
         poleCount={site.pole_count ?? 1}
+        formatType={site.format_type}
+        fleetSize={site.fleet_size ?? null}
+        surfaceWidthM={site.surface_width_m ? Number(site.surface_width_m) : null}
+        surfaceHeightM={site.surface_height_m ? Number(site.surface_height_m) : null}
       />
 
       {/* Spend justification */}
