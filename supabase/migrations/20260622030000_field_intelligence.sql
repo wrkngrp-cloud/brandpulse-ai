@@ -4,7 +4,7 @@ create table if not exists fso_teams (
   brand_id        uuid not null references brands(id) on delete cascade,
   workspace_id    uuid not null references workspaces(id) on delete cascade,
   name            text not null,
-  token           text not null unique default encode(gen_random_bytes(24), 'hex'),
+  token           text not null unique default replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', ''),
   active          boolean default true,
   notes           text,
   created_at      timestamptz default now()
