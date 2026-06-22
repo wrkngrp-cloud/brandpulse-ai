@@ -48,13 +48,13 @@ export async function POST(request: NextRequest) {
       }).eq('id', pendingNps.id)
 
       // Store in survey_responses if linked to a survey
+      // survey_responses has: survey_id, answers, source, quality_flag
+      // It does NOT have brand_id, workspace_id, or channel columns
       if (pendingNps.survey_id) {
         await supabase.from('survey_responses').insert({
           survey_id:   pendingNps.survey_id,
-          brand_id:    pendingNps.brand_id,
-          workspace_id: pendingNps.workspace_id,
           answers:     { q1: npsScore },
-          channel:     'whatsapp',
+          source:      'whatsapp',
           quality_flag: 'ok',
         })
       }

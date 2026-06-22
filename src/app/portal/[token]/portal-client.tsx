@@ -17,14 +17,12 @@ import { cn, formatNGN } from '@/lib/utils'
 type Range = '7d' | '30d' | '90d' | '6m'
 
 interface Campaign {
-  id:         string
-  name:       string
-  channel:    string
-  status:     string
-  budget:     number | null
-  spend:      number | null
-  start_date: string
-  end_date:   string | null
+  id:           string
+  name:         string
+  status:       string
+  total_budget: number | null
+  start_date:   string
+  end_date:     string | null
 }
 
 interface CompetitorSighting {
@@ -64,7 +62,7 @@ interface PortalData {
   totalBudget:          number
   totalSpend:           number
   activeCampaigns:      number
-  npsResponses:         { nps_score: number; created_at: string }[]
+  npsResponses:         { score: number; created_at: string }[]
   avgNps:               number | null
   mentionCount:         number
   competitors:          { name: string; type: string }[]
@@ -82,8 +80,8 @@ function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
 }
 
-function fmtNGN(kobo: number) {
-  return formatNGN(kobo / 100)
+function fmtNGN(naira: number) {
+  return formatNGN(naira)
 }
 
 function bhiZone(bhi: number): { label: string; color: string } {
@@ -195,7 +193,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
       weekStart.setDate(d.getDate() - d.getDay())
       const key = weekStart.toISOString().slice(0, 10)
       if (!byWeek[key]) byWeek[key] = []
-      byWeek[key].push(r.nps_score)
+      byWeek[key].push(r.score)
     }
     Object.entries(byWeek).sort().forEach(([week, scores]) => {
       npsWeeks.push({ week, score: scores.reduce((a, b) => a + b, 0) / scores.length })
@@ -213,10 +211,10 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
     neg:   r.negative_pct,
   }))
 
-  // Campaign table — show with spend % of budget
+  // Campaign table — spend column does not exist; show budget utilisation as N/A
   const campaignRows = campaigns.map(c => ({
     ...c,
-    spendPct: c.budget ? Math.round(((c.spend ?? 0) / c.budget) * 100) : null,
+    spendPct: null as number | null,
   }))
 
   return (
@@ -427,12 +425,8 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                     <p className="text-[16px] font-bold">{fmtNGN(totalBudget)}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] text-muted-foreground">Deployed spend</p>
-                    <p className="text-[16px] font-bold">{fmtNGN(totalSpend)}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground">Budget utilisation</p>
-                    <p className="text-[16px] font-bold">{totalBudget > 0 ? `${Math.round((totalSpend / totalBudget) * 100)}%` : '—'}</p>
+                    <p className="text-[11px] text-muted-foreground">Active campaigns</p>
+                    <p className="text-[16px] font-bold">{activeCampaigns}</p>
                   </div>
                 </div>
               </div>
@@ -441,10 +435,9 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                   <thead>
                     <tr className="border-b bg-muted/30">
                       <th className="text-left px-5 py-2.5 font-semibold text-muted-foreground">Campaign</th>
-                      <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground">Channel</th>
-                      <th className="text-right px-4 py-2.5 font-semibold text-muted-foreground">Spend</th>
                       <th className="text-right px-4 py-2.5 font-semibold text-muted-foreground">Budget</th>
-                      <th className="text-right px-5 py-2.5 font-semibold text-muted-foreground">Utilisation</th>
+                      <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground">Start</th>
+                      <th className="text-left px-5 py-2.5 font-semibold text-muted-foreground">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -456,19 +449,9 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                             <span className="font-medium truncate max-w-[160px]">{c.name}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-muted-foreground capitalize">{c.channel}</td>
-                        <td className="px-4 py-3 text-right font-medium">{c.spend != null ? fmtNGN(c.spend) : '—'}</td>
-                        <td className="px-4 py-3 text-right text-muted-foreground">{c.budget != null ? fmtNGN(c.budget) : '—'}</td>
-                        <td className="px-5 py-3 text-right">
-                          {c.spendPct != null ? (
-                            <div className="flex items-center justify-end gap-2">
-                              <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                                <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, c.spendPct)}%` }} />
-                              </div>
-                              <span className="font-medium">{c.spendPct}%</span>
-                            </div>
-                          ) : '—'}
-                        </td>
+                        <td className="px-4 py-3 text-right font-medium">{c.total_budget != null ? fmtNGN(c.total_budget) : '—'}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{c.start_date ?? '—'}</td>
+                        <td className="px-5 py-3 capitalize text-muted-foreground">{c.status}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -498,7 +481,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               <div className="rounded-2xl border bg-card p-5 text-center">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Promoters</p>
                 <p className="text-[42px] font-bold leading-none text-emerald-600">
-                  {Math.round((npsResponses.filter(r => r.nps_score >= 9).length / npsResponses.length) * 100)}%
+                  {Math.round((npsResponses.filter(r => r.score >= 9).length / npsResponses.length) * 100)}%
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-1">scored 9-10</p>
               </div>

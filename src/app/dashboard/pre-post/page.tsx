@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Zap } from 'lucide-react'
@@ -38,7 +39,11 @@ async function PrePostHistory() {
   )
 }
 
-export default function PrePostPage() {
+export default async function PrePostPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-start justify-between gap-4">
