@@ -2,18 +2,19 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Building2, Link2, MapPin, Swords, Share2, CreditCard, Layers, Plug, ExternalLink } from 'lucide-react'
+import { User, Building2, Link2, MapPin, Swords, Share2, CreditCard, Layers, Plug, ExternalLink, ClipboardList } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const SETTINGS_LINKS = [
-  { label: 'Profile',            href: '/dashboard/settings/profile',    icon: User       },
-  { label: 'Brands',             href: '/dashboard/settings/brands',     icon: Layers     },
-  { label: 'Brand',              href: '/dashboard/settings/brand',      icon: Building2  },
-  { label: 'Connected Accounts', href: '/dashboard/settings/connections',icon: Link2      },
-  { label: 'OOH Domain',         href: '/dashboard/settings/ooh-domain', icon: MapPin     },
-  { label: 'Competitors',        href: '/dashboard/settings/competitors', icon: Swords     },
-  { label: 'Client Portal',      href: '/dashboard/settings/portal',     icon: Share2     },
-  { label: 'Billing & Plan',     href: '/dashboard/settings/billing',    icon: CreditCard },
+  { label: 'Profile',            href: '/dashboard/settings/profile',      icon: User          },
+  { label: 'Brands',             href: '/dashboard/settings/brands',       icon: Layers        },
+  { label: 'Brand',              href: '/dashboard/settings/brand',        icon: Building2     },
+  { label: 'Connected Accounts', href: '/dashboard/settings/connections',  icon: Link2         },
+  { label: 'OOH Domain',         href: '/dashboard/settings/ooh-domain',   icon: MapPin        },
+  { label: 'Competitors',        href: '/dashboard/settings/competitors',   icon: Swords        },
+  { label: 'Field Teams',        href: '/dashboard/settings/field-teams',  icon: ClipboardList },
+  { label: 'Client Portal',      href: '/dashboard/settings/portal',       icon: Share2        },
+  { label: 'Billing & Plan',     href: '/dashboard/settings/billing',      icon: CreditCard    },
 ]
 
 export function SettingsNav() {
