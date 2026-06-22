@@ -16,7 +16,7 @@ export default async function EventsPage() {
 
   const { data: events } = await supabase
     .from('events')
-    .select('id, name, event_type, city, state, date_start, date_end, status, budget, currency')
+    .select('id, name, event_type, activation_type, city, state, date_start, date_end, status, budget, currency')
     .eq('brand_id', brand.id)
     .order('date_start', { ascending: false })
 

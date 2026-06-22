@@ -11,18 +11,20 @@ import {
   CalendarDays, MapPin, Radio, Square,
   ClipboardEdit, Trash2, ExternalLink,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface Event {
-  id:         string
-  name:       string
-  event_type: string | null
-  city:       string
-  state:      string | null
-  date_start: string
-  date_end:   string
-  status:     string
-  budget:     number | string | null
-  currency:   string | null
+  id:              string
+  name:            string
+  event_type:      string | null
+  activation_type: string | null
+  city:            string
+  state:           string | null
+  date_start:      string
+  date_end:        string
+  status:          string
+  budget:          number | string | null
+  currency:        string | null
 }
 
 const STATUS_BADGE: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
@@ -30,6 +32,32 @@ const STATUS_BADGE: Record<string, { label: string; variant: 'default' | 'second
   live:     { label: 'Live',     variant: 'default'   },
   closed:   { label: 'Closed',   variant: 'outline'   },
   reported: { label: 'Reported', variant: 'outline'   },
+}
+
+const ACTIVATION_LABELS: Record<string, string> = {
+  event:              'Branded Event',
+  sampling:           'Sampling',
+  roadshow:           'Roadshow',
+  church_mosque:      'Church / Mosque',
+  school_contact:     'School Contact',
+  estate_community:   'Estate / Community',
+  market_activation:  'Market Activation',
+  branded_truck:      'Branded Truck',
+  sports_sponsorship: 'Sports Sponsorship',
+  concert_festival:   'Concert / Festival',
+}
+
+function activationBadgeClass(type: string): string {
+  if (['sampling', 'roadshow', 'market_activation'].includes(type)) {
+    return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+  }
+  if (['church_mosque', 'estate_community', 'school_contact'].includes(type)) {
+    return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+  }
+  if (['branded_truck', 'sports_sponsorship', 'concert_festival'].includes(type)) {
+    return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+  }
+  return 'bg-muted text-muted-foreground'
 }
 
 function fmtDate(d: string) {
@@ -41,6 +69,7 @@ function EventRow({ ev }: { ev: Event }) {
   const [, start] = useTransition()
 
   const badge = STATUS_BADGE[ev.status] ?? STATUS_BADGE.planned
+  const activationType = ev.activation_type ?? ev.event_type
 
   const actions: ItemAction[] = [
     {
@@ -48,7 +77,6 @@ function EventRow({ ev }: { ev: Event }) {
       icon:    ExternalLink,
       onClick: () => router.push(`/dashboard/events/${ev.id}`),
     },
-    // Status-specific actions
     ...(ev.status === 'planned' ? [{
       label:   'Go live',
       icon:    Radio,
@@ -72,14 +100,13 @@ function EventRow({ ev }: { ev: Event }) {
       icon:    ClipboardEdit,
       onClick: () => router.push(`/dashboard/events/${ev.id}/debrief`),
     }] : []),
-    // Destructive
     {
-      label:             'Delete event',
-      icon:              Trash2,
-      variant:           'destructive' as const,
-      separator:         true,
-      requireConfirm:    true,
-      confirmTitle:      'Delete event',
+      label:              'Delete event',
+      icon:               Trash2,
+      variant:            'destructive' as const,
+      separator:          true,
+      requireConfirm:     true,
+      confirmTitle:       'Delete event',
       confirmDescription: `"${ev.name}" and all its interactions, leads, and reports will be permanently deleted.`,
       onClick: () => start(async () => {
         const r = await deleteEvent(ev.id)
@@ -97,13 +124,18 @@ function EventRow({ ev }: { ev: Event }) {
       >
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1 min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <p className="font-medium text-sm truncate">{ev.name}</p>
               <Badge variant={badge.variant} className="text-xs shrink-0">{badge.label}</Badge>
+              {activationType && (
+                <span className={cn(
+                  'text-xs px-2 py-0.5 rounded-full font-medium shrink-0',
+                  activationBadgeClass(activationType),
+                )}>
+                  {ACTIVATION_LABELS[activationType] ?? activationType}
+                </span>
+              )}
             </div>
-            {ev.event_type && (
-              <p className="text-xs text-muted-foreground capitalize">{ev.event_type}</p>
-            )}
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <CalendarDays className="h-3 w-3" />
@@ -126,7 +158,6 @@ function EventRow({ ev }: { ev: Event }) {
         </div>
       </Link>
 
-      {/* Three-dot menu */}
       <div className="absolute right-2 top-1/2 -translate-y-1/2">
         <ItemActions actions={actions} />
       </div>

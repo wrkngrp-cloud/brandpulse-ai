@@ -15,6 +15,11 @@ function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
+function fmtNGNLocal(n: number | null | undefined): string {
+  if (n == null) return '—'
+  return `₦${n.toLocaleString('en-NG', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+}
+
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
@@ -60,6 +65,22 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     event.kpi_targets ?? {},
   )
 
+  // BTL-specific derived metrics
+  const isBtl = event.activation_type && event.activation_type !== 'event'
+  const spendBd = event.spend_breakdown as { agency?: number; materials?: number; sampling?: number; logistics?: number } | null
+  const totalBtlSpend = spendBd
+    ? ((spendBd.agency ?? 0) + (spendBd.materials ?? 0) + (spendBd.sampling ?? 0) + (spendBd.logistics ?? 0))
+    : (event.budget ? Number(event.budget) : null)
+
+  const actualAttendance = (interactions ?? []).length > 0 ? (interactions ?? []).length : (event.expected_attendance ?? null)
+  const leadsCount = (interactions ?? []).filter(i => ['new_lead', 'new_customer'].includes(i.interaction_type)).length
+
+  const costPerContact = totalBtlSpend && actualAttendance ? totalBtlSpend / actualAttendance : null
+  const costPerLead    = totalBtlSpend && leadsCount > 0   ? totalBtlSpend / leadsCount       : null
+  const sampleConvRate = event.samples_distributed && leadsCount > 0
+    ? (leadsCount / event.samples_distributed) * 100
+    : null
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
@@ -91,7 +112,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             <p className="text-sm text-muted-foreground mt-0.5">
               {event.city}{event.state ? `, ${event.state}` : ''} · {fmtDate(event.date_start)}
               {event.date_end !== event.date_start && ` – ${fmtDate(event.date_end)}`}
-              {event.event_type && ` · ${event.event_type}`}
+              {event.activation_type && ` · ${event.activation_type.replace(/_/g, ' ')}`}
             </p>
           </div>
           {(event.status === 'closed' || event.status === 'reported') && (
@@ -104,6 +125,41 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           )}
         </div>
       </div>
+
+      {/* BTL metrics panel (shown when activation_type is set, for closed/reported status) */}
+      {isBtl && (event.status === 'closed' || event.status === 'reported') && (
+        <div className="border rounded-xl p-5 bg-card space-y-4">
+          <h2 className="text-sm font-semibold">BTL performance</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="border rounded-xl p-4 bg-muted/30 space-y-1">
+              <p className="text-lg font-semibold tabular-nums">{fmtNGNLocal(costPerContact)}</p>
+              <p className="text-xs text-muted-foreground">Cost per person reached</p>
+            </div>
+            <div className="border rounded-xl p-4 bg-muted/30 space-y-1">
+              <p className="text-lg font-semibold tabular-nums">{fmtNGNLocal(costPerLead)}</p>
+              <p className="text-xs text-muted-foreground">Cost per lead</p>
+            </div>
+            {sampleConvRate != null && (
+              <div className="border rounded-xl p-4 bg-muted/30 space-y-1">
+                <p className="text-lg font-semibold tabular-nums">{sampleConvRate.toFixed(1)}%</p>
+                <p className="text-xs text-muted-foreground">Sample conversion rate</p>
+              </div>
+            )}
+            <div className="border rounded-xl p-4 bg-muted/30 space-y-1">
+              <p className="text-lg font-semibold tabular-nums">{fmtNGNLocal(totalBtlSpend)}</p>
+              <p className="text-xs text-muted-foreground">Total BTL spend</p>
+            </div>
+          </div>
+          {spendBd && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-muted-foreground pt-2 border-t">
+              {spendBd.agency    != null && <span>Agency: {fmtNGNLocal(spendBd.agency)}</span>}
+              {spendBd.materials != null && <span>Materials: {fmtNGNLocal(spendBd.materials)}</span>}
+              {spendBd.sampling  != null && <span>Sampling: {fmtNGNLocal(spendBd.sampling)}</span>}
+              {spendBd.logistics != null && <span>Logistics: {fmtNGNLocal(spendBd.logistics)}</span>}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Closed: prompt for debrief or show progress if debrief already submitted */}
       {event.status === 'closed' && !event.debrief && <DebriefPromptCard eventId={id} />}
@@ -238,6 +294,24 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             <>
               <dt className="text-muted-foreground">Expected attendance</dt>
               <dd>{event.expected_attendance.toLocaleString()}</dd>
+            </>
+          )}
+          {isBtl && event.target_community_size && (
+            <>
+              <dt className="text-muted-foreground">Target reach</dt>
+              <dd>{event.target_community_size.toLocaleString()}</dd>
+            </>
+          )}
+          {isBtl && event.samples_distributed && (
+            <>
+              <dt className="text-muted-foreground">Samples planned</dt>
+              <dd>{event.samples_distributed.toLocaleString()}</dd>
+            </>
+          )}
+          {isBtl && event.collateral_distributed && (
+            <>
+              <dt className="text-muted-foreground">Flyers / branded items</dt>
+              <dd>{event.collateral_distributed.toLocaleString()}</dd>
             </>
           )}
           {event.budget && (

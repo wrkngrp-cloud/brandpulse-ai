@@ -15,6 +15,7 @@ import { campaignTargetMonitor }       from '@/lib/inngest/functions/campaign-ta
 import { emailConnectorSync }          from '@/lib/inngest/functions/email-connector-sync'
 import { panelDailyCheck, panelDispatch }       from '@/lib/inngest/functions/panel-dispatch'
 import { monthlyReportCron, weeklyDigestCron }  from '@/lib/inngest/functions/scheduled-reports'
+import { youtubeBrandMonitor }         from '@/lib/inngest/functions/youtube-brand-monitor'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -27,5 +28,6 @@ export const { GET, POST, PUT } = serve({
     metaAdsDailySync, prCrawl, geoLiftStudy, campaignTargetMonitor,
     emailConnectorSync, panelDailyCheck, panelDispatch,
     monthlyReportCron, weeklyDigestCron,
+    youtubeBrandMonitor,
   ],
 })
