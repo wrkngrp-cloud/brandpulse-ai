@@ -64,7 +64,7 @@ export default function VoiceBuilderPage() {
         <p className="eyebrow mb-1">Settings</p>
         <h1 className="h-display text-[26px] leading-none">Brand Voice Builder</h1>
         <p className="mt-1.5 text-[13px] text-muted-foreground/70 max-w-xl">
-          Paste 3-10 samples of your brand's existing content — social posts, ads, press releases, email copy. Claude extracts your voice pattern and saves it to your brand profile, powering the Pre-Post Widget and AI content scoring.
+          Paste 3-10 samples of your brand's existing content — social posts, ads, press releases, email copy. BrandPulse AI extracts your voice pattern and saves it to your brand profile, powering the Pre-Post Widget and AI content scoring.
         </p>
       </div>
 

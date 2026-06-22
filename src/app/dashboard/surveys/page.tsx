@@ -212,7 +212,7 @@ async function SurveyListServer() {
         <MessageSquare className="h-8 w-8 text-muted-foreground/40 mx-auto" />
         <p className="text-sm font-medium">No surveys yet</p>
         <p className="text-xs text-muted-foreground">
-          Create a B2 intercept survey and share the link with your audience.
+          Create a brand intercept survey and share the link with your audience.
         </p>
       </div>
     )

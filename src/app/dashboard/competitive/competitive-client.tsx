@@ -331,7 +331,7 @@ function BriefingTab({
           </Section>
 
           {result.porter_forces && (
-            <Section title="Porter's Five Forces" icon={AlertCircle} defaultOpen>
+            <Section title="Competitive Forces" icon={AlertCircle} defaultOpen>
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-3">
                   <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold border', {
