@@ -18,15 +18,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
   }
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
+  const { data: brand } = await supabase.from('brands').select('id, workspace_id').limit(1).single()
   if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
-
-  const { data: workspace } = await supabase
-    .from('brands')
-    .select('workspace_id')
-    .eq('id', brand.id)
-    .single()
-  if (!workspace) return NextResponse.json({ error: 'No workspace found' }, { status: 404 })
 
   const encryptedKey = encrypt(parsed.data.api_key)
 
@@ -35,7 +28,7 @@ export async function POST(request: NextRequest) {
     .upsert(
       {
         brand_id:     brand.id,
-        workspace_id: workspace.workspace_id,
+        workspace_id: brand.workspace_id,
         api_key:      encryptedKey,
         updated_at:   new Date().toISOString(),
       },
