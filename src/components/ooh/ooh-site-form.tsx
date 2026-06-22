@@ -116,13 +116,13 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
   const [trafficAiEst, setTrafficAiEst] = useState(Boolean(dv.traffic_ai_estimated ?? draft?.traffic_ai_estimated))
   const [estimating,   setEstimating]   = useState(false)
 
-  // Extended format fields
-  const [fleetSize,          setFleetSize]          = useState<number | ''>('')
-  const [routeLgas,          setRouteLgas]          = useState('')
-  const [surfaceWidthM,      setSurfaceWidthM]      = useState<number | ''>('')
-  const [surfaceHeightM,     setSurfaceHeightM]     = useState<number | ''>('')
-  const [urbanClassification, setUrbanClassification] = useState('')
-  const [vehicleType,        setVehicleType]        = useState('')
+  // Extended format fields — pre-populate from defaultValues when editing
+  const [fleetSize,          setFleetSize]          = useState<number | ''>(dv.fleet_size != null ? Number(dv.fleet_size) : '')
+  const [routeLgas,          setRouteLgas]          = useState(Array.isArray(dv.route_lgas) ? (dv.route_lgas as string[]).join(', ') : (dv.route_lgas != null ? String(dv.route_lgas) : ''))
+  const [surfaceWidthM,      setSurfaceWidthM]      = useState<number | ''>(dv.surface_width_m != null ? Number(dv.surface_width_m) : '')
+  const [surfaceHeightM,     setSurfaceHeightM]     = useState<number | ''>(dv.surface_height_m != null ? Number(dv.surface_height_m) : '')
+  const [urbanClassification, setUrbanClassification] = useState(dv.urban_classification != null ? String(dv.urban_classification) : '')
+  const [vehicleType,        setVehicleType]        = useState(dv.vehicle_type != null ? String(dv.vehicle_type) : '')
 
   // Demographics inference state
   const [demographics,     setDemographics]     = useState<PlaceDemographics | null>(null)
