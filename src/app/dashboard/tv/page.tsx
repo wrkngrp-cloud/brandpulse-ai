@@ -5,7 +5,7 @@ import { Badge }           from '@/components/ui/badge'
 import { Tv, Users, TrendingUp, Activity, Download } from 'lucide-react'
 import { MediaPlanUploadDialog } from '@/components/offline-media/media-plan-upload-dialog'
 import { buttonVariants }  from '@/components/ui/button'
-import { cn }              from '@/lib/utils'
+import { cn, formatNGN }   from '@/lib/utils'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { TvAiAnalysis }    from './tv-ai-analysis'
 import { getActiveBrand }  from '@/lib/active-brand'
@@ -31,12 +31,6 @@ function fmt(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
   if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`
   return String(n)
-}
-
-function fmtCurrency(n: number): string {
-  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000)     return `₦${(n / 1_000).toFixed(0)}K`
-  return `₦${n.toFixed(0)}`
 }
 
 type TvChannel = {
@@ -187,7 +181,7 @@ export default async function TVPage({
               { label: 'GRPs Planned',   value: totalGrpPlanned.toFixed(1),    sub: `Last ${days} days`,          icon: TrendingUp, color: 'text-blue-500' },
               { label: 'GRPs Delivered', value: totalGrpDelivered.toFixed(1),  sub: `${deliveryPct}% delivery`, icon: Activity, color: 'text-emerald-500' },
               { label: 'Gross Impressions', value: fmt(totalReach),            sub: 'Total viewer-spots',    icon: Users,      color: 'text-indigo-500' },
-              { label: 'Total Spend',    value: fmtCurrency(totalSpend),       sub: `CPRP: ${fmtCurrency(cprp)}`, icon: Tv, color: 'text-violet-500' },
+              { label: 'Total Spend',    value: formatNGN(totalSpend),       sub: `CPRP: ${formatNGN(cprp)}`, icon: Tv, color: 'text-violet-500' },
             ].map(m => (
               <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">
                 <div className="flex items-center justify-between">
@@ -226,7 +220,7 @@ export default async function TVPage({
                       <td className="py-2.5 pr-4">{s.spots_planned}</td>
                       <td className="py-2.5 pr-4 text-muted-foreground">{s.spots_aired ?? '–'}</td>
                       <td className="py-2.5 pr-4 text-muted-foreground">{s.grp_planned ? Number(s.grp_planned).toFixed(1) : '–'}</td>
-                      <td className="py-2.5 pr-4 font-medium">{s.net_cost ? fmtCurrency(Number(s.net_cost)) : '–'}</td>
+                      <td className="py-2.5 pr-4 font-medium">{s.net_cost ? formatNGN(Number(s.net_cost)) : '–'}</td>
                       <td className="py-2.5">
                         <Badge variant={STATUS_VARIANT[s.status] ?? 'secondary'} className="text-[10px] capitalize">
                           {s.status.replace('_', ' ')}

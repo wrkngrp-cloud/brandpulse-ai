@@ -14,8 +14,9 @@ interface TrendPoint {
 }
 
 interface Props {
-  data:    TrendPoint[]
-  weekly?: boolean
+  data:          TrendPoint[]
+  weekly?:       boolean
+  benchmarkP50?: number | null
 }
 
 function shortDate(d: string) {
@@ -48,7 +49,7 @@ function CustomTooltip({ active, payload, label }: {
   )
 }
 
-export function SentimentTrendChart({ data, weekly = false }: Props) {
+export function SentimentTrendChart({ data, weekly = false, benchmarkP50 }: Props) {
   if (data.length < 2) return null
 
   const dateKey = weekly ? 'weekLabel' : 'day'
@@ -111,6 +112,17 @@ export function SentimentTrendChart({ data, weekly = false }: Props) {
           strokeDasharray="4 4"
           strokeOpacity={0.20}
         />
+
+        {benchmarkP50 != null && (
+          <ReferenceLine
+            y={benchmarkP50}
+            stroke="#f59e0b"
+            strokeDasharray="6 3"
+            strokeWidth={1.5}
+            strokeOpacity={0.7}
+            label={{ value: `Sector P50 (${Math.round(benchmarkP50)})`, position: 'insideTopRight', fontSize: 9, fill: '#f59e0b', opacity: 0.85 }}
+          />
+        )}
 
         {/* Negative % — dashed bottom layer */}
         <Area

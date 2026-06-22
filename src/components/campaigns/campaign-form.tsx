@@ -6,7 +6,7 @@ import { Input }          from '@/components/ui/input'
 import { Label }          from '@/components/ui/label'
 import { Textarea }       from '@/components/ui/textarea'
 import { SuccessDialog }  from '@/components/ui/success-dialog'
-import { cn }             from '@/lib/utils'
+import { cn, formatNGN }  from '@/lib/utils'
 import { ChevronRight, ChevronLeft, Lock, Check } from 'lucide-react'
 import type { CampaignFormState } from '@/app/dashboard/campaigns/actions'
 
@@ -281,7 +281,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
           {selectedChannels.length > 0 && totalAllocated > 0 && (
             <div className="border rounded-xl p-3 bg-muted/30 text-sm flex justify-between">
               <span className="text-muted-foreground">Total allocated</span>
-              <span className="font-medium tabular-nums">NGN {totalAllocated.toLocaleString('en-NG')}</span>
+              <span className="font-medium tabular-nums">{formatNGN(totalAllocated)}</span>
             </div>
           )}
 

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
 
 function TriggerCompetitiveCrawlButton() {
   const [phase, setPhase] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
@@ -636,12 +637,11 @@ function SightingsTab({
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground">State</label>
-              <input
-                type="text"
-                placeholder="e.g. Lagos State"
-                className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                value={form.state}
-                onChange={e => updateField('state', e.target.value)}
+              <NigeriaLocationSelect
+                state={form.state}
+                lga=""
+                onStateChange={v => updateField('state', v)}
+                onLgaChange={() => {}}
               />
             </div>
 

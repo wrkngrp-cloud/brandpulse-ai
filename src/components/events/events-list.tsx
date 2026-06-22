@@ -11,6 +11,7 @@ import {
   CalendarDays, MapPin, Radio, Square,
   ClipboardEdit, Trash2, ExternalLink,
 } from 'lucide-react'
+import { formatNGN } from '@/lib/utils'
 
 interface Event {
   id:         string
@@ -119,7 +120,7 @@ function EventRow({ ev }: { ev: Event }) {
             <div className="text-right shrink-0 pr-8">
               <p className="text-xs text-muted-foreground">Budget</p>
               <p className="text-sm font-medium">
-                {ev.currency} {Number(ev.budget).toLocaleString('en-NG')}
+                {ev.currency === 'NGN' ? formatNGN(Number(ev.budget)) : `${ev.currency} ${Number(ev.budget).toLocaleString('en-NG')}`}
               </p>
             </div>
           )}

@@ -8,7 +8,7 @@ import {
 import { Info, Link as LinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { BHIGauge } from '@/components/dashboard/bhi-gauge'
-import { cn } from '@/lib/utils'
+import { cn, formatNGN } from '@/lib/utils'
 import { computeFullBHI, ZONE_META, type FullBHIComponents, type FullBHIResult, type BHIZone } from '@/lib/bhi'
 import { rangeLabelShort, rangeLabelLong } from '@/lib/range-label'
 
@@ -69,12 +69,6 @@ const ESOV_POSTURE = (esov: number) =>
   esov === 0  ? { label: 'Parity',           color: 'text-muted-foreground', bg: 'bg-muted border-border' } :
   esov > -5   ? { label: 'Decline Risk',     color: 'text-amber-500',  bg: 'bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900' } :
                 { label: 'Critical Decline', color: 'text-red-500',    bg: 'bg-red-50 border-red-200 dark:bg-red-950/40 dark:border-red-900'         }
-
-function formatNGN(n: number): string {
-  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000)     return `₦${(n / 1_000).toFixed(0)}K`
-  return `₦${n}`
-}
 
 export function BrandEquityClient({
   bhi, sparkline, sovPct, currentNps, npsTotal, emvRaw, perceptionDimensions, brandName, days = 30,
@@ -150,6 +144,24 @@ export function BrandEquityClient({
               const available = score != null
               const zone = bhi.zone ? ZONE_META[bhi.zone] : null
 
+              const BENCH_KEY: Partial<Record<keyof FullBHIComponents, string>> = {
+                sentiment: 'sentiment',
+                blendedSov: 'sov',
+              }
+              const bKey = BENCH_KEY[meta.key]
+              const b = bKey ? benchmarks[bKey] : undefined
+              const pctile = available && b && (score as number) != null
+                ? (score as number) >= b.top_decile ? 'Top 10%'
+                  : (score as number) >= b.p75       ? 'Top 25%'
+                  : (score as number) >= b.p50       ? 'Above P50'
+                  : (score as number) >= b.p25       ? 'Below P50'
+                  : 'Bottom 25%'
+                : null
+              const pctileColor = pctile === 'Top 10%' || pctile === 'Top 25%' ? 'text-green-600'
+                : pctile === 'Above P50' ? 'text-blue-500'
+                : pctile === 'Below P50' ? 'text-amber-500'
+                : pctile ? 'text-red-500' : ''
+
               return (
                 <div key={meta.key} className="flex items-center gap-3">
                   <div className="w-24 shrink-0">
@@ -175,6 +187,9 @@ export function BrandEquityClient({
                       <span className="text-[10px] text-muted-foreground/40 bg-muted rounded px-1">{meta.phase}</span>
                     ) : (
                       <span className="text-xs text-muted-foreground/40">—</span>
+                    )}
+                    {pctile && (
+                      <p className={cn('text-[9px] font-semibold uppercase tracking-wide leading-none mt-0.5', pctileColor)}>{pctile}</p>
                     )}
                   </div>
                   <div className="w-24 shrink-0 hidden sm:block">
@@ -325,6 +340,16 @@ export function BrandEquityClient({
               <ReferenceLine y={80} stroke="#14b8a6" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Leading', fontSize: 9, fill: '#14b8a6', opacity: 0.5 }} />
               <ReferenceLine y={65} stroke="#22c55e" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Healthy', fontSize: 9, fill: '#22c55e', opacity: 0.5 }} />
               <ReferenceLine y={40} stroke="#f59e0b" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Building', fontSize: 9, fill: '#f59e0b', opacity: 0.5 }} />
+              {benchmarks['bhi']?.p50 != null && (
+                <ReferenceLine
+                  y={benchmarks['bhi'].p50}
+                  stroke="#a855f7"
+                  strokeDasharray="6 3"
+                  strokeWidth={1.5}
+                  strokeOpacity={0.65}
+                  label={{ value: `Sector P50 (${Math.round(benchmarks['bhi'].p50)})`, position: 'insideBottomRight', fontSize: 9, fill: '#a855f7', opacity: 0.8 }}
+                />
+              )}
               <RechartTooltip
                 formatter={(v) => [typeof v === 'number' ? Math.round(v) : v, 'BHI Score']}
                 labelFormatter={(v) => typeof v === 'string' ? new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' }) : String(v)}

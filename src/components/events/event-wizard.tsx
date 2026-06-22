@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { TagInput } from '@/components/onboarding/brand-profile-fields'
 import { ArrowLeft, ArrowRight, CalendarDays, Check, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
 
 const STEPS = ['Basics', 'Goals', 'KPI Targets', 'Budget', 'Team']
 const EVENT_TYPES = ['Activation', 'Sponsorship', 'Pop-up', 'Roadshow', 'Exhibition', 'Concert', 'Launch', 'Other']
@@ -250,11 +251,16 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="city">City *</Label>
-                <Input id="city" value={data.city} onChange={e => set('city', e.target.value)} placeholder="Lagos" />
+                <Input id="city" value={data.city} onChange={e => set('city', e.target.value)} placeholder="e.g. Lagos" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
-                <Input id="state" value={data.state} onChange={e => set('state', e.target.value)} placeholder="Lagos State" />
+                <Label>State / LGA</Label>
+                <NigeriaLocationSelect
+                  state={data.state}
+                  lga=""
+                  onStateChange={v => set('state', v)}
+                  onLgaChange={() => {}}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="date_start">Start date *</Label>

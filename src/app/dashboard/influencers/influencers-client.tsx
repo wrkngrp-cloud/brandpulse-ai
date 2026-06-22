@@ -6,7 +6,7 @@ import {
   Plus, X, Globe, ChevronDown, Eye,
   Megaphone, Filter,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatNGN } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -242,11 +242,6 @@ interface LinkedInfluencer {
   campaignName: string
 }
 
-function formatNGN(n: number): string {
-  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `₦${(n / 1_000).toFixed(0)}K`
-  return `₦${n.toLocaleString()}`
-}
 
 function formatCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`

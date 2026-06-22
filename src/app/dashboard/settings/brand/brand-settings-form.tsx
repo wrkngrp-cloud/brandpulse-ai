@@ -341,6 +341,16 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
         />
       </SectionCard>
 
+      <SectionCard title="Alternative Search Terms">
+        <TagInput
+          label="Aliases and misspellings (max 10)"
+          placeholder="e.g. Jara Foods"
+          values={data.brandAliases}
+          onChange={v => patch('brandAliases', v.slice(0, 10))}
+          hint="Common alternate spellings, short names, or product lines that refer to your brand. These are added to crawl search queries alongside your primary brand name."
+        />
+      </SectionCard>
+
       <div className="flex justify-end pt-2">
         <Button onClick={handleSave} disabled={pending}>
           {pending ? 'Saving…' : 'Save brand profile'}

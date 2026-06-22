@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { cn, formatNGN } from '@/lib/utils'
 import {
   Monitor, TrendingUp, Eye, MousePointerClick, Coins, Users, Target,
   CheckCircle, AlertCircle, Link as LinkIcon, ChevronRight,
@@ -92,9 +92,7 @@ interface CampaignSummary {
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 function fmtNGN(val: number): string {
-  if (val >= 1_000_000) return `₦${(val / 1_000_000).toFixed(1)}M`
-  if (val >= 1_000)     return `₦${(val / 1_000).toFixed(0)}K`
-  return `₦${Math.round(val)}`
+  return formatNGN(val)
 }
 
 function fmtNum(val: number): string {

@@ -5,7 +5,7 @@ import { Badge }           from '@/components/ui/badge'
 import { Newspaper, BookOpen, TrendingUp, BarChart2, Download, QrCode, ExternalLink } from 'lucide-react'
 import { MediaPlanUploadDialog } from '@/components/offline-media/media-plan-upload-dialog'
 import { buttonVariants }  from '@/components/ui/button'
-import { cn }              from '@/lib/utils'
+import { cn, formatNGN }   from '@/lib/utils'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { PrintAiAnalysis } from './print-ai-analysis'
 import { getActiveBrand }  from '@/lib/active-brand'
@@ -38,12 +38,6 @@ function fmt(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
   if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}K`
   return String(n)
-}
-
-function fmtCurrency(n: number): string {
-  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000)     return `₦${(n / 1_000).toFixed(0)}K`
-  return `₦${n.toFixed(0)}`
 }
 
 type PrintPublication = {
@@ -188,7 +182,7 @@ export default async function PrintPage({
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               { label: 'Total Insertions',   value: totalInsertions.toLocaleString(), sub: `Last ${days} days`,           icon: Newspaper,  color: 'text-amber-600' },
-              { label: 'Total Spend',        value: fmtCurrency(totalSpend),          sub: 'Net cost across all buys', icon: TrendingUp,  color: 'text-indigo-500' },
+              { label: 'Total Spend',        value: formatNGN(totalSpend),          sub: 'Net cost across all buys', icon: TrendingUp,  color: 'text-indigo-500' },
               { label: 'Est. Readership',    value: fmt(totalReadership),             sub: 'Circ. × pass-along',      icon: BookOpen,    color: 'text-emerald-500' },
               { label: 'QR Scans',           value: totalQrScans.toLocaleString(),    sub: `${qrScanRate}% scan rate`, icon: BarChart2,  color: 'text-blue-500' },
             ].map(m => (
@@ -229,7 +223,7 @@ export default async function PrintPage({
                         <td className="py-2.5 pr-4 text-muted-foreground whitespace-nowrap">{SIZE_LABEL[p.size] ?? p.size}</td>
                         <td className="py-2.5 pr-4 text-muted-foreground whitespace-nowrap">{p.colour === 'full_colour' ? 'Colour' : 'B&W'}</td>
                         <td className="py-2.5 pr-4">{p.insertions}</td>
-                        <td className="py-2.5 pr-4 font-medium">{p.net_cost ? fmtCurrency(Number(p.net_cost)) : '–'}</td>
+                        <td className="py-2.5 pr-4 font-medium">{p.net_cost ? formatNGN(Number(p.net_cost)) : '–'}</td>
                         <td className="py-2.5 pr-4">
                           {qrUrl ? (
                             <a

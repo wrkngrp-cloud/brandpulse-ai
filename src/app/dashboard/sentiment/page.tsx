@@ -107,7 +107,21 @@ async function SentimentData({ days = 84 }: { days: number }) {
   const brandId = await getActiveBrandId(supabase)
   const bid = brandId ?? ''
 
-  const [{ data: daily }, { data: mentions }, { data: lastRun }, { data: heatmapRaw }] = await Promise.all([
+  const { data: brandRow } = await (bid
+    ? supabase.from('brands').select('industry').eq('id', bid).maybeSingle()
+    : supabase.from('brands').select('industry').limit(1).maybeSingle())
+
+  const SECTOR_MAP: Record<string, string> = {
+    'fmcg':'FMCG','consumer goods':'FMCG','fintech':'Fintech','financial services':'Fintech',
+    'banking':'Fintech','telecommunications':'Telecommunications','telecom':'Telecommunications',
+    'entertainment':'Entertainment','media':'Entertainment','e-commerce':'E-commerce',
+    'retail':'E-commerce','fashion':'Fashion','lifestyle':'Fashion','food & beverage':'Food & Beverage',
+    'food':'Food & Beverage','healthcare':'Healthcare','technology':'Technology','tech':'Technology',
+    'real estate':'Real Estate',
+  }
+  const sector = SECTOR_MAP[(brandRow?.industry ?? '').toLowerCase().trim()] ?? 'FMCG'
+
+  const [{ data: daily }, { data: mentions }, { data: lastRun }, { data: heatmapRaw }, { data: benchmarkRow }] = await Promise.all([
     supabase
       .from('sentiment_daily')
       .select('day, social_score, positive_pct, neutral_pct, negative_pct, emotion_distribution, platform_breakdown')
@@ -133,7 +147,15 @@ async function SentimentData({ days = 84 }: { days: number }) {
       .eq('brand_id', bid)
       .order('day', { ascending: true })
       .limit(400),   // ~13 months for heatmap
+    supabase
+      .from('sector_benchmarks')
+      .select('p50')
+      .eq('sector', sector)
+      .eq('metric', 'sentiment_score')
+      .maybeSingle(),
   ])
+
+  const sentimentBenchmarkP50 = (benchmarkRow as { p50: number } | null)?.p50 ?? null
 
   const latest       = daily?.[0] ?? null
   const hasRanBefore = Boolean(lastRun)
@@ -294,7 +316,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
               ))}
             </div>
           </div>
-          <SentimentTrendChart data={weekly} weekly />
+          <SentimentTrendChart data={weekly} weekly benchmarkP50={sentimentBenchmarkP50} />
         </div>
       )}
 

@@ -39,6 +39,23 @@ export default async function NpsTrackerPage() {
       .maybeSingle(),
   ])
 
+  const NPS_SECTOR_MAP: Record<string, string> = {
+    'fmcg':'FMCG','consumer goods':'FMCG','fintech':'Fintech','financial services':'Fintech',
+    'banking':'Fintech','telecommunications':'Telecommunications','telecom':'Telecommunications',
+    'entertainment':'Entertainment','media':'Entertainment','e-commerce':'E-commerce',
+    'retail':'E-commerce','fashion':'Fashion','lifestyle':'Fashion','food & beverage':'Food & Beverage',
+    'food':'Food & Beverage','healthcare':'Healthcare','technology':'Technology','tech':'Technology',
+    'real estate':'Real Estate',
+  }
+  const npsSector = NPS_SECTOR_MAP[(brand?.industry ?? '').toLowerCase().trim()] ?? 'FMCG'
+  const { data: npsBenchmarkRow } = await supabase
+    .from('sector_benchmarks')
+    .select('p50')
+    .eq('sector', npsSector)
+    .eq('metric', 'nps')
+    .maybeSingle()
+  const npsBenchmarkP50 = (npsBenchmarkRow as { p50: number } | null)?.p50 ?? null
+
   // ── Extract NPS scores and any open-text answers from each response
   interface NpsRow {
     score:      number
@@ -164,6 +181,7 @@ export default async function NpsTrackerPage() {
         industry={brand?.industry ?? null}
         detractorTexts={detractorTexts}
         promoterTexts={promoterTexts}
+        benchmarkP50={npsBenchmarkP50}
       />
     </div>
   )

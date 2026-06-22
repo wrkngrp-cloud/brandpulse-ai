@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/lib/utils'
+import { cn, formatNGN } from '@/lib/utils'
 import { CampaignAiSummary } from './campaign-ai-summary'
 
 const OBJECTIVE_META: Record<string, { label: string; color: string }> = {
@@ -56,6 +56,7 @@ interface CampaignOverviewProps {
 
 function fmtMoney(v: number | null, cur = 'NGN') {
   if (!v) return '—'
+  if (cur === 'NGN') return formatNGN(Number(v))
   return `${cur} ${Number(v).toLocaleString('en-NG')}`
 }
 

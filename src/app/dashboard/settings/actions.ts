@@ -76,6 +76,7 @@ const brandSchema = z.object({
   marketSharePct:     z.number().min(0).max(100).nullable().default(null),
   brandValues:        z.array(z.string()).default([]),
   monitoredHashtags:  z.array(z.string()).default([]),
+  brandAliases:       z.array(z.string()).max(10).default([]),
   brandVoice: z.object({
     adjectives:       z.array(z.string()).default([]),
     tone:             z.string().default(''),
@@ -133,6 +134,7 @@ export async function updateBrand(
     market_share_pct:    d.marketSharePct,
     brand_values:        d.brandValues,
     monitored_hashtags:  d.monitoredHashtags,
+    brand_aliases:       d.brandAliases,
     brand_voice:         d.brandVoice,
     cultural_profile:    d.culturalProfile,
     target_segments:     d.targetSegments,

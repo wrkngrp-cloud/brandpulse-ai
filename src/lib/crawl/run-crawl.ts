@@ -68,7 +68,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
   const today = new Date().toISOString().slice(0, 10)
 
   const { data: brand } = await supabase
-    .from('brands').select('id, name, monitored_hashtags').eq('id', brandId).single()
+    .from('brands').select('id, name, monitored_hashtags, brand_aliases').eq('id', brandId).single()
   if (!brand) throw new Error('Brand not found')
 
   // ── 1. Get connected social accounts ──────────────────────────────────────
@@ -113,7 +113,10 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
 
       // Run @mention timeline and keyword/text search in parallel
       // Pass custom hashtags so the search query includes them alongside the brand name
-      const extraHashtags = (brand.monitored_hashtags as string[] | null) ?? []
+      const extraHashtags = [
+        ...((brand.monitored_hashtags as string[] | null) ?? []),
+        ...((brand.brand_aliases     as string[] | null) ?? []),
+      ]
       const [mentionTweets, keywordTweets] = await Promise.all([
         withRefresh(() => fetchTwitterUserMentions(twitterConn.account_id!, accessToken, since)),
         withRefresh(() => fetchTwitterKeywordMentions(brand.name, handle, accessToken, since, extraHashtags))
@@ -152,7 +155,10 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
 
   if (instagramConn?.account_id && instagramConn.access_token) {
     try {
-      const customHashtags = (brand.monitored_hashtags as string[] | null) ?? []
+      const customHashtags = [
+        ...((brand.monitored_hashtags as string[] | null) ?? []),
+        ...((brand.brand_aliases     as string[] | null) ?? []),
+      ]
       const hashtags = [...new Set([...deriveHashtags(brand.name), ...customHashtags])]
       const igToken = decrypt(instagramConn.access_token)
       const [hashtagMentions, taggedMedia] = await Promise.all([

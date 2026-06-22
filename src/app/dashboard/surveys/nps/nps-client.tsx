@@ -32,6 +32,7 @@ interface Props {
   industry:         string | null
   detractorTexts:   string[]
   promoterTexts:    string[]
+  benchmarkP50?:    number | null
 }
 
 interface DiagnosisResult {
@@ -120,7 +121,7 @@ function NpsWhatsAppSender() {
 
 export function NpsClient({
   weeklyData, currentNps, totalPromoters, totalPassives, totalDetractors,
-  totalResponses, trendDirection, brandName, industry, detractorTexts, promoterTexts,
+  totalResponses, trendDirection, brandName, industry, detractorTexts, promoterTexts, benchmarkP50,
 }: Props) {
   const [diagnosis, setDiagnosis] = useState<DiagnosisResult | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -302,6 +303,17 @@ export function NpsClient({
                 strokeOpacity={0.20}
                 label={{ value: 'Excellent', position: 'insideTopRight', fontSize: 9, fill: '#22c55e', opacity: 0.5 }}
               />
+
+              {benchmarkP50 != null && (
+                <ReferenceLine
+                  y={benchmarkP50}
+                  stroke="#f59e0b"
+                  strokeDasharray="6 3"
+                  strokeWidth={1.5}
+                  strokeOpacity={0.7}
+                  label={{ value: `Sector P50 (${Math.round(benchmarkP50)})`, position: 'insideTopRight', fontSize: 9, fill: '#f59e0b', opacity: 0.85 }}
+                />
+              )}
 
               <Area
                 type="monotone"

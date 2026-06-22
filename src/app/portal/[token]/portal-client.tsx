@@ -10,7 +10,7 @@ import {
   DollarSign, Target, Award, AlertCircle, CheckCircle2, ChevronRight,
   RefreshCw, Calendar, BarChart3, Eye, Newspaper,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatNGN } from '@/lib/utils'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -83,10 +83,7 @@ function fmtDate(d: string) {
 }
 
 function fmtNGN(kobo: number) {
-  const ngn = kobo / 100
-  if (ngn >= 1_000_000) return `₦${(ngn / 1_000_000).toFixed(1)}M`
-  if (ngn >= 1_000)     return `₦${(ngn / 1_000).toFixed(0)}K`
-  return `₦${ngn.toFixed(0)}`
+  return formatNGN(kobo / 100)
 }
 
 function bhiZone(bhi: number): { label: string; color: string } {

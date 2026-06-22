@@ -12,59 +12,7 @@ import { estimateTraffic, inferSiteDemographics } from '@/app/dashboard/ooh/acti
 import { UrlLengthAdvisor }   from '@/components/ooh/url-length-advisor'
 import Link                   from 'next/link'
 import type { PlaceDemographics } from '@/lib/ooh/places-demographics'
-
-// ── Nigerian states + LGAs ────────────────────────────────────────────────────
-const LGAS_BY_STATE: Record<string, string[]> = {
-  'Lagos State': [
-    'Agege', 'Ajeromi-Ifelodun', 'Alimosho', 'Amuwo-Odofin', 'Apapa',
-    'Badagry', 'Epe', 'Eti-Osa', 'Ibeju-Lekki', 'Ifako-Ijaiye',
-    'Ikeja', 'Ikorodu', 'Kosofe', 'Lagos Island', 'Lagos Mainland',
-    'Mushin', 'Ojo', 'Oshodi-Isolo', 'Shomolu', 'Surulere',
-  ],
-  'FCT (Abuja)': [
-    'Abaji', 'Bwari', 'Gwagwalada', 'Kuje', 'Kwali', 'Municipal Area Council',
-  ],
-  'Rivers State': [
-    'Port Harcourt', 'Obio-Akpor', 'Eleme', 'Emohua', 'Etche',
-    'Ikwerre', 'Khana', 'Okrika', 'Oyigbo', 'Tai',
-  ],
-  'Oyo State': [
-    'Ibadan North', 'Ibadan North-East', 'Ibadan North-West',
-    'Ibadan South-East', 'Ibadan South-West', 'Akinyele', 'Egbeda',
-    'Lagelu', 'Ogbomosho North', 'Oluyole', 'Ona Ara',
-  ],
-  'Kano State': [
-    'Kano Municipal', 'Nassarawa', 'Dala', 'Fagge', 'Gwale',
-    'Kumbotso', 'Tarauni', 'Ungogo', 'Dawakin Tofa',
-  ],
-  'Kaduna State': [
-    'Kaduna North', 'Kaduna South', 'Chikun', 'Igabi', 'Birnin Gwari', 'Zaria',
-  ],
-  'Enugu State': [
-    'Enugu East', 'Enugu North', 'Enugu South', 'Igbo-Eze North', 'Udi', 'Nkanu West',
-  ],
-  'Delta State': [
-    'Warri South', 'Warri North', 'Warri South-West', 'Oshimili South', 'Ethiope East', 'Uvwie',
-  ],
-  'Anambra State': [
-    'Onitsha North', 'Onitsha South', 'Awka South', 'Awka North', 'Nnewi North', 'Idemili North',
-  ],
-  'Cross River State': [
-    'Calabar Municipality', 'Calabar South', 'Odukpani', 'Abi',
-  ],
-  'Ondo State': [
-    'Akure South', 'Akure North', 'Ondo East', 'Ondo West', 'Ile-Oluji',
-  ],
-  'Osun State': [
-    'Osogbo', 'Ife Central', 'Ife East', 'Ilesa East', 'Ilesa West',
-  ],
-  'Ogun State': [
-    'Abeokuta South', 'Abeokuta North', 'Sagamu', 'Ijebu Ode', 'Ado-Odo/Ota',
-  ],
-  'Edo State': [
-    'Oredo', 'Ikpoba-Okha', 'Egor', 'Ovia North-East', 'Uhunmwonde',
-  ],
-}
+import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
 
 const FORMAT_TYPES = [
   'Billboard', 'Unipole', 'Bridge Panel', 'Transit Shelter',
@@ -450,13 +398,6 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
     setShortCode(randomShortCode())
   }
 
-  const lgaOptions = stateNg
-    ? Object.entries(LGAS_BY_STATE).find(([k]) =>
-        k.toLowerCase().includes(stateNg.toLowerCase()) ||
-        stateNg.toLowerCase().includes(k.toLowerCase().split(' ')[0])
-      )?.[1] ?? []
-    : []
-
   return (
     <form
       action={formAction}
@@ -667,19 +608,18 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="state">State</Label>
-            <select
-              id="state" name="state"
-              value={stateNg}
-              onChange={e => { setStateNg(e.target.value); setLga('') }}
-              className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <option value="">Select state…</option>
-              {Object.keys(LGAS_BY_STATE).map(s => <option key={s} value={s}>{s}</option>)}
-              <option value="Other">Other state</option>
-            </select>
+            <Label>State</Label>
+            <input type="hidden" name="state" value={stateNg} />
+            <NigeriaLocationSelect
+              state={stateNg}
+              lga={lga}
+              onStateChange={s => { setStateNg(s); setLga('') }}
+              onLgaChange={setLga}
+            />
           </div>
         </div>
+
+        <input type="hidden" name="lga" value={lga} />
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
@@ -695,18 +635,10 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             </select>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="lga">LGA</Label>
-            <select
-              id="lga" name="lga"
-              value={lga}
-              onChange={e => setLga(e.target.value)}
-              disabled={lgaOptions.length === 0}
-              className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-            >
-              <option value="">{stateNg ? 'Select LGA…' : 'Select state first'}</option>
-              {lgaOptions.map(l => <option key={l} value={l}>{l}</option>)}
-              {stateNg && <option value="Other">Other</option>}
-            </select>
+            <Label>LGA</Label>
+            <p className="h-9 flex items-center text-sm text-muted-foreground">
+              {lga || (stateNg ? 'Select LGA in state picker above' : 'Select state first')}
+            </p>
           </div>
         </div>
 

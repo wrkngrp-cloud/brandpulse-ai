@@ -127,7 +127,7 @@ const BASE_CALENDAR: BaseMoment[] = [
     name: 'Ojude Oba Festival', mmdd: '06-29', type: 'Cultural',
     brandRelevance: 'Ijebu-Ode\'s royal durbar — spectacular fashion, horsemanship, and Yoruba heritage. Premium brand and influencer moment',
     tags: ['culture', 'fashion', 'premium', 'southwest', 'muslim', 'yoruba', 'food'],
-    floatingDates: { '2026': '2026-06-29', '2027': '2027-06-18' },
+    floatingDates: { '2026': '2026-06-29', '2027': '2027-06-18', '2028': '2028-06-07' },
   },
   {
     name: 'New Yam Festival (Iriji)', mmdd: '08-20', type: 'Cultural',
@@ -148,7 +148,7 @@ const BASE_CALENDAR: BaseMoment[] = [
     name: 'Durbar Festival', mmdd: '04-17', type: 'Cultural',
     brandRelevance: 'Royal Durbar at Eid — thousands of horsemen in ceremonial dress across Kano, Zaria, Sokoto. Premium northern storytelling moment',
     tags: ['culture', 'fashion', 'premium', 'north', 'hausa', 'muslim', 'traditional'],
-    floatingDates: { '2026': '2026-04-17', '2027': '2027-04-06' },
+    floatingDates: { '2026': '2026-04-17', '2027': '2027-04-06', '2028': '2028-03-26' },
   },
   {
     name: 'Calabar Carnival', mmdd: '12-01', type: 'Cultural',
@@ -245,25 +245,25 @@ const BASE_CALENDAR: BaseMoment[] = [
     name: 'Ramadan Start', mmdd: '03-18', type: 'Religious',
     brandRelevance: 'Reach Muslim consumers with values-led, community, and Sahur/Iftar-themed content',
     tags: ['muslim', 'north', 'hausa', 'yoruba', 'community', 'food', 'fmcg', 'religious'],
-    floatingDates: { '2026': '2026-03-18', '2027': '2027-03-08' },
+    floatingDates: { '2026': '2026-03-18', '2027': '2027-03-08', '2028': '2028-02-26' },
   },
   {
     name: 'Easter', mmdd: '04-05', type: 'Religious',
     brandRelevance: 'Family gatherings drive food and gifting spend — strong moment for FMCG, travel, and celebration brands',
     tags: ['christian', 'south', 'east', 'family', 'food', 'gifting', 'all'],
-    floatingDates: { '2026': '2026-04-05', '2027': '2027-03-28' },
+    floatingDates: { '2026': '2026-04-05', '2027': '2027-03-28', '2028': '2028-04-16' },
   },
   {
     name: 'Eid al-Fitr', mmdd: '04-17', type: 'Religious',
     brandRelevance: 'End of Ramadan celebration — gifting, fashion, and premium experiences resonate with Muslim consumers',
     tags: ['muslim', 'north', 'hausa', 'yoruba', 'family', 'fashion', 'food', 'premium', 'gifting'],
-    floatingDates: { '2026': '2026-04-17', '2027': '2027-04-06' },
+    floatingDates: { '2026': '2026-04-17', '2027': '2027-04-06', '2028': '2028-03-27' },
   },
   {
     name: 'Eid al-Adha', mmdd: '06-26', type: 'Religious',
     brandRelevance: 'Themes of sacrifice, generosity, and community — food and lifestyle brands create lasting impressions',
     tags: ['muslim', 'north', 'hausa', 'community', 'food', 'family', 'religious'],
-    floatingDates: { '2026': '2026-06-26', '2027': '2027-06-16' },
+    floatingDates: { '2026': '2026-06-26', '2027': '2027-06-16', '2028': '2028-06-04' },
   },
   {
     name: 'Christmas', mmdd: '12-25', type: 'Religious',
@@ -340,7 +340,7 @@ const BASE_CALENDAR: BaseMoment[] = [
 function buildCalendar(today: string): CulturalMoment[] {
   const currentYear = new Date(today).getFullYear()
   const moments: CulturalMoment[] = []
-  for (const yr of [currentYear, currentYear + 1]) {
+  for (const yr of [currentYear, currentYear + 1, currentYear + 2]) {
     for (const base of BASE_CALENDAR) {
       const date = base.floatingDates?.[String(yr)] ?? `${yr}-${base.mmdd}`
       moments.push({ name: base.name, date, type: base.type, brandRelevance: base.brandRelevance, tags: base.tags })
@@ -891,7 +891,7 @@ export function CulturalClient({
           <div className="flex items-center gap-2">
             <Globe className="h-4 w-4 text-muted-foreground" />
             <p className="text-sm font-semibold">Full Cultural Calendar</p>
-            <span className="text-xs text-muted-foreground">— {allUpcoming.length} upcoming moments</span>
+            <span className="text-xs text-muted-foreground">— Planning calendar covers 2026–2028 · {allUpcoming.length} upcoming moments</span>
           </div>
         </div>
 
