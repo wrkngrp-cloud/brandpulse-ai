@@ -59,10 +59,10 @@ export default async function BusinessCasePage() {
       .eq('brand_id', brand.id)
       .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
 
-    supabase.from('survey_responses')
-      .select('nps_score')
+    supabase.from('nps_records')
+      .select('score')
       .eq('brand_id', brand.id)
-      .not('nps_score', 'is', null)
+      .not('score', 'is', null)
       .gte('created_at', ninetyDaysAgo),
 
     supabase.from('sentiment_daily')
@@ -90,7 +90,7 @@ export default async function BusinessCasePage() {
   const totalBudget      = (campaigns ?? []).reduce((s, c) => s + (c.budget ?? 0), 0)
   const activeCampaigns  = (campaigns ?? []).filter(c => c.status === 'active').length
 
-  const npsScores        = (npsData ?? []).map(r => r.nps_score ?? 0)
+  const npsScores        = (npsData ?? []).map(r => r.score ?? 0)
   const avgNps           = npsScores.length > 0
     ? npsScores.reduce((a, b) => a + b, 0) / npsScores.length
     : null
