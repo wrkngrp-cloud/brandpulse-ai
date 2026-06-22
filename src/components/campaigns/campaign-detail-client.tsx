@@ -56,6 +56,7 @@ interface Event {
   id: string
   name: string
   event_type: string | null
+  activation_type: string | null
   city: string
   state: string | null
   date_start: string
@@ -882,38 +883,119 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               </Link>
             </div>
           ) : (
-            <div className="divide-y border rounded-xl overflow-hidden">
-              {events.map(ev => (
-                <div key={ev.id} className="flex items-center gap-4 px-4 py-3 bg-card hover:bg-muted/30 transition-colors">
-                  <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                    <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <Link href={`/dashboard/events/${ev.id}`} className="text-sm font-medium hover:underline truncate">
-                        {ev.name}
+            <>
+              <div className="divide-y border rounded-xl overflow-hidden">
+                {events.map(ev => {
+                  const displayType = ev.activation_type ?? ev.event_type
+                  const evLeads = leadsByEvent[ev.id] ?? 0
+                  const evCpl = evLeads > 0 && ev.budget ? Math.round(ev.budget / evLeads) : null
+                  return (
+                    <div key={ev.id} className="flex items-center gap-4 px-4 py-3 bg-card hover:bg-muted/30 transition-colors">
+                      <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                        <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <Link href={`/dashboard/events/${ev.id}`} className="text-sm font-medium hover:underline truncate">
+                            {ev.name}
+                          </Link>
+                          <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0', EVENT_STATUS[ev.status] ?? 'bg-muted text-muted-foreground')}>
+                            {ev.status.charAt(0).toUpperCase() + ev.status.slice(1)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.date_start)}
+                          {displayType ? ` · ${displayType.replace(/_/g, ' ')}` : ''}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right space-y-0.5">
+                        {ev.budget && (
+                          <>
+                            <p className="text-sm tabular-nums">{fmtMoney(ev.budget, ev.currency)}</p>
+                            <p className="text-xs text-muted-foreground">budget</p>
+                          </>
+                        )}
+                        {evCpl != null && (
+                          <p className="text-xs text-muted-foreground">CPL: {fmtMoney(evCpl, ev.currency)}</p>
+                        )}
+                      </div>
+                      <Link href={`/dashboard/events/${ev.id}`} className="shrink-0 text-muted-foreground hover:text-foreground">
+                        <ExternalLink className="h-4 w-4" />
                       </Link>
-                      <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0', EVENT_STATUS[ev.status] ?? 'bg-muted text-muted-foreground')}>
-                        {ev.status.charAt(0).toUpperCase() + ev.status.slice(1)}
-                      </span>
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.date_start)}
-                      {ev.event_type ? ` · ${ev.event_type}` : ''}
-                    </p>
+                  )
+                })}
+              </div>
+
+              {/* BTL activations rollup */}
+              {(() => {
+                const btlEvents = events.filter(ev => ev.activation_type && ev.activation_type !== 'event')
+                if (btlEvents.length === 0) return null
+                const btlTotalCost = btlEvents.reduce((s, ev) => s + (Number(ev.budget) || 0), 0)
+                const btlTotalLeads = btlEvents.reduce((s, ev) => s + (leadsByEvent[ev.id] ?? 0), 0)
+                const btlBlendedCpl = btlTotalLeads > 0 && btlTotalCost > 0
+                  ? Math.round(btlTotalCost / btlTotalLeads) : null
+                return (
+                  <div className="border rounded-xl p-5 bg-card space-y-4">
+                    <p className="text-sm font-semibold">BTL activations</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
+                        <p className="text-lg font-bold tabular-nums">{btlEvents.length}</p>
+                        <p className="text-xs text-muted-foreground">Activations</p>
+                      </div>
+                      <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
+                        <p className="text-lg font-bold tabular-nums">{fmtMoney(btlTotalCost || null, campaign.currency)}</p>
+                        <p className="text-xs text-muted-foreground">Total cost</p>
+                      </div>
+                      <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
+                        <p className="text-lg font-bold tabular-nums">{btlTotalLeads.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">Total leads</p>
+                      </div>
+                      <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
+                        <p className="text-lg font-bold tabular-nums">{btlBlendedCpl != null ? fmtMoney(btlBlendedCpl, campaign.currency) : '—'}</p>
+                        <p className="text-xs text-muted-foreground">Blended CPL</p>
+                      </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs min-w-[480px]">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left font-medium text-muted-foreground pb-2 pr-4">Activation</th>
+                            <th className="text-left font-medium text-muted-foreground pb-2 pr-4">Type</th>
+                            <th className="text-left font-medium text-muted-foreground pb-2 pr-4">Location</th>
+                            <th className="text-left font-medium text-muted-foreground pb-2 pr-4">Date</th>
+                            <th className="text-right font-medium text-muted-foreground pb-2">CPL</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {btlEvents.map(ev => {
+                            const evLeads = leadsByEvent[ev.id] ?? 0
+                            const evCpl   = evLeads > 0 && ev.budget ? Math.round(ev.budget / evLeads) : null
+                            return (
+                              <tr key={ev.id} className="border-b last:border-0">
+                                <td className="py-2 pr-4">
+                                  <Link href={`/dashboard/events/${ev.id}`} className="font-medium hover:underline">
+                                    {ev.name}
+                                  </Link>
+                                </td>
+                                <td className="py-2 pr-4 text-muted-foreground capitalize">
+                                  {(ev.activation_type ?? '').replace(/_/g, ' ')}
+                                </td>
+                                <td className="py-2 pr-4 text-muted-foreground">{ev.city}</td>
+                                <td className="py-2 pr-4 text-muted-foreground">{fmtDate(ev.date_start)}</td>
+                                <td className="py-2 text-right">
+                                  {evCpl != null ? fmtMoney(evCpl, ev.currency) : '—'}
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                  {ev.budget && (
-                    <div className="shrink-0 text-right">
-                      <p className="text-sm tabular-nums">{fmtMoney(ev.budget, ev.currency)}</p>
-                      <p className="text-xs text-muted-foreground">budget</p>
-                    </div>
-                  )}
-                  <Link href={`/dashboard/events/${ev.id}`} className="shrink-0 text-muted-foreground hover:text-foreground">
-                    <ExternalLink className="h-4 w-4" />
-                  </Link>
-                </div>
-              ))}
-            </div>
+                )
+              })()}
+            </>
           )}
         </div>
       )}

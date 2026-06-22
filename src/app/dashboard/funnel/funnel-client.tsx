@@ -3,11 +3,12 @@
 import { useState, useTransition } from 'react'
 import {
   Globe, Eye, Heart, Zap, Shield, Share2,
-  ChevronDown, Sparkles, Loader2, AlertCircle, ChevronRight,
+  ChevronDown, Sparkles, Loader2, AlertCircle, ChevronRight, Info,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import Link from 'next/link'
 
 type StageKey = 'awareness' | 'consideration' | 'preference' | 'action' | 'loyalty' | 'advocacy'
 
@@ -50,6 +51,31 @@ const STAGES: {
   { key: 'advocacy',      label: 'Advocacy',      description: 'Share rate → Word-of-mouth / Distinctive Assets (Ehrenberg-Bass)', icon: Share2 },
 ]
 
+const STAGE_EMPTY: Record<StageKey, { text: string; linkLabel?: string; linkHref?: string }> = {
+  awareness:     { text: '' },
+  consideration: {
+    text: 'Consideration tracks brand awareness in conversation. Run a sentiment crawl in Settings to start collecting social mentions.',
+    linkLabel: 'Go to Connectors',
+    linkHref: '/dashboard/connectors',
+  },
+  preference:    { text: '' },
+  action:        {
+    text: 'Action measures how many people convert — via campaign links, event leads, or sales. Connect vanity URLs in OOH tracking, log event leads via the Events module, or import sales data to see this stage.',
+    linkLabel: 'OOH tracking',
+    linkHref: '/dashboard/ooh',
+  },
+  loyalty:       {
+    text: 'Loyalty measures how many customers would buy again. Run an NPS survey — go to Surveys to send your first pulse.',
+    linkLabel: 'Go to Surveys',
+    linkHref: '/dashboard/surveys/nps',
+  },
+  advocacy:      {
+    text: 'Advocacy measures organic brand championing. It needs at least 50 social engagements tracked and NPS data with 10+ responses.',
+    linkLabel: 'Track social posts',
+    linkHref: '/dashboard/sentiment',
+  },
+}
+
 function scoreColor(score: number) {
   if (score >= 65) return 'text-foreground'
   if (score >= 40) return 'text-amber-500'
@@ -75,6 +101,18 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
   const stageScores = STAGES.map(s => scores[s.key].score)
 
   function handleDiagnose() {
+    const nullStages = STAGES.filter(s => scores[s.key].score == null).map(s => s.label)
+    const hasEnoughData = nullStages.length < STAGES.length - 1
+
+    if (!hasEnoughData) {
+      const missing = nullStages.join(', ')
+      toast.error(
+        `Not enough data yet to run a full diagnosis. The funnel needs data across at least 2 stages. What's missing: ${missing}.`,
+        { duration: 6000 },
+      )
+      return
+    }
+
     startTransition(async () => {
       const res = await fetch('/api/funnel/diagnose', {
         method:  'POST',
@@ -214,6 +252,26 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                         )}
                       </button>
                     </div>
+
+                    {/* Empty state callout when score is null */}
+                    {score == null && STAGE_EMPTY[stage.key].text && (
+                      <div className="mt-3 flex items-start gap-2 border rounded-lg bg-muted/30 px-3 py-2">
+                        <Info className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            {STAGE_EMPTY[stage.key].text}
+                          </p>
+                          {STAGE_EMPTY[stage.key].linkLabel && STAGE_EMPTY[stage.key].linkHref && (
+                            <Link
+                              href={STAGE_EMPTY[stage.key].linkHref!}
+                              className="text-xs text-primary hover:underline"
+                            >
+                              {STAGE_EMPTY[stage.key].linkLabel} →
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

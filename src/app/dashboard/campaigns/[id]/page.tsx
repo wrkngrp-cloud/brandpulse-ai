@@ -51,7 +51,7 @@ export default async function CampaignDetailPage({
       .order('created_at', { ascending: false }),
     supabase
       .from('events')
-      .select('id, name, event_type, city, state, date_start, date_end, status, budget, currency')
+      .select('id, name, event_type, activation_type, city, state, date_start, date_end, status, budget, currency')
       .eq('campaign_id', id)
       .order('date_start', { ascending: false }),
     supabase
