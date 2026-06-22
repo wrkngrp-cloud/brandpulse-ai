@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
 
     sections.includes('campaigns')
       ? supabase.from('campaigns')
-          .select('id, name, channel, status, budget, spend, start_date, end_date')
+          .select('id, name, status, total_budget, start_date, end_date')
           .eq('brand_id', brandId)
           .gte('start_date', since)
           .order('start_date', { ascending: false })
@@ -87,10 +87,10 @@ export async function GET(request: NextRequest) {
       : { data: null },
 
     sections.includes('nps')
-      ? supabase.from('survey_responses')
-          .select('nps_score, created_at')
+      ? supabase.from('nps_records')
+          .select('score, created_at')
           .eq('brand_id', brandId)
-          .not('nps_score', 'is', null)
+          .not('score', 'is', null)
           .gte('created_at', since)
           .order('created_at', { ascending: true })
       : { data: null },
@@ -155,11 +155,12 @@ export async function GET(request: NextRequest) {
   const sentimentDelta  = latestSentiment != null && firstSentiment != null ? latestSentiment - firstSentiment : null
 
   const avgNps = npsResponses.length > 0
-    ? npsResponses.reduce((s, r) => s + (r.nps_score ?? 0), 0) / npsResponses.length
+    ? npsResponses.reduce((s, r) => s + (r.score ?? 0), 0) / npsResponses.length
     : null
 
-  const totalBudget  = campaigns.reduce((s, c) => s + (c.budget ?? 0), 0)
-  const totalSpend   = campaigns.reduce((s, c) => s + (c.spend ?? 0), 0)
+  // campaigns.total_budget is stored in NGN; campaigns has no top-level 'spend' column
+  const totalBudget  = campaigns.reduce((s, c) => s + ((c as unknown as { total_budget?: number }).total_budget ?? 0), 0)
+  const totalSpend   = 0  // no spend column on campaigns table — channel spend is in campaign_channels.budget_allocation
   const activeCampaigns = campaigns.filter(c => c.status === 'active').length
 
   // AI executive summary (structural tier, board-grade framing)
@@ -177,7 +178,7 @@ Key metrics:
 - Share of Voice: ${latestSov?.social_sov ?? 'N/A'}%
 - Total mentions: ${mentionCount}
 - Active campaigns: ${activeCampaigns} / ${campaigns.length} total
-- Total media spend tracked: ₦${(totalSpend / 100).toLocaleString()}
+- Total campaign budget: ₦${totalBudget.toLocaleString()}
 - NPS score: ${avgNps != null ? avgNps.toFixed(1) : 'N/A'} (${npsResponses.length} responses)
 - Market share: ${brand.market_share_pct ?? 'N/A'}%
 
@@ -207,7 +208,7 @@ Sentiment: ${latestSentiment != null ? latestSentiment.toFixed(1) : 'N/A'} (delt
 SOV: ${latestSov?.social_sov ?? 'N/A'}%
 NPS: ${avgNps != null ? avgNps.toFixed(1) : 'N/A'}
 Active campaigns: ${activeCampaigns}
-Spend: ₦${(totalSpend / 100).toLocaleString()}
+Budget: ₦${totalBudget.toLocaleString()}
 Mentions: ${mentionCount}
 
 Respond with ONLY valid JSON (no markdown, no code fences):

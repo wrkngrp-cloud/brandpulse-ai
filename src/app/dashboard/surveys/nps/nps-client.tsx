@@ -95,7 +95,7 @@ function NpsWhatsAppSender() {
       </div>
       <p className="text-[12.5px] text-muted-foreground">
         Sends a 0-10 NPS question via WhatsApp. Replies are captured automatically and appear in your NPS score.
-        Requires Africa's Talking WhatsApp API ({process.env.NEXT_PUBLIC_APP_URL ? 'configured' : 'set AFRICAS_TALKING_API_KEY'}).
+        Requires the Africa's Talking WhatsApp API (set AFRICAS_TALKING_API_KEY in environment variables).
       </p>
       {sent && (
         <div className="rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 p-3">
