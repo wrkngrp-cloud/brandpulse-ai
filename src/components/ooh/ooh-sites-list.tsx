@@ -57,6 +57,12 @@ const STATUS_LABELS: Record<string, string> = {
   live: 'Live', upcoming: 'Upcoming', ended: 'Ended', 'no-dates': 'No dates',
 }
 
+const FORMAT_BADGE: Record<string, { label: string; style: string }> = {
+  'Keke Fleet':      { label: 'Keke Fleet',      style: 'bg-orange-100 text-orange-800 dark:bg-orange-950/50 dark:text-orange-300' },
+  'Wall Painting':   { label: 'Wall Painting',   style: 'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300' },
+  'Branded Vehicle': { label: 'Branded Vehicle', style: 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300' },
+}
+
 export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps) {
   const router = useRouter()
 
@@ -98,9 +104,13 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                   ) : !site.campaign_id ? (
                     <span className="text-xs text-muted-foreground/60 italic">Always On</span>
                   ) : null}
-                  {site.format_type && (
+                  {site.format_type && FORMAT_BADGE[site.format_type] ? (
+                    <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', FORMAT_BADGE[site.format_type].style)}>
+                      {FORMAT_BADGE[site.format_type].label}
+                    </span>
+                  ) : site.format_type ? (
                     <span className="text-xs text-muted-foreground">{site.format_type}</span>
-                  )}
+                  ) : null}
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5 truncate">
                   {[site.city, site.state].filter(Boolean).join(', ')}

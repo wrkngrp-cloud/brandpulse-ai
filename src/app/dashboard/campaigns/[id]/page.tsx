@@ -116,11 +116,18 @@ export default async function CampaignDetailPage({
         .limit(50)
     : Promise.resolve({ data: [] })
 
-  const [{ data: socialPosts }, { data: oohVisits }, { data: influencers }, { data: unlinkedInfluencers }] = await Promise.all([
+  // 5. Attributed e-commerce revenue for this campaign
+  const ecommerceQuery = supabase
+    .from('ecommerce_sales')
+    .select('amount')
+    .eq('campaign_id', id)
+
+  const [{ data: socialPosts }, { data: oohVisits }, { data: influencers }, { data: unlinkedInfluencers }, { data: ecommerceSales }] = await Promise.all([
     socialQuery,
     oohVisitsQuery,
     influencersQuery,
     unlinkedInfluencersQuery,
+    ecommerceQuery,
   ])
 
   return (
@@ -151,6 +158,7 @@ export default async function CampaignDetailPage({
         oohVisits={oohVisits ?? []}
         influencers={influencers ?? []}
         unlinkedInfluencers={unlinkedInfluencers ?? []}
+        attributedRevenue={(ecommerceSales ?? []).reduce((s, r) => s + Number(r.amount), 0)}
       />
     </div>
   )

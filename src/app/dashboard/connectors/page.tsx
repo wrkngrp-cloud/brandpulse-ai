@@ -1,11 +1,15 @@
 import { createClient }        from '@/lib/supabase/server'
 import { redirect }            from 'next/navigation'
+import Link                   from 'next/link'
 import { SocialConnectCard }   from '@/components/dashboard/social-connect-card'
 import { GA4ConnectCard, type GA4ConnectionData }      from '@/components/dashboard/ga4-connect-card'
 import { PaymentConnectCard, type PaymentConfigStatus } from '@/components/dashboard/payment-connect-card'
 import { AppStoreConnectCard, type AppStoreConfigData } from '@/components/dashboard/app-store-connect-card'
 import { EmailConnectCard, type EmailConnectorStatus }  from '@/components/dashboard/email-connect-card'
 import { PixelCard } from './pixel-card'
+import { ShoppingCart, ArrowRight } from 'lucide-react'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,13 +32,18 @@ export default async function ConnectorsPage() {
   let appStoreConfig:  AppStoreConfigData | null = null
   let emailStatus:     EmailConnectorStatus      = { mailchimp: false, brevo: false }
 
+  let ecommerceStats: { sources: string[]; totalOrders: number; lastImportAt: string | null } = {
+    sources: [], totalOrders: 0, lastImportAt: null,
+  }
+
   if (brand) {
-    const [ga4Res, webhookRes, appRes, reviewRes, emailRes] = await Promise.all([
+    const [ga4Res, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
       supabase.from('ga4_connections').select('id, property_id, property_name, last_synced_at').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('webhook_configs').select('provider').eq('brand_id', brand.id),
       supabase.from('app_store_configs').select('apple_app_id, google_pkg_name').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('app_reviews').select('rating').eq('brand_id', brand.id).order('reviewed_at', { ascending: false }).limit(30),
       supabase.from('email_connectors').select('provider, last_synced_at').eq('brand_id', brand.id),
+      supabase.from('ecommerce_sales').select('source, imported_at').eq('brand_id', brand.id).order('imported_at', { ascending: false }).limit(200),
     ])
 
     ga4Connection = ga4Res.data ?? null
@@ -61,6 +70,15 @@ export default async function ConnectorsPage() {
         mailchimp:     emailRes.data.some(r => r.provider === 'mailchimp'),
         brevo:         emailRes.data.some(r => r.provider === 'brevo'),
         last_synced_at: emailRes.data[0]?.last_synced_at ?? null,
+      }
+    }
+
+    if (ecomRes.data && ecomRes.data.length > 0) {
+      const sources = [...new Set(ecomRes.data.map((r: { source: string }) => r.source))]
+      ecommerceStats = {
+        sources,
+        totalOrders:  ecomRes.data.length,
+        lastImportAt: ecomRes.data[0]?.imported_at ?? null,
       }
     }
   }
@@ -119,6 +137,40 @@ export default async function ConnectorsPage() {
       <section>
         <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Email Marketing</h2>
         <EmailConnectCard status={emailStatus} />
+      </section>
+
+      {/* E-commerce */}
+      <section>
+        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">E-commerce Sales</h2>
+        <div className="border rounded-xl p-5 bg-card space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Sales Import</p>
+                {ecommerceStats.totalOrders > 0 ? (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {ecommerceStats.totalOrders.toLocaleString()} orders · sources: {ecommerceStats.sources.join(', ')}
+                    {ecommerceStats.lastImportAt && (
+                      <> · last import {new Date(ecommerceStats.lastImportAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</>
+                    )}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground mt-0.5">No sales imported yet. Connect Jumia or Konga to start tracking revenue.</p>
+                )}
+              </div>
+            </div>
+            <Link
+              href="/dashboard/connectors/ecommerce"
+              className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'shrink-0 inline-flex items-center gap-1.5')}
+            >
+              Import sales data
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Info notes */}

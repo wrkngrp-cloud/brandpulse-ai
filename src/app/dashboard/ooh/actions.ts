@@ -38,6 +38,12 @@ const SiteSchema = z.object({
   notes:                z.string().optional(),
   qr_enabled:           z.boolean().default(false),
   place_demographics:   z.string().optional(), // JSON string, parsed manually
+  fleet_size:           z.coerce.number().int().positive().optional(),
+  route_lgas:           z.string().optional(), // comma-separated, split on insert
+  surface_width_m:      z.coerce.number().positive().optional(),
+  surface_height_m:     z.coerce.number().positive().optional(),
+  urban_classification: z.enum(['urban', 'semi_urban', 'rural']).optional(),
+  vehicle_type:         z.enum(['truck', 'tanker', 'bus', 'van', 'keke']).optional(),
 })
 
 type FormState = { error?: string; success?: boolean; siteId?: string; siteName?: string } | null
@@ -151,7 +157,7 @@ export async function createSite(
     return { error: parsed.error.issues[0].message }
   }
 
-  const { qr_enabled, short_code: rawShortCode, place_demographics: rawDemographics, ...siteData } = parsed.data
+  const { qr_enabled, short_code: rawShortCode, place_demographics: rawDemographics, route_lgas: rawRouteLgas, ...siteData } = parsed.data
 
   const qrToken  = qr_enabled
     ? `qr-${Math.random().toString(36).slice(2, 10)}`
@@ -166,23 +172,33 @@ export async function createSite(
     try { parsedDemographics = JSON.parse(rawDemographics) } catch { /* ignore */ }
   }
 
+  const routeLgasArray = rawRouteLgas
+    ? rawRouteLgas.split(',').map(s => s.trim()).filter(Boolean)
+    : null
+
   const { data: site, error } = await supabase
     .from('ooh_sites')
     .insert({
       ...siteData,
-      brand_id:             brand.id,
-      status:               'active',
-      campaign_id:          campaignId,
-      qr_token:             qrToken,
-      short_code:           shortCode,
-      lat:                  siteData.lat           ?? null,
-      lng:                  siteData.lng           ?? null,
-      daily_traffic:        siteData.daily_traffic ?? null,
-      monthly_cost:         siteData.monthly_cost  ?? null,
-      campaign_start:       siteData.campaign_start ?? null,
-      campaign_end:         siteData.campaign_end   ?? null,
-      pole_count:           siteData.pole_count    ?? 1,
-      place_demographics:   parsedDemographics ?? null,
+      brand_id:              brand.id,
+      status:                'active',
+      campaign_id:           campaignId,
+      qr_token:              qrToken,
+      short_code:            shortCode,
+      lat:                   siteData.lat                ?? null,
+      lng:                   siteData.lng                ?? null,
+      daily_traffic:         siteData.daily_traffic      ?? null,
+      monthly_cost:          siteData.monthly_cost       ?? null,
+      campaign_start:        siteData.campaign_start     ?? null,
+      campaign_end:          siteData.campaign_end       ?? null,
+      pole_count:            siteData.pole_count         ?? 1,
+      place_demographics:    parsedDemographics          ?? null,
+      fleet_size:            siteData.fleet_size         ?? null,
+      route_lgas:            routeLgasArray,
+      surface_width_m:       siteData.surface_width_m    ?? null,
+      surface_height_m:      siteData.surface_height_m   ?? null,
+      urban_classification:  siteData.urban_classification ?? null,
+      vehicle_type:          siteData.vehicle_type       ?? null,
     })
     .select('id')
     .single()
@@ -215,24 +231,34 @@ export async function updateSite(
     return { error: parsed.error.issues[0].message }
   }
 
-  const { qr_enabled, short_code: rawShortCode, place_demographics: rawDemographics2, ...siteData } = parsed.data
+  const { qr_enabled, short_code: rawShortCode, place_demographics: rawDemographics2, route_lgas: rawRouteLgas2, ...siteData } = parsed.data
 
   let parsedDemographics2: unknown | null = null
   if (rawDemographics2) {
     try { parsedDemographics2 = JSON.parse(rawDemographics2) } catch { /* ignore */ }
   }
 
+  const routeLgasArray2 = rawRouteLgas2
+    ? rawRouteLgas2.split(',').map(s => s.trim()).filter(Boolean)
+    : null
+
   const updatePayload: Record<string, unknown> = {
     ...siteData,
-    status:             'active',
-    lat:                siteData.lat           ?? null,
-    lng:                siteData.lng           ?? null,
-    daily_traffic:      siteData.daily_traffic ?? null,
-    monthly_cost:       siteData.monthly_cost  ?? null,
-    campaign_start:     siteData.campaign_start ?? null,
-    campaign_end:       siteData.campaign_end   ?? null,
-    pole_count:         siteData.pole_count    ?? 1,
-    place_demographics: parsedDemographics2 ?? null,
+    status:                'active',
+    lat:                   siteData.lat                ?? null,
+    lng:                   siteData.lng                ?? null,
+    daily_traffic:         siteData.daily_traffic      ?? null,
+    monthly_cost:          siteData.monthly_cost       ?? null,
+    campaign_start:        siteData.campaign_start     ?? null,
+    campaign_end:          siteData.campaign_end       ?? null,
+    pole_count:            siteData.pole_count         ?? 1,
+    place_demographics:    parsedDemographics2         ?? null,
+    fleet_size:            siteData.fleet_size         ?? null,
+    route_lgas:            routeLgasArray2,
+    surface_width_m:       siteData.surface_width_m    ?? null,
+    surface_height_m:      siteData.surface_height_m   ?? null,
+    urban_classification:  siteData.urban_classification ?? null,
+    vehicle_type:          siteData.vehicle_type       ?? null,
   }
   // Only update short_code if the user explicitly changed it
   if (rawShortCode) updatePayload.short_code = rawShortCode
