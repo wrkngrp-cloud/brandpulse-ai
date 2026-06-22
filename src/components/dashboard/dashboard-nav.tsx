@@ -26,7 +26,6 @@ const INTELLIGENCE = [
 const AUDIENCE = [
   { label: 'Competitive',        href: '/dashboard/competitive',        icon: Trophy     },
   { label: 'Influencers',        href: '/dashboard/influencers',        icon: Users      },
-  { label: 'YouTube',            href: '/dashboard/youtube',            icon: PlayCircle },
   { label: 'Cultural',           href: '/dashboard/cultural',           icon: Globe      },
   { label: 'PR Tracking',        href: '/dashboard/pr',                 icon: FileSearch },
   { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: Clipboard  },

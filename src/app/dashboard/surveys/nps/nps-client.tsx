@@ -393,8 +393,6 @@ export function NpsClient({
         </div>
       )}
 
-      {/* ── NPS via WhatsApp ──────────────────────────────────────────────── */}
-      <NpsWhatsAppSender />
     </div>
   )
 }
