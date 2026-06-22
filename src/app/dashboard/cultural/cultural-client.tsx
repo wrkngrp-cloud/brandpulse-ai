@@ -710,6 +710,8 @@ export function CulturalClient({
 
   // Score and sort all upcoming moments
   const allUpcoming = buildCalendar(today)
+  const calStartYear = new Date(today).getFullYear()
+  const calEndYear   = calStartYear + 2
   const scoredMoments = allUpcoming.map(m => ({
     moment: m,
     score:  scoreMoment(m, category, audienceTags, categoryTagSet),
@@ -891,7 +893,7 @@ export function CulturalClient({
           <div className="flex items-center gap-2">
             <Globe className="h-4 w-4 text-muted-foreground" />
             <p className="text-sm font-semibold">Full Cultural Calendar</p>
-            <span className="text-xs text-muted-foreground">— Planning calendar covers 2026–2028 · {allUpcoming.length} upcoming moments</span>
+            <span className="text-xs text-muted-foreground">— Planning calendar covers {calStartYear}–{calEndYear} · {allUpcoming.length} upcoming moments</span>
           </div>
         </div>
 

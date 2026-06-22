@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   ] = await Promise.all([
     service
       .from('sov_snapshots')
-      .select('snapshot_date, social_sov, blended_sov, competitor_data')
+      .select('snapshot_date, social_sov, competitor_data')
       .eq('brand_id', brand.id)
       .order('snapshot_date', { ascending: false })
       .limit(1).maybeSingle(),
@@ -37,9 +37,9 @@ export async function POST(req: NextRequest) {
       .eq('brand_id', brand.id),
     service
       .from('competitor_sightings')
-      .select('name, observation_type, scale, notes, occurred_at')
+      .select('competitor_name, sighting_type, description, spotted_at')
       .eq('brand_id', brand.id)
-      .order('occurred_at', { ascending: false })
+      .order('spotted_at', { ascending: false })
       .limit(10),
     service
       .from('sentiment_daily')
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
 
   // ── Competitor sightings ────────────────────────────────────────────────────
   const sightingsBlock = (sightings ?? []).length > 0
-    ? (sightings ?? []).map(s => `  • [${s.scale?.toUpperCase() ?? 'UNKNOWN'}] ${s.name}: ${s.observation_type ?? ''} — ${s.notes ?? ''} (${s.occurred_at?.slice(0, 10) ?? 'unknown date'})`).join('\n')
+    ? (sightings ?? []).map(s => `  • [${s.sighting_type?.toUpperCase() ?? 'UNKNOWN'}] ${s.competitor_name ?? 'unknown'}: ${s.description ?? ''} (${s.spotted_at?.slice(0, 10) ?? 'unknown date'})`).join('\n')
     : 'No competitor sightings recorded yet'
 
   const competitorNames = (competitors ?? []).map(c => c.name).join(', ') || 'none registered'

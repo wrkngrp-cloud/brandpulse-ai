@@ -151,14 +151,19 @@ export function MentionsList({ initialMentions }: { initialMentions: Mention[] }
                 </span>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
-                {m.sentiment_label && (
-                  <span className={`text-xs font-medium capitalize ${LABEL_COLOR[m.sentiment_label] ?? 'text-muted-foreground'} ${m.disputed ? 'line-through opacity-50' : ''}`}>
+                {m.sentiment_label && !m.disputed && (
+                  <span className={`text-xs font-medium capitalize ${LABEL_COLOR[m.sentiment_label] ?? 'text-muted-foreground'}`}>
+                    {m.sentiment_label}
+                  </span>
+                )}
+                {m.disputed && m.sentiment_label && (
+                  <span className={`text-xs font-medium capitalize line-through opacity-50 ${LABEL_COLOR[m.sentiment_label] ?? 'text-muted-foreground'}`}>
                     {m.sentiment_label}
                   </span>
                 )}
                 {m.disputed && (
-                  <span className={`text-xs font-semibold capitalize ${LABEL_COLOR[m.sentiment_label ?? 'neutral']}`}>
-                    {m.sentiment_label}
+                  <span className="text-xs font-semibold capitalize text-amber-600 dark:text-amber-400">
+                    disputed
                   </span>
                 )}
                 <span className="text-xs text-muted-foreground">

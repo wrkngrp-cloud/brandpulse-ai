@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
   } else if (stage === 'preference') {
     const [{ data: sentDays }, { data: press }] = await Promise.all([
       supabase.from('sentiment_daily').select('social_score, day').gte('day', cut14).order('day', { ascending: true }),
-      supabase.from('press_mentions').select('sentiment_score, title').eq('brand_id', brand.id).gte('published_at', d30.toISOString()).order('published_at', { ascending: false }).limit(10),
+      supabase.from('press_mentions').select('sentiment_score, headline').eq('brand_id', brand.id).gte('published_at', d30.toISOString()).order('published_at', { ascending: false }).limit(10),
     ])
 
     const sentWithData = (sentDays ?? []).filter(d => d.social_score != null)
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
       sentiment_days_with_data: sentWithData.length,
       press_mentions_30d: press?.length ?? 0,
       avg_press_sentiment: avgPress != null ? Math.round(avgPress) : null,
-      recent_headlines: (press ?? []).slice(0, 3).map(p => p.title).filter(Boolean),
+      recent_headlines: (press ?? []).slice(0, 3).map(p => p.headline).filter(Boolean),
     }
 
   } else if (stage === 'action') {
