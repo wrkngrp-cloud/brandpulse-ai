@@ -12,7 +12,7 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
 
   const { data: event } = await supabase
     .from('events')
-    .select('id, name, status, debrief, city, date_start')
+    .select('id, name, status, debrief, city, day')
     .eq('id', id)
     .single()
 

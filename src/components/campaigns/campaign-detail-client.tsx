@@ -55,20 +55,17 @@ interface OohSite {
 interface Event {
   id: string
   name: string
-  event_type: string | null
   activation_type: string | null
   city: string
   state: string | null
-  date_start: string | null
-  date_end: string | null
+  day: string | null
   status: string
-  expected_attendance: number | null
-  budget: number | null
+  estimated_attendance: number | null
   currency: string
 }
 
 interface UnlinkedSite { id: string; site_name: string; city: string | null; state: string | null; format_type: string | null; visits: number }
-interface UnlinkedEvent { id: string; name: string; event_type: string | null; activation_type: string | null; city: string; date_start: string | null; status: string }
+interface UnlinkedEvent { id: string; name: string; activation_type: string | null; city: string; day: string | null; status: string }
 
 export interface CampaignInfluencer {
   id: string
@@ -336,7 +333,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
 
   // Performance aggregates
   const totalOohVisits   = oohSites.reduce((s, site) => s + (site.visits ?? 0), 0)
-  const totalEventAttendance = events.reduce((s, ev) => s + (Number(ev.expected_attendance) || 0), 0)
+  const totalEventAttendance = events.reduce((s, ev) => s + (Number(ev.estimated_attendance) || 0), 0)
   const totalLeads       = interactions.filter(i => i.interaction_type === 'new_lead').length
   const totalEngaged     = interactions.filter(i => ['new_lead','new_customer','engaged'].includes(i.interaction_type)).length
   const totalSpend       = totalOohSpend

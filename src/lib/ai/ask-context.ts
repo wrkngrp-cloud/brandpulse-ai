@@ -52,7 +52,7 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
       .limit(6),
     supabase
       .from('sov_snapshots')
-      .select('snapshot_date, social_sov, competitor_data')
+      .select('snapshot_date, social_sov, blended_sov, competitor_data')
       .eq('brand_id', brandId)
       .order('snapshot_date', { ascending: false })
       .limit(1)
@@ -170,8 +170,8 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
 
   // SOV
   if (sovRow) {
-    parts.push(`Share of Voice (${sovRow.snapshot_date}): Social SOV ${sovRow.social_sov ?? '—'}%`)
-    availableSources.push({ label: 'Share of Voice', detail: `Social ${sovRow.social_sov}%, updated ${sovRow.snapshot_date}` })
+    parts.push(`Share of Voice (${sovRow.snapshot_date}): Social SOV ${sovRow.social_sov ?? '—'}%, Blended SOV ${sovRow.blended_sov ?? '—'}%`)
+    availableSources.push({ label: 'Share of Voice', detail: `Social ${sovRow.social_sov}%, Blended ${sovRow.blended_sov}%, updated ${sovRow.snapshot_date}` })
   } else {
     parts.push('Share of Voice: no data yet — SOV snapshot not yet generated')
   }
