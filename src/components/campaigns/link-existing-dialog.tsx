@@ -19,8 +19,9 @@ interface EventOption {
   id: string
   name: string
   city: string
-  day: string | null
+  date_start: string | null
   status: string
+  event_type: string | null
   activation_type: string | null
 }
 
@@ -187,7 +188,7 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
                     <p className="text-xs text-muted-foreground truncate">
                       {ev.city}
                       {ev.activation_type ? ` · ${ev.activation_type}` : ''}
-                      {ev.day ? ` · ${fmtDate(ev.day)}` : ''}
+                      {ev.date_start ? ` · ${fmtDate(ev.date_start)}` : ''}
                     </p>
                   </div>
                   {selected === ev.id && <Check className="h-4 w-4 shrink-0" />}

@@ -55,17 +55,20 @@ interface OohSite {
 interface Event {
   id: string
   name: string
+  event_type: string | null
   activation_type: string | null
   city: string
   state: string | null
-  day: string | null
+  date_start: string | null
+  date_end: string | null
   status: string
-  estimated_attendance: number | null
+  expected_attendance: number | null
+  budget: number | null
   currency: string
 }
 
 interface UnlinkedSite { id: string; site_name: string; city: string | null; state: string | null; format_type: string | null; visits: number }
-interface UnlinkedEvent { id: string; name: string; activation_type: string | null; city: string; day: string | null; status: string }
+interface UnlinkedEvent { id: string; name: string; event_type: string | null; activation_type: string | null; city: string; date_start: string | null; status: string }
 
 export interface CampaignInfluencer {
   id: string
@@ -333,7 +336,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
 
   // Performance aggregates
   const totalOohVisits   = oohSites.reduce((s, site) => s + (site.visits ?? 0), 0)
-  const totalEventAttendance = events.reduce((s, ev) => s + (Number(ev.estimated_attendance) || 0), 0)
+  const totalEventAttendance = events.reduce((s, ev) => s + (Number(ev.expected_attendance) || 0), 0)
   const totalLeads       = interactions.filter(i => i.interaction_type === 'new_lead').length
   const totalEngaged     = interactions.filter(i => ['new_lead','new_customer','engaged'].includes(i.interaction_type)).length
   const totalSpend       = totalOohSpend
@@ -634,14 +637,14 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               {ev.name}
                             </Link>
                             <span className="ml-1.5 text-muted-foreground">
-                              {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.day)}
+                              {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.date_start)}
                             </span>
                           </td>
                           <td className="py-2 pr-4 text-right tabular-nums font-medium">
                             {leads > 0 ? leads.toLocaleString() : <span className="text-muted-foreground">—</span>}
                           </td>
                           <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">
-                            {ev.estimated_attendance != null ? ev.estimated_attendance.toLocaleString() : '—'}
+                            {ev.expected_attendance != null ? ev.expected_attendance.toLocaleString() : '—'}
                           </td>
                           <td className="py-2 text-right tabular-nums">
                             <span className="text-muted-foreground">—</span>
@@ -899,14 +902,14 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           </span>
                         </div>
                         <p className="text-xs text-muted-foreground truncate">
-                          {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.day)}
+                          {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.date_start)}
                           {ev.activation_type ? ` · ${ev.activation_type.replace(/_/g, ' ')}` : ''}
                         </p>
                       </div>
                       <div className="shrink-0 text-right space-y-0.5">
-                        {ev.estimated_attendance != null && (
+                        {ev.expected_attendance != null && (
                           <>
-                            <p className="text-sm tabular-nums">{ev.estimated_attendance.toLocaleString()}</p>
+                            <p className="text-sm tabular-nums">{ev.expected_attendance.toLocaleString()}</p>
                             <p className="text-xs text-muted-foreground">est. attendance</p>
                           </>
                         )}
@@ -926,7 +929,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               {(() => {
                 const btlEvents = events.filter(ev => ev.activation_type && ev.activation_type !== 'event')
                 if (btlEvents.length === 0) return null
-                const btlTotalAttendance = btlEvents.reduce((s, ev) => s + (Number(ev.estimated_attendance) || 0), 0)
+                const btlTotalAttendance = btlEvents.reduce((s, ev) => s + (Number(ev.expected_attendance) || 0), 0)
                 const btlTotalLeads = btlEvents.reduce((s, ev) => s + (leadsByEvent[ev.id] ?? 0), 0)
                 const btlBlendedCpl = null
                 return (
@@ -975,7 +978,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                                   {(ev.activation_type ?? '').replace(/_/g, ' ')}
                                 </td>
                                 <td className="py-2 pr-4 text-muted-foreground">{ev.city}</td>
-                                <td className="py-2 pr-4 text-muted-foreground">{fmtDate(ev.day)}</td>
+                                <td className="py-2 pr-4 text-muted-foreground">{fmtDate(ev.date_start)}</td>
                                 <td className="py-2 text-right">
                                   {evLeads > 0 ? evLeads : '—'}
                                 </td>
