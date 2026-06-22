@@ -268,12 +268,12 @@ function AddDealDialog({ campaigns, brandId, onAdded }: { campaigns: Campaign[];
           {campaigns.length > 0 && (
             <div className="space-y-2">
               <Label>Link to campaign</Label>
-              <Select value={form.linked_campaign_id} onValueChange={v => setF('linked_campaign_id', v === '__none' ? '' : v)}>
+              <Select value={form.linked_campaign_id} onValueChange={v => setF('linked_campaign_id', !v || v === '__none' ? '' : v)}>
                 <SelectTrigger><SelectValue placeholder="Select campaign (optional)" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">None</SelectItem>
                   {campaigns.map(c => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    <SelectItem key={c.id} value={c.id}>{c.name ?? ''}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -291,7 +291,7 @@ function AddDealDialog({ campaigns, brandId, onAdded }: { campaigns: Campaign[];
   )
 }
 
-export function PlayCircleClient({ mentions, deals, campaigns, isConnected, lastSyncedAt, brandId }: Props) {
+export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyncedAt, brandId }: Props) {
   const [tab, setTab] = useState<'mentions' | 'deals'>('mentions')
   const [connected, setConnected] = useState(isConnected)
   const [running, startRun] = useTransition()
