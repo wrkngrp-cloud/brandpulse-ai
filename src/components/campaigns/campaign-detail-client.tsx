@@ -59,15 +59,16 @@ interface Event {
   activation_type: string | null
   city: string
   state: string | null
-  date_start: string
-  date_end: string
+  date_start: string | null
+  date_end: string | null
   status: string
+  expected_attendance: number | null
   budget: number | null
   currency: string
 }
 
 interface UnlinkedSite { id: string; site_name: string; city: string | null; state: string | null; format_type: string | null; visits: number }
-interface UnlinkedEvent { id: string; name: string; event_type: string | null; city: string; date_start: string; status: string }
+interface UnlinkedEvent { id: string; name: string; event_type: string | null; activation_type: string | null; city: string; date_start: string | null; status: string }
 
 export interface CampaignInfluencer {
   id: string
@@ -335,10 +336,10 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
 
   // Performance aggregates
   const totalOohVisits   = oohSites.reduce((s, site) => s + (site.visits ?? 0), 0)
-  const totalEventBudget = events.reduce((s, ev) => s + (Number(ev.budget) || 0), 0)
+  const totalEventAttendance = events.reduce((s, ev) => s + (Number(ev.expected_attendance) || 0), 0)
   const totalLeads       = interactions.filter(i => i.interaction_type === 'new_lead').length
   const totalEngaged     = interactions.filter(i => ['new_lead','new_customer','engaged'].includes(i.interaction_type)).length
-  const totalSpend       = totalOohSpend + totalEventBudget
+  const totalSpend       = totalOohSpend
   const cpl              = totalLeads > 0 && totalSpend > 0 ? Math.round(totalSpend / totalLeads) : null
   const cpv              = totalOohVisits > 0 && totalOohSpend > 0 ? Math.round(totalOohSpend / totalOohVisits) : null
 
@@ -461,7 +462,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                 label: 'Total Spend',
                 value: fmtMoney(totalSpend || null, campaign.currency),
                 icon: DollarSign,
-                sub: 'OOH + event budgets',
+                sub: 'OOH monthly cost',
               },
               {
                 label: 'Total Impressions',
@@ -622,14 +623,13 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <tr className="border-b">
                       <th className="text-left text-muted-foreground font-medium pb-2 pr-4">Event</th>
                       <th className="text-right text-muted-foreground font-medium pb-2 pr-4">Leads</th>
-                      <th className="text-right text-muted-foreground font-medium pb-2 pr-4">Budget</th>
+                      <th className="text-right text-muted-foreground font-medium pb-2 pr-4">Est. Attendance</th>
                       <th className="text-right text-muted-foreground font-medium pb-2">CPL</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
                     {events.map(ev => {
                       const leads     = leadsByEvent[ev.id] ?? 0
-                      const evCpl     = leads > 0 && ev.budget ? Math.round(Number(ev.budget) / leads) : null
                       return (
                         <tr key={ev.id}>
                           <td className="py-2 pr-4">
@@ -637,17 +637,17 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               {ev.name}
                             </Link>
                             <span className="ml-1.5 text-muted-foreground">
-                              {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.date_start)}
+                              {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.day)}
                             </span>
                           </td>
                           <td className="py-2 pr-4 text-right tabular-nums font-medium">
                             {leads > 0 ? leads.toLocaleString() : <span className="text-muted-foreground">—</span>}
                           </td>
                           <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">
-                            {fmtMoney(ev.budget, ev.currency)}
+                            {ev.estimated_attendance != null ? ev.estimated_attendance.toLocaleString() : '—'}
                           </td>
                           <td className="py-2 text-right tabular-nums">
-                            {evCpl !== null ? fmtMoney(evCpl, ev.currency) : <span className="text-muted-foreground">—</span>}
+                            <span className="text-muted-foreground">—</span>
                           </td>
                         </tr>
                       )
@@ -658,8 +658,8 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                       <tr className="border-t">
                         <td className="pt-2 text-muted-foreground font-medium">Total</td>
                         <td className="pt-2 text-right tabular-nums font-semibold">{totalLeads.toLocaleString()}</td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">{fmtMoney(totalEventBudget || null, campaign.currency)}</td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">{cpl !== null ? fmtMoney(cpl, campaign.currency) : '—'}</td>
+                        <td className="pt-2 text-right tabular-nums font-semibold">{totalEventAttendance > 0 ? totalEventAttendance.toLocaleString() : '—'}</td>
+                        <td className="pt-2 text-right tabular-nums font-semibold">—</td>
                       </tr>
                     </tfoot>
                   )}
@@ -886,9 +886,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
             <>
               <div className="divide-y border rounded-xl overflow-hidden">
                 {events.map(ev => {
-                  const displayType = ev.activation_type ?? ev.event_type
                   const evLeads = leadsByEvent[ev.id] ?? 0
-                  const evCpl = evLeads > 0 && ev.budget ? Math.round(ev.budget / evLeads) : null
                   return (
                     <div key={ev.id} className="flex items-center gap-4 px-4 py-3 bg-card hover:bg-muted/30 transition-colors">
                       <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
@@ -904,19 +902,19 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           </span>
                         </div>
                         <p className="text-xs text-muted-foreground truncate">
-                          {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.date_start)}
-                          {displayType ? ` · ${displayType.replace(/_/g, ' ')}` : ''}
+                          {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.day)}
+                          {ev.activation_type ? ` · ${ev.activation_type.replace(/_/g, ' ')}` : ''}
                         </p>
                       </div>
                       <div className="shrink-0 text-right space-y-0.5">
-                        {ev.budget && (
+                        {ev.estimated_attendance != null && (
                           <>
-                            <p className="text-sm tabular-nums">{fmtMoney(ev.budget, ev.currency)}</p>
-                            <p className="text-xs text-muted-foreground">budget</p>
+                            <p className="text-sm tabular-nums">{ev.estimated_attendance.toLocaleString()}</p>
+                            <p className="text-xs text-muted-foreground">est. attendance</p>
                           </>
                         )}
-                        {evCpl != null && (
-                          <p className="text-xs text-muted-foreground">CPL: {fmtMoney(evCpl, ev.currency)}</p>
+                        {evLeads > 0 && (
+                          <p className="text-xs text-muted-foreground">{evLeads} leads</p>
                         )}
                       </div>
                       <Link href={`/dashboard/events/${ev.id}`} className="shrink-0 text-muted-foreground hover:text-foreground">
@@ -931,10 +929,9 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               {(() => {
                 const btlEvents = events.filter(ev => ev.activation_type && ev.activation_type !== 'event')
                 if (btlEvents.length === 0) return null
-                const btlTotalCost = btlEvents.reduce((s, ev) => s + (Number(ev.budget) || 0), 0)
+                const btlTotalAttendance = btlEvents.reduce((s, ev) => s + (Number(ev.estimated_attendance) || 0), 0)
                 const btlTotalLeads = btlEvents.reduce((s, ev) => s + (leadsByEvent[ev.id] ?? 0), 0)
-                const btlBlendedCpl = btlTotalLeads > 0 && btlTotalCost > 0
-                  ? Math.round(btlTotalCost / btlTotalLeads) : null
+                const btlBlendedCpl = null
                 return (
                   <div className="border rounded-xl p-5 bg-card space-y-4">
                     <p className="text-sm font-semibold">BTL activations</p>
@@ -944,8 +941,8 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                         <p className="text-xs text-muted-foreground">Activations</p>
                       </div>
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
-                        <p className="text-lg font-bold tabular-nums">{fmtMoney(btlTotalCost || null, campaign.currency)}</p>
-                        <p className="text-xs text-muted-foreground">Total cost</p>
+                        <p className="text-lg font-bold tabular-nums">{btlTotalAttendance > 0 ? btlTotalAttendance.toLocaleString() : '—'}</p>
+                        <p className="text-xs text-muted-foreground">Est. attendance</p>
                       </div>
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
                         <p className="text-lg font-bold tabular-nums">{btlTotalLeads.toLocaleString()}</p>
@@ -964,13 +961,12 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                             <th className="text-left font-medium text-muted-foreground pb-2 pr-4">Type</th>
                             <th className="text-left font-medium text-muted-foreground pb-2 pr-4">Location</th>
                             <th className="text-left font-medium text-muted-foreground pb-2 pr-4">Date</th>
-                            <th className="text-right font-medium text-muted-foreground pb-2">CPL</th>
+                            <th className="text-right font-medium text-muted-foreground pb-2">Leads</th>
                           </tr>
                         </thead>
                         <tbody>
                           {btlEvents.map(ev => {
                             const evLeads = leadsByEvent[ev.id] ?? 0
-                            const evCpl   = evLeads > 0 && ev.budget ? Math.round(ev.budget / evLeads) : null
                             return (
                               <tr key={ev.id} className="border-b last:border-0">
                                 <td className="py-2 pr-4">
@@ -982,9 +978,9 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                                   {(ev.activation_type ?? '').replace(/_/g, ' ')}
                                 </td>
                                 <td className="py-2 pr-4 text-muted-foreground">{ev.city}</td>
-                                <td className="py-2 pr-4 text-muted-foreground">{fmtDate(ev.date_start)}</td>
+                                <td className="py-2 pr-4 text-muted-foreground">{fmtDate(ev.day)}</td>
                                 <td className="py-2 text-right">
-                                  {evCpl != null ? fmtMoney(evCpl, ev.currency) : '—'}
+                                  {evLeads > 0 ? evLeads : '—'}
                                 </td>
                               </tr>
                             )

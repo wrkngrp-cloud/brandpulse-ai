@@ -34,8 +34,8 @@ interface Event {
   name: string
   status: string
   city: string | null
-  date_start: string
-  event_type: string | null
+  day: string
+  activation_type: string | null
 }
 
 interface Mention {
@@ -474,7 +474,7 @@ export function OverviewClient({
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-medium truncate group-hover:text-foreground transition-colors">{ev.name}</p>
                     <p className="text-[11px] text-muted-foreground truncate mt-0.5">
-                      {ev.city ? `${ev.city} · ` : ''}{fmtDate(ev.date_start)}
+                      {ev.city ? `${ev.city} · ` : ''}{fmtDate(ev.day)}
                     </p>
                   </div>
                 </Link>

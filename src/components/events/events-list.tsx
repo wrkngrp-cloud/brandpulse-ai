@@ -14,17 +14,16 @@ import {
 import { formatNGN, cn } from '@/lib/utils'
 
 interface Event {
-  id:              string
-  name:            string
-  event_type:      string | null
-  activation_type: string | null
-  city:            string
-  state:           string | null
-  date_start:      string
-  date_end:        string
-  status:          string
-  budget:          number | string | null
-  currency:        string | null
+  id:                   string
+  name:                 string
+  activation_type:      string | null
+  city:                 string
+  state:                string | null
+  day:                  string
+  status:               string
+  estimated_attendance: number | null
+  actual_attendance:    number | null
+  currency:             string | null
 }
 
 const STATUS_BADGE: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
@@ -69,7 +68,7 @@ function EventRow({ ev }: { ev: Event }) {
   const [, start] = useTransition()
 
   const badge = STATUS_BADGE[ev.status] ?? STATUS_BADGE.planned
-  const activationType = ev.activation_type ?? ev.event_type
+  const activationType = ev.activation_type
 
   const actions: ItemAction[] = [
     {
@@ -139,7 +138,7 @@ function EventRow({ ev }: { ev: Event }) {
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <CalendarDays className="h-3 w-3" />
-                {fmtDate(ev.date_start)}{ev.date_end !== ev.date_start && ` – ${fmtDate(ev.date_end)}`}
+                {fmtDate(ev.day)}
               </span>
               <span className="flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
@@ -147,12 +146,10 @@ function EventRow({ ev }: { ev: Event }) {
               </span>
             </div>
           </div>
-          {ev.budget && (
+          {ev.estimated_attendance != null && (
             <div className="text-right shrink-0 pr-8">
-              <p className="text-xs text-muted-foreground">Budget</p>
-              <p className="text-sm font-medium">
-                {ev.currency === 'NGN' ? formatNGN(Number(ev.budget)) : `${ev.currency} ${Number(ev.budget).toLocaleString('en-NG')}`}
-              </p>
+              <p className="text-xs text-muted-foreground">Est. Attendance</p>
+              <p className="text-sm font-medium">{ev.estimated_attendance.toLocaleString()}</p>
             </div>
           )}
         </div>

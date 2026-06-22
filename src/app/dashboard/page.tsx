@@ -44,7 +44,7 @@ async function DashboardContent({ days }: { days: number }) {
     supabase.from('mentions').select('id, content, author_handle, platform, sentiment_label, created_at').eq('brand_id', brandId ?? '').order('created_at', { ascending: false }).limit(4),
     supabase.from('mentions').select('id', { count: 'exact', head: true }).eq('brand_id', brandId ?? '').gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
     supabase.from('campaigns').select('id, name, status, objectives, start_date, total_budget, currency').eq('brand_id', brandId ?? '').in('status', ['active', 'paused']).order('created_at', { ascending: false }).limit(3),
-    supabase.from('events').select('id, name, status, city, date_start, event_type').eq('brand_id', brandId ?? '').in('status', ['planned', 'live']).order('date_start', { ascending: true }).limit(3),
+    supabase.from('events').select('id, name, status, city, day, activation_type').eq('brand_id', brandId ?? '').in('status', ['planned', 'live']).order('day', { ascending: true }).limit(3),
     supabase.from('sentiment_daily').select('social_score, day').eq('brand_id', brandId ?? '').gte('day', cutoffStr).order('day', { ascending: true }),
     supabase.from('social_posts').select('impressions, reach, likes, comments, shares').eq('brand_id', brandId ?? '').gte('posted_at', cutoffISO),
     supabase.from('surveys').select('id').eq('brand_id', brandId ?? '').in('type', ['awareness_check', 'b2_intercept']),

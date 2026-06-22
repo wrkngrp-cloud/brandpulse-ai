@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   ] = await Promise.all([
     service
       .from('sov_snapshots')
-      .select('snapshot_date, social_sov, blended_sov, competitor_data')
+      .select('snapshot_date, social_sov, competitor_data')
       .eq('brand_id', brand.id)
       .order('snapshot_date', { ascending: false })
       .limit(1).maybeSingle(),

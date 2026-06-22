@@ -19,9 +19,9 @@ interface EventOption {
   id: string
   name: string
   city: string
-  date_start: string
+  day: string | null
   status: string
-  event_type: string | null
+  activation_type: string | null
 }
 
 interface LinkOohDialogProps {
@@ -34,7 +34,8 @@ interface LinkEventDialogProps {
   availableEvents: EventOption[]
 }
 
-function fmtDate(d: string) {
+function fmtDate(d: string | null) {
+  if (!d) return ''
   return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
@@ -185,8 +186,8 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
                     </div>
                     <p className="text-xs text-muted-foreground truncate">
                       {ev.city}
-                      {ev.event_type ? ` · ${ev.event_type}` : ''}
-                      {` · ${fmtDate(ev.date_start)}`}
+                      {ev.activation_type ? ` · ${ev.activation_type}` : ''}
+                      {ev.day ? ` · ${fmtDate(ev.day)}` : ''}
                     </p>
                   </div>
                   {selected === ev.id && <Check className="h-4 w-4 shrink-0" />}

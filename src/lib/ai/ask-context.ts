@@ -52,7 +52,7 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
       .limit(6),
     supabase
       .from('sov_snapshots')
-      .select('snapshot_date, social_sov, blended_sov, competitor_data')
+      .select('snapshot_date, social_sov, competitor_data')
       .eq('brand_id', brandId)
       .order('snapshot_date', { ascending: false })
       .limit(1)
@@ -76,9 +76,9 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
       .limit(10),
     supabase
       .from('events')
-      .select('name, event_type, city, date_start, date_end, status, budget, currency')
+      .select('name, activation_type, city, day, status, estimated_attendance')
       .eq('brand_id', brandId)
-      .order('date_start', { ascending: false })
+      .order('day', { ascending: false })
       .limit(5),
     supabase
       .from('campaigns')
@@ -170,7 +170,7 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
 
   // SOV
   if (sovRow) {
-    parts.push(`Share of Voice (${sovRow.snapshot_date}): Social SOV ${sovRow.social_sov ?? '—'}%, Blended SOV ${sovRow.blended_sov ?? '—'}%`)
+    parts.push(`Share of Voice (${sovRow.snapshot_date}): Social SOV ${sovRow.social_sov ?? '—'}%`)
     availableSources.push({ label: 'Share of Voice', detail: `Social ${sovRow.social_sov}%, updated ${sovRow.snapshot_date}` })
   } else {
     parts.push('Share of Voice: no data yet — SOV snapshot not yet generated')
@@ -238,7 +238,7 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
   if (recentEvents && recentEvents.length > 0) {
     const eventLines = recentEvents.map(ev => {
       const loc = [ev.city].filter(Boolean).join(', ')
-      return `  • "${ev.name}" [${ev.status}]${ev.event_type ? ' — ' + ev.event_type : ''}, ${loc}, ${ev.date_start}${ev.date_end && ev.date_end !== ev.date_start ? ' → ' + ev.date_end : ''}${ev.budget ? `, budget ${ev.currency} ${Number(ev.budget).toLocaleString()}` : ''}`
+      return `  • "${ev.name}" [${ev.status}]${ev.activation_type ? ' — ' + ev.activation_type : ''}, ${loc}, ${ev.day ?? ''}${ev.estimated_attendance ? `, est. attendance ${ev.estimated_attendance.toLocaleString()}` : ''}`
     }).join('\n')
     parts.push(`Events & Activations (recent ${recentEvents.length}):\n${eventLines}`)
     availableSources.push({

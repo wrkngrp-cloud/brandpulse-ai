@@ -83,7 +83,7 @@ export default async function ConnectorsPage() {
     }
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+  const appUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? ''
 
   return (
     <div className="max-w-3xl space-y-8 pb-12">

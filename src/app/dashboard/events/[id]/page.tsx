@@ -61,7 +61,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
   const metrics = computeEventMetrics(
     interactions  ?? [],
-    event.budget,
+    null,
     event.kpi_targets ?? {},
   )
 
@@ -70,9 +70,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   const spendBd = event.spend_breakdown as { agency?: number; materials?: number; sampling?: number; logistics?: number } | null
   const totalBtlSpend = spendBd
     ? ((spendBd.agency ?? 0) + (spendBd.materials ?? 0) + (spendBd.sampling ?? 0) + (spendBd.logistics ?? 0))
-    : (event.budget ? Number(event.budget) : null)
+    : null
 
-  const actualAttendance = (interactions ?? []).length > 0 ? (interactions ?? []).length : (event.expected_attendance ?? null)
+  const actualAttendance = (interactions ?? []).length > 0 ? (interactions ?? []).length : (event.actual_attendance ?? event.estimated_attendance ?? null)
   const leadsCount = (interactions ?? []).filter(i => ['new_lead', 'new_customer'].includes(i.interaction_type)).length
 
   const costPerContact = totalBtlSpend && actualAttendance ? totalBtlSpend / actualAttendance : null
@@ -110,8 +110,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           <div>
             <h1 className="text-xl font-semibold">{event.name}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              {event.city}{event.state ? `, ${event.state}` : ''} · {fmtDate(event.date_start)}
-              {event.date_end !== event.date_start && ` – ${fmtDate(event.date_end)}`}
+              {event.city}{event.state ? `, ${event.state}` : ''} · {fmtDate(event.day)}
               {event.activation_type && ` · ${event.activation_type.replace(/_/g, ' ')}`}
             </p>
           </div>
@@ -252,7 +251,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         <LiveDashboard
           eventId={id}
           status={event.status}
-          budget={event.budget ? Number(event.budget) : null}
+          budget={null}
           ambassadors={ambassadors ?? []}
           initialInteractions={interactions ?? []}
         />
@@ -290,10 +289,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
               <dd>{event.venue}</dd>
             </>
           )}
-          {event.expected_attendance && (
+          {event.estimated_attendance && (
             <>
-              <dt className="text-muted-foreground">Expected attendance</dt>
-              <dd>{event.expected_attendance.toLocaleString()}</dd>
+              <dt className="text-muted-foreground">Estimated attendance</dt>
+              <dd>{event.estimated_attendance.toLocaleString()}</dd>
             </>
           )}
           {isBtl && event.target_community_size && (
@@ -314,10 +313,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
               <dd>{event.collateral_distributed.toLocaleString()}</dd>
             </>
           )}
-          {event.budget && (
+          {event.actual_attendance && (
             <>
-              <dt className="text-muted-foreground">Budget</dt>
-              <dd>{event.currency} {Number(event.budget).toLocaleString('en-NG')}</dd>
+              <dt className="text-muted-foreground">Actual attendance</dt>
+              <dd>{event.actual_attendance.toLocaleString()}</dd>
             </>
           )}
           {event.hashtags?.length > 0 && (

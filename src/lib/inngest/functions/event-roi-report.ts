@@ -44,7 +44,7 @@ export const eventRoiReport = inngest.createFunction(
 
       const metrics = computeEventMetrics(
         interactions  ?? [],
-        ev.budget,
+        null,
         ev.kpi_targets ?? {},
       )
 
@@ -67,9 +67,7 @@ export const eventRoiReport = inngest.createFunction(
         name:         ev.name as string,
         city:         ev.city as string,
         state:        ev.state as string | null,
-        date_start:   ev.date_start as string,
-        date_end:     ev.date_end as string,
-        budget:       ev.budget as number | null,
+        day:          ev.day as string | null,
         kpi_targets:  ev.kpi_targets as Record<string, number> | null,
         brandName,
         surveyCount,
@@ -82,7 +80,7 @@ export const eventRoiReport = inngest.createFunction(
 
     // ── Step 2: generate AI narrative ────────────────────────────────────────
     const narrative = await step.run('generate-narrative', async () => {
-      const { name, city, state, date_start, date_end, budget, kpi_targets, brandName,
+      const { name, city, state, day, kpi_targets, brandName,
               surveyCount, debrief, objectivesList, metrics, ambBreakdown } = eventData
 
       const debriefSection = debrief
@@ -102,7 +100,7 @@ export const eventRoiReport = inngest.createFunction(
           system: 'You are a brand intelligence analyst writing a concise post-event ROI report for a Nigerian brand. Be specific, reference the numbers, and keep the tone warm and professional. Where debrief notes are provided, weave them into the analysis.',
           messages: [{
             role:    'user',
-            content: `Write a post-event ROI report narrative for "${name}" (${brandName}) held in ${city}${state ? ', ' + state : ''} on ${date_start}${date_end !== date_start ? ' to ' + date_end : ''}.
+            content: `Write a post-event ROI report narrative for "${name}" (${brandName}) held in ${city}${state ? ', ' + state : ''} on ${day ?? 'unknown date'}.
 ${objectivesList}
 
 KEY METRICS:
@@ -113,7 +111,7 @@ KEY METRICS:
 - Merch distributed: ${metrics.total_merch}, Samples: ${metrics.total_samples}
 - Photo moments: ${metrics.total_photo}
 - Event EMV: ₦${metrics.event_emv.toLocaleString()}
-- Budget: ${budget ? '₦' + Number(budget).toLocaleString() : 'not set'}
+- Budget: not tracked in this version
 - Cost per lead: ${metrics.cost_per_lead ? '₦' + metrics.cost_per_lead.toFixed(0) : 'N/A'}
 - Cost per new customer: ${metrics.cost_per_account ? '₦' + metrics.cost_per_account.toFixed(0) : 'N/A'}
 - Event ROI: ${metrics.event_roi ? metrics.event_roi.toFixed(1) + '%' : 'N/A'}
@@ -135,7 +133,7 @@ Write 3-4 paragraphs covering: (1) overall performance summary, (2) what worked 
       } catch (err) {
         // AI failed even after Haiku fallback — write report with a metrics-only summary
         console.error('[event-roi-report] AI narrative failed after all fallbacks:', err)
-        return `${name} recorded ${metrics.total_interactions} total interactions across the event period in ${city}. Ambassadors captured ${metrics.total_leads} new leads and ${metrics.total_new_customers} new customers, generating an estimated event EMV of ₦${metrics.event_emv.toLocaleString()}${budget ? ' against a budget of ₦' + Number(budget).toLocaleString() : ''}. A full AI narrative could not be generated at this time.`
+        return `${name} recorded ${metrics.total_interactions} total interactions across the event period in ${city}. Ambassadors captured ${metrics.total_leads} new leads and ${metrics.total_new_customers} new customers, generating an estimated event EMV of ₦${metrics.event_emv.toLocaleString()}. A full AI narrative could not be generated at this time.`
       }
     })
 

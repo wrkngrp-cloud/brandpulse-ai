@@ -51,9 +51,9 @@ export default async function CampaignDetailPage({
       .order('created_at', { ascending: false }),
     supabase
       .from('events')
-      .select('id, name, event_type, activation_type, city, state, date_start, date_end, status, budget, currency')
+      .select('id, name, activation_type, city, state, day, status, estimated_attendance, currency')
       .eq('campaign_id', id)
-      .order('date_start', { ascending: false }),
+      .order('day', { ascending: false }),
     supabase
       .from('ooh_sites')
       .select('id, site_name, city, state, format_type, visits')
@@ -63,9 +63,9 @@ export default async function CampaignDetailPage({
       .limit(30),
     supabase
       .from('events')
-      .select('id, name, event_type, city, date_start, status')
+      .select('id, name, activation_type, city, day, status')
       .is('campaign_id', null)
-      .order('date_start', { ascending: false })
+      .order('day', { ascending: false })
       .limit(30),
   ])
 

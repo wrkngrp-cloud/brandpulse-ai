@@ -85,7 +85,7 @@ export default async function ConnectionsSettingsPage() {
     }
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+  const appUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? ''
 
   return (
     <div className="space-y-6">

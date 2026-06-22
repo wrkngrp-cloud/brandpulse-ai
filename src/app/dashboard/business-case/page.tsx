@@ -101,7 +101,16 @@ export default async function BusinessCasePage() {
 
   const spendEfficiency  = totalSpend > 0 && currentBhi != null ? currentBhi / (totalSpend / 100_000_000) : null
 
+  // Channel spend breakdown — use budget_allocation from campaign_channels as proxy
   const channelSpend: Record<string, number> = {}
+  for (const c of campaigns ?? []) {
+    const channels = (c as { campaign_channels?: { channel: string; budget_allocation: number | null }[] }).campaign_channels ?? []
+    for (const ch of channels) {
+      if (ch.channel && ch.budget_allocation) {
+        channelSpend[ch.channel] = (channelSpend[ch.channel] ?? 0) + ch.budget_allocation
+      }
+    }
+  }
 
   // AI-generated business case
   let aiBusinessCase: {

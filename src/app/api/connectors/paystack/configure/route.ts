@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/paystack`
+  const webhookUrl = `${process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/paystack`
 
   return NextResponse.json({ success: true, webhookUrl })
 }
