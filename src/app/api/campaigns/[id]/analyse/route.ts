@@ -22,7 +22,7 @@ export async function POST(
       .select('id, name, description, objectives, start_date, end_date, total_budget, currency, status, campaign_channels(channel, budget_allocation)')
       .eq('id', id)
       .single(),
-    supabase.from('brands').select('name, industry').limit(1).single(),
+    supabase.from('brands').select('name, category').limit(1).single(),
     supabase
       .from('ooh_sites')
       .select('site_name, city, state, format_type, visits, monthly_cost, currency, daily_traffic, campaign_start, campaign_end, notes')
@@ -30,7 +30,7 @@ export async function POST(
       .eq('status', 'active'),
     supabase
       .from('events')
-      .select('id, name, city, date_start, status, budget')
+      .select('id, name, city, day, status, estimated_attendance')
       .eq('campaign_id', id),
   ])
 

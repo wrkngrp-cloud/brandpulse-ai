@@ -49,7 +49,7 @@ export default async function BusinessCasePage() {
       .limit(1).maybeSingle(),
 
     supabase.from('campaigns')
-      .select('id, name, channel, status, budget, spend, start_date, end_date')
+      .select('id, name, status, total_budget, start_date, end_date, campaign_channels(channel, budget_allocation)')
       .eq('brand_id', brand.id)
       .gte('start_date', ninetyDaysAgo)
       .order('start_date', { ascending: false }),
@@ -86,8 +86,8 @@ export default async function BusinessCasePage() {
   const marketShare      = brand.market_share_pct ? Number(brand.market_share_pct) : null
   const esov             = sov != null && marketShare != null ? sov - marketShare : null
 
-  const totalSpend       = (campaigns ?? []).reduce((s, c) => s + (c.spend ?? 0), 0)
-  const totalBudget      = (campaigns ?? []).reduce((s, c) => s + (c.budget ?? 0), 0)
+  const totalBudget      = (campaigns ?? []).reduce((s, c) => s + (c.total_budget ?? 0), 0)
+  const totalSpend       = totalBudget
   const activeCampaigns  = (campaigns ?? []).filter(c => c.status === 'active').length
 
   const npsScores        = (npsData ?? []).map(r => r.score ?? 0)
@@ -101,13 +101,7 @@ export default async function BusinessCasePage() {
 
   const spendEfficiency  = totalSpend > 0 && currentBhi != null ? currentBhi / (totalSpend / 100_000_000) : null
 
-  // Channel breakdown
   const channelSpend: Record<string, number> = {}
-  for (const c of campaigns ?? []) {
-    if (c.channel && c.spend) {
-      channelSpend[c.channel] = (channelSpend[c.channel] ?? 0) + c.spend
-    }
-  }
 
   // AI-generated business case
   let aiBusinessCase: {

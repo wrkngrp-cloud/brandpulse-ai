@@ -9,7 +9,7 @@ import {
   CalendarDays, MapPin, Megaphone, Zap, Trophy, ChevronDown,
   Monitor, Radio, Tv, Newspaper, Filter, Award, Users, Palette, Globe,
   Target, FileSearch, BookOpen, PieChart, Sparkles, ClipboardCheck,
-  TrendingUp, Plug, BarChart3, PlayCircle, Clipboard,
+  TrendingUp, Plug, BarChart3, Clipboard,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 

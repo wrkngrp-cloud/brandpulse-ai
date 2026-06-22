@@ -34,7 +34,7 @@ export default async function NpsTrackerPage() {
       .gte('collected_at', twelveWeeksAgo.toISOString()),
     supabase
       .from('brands')
-      .select('name, industry')
+      .select('name, category')
       .limit(1)
       .maybeSingle(),
   ])
@@ -47,7 +47,7 @@ export default async function NpsTrackerPage() {
     'food':'Food & Beverage','healthcare':'Healthcare','technology':'Technology','tech':'Technology',
     'real estate':'Real Estate',
   }
-  const npsSector = NPS_SECTOR_MAP[(brand?.industry ?? '').toLowerCase().trim()] ?? 'FMCG'
+  const npsSector = NPS_SECTOR_MAP[(brand?.category ?? '').toLowerCase().trim()] ?? 'FMCG'
   const { data: npsBenchmarkRow } = await supabase
     .from('sector_benchmarks')
     .select('p50')
@@ -178,7 +178,7 @@ export default async function NpsTrackerPage() {
         totalResponses={totalResponses}
         trendDirection={trendDirection}
         brandName={brand?.name ?? 'your brand'}
-        industry={brand?.industry ?? null}
+        industry={brand?.category ?? null}
         detractorTexts={detractorTexts}
         promoterTexts={promoterTexts}
         benchmarkP50={npsBenchmarkP50}

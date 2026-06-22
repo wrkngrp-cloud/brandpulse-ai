@@ -58,8 +58,8 @@ export default async function FunnelPage() {
       .select('answers')
       .eq('quality_flag', 'ok'),
     bid
-      ? supabase.from('brands').select('name, industry').eq('id', bid).maybeSingle()
-      : supabase.from('brands').select('name, industry').limit(1).maybeSingle(),
+      ? supabase.from('brands').select('name, category').eq('id', bid).maybeSingle()
+      : supabase.from('brands').select('name, category').limit(1).maybeSingle(),
   ])
 
   // ── 1. Awareness: SOV % (direct, already 0-100)
@@ -155,7 +155,7 @@ export default async function FunnelPage() {
       <FunnelClient
         scores={scores}
         brandName={brand?.name ?? 'your brand'}
-        industry={brand?.industry ?? null}
+        industry={brand?.category ?? null}
       />
     </div>
   )

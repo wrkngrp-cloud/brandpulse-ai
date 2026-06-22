@@ -108,8 +108,8 @@ async function SentimentData({ days = 84 }: { days: number }) {
   const bid = brandId ?? ''
 
   const { data: brandRow } = await (bid
-    ? supabase.from('brands').select('industry').eq('id', bid).maybeSingle()
-    : supabase.from('brands').select('industry').limit(1).maybeSingle())
+    ? supabase.from('brands').select('category').eq('id', bid).maybeSingle()
+    : supabase.from('brands').select('category').limit(1).maybeSingle())
 
   const SECTOR_MAP: Record<string, string> = {
     'fmcg':'FMCG','consumer goods':'FMCG','fintech':'Fintech','financial services':'Fintech',
@@ -119,7 +119,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
     'food':'Food & Beverage','healthcare':'Healthcare','technology':'Technology','tech':'Technology',
     'real estate':'Real Estate',
   }
-  const sector = SECTOR_MAP[(brandRow?.industry ?? '').toLowerCase().trim()] ?? 'FMCG'
+  const sector = SECTOR_MAP[(brandRow?.category ?? '').toLowerCase().trim()] ?? 'FMCG'
 
   const [{ data: daily }, { data: mentions }, { data: lastRun }, { data: heatmapRaw }, { data: benchmarkRow }] = await Promise.all([
     supabase
@@ -151,7 +151,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
       .from('sector_benchmarks')
       .select('p50')
       .eq('sector', sector)
-      .eq('metric', 'sentiment_score')
+      .eq('metric', 'sentiment')
       .maybeSingle(),
   ])
 

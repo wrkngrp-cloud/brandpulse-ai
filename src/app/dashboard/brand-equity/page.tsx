@@ -72,8 +72,8 @@ export default async function BrandEquityPage({
       .eq('brand_id', bid)
       .gte('posted_at', cutoffISO),
     bid
-      ? supabase.from('brands').select('name, industry, market_share_pct').eq('id', bid).maybeSingle()
-      : supabase.from('brands').select('name, industry, market_share_pct').limit(1).maybeSingle(),
+      ? supabase.from('brands').select('name, category, market_share_pct').eq('id', bid).maybeSingle()
+      : supabase.from('brands').select('name, category, market_share_pct').limit(1).maybeSingle(),
     supabase
       .from('brand_health_snapshots')
       .select('bhi, snapshot_date')
@@ -201,7 +201,7 @@ export default async function BrandEquityPage({
     'food':'Food & Beverage','healthcare':'Healthcare','technology':'Technology','tech':'Technology',
     'real estate':'Real Estate',
   }
-  const sector = sectorMap[(brand?.industry ?? '').toLowerCase().trim()] ?? 'FMCG'
+  const sector = sectorMap[(brand?.category ?? '').toLowerCase().trim()] ?? 'FMCG'
   const { data: benchmarkRows } = await supabase
     .from('sector_benchmarks')
     .select('metric, p25, p50, p75, top_decile')
@@ -256,7 +256,7 @@ export default async function BrandEquityPage({
         emvRaw={Math.round(emvRaw)}
         perceptionDimensions={dimensionAvgs}
         brandName={brand?.name ?? 'your brand'}
-        industry={brand?.industry ?? null}
+        industry={brand?.category ?? null}
         marketSharePct={brand?.market_share_pct ?? null}
         days={days}
         sector={sector}

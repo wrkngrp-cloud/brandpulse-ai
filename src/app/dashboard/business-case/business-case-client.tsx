@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-interface Campaign { id: string; name: string; channel: string; status: string; budget: number | null; spend: number | null }
+interface Campaign { id: string; name: string; status: string; total_budget: number | null; start_date: string | null; end_date: string | null }
 
 interface AiBusinessCase {
   headline:     string
