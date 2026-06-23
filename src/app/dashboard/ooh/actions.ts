@@ -6,6 +6,7 @@ import { z }             from 'zod'
 import { revalidatePath } from 'next/cache'
 import { callAi }         from '@/lib/ai/client'
 import { inferDemographics, type PlaceDemographics } from '@/lib/ooh/places-demographics'
+import { getActiveBrandId } from '@/lib/active-brand'
 
 const SiteSchema = z.object({
   site_name:            z.string().min(2, 'Site name required'),
@@ -143,8 +144,8 @@ export async function createSite(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return { error: 'No brand found' }
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return { error: 'No brand found' }
 
   const raw = Object.fromEntries(formData.entries())
   const parsed = SiteSchema.safeParse({
@@ -180,7 +181,7 @@ export async function createSite(
     .from('ooh_sites')
     .insert({
       ...siteData,
-      brand_id:              brand.id,
+      brand_id:              brandId,
       status:                'active',
       campaign_id:           campaignId,
       qr_token:              qrToken,
@@ -302,8 +303,8 @@ export async function saveDraft(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return { error: 'No brand found' }
+  const draftBrandId = await getActiveBrandId(supabase)
+  if (!draftBrandId) return { error: 'No brand found' }
 
   const raw = Object.fromEntries(formData.entries())
   const parsed = DraftSchema.safeParse({
@@ -315,7 +316,7 @@ export async function saveDraft(
 
   // Draft saves are best-effort — don't block on validation
   const draftPayload = {
-    brand_id:   brand.id,
+    brand_id:   draftBrandId,
     status:     'draft' as const,
     site_name:  (raw.site_name as string) || 'Untitled draft',
     city:       (raw.city as string) || '',

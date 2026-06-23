@@ -76,9 +76,9 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
       .limit(10),
     supabase
       .from('events')
-      .select('name, activation_type, city, day, status, estimated_attendance')
+      .select('name, activation_type, city, date_start, status, expected_attendance')
       .eq('brand_id', brandId)
-      .order('day', { ascending: false })
+      .order('date_start', { ascending: false })
       .limit(5),
     supabase
       .from('campaigns')
@@ -238,7 +238,7 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
   if (recentEvents && recentEvents.length > 0) {
     const eventLines = recentEvents.map(ev => {
       const loc = [ev.city].filter(Boolean).join(', ')
-      return `  • "${ev.name}" [${ev.status}]${ev.activation_type ? ' — ' + ev.activation_type : ''}, ${loc}, ${ev.day ?? ''}${ev.estimated_attendance ? `, est. attendance ${ev.estimated_attendance.toLocaleString()}` : ''}`
+      return `  • "${ev.name}" [${ev.status}]${ev.activation_type ? ' — ' + ev.activation_type : ''}, ${loc}, ${ev.date_start ?? ''}${ev.expected_attendance ? `, est. attendance ${ev.expected_attendance.toLocaleString()}` : ''}`
     }).join('\n')
     parts.push(`Events & Activations (recent ${recentEvents.length}):\n${eventLines}`)
     availableSources.push({

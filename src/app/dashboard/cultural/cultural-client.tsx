@@ -124,10 +124,10 @@ const BASE_CALENDAR: BaseMoment[] = [
 
   // ── Nigerian Cultural ────────────────────────────────────────────────────
   {
-    name: 'Ojude Oba Festival', mmdd: '06-29', type: 'Cultural',
+    name: 'Ojude Oba Festival', mmdd: '05-30', type: 'Cultural',
     brandRelevance: 'Ijebu-Ode\'s royal durbar — spectacular fashion, horsemanship, and Yoruba heritage. Premium brand and influencer moment',
     tags: ['culture', 'fashion', 'premium', 'southwest', 'muslim', 'yoruba', 'food'],
-    floatingDates: { '2026': '2026-06-29', '2027': '2027-06-18', '2028': '2028-06-07' },
+    floatingDates: { '2026': '2026-05-30', '2027': '2027-05-19', '2028': '2028-05-07' },
   },
   {
     name: 'New Yam Festival (Iriji)', mmdd: '08-20', type: 'Cultural',
@@ -145,10 +145,10 @@ const BASE_CALENDAR: BaseMoment[] = [
     tags: ['culture', 'north', 'hausa', 'community', 'rural', 'mass', 'fmcg'],
   },
   {
-    name: 'Durbar Festival', mmdd: '04-17', type: 'Cultural',
+    name: 'Durbar Festival', mmdd: '03-20', type: 'Cultural',
     brandRelevance: 'Royal Durbar at Eid — thousands of horsemen in ceremonial dress across Kano, Zaria, Sokoto. Premium northern storytelling moment',
     tags: ['culture', 'fashion', 'premium', 'north', 'hausa', 'muslim', 'traditional'],
-    floatingDates: { '2026': '2026-04-17', '2027': '2027-04-06', '2028': '2028-03-26' },
+    floatingDates: { '2026': '2026-03-20', '2027': '2027-03-09', '2028': '2028-02-27' },
   },
   {
     name: 'Calabar Carnival', mmdd: '12-01', type: 'Cultural',
@@ -242,10 +242,10 @@ const BASE_CALENDAR: BaseMoment[] = [
 
   // ── Religious ───────────────────────────────────────────────────────────
   {
-    name: 'Ramadan Start', mmdd: '03-18', type: 'Religious',
+    name: 'Ramadan Start', mmdd: '02-18', type: 'Religious',
     brandRelevance: 'Reach Muslim consumers with values-led, community, and Sahur/Iftar-themed content',
     tags: ['muslim', 'north', 'hausa', 'yoruba', 'community', 'food', 'fmcg', 'religious'],
-    floatingDates: { '2026': '2026-03-18', '2027': '2027-03-08', '2028': '2028-02-26' },
+    floatingDates: { '2026': '2026-02-18', '2027': '2027-02-08', '2028': '2028-01-28' },
   },
   {
     name: 'Easter', mmdd: '04-05', type: 'Religious',
@@ -254,16 +254,16 @@ const BASE_CALENDAR: BaseMoment[] = [
     floatingDates: { '2026': '2026-04-05', '2027': '2027-03-28', '2028': '2028-04-16' },
   },
   {
-    name: 'Eid al-Fitr', mmdd: '04-17', type: 'Religious',
+    name: 'Eid al-Fitr', mmdd: '03-20', type: 'Religious',
     brandRelevance: 'End of Ramadan celebration — gifting, fashion, and premium experiences resonate with Muslim consumers',
     tags: ['muslim', 'north', 'hausa', 'yoruba', 'family', 'fashion', 'food', 'premium', 'gifting'],
-    floatingDates: { '2026': '2026-04-17', '2027': '2027-04-06', '2028': '2028-03-27' },
+    floatingDates: { '2026': '2026-03-20', '2027': '2027-03-09', '2028': '2028-02-27' },
   },
   {
-    name: 'Eid al-Adha', mmdd: '06-26', type: 'Religious',
+    name: 'Eid al-Adha (Sallah)', mmdd: '05-27', type: 'Religious',
     brandRelevance: 'Themes of sacrifice, generosity, and community — food and lifestyle brands create lasting impressions',
     tags: ['muslim', 'north', 'hausa', 'community', 'food', 'family', 'religious'],
-    floatingDates: { '2026': '2026-06-26', '2027': '2027-06-16', '2028': '2028-06-04' },
+    floatingDates: { '2026': '2026-05-27', '2027': '2027-05-16', '2028': '2028-05-05' },
   },
   {
     name: 'Christmas', mmdd: '12-25', type: 'Religious',

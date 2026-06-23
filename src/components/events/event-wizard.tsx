@@ -286,8 +286,8 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
               <div className="sm:col-span-2 space-y-2">
                 <Label>Activation type</Label>
                 <Select value={data.activation_type} onValueChange={v => set('activation_type', v ?? 'event')}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent className="min-w-[280px]">
                     {ACTIVATION_TYPES.map(t => (
                       <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
                     ))}

@@ -19,10 +19,9 @@ interface Event {
   activation_type:      string | null
   city:                 string
   state:                string | null
-  day:                  string
+  date_start:           string | null
   status:               string
-  estimated_attendance: number | null
-  actual_attendance:    number | null
+  expected_attendance:  number | null
   currency:             string | null
 }
 
@@ -136,20 +135,22 @@ function EventRow({ ev }: { ev: Event }) {
               )}
             </div>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <CalendarDays className="h-3 w-3" />
-                {fmtDate(ev.day)}
-              </span>
+              {ev.date_start && (
+                <span className="flex items-center gap-1">
+                  <CalendarDays className="h-3 w-3" />
+                  {fmtDate(ev.date_start)}
+                </span>
+              )}
               <span className="flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 {ev.city}{ev.state ? `, ${ev.state}` : ''}
               </span>
             </div>
           </div>
-          {ev.estimated_attendance != null && (
+          {ev.expected_attendance != null && (
             <div className="text-right shrink-0 pr-8">
               <p className="text-xs text-muted-foreground">Est. Attendance</p>
-              <p className="text-sm font-medium">{ev.estimated_attendance.toLocaleString()}</p>
+              <p className="text-sm font-medium">{ev.expected_attendance.toLocaleString()}</p>
             </div>
           )}
         </div>

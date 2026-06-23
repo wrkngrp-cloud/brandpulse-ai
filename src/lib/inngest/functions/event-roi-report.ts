@@ -67,7 +67,7 @@ export const eventRoiReport = inngest.createFunction(
         name:         ev.name as string,
         city:         ev.city as string,
         state:        ev.state as string | null,
-        day:          ev.day as string | null,
+        day:          ev.date_start as string | null,
         kpi_targets:  ev.kpi_targets as Record<string, number> | null,
         brandName,
         surveyCount,

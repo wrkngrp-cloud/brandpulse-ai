@@ -5,6 +5,7 @@ import { randomBytes }    from 'crypto'
 import { z }              from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { inngest }        from '@/lib/inngest/client'
+import { getActiveBrandId } from '@/lib/active-brand'
 
 export type EventState = { error?: string; success?: boolean; eventId?: string } | null
 
@@ -17,16 +18,10 @@ async function getBrandId(): Promise<{ brandId: string } | { error: string }> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated.' }
 
-  const service = await createServiceClient()
-  const { data: member } = await service
-    .from('workspace_members').select('workspace_id').eq('user_id', user.id).single()
-  if (!member) return { error: 'Workspace not found.' }
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return { error: 'Brand not found.' }
 
-  const { data: brand } = await service
-    .from('brands').select('id').eq('workspace_id', member.workspace_id).single()
-  if (!brand) return { error: 'Brand not found.' }
-
-  return { brandId: brand.id }
+  return { brandId }
 }
 
 // ── E1: Create event ──────────────────────────────────────────────────────────

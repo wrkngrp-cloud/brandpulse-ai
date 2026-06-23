@@ -36,6 +36,16 @@ const OBJECTIVE_LABELS: Record<string, string> = {
   retention:     'Retention',
 }
 
+const CHANNEL_LABELS: Record<string, string> = {
+  ooh:         'OOH',
+  events:      'Events',
+  digital:     'Digital',
+  influencers: 'Influencers',
+  radio:       'Radio',
+  tv:          'TV',
+  print:       'Print',
+}
+
 const STATUS_STYLES: Record<string, string> = {
   draft:     'bg-muted text-muted-foreground',
   active:    'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300',
@@ -90,7 +100,7 @@ export function CampaignsList({ campaigns }: CampaignsListProps) {
               </div>
               <p className="text-xs text-muted-foreground mt-0.5 truncate">
                 {dateRange}
-                {channels.length > 0 && ` · ${channels.join(', ').toUpperCase()}`}
+                {channels.length > 0 && ` · ${channels.map(ch => CHANNEL_LABELS[ch] ?? ch.toUpperCase()).join(', ')}`}
                 {c.total_budget ? ` · ${fmtBudget(c.total_budget, c.currency)}` : ''}
               </p>
             </div>

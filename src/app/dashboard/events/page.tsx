@@ -5,20 +5,21 @@ import { buttonVariants } from '@/components/ui/button'
 import { EventsList }    from '@/components/events/events-list'
 import { CalendarDays, Plus } from 'lucide-react'
 import { cn }            from '@/lib/utils'
+import { getActiveBrand } from '@/lib/active-brand'
 
 export default async function EventsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
+  const brand = await getActiveBrand<{ id: string }>(supabase, 'id')
   if (!brand) redirect('/onboarding')
 
   const { data: events } = await supabase
     .from('events')
-    .select('id, name, activation_type, city, state, day, status, estimated_attendance, actual_attendance, currency, latitude, longitude')
+    .select('id, name, activation_type, city, state, date_start, status, expected_attendance, currency')
     .eq('brand_id', brand.id)
-    .order('day', { ascending: false })
+    .order('date_start', { ascending: false })
 
   return (
     <div className="space-y-6">
