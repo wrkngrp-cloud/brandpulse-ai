@@ -1,5 +1,6 @@
 import { createClient }        from '@/lib/supabase/server'
 import { redirect }            from 'next/navigation'
+import { getActiveBrand }      from '@/lib/active-brand'
 import Link                   from 'next/link'
 import { SocialConnectCard }   from '@/components/dashboard/social-connect-card'
 import { GA4ConnectCard, type GA4ConnectionData }      from '@/components/dashboard/ga4-connect-card'
@@ -18,10 +19,7 @@ export default async function ConnectorsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name')
-    .limit(1).maybeSingle()
+  const brand = await getActiveBrand<{ id: string; name: string }>(supabase, 'id, name')
 
   const { data: connections } = await supabase
     .from('social_connections')
@@ -36,7 +34,7 @@ export default async function ConnectorsPage() {
     sources: [], totalOrders: 0, lastImportAt: null,
   }
 
-  if (brand) {
+  if (brand?.id) {
     const [ga4Res, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
       supabase.from('ga4_connections').select('id, property_id, property_name, last_synced_at').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('webhook_configs').select('provider').eq('brand_id', brand.id),
