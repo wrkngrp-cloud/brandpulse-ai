@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { encrypt } from '@/lib/crypto'
 import { z } from 'zod'
 
@@ -19,9 +20,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
   }
 
-  const { data: brand } = await supabase
-    .from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
 
   const encryptedKey = encrypt(parsed.data.api_key)
 
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     .from('email_connectors')
     .upsert(
       {
-        brand_id:   brand.id,
+        brand_id:   brandId,
         provider:   'brevo',
         api_key:    encryptedKey,
         list_id:    parsed.data.list_id?.trim() ?? null,

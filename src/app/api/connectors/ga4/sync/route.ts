@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { decrypt } from '@/lib/crypto'
+import { getActiveBrandId } from '@/lib/active-brand'
 
 interface GA4MetricValue {
   value: string
@@ -23,17 +24,13 @@ export async function POST() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
 
   const { data: connection } = await supabase
     .from('ga4_connections')
     .select('id, property_id, access_token, refresh_token')
-    .eq('brand_id', brand.id)
+    .eq('brand_id', brandId)
     .single()
 
   if (!connection) {
@@ -57,6 +54,7 @@ export async function POST() {
           { name: 'activeUsers' },
           { name: 'conversions' },
         ],
+        metricAggregations: ['TOTAL'],
       }),
     }
   )
@@ -85,23 +83,21 @@ export async function POST() {
 
   const service = await createServiceClient()
 
+  // sdk_events is a time-series log — insert a new snapshot each sync
   await service
     .from('sdk_events')
-    .upsert(
-      {
-        brand_id:    brand.id,
-        event_type:  'ga4_sessions',
-        value:       sessions,
-        metadata:    { activeUsers, conversions },
-        occurred_at: new Date().toISOString(),
-      },
-      { onConflict: 'brand_id,event_type' }
-    )
+    .insert({
+      brand_id:    brandId,
+      event_type:  'ga4_sessions',
+      value:       sessions,
+      metadata:    { activeUsers, conversions },
+      occurred_at: new Date().toISOString(),
+    })
 
   await service
     .from('ga4_connections')
     .update({ last_synced_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-    .eq('brand_id', brand.id)
+    .eq('brand_id', brandId)
 
   return NextResponse.json({ success: true, sessions, activeUsers, conversions })
 }

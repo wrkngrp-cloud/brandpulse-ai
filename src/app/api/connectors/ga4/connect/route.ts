@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { encrypt } from '@/lib/crypto'
 import { z } from 'zod'
 
@@ -23,12 +24,8 @@ export async function POST(request: NextRequest) {
 
   const { property_id, property_name, access_token, refresh_token } = parsed.data
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
 
   const encryptedAccessToken = encrypt(access_token)
   const encryptedRefreshToken = refresh_token ? encrypt(refresh_token) : null
@@ -37,7 +34,7 @@ export async function POST(request: NextRequest) {
     .from('ga4_connections')
     .upsert(
       {
-        brand_id:      brand.id,
+        brand_id:      brandId,
         property_id,
         property_name: property_name ?? null,
         access_token:  encryptedAccessToken,
