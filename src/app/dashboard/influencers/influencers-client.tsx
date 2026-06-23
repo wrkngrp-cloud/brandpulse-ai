@@ -1139,14 +1139,26 @@ function InfluencerCard({
                 }
               }}
             >
-              <SelectTrigger className="h-7 text-xs w-[160px]">
+              <SelectTrigger className="h-7 text-xs w-[180px]">
                 <SelectValue placeholder="Link to campaign" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="min-w-[220px]">
                 <SelectItem value="none">No campaign</SelectItem>
-                {availableCampaigns.map(c => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                ))}
+                {availableCampaigns
+                  .filter(c => c.status !== 'completed')
+                  .map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                {availableCampaigns.some(c => c.status === 'completed') && (
+                  <>
+                    <div className="px-2 py-1 text-[10px] text-muted-foreground uppercase tracking-wide mt-1">Completed</div>
+                    {availableCampaigns
+                      .filter(c => c.status === 'completed')
+                      .map(c => (
+                        <SelectItem key={c.id} value={c.id} className="text-muted-foreground">{c.name}</SelectItem>
+                      ))}
+                  </>
+                )}
               </SelectContent>
             </Select>
           )}

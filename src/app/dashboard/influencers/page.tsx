@@ -25,7 +25,6 @@ export default async function InfluencersPage() {
       .from('campaigns')
       .select('id, name, status')
       .eq('brand_id', brand.id)
-      .in('status', ['draft', 'active', 'paused'])
       .order('created_at', { ascending: false }),
     supabase
       .from('influencer_campaigns')
