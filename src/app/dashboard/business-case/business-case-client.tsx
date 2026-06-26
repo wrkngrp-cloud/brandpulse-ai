@@ -49,10 +49,9 @@ interface Props {
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 const fmtNGN = (k: number) => {
-  const n = k / 100
-  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000)     return `₦${(n / 1_000).toFixed(0)}K`
-  return `₦${n.toFixed(0)}`
+  if (k >= 1_000_000) return `₦${(k / 1_000_000).toFixed(1)}M`
+  if (k >= 1_000)     return `₦${(k / 1_000).toFixed(0)}K`
+  return `₦${k.toFixed(0)}`
 }
 
 function fmtDate(d: string) {

@@ -170,7 +170,9 @@ export default async function GeoLiftPage() {
       .order('created_at', { ascending: false }),
   ])
 
-  const hasStudies = (studies ?? []).length > 0
+  const hasStudies    = (studies ?? []).length > 0
+  const hasSerpApi    = !!process.env.SERPAPI_KEY
+  const pendingCount  = (studies ?? []).filter(s => s.status === 'pending').length
 
   return (
     <div className="space-y-6">
@@ -180,6 +182,20 @@ export default async function GeoLiftPage() {
           Measure true incremental brand search uplift by city
         </p>
       </div>
+
+      {!hasSerpApi && (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800 px-4 py-3">
+          <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-amber-900 dark:text-amber-200">SerpAPI key not configured</p>
+            <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+              Geo-Lift studies need <code className="font-mono">SERPAPI_KEY</code> to query Google Trends.
+              New studies will be queued but won't run until the key is set in your environment variables.
+              {pendingCount > 0 && ` (${pendingCount} queued now)`}
+            </p>
+          </div>
+        </div>
+      )}
 
       {hasStudies && (
         <div className="space-y-4">

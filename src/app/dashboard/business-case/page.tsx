@@ -98,7 +98,7 @@ export default async function BusinessCasePage() {
     ? sentimentTrend.reduce((s, r) => s + r.social_score, 0) / sentimentTrend.length
     : null
 
-  const spendEfficiency  = totalSpend > 0 && currentBhi != null ? currentBhi / (totalSpend / 100_000_000) : null
+  const spendEfficiency  = totalSpend > 0 && currentBhi != null ? currentBhi / (totalSpend / 1_000_000) : null
 
   // Channel spend breakdown — use budget_allocation from campaign_channels as proxy
   const channelSpend: Record<string, number> = {}
@@ -139,8 +139,8 @@ PERFORMANCE DATA:
 - Avg Sentiment: ${avgSentiment != null ? avgSentiment.toFixed(1) : 'N/A'}/100
 - NPS: ${avgNps != null ? avgNps.toFixed(1) : 'N/A'} (${npsScores.length} responses)
 - Brand mentions (30d): ${mentions30d ?? 0}
-- Total media spend (90d): ₦${(totalSpend / 100).toLocaleString()}
-- Total budget (90d): ₦${(totalBudget / 100).toLocaleString()}
+- Total media spend (90d): ₦${totalSpend.toLocaleString()}
+- Total budget (90d): ₦${totalBudget.toLocaleString()}
 - Active campaigns: ${activeCampaigns}
 - Tracked competitors: ${(competitors ?? []).map(c => c.name).join(', ') || 'none yet'}
 

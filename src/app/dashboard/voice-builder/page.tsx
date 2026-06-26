@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Loader2, Sparkles, Plus, Trash2, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -29,9 +29,16 @@ interface VoiceResult {
 }
 
 export default function VoiceBuilderPage() {
-  const [samples, setSamples] = useState<string[]>([''])
-  const [loading, setLoading] = useState(false)
-  const [result, setResult]   = useState<VoiceResult | null>(null)
+  const [samples, setSamples]     = useState<string[]>([''])
+  const [loading, setLoading]     = useState(false)
+  const [result, setResult]       = useState<VoiceResult | null>(null)
+  const [brandName, setBrandName] = useState('')
+
+  useEffect(() => {
+    fetch('/api/brands').then(r => r.json()).then(d => {
+      if (d.brands?.[0]?.name) setBrandName(d.brands[0].name)
+    }).catch(() => {})
+  }, [])
 
   function addSample()    { setSamples(s => [...s, '']) }
   function removeSample(i: number) { setSamples(s => s.filter((_, j) => j !== i)) }
@@ -45,7 +52,7 @@ export default function VoiceBuilderPage() {
       const res = await fetch('/api/ai/brand-voice-builder', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ samples: filled, brandName: '' }),
+        body:    JSON.stringify({ samples: filled, brandName }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Failed')

@@ -109,7 +109,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
           <p className="eyebrow mb-1.5">Attribution</p>
           <h1 className="h-display text-[28px] sm:text-[32px] leading-none">Media Mix</h1>
           <p className="mt-1.5 text-[13px] text-muted-foreground/60">
-            Contribution-weighted channel attribution across all active media
+            Activity-weighted channel attribution — estimated contribution based on media activity levels
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">

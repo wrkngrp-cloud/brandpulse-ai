@@ -5,6 +5,6 @@ import { RetentionClient } from './retention-client'
 export default async function RetentionPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/auth/login')
   return <RetentionClient />
 }

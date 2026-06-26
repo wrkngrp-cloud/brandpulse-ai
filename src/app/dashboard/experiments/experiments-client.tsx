@@ -57,8 +57,8 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   other:        <span className="text-xs">🧪</span>,
 }
 
-// Simple z-score based significance check (two-proportion z-test)
-function calcSignificance(control: Variant, variant: Variant): { pValue: number; significant: boolean; winner: 'control' | 'variant' | null; liftPct: number } {
+// Two-proportion z-test for significance
+function calcSignificance(control: Variant, variant: Variant, confidenceTarget = 95): { pValue: number; significant: boolean; winner: 'control' | 'variant' | null; liftPct: number } {
   const n1 = control.impressions, x1 = control.conversions
   const n2 = variant.impressions, x2 = variant.conversions
   if (!n1 || !n2 || (!x1 && !x2)) return { pValue: 1, significant: false, winner: null, liftPct: 0 }
@@ -68,11 +68,12 @@ function calcSignificance(control: Variant, variant: Variant): { pValue: number;
   if (se === 0) return { pValue: 1, significant: false, winner: null, liftPct: 0 }
   const z   = (p2 - p1) / se
   const pValue = 2 * (1 - normalCDF(Math.abs(z)))
+  const alpha   = 1 - (confidenceTarget / 100)
   const liftPct = p1 > 0 ? ((p2 - p1) / p1) * 100 : 0
   return {
     pValue,
-    significant: pValue < 0.05,
-    winner: pValue < 0.05 ? (p2 > p1 ? 'variant' : 'control') : null,
+    significant: pValue < alpha,
+    winner: pValue < alpha ? (p2 > p1 ? 'variant' : 'control') : null,
     liftPct,
   }
 }
@@ -233,7 +234,7 @@ export function ExperimentsClient() {
                           .map(v => {
                             const control   = exp.variants.find(x => x.is_control) ?? exp.variants[0]
                             const convRate  = v.impressions > 0 ? (v.conversions / v.impressions) * 100 : 0
-                            const sig       = v.is_control ? null : calcSignificance(control, v)
+                            const sig       = v.is_control ? null : calcSignificance(control, v, exp.confidence_target)
                             const isWinner  = exp.winner_variant_id === v.id
                             return (
                               <tr key={v.id} className={cn('hover:bg-muted/20', isWinner && 'bg-green-50/50')}>

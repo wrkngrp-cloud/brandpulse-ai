@@ -1633,6 +1633,279 @@ export async function POST(req: NextRequest) {
     crawl_source:    'manual',
   })))
 
+  /* ── 28. Marketplace — Jara on Jumia & Konga vs ChowMate ────────────── */
+  const { data: mp1 } = await sb.from('marketplace_products').insert({
+    brand_id: brandId, platform: 'jumia', product_name: 'Jara Long Grain Rice 5kg',
+    sku: 'JLR-5KG', category: 'Rice & Grains', is_own_product: true, is_active: true,
+    product_url: 'https://jumia.com.ng/jara-rice-5kg',
+  }).select('id').single()
+  const { data: mp2 } = await sb.from('marketplace_products').insert({
+    brand_id: brandId, platform: 'jumia', product_name: 'Jara Spice Mix 200g',
+    sku: 'JSM-200G', category: 'Spices & Seasoning', is_own_product: true, is_active: true,
+    product_url: 'https://jumia.com.ng/jara-spice-mix-200g',
+  }).select('id').single()
+  const { data: mp3 } = await sb.from('marketplace_products').insert({
+    brand_id: brandId, platform: 'konga', product_name: 'Jara Oats 500g',
+    sku: 'JOT-500G', category: 'Cereals & Oats', is_own_product: true, is_active: true,
+    product_url: 'https://konga.com/product/jara-oats-500g',
+  }).select('id').single()
+  const { data: mp4 } = await sb.from('marketplace_products').insert({
+    brand_id: brandId, platform: 'jumia', product_name: 'ChowMate Jollof Rice Mix 1kg',
+    sku: 'CM-JRM-1KG', category: 'Rice & Grains', is_own_product: false, is_active: true,
+    product_url: 'https://jumia.com.ng/chowmate-jollof-mix-1kg',
+  }).select('id').single()
+  const { data: mp5 } = await sb.from('marketplace_products').insert({
+    brand_id: brandId, platform: 'konga', product_name: 'NutriNg Premium Rice 5kg',
+    sku: 'NNG-PR-5KG', category: 'Rice & Grains', is_own_product: false, is_active: true,
+    product_url: 'https://konga.com/product/nutring-premium-rice-5kg',
+  }).select('id').single()
+
+  const mpIds = [mp1?.id, mp2?.id, mp3?.id, mp4?.id, mp5?.id]
+
+  const snapshotBase = [
+    { idx: 0, prices: [3_200, 3_100, 3_050, 3_200, 3_200, 3_300, 3_300, 3_400], ratings: [4.6, 4.7, 4.7, 4.5, 4.6, 4.6, 4.7, 4.8], reviews: [847, 812, 798, 822, 835, 856, 862, 871], shelf: [3, 2, 2, 1, 1, 2, 2, 1] },
+    { idx: 1, prices: [980, 950, 950, 1_000, 1_000, 1_000, 1_020, 1_020], ratings: [4.5, 4.4, 4.5, 4.5, 4.6, 4.6, 4.6, 4.7], reviews: [412, 398, 401, 415, 422, 430, 441, 448], shelf: [5, 4, 4, 3, 3, 3, 2, 2] },
+    { idx: 2, prices: [850, 820, 820, 850, 850, 880, 880, 880], ratings: [4.4, 4.3, 4.4, 4.4, 4.5, 4.5, 4.6, 4.6], reviews: [289, 275, 280, 292, 299, 307, 314, 321], shelf: [4, 5, 4, 4, 3, 3, 3, 2] },
+    { idx: 3, prices: [2_800, 2_850, 2_800, 2_750, 2_700, 2_650, 2_650, 2_700], ratings: [4.1, 4.0, 4.1, 4.2, 4.2, 4.1, 4.2, 4.3], reviews: [1_241, 1_189, 1_202, 1_214, 1_230, 1_247, 1_261, 1_278], shelf: [1, 1, 1, 2, 2, 1, 1, 2] },
+    { idx: 4, prices: [2_950, 2_900, 2_900, 2_950, 2_950, 3_000, 3_000, 3_000], ratings: [4.3, 4.2, 4.3, 4.3, 4.4, 4.4, 4.4, 4.5], reviews: [631, 608, 614, 625, 638, 647, 657, 664], shelf: [5, 4, 4, 5, 4, 4, 3, 3] },
+  ]
+  const snapInserts = []
+  for (const s of snapshotBase) {
+    const id = mpIds[s.idx]
+    if (!id) continue
+    for (let w = 0; w < 8; w++) {
+      snapInserts.push({
+        brand_id: brandId, product_id: id,
+        snapshot_date: dAgo(w * 7),
+        price: s.prices[w], currency: 'NGN',
+        rating: s.ratings[w], review_count: s.reviews[w],
+        shelf_position: s.shelf[w], in_stock: true,
+        sales_rank: Math.round(s.shelf[w] * 12 + (w * 2)),
+        badges: s.idx < 3 ? ['Jara Brand'] : [],
+      })
+    }
+  }
+  await sb.from('marketplace_snapshots').insert(snapInserts)
+
+  // Add marketplace reviews for Jara Rice (mp1)
+  if (mp1?.id) {
+    await sb.from('marketplace_reviews').insert([
+      { brand_id: brandId, product_id: mp1.id, platform: 'jumia', external_id: 'jmr-001', author: 'Ngozi A.', rating: 5, title: 'Best rice in the market!', body: 'Jara Long Grain cooks so well. No stones, no broken grains. My family loves it.', verified: true, helpful_count: 47, sentiment_label: 'positive', sentiment_score: 92, reviewed_at: dAgo(12) },
+      { brand_id: brandId, product_id: mp1.id, platform: 'jumia', external_id: 'jmr-002', author: 'Emeka O.', rating: 4, title: 'Good quality, fast delivery', body: 'Quality is consistent. Delivery was 2 days. Would be 5 stars if price was lower.', verified: true, helpful_count: 23, sentiment_label: 'positive', sentiment_score: 74, reviewed_at: dAgo(20) },
+      { brand_id: brandId, product_id: mp1.id, platform: 'jumia', external_id: 'jmr-003', author: 'Bimpe K.', rating: 2, title: 'Price increase again?', body: 'Love the product but the price jump from ₦3,050 to ₦3,400 in 2 weeks is too much. Looking at alternatives.', verified: false, helpful_count: 89, sentiment_label: 'negative', sentiment_score: 28, reviewed_at: dAgo(5) },
+      { brand_id: brandId, product_id: mp1.id, platform: 'jumia', external_id: 'jmr-004', author: 'Tunde B.', rating: 5, title: 'Consistent quality', body: 'Been buying Jara Rice for 3 years. Never disappointed me once.', verified: true, helpful_count: 61, sentiment_label: 'positive', sentiment_score: 96, reviewed_at: dAgo(35) },
+    ])
+  }
+
+  /* ── 29. Budget plan + line items + actuals (Summer Vibes) ───────────── */
+  const { data: budgetPlan } = await sb.from('budget_plans').insert({
+    brand_id: brandId, name: 'Jara Summer Vibes — Q3 2026',
+    period_start: dAgo(14), period_end: dAgo(-76),
+    total_budget: 8_500_000, currency: 'NGN',
+    status: 'active', notes: 'Full 90-day campaign. Digital + OOH weighted toward Lagos.',
+    created_by: userId,
+  }).select('id').single()
+
+  if (budgetPlan?.id) {
+    const { data: li1 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: budgetPlan.id, channel: 'digital', label: 'Meta Ads (Facebook + Instagram)', planned_amount: 2_500_000, actual_amount: 1_124_800, currency: 'NGN', campaign_id: camp3Id }).select('id').single()
+    const { data: li2 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: budgetPlan.id, channel: 'digital', label: 'Google Display & Search', planned_amount: 800_000, actual_amount: 362_000, currency: 'NGN', campaign_id: camp3Id }).select('id').single()
+    const { data: li3 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: budgetPlan.id, channel: 'ooh', label: 'Lagos Billboards (Lekki + Oshodi)', planned_amount: 2_200_000, actual_amount: 1_100_000, currency: 'NGN', campaign_id: camp3Id }).select('id').single()
+    const { data: li4 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: budgetPlan.id, channel: 'ooh', label: 'Abuja LED Screen (Transcorp)', planned_amount: 480_000, actual_amount: 480_000, currency: 'NGN', campaign_id: camp3Id }).select('id').single()
+    const { data: li5 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: budgetPlan.id, channel: 'influencer', label: 'Chef Kemisola + Foodie Naija', planned_amount: 1_400_000, actual_amount: 1_400_000, currency: 'NGN', campaign_id: camp3Id }).select('id').single()
+    const { data: li6 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: budgetPlan.id, channel: 'production', label: 'Creative Production & Editing', planned_amount: 620_000, actual_amount: 584_000, currency: 'NGN' }).select('id').single()
+    const { data: li7 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: budgetPlan.id, channel: 'events', label: 'Mall Sampling Activations', planned_amount: 500_000, actual_amount: 0, currency: 'NGN', campaign_id: camp3Id }).select('id').single()
+
+    // Actuals (spend events) — staggered over last 14 days
+    const actualInserts = [
+      { li: li1?.id, amount: 524_800, desc: 'Meta Ads Week 1', ref: 'META-INV-8821', spent_on: dAgo(13) },
+      { li: li1?.id, amount: 600_000, desc: 'Meta Ads Week 2', ref: 'META-INV-8934', spent_on: dAgo(6) },
+      { li: li2?.id, amount: 362_000, desc: 'Google Ads — Display + Search', ref: 'GGL-INV-4421', spent_on: dAgo(10) },
+      { li: li3?.id, amount: 560_000, desc: 'Lekki Toll Gate billboard — Month 1', ref: 'OOHN-221', spent_on: dAgo(14) },
+      { li: li3?.id, amount: 540_000, desc: 'Oshodi + Surulere banners — Month 1', ref: 'LASAA-112', spent_on: dAgo(14) },
+      { li: li4?.id, amount: 480_000, desc: 'Transcorp LED Screen — 4 weeks', ref: 'OOHM-512', spent_on: dAgo(14) },
+      { li: li5?.id, amount: 850_000, desc: '@chefkemisola partnership fee', ref: 'INF-KEMI-01', spent_on: dAgo(18) },
+      { li: li5?.id, amount: 550_000, desc: '@foodie_naija Instagram series (3 posts)', ref: 'INF-FOOD-01', spent_on: dAgo(15) },
+      { li: li6?.id, amount: 584_000, desc: 'Creative studio — Summer Vibes full package', ref: 'PROD-SV-2026', spent_on: dAgo(21) },
+    ]
+    for (const a of actualInserts) {
+      if (!a.li) continue
+      await sb.from('budget_actuals').insert({ brand_id: brandId, line_item_id: a.li, amount: a.amount, currency: 'NGN', description: a.desc, reference: a.ref, spent_on: a.spent_on, created_by: userId })
+    }
+    void li7 // scheduled, not yet spent
+  }
+
+  /* ── 30. Loyalty program — Jara Rewards ──────────────────────────────── */
+  const { data: lp } = await sb.from('loyalty_programs').insert({
+    brand_id: brandId, name: 'Jara Rewards', description: 'Earn points on every Jara purchase. Redeem for discounts and exclusive products.',
+    points_currency: 'Jara Points', points_per_naira: 0.01,
+    is_active: true,
+  }).select('id').single()
+
+  let bronze: { id: string } | null = null, silver: { id: string } | null = null, gold: { id: string } | null = null
+  if (lp?.id) {
+    const { data: t1 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: lp.id, name: 'Bronze', min_points: 0, color: '#cd7f32', perks: ['5% discount on Jara Rice', 'Birthday bonus points', 'Early access to new products'], sort_order: 1 }).select('id').single()
+    const { data: t2 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: lp.id, name: 'Silver', min_points: 5_000, color: '#aaa9ad', perks: ['8% discount on all products', 'Double points Fridays', 'Free shipping on Jumia/Konga', 'Quarterly mystery box'], sort_order: 2 }).select('id').single()
+    const { data: t3 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: lp.id, name: 'Gold', min_points: 20_000, color: '#ffd700', perks: ['12% lifetime discount', 'Monthly chef masterclass invite', 'Personalised gifting', 'Priority CS hotline', 'Exclusive community kitchen invites'], sort_order: 3 }).select('id').single()
+    bronze = t1; silver = t2; gold = t3
+
+    // Rewards
+    await sb.from('loyalty_rewards').insert([
+      { brand_id: brandId, program_id: lp.id, name: '₦500 off next purchase', description: 'Redeem for ₦500 discount on any Jara order', points_cost: 1_000, reward_type: 'discount', is_active: true, stock_count: null },
+      { brand_id: brandId, program_id: lp.id, name: 'Free Jara Spice Mix 200g', description: 'Get a free Jara Spice Mix added to your next order', points_cost: 2_500, reward_type: 'free_product', is_active: true, stock_count: 200 },
+      { brand_id: brandId, program_id: lp.id, name: 'Chef Kemisola Cooking Class', description: 'Live online cooking class with Chef Kemisola — 1 session', points_cost: 8_000, reward_type: 'experience', is_active: true, stock_count: 50 },
+      { brand_id: brandId, program_id: lp.id, name: '₦2,000 off ₦10,000+ order', description: 'Discount voucher for large orders', points_cost: 3_500, reward_type: 'voucher', is_active: true, stock_count: null },
+    ])
+
+    // Members with varied tiers and points
+    const memberData = [
+      { name: 'Funke Adeleke',  email: 'funke.a@gmail.com', phone: '+2348012345001', tier: gold?.id,   pts: 32_400, lf: 38_200, joined: dAgo(320) },
+      { name: 'Chidi Okonkwo', email: 'chidi.o@yahoo.com', phone: '+2348034567002', tier: gold?.id,   pts: 28_100, lf: 31_600, joined: dAgo(280) },
+      { name: 'Amina Bello',   email: 'amina.b@gmail.com', phone: '+2347012345003', tier: silver?.id, pts: 14_800, lf: 18_400, joined: dAgo(210) },
+      { name: 'Taiwo Adesanya',email: 'taiwo.a@gmail.com', phone: '+2348045678004', tier: silver?.id, pts: 11_200, lf: 12_900, joined: dAgo(180) },
+      { name: 'Ngozi Eze',     email: 'ngozi.e@gmail.com', phone: '+2348056789005', tier: silver?.id, pts: 8_400,  lf: 9_100,  joined: dAgo(155) },
+      { name: 'Emeka Uche',    email: 'emeka.u@gmail.com', phone: '+2348067890006', tier: silver?.id, pts: 6_200,  lf: 7_800,  joined: dAgo(140) },
+      { name: 'Bimpe Lawal',   email: 'bimpe.l@gmail.com', phone: '+2348078901007', tier: bronze?.id, pts: 3_800,  lf: 4_200,  joined: dAgo(90) },
+      { name: 'Yusuf Garba',   email: 'yusuf.g@gmail.com', phone: '+2347023456008', tier: bronze?.id, pts: 2_100,  lf: 2_800,  joined: dAgo(75) },
+      { name: 'Shade Williams',email: 'shade.w@gmail.com', phone: '+2348034567009', tier: bronze?.id, pts: 1_400,  lf: 1_900,  joined: dAgo(60) },
+      { name: 'Ola Adeyemi',   email: 'ola.a@gmail.com',  phone: '+2348045678010', tier: bronze?.id, pts: 620,    lf: 620,    joined: dAgo(30) },
+    ]
+    const { data: memberRows } = await sb.from('loyalty_members').insert(
+      memberData.map(m => ({
+        brand_id: brandId, program_id: lp.id, name: m.name, email: m.email, phone: m.phone,
+        current_tier_id: m.tier, points_balance: m.pts, lifetime_points: m.lf,
+        joined_at: m.joined, last_activity_at: dAgo(Math.floor(Math.random() * 20)),
+      }))
+    ).select('id')
+
+    if (memberRows?.length) {
+      const txInserts = memberRows.flatMap((member, idx) => {
+        const m = memberData[idx]
+        const rows = []
+        // Initial earn (purchase)
+        rows.push({ brand_id: brandId, member_id: member.id, transaction_type: 'earn', points: Math.round(m.lf * 0.7), description: 'Purchase — Jara Rice 5kg × 4', reference: `PUR-${idx + 1001}`, occurred_at: m.joined })
+        // Additional earn
+        rows.push({ brand_id: brandId, member_id: member.id, transaction_type: 'earn', points: Math.round(m.lf * 0.2), description: 'Purchase — Jara Oats + Spice Mix', reference: `PUR-${idx + 2001}`, occurred_at: dAgo(60) })
+        // Bonus
+        rows.push({ brand_id: brandId, member_id: member.id, transaction_type: 'bonus', points: Math.round(m.lf * 0.1), description: 'Referral bonus — friend signup', reference: `REF-${idx + 3001}`, occurred_at: dAgo(30) })
+        // Redemption for high-tier members
+        if (m.pts < m.lf) {
+          const redeemed = m.lf - m.pts
+          rows.push({ brand_id: brandId, member_id: member.id, transaction_type: 'redeem', points: -redeemed, description: 'Reward redemption — ₦500 discount', reference: `RDM-${idx + 4001}`, occurred_at: dAgo(15) })
+        }
+        return rows
+      })
+      await sb.from('loyalty_transactions').insert(txInserts)
+    }
+  }
+
+  /* ── 31. A/B Experiments ─────────────────────────────────────────────── */
+  const { data: exp1 } = await sb.from('ab_experiments').insert({
+    brand_id: brandId, name: 'Summer Vibes Email CTA',
+    hypothesis: 'A stronger action-oriented CTA ("Grab yours now") will drive higher click-through than the current informational CTA ("Learn more")',
+    experiment_type: 'email', metric_primary: 'click_through_rate',
+    metrics_secondary: ['open_rate', 'conversion_rate'],
+    status: 'concluded',
+    confidence_target: 95, min_sample_size: 500,
+    started_at: tsAgo(21), concluded_at: tsAgo(7),
+  }).select('id').single()
+
+  const { data: exp2 } = await sb.from('ab_experiments').insert({
+    brand_id: brandId, name: 'Jara Rice Jumia Listing Image',
+    hypothesis: 'A lifestyle cooking image will generate more clicks than the plain product-on-white image, because it shows the product in context',
+    experiment_type: 'creative', metric_primary: 'click_through_rate',
+    status: 'running',
+    confidence_target: 95, min_sample_size: 300,
+    started_at: tsAgo(7),
+  }).select('id').single()
+
+  const { data: exp3 } = await sb.from('ab_experiments').insert({
+    brand_id: brandId, name: 'WhatsApp Survey Greeting Language',
+    hypothesis: 'Opening survey invite in Pidgin English ("How body? Quick question for you!") will yield higher response rates than formal English ("We value your feedback")',
+    experiment_type: 'message', metric_primary: 'response_rate',
+    status: 'draft',
+    confidence_target: 90, min_sample_size: 200,
+  }).select('id').single()
+
+  if (exp1?.id) {
+    const { data: ev1c } = await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: exp1.id, name: 'Control — Learn More', is_control: true, traffic_split: 50, impressions: 2840, conversions: 142, revenue: 0, sort_order: 1, content: { cta_text: 'Learn more', cta_color: '#666666' } }).select('id').single()
+    const { data: ev1v } = await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: exp1.id, name: 'Variant — Grab Yours Now', is_control: false, traffic_split: 50, impressions: 2861, conversions: 218, revenue: 0, sort_order: 2, content: { cta_text: 'Grab yours now', cta_color: '#E8763E' } }).select('id').single()
+    if (ev1v?.id) await sb.from('ab_experiments').update({ winner_variant_id: ev1v.id }).eq('id', exp1.id)
+    void ev1c
+  }
+  if (exp2?.id) {
+    await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: exp2.id, name: 'Control — Product White BG', is_control: true, traffic_split: 50, impressions: 1420, conversions: 68, revenue: 218_400, sort_order: 1, content: { image_type: 'product_white', description: 'Jara 5kg bag on white background' } })
+    await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: exp2.id, name: 'Variant — Lifestyle Cooking', is_control: false, traffic_split: 50, impressions: 1435, conversions: 94, revenue: 301_800, sort_order: 2, content: { image_type: 'lifestyle', description: 'Family cooking jollof with Jara rice' } })
+  }
+  if (exp3?.id) {
+    await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: exp3.id, name: 'Control — Formal English', is_control: true, traffic_split: 50, impressions: 0, conversions: 0, revenue: 0, sort_order: 1, content: { message: 'We value your feedback. Could you spare 2 minutes?' } })
+    await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: exp3.id, name: 'Variant — Pidgin Greeting', is_control: false, traffic_split: 50, impressions: 0, conversions: 0, revenue: 0, sort_order: 2, content: { message: 'How body? Quick question for you! Go bother you 2 mins? 🙏' } })
+  }
+
+  /* ── 32. Advocacy scores (weekly for 12 weeks) ───────────────────────── */
+  const advocacyRows = Array.from({ length: 12 }, (_, i) => {
+    const w = 11 - i
+    const ss = sentScore(w * 7)
+    const vol = Math.round(28 + i * 3.2 + Math.sin(i * 0.8) * 4)
+    const posVol = Math.round(vol * (0.55 + (ss / 100) * 0.2))
+    const negVol = Math.round(vol * (0.12 - (ss / 100) * 0.04))
+    const neuVol = vol - posVol - negVol
+    const reach = Math.round(vol * (2800 + i * 120))
+    const engagement = Math.round(reach * 0.052)
+    const sentRatio = posVol / vol
+    const volScore = Math.min(100, (vol / 60) * 100)
+    const reachScore = Math.min(100, (reach / 120_000) * 100)
+    const engmtScore = Math.min(100, (engagement / 6_500) * 100)
+    const score = (sentRatio * 40) + ((volScore * 0.5 + reachScore * 0.5) * 0.4) + (engmtScore * 0.2)
+    return {
+      brand_id: brandId, week_start: dAgo(w * 7 + 6),
+      ugc_mentions: vol, positive_mentions: posVol, neutral_mentions: neuVol, negative_mentions: negVol,
+      avg_sentiment: +ss.toFixed(2), total_reach: reach, total_engagement: engagement,
+      top_platforms: { instagram: Math.round(vol * 0.55), twitter: Math.round(vol * 0.38), tiktok: Math.round(vol * 0.07) },
+      top_themes: ss > 70 ? ['brand love', 'product quality', 'nostalgia'] : ['pricing', 'availability', 'comparison'],
+      advocacy_score: +Math.min(100, score).toFixed(2),
+      score_delta: i > 0 ? +(Math.sin(i * 0.5) * 3.2).toFixed(2) : 0,
+      score_factors: { sentiment_contribution: +(sentRatio * 40).toFixed(1), volume_contribution: +((volScore * 0.5 + reachScore * 0.5) * 0.4).toFixed(1), engagement_contribution: +(engmtScore * 0.2).toFixed(1) },
+    }
+  })
+  await sb.from('advocacy_scores').insert(advocacyRows)
+
+  /* ── 33. Promoters + referral codes ──────────────────────────────────── */
+  const promoterData = [
+    { name: 'Funke Adeleke', email: 'funke.a@gmail.com', phone: '+2348012345001', nps: 10, city: 'Lagos', code: 'BP-JARA01', clicks: 48, conversions: 12 },
+    { name: 'Chidi Okonkwo', email: 'chidi.o@yahoo.com', phone: '+2348034567002', nps: 9, city: 'Abuja', code: 'BP-JARA02', clicks: 31, conversions: 8 },
+    { name: 'Amina Bello', email: 'amina.b@gmail.com', phone: '+2347012345003', nps: 10, city: 'Kano', code: 'BP-JARA03', clicks: 22, conversions: 6 },
+    { name: 'Taiwo Adesanya', email: 'taiwo.a@gmail.com', phone: '+2348045678004', nps: 9, city: 'Lagos', code: 'BP-JARA04', clicks: 15, conversions: 3 },
+  ]
+  for (const p of promoterData) {
+    const { data: prom } = await sb.from('promoters').insert({
+      brand_id: brandId, name: p.name, email: p.email, phone: p.phone,
+      nps_score: p.nps, city: p.city, status: 'active',
+      notes: `Activated after Summer Vibes NPS pulse. ${p.nps === 10 ? 'Superfan.' : 'Highly satisfied customer.'}`,
+      activated_at: dAgo(10),
+    }).select('id').single()
+    if (prom?.id) {
+      await sb.from('referral_codes').insert({
+        brand_id: brandId, promoter_id: prom.id, code: p.code,
+        destination_url: 'https://jarafoods.com/summer',
+        click_count: p.clicks, conversion_count: p.conversions, is_active: true,
+      })
+    }
+  }
+
+  /* ── 34. Customer Profiles (CDP) ─────────────────────────────────────── */
+  await sb.from('customer_profiles').insert([
+    { brand_id: brandId, name: 'Funke Adeleke',  email: 'funke.a@gmail.com',  phone: '+2348012345001', city: 'Lagos',  nps_score: 10, survey_count: 3, last_seen_at: dAgo(5),  tags: ['promoter', 'gold-loyalty', 'jollof-fan'], sources: ['survey', 'nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Chidi Okonkwo',  email: 'chidi.o@yahoo.com',  phone: '+2348034567002', city: 'Abuja',  nps_score: 9,  survey_count: 2, last_seen_at: dAgo(8),  tags: ['promoter', 'gold-loyalty', 'rice-buyer'], sources: ['survey', 'nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Amina Bello',    email: 'amina.b@gmail.com',  phone: '+2347012345003', city: 'Kano',   nps_score: 10, survey_count: 2, last_seen_at: dAgo(12), tags: ['promoter', 'silver-loyalty', 'northern-market'], sources: ['survey', 'nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Taiwo Adesanya', email: 'taiwo.a@gmail.com',  phone: '+2348045678004', city: 'Lagos',  nps_score: 9,  survey_count: 1, last_seen_at: dAgo(15), tags: ['promoter', 'silver-loyalty'], sources: ['nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Ngozi Eze',      email: 'ngozi.e@gmail.com',  phone: '+2348056789005', city: 'Lagos',  nps_score: 7,  survey_count: 1, last_seen_at: dAgo(18), tags: ['passive', 'silver-loyalty'], sources: ['survey', 'loyalty'] },
+    { brand_id: brandId, name: 'Emeka Uche',     email: 'emeka.u@gmail.com',  phone: '+2348067890006', city: 'Lagos',  nps_score: 8,  survey_count: 2, last_seen_at: dAgo(22), tags: ['passive', 'silver-loyalty'], sources: ['nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Bimpe Lawal',    email: 'bimpe.l@gmail.com',  phone: '+2348078901007', city: 'Lagos',  nps_score: 5,  survey_count: 1, last_seen_at: dAgo(25), tags: ['detractor', 'bronze-loyalty', 'price-sensitive'], sources: ['survey', 'loyalty'] },
+    { brand_id: brandId, name: 'Yusuf Garba',    email: 'yusuf.g@gmail.com',  phone: '+2347023456008', city: 'Kano',   nps_score: 3,  survey_count: 1, last_seen_at: dAgo(30), tags: ['detractor', 'bronze-loyalty', 'northern-market'], sources: ['nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Shade Williams', email: 'shade.w@gmail.com',  phone: '+2348034567009', city: 'Lagos',  nps_score: 7,  survey_count: 1, last_seen_at: dAgo(32), tags: ['passive', 'bronze-loyalty'], sources: ['nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Ola Adeyemi',    email: 'ola.a@gmail.com',    phone: '+2348045678010', city: 'Ibadan', nps_score: 9,  survey_count: 0, last_seen_at: dAgo(28), tags: ['promoter', 'bronze-loyalty', 'new-customer'], sources: ['loyalty'] },
+  ])
+
   /* ── Done ─────────────────────────────────────────────────────────────── */
   return NextResponse.json({
     success: true,
@@ -1675,6 +1948,20 @@ export async function POST(req: NextRequest) {
       printPlacements:     8,
       geoLiftStudies:      3,
       pressMentions:       12,
+      marketplaceProducts: 5,
+      marketplaceSnapshots: 40,
+      marketplaceReviews:  4,
+      budgetPlan:          1,
+      budgetLineItems:     7,
+      budgetActuals:       9,
+      loyaltyProgram:      1,
+      loyaltyTiers:        3,
+      loyaltyMembers:      10,
+      loyaltyRewards:      4,
+      abExperiments:       3,
+      advocacyScores:      12,
+      promoters:           4,
+      customerProfiles:    10,
     },
   })
 }
