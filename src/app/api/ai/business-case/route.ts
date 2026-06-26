@@ -173,8 +173,9 @@ Return ONLY this JSON, no preamble, no markdown fences:
   "recommendation": "string — clear Go/No-Go/Conditional verdict with specific conditions"
 }`
 
+  let raw = ''
   try {
-    const raw = await callAi({
+    raw = await callAi({
       tier:        'boardGrade',
       system:      'You are a senior business strategist building board-ready investment cases for Nigerian/West African brands. Apply Aaker, ESOV, Porter, and Ansoff frameworks explicitly. Return ONLY valid JSON with no markdown fences.',
       messages:    [{ role: 'user', content: userPrompt }],
@@ -187,6 +188,7 @@ Return ONLY this JSON, no preamble, no markdown fences:
     return NextResponse.json(result)
   } catch (err) {
     console.error('[business-case] AI error:', err)
+    console.error('[business-case] Raw AI response (first 500 chars):', raw?.slice(0, 500))
     return NextResponse.json({ error: 'Failed to generate business case. Please try again.' }, { status: 500 })
   }
 }

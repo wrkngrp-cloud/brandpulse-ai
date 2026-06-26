@@ -4,13 +4,13 @@ import Anthropic from '@anthropic-ai/sdk'
 // cultural  (sentiment, Pidgin/Yoruba/Igbo/Hausa)    → Claude Haiku 4.5
 // structural (reports, briefings, funnel diagnosis)   → Claude Sonnet 4.6
 // chat       (AI Command Layer)                       → Claude Sonnet 4.6
-// boardGrade (executive business cases)               → Claude Opus 4.8
+// boardGrade (executive business cases)               → Claude Sonnet 4.6 (Opus when confirmed available)
 
 export const MODELS = {
   cultural:   'claude-haiku-4-5-20251001',
   structural: 'claude-sonnet-4-6',
   chat:       'claude-sonnet-4-6',
-  boardGrade: 'claude-opus-4-8',
+  boardGrade: 'claude-sonnet-4-6',
 } as const
 
 export type ModelTier = keyof typeof MODELS
