@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
+import { getActiveBrand } from '@/lib/active-brand'
 
 export const runtime = 'nodejs'
 export const maxDuration = 120
@@ -39,11 +40,7 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name, category')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{ id: string; name: string; category: string | null }>(supabase, 'id, name, category')
   if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
 
   const service = await createServiceClient()

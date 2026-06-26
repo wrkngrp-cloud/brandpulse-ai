@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 
 // Map brand category strings → sector_benchmarks sector keys
 const SECTOR_MAP: Record<string, string> = {
@@ -51,7 +52,7 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase.from('brands').select('category').limit(1).single()
+  const brand = await getActiveBrand<{ category: string | null }>(supabase, 'category')
   const sector = resolveSector(brand?.category ?? null)
 
   const { data: benchmarks } = await supabase

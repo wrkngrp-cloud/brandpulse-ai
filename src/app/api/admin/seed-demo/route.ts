@@ -13,7 +13,7 @@ import { createClient }              from '@supabase/supabase-js'
 const DEMO_EMAIL    = 'demo@jarafoods.brandpulse.ai'
 const DEMO_PASSWORD = 'Demo@Jara2026!'
 const SEED_SECRET   = 'seed-jara-demo-2026'
-const BASE          = new Date('2026-06-15T12:00:00Z')
+const BASE          = new Date()
 
 /* ── Date helpers ────────────────────────────────────────────────────────── */
 

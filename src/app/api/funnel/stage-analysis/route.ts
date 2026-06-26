@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { createClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
 import { z } from 'zod'
@@ -34,8 +35,9 @@ export async function POST(req: NextRequest) {
 
   const { stage, score, brandName, industry } = parsed.data
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
+  const brand = { id: brandId }
 
   const now = new Date()
   const d30 = new Date(now); d30.setDate(now.getDate() - 30)

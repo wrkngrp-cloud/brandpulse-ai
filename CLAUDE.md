@@ -31,6 +31,61 @@ for cache/rate-limit.
 - Public endpoints (/survey/[id], /ambassador/[token], /go/[slug]) post/redirect via a
   service-role API route that validates the token/slug. NEVER open anon RLS on those tables.
 
+## Active brand lookup (critical — always use this)
+ALWAYS use `getActiveBrandId(supabase)` or `getActiveBrand<T>(supabase, 'col1, col2')`
+from `src/lib/active-brand.ts` in every API route that needs the current brand.
+NEVER use `.from('brands').select(...).limit(1).single()` — this ignores the
+active_brand_id cookie and breaks multi-brand workspaces silently.
+
+## WhatsApp Deep Integration — Model A (Phase 4)
+Architecture: BrandPulse-owned WABA. All sends originate from BrandPulse's own
+WhatsApp Business number. Users manage contacts and templates inside BrandPulse UI
+only — they never touch an API key or external platform.
+API: Meta Cloud API v20.0
+Send endpoint: POST https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages
+Webhook: POST /api/whatsapp/webhook (delivery status callbacks: sent/delivered/read/failed)
+Env vars (server-side only, never client):
+  WHATSAPP_PHONE_NUMBER_ID    — the registered phone number's ID
+  WHATSAPP_BUSINESS_ACCOUNT_ID — the WABA ID
+  WHATSAPP_ACCESS_TOKEN       — permanent system user token (never page token)
+Rules:
+- All templates must be pre-approved by Meta before use (message type: template).
+- Interactive messages (buttons, lists) are valid for session replies only (within 24h window).
+- NDPR consent gate: check whatsapp_opted_in = true on whatsapp_contacts before ANY send.
+  Never send to a contact without explicit opt-in on file.
+- Unsubscribe: inbound reply "STOP" → webhook handler → set whatsapp_opted_in = false.
+- Rate limit: 1,000 business-initiated conversations/day on standard tier. Hard-stop Inngest
+  job if daily_sent_count >= 1000; log warning to notification centre.
+- All dispatch runs through Inngest jobs (never direct in API routes — too slow for bulk).
+- Log every send to whatsapp_send_log; per-campaign totals in whatsapp_campaigns.
+- NEVER store phone numbers in plain text. Hash with SHA-256 for whatsapp_send_log.
+  Store E.164 format (+2348012345678) only in whatsapp_contacts with RLS.
+
+## AI Visibility Tracker (Phase 4 — built)
+Checks brand presence in ChatGPT, Gemini, and Perplexity. Runs weekly (Monday 9am cron) + on-demand.
+Tables: `ai_visibility_checks` (per-question results), `ai_visibility_scores` (weekly aggregate per brand).
+Claude (structural tier) generates 5 category questions AND analyzes each response for brand mentions/tone/competitors.
+External platform queries use raw fetch (not SDK) — conditional on env vars:
+  OPENAI_API_KEY        → ChatGPT GPT-4o mini
+  GOOGLE_AI_API_KEY     → Gemini 2.0 Flash
+  PERPLEXITY_API_KEY    → Perplexity Sonar
+At least one must be set for checks to run. Missing platforms are skipped gracefully.
+Score: 0–100. Formula: weighted mention rate (position: early=1.0/mid=0.7/late=0.4 × tone: pos=1.1/neu=1.0/neg=0.9) × 100.
+Trigger on-demand: POST /api/ai-visibility/check (fires ai-visibility/check Inngest event).
+
+## GA4 OAuth (Phase 4 — built)
+CSRF: ga4_oauth_state cookie (httpOnly, sameSite: lax, 10min TTL).
+Tokens: stored encrypted in ga4_connections (access_token, refresh_token, token_expiry).
+Auto-refresh: check token_expiry before every sync; refresh if within 2 minutes of expiry.
+Property ID: stored as numeric string — strip 'properties/' prefix from Admin API resource name.
+metricAggregations: ['TOTAL'] is required in runReport body for totals[] to populate.
+
+## Google Sign-In (Phase 4 — built)
+Supabase signInWithOAuth({ provider: 'google' }) — client-side only via GoogleSignInButton.
+Auth callback at /api/auth/callback: after exchangeCodeForSession, checks app_metadata.provider.
+New OAuth users (no workspace_members row) → create workspace + member (owner) + blank brand
+→ redirect to /onboarding. Returning users → redirect to /dashboard (or ?next= param).
+
 ## Sentiment data model
 Social mentions are collected from ALL connected platforms (X and Instagram today;
 TikTok/LinkedIn/Facebook are supported by the schema). Each mention row carries

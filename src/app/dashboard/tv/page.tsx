@@ -126,7 +126,7 @@ export default async function TVPage({
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">TV Intelligence</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Track TV spot performance, GRP delivery, and spend across Nigerian channels.
+              Log your agency buy plan and post-buy report to reconcile GRP delivery and spend across Nigerian channels.
             </p>
           </div>
         </div>
@@ -153,8 +153,7 @@ export default async function TVPage({
           <div>
             <h2 className="text-lg font-semibold">No TV schedules yet</h2>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              Upload your TV buy plan to start tracking GRP delivery, reach, and CPRP
-              across NTA, Channels TV, AIT, DSTV, and other Nigerian channels.
+              Upload your agency buy plan and post-buy report to reconcile GRP delivery, reach, and CPRP across NTA, Channels TV, AIT, DSTV, and other Nigerian channels.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 justify-center">

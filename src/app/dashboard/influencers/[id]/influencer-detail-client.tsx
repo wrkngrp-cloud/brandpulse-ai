@@ -469,7 +469,11 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
                 }}
               >
                 <SelectTrigger className="h-8 text-xs">
-                  <SelectValue placeholder="Not linked" />
+                  <span className="flex flex-1 text-left text-xs truncate">
+                    {inf.campaign_id
+                      ? (campaigns.find(c => c.id === inf.campaign_id)?.name ?? 'Not linked')
+                      : 'Not linked'}
+                  </span>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No campaign</SelectItem>

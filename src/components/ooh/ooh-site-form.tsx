@@ -8,6 +8,7 @@ import { Input }              from '@/components/ui/input'
 import { Label }              from '@/components/ui/label'
 import { Textarea }           from '@/components/ui/textarea'
 import { Copy, RefreshCw, Link2, QrCode, MapPin, Sparkles, Loader2, Settings, Zap, Map, X, Users } from 'lucide-react'
+import { FieldTip } from '@/components/ui/field-tip'
 import { estimateTraffic, inferSiteDemographics } from '@/app/dashboard/ooh/actions'
 import { UrlLengthAdvisor }   from '@/components/ooh/url-length-advisor'
 import Link                   from 'next/link'
@@ -649,7 +650,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="format_type">Format</Label>
+            <Label htmlFor="format_type">Format <FieldTip tip="Determines how we calculate impressions and traffic. Lamppole multiplies per pole count. Keke counts per vehicle per route. Wall Mural uses surface area. Branded Vehicle uses fleet size and routes." /></Label>
             <select
               id="format_type" name="format_type"
               value={formatType}
@@ -673,7 +674,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           <div className="space-y-4 rounded-lg border border-orange-200 bg-orange-50/40 dark:border-orange-900/40 dark:bg-orange-950/10 p-4">
             <p className="text-xs font-semibold text-orange-700 dark:text-orange-400 uppercase tracking-wider">Keke Fleet Details</p>
             <div className="space-y-1.5">
-              <Label htmlFor="fleet_size">Number of keke units</Label>
+              <Label htmlFor="fleet_size">Number of keke units <FieldTip tip="How many tricycles carry your branding. Total impressions are multiplied by units × daily routes covered." /></Label>
               <Input
                 id="fleet_size" name="fleet_size" type="number" min="1"
                 placeholder="e.g. 50"
@@ -701,7 +702,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             <p className="text-xs font-semibold text-green-700 dark:text-green-400 uppercase tracking-wider">Wall Painting Details</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="surface_width_m">Width (metres)</Label>
+                <Label htmlFor="surface_width_m">Width (metres) <FieldTip tip="Used to calculate surface area and estimate impressions (width × height × 150/day). Ask your vendor for the exact dimensions." /></Label>
                 <Input
                   id="surface_width_m" name="surface_width_m" type="number" min="0" step="0.1"
                   placeholder="e.g. 6"
@@ -710,7 +711,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="surface_height_m">Height (metres)</Label>
+                <Label htmlFor="surface_height_m">Height (metres) <FieldTip tip="Along with width, this determines surface area and the daily impression estimate shown below." /></Label>
                 <Input
                   id="surface_height_m" name="surface_height_m" type="number" min="0" step="0.1"
                   placeholder="e.g. 4"
@@ -726,7 +727,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
               </p>
             )}
             <div className="space-y-1.5">
-              <Label htmlFor="urban_classification">Area classification</Label>
+              <Label htmlFor="urban_classification">Area classification <FieldTip tip="Affects how we benchmark CPM. Urban core gets higher rates than peri-urban or suburban. Ask your vendor which applies if unsure." /></Label>
               <select
                 id="urban_classification" name="urban_classification"
                 value={urbanClassification}
@@ -746,7 +747,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Branded Vehicle Details</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="fleet_size_v">Number of vehicles</Label>
+                <Label htmlFor="fleet_size_v">Number of vehicles <FieldTip tip="Impressions are calculated as vehicles × 2,000 unique views per vehicle per day across all routes." /></Label>
                 <Input
                   id="fleet_size_v" name="fleet_size" type="number" min="1"
                   placeholder="e.g. 20"
@@ -755,7 +756,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="vehicle_type">Vehicle type</Label>
+                <Label htmlFor="vehicle_type">Vehicle type <FieldTip tip="Affects reach estimate. Tankers and trucks cover longer inter-state routes and hit more unique eyes per day than buses or vans." /></Label>
                 <select
                   id="vehicle_type" name="vehicle_type"
                   value={vehicleType}
@@ -768,7 +769,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="route_lgas_v">LGAs covered (comma-separated)</Label>
+              <Label htmlFor="route_lgas_v">LGAs covered <FieldTip tip="The local government areas this fleet regularly moves through. The more LGAs covered, the wider your daily reach spread." /></Label>
               <Input
                 id="route_lgas_v" name="route_lgas_input"
                 placeholder="e.g. Ikeja, Surulere, Lagos Island"
@@ -811,7 +812,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             defaultChecked={Boolean(defaultValues?.illuminated)}
             className="h-4 w-4 rounded border-input"
           />
-          <Label htmlFor="illuminated" className="cursor-pointer">Illuminated / backlit</Label>
+          <Label htmlFor="illuminated" className="cursor-pointer">Illuminated / backlit <FieldTip tip="Illuminated sites get a visibility multiplier for night-time reach. Tick this if the display is lit after dark." /></Label>
         </div>
       </div>
 
@@ -857,7 +858,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="operator">Operator / vendor</Label>
+          <Label htmlFor="operator">Operator / vendor <FieldTip tip="The company or person selling you this space. Used for your records and cost audits — not factored into scoring." /></Label>
           <Input
             id="operator" name="operator"
             placeholder="Posterscope, LAASAA permit, etc."
@@ -869,6 +870,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           <div className="col-span-2 space-y-1.5">
             <Label htmlFor="monthly_cost">
               {isLamppole ? 'Monthly cost (total for all poles)' : 'Monthly cost'}
+              <FieldTip tip="What you pay per month for this site. Used to calculate your CPM and ROI against attributed visits tracked through the vanity link." />
             </Label>
             <Input
               id="monthly_cost" name="monthly_cost" type="number" min="0" step="0.01"

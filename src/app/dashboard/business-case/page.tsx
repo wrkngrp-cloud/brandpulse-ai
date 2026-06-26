@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect }     from 'next/navigation'
+import { getActiveBrand } from '@/lib/active-brand'
 import { callAi }       from '@/lib/ai/client'
 import { BusinessCaseClient } from './business-case-client'
 
@@ -10,11 +11,9 @@ export default async function BusinessCasePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name, category, market_share_pct, brand_voice')
-    .limit(1).maybeSingle()
-
+  const brand = await getActiveBrand<{ id: string; name: string; category: string | null; market_share_pct: number | null; brand_voice: Record<string, unknown> }>(
+    supabase, 'id, name, category, market_share_pct, brand_voice'
+  )
   if (!brand) redirect('/onboarding')
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)

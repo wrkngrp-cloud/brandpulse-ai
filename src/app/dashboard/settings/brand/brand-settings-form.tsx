@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
+import { FieldTip } from '@/components/ui/field-tip'
 import { Upload, X, Loader2, ImageIcon, Sparkles, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 

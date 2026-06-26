@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { callAi } from '@/lib/ai/client'
 import { z } from 'zod'
 
@@ -30,8 +31,8 @@ export async function POST(request: NextRequest) {
 
   const { days, brandName } = parsed.data
 
-  const { data: brand } = await supabase.from('brands').select('id, category').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brand = await getActiveBrand<{ id: string; category: string | null }>(supabase, 'id, category')
+  if (!brand) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
 
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - days)

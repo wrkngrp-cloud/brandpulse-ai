@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
@@ -18,8 +19,9 @@ export async function GET(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
+  const brand = { id: brandId }
 
   const { data, error } = await supabase
     .from('campaign_targets')
@@ -41,8 +43,9 @@ export async function POST(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
+  const brand = { id: brandId }
 
   let body: unknown
   try { body = await req.json() } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }) }
@@ -81,8 +84,9 @@ export async function DELETE(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
+  const brand = { id: brandId }
 
   const { searchParams } = new URL(req.url)
   const metric = searchParams.get('metric')

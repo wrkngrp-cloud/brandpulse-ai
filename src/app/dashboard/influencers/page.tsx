@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { InfluencersClient } from './influencers-client'
-import { InfluencerRoiTracker } from '@/components/influencers/roi-tracker'
 import { getActiveBrand } from '@/lib/active-brand'
 
 export const dynamic = 'force-dynamic'
@@ -34,26 +33,21 @@ export default async function InfluencersPage() {
   ])
 
   return (
-    <div className="space-y-10">
-      <InfluencersClient
-        brandId={brand.id}
-        brandName={brand.name}
-        initialInfluencers={influencers ?? []}
-        campaigns={campaigns ?? []}
-      />
-
-      <div className="border-t pt-8">
-        <InfluencerRoiTracker initialCampaigns={(roiCampaigns ?? []).map(c => ({
-          ...c,
-          emv: Number(c.emv ?? 0),
-          fee: Number(c.fee ?? 0),
-          reach: c.reach ?? 0,
-          impressions: c.impressions ?? 0,
-          engagements: c.engagements ?? 0,
-          attributed_clicks: c.attributed_clicks ?? 0,
-          attributed_conversions: c.attributed_conversions ?? 0,
-        }))} />
-      </div>
-    </div>
+    <InfluencersClient
+      brandId={brand.id}
+      brandName={brand.name}
+      initialInfluencers={influencers ?? []}
+      campaigns={campaigns ?? []}
+      initialRoiCampaigns={(roiCampaigns ?? []).map(c => ({
+        ...c,
+        emv: Number(c.emv ?? 0),
+        fee: Number(c.fee ?? 0),
+        reach: c.reach ?? 0,
+        impressions: c.impressions ?? 0,
+        engagements: c.engagements ?? 0,
+        attributed_clicks: c.attributed_clicks ?? 0,
+        attributed_conversions: c.attributed_conversions ?? 0,
+      }))}
+    />
   )
 }

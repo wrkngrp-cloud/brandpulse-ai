@@ -131,7 +131,7 @@ export default async function RadioPage({
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Radio Intelligence</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Track airtime, reach, and spend across Nigeria&apos;s top radio stations.
+              Log your agency buy plan and post-buy report to reconcile airtime delivery and spend across Nigerian stations.
             </p>
           </div>
         </div>

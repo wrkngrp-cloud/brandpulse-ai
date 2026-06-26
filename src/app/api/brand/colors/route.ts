@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
@@ -14,8 +15,9 @@ export async function POST(req: NextRequest) {
   const body = schema.safeParse(await req.json().catch(() => null))
   if (!body.success) return NextResponse.json({ error: body.error.issues[0]?.message }, { status: 400 })
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
+  const brand = { id: brandId }
 
   const { error } = await supabase
     .from('brands')

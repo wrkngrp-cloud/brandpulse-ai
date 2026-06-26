@@ -10,6 +10,7 @@ import { Label }    from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput } from '@/components/onboarding/brand-profile-fields'
 import { ArrowLeft, ArrowRight, CalendarDays, Check, Plus, Trash2 } from 'lucide-react'
+import { FieldTip } from '@/components/ui/field-tip'
 import { cn } from '@/lib/utils'
 import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
 
@@ -284,7 +285,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                 <Input id="name" value={data.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Jara Surulere Market Activation" />
               </div>
               <div className="sm:col-span-2 space-y-2">
-                <Label>Activation type</Label>
+                <Label>Activation type <FieldTip tip="The format of your brand activity. This changes how we calculate reach and log attribution. Sampling counts units distributed. Roadshow counts location stops. Church/mosque uses congregation size as potential reach." /></Label>
                 <Select value={data.activation_type} onValueChange={v => set('activation_type', v ?? 'event')}>
                   <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                   <SelectContent className="min-w-[280px]">
@@ -320,7 +321,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                 <Input id="date_end" type="date" value={data.date_end} min={data.date_start} onChange={e => set('date_end', e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="attendance">Expected attendance</Label>
+                <Label htmlFor="attendance">Expected attendance <FieldTip tip="Your target or estimated turnout. After the event, BrandPulse compares this to actual leads captured and ambassador reports to show your conversion rate." /></Label>
                 <Input id="attendance" type="number" min={1} value={data.expected_attendance} onChange={e => set('expected_attendance', e.target.value)} placeholder="500" />
               </div>
             </div>
@@ -348,7 +349,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                 <p className="text-xs text-muted-foreground">Units you plan to hand out</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="collateral">Flyers / branded items</Label>
+                <Label htmlFor="collateral">Flyers / branded items <FieldTip tip="Total collateral you plan to distribute. Used as a proxy for reach when other attribution signals are not available." /></Label>
                 <Input id="collateral" type="number" min={0} value={data.collateral_distributed} onChange={e => set('collateral_distributed', e.target.value)} placeholder="2000" />
               </div>
               <div className="sm:col-span-2 space-y-2">
@@ -362,7 +363,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
               <p className="text-sm font-medium">Spend breakdown</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="spend_agency">Agency fee (₦)</Label>
+                  <Label htmlFor="spend_agency">Agency fee (₦) <FieldTip tip="Breaking down spend per line lets BrandPulse calculate cost-per-lead and cost-per-customer accurately at debrief. Leave any line blank if it does not apply." /></Label>
                   <Input id="spend_agency" type="number" min={0} value={data.spend_breakdown.agency} onChange={e => setSpend('agency', e.target.value)} placeholder="0" />
                 </div>
                 <div className="space-y-2">
@@ -450,13 +451,13 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {showReach && (
                 <div className="space-y-2">
-                  <Label htmlFor="expected_reach">Expected reach</Label>
+                  <Label htmlFor="expected_reach">Expected reach <FieldTip tip="The total number of unique people you expect to encounter your brand at this activation. BrandPulse will compare actuals to this at debrief." /></Label>
                   <Input id="expected_reach" type="number" min={0} value={data.kpi_targets.expected_reach} onChange={e => setKpi('expected_reach', e.target.value)} placeholder="10000" />
                 </div>
               )}
               {showEngaged && (
                 <div className="space-y-2">
-                  <Label htmlFor="expected_engaged">Expected engaged visitors</Label>
+                  <Label htmlFor="expected_engaged">Expected engaged visitors <FieldTip tip="People who actively interacted — stopped, sampled, answered a question, or took a photo. Different from total footfall or raw reach." /></Label>
                   <Input id="expected_engaged" type="number" min={0} value={data.kpi_targets.expected_engaged} onChange={e => setKpi('expected_engaged', e.target.value)} placeholder="1000" />
                 </div>
               )}
@@ -468,31 +469,31 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
               )}
               {showLeads && (
                 <div className="space-y-2">
-                  <Label htmlFor="expected_leads">Expected new leads</Label>
+                  <Label htmlFor="expected_leads">Expected new leads <FieldTip tip="People who gave you their contact details. If using a missed-call number, each flash counts as one lead." /></Label>
                   <Input id="expected_leads" type="number" min={0} value={data.kpi_targets.expected_leads} onChange={e => setKpi('expected_leads', e.target.value)} placeholder="200" />
                 </div>
               )}
               {showCustomers && (
                 <div className="space-y-2">
-                  <Label htmlFor="expected_customers">Expected new customers</Label>
+                  <Label htmlFor="expected_customers">Expected new customers <FieldTip tip="People you expect to convert to a first purchase directly because of this activation. The actual figure is logged at debrief." /></Label>
                   <Input id="expected_customers" type="number" min={0} value={data.kpi_targets.expected_new_customers} onChange={e => setKpi('expected_new_customers', e.target.value)} placeholder="50" />
                 </div>
               )}
               {showCPL && (
                 <div className="space-y-2">
-                  <Label htmlFor="cpl">Target cost per lead (NGN)</Label>
+                  <Label htmlFor="cpl">Target cost per lead (NGN) <FieldTip tip="Your efficiency benchmark. Divide your total activation budget by expected leads to get a sense of whether this target is realistic." /></Label>
                   <Input id="cpl" type="number" min={0} value={data.kpi_targets.target_cost_per_lead} onChange={e => setKpi('target_cost_per_lead', e.target.value)} placeholder="2500" />
                 </div>
               )}
               {showCPA && (
                 <div className="space-y-2">
-                  <Label htmlFor="cpa">Target cost per customer (NGN)</Label>
+                  <Label htmlFor="cpa">Target cost per customer (NGN) <FieldTip tip="The acquisition cost you are aiming for from this activation. Actual cost-per-customer will be calculated at debrief." /></Label>
                   <Input id="cpa" type="number" min={0} value={data.kpi_targets.target_cost_per_customer} onChange={e => setKpi('target_cost_per_customer', e.target.value)} placeholder="10000" />
                 </div>
               )}
               {showPhotos && (
                 <div className="space-y-2">
-                  <Label htmlFor="expected_photos">Expected photo moments</Label>
+                  <Label htmlFor="expected_photos">Expected photo moments <FieldTip tip="Branded photo opportunities that produce shareable content. Used to estimate organic social amplification from the event." /></Label>
                   <Input id="expected_photos" type="number" min={0} value={data.kpi_targets.expected_photo_moments} onChange={e => setKpi('expected_photo_moments', e.target.value)} placeholder="100" />
                 </div>
               )}
@@ -554,7 +555,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
               {data.ambassadors.map((amb, i) => (
                 <div key={i} className="flex items-end gap-3">
                   <div className="flex-1 space-y-1">
-                    <Label htmlFor={`amb-name-${i}`} className="text-xs">Full name *</Label>
+                    <Label htmlFor={`amb-name-${i}`} className="text-xs">Full name * <FieldTip tip="The field rep running this activation. They get a mobile link to log interactions and submit their end-of-day report." /></Label>
                     <Input
                       id={`amb-name-${i}`}
                       value={amb.name}

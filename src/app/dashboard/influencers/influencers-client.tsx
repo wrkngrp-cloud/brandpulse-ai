@@ -10,6 +10,7 @@ import { cn, formatNGN } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FieldTip } from '@/components/ui/field-tip'
 import { Badge } from '@/components/ui/badge'
 import {
   Select,
@@ -21,6 +22,7 @@ import {
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { PostTracker } from '@/components/influencers/post-tracker'
+import { InfluencerRoiTracker, type InfluencerCampaign } from '@/components/influencers/roi-tracker'
 
 export interface Influencer {
   id: string
@@ -109,6 +111,7 @@ interface Props {
   brandName: string
   initialInfluencers: Influencer[]
   campaigns?: CampaignOption[]
+  initialRoiCampaigns?: InfluencerCampaign[]
 }
 
 const PLATFORMS = ['instagram', 'tiktok', 'twitter', 'youtube', 'facebook'] as const
@@ -250,8 +253,8 @@ function formatCount(n: number): string {
 }
 
 
-export function InfluencersClient({ brandId, brandName, initialInfluencers, campaigns = [] }: Props) {
-  const [activeTab, setActiveTab] = useState<'intelligence' | 'campaigns'>('intelligence')
+export function InfluencersClient({ brandId, brandName, initialInfluencers, campaigns = [], initialRoiCampaigns = [] }: Props) {
+  const [activeTab, setActiveTab] = useState<'intelligence' | 'campaigns' | 'roi'>('intelligence')
   const [influencers, setInfluencers] = useState<Influencer[]>(initialInfluencers)
   const [showForm, setShowForm] = useState(false)
   const [scoringId, setScoringId] = useState<string | null>(null)
@@ -484,28 +487,24 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
 
       {/* Tabs */}
       <div className="flex gap-1 border-b">
-        <button
-          onClick={() => setActiveTab('intelligence')}
-          className={cn(
-            'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
-            activeTab === 'intelligence'
-              ? 'border-primary text-foreground'
-              : 'border-transparent text-muted-foreground hover:text-foreground',
-          )}
-        >
-          <span className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5" />Intelligence</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('campaigns')}
-          className={cn(
-            'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
-            activeTab === 'campaigns'
-              ? 'border-primary text-foreground'
-              : 'border-transparent text-muted-foreground hover:text-foreground',
-          )}
-        >
-          <span className="flex items-center gap-1.5"><Megaphone className="h-3.5 w-3.5" />Campaigns</span>
-        </button>
+        {([
+          { id: 'intelligence', label: 'Intelligence', Icon: Users },
+          { id: 'campaigns',    label: 'Campaigns',    Icon: Megaphone },
+          { id: 'roi',          label: 'ROI Tracker',  Icon: TrendingUp },
+        ] as const).map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            onClick={() => setActiveTab(id)}
+            className={cn(
+              'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+              activeTab === id
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <span className="flex items-center gap-1.5"><Icon className="h-3.5 w-3.5" />{label}</span>
+          </button>
+        ))}
       </div>
 
       {/* ── Intelligence Tab ── */}
@@ -550,7 +549,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
 
               {/* Social profile inputs */}
               <div className="space-y-3">
-                <Label>Social profiles</Label>
+                <Label>Social profiles <FieldTip tip="Paste the full profile URL or just the @handle. BrandPulse auto-detects the platform. Select the platform manually if it does not detect correctly." /></Label>
                 {entries.map((entry, i) => (
                   <div key={i} className="flex gap-2 items-center">
                     <Input
@@ -683,6 +682,11 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
           totalPotentialReach={totalPotentialReach}
           totalLinked={linkedInfluencers.length}
         />
+      )}
+
+      {/* ── ROI Tracker Tab ── */}
+      {activeTab === 'roi' && (
+        <InfluencerRoiTracker initialCampaigns={initialRoiCampaigns} />
       )}
     </div>
   )
@@ -1140,7 +1144,11 @@ function InfluencerCard({
               }}
             >
               <SelectTrigger className="h-7 text-xs w-[180px]">
-                <SelectValue placeholder="Link to campaign" />
+                <span className="flex flex-1 text-left truncate">
+                  {inf.campaign_id
+                    ? (availableCampaigns.find(c => c.id === inf.campaign_id)?.name ?? 'Link to campaign')
+                    : 'Link to campaign'}
+                </span>
               </SelectTrigger>
               <SelectContent className="min-w-[220px]">
                 <SelectItem value="none">No campaign</SelectItem>

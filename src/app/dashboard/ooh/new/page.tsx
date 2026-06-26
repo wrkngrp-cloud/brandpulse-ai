@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect }      from 'next/navigation'
+import { getActiveBrand } from '@/lib/active-brand'
 import { OohSiteForm }   from '@/components/ooh/ooh-site-form'
 import { createSite }    from '../actions'
 
@@ -14,8 +15,7 @@ export default async function NewOohSitePage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands').select('id, name, ooh_redirect_domain').limit(1).single()
+  const brand = await getActiveBrand<{ id: string; name: string; ooh_redirect_domain: string | null }>(supabase, 'id, name, ooh_redirect_domain')
   if (!brand) redirect('/onboarding')
 
   // Resolve campaign name for display if campaign_id provided

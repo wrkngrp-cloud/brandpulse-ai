@@ -31,25 +31,13 @@ export async function POST(request: NextRequest) {
   // Get workspace
   const service = await createServiceClient()
   const { data: member } = await service
-    .from('workspace_members').select('workspace_id, workspaces(plan)')
+    .from('workspace_members').select('workspace_id')
     .eq('user_id', user.id).limit(1).single()
   if (!member) return NextResponse.json({ error: 'Workspace not found' }, { status: 404 })
 
   const workspaceId = member.workspace_id
-  const plan = (member.workspaces as unknown as { plan: string } | null)?.plan ?? 'starter'
 
-  // Check plan brand limit
-  const { data: planRow } = await service.from('plan_limits').select('brand_count').eq('plan', plan).single()
-  const limit = planRow?.brand_count ?? 1
-  if (limit !== -1) {
-    const { count } = await supabase.from('brands').select('id', { count: 'exact', head: true })
-    if ((count ?? 0) >= limit) {
-      return NextResponse.json({
-        error: `Your ${plan} plan supports up to ${limit} brand${limit === 1 ? '' : 's'}. Upgrade to add more.`,
-        upgrade: true,
-      }, { status: 403 })
-    }
-  }
+  // Brand limit enforcement disabled during beta
 
   const { data, error } = await service.from('brands').insert({
     workspace_id:     workspaceId,

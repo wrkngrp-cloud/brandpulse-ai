@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
+import { FieldTip } from '@/components/ui/field-tip'
 
 function TriggerCompetitiveCrawlButton() {
   const [phase, setPhase] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
@@ -612,7 +613,7 @@ function SightingsTab({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Sighting type</label>
+              <label className="text-xs font-medium text-muted-foreground inline-flex items-center gap-1">Sighting type <FieldTip tip="What kind of marketing activity you spotted. Billboard, radio, sponsorship etc. Helps the AI identify which channels your competitors are investing in most." /></label>
               <select
                 className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                 value={form.sighting_type}
@@ -646,7 +647,7 @@ function SightingsTab({
             </div>
 
             <div className="space-y-1.5 sm:col-span-2">
-              <label className="text-xs font-medium text-muted-foreground">Description</label>
+              <label className="text-xs font-medium text-muted-foreground inline-flex items-center gap-1">Description <FieldTip tip="Describe the messaging, creative angle, or scale of what you saw. The more detail you add, the better the AI can identify patterns across multiple sightings." /></label>
               <textarea
                 rows={3}
                 placeholder="Describe what you saw — location, messaging, scale, timing..."

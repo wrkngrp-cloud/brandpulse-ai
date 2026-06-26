@@ -1,7 +1,7 @@
 # BrandPulse AI — Build Status
 
 > Feed this file into your project chat at the start of each session to bring it up to date.
-> Updated after every pushed session. Last updated: 2026-06-20.
+> Updated after every pushed session. Last updated: 2026-06-24.
 
 ---
 
@@ -114,6 +114,102 @@
 | Brand Tracking Panel | Monthly recurring survey panel for longitudinal awareness tracking |
 | Sector Benchmarking | BHI/SOV/NPS vs Nigerian category averages (requires peer data aggregation) |
 | Media Mix Modelling (MMM) Lite | Regression-based multi-channel attribution — top CMO request |
+
+---
+
+### Phase 4 — WhatsApp Deep Integration ✅ (2026-06-24)
+
+**Architecture: Model A — BrandPulse-owned WABA, Meta Cloud API v20.0**
+Users never touch an API key. Contacts + templates managed entirely inside BrandPulse UI.
+
+| Component | Route / File | Status |
+|---|---|---|
+| DB migration | `supabase/migrations/20260630000001_whatsapp.sql` | ✅ |
+| Webhook (verify + delivery callbacks + STOP opt-out) | `POST /api/whatsapp/webhook` | ✅ |
+| Templates API (fetch approved Meta templates) | `GET /api/whatsapp/templates` | ✅ |
+| Contact CSV import (Nigerian phone normalisation) | `POST /api/whatsapp/contacts/import` | ✅ |
+| Campaign send (triggers Inngest broadcast) | `POST /api/whatsapp/send` | ✅ |
+| Broadcast Inngest function (batched, 1k/day limit) | `src/lib/inngest/functions/whatsapp-broadcast.ts` | ✅ |
+| WhatsApp hub page (stats + campaign history + send sheet) | `/dashboard/whatsapp` | ✅ |
+| Contact management page (CSV upload + list) | `/dashboard/whatsapp/contacts` | ✅ |
+| WhatsApp card on Connectors page | `src/components/dashboard/whatsapp-connect-card.tsx` | ✅ |
+| Nav link (Surveys & Messaging section) | `dashboard-nav.tsx` | ✅ |
+
+Required env vars (add to Vercel):
+- `WHATSAPP_PHONE_NUMBER_ID` — from Meta Business Manager → WhatsApp → API Setup
+- `WHATSAPP_BUSINESS_ACCOUNT_ID` — WABA ID
+- `WHATSAPP_ACCESS_TOKEN` — permanent system user token
+- `WHATSAPP_APP_SECRET` — for webhook HMAC verification
+- `WHATSAPP_VERIFY_TOKEN` — any string you choose for webhook handshake
+
+Webhook URL to register in Meta: `https://brandpulse.ai/api/whatsapp/webhook`
+
+---
+
+### Phase 4 — AI Visibility Tracker, Voice Builder, SDK/Pixel, Billing ✅ (2026-06-24)
+
+| Feature | Route / File | Status |
+|---|---|---|
+| **AI Visibility Tracker** | | |
+| DB migration | `supabase/migrations/20260701000001_ai_visibility.sql` | ✅ |
+| Inngest weekly cron (every Monday) | `lib/inngest/functions/ai-visibility.ts → aiVisibilityWeeklyCron` | ✅ |
+| Inngest on-demand function | `lib/inngest/functions/ai-visibility.ts → aiVisibilityOnDemand` | ✅ |
+| Trigger API | `POST /api/ai-visibility/check` | ✅ |
+| Scores API | `GET /api/ai-visibility/scores` | ✅ |
+| Dashboard page + client | `/dashboard/ai-visibility` | ✅ |
+| Nav link (Intelligence section) | `dashboard-nav.tsx` | ✅ |
+| **AI Brand Voice Builder** | | |
+| UI + API | `/dashboard/voice-builder`, `POST /api/ai/brand-voice-builder` | ✅ (was already built) |
+| `getActiveBrandId` fix | `api/ai/brand-voice-builder/route.ts` | ✅ fixed |
+| **BrandPulse SDK / Pixel** | | |
+| DB migration | `20260624003000_sdk_events.sql` (sdk_events + pixel_configs) | ✅ (was already built) |
+| Track endpoint | `POST /api/sdk/event` (rate-limited via Upstash) | ✅ (was already built) |
+| Pixel setup | `GET/POST /api/sdk/pixel` | ✅ fixed (getActiveBrandId) |
+| Settings UI | `/dashboard/settings/pixel` | ✅ (was already built) |
+| **Tiered Billing (Stripe)** | | |
+| Stripe lib | `src/lib/stripe.ts` (PLAN_DISPLAY, STRIPE_PRICES) | ✅ (was already built) |
+| DB schema | `workspaces.stripe_*`, `plan_limits`, `usage_events` | ✅ (was already built) |
+| Checkout session | `POST /api/billing/checkout` | ✅ (was already built) |
+| Customer portal | `POST /api/billing/portal` | ✅ (was already built) |
+| Webhook handler | `POST /api/billing/webhook` | ✅ (was already built) |
+| Billing UI | `/dashboard/settings/billing` | ✅ (was already built) |
+
+Required env vars for AI Visibility Tracker (at least one):
+- `OPENAI_API_KEY` → ChatGPT (GPT-4o mini)
+- `GOOGLE_AI_API_KEY` → Gemini 2.0 Flash
+- `PERPLEXITY_API_KEY` → Perplexity Sonar
+
+Required env vars for Billing:
+**DEFERRED — post-beta. Will replace Stripe with Paystack when billing is activated.**
+Current Stripe code stays in place but is not deployed/configured until after beta.
+
+### Phase 4 — Items built this session (commit pending, 2026-06-24)
+
+| Feature | Route / Key Files | Status |
+|---|---|---|
+| GA4 OAuth "Connect with Google" | `GET /api/connectors/ga4/auth`, `GET /api/connectors/ga4/callback` | ✅ CSRF state cookie, token exchange, GA4 Admin API property discovery, stores to ga4_connections |
+| GA4 token auto-refresh | `src/app/api/connectors/ga4/sync/route.ts` | ✅ Checks token_expiry, refreshes if within 2 min, updates ga4_connections |
+| GA4 connect card | `src/components/dashboard/ga4-connect-card.tsx` | ✅ Google OAuth button replaces manual form; success/error toast on redirect-back |
+| Google Sign-In (auth) | `src/components/auth/google-sign-in-button.tsx` | ✅ Supabase signInWithOAuth; loading state with Loader2 spinner |
+| Login + Signup — Google button | `src/app/(auth)/auth/login/page.tsx`, `src/app/(auth)/auth/signup/page.tsx` | ✅ Google button + "or continue with email" divider; form id + form= attribute pattern |
+| New Google user provisioning | `src/app/api/auth/callback/route.ts` | ✅ Checks workspace_members after OAuth; creates workspace + member + blank brand; redirects to /onboarding |
+| Connector brand lookup fix | All 6 connector routes (ga4, paystack, flutterwave, mailchimp, brevo) | ✅ Replaced .limit(1).single() brand lookups with getActiveBrandId() / getActiveBrand() |
+| GA4 sync metricAggregations fix | `src/app/api/connectors/ga4/sync/route.ts` | ✅ Added metricAggregations: ['TOTAL'] so totals[] populates in GA4 Data API response |
+| sdk_events insert fix | `src/app/api/connectors/ga4/sync/route.ts` | ✅ Switched upsert → insert (INDEX not UNIQUE on brand_id+event_type) |
+| Connectors page brand fix | `src/app/dashboard/connectors/page.tsx` | ✅ Uses getActiveBrand() not .limit(1).maybeSingle() |
+
+### Phase 6 — Retention & Advocacy OS (PLANNED — PRD defined 2026-06-24)
+
+Full build list defined in PRD v7.3, Documents 2 and 3. Modules 17–20.
+
+| Module | Name | Key builds | PRD ref |
+|---|---|---|---|
+| 17 | Retention Intelligence | Churn risk view, WhatsApp re-engagement, HubSpot connector | Doc 2 §17, Doc 3 Phase 6 items 1–3 |
+| 18 | Advocacy Engine | Promoter activation flow, advocacy dashboard, social proof, referral tracking | Doc 2 §18, Doc 3 Phase 6 items 4–5 |
+| 19 | Marketing Execution Channels | WhatsApp lifecycle flows, in-app messaging + push, TikTok connector | Doc 2 §19, Doc 3 Phase 6 items 6–8 |
+| 20 | Customer Data Platform | CDP layer, loyalty engine, A/B testing, marketplace intelligence, budget pacing | Doc 2 §20, Doc 3 Phase 6 items 9–13 |
+
+**Build sequence (recommended):** Retention risk view → HubSpot connector → Promoter activation flow → Advocacy dashboard → WhatsApp lifecycle flows → TikTok connector → In-app messaging → Loyalty engine → CDP customer profiles → Segment builder → A/B testing → Marketplace intelligence → Budget pacing.
 
 ---
 

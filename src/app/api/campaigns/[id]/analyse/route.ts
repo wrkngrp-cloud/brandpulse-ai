@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { callAi } from '@/lib/ai/client'
 
 export async function POST(
@@ -22,7 +23,7 @@ export async function POST(
       .select('id, name, description, objectives, start_date, end_date, total_budget, currency, status, campaign_channels(channel, budget_allocation)')
       .eq('id', id)
       .single(),
-    supabase.from('brands').select('name, category').limit(1).single(),
+    getActiveBrand<{ name: string; category: string | null }>(supabase, 'name, category').then(b => ({ data: b, error: null })),
     supabase
       .from('ooh_sites')
       .select('site_name, city, state, format_type, visits, monthly_cost, currency, daily_traffic, campaign_start, campaign_end, notes')

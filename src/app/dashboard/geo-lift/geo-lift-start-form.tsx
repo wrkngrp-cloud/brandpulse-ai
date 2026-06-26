@@ -7,6 +7,7 @@ import { Input }                   from '@/components/ui/input'
 import { Label }                   from '@/components/ui/label'
 import { toast }                   from 'sonner'
 import { startGeoLiftStudy }       from './actions'
+import { FieldTip }                from '@/components/ui/field-tip'
 
 const CITIES = ['Lagos', 'Abuja', 'Port Harcourt', 'Kano', 'Ibadan']
 
@@ -88,7 +89,7 @@ export function GeoLiftStartForm({ brandId, brandName, campaigns }: Props) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="glTreatment">Treatment city</Label>
+          <Label htmlFor="glTreatment">Treatment city <FieldTip tip="The city where your campaign is actively running. This is where you expect to see search lift if the campaign is working." /></Label>
           <select
             id="glTreatment"
             value={treatmentCity}
@@ -105,7 +106,7 @@ export function GeoLiftStartForm({ brandId, brandName, campaigns }: Props) {
           </select>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="glControl">Control city</Label>
+          <Label htmlFor="glControl">Control city <FieldTip tip="A similar city with no active campaign. It acts as your baseline — if the control stays flat while the treatment city rises, that difference is real lift from your campaign. Pick a city with a similar income and population profile." /></Label>
           <select
             id="glControl"
             value={controlCity}
@@ -133,7 +134,7 @@ export function GeoLiftStartForm({ brandId, brandName, campaigns }: Props) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="glStart">Study start</Label>
+          <Label htmlFor="glStart">Study start <FieldTip tip="Set these to match when your campaign goes live and when it ends. Results need at least 4 weeks to be statistically meaningful." /></Label>
           <Input
             id="glStart"
             type="date"

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { runCrawl } from '@/lib/crawl/run-crawl'
 
 export const runtime    = 'nodejs'
@@ -10,8 +11,9 @@ export async function POST() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
+  const brand = { id: brandId }
 
   // Create run record
   const service = await createServiceClient()

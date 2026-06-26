@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ExcelJS from 'exceljs'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { callAi } from '@/lib/ai/client'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
@@ -112,9 +113,9 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase
-    .from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 400 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 400 })
+  const brand = { id: brandId }
 
   // Parse multipart form
   let formData: FormData

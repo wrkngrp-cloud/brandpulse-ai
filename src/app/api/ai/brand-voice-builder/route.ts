@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { callAi } from '@/lib/ai/client'
 import { z } from 'zod'
 
@@ -89,9 +90,9 @@ Return ONLY this JSON, no preamble:
     return NextResponse.json({ error: 'Failed to parse AI response. Please try again.' }, { status: 500 })
   }
 
-  // Save to brand_voice (store prism data in existing jsonb field alongside core fields)
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).maybeSingle()
-  if (brand) {
+  // Save to brand_voice on the active brand
+  const brandId = await getActiveBrandId(supabase)
+  if (brandId) {
     const service = await createServiceClient()
     await service.from('brands').update({
       brand_voice: {
@@ -102,8 +103,8 @@ Return ONLY this JSON, no preamble:
         signaturePhrases: result.signaturePhrases,
         kapferer_prism:   result.kapferer_prism ?? null,
       },
-    }).eq('id', brand.id)
+    }).eq('id', brandId)
   }
 
-  return NextResponse.json({ ...result, saved: !!brand })
+  return NextResponse.json({ ...result, saved: !!brandId })
 }

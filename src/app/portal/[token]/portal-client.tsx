@@ -66,7 +66,7 @@ interface PortalData {
   avgNps:               number | null
   mentionCount:         number
   competitors:          { name: string; type: string }[]
-  sovCompetitor:        { competitor_breakdown: unknown } | null
+  sovCompetitor:        { competitor_data: unknown; snapshot_date: string } | null
   competitorSightings:  CompetitorSighting[]
   competitorMentions:   CompetitorMention[]
   executiveSummary:     string | null
@@ -175,7 +175,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
     }
   }, [token])
 
-  const { brand, sections, bhiHistory, bhiDelta, sentimentData, sentimentDelta, latestSentiment, latestSov, sovTrend, campaigns, totalBudget, totalSpend, activeCampaigns, npsResponses, avgNps, mentionCount, competitors, competitorSightings, competitorMentions, executiveSummary, winsAndConcerns, days } = data
+  const { brand, sections, bhiHistory, bhiDelta, sentimentData, sentimentDelta, latestSentiment, latestSov, sovTrend, sovCompetitor, campaigns, totalBudget, totalSpend, activeCampaigns, npsResponses, avgNps, mentionCount, competitors, competitorSightings, competitorMentions, executiveSummary, winsAndConcerns, days } = data
 
   const latestBhi = bhiHistory.length > 0 ? Number(bhiHistory[bhiHistory.length - 1].bhi) : null
   const zone      = latestBhi != null ? bhiZone(latestBhi) : null
@@ -507,23 +507,87 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
         {competitors.length > 0 && (
           <section>
             <SectionHeading icon={Target}>Competitive Position</SectionHeading>
-            <div className="rounded-2xl border bg-card p-5">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <div className="rounded-xl bg-primary/8 border border-primary/20 p-4 text-center">
-                  <p className="text-[11px] font-bold text-primary uppercase tracking-wider mb-1">{brand.name}</p>
-                  <p className="text-[22px] font-bold text-primary">{latestSov ? `${latestSov.social_sov}%` : '—'}</p>
-                  <p className="text-[10px] text-primary/70">Share of Voice</p>
-                </div>
-                {competitors.slice(0, 5).map(c => (
-                  <div key={c.name} className="rounded-xl bg-muted/40 p-4 text-center">
-                    <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1 truncate">{c.name}</p>
-                    <p className="text-[22px] font-bold">—</p>
-                    <p className="text-[10px] text-muted-foreground">Monitoring</p>
+            {(() => {
+              // Parse competitor_data into a name→sov map
+              const sovMap: Record<string, number> = {}
+              if (sovCompetitor?.competitor_data && typeof sovCompetitor.competitor_data === 'object') {
+                const raw = sovCompetitor.competitor_data as Record<string, unknown>
+                for (const [key, val] of Object.entries(raw)) {
+                  if (typeof val === 'number') sovMap[key.toLowerCase()] = val
+                  else if (val && typeof val === 'object') {
+                    const v = (val as Record<string, unknown>).sov ?? (val as Record<string, unknown>).social_sov
+                    if (typeof v === 'number') sovMap[key.toLowerCase()] = v
+                  }
+                }
+              }
+              const allItems = [
+                { name: brand.name, sov: latestSov ? Number(latestSov.social_sov) : null, isBrand: true },
+                ...competitors.slice(0, 5).map(c => ({
+                  name: c.name,
+                  sov: sovMap[c.name.toLowerCase()] ?? null,
+                  isBrand: false,
+                })),
+              ]
+              const allWithSov = allItems.filter(i => i.sov != null)
+              const maxSov = allWithSov.length > 0 ? Math.max(...allWithSov.map(i => i.sov!)) : 0
+
+              return (
+                <div className="rounded-2xl border bg-card p-5 space-y-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {allItems.map(item => (
+                      <div
+                        key={item.name}
+                        className={cn(
+                          'rounded-xl p-4 text-center',
+                          item.isBrand
+                            ? 'bg-primary/8 border border-primary/20'
+                            : 'bg-muted/40 border border-border/50'
+                        )}
+                      >
+                        <p className={cn(
+                          'text-[11px] font-bold uppercase tracking-wider mb-1 truncate',
+                          item.isBrand ? 'text-primary' : 'text-muted-foreground'
+                        )}>
+                          {item.name}
+                        </p>
+                        <p className={cn('text-[22px] font-bold leading-none', item.isBrand ? 'text-primary' : '')}>
+                          {item.sov != null ? `${Number(item.sov).toFixed(1)}%` : '—'}
+                        </p>
+                        <p className={cn('text-[10px] mt-1', item.isBrand ? 'text-primary/70' : 'text-muted-foreground')}>
+                          Share of Voice
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-3">Competitive SOV data updates weekly from social listening.</p>
-            </div>
+
+                  {/* SOV comparison bar chart when real data exists */}
+                  {allWithSov.length > 1 && maxSov > 0 && (
+                    <div className="space-y-2.5 pt-2 border-t">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">SOV Comparison</p>
+                      {allItems.filter(i => i.sov != null).map(item => (
+                        <div key={item.name} className="flex items-center gap-3">
+                          <p className={cn('text-[11px] font-medium w-28 shrink-0 truncate', item.isBrand ? 'text-primary' : 'text-foreground')}>
+                            {item.name}
+                          </p>
+                          <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
+                            <div
+                              className={cn('h-full rounded-full', item.isBrand ? 'bg-primary' : 'bg-muted-foreground/40')}
+                              style={{ width: `${(item.sov! / maxSov) * 100}%` }}
+                            />
+                          </div>
+                          <p className="text-[11px] font-semibold w-10 text-right shrink-0">{item.sov!.toFixed(1)}%</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <p className="text-[11px] text-muted-foreground">
+                    SOV data from social listening · updates weekly
+                    {sovCompetitor?.snapshot_date && ` · last snapshot ${new Date(sovCompetitor.snapshot_date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}`}
+                  </p>
+                </div>
+              )
+            })()}
           </section>
         )}
 

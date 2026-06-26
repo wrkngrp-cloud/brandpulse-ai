@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrand, getActiveBrandId } from '@/lib/active-brand'
 import { encrypt, decrypt } from '@/lib/crypto'
 import { z } from 'zod'
 
@@ -18,8 +19,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
   }
 
-  const { data: brand } = await supabase.from('brands').select('id, workspace_id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brand = await getActiveBrand<{ id: string; workspace_id: string }>(supabase, 'id, workspace_id')
+  if (!brand) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
 
   const encryptedKey = encrypt(parsed.data.api_key)
 
@@ -45,8 +46,9 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ connected: false })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ connected: false })
+  const brand = { id: brandId }
 
   const { data: config } = await supabase
     .from('youtube_api_configs')

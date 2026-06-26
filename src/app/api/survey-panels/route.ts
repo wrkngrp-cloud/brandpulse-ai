@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
@@ -28,8 +29,9 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ panels: [] })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ panels: [] })
+  const brand = { id: brandId }
 
   const { data: panels } = await supabase
     .from('survey_panels')
@@ -48,8 +50,9 @@ export async function POST(request: NextRequest) {
   const parsed = CreateBody.safeParse(await request.json().catch(() => ({})))
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
+  const brand = { id: brandId }
 
   const { data: member } = await supabase.from('workspace_members')
     .select('workspace_id').eq('user_id', user.id).limit(1).single()

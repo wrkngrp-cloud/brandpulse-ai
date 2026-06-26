@@ -109,7 +109,11 @@ export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit,
             <div className="space-y-2">
               <Label>Brand</Label>
               <Select value={brandId} onValueChange={(v) => v && setBrandId(v)}>
-                <SelectTrigger><SelectValue placeholder="Select brand" /></SelectTrigger>
+                <SelectTrigger>
+                  <span className="flex flex-1 text-left text-sm truncate">
+                    {brands.find(b => b.id === brandId)?.name ?? 'Select brand'}
+                  </span>
+                </SelectTrigger>
                 <SelectContent>
                   {brands.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                 </SelectContent>

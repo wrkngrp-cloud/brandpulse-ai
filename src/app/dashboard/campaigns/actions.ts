@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient }  from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { revalidatePath } from 'next/cache'
 import { z }             from 'zod'
 
@@ -32,8 +33,8 @@ export async function createCampaign(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return { error: 'No brand found' }
+  const brand = { id: await getActiveBrandId(supabase) }
+  if (!brand.id) return { error: 'No active brand' }
 
   const raw = Object.fromEntries(formData.entries())
 

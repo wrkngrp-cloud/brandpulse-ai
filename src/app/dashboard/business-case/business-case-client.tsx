@@ -156,6 +156,12 @@ export function BusinessCaseClient({
       </div>
 
       {/* AI Executive Case */}
+      {!aiBusinessCase && (
+        <div className="rounded-2xl border bg-muted/30 px-5 py-4 flex items-center gap-3 text-[13px] text-muted-foreground">
+          <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
+          <span>AI executive brief could not be generated — your brand data is all here, but there was not enough historical data to produce a board-ready narrative yet. Try again once you have at least 4 weeks of campaign and sentiment data.</span>
+        </div>
+      )}
       {aiBusinessCase && (
         <section>
           <SectionHead icon={Briefcase}>Executive Brief</SectionHead>

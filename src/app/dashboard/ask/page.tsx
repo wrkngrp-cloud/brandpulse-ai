@@ -2,20 +2,20 @@
 
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Send, Loader2, Sparkles, Plus, MessageSquare } from 'lucide-react'
+import {
+  Send, Loader2, Sparkles, Plus, MessageSquare,
+  TrendingUp, FileText, Filter,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
-import { V2Tools } from './v2-tools'
+import { MonthlyReportTab, BusinessCaseTab, FunnelDiagnosticTab } from './v2-tools'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-interface Source {
-  label: string
-  detail: string
-}
+interface Source { label: string; detail: string }
 
 interface Message {
   role: 'user' | 'assistant'
@@ -53,21 +53,34 @@ const STARTERS = [
 function timeAgo(iso: string): string {
   const ms = Date.now() - new Date(iso).getTime()
   const m = Math.floor(ms / 60_000)
-  if (m < 1)   return 'just now'
-  if (m < 60)  return `${m}m ago`
+  if (m < 1)  return 'just now'
+  if (m < 60) return `${m}m ago`
   const h = Math.floor(m / 60)
-  if (h < 24)  return `${h}h ago`
+  if (h < 24) return `${h}h ago`
   return `${Math.floor(h / 24)}d ago`
 }
 
-// ── Page ─────────────────────────────────────────────────────────────────────
+// ── Tab definitions ───────────────────────────────────────────────────────────
+
+type TabId = 'chat' | 'monthly-report' | 'business-case' | 'funnel'
+
+const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
+  { id: 'chat',           label: 'Ask AI',          icon: Sparkles  },
+  { id: 'monthly-report', label: 'Monthly Report',  icon: TrendingUp },
+  { id: 'business-case',  label: 'Business Case',   icon: FileText  },
+  { id: 'funnel',         label: 'Funnel Diagnostic', icon: Filter  },
+]
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 function AskPageContent() {
   const router       = useRouter()
   const searchParams = useSearchParams()
   const cid          = searchParams.get('cid')
   const initialQ     = searchParams.get('q') ?? ''
+  const tabParam     = (searchParams.get('tab') ?? 'chat') as TabId
 
+  const [activeTab,     setActiveTab]     = useState<TabId>(TABS.some(t => t.id === tabParam) ? tabParam : 'chat')
   const [conversations, setConversations] = useState<ConversationSummary[]>([])
   const [messages,      setMessages]      = useState<Message[]>([])
   const [input,         setInput]         = useState(initialQ)
@@ -76,10 +89,9 @@ function AskPageContent() {
   const [histLoading,   setHistLoading]   = useState(false)
   const [conversationId, setConvId]       = useState<string | null>(cid)
   const [userEmail,     setUserEmail]     = useState('')
-  const bottomRef  = useRef<HTMLDivElement>(null)
-  const textRef    = useRef<HTMLTextAreaElement>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
+  const textRef   = useRef<HTMLTextAreaElement>(null)
 
-  // Fetch user email for V2Tools
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data }) => {
@@ -87,7 +99,6 @@ function AskPageContent() {
     })
   }, [])
 
-  // Auto-send when navigated here with ?q=
   const autoSentRef = useRef(false)
   useEffect(() => {
     if (initialQ && !autoSentRef.current) {
@@ -96,7 +107,6 @@ function AskPageContent() {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Load conversation list
   const loadList = useCallback(async () => {
     setConvLoading(true)
     try {
@@ -112,7 +122,6 @@ function AskPageContent() {
 
   useEffect(() => { loadList() }, [loadList])
 
-  // Load full messages when a conversation is selected
   useEffect(() => {
     if (!cid) { setMessages([]); setConvId(null); return }
     if (cid === conversationId && messages.length > 0) return
@@ -124,11 +133,7 @@ function AskPageContent() {
     fetch(`/api/ai/conversations/${cid}`)
       .then(r => r.json() as Promise<{ messages: Array<{ role: string; content: string }> }>)
       .then(data => {
-        const msgs: Message[] = (data.messages ?? []).map(m => ({
-          role:    m.role as 'user' | 'assistant',
-          content: m.content,
-        }))
-        setMessages(msgs)
+        setMessages((data.messages ?? []).map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })))
       })
       .catch(() => setMessages([]))
       .finally(() => setHistLoading(false))
@@ -167,7 +172,6 @@ function AskPageContent() {
         conversationId: string
       }
 
-      // If this is a new conversation, update URL without navigation
       if (!conversationId && data.conversationId) {
         setConvId(data.conversationId)
         router.replace(`/dashboard/ask?cid=${data.conversationId}`, { scroll: false })
@@ -181,7 +185,6 @@ function AskPageContent() {
         collectionRecommendation: data.collectionRecommendation,
       }])
 
-      // Refresh sidebar list to show new/updated entry
       loadList()
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Network error. Check your connection and try again.' }])
@@ -197,11 +200,14 @@ function AskPageContent() {
     router.replace('/dashboard/ask', { scroll: false })
   }
 
+  function switchTab(id: TabId) {
+    setActiveTab(id)
+    const url = id === 'chat' ? '/dashboard/ask' : `/dashboard/ask?tab=${id}`
+    router.replace(url, { scroll: false })
+  }
+
   function handleKey(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      send(input)
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) }
   }
 
   const activeConvTitle = conversationId
@@ -209,186 +215,231 @@ function AskPageContent() {
     : null
 
   return (
-    <div className="flex h-[calc(100vh-7rem)] gap-0 -m-6">
-      {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-56 border-r shrink-0 bg-background">
-        <div className="p-3 border-b shrink-0">
-          <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs" onClick={newChat}>
-            <Plus className="h-3.5 w-3.5" />
-            New chat
-          </Button>
-        </div>
+    <div className="flex flex-col h-[calc(100vh-7rem)] -m-6">
 
-        <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
-          {convLoading && messages.length === 0 && (
-            <p className="text-[11px] text-muted-foreground px-2 py-3">Loading history...</p>
-          )}
-          {conversations.length === 0 && !convLoading && (
-            <p className="text-[11px] text-muted-foreground px-2 py-3">No past conversations yet.</p>
-          )}
-          {conversations.map(conv => (
+      {/* Tab bar */}
+      <div className="shrink-0 flex items-center gap-1 border-b px-4 bg-background">
+        {TABS.map(tab => {
+          const Icon = tab.icon
+          return (
             <button
-              key={conv.id}
-              onClick={() => {
-                setMessages([])
-                setConvId(conv.id)
-                router.replace(`/dashboard/ask?cid=${conv.id}`, { scroll: false })
-              }}
+              key={tab.id}
+              onClick={() => switchTab(tab.id)}
               className={cn(
-                'w-full text-left rounded-lg px-2.5 py-2 transition-colors group',
-                conv.id === conversationId
-                  ? 'bg-muted text-foreground'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                'flex items-center gap-1.5 px-3 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap',
+                activeTab === tab.id
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30'
               )}
             >
-              <div className="flex items-start gap-1.5">
-                <MessageSquare className="h-3 w-3 mt-0.5 shrink-0 opacity-50" />
-                <div className="min-w-0">
-                  <p className="text-[11px] font-medium leading-tight line-clamp-2 text-foreground/80">
-                    {conv.title}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{timeAgo(conv.updatedAt)}</p>
-                </div>
-              </div>
+              <Icon className="h-3.5 w-3.5" />
+              {tab.label}
             </button>
-          ))}
-        </div>
-      </aside>
+          )
+        })}
+      </div>
 
-      {/* Main chat */}
-      <div className="flex flex-col flex-1 min-w-0 p-6">
-        {/* Header */}
-        <div className="shrink-0 pb-4 border-b mb-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-foreground" />
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {activeConvTitle ? (
-                <span className="text-lg font-medium line-clamp-1">{activeConvTitle}</span>
-              ) : 'Ask AI'}
-            </h1>
-          </div>
-          {!activeConvTitle && (
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Ask anything about your brand health, sentiment, or performance — answers are grounded in your live data.
-            </p>
-          )}
-        </div>
+      {/* Tab content — flex-1, min-h-0 so children can scroll */}
+      <div className="flex-1 min-h-0 overflow-hidden">
 
-        {/* V2 AI Power Tools */}
-        <V2Tools userEmail={userEmail} />
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto space-y-6 pr-1">
-          {histLoading && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Loading conversation...
-            </div>
-          )}
-
-          {messages.length === 0 && !histLoading && (
-            <div className="flex flex-col items-center justify-center h-full gap-6 text-center">
-              <div className="space-y-1">
-                <p className="text-sm font-medium">What do you want to know about your brand?</p>
-                <p className="text-xs text-muted-foreground">Every answer cites its source and states its confidence.</p>
+        {/* ── Chat tab ── */}
+        {activeTab === 'chat' && (
+          <div className="flex h-full gap-0">
+            {/* Sidebar */}
+            <aside className="hidden md:flex flex-col w-56 border-r shrink-0 bg-background">
+              <div className="p-3 border-b shrink-0">
+                <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs" onClick={newChat}>
+                  <Plus className="h-3.5 w-3.5" />New chat
+                </Button>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl">
-                {STARTERS.map(s => (
+
+              <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
+                {convLoading && messages.length === 0 && (
+                  <p className="text-[11px] text-muted-foreground px-2 py-3">Loading history...</p>
+                )}
+                {conversations.length === 0 && !convLoading && (
+                  <p className="text-[11px] text-muted-foreground px-2 py-3">No past conversations yet.</p>
+                )}
+                {conversations.map(conv => (
                   <button
-                    key={s}
-                    onClick={() => send(s)}
-                    className="text-left text-sm px-4 py-3 rounded-xl border hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                    key={conv.id}
+                    onClick={() => {
+                      setMessages([])
+                      setConvId(conv.id)
+                      router.replace(`/dashboard/ask?cid=${conv.id}`, { scroll: false })
+                    }}
+                    className={cn(
+                      'w-full text-left rounded-lg px-2.5 py-2 transition-colors group',
+                      conv.id === conversationId
+                        ? 'bg-muted text-foreground'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    )}
                   >
-                    {s}
+                    <div className="flex items-start gap-1.5">
+                      <MessageSquare className="h-3 w-3 mt-0.5 shrink-0 opacity-50" />
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-medium leading-tight line-clamp-2 text-foreground/80">{conv.title}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{timeAgo(conv.updatedAt)}</p>
+                      </div>
+                    </div>
                   </button>
                 ))}
               </div>
-            </div>
-          )}
+            </aside>
 
-          {messages.map((m, i) => (
-            <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {m.role === 'assistant' && (
-                <div className="h-7 w-7 rounded-full bg-foreground flex items-center justify-center shrink-0 mt-0.5">
-                  <Sparkles className="h-3.5 w-3.5 text-background" />
+            {/* Chat main */}
+            <div className="flex flex-col flex-1 min-w-0 min-h-0 p-6">
+              {/* Header */}
+              <div className="shrink-0 pb-4 border-b mb-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5" />
+                  <h1 className="text-2xl font-semibold tracking-tight">
+                    {activeConvTitle
+                      ? <span className="text-lg font-medium line-clamp-1">{activeConvTitle}</span>
+                      : 'Ask AI'
+                    }
+                  </h1>
                 </div>
-              )}
+                {!activeConvTitle && (
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    Ask anything about your brand health, sentiment, or performance — answers are grounded in your live data.
+                  </p>
+                )}
+              </div>
 
-              <div className={`flex flex-col gap-2 max-w-2xl ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
-                <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
-                  m.role === 'user'
-                    ? 'bg-foreground text-background rounded-br-sm'
-                    : 'bg-muted rounded-bl-sm'
-                }`}>
-                  {m.content}
-                </div>
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto min-h-0 space-y-6 pr-1">
+                {histLoading && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading conversation...
+                  </div>
+                )}
 
-                {m.role === 'assistant' && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {m.confidence && (
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${CONFIDENCE_CLASS[m.confidence] ?? CONFIDENCE_CLASS.Low}`}>
-                        {m.confidence} confidence
-                      </span>
+                {messages.length === 0 && !histLoading && (
+                  <div className="flex flex-col items-center justify-center h-full gap-6 text-center">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">What do you want to know about your brand?</p>
+                      <p className="text-xs text-muted-foreground">Every answer cites its source and states its confidence.</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl">
+                      {STARTERS.map(s => (
+                        <button
+                          key={s}
+                          onClick={() => send(s)}
+                          className="text-left text-sm px-4 py-3 rounded-xl border hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {messages.map((m, i) => (
+                  <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    {m.role === 'assistant' && (
+                      <div className="h-7 w-7 rounded-full bg-foreground flex items-center justify-center shrink-0 mt-0.5">
+                        <Sparkles className="h-3.5 w-3.5 text-background" />
+                      </div>
                     )}
-                    {m.sources?.map((s, si) => (
-                      <Badge key={si} variant="outline" className="text-xs font-normal" title={s.detail}>
-                        {s.label}
-                      </Badge>
-                    ))}
+                    <div className={`flex flex-col gap-2 max-w-2xl ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
+                      <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+                        m.role === 'user'
+                          ? 'bg-foreground text-background rounded-br-sm'
+                          : 'bg-muted rounded-bl-sm'
+                      }`}>
+                        {m.content}
+                      </div>
+
+                      {m.role === 'assistant' && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {m.confidence && (
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${CONFIDENCE_CLASS[m.confidence] ?? CONFIDENCE_CLASS.Low}`}>
+                              {m.confidence} confidence
+                            </span>
+                          )}
+                          {m.sources?.map((s, si) => (
+                            <Badge key={si} variant="outline" className="text-xs font-normal" title={s.detail}>
+                              {s.label}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      {m.role === 'assistant' && m.collectionRecommendation && (
+                        <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 leading-relaxed max-w-2xl">
+                          <span className="font-medium">To get a better answer: </span>
+                          {m.collectionRecommendation}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {loading && (
+                  <div className="flex gap-3 justify-start">
+                    <div className="h-7 w-7 rounded-full bg-foreground flex items-center justify-center shrink-0">
+                      <Sparkles className="h-3.5 w-3.5 text-background" />
+                    </div>
+                    <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-2">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Thinking...</span>
+                    </div>
                   </div>
                 )}
 
-                {m.role === 'assistant' && m.collectionRecommendation && (
-                  <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 leading-relaxed max-w-2xl">
-                    <span className="font-medium">To get a better answer: </span>
-                    {m.collectionRecommendation}
-                  </div>
-                )}
+                <div ref={bottomRef} />
+              </div>
+
+              {/* Input */}
+              <div className="shrink-0 pt-4 border-t mt-4">
+                <div className="flex items-end gap-3 max-w-3xl">
+                  <Textarea
+                    ref={textRef}
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={handleKey}
+                    placeholder="Ask about your brand health, sentiment, or performance..."
+                    className="min-h-[44px] max-h-[160px] resize-none text-sm"
+                    rows={1}
+                    disabled={loading}
+                  />
+                  <Button
+                    size="icon"
+                    className="h-11 w-11 shrink-0"
+                    onClick={() => send(input)}
+                    disabled={!input.trim() || loading}
+                  >
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  </Button>
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-2">
+                  Enter to send · Shift+Enter for new line · Answers grounded in your brand data
+                </p>
               </div>
             </div>
-          ))}
-
-          {loading && (
-            <div className="flex gap-3 justify-start">
-              <div className="h-7 w-7 rounded-full bg-foreground flex items-center justify-center shrink-0">
-                <Sparkles className="h-3.5 w-3.5 text-background" />
-              </div>
-              <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-2">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Thinking...</span>
-              </div>
-            </div>
-          )}
-
-          <div ref={bottomRef} />
-        </div>
-
-        {/* Input */}
-        <div className="shrink-0 pt-4 border-t mt-4">
-          <div className="flex items-end gap-3 max-w-3xl">
-            <Textarea
-              ref={textRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKey}
-              placeholder="Ask about your brand health, sentiment, or performance..."
-              className="min-h-[44px] max-h-[160px] resize-none text-sm"
-              rows={1}
-              disabled={loading}
-            />
-            <Button
-              size="icon"
-              className="h-11 w-11 shrink-0"
-              onClick={() => send(input)}
-              disabled={!input.trim() || loading}
-            >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            </Button>
           </div>
-          <p className="text-[11px] text-muted-foreground mt-2">
-            Enter to send · Shift+Enter for new line · Answers grounded in your brand data
-          </p>
-        </div>
+        )}
+
+        {/* ── Tool tabs — each manages its own scroll internally ── */}
+        {activeTab === 'monthly-report' && (
+          <div className="h-full flex flex-col">
+            <MonthlyReportTab userEmail={userEmail} />
+          </div>
+        )}
+
+        {activeTab === 'business-case' && (
+          <div className="h-full flex flex-col">
+            <BusinessCaseTab />
+          </div>
+        )}
+
+        {activeTab === 'funnel' && (
+          <div className="h-full overflow-y-auto">
+            <FunnelDiagnosticTab />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Building2, Link2, MapPin, Swords, Share2, CreditCard, Layers, Plug, ExternalLink, ClipboardList, Code2 } from 'lucide-react'
+import { User, Building2, Link2, MapPin, Swords, Share2, Layers, Plug, ExternalLink, ClipboardList, Code2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const SETTINGS_LINKS = [
@@ -15,7 +15,7 @@ const SETTINGS_LINKS = [
   { label: 'Field Teams',        href: '/dashboard/settings/field-teams',  icon: ClipboardList },
   { label: 'Pixel & SDK',        href: '/dashboard/settings/pixel',        icon: Code2         },
   { label: 'Client Portal',      href: '/dashboard/settings/portal',       icon: Share2        },
-  { label: 'Billing & Plan',     href: '/dashboard/settings/billing',      icon: CreditCard    },
+  // Billing hidden during beta — re-enable post-validation
 ]
 
 export function SettingsNav() {

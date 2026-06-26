@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient }       from '@/lib/supabase/server'
+import { getActiveBrandId }   from '@/lib/active-brand'
 import { revalidatePath }     from 'next/cache'
 import { z }                  from 'zod'
 
@@ -64,7 +65,7 @@ export async function saveOohDomain(_prev: State, formData: FormData): Promise<S
   const { error } = await supabase
     .from('brands')
     .update({ ooh_redirect_domain: domain, ooh_redirect_domain_verified: false })
-    .eq('id', (await supabase.from('brands').select('id').limit(1).single()).data?.id ?? '')
+    .eq('id', (await getActiveBrandId(supabase)) ?? '')
 
   if (error) return { error: error.message }
 
@@ -80,8 +81,10 @@ export async function removeOohDomain(): Promise<State> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  const { data: brand } = await supabase.from('brands').select('id, ooh_redirect_domain').limit(1).single()
-  if (!brand) return { error: 'No brand found' }
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return { error: 'No active brand' }
+  const { data: brand } = await supabase.from('brands').select('ooh_redirect_domain').eq('id', brandId).single()
+  if (!brand) return { error: 'Brand not found' }
 
   // Remove from Vercel
   if (brand.ooh_redirect_domain && VERCEL_TOKEN) {
@@ -95,7 +98,7 @@ export async function removeOohDomain(): Promise<State> {
   await supabase
     .from('brands')
     .update({ ooh_redirect_domain: null, ooh_redirect_domain_verified: false })
-    .eq('id', brand.id)
+    .eq('id', brandId)
 
   revalidatePath('/dashboard/settings/ooh-domain')
   return { success: 'Custom domain removed.' }

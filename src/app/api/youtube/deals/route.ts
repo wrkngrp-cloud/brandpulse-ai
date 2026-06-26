@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { z } from 'zod'
 
 const Body = z.object({
@@ -25,8 +26,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
   }
 
-  const { data: brand } = await supabase.from('brands').select('id, workspace_id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brand = await getActiveBrand<{ id: string; workspace_id: string }>(supabase, 'id, workspace_id')
+  if (!brand) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
 
   const d = parsed.data
 

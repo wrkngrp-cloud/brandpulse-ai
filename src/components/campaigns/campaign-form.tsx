@@ -8,6 +8,7 @@ import { Textarea }       from '@/components/ui/textarea'
 import { SuccessDialog }  from '@/components/ui/success-dialog'
 import { cn, formatNGN }  from '@/lib/utils'
 import { ChevronRight, ChevronLeft, Lock, Check } from 'lucide-react'
+import { FieldTip } from '@/components/ui/field-tip'
 import type { CampaignFormState } from '@/app/dashboard/campaigns/actions'
 
 const OBJECTIVES = [
@@ -112,7 +113,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
         {/* ── Step 1: Campaign Brief ── */}
         <div className={step === 1 ? 'space-y-5' : 'hidden'}>
           <div className="space-y-1.5">
-            <Label htmlFor="name">Campaign name</Label>
+            <Label htmlFor="name">Campaign name <FieldTip tip='Give it a name you will recognise in reports. Include the quarter, theme, or key channel — e.g. "Q3 Awareness Push" or "Nourish Nigeria Relaunch."' /></Label>
             <Input id="name" name="name" placeholder="e.g. Q3 Awareness Push" required />
           </div>
 
@@ -128,7 +129,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
 
           {/* Multi-select objectives */}
           <div className="space-y-2">
-            <Label>Campaign objectives <span className="text-muted-foreground font-normal text-xs">(select all that apply)</span></Label>
+            <Label>Campaign objectives <span className="text-muted-foreground font-normal text-xs">(select all that apply)</span> <FieldTip tip="Objectives tell the AI what this campaign was trying to achieve. After the campaign ends, BrandPulse measures whether each objective moved." /></Label>
             <div className="grid grid-cols-2 gap-2">
               {OBJECTIVES.map(o => {
                 const selected = objectives.includes(o.value)
@@ -170,7 +171,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
 
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2 space-y-1.5">
-              <Label htmlFor="total_budget">Total budget</Label>
+              <Label htmlFor="total_budget">Total budget <FieldTip tip="The full budget for this campaign across all channels in NGN. You will allocate it per channel in the next step." /></Label>
               <Input id="total_budget" name="total_budget" type="number" min="0" step="1000" placeholder="0" />
             </div>
             <div className="space-y-1.5">
@@ -232,7 +233,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
                       <div className="mt-3 space-y-3 border-t pt-3" onClick={e => e.stopPropagation()}>
                         {/* Budget */}
                         <div className="flex items-center gap-3">
-                          <Label className="text-xs text-muted-foreground shrink-0 w-28">Budget allocation</Label>
+                          <Label className="text-xs text-muted-foreground shrink-0 w-28">Budget allocation <FieldTip tip="How much of the total budget goes into this channel. Leaving it blank means the channel is active but unbudgeted — ROI reports will show reach without cost efficiency." /></Label>
                           <Input
                             type="number" min="0" step="1000" placeholder="0"
                             value={cfg?.budget ?? ''}

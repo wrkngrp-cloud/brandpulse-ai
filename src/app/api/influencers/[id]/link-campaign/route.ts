@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 
 export async function POST(
   request: NextRequest,
@@ -11,13 +12,8 @@ export async function POST(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .single()
-
-  if (!brand) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
 
   const body = await request.json().catch(() => ({}))
   const campaign_id: string | null = body.campaign_id ?? null
@@ -26,7 +22,7 @@ export async function POST(
     .from('influencers')
     .update({ campaign_id })
     .eq('id', id)
-    .eq('brand_id', brand.id)
+    .eq('brand_id', brandId)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

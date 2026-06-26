@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
 import { buildBrandContext, formatBrandContextBlock } from '@/lib/ai/brand-context'
@@ -11,8 +12,9 @@ export async function POST(req: NextRequest) {
   const { surveyId } = await req.json() as { surveyId: string }
   if (!surveyId) return NextResponse.json({ error: 'surveyId required' }, { status: 400 })
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
+  const brand = { id: brandId }
 
   const service = await createServiceClient()
 

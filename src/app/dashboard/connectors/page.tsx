@@ -7,6 +7,7 @@ import { GA4ConnectCard, type GA4ConnectionData }      from '@/components/dashbo
 import { PaymentConnectCard, type PaymentConfigStatus } from '@/components/dashboard/payment-connect-card'
 import { AppStoreConnectCard, type AppStoreConfigData } from '@/components/dashboard/app-store-connect-card'
 import { EmailConnectCard, type EmailConnectorStatus }  from '@/components/dashboard/email-connect-card'
+// WhatsAppConnectCard hidden until dedicated number is configured
 import { PixelCard } from './pixel-card'
 import { ShoppingCart, ArrowRight } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
@@ -33,6 +34,7 @@ export default async function ConnectorsPage() {
   let ecommerceStats: { sources: string[]; totalOrders: number; lastImportAt: string | null } = {
     sources: [], totalOrders: 0, lastImportAt: null,
   }
+  // whatsappStats removed — WhatsApp connector hidden during beta
 
   if (brand?.id) {
     const [ga4Res, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
@@ -136,6 +138,8 @@ export default async function ConnectorsPage() {
         <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Email Marketing</h2>
         <EmailConnectCard status={emailStatus} />
       </section>
+
+      {/* WhatsApp connector hidden until dedicated number is configured */}
 
       {/* E-commerce */}
       <section>

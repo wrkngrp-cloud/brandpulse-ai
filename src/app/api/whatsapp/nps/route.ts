@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { z } from 'zod'
 
 const Body = z.object({
@@ -19,8 +20,8 @@ export async function POST(request: NextRequest) {
   const parsed = Body.safeParse(await request.json().catch(() => ({})))
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
 
-  const { data: brand } = await supabase.from('brands').select('id, name, workspace_id').limit(1).maybeSingle()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brand = await getActiveBrand<{ id: string; name: string; workspace_id: string }>(supabase, 'id, name, workspace_id')
+  if (!brand) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
 
   const message = `Hi! ${brand.name} wants to know — on a scale of 0 to 10, how likely are you to recommend us to a friend or colleague?\n\nReply with just a number (0-10). 0 = Not at all likely, 10 = Extremely likely.\n\nThank you! 🙏`
 

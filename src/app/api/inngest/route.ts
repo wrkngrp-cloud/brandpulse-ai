@@ -16,6 +16,8 @@ import { emailConnectorSync }          from '@/lib/inngest/functions/email-conne
 import { panelDailyCheck, panelDispatch }       from '@/lib/inngest/functions/panel-dispatch'
 import { monthlyReportCron, weeklyDigestCron }  from '@/lib/inngest/functions/scheduled-reports'
 import { youtubeBrandMonitor }         from '@/lib/inngest/functions/youtube-brand-monitor'
+import { whatsappBroadcast }           from '@/lib/inngest/functions/whatsapp-broadcast'
+import { aiVisibilityWeeklyCron, aiVisibilityOnDemand } from '@/lib/inngest/functions/ai-visibility'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -29,5 +31,7 @@ export const { GET, POST, PUT } = serve({
     emailConnectorSync, panelDailyCheck, panelDispatch,
     monthlyReportCron, weeklyDigestCron,
     youtubeBrandMonitor,
+    whatsappBroadcast,
+    aiVisibilityWeeklyCron, aiVisibilityOnDemand,
   ],
 })

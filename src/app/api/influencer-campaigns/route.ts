@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
@@ -18,7 +19,7 @@ const schema = z.object({
 
 export async function GET() {
   const supabase = await createClient()
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).maybeSingle()
+  const brand = { id: await getActiveBrandId(supabase) }
   if (!brand) return NextResponse.json({ error: 'No brand' }, { status: 400 })
 
   const { data, error } = await supabase
@@ -33,7 +34,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).maybeSingle()
+  const brand = { id: await getActiveBrandId(supabase) }
   if (!brand) return NextResponse.json({ error: 'No brand' }, { status: 400 })
 
   const body = await req.json()

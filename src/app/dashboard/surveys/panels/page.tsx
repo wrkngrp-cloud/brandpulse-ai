@@ -1,10 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import { getActiveBrand } from '@/lib/active-brand'
 import { SurveyPanelsClient } from './panels-client'
 
 export default async function SurveyPanelsPage() {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase.from('brands').select('id, name').limit(1).single()
+  const brand = await getActiveBrand<{ id: string; name: string }>(supabase, 'id, name')
 
   const { data: panels } = await supabase
     .from('survey_panels')

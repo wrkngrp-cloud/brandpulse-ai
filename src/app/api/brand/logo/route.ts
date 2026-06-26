@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getActiveBrand, getActiveBrandId } from '@/lib/active-brand'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
@@ -17,8 +18,9 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
+  const brand = { id: brandId }
 
   let formData: FormData
   try {
@@ -64,8 +66,8 @@ export async function DELETE(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase.from('brands').select('id, logo_url').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brand = await getActiveBrand<{ id: string; logo_url: string | null }>(supabase, 'id, logo_url')
+  if (!brand) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
 
   const service = await createServiceClient()
 

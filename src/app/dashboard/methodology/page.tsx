@@ -61,7 +61,7 @@ const sections = [
       },
       {
         heading: 'Sentiment classification',
-        text: 'Each social mention is classified as positive, neutral, or negative using Claude Haiku, our fastest AI tier, which is specifically calibrated for Nigerian Pidgin English, Yoruba-inflected expressions, Igbo code-switching, and Hausa digital vernacular. Standard English-only models misclassify approximately 30–40% of West African social content, which is why we built a dedicated cultural classification layer.',
+        text: 'Each social mention is classified as positive, neutral, or negative using our fastest AI tier, specifically calibrated for Nigerian Pidgin English, Yoruba-inflected expressions, Igbo code-switching, and Hausa digital vernacular. Standard English-only models misclassify approximately 30–40% of West African social content, which is why we built a dedicated cultural classification layer.',
       },
       {
         heading: 'Emotion detection',
@@ -137,7 +137,7 @@ const sections = [
     body: [
       {
         heading: 'Pre-publication scoring',
-        text: 'Content is scored across five dimensions: Cultural Resonance (does it connect with Nigerian cultural context, idioms, and seasonal moments?), Brand Safety (does it carry reputational risk?), Clarity (is the message clear to the intended audience?), Engagement Potential (is it likely to drive interaction?), and CTA Effectiveness (is the call to action prominent and compelling?). Each dimension is scored 0–100 by Claude Haiku, our culturally-calibrated AI tier.',
+        text: 'Content is scored across five dimensions: Cultural Resonance (does it connect with Nigerian cultural context, idioms, and seasonal moments?), Brand Safety (does it carry reputational risk?), Clarity (is the message clear to the intended audience?), Engagement Potential (is it likely to drive interaction?), and CTA Effectiveness (is the call to action prominent and compelling?). Each dimension is scored 0–100 by our culturally-calibrated AI.',
       },
       {
         heading: 'Cultural calibration',
@@ -243,15 +243,15 @@ const sections = [
     color: 'text-blue-500',
     bg: 'bg-blue-50 dark:bg-blue-950/30',
     title: 'Radio Intelligence',
-    subtitle: 'Daypart efficiency analysis and delivery tracking across Nigerian radio stations.',
+    subtitle: 'Daypart efficiency analysis and agency post-buy reconciliation for Nigerian radio buys.',
     body: [
       {
-        heading: 'Metrics tracked',
-        text: 'Spots Planned vs Spots Aired (delivery rate), Cost per Spot, Total Spend per station and daypart. Dayparts follow the Nigerian radio industry standard: Morning Drive (06:00–10:00), Daytime (10:00–15:00), Afternoon Drive (15:00–19:00), Evening (19:00–22:00), and Late Night (22:00–06:00).',
+        heading: 'How data enters BrandPulse',
+        text: 'Radio data is logged from your media agency\'s buy plan and post-buy report — either via CSV upload or manual entry. BrandPulse does not monitor live broadcasts. Spots Planned comes from your approved buy; Spots Aired comes from the delivery confirmation your agency provides after each flight. Dayparts follow the Nigerian radio industry standard: Morning Drive (06:00–10:00), Daytime (10:00–15:00), Afternoon Drive (15:00–19:00), Evening (19:00–22:00), and Late Night (22:00–06:00).',
       },
       {
         heading: 'Daypart Efficiency Ranking',
-        text: 'The AI analysis layer computes a cost-per-impression estimate per daypart using published listenership ratings for Nigerian stations (Beat FM, Cool FM, Wazobia FM, Naija FM, and others in the BrandPulse station database). Dayparts are ranked by efficiency — cost effectiveness adjusted for listenership size — giving media planners a clear reallocation guide.',
+        text: 'BrandPulse holds a static listenership database for Nigerian stations (Beat FM, Cool FM, Wazobia FM, Naija FM, Smooth FM, Rhythm FM, and others). The AI combines your logged spend and spot count with the station\'s reach figures to compute cost-per-impression per daypart. Dayparts are then ranked by efficiency, giving you a clear reallocation guide for your next buy.',
       },
     ],
   },
@@ -261,15 +261,19 @@ const sections = [
     color: 'text-cyan-600',
     bg: 'bg-cyan-50 dark:bg-cyan-950/30',
     title: 'TV Intelligence',
-    subtitle: 'GRP-based performance tracking and prime time vs fringe efficiency analysis across Nigerian television.',
+    subtitle: 'GRP reconciliation and prime time vs fringe efficiency analysis for logged TV buys.',
     body: [
       {
+        heading: 'How data enters BrandPulse',
+        text: 'TV data is logged from your media agency\'s buy plan and post-buy delivery report — either via CSV upload or manual entry. BrandPulse does not monitor live broadcasts or detect spots on air. GRPs Planned and Spots Planned come from your approved buy; GRPs Delivered and Spots Aired come from the post-buy confirmation your agency provides after each flight.',
+      },
+      {
         heading: 'Core metrics',
-        text: 'Gross Rating Points (GRP) — the total audience delivery, calculated as Reach % × Average Frequency. Cost Per Rating Point (CPRP) — the spend required to deliver one GRP; lower is better. Cost Per Thousand (CPT) — the spend required to reach 1,000 members of the target audience. These three metrics are the industry standard for TV media buying used by all major Nigerian agencies.',
+        text: 'Gross Rating Points (GRP) — total audience delivery, calculated as Reach % × Average Frequency. Cost Per Rating Point (CPRP) — spend required to deliver one GRP; lower is better. Cost Per Thousand (CPT) — spend required to reach 1,000 members of the target audience. These are the industry-standard metrics used by all major Nigerian agencies.',
       },
       {
         heading: 'AI analysis',
-        text: 'The AI layer ranks programmes by GRP delivery efficiency, flags underdelivery against planned GRP targets, analyses prime time versus fringe allocation, and produces a single prioritised budget reallocation recommendation. Channel coverage includes NTA, AIT, Channels TV, TVC, DSTV bouquet channels (Africa Magic, SuperSport, CNN), and major regional stations.',
+        text: 'The AI layer compares your logged planned vs delivered GRPs to surface underdelivery, ranks programmes by cost-efficiency, and analyses prime time versus fringe allocation. BrandPulse holds a channel database covering NTA, AIT, Channels TV, TVC, Africa Magic, SuperSport, and major regional stations — these are reference records for matching and efficiency benchmarking, not live monitoring feeds.',
       },
     ],
   },
@@ -305,7 +309,7 @@ const sections = [
     body: [
       {
         heading: 'Weekly AI briefing',
-        text: 'Every Monday at 08:00 Lagos time, BrandPulse generates a competitive briefing for each brand using Sonnet 4.6. The briefing synthesises the past week\'s competitor sightings, SOV movements, sentiment shifts, and campaign signals into a structured narrative with strategic implications and recommended responses. The briefing is delivered in the app and via email.',
+        text: 'Every Monday at 08:00 Lagos time, BrandPulse generates a competitive briefing for each brand. The briefing synthesises the past week\'s competitor sightings, SOV movements, sentiment shifts, and campaign signals into a structured narrative with strategic implications and recommended responses. The briefing is delivered in the app and via email.',
       },
       {
         heading: 'ESOV League',
@@ -455,7 +459,7 @@ export default function MethodologyPage() {
       <div className="border rounded-xl p-5 space-y-2 bg-muted/20">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">A note on AI usage</p>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          BrandPulse uses three tiers of AI depending on task complexity. Cultural tasks — sentiment classification, Pre-Post scoring, cultural resonance — use our fastest model, calibrated specifically for Nigerian linguistic patterns. Structural analysis tasks — creative comparison, influencer scoring, funnel diagnosis, competitive briefings — use our mid-tier model. Board-grade outputs — business cases, strategic recommendations requiring deep synthesis — use our most capable model. No model names are displayed in the product; you interact with BrandPulse intelligence, not a specific AI vendor.
+          BrandPulse uses three tiers of AI depending on task complexity. Cultural tasks — sentiment classification, Pre-Post scoring, cultural resonance — use our fastest model, calibrated specifically for Nigerian linguistic patterns. Structural analysis tasks — creative comparison, influencer scoring, funnel diagnosis, competitive briefings — use our mid-tier model. Board-grade outputs — business cases, strategic recommendations requiring deep synthesis — use our most capable model.
         </p>
       </div>
     </div>

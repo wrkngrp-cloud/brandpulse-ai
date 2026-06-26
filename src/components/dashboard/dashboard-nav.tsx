@@ -9,18 +9,19 @@ import {
   CalendarDays, MapPin, Megaphone, Zap, Trophy, ChevronDown,
   Monitor, Radio, Tv, Newspaper, Filter, Award, Users, Palette, Globe,
   Target, FileSearch, BookOpen, PieChart, Sparkles, ClipboardCheck,
-  TrendingUp, Plug, BarChart3, Clipboard,
+  TrendingUp, Plug, BarChart3, Clipboard, MessageCircle, Bot,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 // ── Section data ────────────────────────────────────────────────────────────
 
 const INTELLIGENCE = [
-  { label: 'Overview',     href: '/dashboard',              icon: LayoutDashboard },
-  { label: 'Sentiment',    href: '/dashboard/sentiment',    icon: BarChart2       },
-  { label: 'Brand Equity', href: '/dashboard/brand-equity', icon: Award           },
-  { label: 'Funnel',       href: '/dashboard/funnel',       icon: Filter          },
-  { label: 'Content',      href: '/dashboard/content',      icon: FileText        },
+  { label: 'Overview',       href: '/dashboard',               icon: LayoutDashboard },
+  { label: 'Sentiment',      href: '/dashboard/sentiment',     icon: BarChart2       },
+  { label: 'Brand Equity',   href: '/dashboard/brand-equity',  icon: Award           },
+  { label: 'Funnel',         href: '/dashboard/funnel',        icon: Filter          },
+  { label: 'Content',        href: '/dashboard/content',       icon: FileText        },
+  // AI Visibility hidden until OPENAI_API_KEY / GOOGLE_AI_API_KEY / PERPLEXITY_API_KEY is set in Vercel
 ]
 
 const AUDIENCE = [
@@ -257,7 +258,7 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
         />
 
         {/* Surveys */}
-        <SectionLabel expanded={expanded}>Surveys</SectionLabel>
+        <SectionLabel expanded={expanded}>Surveys & Messaging</SectionLabel>
         <CollapsibleSection
           label="Surveys"
           paths={SURVEY_PATHS}
@@ -266,6 +267,7 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
           expanded={expanded}
           pathname={pathname}
         />
+        {/* WhatsApp hidden until dedicated number is configured */}
 
         {/* Reporting */}
         <SectionLabel expanded={expanded}>Reporting</SectionLabel>

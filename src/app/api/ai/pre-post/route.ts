@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { callAi } from '@/lib/ai/client'
 import { buildPrePostSystemPrompt, buildPrePostUserMessage } from '@/lib/ai/pre-post-context'
 
@@ -43,8 +44,8 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase.from('brands').select('id, target_segments').limit(1).single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brand = await getActiveBrand<{ id: string; target_segments: unknown[] }>(supabase, 'id, target_segments')
+  if (!brand) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
 
   const body = await req.json() as PrePostRequestBody
   if (!body.content?.trim() && !body.imageBase64) {

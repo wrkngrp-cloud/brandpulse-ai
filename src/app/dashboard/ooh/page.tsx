@@ -4,6 +4,7 @@ import Link                 from 'next/link'
 import { buttonVariants }   from '@/components/ui/button'
 import { cn }               from '@/lib/utils'
 import { MapPin, Plus }     from 'lucide-react'
+import { getActiveBrand }   from '@/lib/active-brand'
 import { OohDashboardClient } from '@/components/ooh/ooh-dashboard-client'
 
 export default async function OohPage() {
@@ -11,8 +12,7 @@ export default async function OohPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands').select('id, name, ooh_redirect_domain').limit(1).single()
+  const brand = await getActiveBrand<{ id: string; name: string; ooh_redirect_domain: string | null }>(supabase, 'id, name, ooh_redirect_domain')
   if (!brand) redirect('/onboarding')
 
   // Fetch sites. campaign_id and campaigns join are available after migration 20260620000000.
