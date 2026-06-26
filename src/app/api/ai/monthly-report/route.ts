@@ -187,8 +187,10 @@ Return ONLY this JSON, no preamble, no markdown:
       temperature: 0.2,
     })
 
-    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
-    result = JSON.parse(cleaned) as MonthlyReportResult
+    const start   = raw.indexOf('{')
+    const end     = raw.lastIndexOf('}')
+    if (start === -1 || end === -1) throw new Error('No JSON object in AI response')
+    result = JSON.parse(raw.slice(start, end + 1)) as MonthlyReportResult
   } catch (err) {
     console.error('[monthly-report] AI error:', err)
     return NextResponse.json({ error: 'Failed to generate report. Please try again.' }, { status: 500 })

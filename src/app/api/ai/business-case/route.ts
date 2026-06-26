@@ -177,18 +177,24 @@ Return ONLY this JSON, no preamble, no markdown fences:
   try {
     raw = await callAi({
       tier:        'boardGrade',
-      system:      'You are a senior business strategist building board-ready investment cases for Nigerian/West African brands. Apply Aaker, ESOV, Porter, and Ansoff frameworks explicitly. Return ONLY valid JSON with no markdown fences.',
+      system:      'You are a senior business strategist building board-ready investment cases for Nigerian/West African brands. Apply Aaker, ESOV, Porter, and Ansoff frameworks explicitly. Return ONLY valid JSON — no markdown, no preamble, no explanation. Start your response with { and end with }.',
       messages:    [{ role: 'user', content: userPrompt }],
-      maxTokens:   4500,
-      temperature: 0.2,
+      maxTokens:   4000,
+      temperature: 0.1,
     })
 
-    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
-    const result = JSON.parse(cleaned) as BusinessCaseResult
+    // Robust JSON extraction: find outermost { … } regardless of any wrapping text
+    const start = raw.indexOf('{')
+    const end   = raw.lastIndexOf('}')
+    if (start === -1 || end === -1 || end <= start) {
+      console.error('[business-case] No JSON object found in response. Raw (500):', raw.slice(0, 500))
+      return NextResponse.json({ error: 'The AI returned an unexpected format. Please try again.' }, { status: 500 })
+    }
+    const result = JSON.parse(raw.slice(start, end + 1)) as BusinessCaseResult
     return NextResponse.json(result)
   } catch (err) {
-    console.error('[business-case] AI error:', err)
-    console.error('[business-case] Raw AI response (first 500 chars):', raw?.slice(0, 500))
+    console.error('[business-case] Error:', err instanceof Error ? err.message : err)
+    console.error('[business-case] Raw (500):', raw?.slice(0, 500))
     return NextResponse.json({ error: 'Failed to generate business case. Please try again.' }, { status: 500 })
   }
 }

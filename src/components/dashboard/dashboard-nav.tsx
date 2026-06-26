@@ -10,7 +10,7 @@ import {
   Monitor, Radio, Tv, Newspaper, Filter, Award, Users, Palette, Globe,
   Target, FileSearch, BookOpen, PieChart, Sparkles, ClipboardCheck,
   TrendingUp, Plug, BarChart3, Clipboard, MessageCircle, Bot,
-  AlertTriangle, Heart, Database,
+  AlertTriangle, Heart, Database, ShoppingBag, DollarSign, FlaskConical,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -72,10 +72,17 @@ const SURVEY_SUB = [
 ]
 
 const REPORTING = [
-  { label: 'Media Mix',     href: '/dashboard/mmm',       icon: PieChart  },
-  { label: 'Geo-Lift',      href: '/dashboard/geo-lift',  icon: Target    },
-  { label: 'Business Case', href: '/dashboard/business-case', icon: BarChart3 },
-  { label: 'Methodology',   href: '/dashboard/methodology', icon: BookOpen },
+  { label: 'Media Mix',     href: '/dashboard/mmm',            icon: PieChart    },
+  { label: 'Geo-Lift',      href: '/dashboard/geo-lift',       icon: Target      },
+  { label: 'Business Case', href: '/dashboard/business-case',  icon: BarChart3   },
+  { label: 'Methodology',   href: '/dashboard/methodology',    icon: BookOpen    },
+  { label: 'Budget & Pacing', href: '/dashboard/budget',       icon: DollarSign  },
+  { label: 'Marketplace',   href: '/dashboard/marketplace',    icon: ShoppingBag },
+  { label: 'A/B Testing',   href: '/dashboard/experiments',    icon: FlaskConical },
+]
+
+const GROWTH = [
+  { label: 'Loyalty Engine', href: '/dashboard/loyalty',   icon: Award },
 ]
 
 // ── Primitives ─────────────────────────────────────────────────────────────
@@ -285,6 +292,12 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
         {/* Reporting */}
         <SectionLabel expanded={expanded}>Reporting</SectionLabel>
         {REPORTING.map(({ label, href, icon }) => (
+          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
+        ))}
+
+        {/* Growth */}
+        <SectionLabel expanded={expanded}>Growth</SectionLabel>
+        {GROWTH.map(({ label, href, icon }) => (
           <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
         ))}
 

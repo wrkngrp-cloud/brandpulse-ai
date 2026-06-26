@@ -504,7 +504,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
         )}
 
         {/* ── Competitive Position ───────────────────────────────── */}
-        {competitors.length > 0 && (
+        {sections.includes('competitive') && competitors.length > 0 && (
           <section>
             <SectionHeading icon={Target}>Competitive Position</SectionHeading>
             {(() => {
@@ -723,6 +723,74 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                   ))}
                 </ul>
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── Monthly Report Summary ─────────────────────────────── */}
+        {sections.includes('reporting') && (
+          <section>
+            <SectionHeading icon={CheckCircle2}>Performance Report</SectionHeading>
+            <div className="rounded-2xl border bg-card p-6 space-y-5">
+              {/* KPI summary table */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                <div className="rounded-xl bg-muted/40 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">BHI</p>
+                  <p className="text-3xl font-bold">{latestBhi != null ? latestBhi.toFixed(1) : '—'}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Brand Health</p>
+                </div>
+                <div className="rounded-xl bg-muted/40 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">SOV</p>
+                  <p className="text-3xl font-bold">{latestSov ? `${Number(latestSov.social_sov).toFixed(1)}%` : '—'}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Share of Voice</p>
+                </div>
+                <div className="rounded-xl bg-muted/40 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">NPS</p>
+                  <p className="text-3xl font-bold">{avgNps != null ? avgNps.toFixed(1) : '—'}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Avg score</p>
+                </div>
+                <div className="rounded-xl bg-muted/40 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Campaigns</p>
+                  <p className="text-3xl font-bold">{campaigns.length}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Active</p>
+                </div>
+              </div>
+
+              {/* Wins & concerns inline */}
+              {winsAndConcerns && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t">
+                  <div>
+                    <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-2">Key wins</p>
+                    <ul className="space-y-1.5">
+                      {winsAndConcerns.wins.slice(0, 3).map((w, i) => (
+                        <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
+                          <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>{w}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-2">Watch items</p>
+                    <ul className="space-y-1.5">
+                      {winsAndConcerns.concerns.slice(0, 3).map((c, i) => (
+                        <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
+                          <span className="text-red-400 shrink-0 mt-0.5">!</span>{c}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Next priorities</p>
+                    <ul className="space-y-1.5">
+                      {winsAndConcerns.priorities.slice(0, 3).map((p, i) => (
+                        <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
+                          <span className="text-blue-500 shrink-0 mt-0.5">→</span>{p}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
         )}

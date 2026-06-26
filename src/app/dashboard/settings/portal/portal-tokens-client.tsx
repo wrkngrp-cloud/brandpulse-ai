@@ -30,13 +30,15 @@ interface Props {
 }
 
 const SECTION_OPTIONS = [
-  { value: 'executive_summary', label: 'Executive Summary (AI)' },
-  { value: 'bhi',               label: 'Brand Health Index'     },
-  { value: 'sentiment',         label: 'Sentiment'              },
-  { value: 'sov',               label: 'Share of Voice'         },
-  { value: 'campaigns',         label: 'Campaign Performance'   },
-  { value: 'nps',               label: 'NPS Score'              },
-  { value: 'insights',          label: 'Wins, Concerns & Priorities (AI)' },
+  { value: 'executive_summary', label: 'Executive Summary (AI)'              },
+  { value: 'bhi',               label: 'Brand Health Index'                  },
+  { value: 'sentiment',         label: 'Sentiment'                           },
+  { value: 'sov',               label: 'Share of Voice'                      },
+  { value: 'competitive',       label: 'Competitive Context'                 },
+  { value: 'campaigns',         label: 'Campaign Performance'                },
+  { value: 'nps',               label: 'NPS Score'                           },
+  { value: 'insights',          label: 'Wins, Concerns & Priorities (AI)'   },
+  { value: 'reporting',         label: 'Monthly Report (AI)'                 },
 ]
 
 export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit, appUrl }: Props) {
