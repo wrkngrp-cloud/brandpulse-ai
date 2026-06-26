@@ -10,6 +10,7 @@ import {
   Monitor, Radio, Tv, Newspaper, Filter, Award, Users, Palette, Globe,
   Target, FileSearch, BookOpen, PieChart, Sparkles, ClipboardCheck,
   TrendingUp, Plug, BarChart3, Clipboard, MessageCircle, Bot,
+  AlertTriangle, Heart, Database,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -30,6 +31,12 @@ const AUDIENCE = [
   { label: 'Cultural',           href: '/dashboard/cultural',           icon: Globe      },
   { label: 'PR Tracking',        href: '/dashboard/pr',                 icon: FileSearch },
   { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: Clipboard  },
+]
+
+const CUSTOMERS = [
+  { label: 'Retention Risk', href: '/dashboard/retention', icon: AlertTriangle },
+  { label: 'Advocacy',       href: '/dashboard/advocacy',  icon: Heart         },
+  { label: 'Customer Data',  href: '/dashboard/cdp',       icon: Database      },
 ]
 
 const CAMPAIGN_PATHS = ['/dashboard/campaigns', '/dashboard/ooh', '/dashboard/events', '/dashboard/digital', '/dashboard/radio', '/dashboard/tv', '/dashboard/print']
@@ -231,6 +238,12 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
         {/* Audience & Competitive */}
         <SectionLabel expanded={expanded}>Audience</SectionLabel>
         {AUDIENCE.map(({ label, href, icon }) => (
+          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
+        ))}
+
+        {/* Customers */}
+        <SectionLabel expanded={expanded}>Customers</SectionLabel>
+        {CUSTOMERS.map(({ label, href, icon }) => (
           <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
         ))}
 
