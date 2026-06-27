@@ -15,67 +15,62 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// ── Mental model ──────────────────────────────────────────────────────────────
+// ── Architecture ──────────────────────────────────────────────────────────────
 //
-//  UNDERSTAND      Brand Health + Intelligence
-//  ──────────────────────────────────────────
-//  PLAN            All Campaigns (the strategy container)
-//  DIGITAL         Digital Ads + Influencers          ← same screen, same budgets
-//  ON-GROUND       Out of Home + Events               ← real-world physical presence
-//  BROADCAST       Radio / TV / Print                 ← traditional mass media
-//  ──────────────────────────────────────────
-//  CRAFT           Creative Lab (voice, pre-post, library)
-//  LISTEN          Surveys + research
-//  ──────────────────────────────────────────
-//  MEASURE         A/B · MMM · Geo-Lift · Budget
-//  GROW            Retention · Loyalty · Advocacy · CDP
-//  REPORT          Business Case · Methodology
-//  SETUP           Connectors
+//  The nav tells the marketer's story in order:
+//
+//  BRAND HEALTH      How is my brand doing?
+//  INTELLIGENCE      What is happening in the market?
+//  CAMPAIGNS         What am I running? (one section — all channels inside it)
+//  CREATIVE          What am I saying?
+//  RESEARCH          What do customers tell me?
+//  MEASUREMENT       Is it working?
+//  GROWTH            How do I keep and grow my base?
+//  REPORTS           How do I present results?
+//  SETUP             Connect and configure
+//
+//  Inside CAMPAIGNS, three natural groups separated by thin dividers (not headers):
+//    Overview: All Campaigns
+//    Digital:  Digital Ads · Influencers
+//    Physical: Out of Home · Events & Activation
+//    Broadcast: Radio · TV · Print
 
-// ── Brand Health ──────────────────────────────────────────────────────────────
+type NavEntry =
+  | { label: string; href: string; icon: React.ElementType }
+  | { divider: true }
 
-const BRAND_HEALTH = [
-  { label: 'Sentiment',     href: '/dashboard/sentiment',    icon: BarChart2  },
-  { label: 'Brand Health',  href: '/dashboard/brand-equity', icon: Activity   },
-  { label: 'Content',       href: '/dashboard/content',      icon: FileText   },
-  { label: 'Funnel',        href: '/dashboard/funnel',       icon: Filter     },
+// ── Section data ──────────────────────────────────────────────────────────────
+
+const BRAND_HEALTH: NavEntry[] = [
+  { label: 'Sentiment',    href: '/dashboard/sentiment',    icon: BarChart2 },
+  { label: 'Brand Health', href: '/dashboard/brand-equity', icon: Activity  },
+  { label: 'Content',      href: '/dashboard/content',      icon: FileText  },
+  { label: 'Funnel',       href: '/dashboard/funnel',       icon: Filter    },
 ]
 
-// ── Intelligence ──────────────────────────────────────────────────────────────
-
-const INTELLIGENCE = [
-  { label: 'Competitive',        href: '/dashboard/competitive',        icon: Trophy     },
+const INTELLIGENCE: NavEntry[] = [
+  { label: 'Competitive',        href: '/dashboard/competitive',        icon: Trophy      },
   { label: 'Marketplace',        href: '/dashboard/marketplace',        icon: ShoppingBag },
-  { label: 'Cultural Insights',  href: '/dashboard/cultural',           icon: Globe      },
-  { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: Clipboard  },
-  { label: 'PR Tracking',        href: '/dashboard/pr',                 icon: FileSearch },
+  { label: 'Cultural Insights',  href: '/dashboard/cultural',           icon: Globe       },
+  { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: Clipboard   },
+  { label: 'PR Tracking',        href: '/dashboard/pr',                 icon: FileSearch  },
 ]
 
-// ── Plan (the campaign container — sits above all execution channels) ─────────
-
-// ── Digital channels (screen-based: you place your content where attention is) ─
-
-const DIGITAL = [
-  { label: 'Digital Ads',  href: '/dashboard/digital',     icon: Monitor },
-  { label: 'Influencers',  href: '/dashboard/influencers', icon: Users   },
+// Campaigns: one section, three channel groups separated by thin dividers.
+// No sub-section headers — the dividers carry the grouping signal.
+const CAMPAIGNS: NavEntry[] = [
+  { label: 'All Campaigns',       href: '/dashboard/campaigns',   icon: Megaphone   },
+  { divider: true },
+  { label: 'Digital Ads',         href: '/dashboard/digital',     icon: Monitor     },
+  { label: 'Influencers',         href: '/dashboard/influencers', icon: Users       },
+  { divider: true },
+  { label: 'Out of Home',         href: '/dashboard/ooh',         icon: MapPin      },
+  { label: 'Events & Activation', href: '/dashboard/events',      icon: CalendarDays },
+  { divider: true },
+  { label: 'Radio',               href: '/dashboard/radio',       icon: Radio       },
+  { label: 'TV',                  href: '/dashboard/tv',          icon: Tv          },
+  { label: 'Print',               href: '/dashboard/print',       icon: Newspaper   },
 ]
-
-// ── On-Ground (physical brand presence in the real world) ────────────────────
-
-const ON_GROUND = [
-  { label: 'Out of Home',        href: '/dashboard/ooh',    icon: MapPin       },
-  { label: 'Events & Activation',href: '/dashboard/events', icon: CalendarDays },
-]
-
-// ── Broadcast (traditional mass media — you buy slots) ───────────────────────
-
-const BROADCAST = [
-  { label: 'Radio', href: '/dashboard/radio', icon: Radio    },
-  { label: 'TV',    href: '/dashboard/tv',    icon: Tv       },
-  { label: 'Print', href: '/dashboard/print', icon: Newspaper },
-]
-
-// ── Creative Lab (how to say it) ──────────────────────────────────────────────
 
 const CREATIVE_PATHS = ['/dashboard/voice-builder', '/dashboard/pre-post', '/dashboard/creative']
 const CREATIVE_SUB = [
@@ -84,8 +79,6 @@ const CREATIVE_SUB = [
   { label: 'Creative Library', href: '/dashboard/creative',      icon: Palette                 },
 ]
 
-// ── Research / Listen ─────────────────────────────────────────────────────────
-
 const SURVEY_PATHS = ['/dashboard/surveys']
 const SURVEY_SUB = [
   { label: 'All Surveys',     href: '/dashboard/surveys',        icon: ClipboardList  },
@@ -93,27 +86,21 @@ const SURVEY_SUB = [
   { label: 'Tracking Panels', href: '/dashboard/surveys/panels', icon: ClipboardCheck },
 ]
 
-// ── Measurement ───────────────────────────────────────────────────────────────
-
-const MEASUREMENT = [
-  { label: 'A/B Testing',     href: '/dashboard/experiments',  icon: FlaskConical },
-  { label: 'Media Mix',       href: '/dashboard/mmm',          icon: PieChart     },
-  { label: 'Geo-Lift',        href: '/dashboard/geo-lift',     icon: Target       },
-  { label: 'Budget & Pacing', href: '/dashboard/budget',       icon: DollarSign   },
+const MEASUREMENT: NavEntry[] = [
+  { label: 'A/B Testing',     href: '/dashboard/experiments', icon: FlaskConical },
+  { label: 'Media Mix',       href: '/dashboard/mmm',         icon: PieChart     },
+  { label: 'Geo-Lift',        href: '/dashboard/geo-lift',    icon: Target       },
+  { label: 'Budget & Pacing', href: '/dashboard/budget',      icon: DollarSign   },
 ]
 
-// ── Growth ────────────────────────────────────────────────────────────────────
-
-const GROWTH = [
+const GROWTH: NavEntry[] = [
   { label: 'Retention Risk', href: '/dashboard/retention', icon: AlertTriangle },
   { label: 'Loyalty Engine', href: '/dashboard/loyalty',   icon: Gift          },
   { label: 'Advocacy',       href: '/dashboard/advocacy',  icon: Heart         },
   { label: 'Customer Data',  href: '/dashboard/cdp',       icon: Database      },
 ]
 
-// ── Reports ───────────────────────────────────────────────────────────────────
-
-const REPORTS = [
+const REPORTS: NavEntry[] = [
   { label: 'Business Case', href: '/dashboard/business-case', icon: BarChart3 },
   { label: 'Methodology',   href: '/dashboard/methodology',   icon: BookOpen  },
 ]
@@ -123,12 +110,17 @@ const REPORTS = [
 function SectionLabel({ children, expanded }: { children: React.ReactNode; expanded: boolean }) {
   if (expanded) {
     return (
-      <p className="px-3 pt-4 pb-1.5 text-[9.5px] font-bold uppercase tracking-[0.13em] text-sidebar-foreground/35 select-none whitespace-nowrap">
+      <p className="px-3 pt-5 pb-1.5 text-[9.5px] font-bold uppercase tracking-[0.13em] text-sidebar-foreground/35 select-none whitespace-nowrap">
         {children}
       </p>
     )
   }
   return <div className="mx-auto my-3 h-px w-6 bg-sidebar-border/60" />
+}
+
+function InSectionDivider({ expanded }: { expanded: boolean }) {
+  if (!expanded) return null
+  return <div className="mx-3 my-1 h-px bg-sidebar-border/40" />
 }
 
 function NavItem({
@@ -163,6 +155,32 @@ function NavItem({
         <span className="text-[13px] font-medium whitespace-nowrap leading-none">{label}</span>
       )}
     </Link>
+  )
+}
+
+function NavSection({
+  entries, isActive, expanded,
+}: {
+  entries: NavEntry[]
+  isActive: (href: string) => boolean
+  expanded: boolean
+}) {
+  return (
+    <>
+      {entries.map((entry, i) => {
+        if ('divider' in entry) return <InSectionDivider key={`div-${i}`} expanded={expanded} />
+        return (
+          <NavItem
+            key={entry.href}
+            href={entry.href}
+            icon={entry.icon}
+            label={entry.label}
+            active={isActive(entry.href)}
+            expanded={expanded}
+          />
+        )
+      })}
+    </>
   )
 }
 
@@ -243,46 +261,17 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
     <LayoutGroup>
       <nav className="flex flex-col gap-0.5" aria-label="Dashboard navigation">
 
-        {/* Home */}
         <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" active={isActive('/dashboard')} expanded={expanded} />
 
-        {/* ── UNDERSTAND ──────────────────────────────────────── */}
-
         <SectionLabel expanded={expanded}>Brand Health</SectionLabel>
-        {BRAND_HEALTH.map(({ label, href, icon }) => (
-          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
-        ))}
+        <NavSection entries={BRAND_HEALTH} isActive={isActive} expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Intelligence</SectionLabel>
-        {INTELLIGENCE.map(({ label, href, icon }) => (
-          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
-        ))}
+        <NavSection entries={INTELLIGENCE} isActive={isActive} expanded={expanded} />
 
-        {/* ── EXECUTE ─────────────────────────────────────────── */}
-
-        {/* Plan: the campaign container that unifies all channels */}
-        <SectionLabel expanded={expanded}>Plan</SectionLabel>
-        <NavItem href="/dashboard/campaigns" icon={Megaphone} label="All Campaigns" active={isActive('/dashboard/campaigns')} expanded={expanded} />
-
-        {/* Digital: screen-based paid channels */}
-        <SectionLabel expanded={expanded}>Digital</SectionLabel>
-        {DIGITAL.map(({ label, href, icon }) => (
-          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
-        ))}
-
-        {/* On-Ground: real-world physical brand presence */}
-        <SectionLabel expanded={expanded}>On-Ground</SectionLabel>
-        {ON_GROUND.map(({ label, href, icon }) => (
-          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
-        ))}
-
-        {/* Broadcast: traditional mass media buys */}
-        <SectionLabel expanded={expanded}>Broadcast</SectionLabel>
-        {BROADCAST.map(({ label, href, icon }) => (
-          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
-        ))}
-
-        {/* ── CRAFT ───────────────────────────────────────────── */}
+        {/* CAMPAIGNS — one section, all channels, three groups separated by dividers */}
+        <SectionLabel expanded={expanded}>Campaigns</SectionLabel>
+        <NavSection entries={CAMPAIGNS} isActive={isActive} expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Creative</SectionLabel>
         <CollapsibleSection
@@ -294,8 +283,6 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
           pathname={pathname}
         />
 
-        {/* ── LISTEN ──────────────────────────────────────────── */}
-
         <SectionLabel expanded={expanded}>Research</SectionLabel>
         <CollapsibleSection
           label="Surveys"
@@ -306,28 +293,14 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
           pathname={pathname}
         />
 
-        {/* ── MEASURE ─────────────────────────────────────────── */}
-
         <SectionLabel expanded={expanded}>Measurement</SectionLabel>
-        {MEASUREMENT.map(({ label, href, icon }) => (
-          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
-        ))}
-
-        {/* ── GROW ────────────────────────────────────────────── */}
+        <NavSection entries={MEASUREMENT} isActive={isActive} expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Growth</SectionLabel>
-        {GROWTH.map(({ label, href, icon }) => (
-          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
-        ))}
-
-        {/* ── REPORT ──────────────────────────────────────────── */}
+        <NavSection entries={GROWTH} isActive={isActive} expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Reports</SectionLabel>
-        {REPORTS.map(({ label, href, icon }) => (
-          <NavItem key={href} href={href} icon={icon} label={label} active={isActive(href)} expanded={expanded} />
-        ))}
-
-        {/* ── SETUP ───────────────────────────────────────────── */}
+        <NavSection entries={REPORTS} isActive={isActive} expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Setup</SectionLabel>
         <NavItem href="/dashboard/connectors" icon={Plug} label="Connectors" active={isActive('/dashboard/connectors')} expanded={expanded} />
