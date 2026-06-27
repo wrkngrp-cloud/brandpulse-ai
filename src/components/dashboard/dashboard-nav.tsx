@@ -263,15 +263,26 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
 
         <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" active={isActive('/dashboard')} expanded={expanded} />
 
+        {/* CAMPAIGNS first — most active daily work, not something you check after reading reports */}
+        <SectionLabel expanded={expanded}>Campaigns</SectionLabel>
+        <NavSection entries={CAMPAIGNS} isActive={isActive} expanded={expanded} />
+
         <SectionLabel expanded={expanded}>Brand Health</SectionLabel>
         <NavSection entries={BRAND_HEALTH} isActive={isActive} expanded={expanded} />
 
+        {/* Surveys adjacent to Brand Health — both answer "what do customers think?" */}
+        <SectionLabel expanded={expanded}>Research</SectionLabel>
+        <CollapsibleSection
+          label="Surveys"
+          paths={SURVEY_PATHS}
+          sub={SURVEY_SUB}
+          icon={ClipboardList}
+          expanded={expanded}
+          pathname={pathname}
+        />
+
         <SectionLabel expanded={expanded}>Intelligence</SectionLabel>
         <NavSection entries={INTELLIGENCE} isActive={isActive} expanded={expanded} />
-
-        {/* CAMPAIGNS — one section, all channels, three groups separated by dividers */}
-        <SectionLabel expanded={expanded}>Campaigns</SectionLabel>
-        <NavSection entries={CAMPAIGNS} isActive={isActive} expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Creative</SectionLabel>
         <CollapsibleSection
@@ -279,16 +290,6 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
           paths={CREATIVE_PATHS}
           sub={CREATIVE_SUB}
           icon={Palette}
-          expanded={expanded}
-          pathname={pathname}
-        />
-
-        <SectionLabel expanded={expanded}>Research</SectionLabel>
-        <CollapsibleSection
-          label="Surveys"
-          paths={SURVEY_PATHS}
-          sub={SURVEY_SUB}
-          icon={ClipboardList}
           expanded={expanded}
           pathname={pathname}
         />
