@@ -637,6 +637,9 @@ export async function POST(req: NextRequest) {
     { c: 'ChowMate latest campaign is EVERYWHERE. Jara where you dey? Time to show up 👀 #FMCG',               p: 'twitter',   sl: 'negative', ss: 30, f: 7800,  d: 260, ic: true },
     { c: 'ChowMate price slash + Jara price increase same week? Walahi this is not looking good for Jara.',    p: 'twitter',   sl: 'negative', ss: 25, f: 3400,  d: 255, ic: true },
     { c: 'Not feeling the Jara rebranding. Old packaging felt more premium. Change for change sake?',           p: 'instagram', sl: 'negative', ss: 32, f: 2100,  d: 80 },
+    { c: 'Jara Summer Vibes packaging is too cute abeg 😍 Just bought 2 packs of Jara Chilled at Shoprite.',   p: 'instagram', sl: 'positive', ss: 91, f: 4700,  d: 0  },
+    { c: 'The Lekki billboard still dey give 🔥 Been seeing it every morning for weeks. Jara doing well.',      p: 'twitter',   sl: 'positive', ss: 84, f: 2300,  d: 1  },
+    { c: 'Jara Summer Vibes campaign got me 😂 Bought Jara Chilled, tasted nothing like the advert. 7/10 sha', p: 'twitter',   sl: 'neutral',  ss: 62, f: 1800,  d: 2  },
   ]
 
   const mentionInserts = mentionData.map((m, i) => ({
@@ -719,7 +722,7 @@ export async function POST(req: NextRequest) {
       quality_flag: 'ok',
       location_lat: lats[i % 5],
       location_lng: lngs[i % 5],
-      collected_at: tsAgo(Math.floor(i * 2.8) + 5, 9 + (i % 12)),
+      collected_at: tsAgo(Math.floor(i * 2.8), 9 + (i % 12)),
     }))
     await sb.from('survey_responses').insert(respInserts)
   }
@@ -1165,6 +1168,9 @@ export async function POST(req: NextRequest) {
     { c: 'Every pack of Jara is made with one goal: nourishing Nigerian families. 🫶🇳🇬 #JaraFoods',                            fs: 'awareness',     p: 'twitter',   li: 5610, co: 441, sh: 1120, er: 6.3, ai: 85, d: 35,  cmp: camp1Id },
     { c: 'Reconnect with the taste of home. Jara Spice Mix brings it all together. Link in bio to shop. 👆',                     fs: 'action',        p: 'instagram', li: 1892, co: 142, sh: 318, er: 3.2, ai: 76, d: 70,  cmp: camp2Id },
     { c: 'Your jollof deserves the best foundation. Jara Long Grain Rice — always consistent. 🍛',                               fs: 'preference',    p: 'instagram', li: 6233, co: 512, sh: 980, er: 7.1, ai: 89, d: 45,  cmp: camp1Id },
+    { c: 'Sunday done right ✅ Jara Chilled on ice, Jara Rice on fire 🔥 #JaraSummerVibes #NaijaWeekend',                         fs: 'advocacy',      p: 'instagram', li: 8921, co: 742, sh: 1803, er: 9.4, ai: 93, d: 0,   cmp: camp3Id },
+    { c: 'Which Jara product is your summer staple? 👇 Drop it in the comments 👇 #JaraSummerVibes',                              fs: 'consideration', p: 'instagram', li: 3840, co: 1247, sh: 621, er: 6.8, ai: 82, d: 1,   cmp: camp3Id },
+    { c: 'Summer afternoons call for Jara Chilled. Now in more stores across Lagos 🌊 #JaraSummerVibes',                           fs: 'awareness',     p: 'twitter',   li: 4102, co: 318, sh: 830, er: 5.3, ai: 78, d: 2,   cmp: camp3Id },
   ]
 
   const postInserts = postData.map((p, i) => ({
