@@ -1,3 +1,12 @@
+/**
+ * @deprecated This route is no longer needed for fresh demo environments.
+ * Perception audit survey + responses are now seeded automatically in
+ * section 13b of /api/admin/seed-demo (main seed route).
+ *
+ * This route remains available as a manual top-up for existing demo accounts
+ * that were seeded before the main seed absorbed this logic. It is restricted
+ * to demo@jarafoods.brandpulse.ai only.
+ */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 

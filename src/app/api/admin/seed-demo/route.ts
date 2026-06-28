@@ -746,6 +746,163 @@ export async function POST(req: NextRequest) {
   })
   await sb.from('nps_records').insert(npsInserts)
 
+  // ── 13b. Perception audit survey + responses ─────────────────────────────
+  // Absorbed from /api/demo/seed-perception — Brand Equity page works out of
+  // the box after seeding without manual button clicks.
+  const BASE_PERC: Record<string, number> = {
+    q2: 4.0, // Quality
+    q3: 4.5, // Trust
+    q4: 3.5, // Innovation
+    q5: 3.0, // Value
+    q6: 4.0, // Cultural Relevance
+    q7: 4.0, // Accessibility
+    q8: 4.5, // Reliability
+    q9: 3.5, // Emotional Connection
+  }
+
+  const { data: perceptionSurvey } = await sb.from('surveys').insert({
+    brand_id: brandId,
+    type:     'perception_audit',
+    name:     'Brand Perception Audit Q2 2025',
+    status:   'live',
+  }).select('id').single()
+
+  if (perceptionSurvey?.id) {
+    const perceptionResponses = Array.from({ length: 15 }, (_, i) => {
+      const answers: Record<string, number> = {
+        // q1: familiarity 3-5 (deterministic)
+        q1: Math.min(5, Math.max(3, 3 + Math.round(Math.abs(Math.sin(i * 2.1))))),
+      }
+      for (const [key, base] of Object.entries(BASE_PERC)) {
+        const v = Math.sin(i * 3.7 + Number(key.slice(1)) * 0.9)  // -1 to 1
+        answers[key] = Math.round(Math.min(5, Math.max(1, base + v * 0.5)) * 2) / 2
+      }
+      return {
+        survey_id:    perceptionSurvey.id,
+        answers,
+        quality_flag: 'ok',
+        collected_at: tsAgo(30 + i * 3, 9 + (i % 10)),
+      }
+    })
+    await sb.from('survey_responses').insert(perceptionResponses)
+  }
+
+  // ── 13c. Awareness check survey + responses ──────────────────────────────
+  // Absorbed from /api/demo/seed-nps (awareness half).
+  const AWARENESS_SEED_ANSWERS = Array.from({ length: 20 }, (_, i) =>
+    i < 16 ? 'Yes — I know them well' : 'I have heard of them'
+  )
+
+  const { data: awarenessSurvey } = await sb.from('surveys').insert({
+    brand_id: brandId,
+    type:     'awareness_check',
+    name:     'Brand Awareness Check Q2 2025',
+    status:   'live',
+  }).select('id').single()
+
+  if (awarenessSurvey?.id) {
+    await sb.from('survey_responses').insert(
+      AWARENESS_SEED_ANSWERS.map((answer, i) => ({
+        survey_id:    awarenessSurvey.id,
+        answers:      { q1: answer },
+        quality_flag: 'ok',
+        collected_at: tsAgo(60 + i * 4, 10 + (i % 8)),
+      }))
+    )
+  }
+
+  // ── 13d. Post-purchase NPS survey + responses ────────────────────────────
+  // Absorbed from /api/demo/seed-nps (NPS half).
+  // Realistic distribution: ~8 promoters (9-10), ~13 passives (7-8), ~4 detractors (0-6).
+  const POST_NPS_SCORES: number[] = [
+    10, 9, 9, 9, 10, 9, 8, 7, 8, 9,
+    8,  7, 8, 8, 7,  9, 10, 7, 8, 9,
+    6,  8, 7, 9, 8,
+  ]
+
+  const { data: postNpsSurvey } = await sb.from('surveys').insert({
+    brand_id: brandId,
+    type:     'post_purchase_nps',
+    name:     'Customer NPS Survey Q2 2025',
+    status:   'live',
+  }).select('id').single()
+
+  if (postNpsSurvey?.id) {
+    await sb.from('survey_responses').insert(
+      POST_NPS_SCORES.map((score, i) => ({
+        survey_id:    postNpsSurvey.id,
+        answers:      { q2: score },
+        quality_flag: 'ok',
+        collected_at: tsAgo(45 + Math.floor(i * 3), 9 + (i % 12)),
+      }))
+    )
+  }
+
+  // ── 13e. Survey tracking panels ──────────────────────────────────────────
+  // Two demo panels: one live (Summer Vibes awareness) and one closed (Reconnect recall).
+  const { data: panel1 } = await sb.from('survey_panels').insert({
+    brand_id:         brandId,
+    workspace_id:     wsId,
+    name:             'Jara Summer Awareness Check',
+    template_key:     'awareness_check',
+    cadence:          'monthly',
+    active:           true,
+    last_run_at:      tsAgo(14, 9),
+    next_run_at:      tsAgo(-16, 9),   // next run: ~16 days from now
+    recipient_emails: ['temi@jarafoods.ng', 'marketing@jarafoods.ng'],
+  }).select('id').single()
+
+  // Link the seeded awareness_check survey back to this panel
+  if (panel1?.id && awarenessSurvey?.id) {
+    await sb.from('surveys').update({ panel_id: panel1.id, is_panel: true }).eq('id', awarenessSurvey.id)
+  }
+
+  const { data: panel2 } = await sb.from('survey_panels').insert({
+    brand_id:         brandId,
+    workspace_id:     wsId,
+    name:             'Jara Reconnect Brand Recall',
+    template_key:     'brand_recall',
+    cadence:          'quarterly',
+    active:           false,   // closed after Reconnect campaign
+    last_run_at:      tsAgo(75, 9),
+    recipient_emails: ['temi@jarafoods.ng'],
+  }).select('id').single()
+
+  // Create the closed brand-recall survey run linked to panel2
+  if (panel2?.id) {
+    const { data: recallSurvey } = await sb.from('surveys').insert({
+      brand_id:  brandId,
+      type:      'brand_recall',
+      name:      'Jara Brand Recall — Q1 2026',
+      status:    'closed',
+      panel_id:  panel2.id,
+      is_panel:  true,
+    }).select('id').single()
+
+    if (recallSurvey?.id) {
+      const recallAnswers = [
+        { q1: 'Jara Foods',  q2: 'Jara Rice',      q3: 'TV advertising'      },
+        { q1: 'Jara Foods',  q2: 'Jara Oats',       q3: 'Supermarket shelf'   },
+        { q1: 'Jara',        q2: 'Jara Spice Mix',  q3: 'Friend recommendation'},
+        { q1: 'Jara Foods',  q2: 'Jara Rice',       q3: 'Social media'        },
+        { q1: 'Jara',        q2: 'Jara Oats',       q3: 'Event / activation'  },
+        { q1: 'Jara Foods',  q2: 'Jara Semolina',   q3: 'Radio'               },
+        { q1: 'Jara',        q2: 'Jara Rice',       q3: 'Billboard'           },
+        { q1: 'Jara Foods',  q2: 'Jara Spice Mix',  q3: 'WhatsApp group'      },
+        { q1: 'Jara',        q2: 'Jara Oats',       q3: 'Supermarket shelf'   },
+        { q1: 'Jara Foods',  q2: 'Jara Rice',       q3: 'TV advertising'      },
+      ]
+      await sb.from('survey_responses').insert(
+        recallAnswers.map((answers, i) => ({
+          survey_id:    recallSurvey.id,
+          answers,
+          quality_flag: 'ok',
+          collected_at: tsAgo(75 + i * 2, 10 + (i % 8)),
+        }))
+      )
+    }
+  }
+
   /* ── 14. Influencers ──────────────────────────────────────────────────── */
   await sb.from('influencers').insert([
     {
@@ -1667,6 +1824,75 @@ export async function POST(req: NextRequest) {
     },
   ])
 
+  // Summer Vibes per-site geo-lift studies — one for each of the 4 active OOH placements.
+  // These are early-stage running studies (campaign launched 14 days ago).
+  await sb.from('geo_lift_studies').insert([
+    {
+      brand_id:          brandId,
+      campaign_id:       camp3Id,
+      ooh_site_id:       lekkiId,
+      treatment_city:    'Lagos',
+      control_city:      'Ibadan',
+      keyword:           'Jara Summer Vibes',
+      study_start:       dAgo(14),
+      study_end:         dAgo(-76),
+      lift_pct:          8.7,
+      confidence:        78.4,
+      correlation:       0.7820,
+      status:            'running',
+      weekly_data:       makeWeekly(2, 65, 52, 8.7),
+      ai_interpretation: 'Early signal from Lekki Toll Gate — +8.7% branded search uplift in the Lagos treatment zone after 2 weeks. Correlation strengthening week-on-week. Study ongoing; confidence expected to cross 90% threshold by week 6.',
+    },
+    {
+      brand_id:          brandId,
+      campaign_id:       camp3Id,
+      ooh_site_id:       surulereId,
+      treatment_city:    'Lagos',
+      control_city:      'Ibadan',
+      keyword:           'Jara Rice',
+      study_start:       dAgo(14),
+      study_end:         dAgo(-76),
+      lift_pct:          6.2,
+      confidence:        72.1,
+      correlation:       0.7340,
+      status:            'running',
+      weekly_data:       makeWeekly(2, 58, 48, 6.2),
+      ai_interpretation: 'Adeniran Ogunsanya Mall unipole generating moderate early uplift for "Jara Rice" branded searches. Surulere mainland audience is responding with a 6.2% treatment lift vs Ibadan control. Confidence still building — recommend extending study 4 more weeks before drawing conclusions.',
+    },
+    {
+      brand_id:          brandId,
+      campaign_id:       camp3Id,
+      ooh_site_id:       transcorpId,
+      treatment_city:    'Abuja',
+      control_city:      'Kaduna',
+      keyword:           'Jara Foods',
+      study_start:       dAgo(14),
+      study_end:         dAgo(-76),
+      lift_pct:          11.8,
+      confidence:        81.9,
+      correlation:       0.8130,
+      status:            'running',
+      weekly_data:       makeWeekly(2, 44, 38, 11.8),
+      ai_interpretation: 'Transcorp Hilton LED placement driving strong early signal in the Abuja CBD — +11.8% branded search uplift, above the Reconnect campaign baseline for this market. C-suite and professional footfall at Transcorp appears highly responsive to digital OOH. Monitor weekly to confirm trajectory.',
+    },
+    {
+      brand_id:          brandId,
+      campaign_id:       camp3Id,
+      ooh_site_id:       oshodiId,
+      treatment_city:    'Lagos',
+      control_city:      'Ibadan',
+      keyword:           'Jara Rice',
+      study_start:       dAgo(14),
+      study_end:         dAgo(-76),
+      lift_pct:          14.3,
+      confidence:        85.6,
+      correlation:       0.8410,
+      status:            'running',
+      weekly_data:       makeWeekly(2, 72, 56, 14.3),
+      ai_interpretation: 'Oshodi overhead banners are outperforming per-impression expectations — 110,000 daily footfall is generating a 14.3% branded search uplift despite the non-illuminated format. Mass-market "Jara Rice" audience is clearly concentrated in this corridor. Highest lift-per-naira of all 4 Summer Vibes OOH sites after 2 weeks.',
+    },
+  ])
+
   /* ── 27. Press mentions (PR tracking) ────────────────────────────────── */
   const pressMentions = [
     { headline: 'Jara Foods Launches "Nourish Nigeria" Campaign Targeting 5 Million Families', publication: 'The Punch', url: 'https://punchng.com/jara-nourish-nigeria-campaign', pub_date: dAgo(2),  sent_score: 0.82, sent_label: 'positive', reach: 280_000, emv: 1_540_000, is_comp: false, comp: null,       snippet: 'Jara Foods has launched an ambitious campaign to reach five million Nigerian families with its premium food products, investing over ₦500 million in a 90-day ATL push.' },
@@ -2351,8 +2577,12 @@ export async function POST(req: NextRequest) {
       geoAudiences:        2,
       oohSearchUplift:     8,
       mentions:            mentionInserts.length,
-      surveyResponses:     npsScores.length,
+      surveyResponses:     npsScores.length + 15 + 20 + 25 + 10,  // BH + perception + awareness + postNPS + recall
       npsRecords:          100,
+      perceptionSurvey:    1,
+      awarenessSurvey:     1,
+      postNpsSurvey:       1,
+      surveyPanels:        2,
       influencers:         8,
       competitorSightings: 5,
       creativeAnalyses:    2,
@@ -2368,7 +2598,7 @@ export async function POST(req: NextRequest) {
       radioSpots:          13,
       printPublications:   6,
       printPlacements:     8,
-      geoLiftStudies:      3,
+      geoLiftStudies:      7,  // 3 historical + 4 OOH-linked Summer Vibes
       pressMentions:       12,
       marketplaceProducts: 5,
       marketplaceSnapshots: 40,
