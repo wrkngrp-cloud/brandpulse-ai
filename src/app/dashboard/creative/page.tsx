@@ -1,5 +1,6 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { createClient }  from '@/lib/supabase/server'
+import { redirect }      from 'next/navigation'
+import { getActiveBrand } from '@/lib/active-brand'
 import { CreativeClient } from './creative-client'
 
 export const dynamic = 'force-dynamic'
@@ -9,24 +10,22 @@ export default async function CreativePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const [{ data: brand }, { data: recentAnalyses }] = await Promise.all([
-    supabase
-      .from('brands')
-      .select('id, name, category, brand_values, primary_color, secondary_color')
-      .limit(1)
-      .single(),
-    supabase
-      .from('creative_analyses')
-      .select('id, analysis_type, result, created_at')
-      .order('created_at', { ascending: false })
-      .limit(5),
-  ])
+  const brand = await getActiveBrand<{
+    id: string; name: string; category: string | null
+    brand_values: string[] | null; primary_color: string | null; secondary_color: string | null
+  }>(supabase, 'id, name, category, brand_values, primary_color, secondary_color')
+
+  const { data: recentAnalyses } = await supabase
+    .from('creative_analyses')
+    .select('id, analysis_type, result, created_at')
+    .eq('brand_id', brand?.id ?? '')
+    .not('analysis_type', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(5)
 
   if (!brand) redirect('/onboarding')
 
-  const brandValues: string[] = Array.isArray(brand.brand_values)
-    ? (brand.brand_values as string[])
-    : []
+  const brandValues: string[] = Array.isArray(brand.brand_values) ? brand.brand_values : []
 
   return (
     <div className="max-w-3xl space-y-6">

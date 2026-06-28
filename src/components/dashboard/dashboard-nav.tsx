@@ -294,8 +294,9 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
           expanded={expanded}
           pathname={pathname}
         />
-        <NavItem href="/dashboard/creative-library" icon={BookOpen} label="Creative Library" active={isActive('/dashboard/creative-library')} expanded={expanded} />
-        <NavItem href="/dashboard/experiments"       icon={FlaskConical} label="A/B Testing"      active={isActive('/dashboard/experiments')}       expanded={expanded} />
+        <NavItem href="/dashboard/creative-library" icon={BookOpen}      label="Creative Library"    active={isActive('/dashboard/creative-library')}  expanded={expanded} />
+        <NavItem href="/dashboard/creative-fatigue" icon={AlertTriangle}  label="Fatigue Monitor"    active={isActive('/dashboard/creative-fatigue')}  expanded={expanded} />
+        <NavItem href="/dashboard/experiments"       icon={FlaskConical}  label="A/B Testing"        active={isActive('/dashboard/experiments')}        expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Measurement</SectionLabel>
         <NavSection entries={MEASUREMENT} isActive={isActive} expanded={expanded} />

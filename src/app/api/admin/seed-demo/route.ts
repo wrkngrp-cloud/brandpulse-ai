@@ -1043,29 +1043,41 @@ export async function POST(req: NextRequest) {
   /* ── 16. Creative analyses ────────────────────────────────────────────── */
   await sb.from('creative_analyses').insert([
     {
-      brand_id: brandId, asset_type: 'social_video',
-      asset_url: 'https://jarafoods.com/assets/nourish-nigeria-hero-30s.mp4',
-      cultural_resonance: 88.0, brand_consistency: 85.0,
-      message_clarity: 82.0, emotional_impact: 91.0, cta_strength: 72.0,
-      funnel_suitability: 'awareness', red_flags: [],
-      recommendations: [
-        'Add a Pidgin subtitle track for wider northern reach',
-        '"Learn More" CTA underperforms on video — try "Find a Store" or "Shop Now"',
-        'Music drop at 8s is a strong brand signature moment — protect in all cut-downs',
-      ],
+      brand_id: brandId,
+      analysis_type: 'compare',
+      input_data: { platform: 'instagram', creativeA: 'Nourish Nigeria hero video — 30s lifestyle', creativeB: 'Summer Vibes product pack shot — 15s' },
+      result: {
+        winner: 'A',
+        why_winner: 'The lifestyle video scores significantly higher on cultural resonance (88 vs 72) and emotional impact — the community kitchen narrative connects deeply with the Jara nourishment brand pillar in a way the product shot cannot match.',
+        creative_a: { engagement: 88, cultural_resonance: 88, brand_fit: 85, tone: 87, clarity: 82, risk: 12, summary: 'Strong brand fit and high emotional pull — music drop at 8s is a signature moment. CTA "Learn More" underperforms; swap for "Shop Now" or "Find a Store".' },
+        creative_b: { engagement: 72, cultural_resonance: 71, brand_fit: 74, tone: 70, clarity: 86, risk: 28, summary: 'Clear and on-brand packaging shot but lacks the emotional depth needed to drive organic sharing. Better suited for retargeting than awareness.' },
+      },
+      created_at: tsAgo(14, 11),
     },
     {
-      brand_id: brandId, asset_type: 'ooh_static',
-      asset_url: 'https://jarafoods.com/assets/summer-vibes-lekki.jpg',
-      cultural_resonance: 79.0, brand_consistency: 90.0,
-      message_clarity: 86.0, emotional_impact: 75.0, cta_strength: 68.0,
-      funnel_suitability: 'awareness',
-      red_flags: [{ flag: 'colour_contrast', detail: 'Yellow tagline on white falls below 3:1 contrast ratio beyond 30m viewing distance' }],
-      recommendations: [
-        'Switch yellow tagline to brand orange (#E8763E) on white for legibility',
-        'Product shot occupies only 10% of billboard area — increase to 35–40%',
-        'Lagos skyline background is strong — confirms local identity and cultural fit',
-      ],
+      brand_id: brandId,
+      analysis_type: 'identity',
+      input_data: { captions: ['Good food starts with great ingredients — Jara Rice 🍚', 'Community is everything. Thank you Abuja for showing up ❤️', 'Breakfast sorted. Jara Oats, 5 minutes, done. 🫶', 'Reconnect with the taste of home. Jara Spice Mix brings it all together.'], brandValues: ['Nourishment', 'Authenticity', 'Community', 'Quality'] },
+      result: {
+        consistency_score: 84,
+        strengths: ['Community and warmth language is consistent across all four captions', 'Active-voice copy aligns with the "Authenticity" brand value', '"Taste of home" in caption 4 is the strongest single brand-voice moment — use more often', 'Short-form captions are disciplined and resist over-explaining'],
+        drift_warnings: ['Caption 2 switches to a gratitude/event register that has no product anchor — risks feeling disconnected from the food brand', '"5 minutes, done" in caption 3 leans functional rather than emotional — inconsistent with the nourishment-led voice', 'Emoji use is inconsistent (2 of 4 use them, 2 don\'t) — pick a style and stick to it'],
+        adjustments: ['Add a subtle product or outcome cue to event captions e.g. "Thank you Abuja — we fed 2,000 families together ❤️"', 'Inject warmth into functional captions — try "5 minutes. Warm bowl. Good morning." instead of "5 minutes, done."', 'Establish emoji policy: 1 maximum per caption, placed at end only', 'Run all captions through the Voice Builder Retune tab before publishing'],
+      },
+      created_at: tsAgo(7, 14),
+    },
+    {
+      brand_id: brandId,
+      analysis_type: 'competitor',
+      input_data: { competitorName: 'ChowMate', content: 'ChowMate — Nigerian Rice Redefined. Premium quality, every grain counts. Shop now at chowmate.ng/summer 🌟' },
+      result: {
+        tone: 'Aspirational / Premium',
+        cultural_fit: 62,
+        engagement_potential: 58,
+        strategic_insights: ['ChowMate\'s "Redefined" positioning attempts premium uplift but feels imposed rather than earned — no cultural or community anchor', '"Every grain counts" is a quality claim with no storytelling proof — it\'s a brand assertion, not a brand truth', 'The western-style aspirational tone may alienate mass-market Northern Nigeria consumers where Jara is strong', 'Direct-to-website CTA in a brand awareness post suggests funnel confusion — mixing brand and performance objectives'],
+        counter_positions: ['Lead with community ownership — "Jara: Made with Nigerian families, for Nigerian families" vs ChowMate\'s top-down premium claim', 'Use origin storytelling (farms, families, processes) to build quality credibility instead of asserting it, making "quality" a story Jara owns not claims', 'Target Northern Nigeria and South-East with dialect-inflected content (Hausa/Igbo phrases) where ChowMate\'s English-only approach leaves a wide gap'],
+      },
+      created_at: tsAgo(3, 9),
     },
   ])
 
@@ -2037,27 +2049,59 @@ export async function POST(req: NextRequest) {
       replication_elements: ['Before/after contrast is instantly readable', '15 seconds max for awareness play', 'No voiceover — music only in first 3 seconds', 'Open loop — the "after" side should make them want to know more', 'End on strong brand frame'],
       tags: ['video', 'teaser', 'new-year', 'before-after'],
     },
+    // ── Fatigue signal assets ────────────────────────────────────────────
+    {
+      title: 'Summer Vibes Launch Ad — Facebook',
+      description: 'Facebook feed image ad for the Summer Vibes campaign. Product pack shot with orange background, "Beat the Heat" headline. Has been running continuously since launch.',
+      asset_type: 'image', format: 'Feed', platform: 'Facebook',
+      status: 'active', fit_for_ads: true,
+      performance: { impressions: 1240000, clicks: 14880, ctr: 1.2, conversions: 1190, spend: 2100000, roas: 2.1, frequency: 5.8 },
+      notes: 'Original Summer Vibes launch ad — running 82 days unrefreshed. Meta Ads Manager flagging high frequency. Audience is tuning out. Need fresh creative ASAP.',
+      replication_elements: ['Orange background aligns with brand palette', '"Beat the Heat" seasonal hook resonated at launch', 'Refresh with lifestyle instead of product-only — market women format likely to reset frequency response'],
+      tags: ['summer-vibes', 'facebook', 'active', 'needs-refresh'],
+      _created_at: dAgo(82),
+    },
+    {
+      title: 'Jara Oats — Morning Routine Reel',
+      description: '30-second Instagram Reel showing a Lagos professional making Jara Oats in the morning rush. Upbeat afrobeats soundtrack. Part of the Q1 brand refresh.',
+      asset_type: 'video', format: 'Reel', platform: 'Instagram',
+      status: 'active', fit_for_ads: true,
+      performance: { impressions: 620000, clicks: 13020, ctr: 2.1, conversions: 1116, spend: 890000, roas: 3.2, frequency: 4.2 },
+      notes: 'Good creative but high frequency on core Lagos Millennial segment. CTR declining week-on-week (started at 3.4%, now 2.1%). A/B test with a new script or swap out with a different talent.',
+      replication_elements: ['Morning routine format is relatable — keep the scenario', 'Afrobeats hook in first 3 seconds is doing the heavy lifting', 'Talent refresh (new face) often resets frequency decay better than new concept'],
+      tags: ['oats', 'reel', 'instagram', 'morning-routine', 'active'],
+      _created_at: dAgo(54),
+    },
+    {
+      title: 'Jara Rice 5kg — Google Display Banner',
+      description: 'Responsive Google Display banner set (300x250, 728x90, 160x600). Product hero with "Nigeria\'s Favourite Rice" tagline and price callout. Running on Google Display Network.',
+      asset_type: 'image', format: 'Display Banner', platform: 'Google',
+      status: 'active', fit_for_ads: true,
+      performance: { impressions: 3400000, clicks: 85000, ctr: 2.5, conversions: 3825, spend: 1250000, roas: 3.4, frequency: 3.6 },
+      notes: 'GDN banner running 49 days. CTR started at 3.8%, trending toward 2.5% — plan creative refresh within 10-14 days before further decline.',
+      replication_elements: ['Price callout critical for Display — always include', '"Nigeria\'s Favourite" social proof claim is strong anchor', 'Refresh headline and image while keeping price callout format'],
+      tags: ['google', 'display', 'banner', 'active'],
+      _created_at: dAgo(49),
+    },
   ]
 
-  try {
-    for (const asset of creativeAssets) {
-      await sb.from('creative_assets').insert({
-        brand_id:            brandId,
-        title:               asset.title,
-        description:         asset.description,
-        asset_type:          asset.asset_type,
-        format:              asset.format,
-        platform:            asset.platform,
-        status:              asset.status,
-        fit_for_ads:         asset.fit_for_ads,
-        performance:         asset.performance,
-        notes:               asset.notes,
-        replication_elements: asset.replication_elements,
-        tags:                asset.tags,
-      })
-    }
-  } catch {
-    // Table may not exist yet — run migration 20260702000008_creative_assets.sql
+  for (const asset of creativeAssets) {
+    const { _created_at, ...rest } = asset as typeof asset & { _created_at?: string }
+    await sb.from('creative_assets').insert({
+      brand_id:             brandId,
+      title:                rest.title,
+      description:          rest.description,
+      asset_type:           rest.asset_type,
+      format:               rest.format,
+      platform:             rest.platform,
+      status:               rest.status,
+      fit_for_ads:          rest.fit_for_ads,
+      performance:          rest.performance,
+      notes:                rest.notes,
+      replication_elements: rest.replication_elements,
+      tags:                 rest.tags,
+      ...((_created_at) ? { created_at: _created_at } : {}),
+    })
   }
 
   /* ── 36. Update brand_voice on the brand record ──────────────────────── */
@@ -2284,7 +2328,7 @@ export async function POST(req: NextRequest) {
       advocacyScores:      12,
       promoters:           4,
       customerProfiles:    10,
-      creativeAssets:      10,
+      creativeAssets:      13,
       brandVoiceUpdated:   true,
       extraSocialPosts:    20,
       fsoTeams:            3,
