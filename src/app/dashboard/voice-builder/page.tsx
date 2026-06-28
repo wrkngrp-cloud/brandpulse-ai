@@ -78,7 +78,20 @@ export default function VoiceBuilderPage() {
       .then(d => {
         const b = d.brands?.[0]
         if (b?.name) setBrandName(b.name)
-        if (b?.brand_voice?.tone) setHasVoice(true)
+        const bv = b?.brand_voice
+        if (bv?.tone) {
+          setHasVoice(true)
+          setVoiceResult({
+            adjectives:      bv.adjectives      ?? [],
+            tone:            bv.tone            ?? '',
+            dos:             bv.dos             ?? [],
+            donts:           bv.donts           ?? [],
+            signaturePhrases:bv.signaturePhrases ?? [],
+            kapferer_prism:  bv.kapferer_prism  ?? undefined,
+            confidenceNote:  bv.confidenceNote  ?? 'Voice profile loaded from your saved brand settings.',
+            saved:           true,
+          })
+        }
       })
       .catch(() => {})
   }, [])
