@@ -72,11 +72,11 @@ const CAMPAIGNS: NavEntry[] = [
   { label: 'Print',               href: '/dashboard/print',       icon: Newspaper   },
 ]
 
-const CREATIVE_PATHS = ['/dashboard/voice-builder', '/dashboard/pre-post', '/dashboard/creative']
-const CREATIVE_SUB = [
-  { label: 'Voice Builder',    href: '/dashboard/voice-builder', icon: Sparkles, badge: 'Setup' },
-  { label: 'Pre-Post Intel',   href: '/dashboard/pre-post',      icon: Zap                     },
-  { label: 'Creative Library', href: '/dashboard/creative',      icon: Palette                 },
+const CREATIVE_LAB_PATHS = ['/dashboard/voice-builder', '/dashboard/pre-post', '/dashboard/creative']
+const CREATIVE_LAB_SUB = [
+  { label: 'Voice Builder',    href: '/dashboard/voice-builder', icon: Sparkles },
+  { label: 'Pre-Post Intel',   href: '/dashboard/pre-post',      icon: Zap      },
+  { label: 'Creative Analysis',href: '/dashboard/creative',      icon: Palette  },
 ]
 
 const SURVEY_PATHS = ['/dashboard/surveys']
@@ -87,10 +87,9 @@ const SURVEY_SUB = [
 ]
 
 const MEASUREMENT: NavEntry[] = [
-  { label: 'A/B Testing',     href: '/dashboard/experiments', icon: FlaskConical },
-  { label: 'Media Mix',       href: '/dashboard/mmm',         icon: PieChart     },
-  { label: 'Geo-Lift',        href: '/dashboard/geo-lift',    icon: Target       },
-  { label: 'Budget & Pacing', href: '/dashboard/budget',      icon: DollarSign   },
+  { label: 'Media Mix',       href: '/dashboard/mmm',      icon: PieChart   },
+  { label: 'Geo-Lift',        href: '/dashboard/geo-lift', icon: Target     },
+  { label: 'Budget & Pacing', href: '/dashboard/budget',   icon: DollarSign },
 ]
 
 const GROWTH: NavEntry[] = [
@@ -263,14 +262,11 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
 
         <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" active={isActive('/dashboard')} expanded={expanded} />
 
-        {/* CAMPAIGNS first — most active daily work, not something you check after reading reports */}
-        <SectionLabel expanded={expanded}>Campaigns</SectionLabel>
-        <NavSection entries={CAMPAIGNS} isActive={isActive} expanded={expanded} />
-
+        {/* Brand Health first — the core product value: how is my brand doing? */}
         <SectionLabel expanded={expanded}>Brand Health</SectionLabel>
         <NavSection entries={BRAND_HEALTH} isActive={isActive} expanded={expanded} />
 
-        {/* Surveys adjacent to Brand Health — both answer "what do customers think?" */}
+        {/* Research adjacent to Brand Health — both answer "what do customers think?" */}
         <SectionLabel expanded={expanded}>Research</SectionLabel>
         <CollapsibleSection
           label="Surveys"
@@ -284,15 +280,22 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
         <SectionLabel expanded={expanded}>Intelligence</SectionLabel>
         <NavSection entries={INTELLIGENCE} isActive={isActive} expanded={expanded} />
 
-        <SectionLabel expanded={expanded}>Creative</SectionLabel>
+        {/* CAMPAIGNS — all channels in one section */}
+        <SectionLabel expanded={expanded}>Campaigns</SectionLabel>
+        <NavSection entries={CAMPAIGNS} isActive={isActive} expanded={expanded} />
+
+        {/* Creative Intelligence — voice, analysis, library, A/B testing */}
+        <SectionLabel expanded={expanded}>Creative Intelligence</SectionLabel>
         <CollapsibleSection
           label="Creative Lab"
-          paths={CREATIVE_PATHS}
-          sub={CREATIVE_SUB}
+          paths={CREATIVE_LAB_PATHS}
+          sub={CREATIVE_LAB_SUB}
           icon={Palette}
           expanded={expanded}
           pathname={pathname}
         />
+        <NavItem href="/dashboard/creative-library" icon={BookOpen} label="Creative Library" active={isActive('/dashboard/creative-library')} expanded={expanded} />
+        <NavItem href="/dashboard/experiments"       icon={FlaskConical} label="A/B Testing"      active={isActive('/dashboard/experiments')}       expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Measurement</SectionLabel>
         <NavSection entries={MEASUREMENT} isActive={isActive} expanded={expanded} />

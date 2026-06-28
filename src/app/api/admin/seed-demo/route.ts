@@ -1906,6 +1906,162 @@ export async function POST(req: NextRequest) {
     { brand_id: brandId, name: 'Ola Adeyemi',    email: 'ola.a@gmail.com',    phone: '+2348045678010', city: 'Ibadan', nps_score: 9,  survey_count: 0, last_seen_at: dAgo(28), tags: ['promoter', 'bronze-loyalty', 'new-customer'], sources: ['loyalty'] },
   ])
 
+  /* ── 35. Creative Assets (Creative Library vault) ───────────────────── */
+  const creativeAssets = [
+    {
+      title: 'Festive Season — Market Women Hero',
+      description: 'Full-bleed image of a market woman proudly holding a 5kg Jara Rice bag. Warm earthy tones with a natural smile. Used for Instagram Feed and Facebook.',
+      asset_type: 'image', format: 'Feed', platform: 'Instagram',
+      status: 'vetted', fit_for_ads: true,
+      performance: { impressions: 148000, clicks: 5920, ctr: 4.0, conversions: 890, spend: 320000, roas: 4.2 },
+      notes: 'Our top performer Q4 2025. Market women imagery outperformed product-only shots by 3.1x on CTR. Brief the photographer to keep the setting recognisably local.',
+      replication_elements: ['Warm earthy tones (burnt orange, deep brown)', 'Real person — not a model', 'Pidgin tagline: "Rice wey make sense"', 'Product in hand, not on table', '5kg bag prominently visible'],
+      tags: ['hero', 'q4-2025', 'instagram', 'top-performer'],
+    },
+    {
+      title: 'Ramadan Healing Recipe Reel',
+      description: '30-second vertical video: hands preparing Jara spice mix into a simmering pot. Voice-over in Hausa with English subtitles. Ramadan crescent overlay in the corner.',
+      asset_type: 'video', format: 'Reel', platform: 'Instagram',
+      status: 'vetted', fit_for_ads: true,
+      performance: { impressions: 210000, clicks: 6300, ctr: 3.0, conversions: 1260, spend: 480000, roas: 3.8 },
+      notes: 'Ran during Ramadan 2026. Northern Nigeria segment drove 68% of conversions. Hausa voiceover was key — English-only test underperformed by 44%.',
+      replication_elements: ['Hausa voiceover for northern Nigeria targeting', 'Cultural timing — Ramadan / suhoor angle', 'Hands-only shot keeps focus on the food', 'Subtitle both languages', '30 seconds max — 85% completion rate'],
+      tags: ['ramadan', 'hausa', 'video', 'northern-nigeria', 'vetted'],
+    },
+    {
+      title: 'Jara Rice 5kg — Price Drop Announcement',
+      description: 'Simple product card: 5kg bag on white background, big red price sticker with new price, and a "Limited time" CTA. Facebook Feed and Instagram Story versions.',
+      asset_type: 'image', format: 'Story', platform: 'Facebook',
+      status: 'vetted', fit_for_ads: true,
+      performance: { impressions: 95000, clicks: 4750, ctr: 5.0, conversions: 1425, spend: 210000, roas: 5.1 },
+      notes: 'Price-led creative outperformed brand-led on Facebook by 2.7x. Facebook audience skews older (25-45) and responds to value signals more than aesthetic.',
+      replication_elements: ['Price prominently front and centre', 'Red urgency colour for price sticker', 'White background keeps product the hero', '"Limited time" CTA drives FOMO', 'Facebook Story format (9:16) — separate crop from Feed version'],
+      tags: ['price-led', 'facebook', 'conversion', 'vetted'],
+    },
+    {
+      title: 'Morning Energy — Radio 30s Script',
+      description: 'Radio script for morning drive-time. Opens with jingle, then a market woman voice testimonial, then an announcer with offer. Runs on Lagos and Abuja FM stations.',
+      asset_type: 'copy', format: 'Radio Script', platform: 'Radio',
+      status: 'vetted', fit_for_ads: false,
+      performance: { impressions: 890000, spend: 1200000 },
+      notes: 'Morning slot (6am-9am) outperforms midday by 2.1x for our category. The testimonial format from a real sounding market woman drives more recall than announcer-only.',
+      replication_elements: ['Open with Jara jingle (under 3 seconds)', 'Testimonial voice — female, market-woman tone', 'Price mention in first 10 seconds', 'Repeat brand name 3x minimum', 'Morning slot 6-9am for Lagos and Abuja'],
+      tags: ['radio', 'morning-slot', 'testimonial', 'script'],
+    },
+    {
+      title: 'Lagos Mainland OOH — Unipole Creative',
+      description: 'Billboard artwork: bold "Jara" wordmark top-left, 5kg bag centre, headline "The Rice Your Family Deserves" in large serif type. Bottom strip shows stockist logos.',
+      asset_type: 'image', format: 'OOH Billboard', platform: 'Out of Home',
+      status: 'vetted', fit_for_ads: true,
+      performance: { impressions: 1200000, spend: 850000 },
+      notes: 'Tested on two sites: Ikeja along and LASU Road. LASU Road site showed stronger brand recall (+18%) likely due to slower traffic. Simple designs outperform busy ones on OOH.',
+      replication_elements: ['Max 7 words on the headline', 'High contrast — dark background with white/orange text', 'Product size should be minimum 40% of artwork', 'Stockist bar at the bottom drives retail enquiries', 'Serif headline reads as premium'],
+      tags: ['ooh', 'billboard', 'lagos', 'vetted'],
+    },
+    {
+      title: 'NPS Thank You — Email Template',
+      description: 'Plain-text style email thanking NPS respondents. Includes a personalised score summary, a discount code, and a referral link. Designed to convert passives to promoters.',
+      asset_type: 'copy', format: 'Email', platform: 'Email',
+      status: 'vetted', fit_for_ads: false,
+      performance: { impressions: 3400, clicks: 680, ctr: 20.0, conversions: 204 },
+      notes: 'Plain text outperformed HTML template by 34% on open rate. Personalised subject line ("Funke, here is what you said") beat generic by 51%.',
+      replication_elements: ['Plain text format — higher open rates', 'Personalised subject with first name', 'Acknowledge their specific NPS score', 'Single CTA only', 'Discount code for detractors: "FEEDBACK10"'],
+      tags: ['email', 'nps', 'retention', 'template'],
+    },
+    {
+      title: 'Influencer Brief — Mama Tolu Collaboration',
+      description: 'Creative brief for micro-influencer @MamaTolu (85k followers, Lagos food/home content). Covers messaging pillars, do/dont list, required hashtags, and deliverables.',
+      asset_type: 'copy', format: 'Brief', platform: 'Instagram',
+      status: 'active', fit_for_ads: false,
+      performance: { impressions: 62000, clicks: 1860, ctr: 3.0, conversions: 186 },
+      notes: 'Mama Tolu delivers consistently. Her audience trusts her cooking recommendations. Let her keep her natural style — briefs that over-script always underperform.',
+      replication_elements: ['Let the creator keep their natural voice', 'Product integration — cooking scene, not product shot', 'Require "authentic use" — not just hold-to-camera', 'Hashtag: #JaraKitchen minimum', 'Brief: max 1 page — creators skip long briefs'],
+      tags: ['influencer', 'brief', 'micro-influencer', 'instagram'],
+    },
+    {
+      title: 'Christmas Hamper Launch — Carousel',
+      description: '5-slide carousel: slide 1 hero hamper shot, slides 2-4 show individual products with prices, slide 5 is a CTA to order a hamper. Designed for Instagram and Facebook.',
+      asset_type: 'carousel', format: 'Feed Carousel', platform: 'Instagram',
+      status: 'vetted', fit_for_ads: true,
+      performance: { impressions: 175000, clicks: 8750, ctr: 5.0, conversions: 1312, spend: 390000, roas: 4.8 },
+      notes: 'Carousels drove 2.4x more saves than single images during the festive period. Slide 3 (spice mix) had the highest swipe-through rate — consider leading with it.',
+      replication_elements: ['Slide 1 must create curiosity — not reveal everything', 'Price each item on its own slide', 'Final slide is always the CTA', 'Warm red/gold palette for festive angle', 'Include "swipe to see more" text on slide 1'],
+      tags: ['christmas', 'carousel', 'festive', 'instagram', 'top-performer'],
+    },
+    {
+      title: 'Jara x Oga Chef — Recipe Card Print',
+      description: 'A5 recipe card: Oga Chef portrait on left, recipe steps on right. Features Jara Rice prominently in the ingredient list. Distributed in-store and at events.',
+      asset_type: 'image', format: 'Print', platform: 'Print',
+      status: 'active', fit_for_ads: false,
+      performance: { impressions: 22000 },
+      notes: "Recipe cards distributed at Shoprite Lagos and events. Drives in-store trial better than vouchers. Oga Chef's face drives credibility with the core 30-50 age group.",
+      replication_elements: ['Recipe format (not ad) — people keep it', 'Celebrity / chef association for credibility', 'A5 format fits in a handbag', 'QR code to video tutorial on back', 'Brand logo bottom right — understated'],
+      tags: ['print', 'recipe-card', 'oga-chef', 'in-store'],
+    },
+    {
+      title: 'New Year New Kitchen — Campaign Teaser',
+      description: 'Split-screen video teaser: left shows a tired kitchen with generic brands; right shows a vibrant kitchen with Jara. 15-second cut for Story/Reel.',
+      asset_type: 'video', format: 'Story / Reel', platform: 'Instagram',
+      status: 'active', fit_for_ads: true,
+      performance: { impressions: 88000, clicks: 2640, ctr: 3.0, spend: 195000 },
+      notes: 'Currently in testing for Q1 2027 campaign. Before/after format performs well in January when people are in "new year" mindset.',
+      replication_elements: ['Before/after contrast is instantly readable', '15 seconds max for awareness play', 'No voiceover — music only in first 3 seconds', 'Open loop — the "after" side should make them want to know more', 'End on strong brand frame'],
+      tags: ['video', 'teaser', 'new-year', 'before-after'],
+    },
+  ]
+
+  try {
+    for (const asset of creativeAssets) {
+      await sb.from('creative_assets').insert({
+        brand_id:            brandId,
+        title:               asset.title,
+        description:         asset.description,
+        asset_type:          asset.asset_type,
+        format:              asset.format,
+        platform:            asset.platform,
+        status:              asset.status,
+        fit_for_ads:         asset.fit_for_ads,
+        performance:         asset.performance,
+        notes:               asset.notes,
+        replication_elements: asset.replication_elements,
+        tags:                asset.tags,
+      })
+    }
+  } catch {
+    // Table may not exist yet — run migration 20260702000008_creative_assets.sql
+  }
+
+  /* ── 36. Update brand_voice on the brand record ──────────────────────── */
+  await sb.from('brands').update({
+    brand_voice: {
+      adjectives:       ['Warm', 'Grounded', 'Confident', 'Playful', 'Authentic'],
+      tone:             'Jara Foods speaks like a trusted market auntie who knows her food — warm, direct, a little cheeky. She does not oversell. She tells you what is good and why, and she sounds like someone you would actually run into at Shoprite or Balogun Market.',
+      dos:              [
+        'Use everyday Naija language — English, Pidgin, or a natural mix',
+        'Centre the family and the kitchen as the heart of Nigerian life',
+        'Be concrete: talk about taste, smell, value for money',
+      ],
+      donts:            [
+        'No corporate speak or imported brand language',
+        'Never claim perfection — honest brands admit trade-offs',
+        'Do not over-hashtag or use empty buzzwords like "premium" without proof',
+      ],
+      signaturePhrases: [
+        'Rice wey make sense.',
+        'Na Jara be that.',
+        'Cook with love. Eat with pride.',
+      ],
+      kapferer_prism: {
+        physique:     'Bold Jara wordmark in deep red-orange. 5kg bag is recognisable on shelf and in hand. Warm earthy colours throughout — nothing clinical or sterile.',
+        personality:  'The friendly, knowledgeable food auntie. Confident but never arrogant. Has opinions. Makes you laugh.',
+        culture:      'Deeply Nigerian. Family gatherings, real kitchens, real women, real food. Values: community, nourishment, pride in local produce.',
+        relationship: 'Peer — not instructor. Jara does not lecture about nutrition; it talks to you like someone who genuinely loves food and wants you to eat well.',
+        reflection:   'The savvy Nigerian homemaker who knows quality from quantity. She is educated, value-conscious, and proud of her table.',
+        self_image:   'Using Jara means I feed my family well. I am not compromising on quality to save money — I am being smart about it.',
+      },
+    },
+  }).eq('id', brandId)
+
   /* ── Done ─────────────────────────────────────────────────────────────── */
   return NextResponse.json({
     success: true,
@@ -1962,6 +2118,8 @@ export async function POST(req: NextRequest) {
       advocacyScores:      12,
       promoters:           4,
       customerProfiles:    10,
+      creativeAssets:      10,
+      brandVoiceUpdated:   true,
     },
   })
 }
