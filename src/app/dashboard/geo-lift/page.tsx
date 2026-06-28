@@ -1,6 +1,6 @@
 import { createClient }        from '@/lib/supabase/server'
 import { redirect }            from 'next/navigation'
-import { TrendingUp, CheckCircle2, Clock, Loader2 } from 'lucide-react'
+import { TrendingUp, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react'
 import { GeoLiftStartForm }    from './geo-lift-start-form'
 import { getActiveBrand }      from '@/lib/active-brand'
 
