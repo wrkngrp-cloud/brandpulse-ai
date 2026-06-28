@@ -2092,6 +2092,143 @@ export async function POST(req: NextRequest) {
   }).eq('id', brandId)
 
   /* ── Done ─────────────────────────────────────────────────────────────── */
+  /* ── 37. Field Intelligence — FSO teams, reports, outlets ───────────── */
+
+  // 3 FSO teams covering different regions
+  const { data: lagosTeam } = await sb.from('fso_teams').insert({
+    brand_id: brandId, workspace_id: wsId, name: 'Lagos & South-West FSO', active: true,
+    notes: 'Covers Lagos, Ogun, Oyo, Ondo, Osun. Lead: Adebola Adeyemi',
+  }).select('id').single()
+
+  const { data: northTeam } = await sb.from('fso_teams').insert({
+    brand_id: brandId, workspace_id: wsId, name: 'North & FCT FSO', active: true,
+    notes: 'Covers Abuja, Kano, Kaduna, Katsina. Lead: Musa Aliyu',
+  }).select('id').single()
+
+  const { data: seTeam } = await sb.from('fso_teams').insert({
+    brand_id: brandId, workspace_id: wsId, name: 'South-East & South-South FSO', active: true,
+    notes: 'Covers Rivers, Enugu, Anambra, Delta, Cross River. Lead: Chidi Okechi',
+  }).select('id').single()
+
+  // Field reports: 25 reports across 30 days, 3 regions
+  type TeamLiteral = 'lagos' | 'north' | 'se'
+  const reportDefs: Array<{
+    team: TeamLiteral; fso: string; code: string; d: number; state: string; lga: string; notes: string
+  }> = [
+    { team: 'lagos', fso: 'Adebola Adeyemi',    code: 'FSO-L01', d: 1,  state: 'Lagos',  lga: 'Ikeja',       notes: 'Good visibility in supermarkets. Competitor shelf next to ours in 3 locations.' },
+    { team: 'lagos', fso: 'Chukwuemeka Obi',    code: 'FSO-L02', d: 1,  state: 'Lagos',  lga: 'Lekki',       notes: 'Strong Jara presence. Festival season stocking noted at ShopRite.' },
+    { team: 'north', fso: 'Musa Aliyu',          code: 'FSO-N01', d: 1,  state: 'Kano',   lga: 'Kano Municipal', notes: 'Stock running low at 2 major distributors. Reorder triggered.' },
+    { team: 'north', fso: 'Halima Sule',         code: 'FSO-N02', d: 2,  state: 'FCT',    lga: 'Garki',       notes: 'Abuja coverage solid. Maitama supermarkets well-stocked.' },
+    { team: 'se',    fso: 'Chidi Okechi',        code: 'FSO-SE1', d: 2,  state: 'Rivers', lga: 'Port Harcourt', notes: 'Mama\'s Pride very aggressive with promos this week.' },
+    { team: 'lagos', fso: 'Adebola Adeyemi',    code: 'FSO-L01', d: 3,  state: 'Lagos',  lga: 'Surulere',    notes: 'Open market coverage. Traders asking for credit terms.' },
+    { team: 'lagos', fso: 'Blessing Akande',     code: 'FSO-L03', d: 3,  state: 'Lagos',  lga: 'Alimosho',    notes: 'Alimosho market huge volume opportunity. Route under-covered historically.' },
+    { team: 'north', fso: 'Musa Aliyu',          code: 'FSO-N01', d: 4,  state: 'Kano',   lga: 'Nassarawa',   notes: 'POSM compliance improving after last month\'s team training.' },
+    { team: 'se',    fso: 'Ngozi Anyanwu',       code: 'FSO-SE2', d: 4,  state: 'Enugu',  lga: 'Enugu North', notes: 'Local brands (Enugu Best Rice) undercutting on price by ₦300.' },
+    { team: 'lagos', fso: 'Chukwuemeka Obi',    code: 'FSO-L02', d: 5,  state: 'Lagos',  lga: 'Victoria Island', notes: 'Premium stores stocked well. Observed premium competitor Uncle Ben\'s promo stand.' },
+    { team: 'north', fso: 'Halima Sule',         code: 'FSO-N02', d: 6,  state: 'FCT',    lga: 'Wuse',        notes: 'Wuse market visit — 8 of 10 outlets stocked. Good penetration.' },
+    { team: 'se',    fso: 'Chidi Okechi',        code: 'FSO-SE1', d: 6,  state: 'Rivers', lga: 'Obio-Akpor',  notes: 'New distributor onboarded — Dike Stores, GRA. Very promising outlet.' },
+    { team: 'lagos', fso: 'Adebola Adeyemi',    code: 'FSO-L01', d: 7,  state: 'Lagos',  lga: 'Badagry',     notes: 'Border town — import-brand competition from Ghana Obroni Rice noted. Need attention.' },
+    { team: 'north', fso: 'Musa Aliyu',          code: 'FSO-N01', d: 8,  state: 'Kaduna', lga: 'Kaduna North', notes: 'First visit to Kaduna route. Awareness low, distribution thin. Opportunity.' },
+    { team: 'lagos', fso: 'Blessing Akande',     code: 'FSO-L03', d: 9,  state: 'Ogun',   lga: 'Sagamu',      notes: 'Route expansion into Ogun. Pharmacies stocking Jara Oats surprisingly well.' },
+    { team: 'se',    fso: 'Ngozi Anyanwu',       code: 'FSO-SE2', d: 10, state: 'Anambra', lga: 'Onitsha',    notes: 'Onitsha main market — high footfall. ChowMate has strong presence here.' },
+    { team: 'lagos', fso: 'Chukwuemeka Obi',    code: 'FSO-L02', d: 11, state: 'Lagos',  lga: 'Yaba',        notes: 'Student zone. Jara Oats 500g doing well. Request for smaller SKU (200g).' },
+    { team: 'north', fso: 'Halima Sule',         code: 'FSO-N02', d: 12, state: 'Kano',   lga: 'Fagge',       notes: 'Fagge market strong. 3 new outlets onboarded. POSM material needed.' },
+    { team: 'se',    fso: 'Chidi Okechi',        code: 'FSO-SE1', d: 13, state: 'Rivers', lga: 'Port Harcourt', notes: 'Follow-up visit. Mama\'s Pride running buy-2-get-1 promo at Rumuola outlets.' },
+    { team: 'lagos', fso: 'Adebola Adeyemi',    code: 'FSO-L01', d: 14, state: 'Lagos',  lga: 'Ikeja',       notes: 'Restock confirmed at key Ikeja accounts. Promo display set up at 4 supermarkets.' },
+    { team: 'north', fso: 'Musa Aliyu',          code: 'FSO-N01', d: 15, state: 'FCT',    lga: 'Maitama',     notes: 'Premium FCT outlets. Price compliance good. All RRP-aligned.' },
+    { team: 'se',    fso: 'Ngozi Anyanwu',       code: 'FSO-SE2', d: 16, state: 'Delta',  lga: 'Asaba',       notes: 'New territory — Delta state. Awareness building needed. Distributed 50 sample packs.' },
+    { team: 'lagos', fso: 'Blessing Akande',     code: 'FSO-L03', d: 18, state: 'Lagos',  lga: 'Mushin',      notes: 'Price sensitivity high in Mushin. Traders requesting smaller wholesale pack.' },
+    { team: 'north', fso: 'Halima Sule',         code: 'FSO-N02', d: 20, state: 'Kano',   lga: 'Kano Municipal', notes: 'Restocked 2 distributors. Noted ChowMate field team in area — very active.' },
+    { team: 'lagos', fso: 'Chukwuemeka Obi',    code: 'FSO-L02', d: 22, state: 'Lagos',  lga: 'Ajah',        notes: 'Lekki-Ajah corridor. New Shoprite branch — Jara Rice on shelf from day 1.' },
+  ]
+
+  const teamMap: Record<TeamLiteral, string | undefined> = {
+    lagos: lagosTeam?.id,
+    north: northTeam?.id,
+    se:    seTeam?.id,
+  }
+
+  // Outlet data templates per area
+  type OutletTemplate = {
+    outlet_name: string; outlet_type: 'supermarket' | 'neighbourhood_shop' | 'pharmacy' | 'open_market' | 'petrol_station' | 'hospital' | 'other'
+    product_available: boolean; facings_count: number; stock_level: 'full' | 'partial' | 'out_of_stock'
+    observed_price_ngn: number; rrp_ngn: number; posm_present: boolean; posm_condition: 'good' | 'damaged' | 'absent'
+    competitor_name: string | null; competitor_activity: string | null; lat: number; lng: number
+  }
+
+  const lagosOutlets: OutletTemplate[] = [
+    { outlet_name: 'ShopRite Ikeja',           outlet_type: 'supermarket',        product_available: true,  facings_count: 8,  stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'good',    competitor_name: 'Golden Penny', competitor_activity: 'Promo standee beside Jara shelf', lat: 6.6018, lng: 3.3515 },
+    { outlet_name: 'Justrite Superstore Yaba', outlet_type: 'supermarket',        product_available: true,  facings_count: 6,  stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'good',    competitor_name: null,           competitor_activity: null,                               lat: 6.5095, lng: 3.3779 },
+    { outlet_name: 'Mama Titi Provision Store',outlet_type: 'neighbourhood_shop', product_available: true,  facings_count: 3,  stock_level: 'partial',      observed_price_ngn: 4600,  rrp_ngn: 4500,  posm_present: false, posm_condition: 'absent',  competitor_name: 'Uncle Ben\'s', competitor_activity: 'Placed next to Jara, same shelf', lat: 6.5244, lng: 3.3792 },
+    { outlet_name: 'Conoil Filling Station Shop',outlet_type: 'petrol_station',   product_available: true,  facings_count: 2,  stock_level: 'partial',      observed_price_ngn: 4750,  rrp_ngn: 4500,  posm_present: false, posm_condition: 'absent',  competitor_name: null,           competitor_activity: null,                               lat: 6.4350, lng: 3.4168 },
+    { outlet_name: 'Eko Supermarket Lekki',    outlet_type: 'supermarket',        product_available: true,  facings_count: 10, stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'good',    competitor_name: 'ChowMate',     competitor_activity: 'End-of-aisle display, large promo', lat: 6.4698, lng: 3.5852 },
+    { outlet_name: 'Bigi Market Surulere',     outlet_type: 'open_market',        product_available: true,  facings_count: 4,  stock_level: 'partial',      observed_price_ngn: 4400,  rrp_ngn: 4500,  posm_present: false, posm_condition: 'absent',  competitor_name: 'Mama\'s Pride', competitor_activity: 'Trader selling side by side',     lat: 6.5023, lng: 3.3578 },
+    { outlet_name: 'Ruff n Tumble Pharmacy',   outlet_type: 'pharmacy',           product_available: true,  facings_count: 2,  stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'damaged', competitor_name: null,           competitor_activity: null,                               lat: 6.4281, lng: 3.4219 },
+    { outlet_name: 'SPAR Maryland',            outlet_type: 'supermarket',        product_available: true,  facings_count: 12, stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'good',    competitor_name: 'Uncle Ben\'s', competitor_activity: 'Premium shelf positioning',        lat: 6.5683, lng: 3.3574 },
+  ]
+
+  const northOutlets: OutletTemplate[] = [
+    { outlet_name: 'Sani Abacha Way Provision', outlet_type: 'neighbourhood_shop', product_available: true,  facings_count: 3,  stock_level: 'partial',      observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'good',    competitor_name: null,       competitor_activity: null,                                    lat: 12.0022, lng: 8.5920 },
+    { outlet_name: 'Kano Central Market',       outlet_type: 'open_market',        product_available: true,  facings_count: 5,  stock_level: 'partial',      observed_price_ngn: 4300,  rrp_ngn: 4500,  posm_present: false, posm_condition: 'absent',  competitor_name: 'ChowMate', competitor_activity: 'Bulk discount offers from ChowMate agent', lat: 12.0011, lng: 8.6135 },
+    { outlet_name: 'Maiduguri Road Supermarket',outlet_type: 'supermarket',        product_available: false, facings_count: 0,  stock_level: 'out_of_stock', observed_price_ngn: 0,     rrp_ngn: 4500,  posm_present: false, posm_condition: 'absent',  competitor_name: 'Golden Penny', competitor_activity: 'Took Jara shelf space during stockout', lat: 12.0118, lng: 8.5800 },
+    { outlet_name: 'Wuse Zone 4 Provision',    outlet_type: 'neighbourhood_shop', product_available: true,  facings_count: 4,  stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'good',    competitor_name: null,       competitor_activity: null,                                    lat: 9.0625,  lng: 7.4836 },
+    { outlet_name: 'Game Stores Abuja',         outlet_type: 'supermarket',        product_available: true,  facings_count: 8,  stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'good',    competitor_name: 'Uncle Ben\'s', competitor_activity: 'Special promotion with recipe card', lat: 9.0735, lng: 7.4905 },
+    { outlet_name: 'Nassarawa Bulk Store',      outlet_type: 'neighbourhood_shop', product_available: true,  facings_count: 6,  stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: false, posm_condition: 'absent',  competitor_name: null,       competitor_activity: null,                                    lat: 11.9980, lng: 8.5958 },
+    { outlet_name: 'Apo Mechanic Open Market',  outlet_type: 'open_market',        product_available: true,  facings_count: 2,  stock_level: 'partial',      observed_price_ngn: 4200,  rrp_ngn: 4500,  posm_present: false, posm_condition: 'absent',  competitor_name: 'Mama\'s Pride', competitor_activity: 'Competing at ₦3,800 — undercutting by ₦700', lat: 9.0217, lng: 7.5188 },
+  ]
+
+  const seOutlets: OutletTemplate[] = [
+    { outlet_name: 'Rumuola Fresh Mart',        outlet_type: 'supermarket',        product_available: true,  facings_count: 6,  stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'good',    competitor_name: "Mama's Pride", competitor_activity: "Buy-2-get-1 promotion board outside", lat: 4.8396,  lng: 7.0085 },
+    { outlet_name: 'Mile 1 Market Diobu',       outlet_type: 'open_market',        product_available: true,  facings_count: 4,  stock_level: 'partial',      observed_price_ngn: 4350,  rrp_ngn: 4500,  posm_present: false, posm_condition: 'absent',  competitor_name: "Mama's Pride", competitor_activity: 'Very visible with red branded sacks', lat: 4.8143,  lng: 6.9825 },
+    { outlet_name: 'Enugu Coal Camp Provision', outlet_type: 'neighbourhood_shop', product_available: true,  facings_count: 3,  stock_level: 'partial',      observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: false, posm_condition: 'absent',  competitor_name: 'Enugu Best Rice', competitor_activity: 'Local brand at ₦4,100 — big price gap', lat: 6.4507,  lng: 7.5128 },
+    { outlet_name: 'Shoprite Enugu',            outlet_type: 'supermarket',        product_available: true,  facings_count: 10, stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'good',    competitor_name: 'Golden Penny', competitor_activity: 'Standard shelf, no promo',           lat: 6.4698,  lng: 7.5093 },
+    { outlet_name: 'Onitsha Head Bridge Market', outlet_type: 'open_market',       product_available: false, facings_count: 0,  stock_level: 'out_of_stock', observed_price_ngn: 0,     rrp_ngn: 4500,  posm_present: false, posm_condition: 'absent',  competitor_name: 'ChowMate',     competitor_activity: 'ChowMate dominant at Head Bridge — 60% of rice shelf', lat: 6.1478, lng: 6.7836 },
+    { outlet_name: 'GRA Pharmacy & Store PH',   outlet_type: 'pharmacy',           product_available: true,  facings_count: 2,  stock_level: 'full',         observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'good',    competitor_name: null,           competitor_activity: null,                                   lat: 4.8156,  lng: 7.0498 },
+    { outlet_name: 'Asaba Mall Superstore',     outlet_type: 'supermarket',        product_available: true,  facings_count: 5,  stock_level: 'partial',      observed_price_ngn: 4500,  rrp_ngn: 4500,  posm_present: true,  posm_condition: 'damaged', competitor_name: 'Uncle Ben\'s', competitor_activity: 'Better positioned at eye level',     lat: 6.1835,  lng: 6.7341 },
+  ]
+
+  const outletsByTeam: Record<TeamLiteral, OutletTemplate[]> = {
+    lagos: lagosOutlets,
+    north: northOutlets,
+    se:    seOutlets,
+  }
+
+  let fieldReportCount = 0
+  let fieldOutletCount = 0
+
+  for (const rd of reportDefs) {
+    const teamId = teamMap[rd.team]
+    if (!teamId) continue
+
+    const { data: fr } = await sb.from('field_reports').insert({
+      brand_id: brandId, workspace_id: wsId, fso_team_id: teamId,
+      fso_name: rd.fso, fso_id_code: rd.code,
+      report_date: dAgo(rd.d), submitted_at: tsAgo(rd.d, 17),
+      state: rd.state, lga: rd.lga, notes: rd.notes,
+    }).select('id').single()
+
+    if (!fr?.id) continue
+    fieldReportCount++
+
+    // Sample 4-6 outlets from the team's territory
+    const pool = outletsByTeam[rd.team]
+    const count = 4 + (fieldReportCount % 3)
+    const slice = pool.slice(0, count)
+
+    for (const o of slice) {
+      await sb.from('field_report_outlets').insert({
+        field_report_id: fr.id, brand_id: brandId,
+        outlet_name: o.outlet_name, outlet_type: o.outlet_type,
+        product_available: o.product_available, facings_count: o.facings_count,
+        stock_level: o.stock_level, observed_price_ngn: o.observed_price_ngn || null,
+        rrp_ngn: o.rrp_ngn, posm_present: o.posm_present, posm_condition: o.posm_condition,
+        competitor_name: o.competitor_name, competitor_activity: o.competitor_activity,
+        lat: o.lat, lng: o.lng,
+      })
+      fieldOutletCount++
+    }
+  }
+
   return NextResponse.json({
     success: true,
     credentials: {
@@ -2150,6 +2287,9 @@ export async function POST(req: NextRequest) {
       creativeAssets:      10,
       brandVoiceUpdated:   true,
       extraSocialPosts:    20,
+      fsoTeams:            3,
+      fieldReports:        fieldReportCount,
+      fieldOutlets:        fieldOutletCount,
     },
   })
 }
