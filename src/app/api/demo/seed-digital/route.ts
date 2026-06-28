@@ -1,7 +1,10 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient }               from '@/lib/supabase/server'
+import { createClient as createAdmin } from '@supabase/supabase-js'
 
 export const runtime = 'nodejs'
+
+const SEED_SECRET = 'seed-jara-demo-2026'
 
 type Platform = 'meta' | 'google'
 type Campaign = { id: string; name: string }
@@ -170,33 +173,68 @@ function generateDays(brandId: string): DailyRow[] {
 
 const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
 
-export async function POST() {
-  const supabase = await createClient()
+export async function POST(req: NextRequest) {
+  const isAdminSeed = req.headers.get('x-seed-secret') === SEED_SECRET
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  let brandId: string
 
-  // Demo data is strictly for the Jara Foods demo account only
-  if (user.email !== DEMO_EMAIL) {
-    return NextResponse.json({ error: 'Not a demo account' }, { status: 403 })
+  if (isAdminSeed) {
+    // Secret-based path: use service role to find the demo brand directly
+    const sb = createAdmin(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } },
+    )
+    const { data: users } = await sb.auth.admin.listUsers({ page: 1, perPage: 200 })
+    const demoUser = users?.users?.find(u => u.email === DEMO_EMAIL)
+    if (!demoUser) return NextResponse.json({ error: 'Demo user not found' }, { status: 404 })
+
+    const { data: member } = await sb
+      .from('workspace_members')
+      .select('workspace_id')
+      .eq('user_id', demoUser.id)
+      .limit(1)
+      .single()
+    if (!member) return NextResponse.json({ error: 'No workspace found' }, { status: 404 })
+
+    const { data: brand } = await sb
+      .from('brands')
+      .select('id')
+      .eq('workspace_id', member.workspace_id)
+      .limit(1)
+      .single()
+    if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+
+    brandId = brand.id
+
+    // Always wipe and reseed when called with the secret
+    await sb.from('digital_performance_daily').delete().eq('brand_id', brandId)
+
+    const rows = generateDays(brandId)
+    const { error: insertErr } = await sb.from('digital_performance_daily').insert(rows)
+    if (insertErr) return NextResponse.json({ error: insertErr.message }, { status: 500 })
+
+    return NextResponse.json({ success: true, inserted: rows.length, brand_id: brandId })
   }
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .single()
+  // Session-based path: user must be logged in as the demo account
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (user.email !== DEMO_EMAIL) return NextResponse.json({ error: 'Not a demo account' }, { status: 403 })
 
+  const { data: brand } = await supabase.from('brands').select('id').limit(1).single()
   if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+
+  brandId = brand.id
 
   // Skip if data already exists for the last 30 days
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-
   const { data: existing } = await supabase
     .from('digital_performance_daily')
     .select('id')
-    .eq('brand_id', brand.id)
+    .eq('brand_id', brandId)
     .gte('date', thirtyDaysAgo.toISOString().slice(0, 10))
     .limit(1)
 
@@ -204,19 +242,9 @@ export async function POST() {
     return NextResponse.json({ success: true, skipped: true, message: 'Demo data already exists' })
   }
 
-  const rows = generateDays(brand.id)
+  const rows = generateDays(brandId)
+  const { error: insertErr } = await supabase.from('digital_performance_daily').insert(rows)
+  if (insertErr) return NextResponse.json({ error: insertErr.message }, { status: 500 })
 
-  const { error: insertErr } = await supabase
-    .from('digital_performance_daily')
-    .insert(rows)
-
-  if (insertErr) {
-    return NextResponse.json({ error: insertErr.message }, { status: 500 })
-  }
-
-  return NextResponse.json({
-    success:  true,
-    inserted: rows.length,
-    brand_id: brand.id,
-  })
+  return NextResponse.json({ success: true, inserted: rows.length, brand_id: brandId })
 }
