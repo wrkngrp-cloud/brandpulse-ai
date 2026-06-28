@@ -83,7 +83,7 @@ function generateDays(brandId: string): DailyRow[] {
 
         // Realistic Nigerian Meta Ads metrics
         const spend       = parseFloat(rand(24000, 35000).toFixed(2)) / META_CAMPAIGNS.length / adsetNames.length
-        const impressions = randInt(50000, 80000) / META_CAMPAIGNS.length / adsetNames.length
+        const impressions = Math.floor(randInt(50000, 80000) / META_CAMPAIGNS.length / adsetNames.length)
         const ctr         = parseFloat(rand(0.018, 0.028).toFixed(4))
         const clicks      = Math.floor(impressions * ctr)
         const cpm         = parseFloat(rand(380, 520).toFixed(2))
@@ -130,7 +130,7 @@ function generateDays(brandId: string): DailyRow[] {
         const adsetId   = `${campaign.id}_adset_${ai}`
 
         const spend       = parseFloat(rand(15000, 22000).toFixed(2)) / GOOGLE_CAMPAIGNS.length / adsetNames.length
-        const impressions = randInt(30000, 50000) / GOOGLE_CAMPAIGNS.length / adsetNames.length
+        const impressions = Math.floor(randInt(30000, 50000) / GOOGLE_CAMPAIGNS.length / adsetNames.length)
         const ctr         = parseFloat(rand(0.021, 0.032).toFixed(4))
         const clicks      = Math.floor(impressions * ctr)
         const cpm         = parseFloat(rand(320, 450).toFixed(2))
