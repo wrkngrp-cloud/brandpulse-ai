@@ -775,12 +775,20 @@ export default async function DigitalPage({
 
       {/* Creative Fatigue Monitor */}
       <Card className="border rounded-xl p-5 bg-card space-y-4">
-        <div>
-          <h2 className="text-base font-semibold">Creative Fatigue Monitor</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Average ad frequency per platform. Above 7 signals audience fatigue and rising CPMs
-            {isDemo ? ' · Demo data' : ''}
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-base font-semibold">Creative Fatigue Monitor</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Average ad frequency per platform. Above 7 signals audience fatigue and rising CPMs
+              {isDemo ? ' · Demo data' : ''}
+            </p>
+          </div>
+          <Link
+            href="/dashboard/creative-fatigue"
+            className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'shrink-0 text-xs')}
+          >
+            Full analysis →
+          </Link>
         </div>
         <FrequencyBarChart
           data={frequencyChartData.length > 0 ? frequencyChartData : undefined}

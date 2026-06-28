@@ -176,6 +176,18 @@ function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string
   )
 }
 
+function productSummary(product: MarketplaceProduct): string {
+  const snap    = product.latest_snapshot?.[0]
+  const cat     = product.category ?? 'Uncategorized'
+  const plat    = product.platform.charAt(0).toUpperCase() + product.platform.slice(1)
+  const reviews = snap?.review_count ? ` · ${snap.review_count.toLocaleString()} reviews` : ''
+  const shelf   = snap?.shelf_position != null ? ` · shelf #${snap.shelf_position}` : ''
+  if (product.is_own_product) {
+    return `Your product in ${cat} on ${plat}${reviews}${shelf}`
+  }
+  return `Competitor tracking — ${cat} on ${plat}${reviews}${shelf}`
+}
+
 function ProductRow({
   product, showSnap, onToggleSnap, onAddSnapshot,
 }: {
@@ -200,7 +212,7 @@ function ProductRow({
               <Badge variant="outline" className="text-xs text-purple-700 border-purple-200">Competitor</Badge>
             )}
           </div>
-          {product.sku && <p className="text-xs text-muted-foreground mt-0.5">SKU: {product.sku}</p>}
+          <p className="text-xs text-muted-foreground mt-0.5">{productSummary(product)}</p>
         </button>
         <div className="flex items-center gap-4 shrink-0 text-sm">
           {snap?.price    != null && <span className="font-semibold">{formatNGN(snap.price)}</span>}

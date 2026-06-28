@@ -92,19 +92,23 @@ export function RetentionClient() {
           {/* KPI row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Risk score gauge */}
-            <div className={cn('rounded-xl border p-5 flex flex-col items-center gap-2', RISK_COLOR[data.overall_risk])}>
-              <svg width="84" height="84" viewBox="0 0 84 84" className="-rotate-90">
-                <circle cx="42" cy="42" r="36" fill="none" strokeWidth="8" className="stroke-current opacity-20" />
-                <circle
-                  cx="42" cy="42" r="36" fill="none" strokeWidth="8"
-                  className="stroke-current"
-                  strokeDasharray={`${riskRing} ${circumference}`}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="text-center -mt-14 mb-6">
-                <div className="text-3xl font-bold">{data.risk_score}</div>
-                <div className="text-xs opacity-75">/ 100</div>
+            <div className={cn('rounded-xl border p-5 flex flex-col items-center justify-center gap-3', RISK_COLOR[data.overall_risk])}>
+              <p className="text-[11px] font-semibold uppercase tracking-widest opacity-60">Risk Score</p>
+              <div className="relative w-[88px] h-[88px]">
+                <svg width="88" height="88" viewBox="0 0 88 88" className="absolute inset-0">
+                  <circle cx="44" cy="44" r="36" fill="none" strokeWidth="8" className="stroke-current opacity-20" />
+                  <circle
+                    cx="44" cy="44" r="36" fill="none" strokeWidth="8"
+                    className="stroke-current"
+                    strokeDasharray={`${riskRing} ${circumference}`}
+                    strokeLinecap="round"
+                    transform="rotate(-90 44 44)"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-[28px] font-bold leading-none">{data.risk_score}</span>
+                  <span className="text-[10px] opacity-50 mt-0.5">out of 100</span>
+                </div>
               </div>
               <Badge variant="outline" className={cn('text-xs font-semibold', RISK_COLOR[data.overall_risk])}>
                 {RISK_LABEL[data.overall_risk]}
