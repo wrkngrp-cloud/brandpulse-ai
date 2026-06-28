@@ -512,27 +512,76 @@ export async function POST(req: NextRequest) {
   ])
 
   /* ── 11b. OOH visit logs (last 14 days, active Summer Vibes sites) ──────── */
-  const oohVisitInserts: { site_id: string; brand_id: string; visited_at: string; device_type: string; ip_region: string }[] = []
+  type OohVisitRow = {
+    site_id: string; brand_id: string; visited_at: string
+    device_type: string; ip_region: string
+    geo_lat?: number; geo_lng?: number; geo_city?: string; geo_state?: string
+    matched_site_id?: string; attribution_method?: string; attribution_confidence?: number
+  }
+  const oohVisitInserts: OohVisitRow[] = []
   const visitDevices = ['mobile', 'mobile', 'mobile', 'desktop', 'tablet']
   const visitRegions = ['Lagos', 'Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Lagos', 'Kano']
-  for (const { id: siteId, count } of [
-    { id: lekkiId,     count: 120 },
-    { id: surulereId,  count: 70  },
-    { id: transcorpId, count: 85  },
-    { id: oshodiId,    count: 140 },
+
+  // Geo coordinates near each site (realistic variance within 2km)
+  const siteGeo: Record<string, { lat: number; lng: number; city: string }> = {
+    [lekkiId ?? '']:     { lat: 6.4700, lng: 3.5855, city: 'Lekki' },
+    [surulereId ?? '']:  { lat: 6.5058, lng: 3.3578, city: 'Surulere' },
+    [transcorpId ?? '']: { lat: 9.0728, lng: 7.4908, city: 'Abuja' },
+    [oshodiId ?? '']:    { lat: 6.5540, lng: 3.3630, city: 'Oshodi' },
+  }
+
+  for (const { id: siteId, count, method } of [
+    { id: lekkiId,     count: 120, method: 'branded_link'  as const },
+    { id: surulereId,  count: 70,  method: 'branded_link'  as const },
+    { id: transcorpId, count: 85,  method: 'geo_proximity' as const },
+    { id: oshodiId,    count: 140, method: 'branded_link'  as const },
   ]) {
     if (!siteId) continue
+    const geo = siteGeo[siteId]
     for (let i = 0; i < count; i++) {
+      const hasGeo = geo && i % 5 !== 0  // 80% have geo data
+      const geoVarianceLat = (Math.random() - 0.5) * 0.008  // ~±400m
+      const geoVarianceLng = (Math.random() - 0.5) * 0.008
       oohVisitInserts.push({
-        site_id:     siteId,
-        brand_id:    brandId,
-        visited_at:  tsAgo(i % 14, 7 + (i % 15)),
-        device_type: visitDevices[i % visitDevices.length],
-        ip_region:   visitRegions[i % visitRegions.length],
+        site_id:               siteId,
+        brand_id:              brandId,
+        visited_at:            tsAgo(i % 14, 7 + (i % 15)),
+        device_type:           visitDevices[i % visitDevices.length],
+        ip_region:             visitRegions[i % visitRegions.length],
+        ...(hasGeo ? {
+          geo_lat:              +(geo.lat + geoVarianceLat).toFixed(7),
+          geo_lng:              +(geo.lng + geoVarianceLng).toFixed(7),
+          geo_city:             geo.city,
+          geo_state:            visitRegions[i % visitRegions.length],
+          matched_site_id:      siteId,
+          attribution_method:   method,
+          attribution_confidence: method === 'branded_link' ? 0.95 : +(0.65 + Math.random() * 0.25).toFixed(2),
+        } : {}),
       })
     }
   }
   if (oohVisitInserts.length > 0) await sb.from('ooh_visits').insert(oohVisitInserts)
+
+  /* ── 11b2. Seed 1 demo geo-retargeting audience for the Lekki site ───────── */
+  if (lekkiId) {
+    await sb.from('ooh_geo_audiences').insert({
+      brand_id: brandId, ooh_site_id: lekkiId,
+      audience_name: 'Lekki Toll Gate — Meta Geo Retarget',
+      platform: 'meta', fence_radius_m: 500, dwell_minutes: 5,
+      creative_headline: 'You saw us at Lekki — shop Jara Rice now',
+      creative_description: 'Get 5% off your first Jara order this week only.',
+      estimated_reach: 18400,
+      status: 'active', synced_at: tsAgo(5, 10),
+    })
+    await sb.from('ooh_geo_audiences').insert({
+      brand_id: brandId, ooh_site_id: lekkiId,
+      audience_name: 'Lekki Toll Gate — Google Display Retarget',
+      platform: 'google', fence_radius_m: 1000, dwell_minutes: 3,
+      creative_headline: 'The rice that nourishes Lagos families',
+      estimated_reach: 24100,
+      status: 'draft',
+    })
+  }
 
   /* ── 11c. OOH search uplift — Lekki site, 8 weeks of data ──────────────── */
   if (lekkiId) {
@@ -2293,6 +2342,7 @@ export async function POST(req: NextRequest) {
       eventInteractions:   60,
       oohSites:            8,
       oohVisits:           415,
+      geoAudiences:        2,
       oohSearchUplift:     8,
       mentions:            mentionInserts.length,
       surveyResponses:     npsScores.length,

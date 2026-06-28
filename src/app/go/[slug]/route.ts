@@ -55,6 +55,11 @@ export async function GET(
   const ipRegion = request.headers.get('x-vercel-ip-country-region')
     ?? request.headers.get('cf-ipcountry')
     ?? null
+  const geoLatStr  = request.headers.get('x-vercel-ip-latitude')
+  const geoLngStr  = request.headers.get('x-vercel-ip-longitude')
+  const geoCity    = request.headers.get('x-vercel-ip-city') ?? null
+  const geoLat     = geoLatStr  ? parseFloat(geoLatStr)  : null
+  const geoLng     = geoLngStr  ? parseFloat(geoLngStr)  : null
 
   const sp           = request.nextUrl.searchParams
   const utmSource    = sp.get('utm_source')
@@ -80,15 +85,22 @@ export async function GET(
   // unreliable on Vercel edge — the process exits with the response).
   await Promise.allSettled([
     supabase.from('ooh_visits').insert({
-      site_id:      site.id,
-      brand_id:     site.brand_id,
-      ip_region:    ipRegion,
-      device_type:  deviceType,
-      referrer:     request.headers.get('referer') ?? null,
-      utm_source:   utmSource,
-      utm_medium:   utmMedium,
-      utm_campaign: utmCampaign,
-      utm_content:  utmContent,
+      site_id:              site.id,
+      brand_id:             site.brand_id,
+      ip_region:            ipRegion,
+      device_type:          deviceType,
+      referrer:             request.headers.get('referer') ?? null,
+      utm_source:           utmSource,
+      utm_medium:           utmMedium,
+      utm_campaign:         utmCampaign,
+      utm_content:          utmContent,
+      geo_lat:              geoLat,
+      geo_lng:              geoLng,
+      geo_city:             geoCity,
+      geo_state:            ipRegion,
+      matched_site_id:      site.id,
+      attribution_method:   'branded_link',
+      attribution_confidence: 0.95,
     }),
     supabase.rpc('increment_ooh_visits', { site_id: site.id }),
   ])

@@ -8,8 +8,9 @@ import { OohVisitChart }       from '@/components/ooh/ooh-visit-chart'
 import { ImpressionCalculator } from '@/components/ooh/impression-calculator'
 import { SpendJustification }  from '@/components/ooh/spend-justification'
 import { SearchUpliftWidget }  from '@/components/ooh/search-uplift-widget'
-import { OohVanityCard }       from '@/components/ooh/ooh-vanity-card'
+import { OohVanityCard }         from '@/components/ooh/ooh-vanity-card'
 import { OohSiteMapDynamic as OohSiteMapClient } from '@/components/ooh/ooh-site-map-dynamic'
+import { GeoAttributionPanel }  from '@/components/ooh/geo-attribution-panel'
 
 export default async function OohSitePage({
   params,
@@ -37,6 +38,22 @@ export default async function OohSitePage({
     .eq('site_id', id)
     .gte('visited_at', thirtyDaysAgo)
     .order('visited_at', { ascending: true })
+
+  // Geo-attributed visits
+  const { data: geoVisits } = await supabase
+    .from('ooh_visits')
+    .select('id, visited_at, device_type, geo_city, geo_state, attribution_method, attribution_confidence')
+    .eq('site_id', id)
+    .gte('visited_at', thirtyDaysAgo)
+    .order('visited_at', { ascending: false })
+    .limit(100)
+
+  // Geo-retargeting audiences for this site
+  const { data: geoAudiences } = await supabase
+    .from('ooh_geo_audiences')
+    .select('id, audience_name, platform, fence_radius_m, status, estimated_reach, creative_headline, synced_at')
+    .eq('ooh_site_id', id)
+    .order('created_at', { ascending: false })
 
   // Search uplift data
   const { data: upliftRows } = await supabase
@@ -171,6 +188,18 @@ export default async function OohSitePage({
         siteId={id}
         brandId={site.brand_id}
         totalTrackedVisits={site.visits ?? 0}
+      />
+
+      {/* Geo Attribution + Retargeting */}
+      <GeoAttributionPanel
+        siteId={id}
+        siteName={site.site_name}
+        siteLat={site.lat ? Number(site.lat) : null}
+        siteLng={site.lng ? Number(site.lng) : null}
+        siteCity={site.city ?? null}
+        brandId={site.brand_id}
+        geoVisits={(geoVisits ?? []) as Parameters<typeof GeoAttributionPanel>[0]['geoVisits']}
+        audiences={(geoAudiences ?? []) as Parameters<typeof GeoAttributionPanel>[0]['audiences']}
       />
     </div>
   )
