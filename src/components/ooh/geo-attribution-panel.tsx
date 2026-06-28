@@ -1,7 +1,6 @@
 'use client'
 
 import { useState }   from 'react'
-import { useRouter }  from 'next/navigation'
 import { Card }       from '@/components/ui/card'
 import { Badge }      from '@/components/ui/badge'
 import { Button }     from '@/components/ui/button'
@@ -83,13 +82,14 @@ function distM(lat1: number, lng1: number, lat2: number, lng2: number) {
 export function GeoAttributionPanel({
   siteId, siteName, siteLat, siteLng, siteCity, brandId, geoVisits, audiences,
 }: Props) {
-  const router = useRouter()
   const [showNewAudience, setShowNewAudience] = useState(false)
   const [platform,        setPlatform]        = useState('meta')
   const [radius,          setRadius]          = useState('500')
   const [audienceName,    setAudienceName]    = useState(`${siteName} — Geo Retarget`)
   const [headline,        setHeadline]        = useState('')
   const [saving,          setSaving]          = useState(false)
+  const [syncing,         setSyncing]         = useState<string | null>(null)
+  const [localAudiences,  setLocalAudiences]  = useState(audiences)
 
   // Geo-attributed visits (has geo coords)
   const geoLocated = geoVisits.filter(v => v.geo_city || v.geo_state)
@@ -128,10 +128,11 @@ export function GeoAttributionPanel({
           creative_headline: headline.trim() || null,
         }),
       })
-      if (!res.ok) throw new Error(await res.text())
-      toast.success('Audience created — ready to sync to ' + (platform === 'meta' ? 'Meta Ads' : 'Google Ads'))
+      const json = await res.json() as { audience?: GeoAudience; error?: string }
+      if (!res.ok) throw new Error(json.error ?? 'Failed to create audience')
+      toast.success('Audience created — click Sync to push to ' + (platform === 'meta' ? 'Meta Ads' : 'Google Ads'))
+      if (json.audience) setLocalAudiences(prev => [json.audience!, ...prev])
       setShowNewAudience(false)
-      router.refresh()
     } catch (e) {
       toast.error(String(e))
     } finally {
@@ -354,7 +355,7 @@ export function GeoAttributionPanel({
         )}
 
         {/* Existing audiences */}
-        {audiences.length === 0 && !showNewAudience ? (
+        {localAudiences.length === 0 && !showNewAudience ? (
           <Card className="p-6 text-center space-y-2">
             <Radio className="h-7 w-7 mx-auto text-muted-foreground" />
             <p className="text-sm text-muted-foreground">No audiences configured yet.</p>
@@ -364,7 +365,7 @@ export function GeoAttributionPanel({
           </Card>
         ) : (
           <div className="space-y-3">
-            {audiences.map(aud => {
+            {localAudiences.map(aud => {
               const meta = STATUS_META[aud.status] ?? STATUS_META.draft
               const StatusIcon = meta.icon
               return (
@@ -385,22 +386,67 @@ export function GeoAttributionPanel({
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {aud.status === 'draft' && (
+                    {(aud.status === 'draft' || aud.status === 'error') && aud.platform === 'meta' && (
+                      <Button
+                        size="sm" variant="outline" className="h-7 text-xs gap-1"
+                        disabled={syncing === aud.id}
+                        onClick={async () => {
+                          setSyncing(aud.id)
+                          try {
+                            const res  = await fetch(`/api/ooh/geo-audiences/${aud.id}/sync`, { method: 'POST' })
+                            const data = await res.json() as {
+                              ok?: boolean
+                              estimated_reach?: number
+                              lower_bound?: number
+                              upper_bound?: number
+                              error?: string
+                            }
+                            if (!res.ok) throw new Error(data.error ?? 'Sync failed')
+                            const lo = data.lower_bound?.toLocaleString()
+                            const hi = data.upper_bound?.toLocaleString()
+                            toast.success(`Synced — estimated reach ${lo}–${hi} people`)
+                            setLocalAudiences(prev => prev.map(a =>
+                              a.id === aud.id
+                                ? { ...a, status: 'active', estimated_reach: data.estimated_reach ?? a.estimated_reach }
+                                : a
+                            ))
+                          } catch (e) {
+                            toast.error(e instanceof Error ? e.message : 'Sync failed')
+                            setLocalAudiences(prev => prev.map(a =>
+                              a.id === aud.id ? { ...a, status: 'error' } : a
+                            ))
+                          } finally {
+                            setSyncing(null)
+                          }
+                        }}
+                      >
+                        {syncing === aud.id
+                          ? <><Zap className="h-3 w-3 animate-pulse" />Syncing…</>
+                          : <><ExternalLink className="h-3 w-3" />Sync to Meta</>
+                        }
+                      </Button>
+                    )}
+                    {(aud.status === 'draft' || aud.status === 'error') && aud.platform === 'google' && (
                       <Button
                         size="sm" variant="outline" className="h-7 text-xs gap-1"
                         onClick={() => {
-                          toast.info('Connect your Meta Ads account in Connectors to sync this audience.')
-                          router.push('/dashboard/connectors')
+                          toast.info('Google Ads sync coming soon.')
                         }}
                       >
                         <ExternalLink className="h-3 w-3" />
-                        Sync to {aud.platform === 'meta' ? 'Meta' : 'Google'}
+                        Sync to Google
                       </Button>
                     )}
                     {aud.status === 'active' && (
                       <div className="flex items-center gap-1 text-xs text-emerald-600">
                         <Users className="h-3.5 w-3.5" />
                         Live
+                      </div>
+                    )}
+                    {aud.status === 'syncing' && (
+                      <div className="flex items-center gap-1 text-xs text-blue-600">
+                        <Zap className="h-3.5 w-3.5 animate-pulse" />
+                        Syncing
                       </div>
                     )}
                   </div>

@@ -3,10 +3,11 @@ import { redirect }            from 'next/navigation'
 import { getActiveBrand }      from '@/lib/active-brand'
 import Link                   from 'next/link'
 import { SocialConnectCard }   from '@/components/dashboard/social-connect-card'
-import { GA4ConnectCard, type GA4ConnectionData }      from '@/components/dashboard/ga4-connect-card'
-import { PaymentConnectCard, type PaymentConfigStatus } from '@/components/dashboard/payment-connect-card'
-import { AppStoreConnectCard, type AppStoreConfigData } from '@/components/dashboard/app-store-connect-card'
-import { EmailConnectCard, type EmailConnectorStatus }  from '@/components/dashboard/email-connect-card'
+import { GA4ConnectCard, type GA4ConnectionData }           from '@/components/dashboard/ga4-connect-card'
+import { MetaAdsConnectCard, type MetaAdsAccountData }      from '@/components/dashboard/meta-ads-connect-card'
+import { PaymentConnectCard, type PaymentConfigStatus }     from '@/components/dashboard/payment-connect-card'
+import { AppStoreConnectCard, type AppStoreConfigData }     from '@/components/dashboard/app-store-connect-card'
+import { EmailConnectCard, type EmailConnectorStatus }      from '@/components/dashboard/email-connect-card'
 // WhatsAppConnectCard hidden until dedicated number is configured
 import { PixelCard } from './pixel-card'
 import { ShoppingCart, ArrowRight } from 'lucide-react'
@@ -26,10 +27,11 @@ export default async function ConnectorsPage() {
     .from('social_connections')
     .select('platform, account_name, sync_status, last_synced_at')
 
-  let ga4Connection:   GA4ConnectionData | null = null
-  let paymentStatus:   PaymentConfigStatus      = { paystack: false, flutterwave: false }
-  let appStoreConfig:  AppStoreConfigData | null = null
-  let emailStatus:     EmailConnectorStatus      = { mailchimp: false, brevo: false }
+  let ga4Connection:    GA4ConnectionData | null  = null
+  let metaAdsAccount:  MetaAdsAccountData | null  = null
+  let paymentStatus:   PaymentConfigStatus        = { paystack: false, flutterwave: false }
+  let appStoreConfig:  AppStoreConfigData | null  = null
+  let emailStatus:     EmailConnectorStatus       = { mailchimp: false, brevo: false }
 
   let ecommerceStats: { sources: string[]; totalOrders: number; lastImportAt: string | null } = {
     sources: [], totalOrders: 0, lastImportAt: null,
@@ -37,8 +39,9 @@ export default async function ConnectorsPage() {
   // whatsappStats removed — WhatsApp connector hidden during beta
 
   if (brand?.id) {
-    const [ga4Res, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
+    const [ga4Res, metaAdsRes, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
       supabase.from('ga4_connections').select('id, property_id, property_name, last_synced_at').eq('brand_id', brand.id).maybeSingle(),
+      supabase.from('digital_ad_accounts').select('id, account_name, ad_account_id, sync_status, last_synced_at').eq('brand_id', brand.id).eq('platform', 'meta').maybeSingle(),
       supabase.from('webhook_configs').select('provider').eq('brand_id', brand.id),
       supabase.from('app_store_configs').select('apple_app_id, google_pkg_name').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('app_reviews').select('rating').eq('brand_id', brand.id).order('reviewed_at', { ascending: false }).limit(30),
@@ -46,7 +49,8 @@ export default async function ConnectorsPage() {
       supabase.from('ecommerce_sales').select('source, imported_at').eq('brand_id', brand.id).order('imported_at', { ascending: false }).limit(200),
     ])
 
-    ga4Connection = ga4Res.data ?? null
+    ga4Connection   = ga4Res.data ?? null
+    metaAdsAccount  = metaAdsRes.data ?? null
 
     if (webhookRes.data) {
       paymentStatus = {
@@ -113,6 +117,12 @@ export default async function ConnectorsPage() {
       <section>
         <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Web Analytics</h2>
         <GA4ConnectCard connection={ga4Connection} />
+      </section>
+
+      {/* Paid Media */}
+      <section>
+        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Paid Media</h2>
+        <MetaAdsConnectCard account={metaAdsAccount} />
       </section>
 
       {/* Website Pixel */}
@@ -183,6 +193,7 @@ export default async function ConnectorsPage() {
           <li>Instagram captures posts where your account is tagged and posts using your brand hashtags.</li>
           <li>Mentions are collected nightly at 4 AM Lagos time, or trigger a manual crawl from the Sentiment page.</li>
           <li>GA4 syncs daily at 6 AM Lagos time — use Sync now for on-demand 30-day totals.</li>
+          <li>Meta Ads syncs campaign performance daily at 6 AM Lagos time. The connection also enables geo-retargeting audiences from OOH sites.</li>
           <li>Payment webhooks fire in real time and link purchases to the brand funnel.</li>
           <li>App Store reviews sync every Sunday at 7 AM Lagos time.</li>
           <li>Email campaign metrics sync daily at 7 AM Lagos time and feed the Loyalty funnel stage.</li>

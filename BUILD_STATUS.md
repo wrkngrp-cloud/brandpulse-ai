@@ -1,7 +1,7 @@
 # BrandPulse AI — Build Status
 
 > Feed this file into your project chat at the start of each session to bring it up to date.
-> Updated after every pushed session. Last updated: 2026-06-24.
+> Updated after every pushed session. Last updated: 2026-06-28.
 
 ---
 
@@ -103,17 +103,17 @@
 | Detailed methodology doc | `METHODOLOGY.md` | ✅ Done — exact formulas, calibration rationale, benchmarks, limitations |
 | Nav update | `dashboard-nav.tsx` — Platform section | ✅ Done |
 
-### Phase 3 — Not yet built
+### Phase 3 — Remaining gaps
 
 | Feature | Notes |
 |---|---|
 | Audio Transcription Module | Whisper pipeline for radio spot transcription; pending API access |
-| BrandPulse JS Pixel / SDK | Website pixel for Action/Loyalty direct data capture |
-| WhatsApp Broadcasting | Campaign-level message sends for survey distribution |
+| ~~BrandPulse JS Pixel / SDK~~ | ✅ Done — `POST /api/sdk/event`, `sdk_events` table, pixel settings at `/dashboard/settings/pixel` |
+| ~~WhatsApp Broadcasting~~ | ✅ Done — Inngest batch broadcast, `/dashboard/whatsapp` (hidden — needs SIM) |
 | Competitive SOV auto-discovery | Automated competitor handle detection from social conversation |
-| Brand Tracking Panel | Monthly recurring survey panel for longitudinal awareness tracking |
-| Sector Benchmarking | BHI/SOV/NPS vs Nigerian category averages (requires peer data aggregation) |
-| Media Mix Modelling (MMM) Lite | Regression-based multi-channel attribution — top CMO request |
+| ~~Brand Tracking Panel~~ | ✅ Done — `/dashboard/surveys/panels`, all CRUD APIs, Inngest cron (9am Lagos daily), email + WhatsApp dispatch |
+| Sector Benchmarking | BHI/SOV/NPS vs Nigerian category averages (requires peer data) |
+| ~~Media Mix Modelling Lite~~ | ✅ Done — `/dashboard/mmm`, activity-weighted attribution model |
 
 ---
 
@@ -198,18 +198,113 @@ Current Stripe code stays in place but is not deployed/configured until after be
 | sdk_events insert fix | `src/app/api/connectors/ga4/sync/route.ts` | ✅ Switched upsert → insert (INDEX not UNIQUE on brand_id+event_type) |
 | Connectors page brand fix | `src/app/dashboard/connectors/page.tsx` | ✅ Uses getActiveBrand() not .limit(1).maybeSingle() |
 
-### Phase 6 — Retention & Advocacy OS (PLANNED — PRD defined 2026-06-24)
+### Phase 6 — Retention & Advocacy OS ✅ (commits a18490e + 29e049a, 2026-06-26)
 
-Full build list defined in PRD v7.3, Documents 2 and 3. Modules 17–20.
+All planned Phase 6 modules are now built.
 
-| Module | Name | Key builds | PRD ref |
-|---|---|---|---|
-| 17 | Retention Intelligence | Churn risk view, WhatsApp re-engagement, HubSpot connector | Doc 2 §17, Doc 3 Phase 6 items 1–3 |
-| 18 | Advocacy Engine | Promoter activation flow, advocacy dashboard, social proof, referral tracking | Doc 2 §18, Doc 3 Phase 6 items 4–5 |
-| 19 | Marketing Execution Channels | WhatsApp lifecycle flows, in-app messaging + push, TikTok connector | Doc 2 §19, Doc 3 Phase 6 items 6–8 |
-| 20 | Customer Data Platform | CDP layer, loyalty engine, A/B testing, marketplace intelligence, budget pacing | Doc 2 §20, Doc 3 Phase 6 items 9–13 |
+| Feature | Route | Key files |
+|---|---|---|
+| Retention Risk view | `/dashboard/retention` | `retention-client.tsx`, `GET /api/retention/risk` |
+| Promoter Activation + Referral Framework | `/dashboard/advocacy` | `advocacy-client.tsx`, `/api/promoters/*`, `/api/referral-codes/*` |
+| Advocacy Dashboard + Leaderboard | `/dashboard/advocacy` (tab 2) | same as above |
+| Public Referral redirect + click tracking | `/ref/[code]` | IP+UA dedup, 24h window |
+| Customer Data Platform (CDP) | `/dashboard/cdp` | `cdp-client.tsx`, `POST /api/cdp/sync`, `GET /api/cdp/profiles` |
+| Social Proof Score | `/dashboard/advocacy` | advocacy score computed from UGC + NPS promoter rate |
+| Marketplace Intelligence | `/dashboard/marketplace` | Jumia/Konga shelf performance, product reviews, competitor pricing |
+| Budget Pacing | `/dashboard/budget` | live spend vs plan, channel-level pacing alerts |
+| Loyalty Engine | `/dashboard/loyalty` | tier system (points, tiers, rewards), auto-promotion on transaction |
+| A/B Testing Framework | `/dashboard/experiments` | variant management, significance calc, `confidence_target` per experiment |
 
-**Build sequence (recommended):** Retention risk view → HubSpot connector → Promoter activation flow → Advocacy dashboard → WhatsApp lifecycle flows → TikTok connector → In-app messaging → Loyalty engine → CDP customer profiles → Segment builder → A/B testing → Marketplace intelligence → Budget pacing.
+**Migrations:** `20260702000001_promoters_referrals.sql`, `20260702000002_cdp.sql`, `20260702000004_marketplace.sql`, `20260702000005_budget.sql`, `20260702000006_loyalty.sql`, `20260702000007_ab_testing.sql`
+
+---
+
+### Phase 6 — AI Power Tools, AI Visibility, GA4 OAuth, Google Sign-In ✅ (commit 4ee427a, 2026-06-24)
+
+| Feature | Route / File | Status |
+|---|---|---|
+| AI Power Tools tabs on Ask AI page | `/dashboard/ask` + `v2-tools.tsx` | ✅ |
+| Business Case expansion (board-grade) | `business-case-client.tsx`, `POST /api/ai/business-case` | ✅ Sonnet 4.6 (Opus unavailable) |
+| Influencer ROI tracker tab | `/dashboard/influencers` | ✅ |
+| Portal competitive context | `/portal/[token]` | ✅ |
+| AI Visibility Tracker | `/dashboard/ai-visibility` | ✅ (hidden — needs AI platform API key) |
+| WhatsApp Deep Integration | `/dashboard/whatsapp` | ✅ (hidden — needs new SIM + Meta WABA) |
+
+---
+
+### Phase 6 — Creative Intelligence, Voice Builder v2, Creative Library ✅ (commit 86e9b1f, 2026-06-28)
+
+| Feature | Route / File | Status |
+|---|---|---|
+| Voice Builder — Retune Caption tab | `/dashboard/voice-builder` | ✅ Rewrites copy in saved brand voice |
+| Voice Builder — Generate Captions tab | `/dashboard/voice-builder` | ✅ Generates N variations from a concept |
+| New API | `POST /api/ai/brand-voice/caption` | ✅ mode=retune / mode=generate; Haiku 4.5 |
+| Creative Library | `/dashboard/creative-library` | ✅ Vetted asset vault; filter by type/ads-ready; drawer with performance data; multi-select → Create Ad Set |
+| Nav restructure | Creative Intelligence section | ✅ Creative Lab (collapsible) + Creative Library + A/B Testing |
+
+**Migration:** `20260702000008_creative_assets.sql` (`creative_assets` table with RLS)
+
+**RLS bug fixed (commit f43edd9):** `creative_assets` policy was `is_workspace_member(brand_id)` — passes brand UUID as workspace_id → always false. Fixed to subquery: `is_workspace_member((SELECT workspace_id FROM brands WHERE id = brand_id))`. Migration: `20260702000011_fix_creative_assets_rls.sql`.
+
+---
+
+### Phase 6 — Creative Fatigue Monitor ✅ (commit e0bf9a1, 2026-06-28)
+
+| Feature | Route / File | Status |
+|---|---|---|
+| Creative Fatigue Monitor | `/dashboard/creative-fatigue` | ✅ Fatigue score per active creative |
+| Alert levels | Critical / Watch / Refresh Soon | ✅ Based on frequency + CTR decline + days running |
+| CTAs | Retune Caption → Voice Builder; Find Replacement → Creative Library; A/B Test → Experiments | ✅ |
+
+**Migration:** `20260702000009_creative_analyses_result.sql` — added `analysis_type`, `input_data`, `result` JSONB to `creative_analyses`.
+
+---
+
+### Phase 6 — OOH Geo Attribution + Geo-Retargeting Audiences ✅ (commit b6ca016, 2026-06-28)
+
+| Feature | Route / File | Status |
+|---|---|---|
+| OOH Geo Attribution | OOH site detail page | ✅ Captures Vercel geo headers (lat/lng/city) in `ooh_visits` at zero cost |
+| Geo Attribution Panel | `geo-attribution-panel.tsx` | ✅ Visits by city, attribution method split, confidence score, visit feed |
+| Geo-Retargeting Audiences | `POST /api/ooh/geo-audiences` | ✅ Create audience config per OOH site (Meta or Google), saved to `ooh_geo_audiences` |
+| Sync to Meta/Google Ads | GeoAttributionPanel sync button | ⚠️ Routes to Connectors — requires Meta `ads_management` OAuth permission (not yet built on Meta connector) |
+
+**Migration:** `20260702000010_ooh_geo_attribution.sql` — extended `ooh_visits` (geo_lat, geo_lng, geo_city, geo_state, matched_site_id, attribution_method, attribution_confidence); new `ooh_geo_audiences` table.
+
+**Geo Audience sync (2026-06-28):** `POST /api/ooh/geo-audiences/[id]/sync` — calls Meta reach estimate API with the site's lat/lng + fence radius. Returns `users_lower_bound` / `users_upper_bound`, stores as `estimated_reach`, marks status `active`. Requires Meta Ads connected in Connectors.
+
+**Meta Ads Connector (2026-06-28):** `MetaAdsConnectCard` added to Connectors page under Paid Media. Shows connection status from `digital_ad_accounts`. Connect → `GET /api/ads/meta/connect?return_to=connectors` (scope: `ads_read,ads_management,read_insights`). Disconnect → `DELETE /api/ads/meta/connect`. Full OAuth: connect stores `{userId, brandId, returnTo}` in Redis state (10 min TTL); callback reads brandId directly (no DB brand lookup — multi-brand safe); redirects back to the originating page (`connectors` or `digital`). Daily sync: `metaAdsDailySync` Inngest function (5 AM Lagos), token auto-refresh 7 days before expiry, upserts into `digital_performance_daily`. Env vars required: `META_APP_ID`, `META_APP_SECRET`. Redirect URI to whitelist in Meta App Dashboard: `https://brandpulse.ai/api/ads/meta/callback`.
+
+**Meta Data Deletion callback (2026-06-28):** `POST /api/auth/meta/deauthorize` — validates signed_request (HMAC-SHA256), returns `{url, confirmation_code}`. Register in Meta App Dashboard → Facebook Login → Data Deletion Request URL: `https://brandpulse.ai/api/auth/meta/deauthorize`. Required before App Review submission.
+
+---
+
+### QA Pass + Nav Restructure ✅ (commit 5b93feb, 2026-06-27)
+
+Nav now has 9 logical sections following marketer workflow:  
+**Brand Health → Intelligence → Campaigns → Creative → Research → Measurement → Growth → Reports → Setup**
+
+**P0 bug fixes:**
+- Business Case `fmtNGN`: removed kobo÷100 division (values stored in NGN)
+- Business Case spend efficiency: `/100M` → `/1M` (BHI per ₦1M metric)
+- Retention redirect: `/login` → `/auth/login`
+- A/B Testing: `calcSignificance` uses `experiment.confidence_target` (was hardcoded 0.05)
+- Loyalty: tier auto-promotion on every transaction
+
+**P1 bug fixes:**
+- MMM description: clarified as activity-weighted attribution (not causal MMM)
+- Geo-Lift: SerpAPI warning banner when `SERPAPI_KEY` not configured
+- Voice Builder: fetches active brand name on mount
+
+---
+
+### Field Intelligence (FSO PWA + Dashboard) ✅ (commit 629cf67, 2026-06-22)
+
+| Feature | Route | Status |
+|---|---|---|
+| Field Intelligence dashboard | `/dashboard/field-intelligence` | ✅ FSO team management, outlet visit reports |
+| FSO PWA (field agent mobile) | built in field-intelligence | ✅ |
+| Demo seed | 06acead | ✅ FSO teams, reports, outlets |
 
 ---
 
@@ -395,3 +490,22 @@ Full build list defined in PRD v7.3, Documents 2 and 3. Modules 17–20.
 | Inngest functions | `src/lib/inngest/functions/` |
 | Social OAuth connect | `src/app/api/social/connect/[platform]/route.ts` |
 | Vanity link redirect | `src/app/go/[slug]/route.ts` |
+| Retention risk page | `src/app/dashboard/retention/retention-client.tsx` |
+| Retention risk API | `src/app/api/retention/risk/route.ts` |
+| Advocacy + Promoters | `src/app/dashboard/advocacy/advocacy-client.tsx` |
+| Referral redirect | `src/app/ref/[code]/route.ts` |
+| CDP sync + profiles | `src/app/api/cdp/` |
+| CDP page | `src/app/dashboard/cdp/cdp-client.tsx` |
+| Loyalty engine | `src/app/dashboard/loyalty/loyalty-client.tsx` |
+| Marketplace | `src/app/dashboard/marketplace/marketplace-client.tsx` |
+| Budget pacing | `src/app/dashboard/budget/budget-client.tsx` |
+| A/B Testing | `src/app/dashboard/experiments/experiments-client.tsx` |
+| Creative Library | `src/app/dashboard/creative-library/creative-library-client.tsx` |
+| Creative Fatigue Monitor | `src/app/dashboard/creative-fatigue/fatigue-client.tsx` |
+| Voice Builder (Retune+Generate) | `src/app/dashboard/voice-builder/page.tsx` |
+| Brand Voice Caption API | `src/app/api/ai/brand-voice/caption/route.ts` |
+| OOH Geo Attribution Panel | `src/components/ooh/geo-attribution-panel.tsx` |
+| OOH Geo Audiences API | `src/app/api/ooh/geo-audiences/route.ts` |
+| Geo-Lift study page | `src/app/dashboard/geo-lift/page.tsx` |
+| Field Intelligence | `src/app/dashboard/field-intelligence/field-intelligence-client.tsx` |
+| MMM page | `src/app/dashboard/mmm/mmm-client.tsx` |
