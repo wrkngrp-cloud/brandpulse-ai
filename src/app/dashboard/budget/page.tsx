@@ -5,6 +5,6 @@ import { BudgetClient } from './budget-client'
 export default async function BudgetPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/auth/login')
   return <BudgetClient />
 }

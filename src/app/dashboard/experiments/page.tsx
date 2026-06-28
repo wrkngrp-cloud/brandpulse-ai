@@ -5,6 +5,6 @@ import { ExperimentsClient } from './experiments-client'
 export default async function ExperimentsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/auth/login')
   return <ExperimentsClient />
 }

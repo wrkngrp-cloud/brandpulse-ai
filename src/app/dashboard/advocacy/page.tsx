@@ -5,6 +5,6 @@ import { AdvocacyClient } from './advocacy-client'
 export default async function AdvocacyPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/auth/login')
   return <AdvocacyClient />
 }

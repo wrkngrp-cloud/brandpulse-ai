@@ -1887,24 +1887,51 @@ export async function POST(req: NextRequest) {
       await sb.from('referral_codes').insert({
         brand_id: brandId, promoter_id: prom.id, code: p.code,
         destination_url: 'https://jarafoods.com/summer',
-        click_count: p.clicks, conversion_count: p.conversions, is_active: true,
+        clicks: p.clicks, conversions: p.conversions, is_active: true,
       })
     }
   }
 
   /* ── 34. Customer Profiles (CDP) ─────────────────────────────────────── */
   await sb.from('customer_profiles').insert([
-    { brand_id: brandId, name: 'Funke Adeleke',  email: 'funke.a@gmail.com',  phone: '+2348012345001', city: 'Lagos',  nps_score: 10, survey_count: 3, last_seen_at: dAgo(5),  tags: ['promoter', 'gold-loyalty', 'jollof-fan'], sources: ['survey', 'nps', 'loyalty'] },
-    { brand_id: brandId, name: 'Chidi Okonkwo',  email: 'chidi.o@yahoo.com',  phone: '+2348034567002', city: 'Abuja',  nps_score: 9,  survey_count: 2, last_seen_at: dAgo(8),  tags: ['promoter', 'gold-loyalty', 'rice-buyer'], sources: ['survey', 'nps', 'loyalty'] },
-    { brand_id: brandId, name: 'Amina Bello',    email: 'amina.b@gmail.com',  phone: '+2347012345003', city: 'Kano',   nps_score: 10, survey_count: 2, last_seen_at: dAgo(12), tags: ['promoter', 'silver-loyalty', 'northern-market'], sources: ['survey', 'nps', 'loyalty'] },
-    { brand_id: brandId, name: 'Taiwo Adesanya', email: 'taiwo.a@gmail.com',  phone: '+2348045678004', city: 'Lagos',  nps_score: 9,  survey_count: 1, last_seen_at: dAgo(15), tags: ['promoter', 'silver-loyalty'], sources: ['nps', 'loyalty'] },
-    { brand_id: brandId, name: 'Ngozi Eze',      email: 'ngozi.e@gmail.com',  phone: '+2348056789005', city: 'Lagos',  nps_score: 7,  survey_count: 1, last_seen_at: dAgo(18), tags: ['passive', 'silver-loyalty'], sources: ['survey', 'loyalty'] },
-    { brand_id: brandId, name: 'Emeka Uche',     email: 'emeka.u@gmail.com',  phone: '+2348067890006', city: 'Lagos',  nps_score: 8,  survey_count: 2, last_seen_at: dAgo(22), tags: ['passive', 'silver-loyalty'], sources: ['nps', 'loyalty'] },
-    { brand_id: brandId, name: 'Bimpe Lawal',    email: 'bimpe.l@gmail.com',  phone: '+2348078901007', city: 'Lagos',  nps_score: 5,  survey_count: 1, last_seen_at: dAgo(25), tags: ['detractor', 'bronze-loyalty', 'price-sensitive'], sources: ['survey', 'loyalty'] },
-    { brand_id: brandId, name: 'Yusuf Garba',    email: 'yusuf.g@gmail.com',  phone: '+2347023456008', city: 'Kano',   nps_score: 3,  survey_count: 1, last_seen_at: dAgo(30), tags: ['detractor', 'bronze-loyalty', 'northern-market'], sources: ['nps', 'loyalty'] },
-    { brand_id: brandId, name: 'Shade Williams', email: 'shade.w@gmail.com',  phone: '+2348034567009', city: 'Lagos',  nps_score: 7,  survey_count: 1, last_seen_at: dAgo(32), tags: ['passive', 'bronze-loyalty'], sources: ['nps', 'loyalty'] },
-    { brand_id: brandId, name: 'Ola Adeyemi',    email: 'ola.a@gmail.com',    phone: '+2348045678010', city: 'Ibadan', nps_score: 9,  survey_count: 0, last_seen_at: dAgo(28), tags: ['promoter', 'bronze-loyalty', 'new-customer'], sources: ['loyalty'] },
+    { brand_id: brandId, name: 'Funke Adeleke',  email: 'funke.a@gmail.com',  phone: '+2348012345001', city: 'Lagos',  nps_score: 10, nps_label: 'promoter',  survey_count: 3, last_seen_at: dAgo(5),  tags: ['promoter', 'gold-loyalty', 'jollof-fan'], sources: ['survey', 'nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Chidi Okonkwo',  email: 'chidi.o@yahoo.com',  phone: '+2348034567002', city: 'Abuja',  nps_score: 9,  nps_label: 'promoter',  survey_count: 2, last_seen_at: dAgo(8),  tags: ['promoter', 'gold-loyalty', 'rice-buyer'], sources: ['survey', 'nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Amina Bello',    email: 'amina.b@gmail.com',  phone: '+2347012345003', city: 'Kano',   nps_score: 10, nps_label: 'promoter',  survey_count: 2, last_seen_at: dAgo(12), tags: ['promoter', 'silver-loyalty', 'northern-market'], sources: ['survey', 'nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Taiwo Adesanya', email: 'taiwo.a@gmail.com',  phone: '+2348045678004', city: 'Lagos',  nps_score: 9,  nps_label: 'promoter',  survey_count: 1, last_seen_at: dAgo(15), tags: ['promoter', 'silver-loyalty'], sources: ['nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Ngozi Eze',      email: 'ngozi.e@gmail.com',  phone: '+2348056789005', city: 'Lagos',  nps_score: 7,  nps_label: 'passive',   survey_count: 1, last_seen_at: dAgo(18), tags: ['passive', 'silver-loyalty'], sources: ['survey', 'loyalty'] },
+    { brand_id: brandId, name: 'Emeka Uche',     email: 'emeka.u@gmail.com',  phone: '+2348067890006', city: 'Lagos',  nps_score: 8,  nps_label: 'passive',   survey_count: 2, last_seen_at: dAgo(22), tags: ['passive', 'silver-loyalty'], sources: ['nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Bimpe Lawal',    email: 'bimpe.l@gmail.com',  phone: '+2348078901007', city: 'Lagos',  nps_score: 5,  nps_label: 'detractor', survey_count: 1, last_seen_at: dAgo(25), tags: ['detractor', 'bronze-loyalty', 'price-sensitive'], sources: ['survey', 'loyalty'] },
+    { brand_id: brandId, name: 'Yusuf Garba',    email: 'yusuf.g@gmail.com',  phone: '+2347023456008', city: 'Kano',   nps_score: 3,  nps_label: 'detractor', survey_count: 1, last_seen_at: dAgo(30), tags: ['detractor', 'bronze-loyalty', 'northern-market'], sources: ['nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Shade Williams', email: 'shade.w@gmail.com',  phone: '+2348034567009', city: 'Lagos',  nps_score: 7,  nps_label: 'passive',   survey_count: 1, last_seen_at: dAgo(32), tags: ['passive', 'bronze-loyalty'], sources: ['nps', 'loyalty'] },
+    { brand_id: brandId, name: 'Ola Adeyemi',    email: 'ola.a@gmail.com',    phone: '+2348045678010', city: 'Ibadan', nps_score: 9,  nps_label: 'promoter',  survey_count: 0, last_seen_at: dAgo(28), tags: ['promoter', 'bronze-loyalty', 'new-customer'], sources: ['loyalty'] },
   ])
+
+  /* ── 35. Extra social posts for richer Advocacy scores ──────────────── */
+  const extraPosts = [
+    { platform: 'instagram', content: 'My family cannot get enough of Jara Rice 🍚 Every Sunday rice is always Jara. Na the best wey dey! #JaraFoods #SundayRice', sentiment_label: 'positive', sentiment_score: 0.92, reach: 4200, likes: 312, comments: 48, shares: 67, posted_at: dAgo(2) },
+    { platform: 'twitter',   content: 'Jara spice mix transformed my jollof. Not exaggerating. Whole family asked what was different. #JaraFoods', sentiment_label: 'positive', sentiment_score: 0.89, reach: 1800, likes: 145, comments: 23, shares: 89, posted_at: dAgo(3) },
+    { platform: 'instagram', content: 'Bought Jara Rice for the first time after seeing it on MamaTolu page. Zero regrets. The quality is proper 💯 #JaraRice', sentiment_label: 'positive', sentiment_score: 0.91, reach: 3600, likes: 267, comments: 31, shares: 54, posted_at: dAgo(4) },
+    { platform: 'facebook',  content: 'Jara Foods hamper was a blessing this festive season. My in-laws kept asking where I bought it from. 10/10 recommend!', sentiment_label: 'positive', sentiment_score: 0.88, reach: 2900, likes: 198, comments: 67, shares: 43, posted_at: dAgo(5) },
+    { platform: 'twitter',   content: 'Okay so I tried Jara oats this morning with banana and I might never go back to my old brand. This is it 😭', sentiment_label: 'positive', sentiment_score: 0.87, reach: 1200, likes: 89, comments: 14, shares: 31, posted_at: dAgo(6) },
+    { platform: 'instagram', content: 'Jara Rice restock finally came through at my Estate Shoprite. Grabbed 3 bags. You know why 😂 #JaraRice #Lagos', sentiment_label: 'positive', sentiment_score: 0.85, reach: 5100, likes: 421, comments: 78, shares: 102, posted_at: dAgo(7) },
+    { platform: 'instagram', content: 'Shoutout to @JaraFoods for making cooking less stressful for us working mums. Quick to prepare, family loves it. Keep it up 🙌', sentiment_label: 'positive', sentiment_score: 0.93, reach: 6800, likes: 534, comments: 112, shares: 145, posted_at: dAgo(8) },
+    { platform: 'twitter',   content: 'Why is Jara always out of stock at Konga? I need the 5kg bag delivered to Abuja ASAP 😩 @JaraFoods please fix your supply', sentiment_label: 'negative', sentiment_score: 0.22, reach: 980, likes: 12, comments: 34, shares: 8, posted_at: dAgo(9) },
+    { platform: 'facebook',  content: 'Been using Jara spice for 6 months now. Consistent quality every time. Not many brands can say that in Nigeria.', sentiment_label: 'positive', sentiment_score: 0.90, reach: 3400, likes: 256, comments: 44, shares: 67, posted_at: dAgo(10) },
+    { platform: 'instagram', content: 'Cooked Jara Oats for my toddler this morning — she ate the whole bowl. This is a miracle tbh 😂 #JaraFoods #MumLife', sentiment_label: 'positive', sentiment_score: 0.86, reach: 7200, likes: 612, comments: 134, shares: 188, posted_at: dAgo(11) },
+    { platform: 'twitter',   content: 'Jara Rice is honestly underrated. Quality rivals the imported brands but at a price that makes actual sense. Support local!', sentiment_label: 'positive', sentiment_score: 0.94, reach: 2100, likes: 178, comments: 29, shares: 112, posted_at: dAgo(13) },
+    { platform: 'instagram', content: 'My compound is literally having a taste test this weekend — brought Jara vs the usual suspects. Will report back 👀 #JaraFoods', sentiment_label: 'positive', sentiment_score: 0.82, reach: 4500, likes: 345, comments: 89, shares: 76, posted_at: dAgo(14) },
+    { platform: 'facebook',  content: 'Customer service at Jara responded to my complaint within 2 hours and sorted me out. That is the kind of brand I will stay loyal to.', sentiment_label: 'positive', sentiment_score: 0.95, reach: 1800, likes: 134, comments: 21, shares: 38, posted_at: dAgo(15) },
+    { platform: 'twitter',   content: 'Saw Jara Rice on a billboard on Ozumba Mbadiwe. The campaign is clean. Nigerian brands stepping up 💪 #Jara', sentiment_label: 'positive', sentiment_score: 0.81, reach: 1400, likes: 98, comments: 17, shares: 44, posted_at: dAgo(16) },
+    { platform: 'instagram', content: 'People ask me why I switched from my old rice brand. Simple: Jara. Same price range, way better texture and aroma 🤷‍♀️', sentiment_label: 'positive', sentiment_score: 0.90, reach: 5600, likes: 467, comments: 93, shares: 121, posted_at: dAgo(18) },
+    { platform: 'twitter',   content: 'The Jara oats packaging redesign looks premium. Picked it up thinking it was an imported brand 😅 Love to see it #MadeInNigeria', sentiment_label: 'positive', sentiment_score: 0.87, reach: 1600, likes: 121, comments: 19, shares: 56, posted_at: dAgo(20) },
+    { platform: 'facebook',  content: 'Jara spice mix is the one thing I pack when I travel abroad. My friends there have started ordering it through their relatives 😂 Global domination!', sentiment_label: 'positive', sentiment_score: 0.96, reach: 4200, likes: 389, comments: 78, shares: 156, posted_at: dAgo(22) },
+    { platform: 'instagram', content: 'Okay the price went up slightly but the quality is still there so I cannot be too mad. Still recommending Jara to everyone.', sentiment_label: 'neutral', sentiment_score: 0.58, reach: 3100, likes: 212, comments: 45, shares: 34, posted_at: dAgo(24) },
+    { platform: 'twitter',   content: 'Jara customer care line does not pick up sometimes. Frustrating when you have a delivery issue. Hope they fix this.', sentiment_label: 'negative', sentiment_score: 0.28, reach: 890, likes: 8, comments: 27, shares: 5, posted_at: dAgo(26) },
+    { platform: 'instagram', content: 'My mum used to laugh at me for buying "expensive rice" — now she specifically asks me to bring Jara when I visit. Vindicated! 😂 #JaraRice', sentiment_label: 'positive', sentiment_score: 0.93, reach: 8900, likes: 789, comments: 167, shares: 234, posted_at: dAgo(28) },
+  ]
+  for (const p of extraPosts) {
+    await sb.from('social_posts').insert({ brand_id: brandId, ...p })
+  }
 
   /* ── 35. Creative Assets (Creative Library vault) ───────────────────── */
   const creativeAssets = [
@@ -2120,6 +2147,7 @@ export async function POST(req: NextRequest) {
       customerProfiles:    10,
       creativeAssets:      10,
       brandVoiceUpdated:   true,
+      extraSocialPosts:    20,
     },
   })
 }
