@@ -1,6 +1,13 @@
 import { createClient }  from '@/lib/supabase/server'
 import { redirect }      from 'next/navigation'
-import { computeFullBHI, type FullBHIComponents } from '@/lib/bhi'
+import {
+  computeFullBHI,
+  computeAwarenessComposite,
+  type FullBHIComponents,
+  type BHIBreakdowns,
+  type ComponentBreakdown,
+  type BreakdownSource,
+} from '@/lib/bhi'
 import { BrandEquityClient } from './brand-equity-client'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { SeedDemoPanel } from './seed-demo-panel'
@@ -30,6 +37,7 @@ export default async function BrandEquityPage({
   cutoff.setDate(cutoff.getDate() - days)
   const cutoffDate = cutoff.toISOString().split('T')[0]
   const cutoffISO  = cutoff.toISOString()
+  const todayDate  = new Date().toISOString().split('T')[0]
 
   const brandId = await getActiveBrandId(supabase)
   const bid = brandId ?? ''
@@ -43,10 +51,14 @@ export default async function BrandEquityPage({
     { data: brand },
     { data: bhiHistory },
     { data: culturalScores },
+    { data: oohSites },
+    { data: brandEvents },
+    { data: digitalPerf },
+    { data: influencers },
   ] = await Promise.all([
     supabase
       .from('sentiment_daily')
-      .select('social_score, day')
+      .select('social_score, day, platform_breakdown')
       .eq('brand_id', bid)
       .gte('day', cutoffDate)
       .order('day', { ascending: false }),
@@ -87,10 +99,55 @@ export default async function BrandEquityPage({
       .not('cultural_score', 'is', null)
       .order('created_at', { ascending: false })
       .limit(30),
+    // ── Awareness sub-sources ──
+    supabase
+      .from('ooh_sites')
+      .select('daily_traffic, campaign_end')
+      .eq('brand_id', bid)
+      .gte('campaign_end', todayDate),
+    supabase
+      .from('events')
+      .select('debrief')
+      .eq('brand_id', bid)
+      .gte('date_start', cutoffDate)
+      .lte('date_start', todayDate),
+    supabase
+      .from('digital_performance_daily')
+      .select('impressions')
+      .eq('brand_id', bid)
+      .gte('date', cutoffDate),
+    supabase
+      .from('influencers')
+      .select('latest_post_reach')
+      .eq('brand_id', bid),
   ])
 
-  // ── 1. Awareness (20%) — SOV %
-  const awarenessScore: number | null = sovSnap?.social_sov ?? null
+  // ── 1. Awareness (20%) — multi-source composite
+  const oohReach = (oohSites ?? []).reduce(
+    (sum, s) => sum + (s.daily_traffic ?? 0) * days,
+    0,
+  )
+  const eventAttendanceTotal = (brandEvents ?? []).reduce((sum, e) => {
+    const debrief = e.debrief as { actual_attendance?: number } | null
+    return sum + (debrief?.actual_attendance ?? 0)
+  }, 0)
+  const digitalImpressionsTotal = (digitalPerf ?? []).reduce(
+    (sum, d) => sum + (d.impressions ?? 0),
+    0,
+  )
+  const influencerReachTotal = (influencers ?? []).reduce(
+    (sum, i) => sum + (i.latest_post_reach ?? 0),
+    0,
+  )
+
+  const awarenessResult = computeAwarenessComposite({
+    socialSov:          sovSnap?.social_sov ?? null,
+    oohMonthlyReach:    oohReach > 0           ? oohReach              : null,
+    eventAttendance:    eventAttendanceTotal > 0 ? eventAttendanceTotal : null,
+    digitalImpressions: digitalImpressionsTotal > 0 ? digitalImpressionsTotal : null,
+    influencerReach:    influencerReachTotal > 0 ? influencerReachTotal : null,
+  })
+  const awarenessScore: number | null = awarenessResult.score
 
   // ── 2. Salience (15%) — aided awareness rate from surveys
   // From awareness_check / b2_intercept responses: all respondents are already aware
@@ -167,12 +224,67 @@ export default async function BrandEquityPage({
     ? Math.min(Math.round((emvRaw / EMV_SCALE_MAX) * 100), 100)
     : null
 
+  // ── Build per-component breakdowns ────────────────────────────────────────
+
+  // Sentiment: aggregate per-platform from platform_breakdown JSONB
+  type PlatformEntry = { volume?: number; score?: number }
+  const platformTotals: Record<string, { weightedScore: number; totalVolume: number }> = {}
+  for (const day of sentWithData) {
+    const pb = (day as { platform_breakdown?: Record<string, PlatformEntry> }).platform_breakdown
+    if (!pb) continue
+    for (const [platform, entry] of Object.entries(pb)) {
+      const vol   = (entry as PlatformEntry).volume ?? 0
+      const score = (entry as PlatformEntry).score  ?? 0
+      if (vol > 0) {
+        if (!platformTotals[platform]) platformTotals[platform] = { weightedScore: 0, totalVolume: 0 }
+        platformTotals[platform].weightedScore += score * vol
+        platformTotals[platform].totalVolume   += vol
+      }
+    }
+  }
+  const platformNames: Record<string, string> = {
+    twitter: 'X (Twitter)', instagram: 'Instagram', tiktok: 'TikTok',
+    facebook: 'Facebook', linkedin: 'LinkedIn',
+  }
+  const sentimentSources: BreakdownSource[] = Object.entries(platformTotals).map(([p, t]) => {
+    const avgScore = Math.round(t.weightedScore / t.totalVolume)
+    return {
+      label:      platformNames[p] ?? p,
+      rawDisplay: `${Math.round(t.totalVolume).toLocaleString('en-NG')} mentions`,
+      weight:     Math.round((t.totalVolume / Object.values(platformTotals).reduce((s, v) => s + v.totalVolume, 0)) * 100),
+      score:      avgScore,
+    }
+  })
+  // If no platform breakdown available, fall back to the blended score as single source
+  const sentimentBreakdown: ComponentBreakdown = sentimentSources.length > 0
+    ? { sources: sentimentSources, composite: sentimentScore }
+    : {
+        sources: [{ label: 'Social (blended)', rawDisplay: null, weight: 100, score: sentimentScore }],
+        composite: sentimentScore,
+      }
+
+  // Simple single-source breakdowns for the remaining components
+  const mkSingle = (label: string, rawDisplay: string | null, score: number | null): ComponentBreakdown => ({
+    sources: [{ label, rawDisplay, weight: 100, score }],
+    composite: score,
+  })
+
+  const breakdowns: BHIBreakdowns = {
+    awareness:         awarenessResult.breakdown,
+    sentiment:         sentimentBreakdown,
+    salience:          mkSingle('Awareness Check surveys', salienceScore !== null ? `${salienceScore}% aware` : null, salienceScore),
+    perception:        mkSingle('Perception Audit surveys', perceptionScore !== null ? `${perceptionScore}/100` : null, perceptionScore),
+    culturalResonance: mkSingle('Cultural analyses', culturalResonance !== null ? `${culturalResonance}/100` : null, culturalResonance),
+    blendedSov:        mkSingle('Social SOV', blendedSov !== null ? `${blendedSov?.toFixed(1)}%` : null, blendedSov),
+    emv:               mkSingle('Social posts EMV', emvScore !== null ? `${emvScore}/100` : null, emvScore),
+  }
+
   // ── Compute full BHI
   const components: FullBHIComponents = {
     awareness: awarenessScore, salience: salienceScore, sentiment: sentimentScore,
     perception: perceptionScore, culturalResonance, blendedSov, emv: emvScore,
   }
-  const bhi = computeFullBHI(components)
+  const bhi = computeFullBHI(components, breakdowns)
 
   // ── Perception radar data (8 dimensions)
   const DIMENSIONS = ['Quality', 'Trust', 'Innovation', 'Value', 'Cultural Relevance', 'Accessibility', 'Reliability', 'Emotional Connection']

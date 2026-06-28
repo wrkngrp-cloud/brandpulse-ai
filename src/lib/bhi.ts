@@ -72,7 +72,7 @@ export function computeBHI({
 // ── Full 7-component BHI ────────────────────────────────────────────────────
 
 export interface FullBHIComponents {
-  awareness:         number | null  // 20% — SOV %
+  awareness:         number | null  // 20% — composite (SOV + OOH + events + digital + influencer)
   salience:          number | null  // 15% — aided awareness rate from surveys
   sentiment:         number | null  // 20% — sentiment_daily.social_score
   perception:        number | null  // 15% — avg perception audit ratings (0-100)
@@ -81,11 +81,36 @@ export interface FullBHIComponents {
   emv:               number | null  // 5%  — normalized EMV (0-100)
 }
 
+// ── Breakdown types (per-component data source detail) ─────────────────────
+
+export interface BreakdownSource {
+  label:      string
+  rawDisplay: string | null   // formatted value, e.g. "22.4%", "3.2M", "1,124"
+  weight:     number          // redistributed weight within this component (0–100)
+  score:      number | null   // 0–100 sub-score for this source
+}
+
+export interface ComponentBreakdown {
+  sources:   BreakdownSource[]
+  composite: number | null
+}
+
+export interface BHIBreakdowns {
+  awareness?:         ComponentBreakdown
+  sentiment?:         ComponentBreakdown
+  salience?:          ComponentBreakdown
+  perception?:        ComponentBreakdown
+  culturalResonance?: ComponentBreakdown
+  blendedSov?:        ComponentBreakdown
+  emv?:               ComponentBreakdown
+}
+
 export interface FullBHIResult {
   score:      number | null
   coverage:   number
   zone:       BHIZone | null
   components: FullBHIComponents
+  breakdowns?: BHIBreakdowns
 }
 
 const FULL_WEIGHTS: Record<keyof FullBHIComponents, number> = {
@@ -98,12 +123,15 @@ const FULL_WEIGHTS: Record<keyof FullBHIComponents, number> = {
   emv:                5,
 }
 
-export function computeFullBHI(components: FullBHIComponents): FullBHIResult {
+export function computeFullBHI(
+  components: FullBHIComponents,
+  breakdowns?: BHIBreakdowns,
+): FullBHIResult {
   const keys = Object.keys(components) as (keyof FullBHIComponents)[]
   const available = keys.filter(k => components[k] !== null)
 
   if (available.length === 0) {
-    return { score: null, coverage: 0, zone: null, components }
+    return { score: null, coverage: 0, zone: null, components, breakdowns }
   }
 
   const totalBaseWeight = keys.reduce((s, k) => s + FULL_WEIGHTS[k], 0)
@@ -115,5 +143,105 @@ export function computeFullBHI(components: FullBHIComponents): FullBHIResult {
     available.reduce((s, k) => s + ((components[k] as number) * FULL_WEIGHTS[k]), 0) / activeWeight
   ).toFixed(1))
 
-  return { score, coverage, zone: getBHIZone(score), components }
+  return { score, coverage, zone: getBHIZone(score), components, breakdowns }
+}
+
+// ── Awareness composite (multi-source) ────────────────────────────────────────
+
+export interface AwarenessInputs {
+  socialSov:          number | null  // SOV percentage, used as 0–100 score directly
+  oohMonthlyReach:    number | null  // raw total reach (daily_traffic × active_days)
+  eventAttendance:    number | null  // total attendee count across events
+  digitalImpressions: number | null  // total digital ad impressions
+  influencerReach:    number | null  // sum of latest_post_reach for brand influencers
+}
+
+// Scale denominators: value that maps to a score of 100
+const AWARENESS_SCALE: Record<keyof AwarenessInputs, number> = {
+  socialSov:          100,        // already a 0–100 percentage
+  oohMonthlyReach:    5_000_000,  // 5M monthly reach = 100
+  eventAttendance:    10_000,     // 10K total attendance = 100
+  digitalImpressions: 5_000_000,  // 5M impressions = 100
+  influencerReach:    2_000_000,  // 2M reach = 100
+}
+
+const AWARENESS_BASE_WEIGHTS: Record<keyof AwarenessInputs, number> = {
+  socialSov:          30,
+  oohMonthlyReach:    25,
+  eventAttendance:    20,
+  digitalImpressions: 15,
+  influencerReach:    10,
+}
+
+const AWARENESS_SOURCE_LABELS: Record<keyof AwarenessInputs, string> = {
+  socialSov:          'Social SOV',
+  oohMonthlyReach:    'OOH Reach',
+  eventAttendance:    'Event Attendance',
+  digitalImpressions: 'Digital Impressions',
+  influencerReach:    'Influencer Reach',
+}
+
+function formatAwarenessRaw(key: keyof AwarenessInputs, v: number): string {
+  switch (key) {
+    case 'socialSov':
+      return `${v.toFixed(1)}%`
+    case 'eventAttendance':
+      return v.toLocaleString('en-NG')
+    default:
+      return v >= 1_000_000
+        ? `${(v / 1_000_000).toFixed(1)}M`
+        : v >= 1_000
+        ? `${Math.round(v / 1_000)}K`
+        : String(Math.round(v))
+  }
+}
+
+export function computeAwarenessComposite(inputs: AwarenessInputs): {
+  score:     number | null
+  breakdown: ComponentBreakdown
+} {
+  const inputKeys = Object.keys(inputs) as (keyof AwarenessInputs)[]
+  const active    = inputKeys.filter(k => inputs[k] !== null && inputs[k] !== undefined)
+
+  if (active.length === 0) {
+    return {
+      score: null,
+      breakdown: {
+        composite: null,
+        sources: inputKeys.map(k => ({
+          label:      AWARENESS_SOURCE_LABELS[k],
+          rawDisplay: null,
+          weight:     AWARENESS_BASE_WEIGHTS[k],
+          score:      null,
+        })),
+      },
+    }
+  }
+
+  const totalActiveWeight = active.reduce((sum, k) => sum + AWARENESS_BASE_WEIGHTS[k], 0)
+
+  const sources: BreakdownSource[] = inputKeys.map(k => {
+    const val = inputs[k]
+    if (val === null || val === undefined) {
+      return { label: AWARENESS_SOURCE_LABELS[k], rawDisplay: null, weight: 0, score: null }
+    }
+    const subScore          = Math.min(100, Math.round((val / AWARENESS_SCALE[k]) * 100))
+    const redistributedWt   = Math.round((AWARENESS_BASE_WEIGHTS[k] / totalActiveWeight) * 100)
+    return {
+      label:      AWARENESS_SOURCE_LABELS[k],
+      rawDisplay: formatAwarenessRaw(k, val),
+      weight:     redistributedWt,
+      score:      subScore,
+    }
+  })
+
+  const composite = Math.round(
+    active.reduce((sum, k) => {
+      const val      = inputs[k] as number
+      const subScore = Math.min(100, (val / AWARENESS_SCALE[k]) * 100)
+      return sum + subScore * (AWARENESS_BASE_WEIGHTS[k] / totalActiveWeight)
+    }, 0),
+  )
+
+  return { score: composite, breakdown: { sources, composite } }
 }

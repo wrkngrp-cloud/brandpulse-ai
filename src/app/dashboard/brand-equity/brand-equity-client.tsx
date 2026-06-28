@@ -5,7 +5,7 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip as RechartTooltip,
   LineChart, Line, XAxis, YAxis, CartesianGrid, ReferenceLine,
 } from 'recharts'
-import { Info, Link as LinkIcon } from 'lucide-react'
+import { Info, Link as LinkIcon, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { BHIGauge } from '@/components/dashboard/bhi-gauge'
 import { cn, formatNGN } from '@/lib/utils'
@@ -45,13 +45,14 @@ const COMPONENT_META: {
   label: string
   weight: number
   source: string
+  multiSource?: boolean
   phase?: string
 }[] = [
-  { key: 'awareness',         label: 'Brand Awareness',     weight: 20, source: 'Share of Voice'          },
+  { key: 'awareness',         label: 'Brand Awareness',     weight: 20, source: 'SOV · OOH · Events · Digital · Influencer', multiSource: true },
   { key: 'salience',          label: 'Brand Salience',      weight: 15, source: 'Awareness Check surveys (q1)' },
-  { key: 'sentiment',         label: 'Brand Sentiment',     weight: 20, source: 'Sentiment score (14d avg)' },
+  { key: 'sentiment',         label: 'Brand Sentiment',     weight: 20, source: 'Per-platform sentiment (14d avg)', multiSource: true },
   { key: 'perception',        label: 'Brand Perception',    weight: 15, source: 'Perception Audit surveys'  },
-  { key: 'culturalResonance', label: 'Cultural Resonance',  weight: 15, source: 'Cultural survey',  phase: 'Phase 3' },
+  { key: 'culturalResonance', label: 'Cultural Resonance',  weight: 15, source: 'Cultural analyses', phase: 'Phase 3' },
   { key: 'blendedSov',        label: 'Blended SOV',         weight: 10, source: 'Social SOV'                },
   { key: 'emv',               label: 'EMV Score',           weight:  5, source: 'Social posts (14d)'        },
 ]
@@ -74,8 +75,9 @@ export function BrandEquityClient({
   bhi, sparkline, sovPct, currentNps, npsTotal, emvRaw, perceptionDimensions, brandName, days = 30,
   sector = 'FMCG', benchmarks = {}, marketSharePct,
 }: Props) {
-  const [marketShare, setMarketShare] = useState<number>(marketSharePct ?? 5)
-  const [targetEsov,  setTargetEsov]  = useState<number>(10)
+  const [marketShare,  setMarketShare]  = useState<number>(marketSharePct ?? 5)
+  const [targetEsov,   setTargetEsov]   = useState<number>(10)
+  const [expandedKey,  setExpandedKey]  = useState<keyof FullBHIComponents | null>(null)
   const rlShort = rangeLabelShort(days)
   const rlLong  = rangeLabelLong(days)
 
@@ -138,11 +140,13 @@ export function BrandEquityClient({
           </div>
 
           {/* Component breakdown */}
-          <div className="sm:col-span-2 space-y-2">
+          <div className="sm:col-span-2 space-y-1">
             {COMPONENT_META.map(meta => {
-              const score = bhi.components[meta.key]
+              const score     = bhi.components[meta.key]
               const available = score != null
-              const zone = bhi.zone ? ZONE_META[bhi.zone] : null
+              const zone      = bhi.zone ? ZONE_META[bhi.zone] : null
+              const isOpen    = expandedKey === meta.key
+              const breakdown = bhi.breakdowns?.[meta.key]
 
               const BENCH_KEY: Partial<Record<keyof FullBHIComponents, string>> = {
                 sentiment: 'sentiment',
@@ -163,38 +167,130 @@ export function BrandEquityClient({
                 : pctile ? 'text-red-500' : ''
 
               return (
-                <div key={meta.key} className="flex items-center gap-3">
-                  <div className="w-24 shrink-0">
-                    <p className="text-xs font-medium truncate">{meta.label}</p>
-                    <p className="text-[10px] text-muted-foreground/60">{meta.weight}% weight</p>
-                  </div>
-                  <div className="flex-1">
-                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-700"
-                        style={{
-                          width: available ? `${score}%` : '0%',
-                          backgroundColor: available ? (zone?.color ?? '#94a3b8') : undefined,
-                          opacity: available ? 1 : 0,
-                        }}
-                      />
+                <div key={meta.key} className="rounded-lg transition-colors">
+                  {/* Row header — clickable */}
+                  <button
+                    onClick={() => setExpandedKey(isOpen ? null : meta.key)}
+                    className="w-full flex items-center gap-3 py-1.5 px-1 rounded-lg hover:bg-muted/40 transition-colors group text-left"
+                  >
+                    <div className="w-24 shrink-0">
+                      <p className="text-xs font-medium truncate">{meta.label}</p>
+                      <p className="text-[10px] text-muted-foreground/60">{meta.weight}% weight</p>
                     </div>
-                  </div>
-                  <div className="w-12 text-right shrink-0">
-                    {available ? (
-                      <span className="text-sm font-semibold tabular-nums">{Math.round(score as number)}</span>
-                    ) : meta.phase ? (
-                      <span className="text-[10px] text-muted-foreground/40 bg-muted rounded px-1">{meta.phase}</span>
-                    ) : (
-                      <span className="text-xs text-muted-foreground/40">—</span>
-                    )}
-                    {pctile && (
-                      <p className={cn('text-[9px] font-semibold uppercase tracking-wide leading-none mt-0.5', pctileColor)}>{pctile}</p>
-                    )}
-                  </div>
-                  <div className="w-24 shrink-0 hidden sm:block">
-                    <p className="text-[10px] text-muted-foreground/60 truncate">{meta.source}</p>
-                  </div>
+                    <div className="flex-1">
+                      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-700"
+                          style={{
+                            width: available ? `${score}%` : '0%',
+                            backgroundColor: available ? (zone?.color ?? '#94a3b8') : undefined,
+                            opacity: available ? 1 : 0,
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="w-12 text-right shrink-0">
+                      {available ? (
+                        <span className="text-sm font-semibold tabular-nums">{Math.round(score as number)}</span>
+                      ) : meta.phase ? (
+                        <span className="text-[10px] text-muted-foreground/40 bg-muted rounded px-1">{meta.phase}</span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground/40">—</span>
+                      )}
+                      {pctile && (
+                        <p className={cn('text-[9px] font-semibold uppercase tracking-wide leading-none mt-0.5', pctileColor)}>{pctile}</p>
+                      )}
+                    </div>
+                    <div className="w-20 shrink-0 hidden sm:flex items-center justify-between gap-1">
+                      <p className="text-[10px] text-muted-foreground/60 truncate flex-1">{meta.source}</p>
+                      <ChevronDown className={cn(
+                        'h-3 w-3 shrink-0 text-muted-foreground/30 transition-transform duration-200 group-hover:text-muted-foreground/60',
+                        isOpen && 'rotate-180',
+                      )} />
+                    </div>
+                    <ChevronDown className={cn(
+                      'h-3 w-3 shrink-0 text-muted-foreground/30 transition-transform duration-200 sm:hidden',
+                      isOpen && 'rotate-180',
+                    )} />
+                  </button>
+
+                  {/* Breakdown panel */}
+                  {isOpen && (
+                    <div className="ml-1 mr-1 mb-2 border border-border/50 rounded-lg bg-muted/20 p-3 space-y-2.5">
+                      <p className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">
+                        Contributing data sources
+                      </p>
+                      {breakdown && breakdown.sources.length > 0 ? (
+                        <>
+                          {breakdown.sources
+                            .filter(s => s.score !== null || s.weight > 0)
+                            .map(source => (
+                              <div key={source.label} className="space-y-1">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <span className="text-[11px] text-foreground/80 font-medium truncate">{source.label}</span>
+                                    {source.rawDisplay && (
+                                      <span className="text-[10px] text-muted-foreground/60 tabular-nums shrink-0">{source.rawDisplay}</span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <span className="text-[10px] text-muted-foreground/50 tabular-nums">
+                                      {source.weight > 0 ? `${source.weight}% wt` : 'no data'}
+                                    </span>
+                                    <span className={cn(
+                                      'text-[11px] font-bold tabular-nums w-10 text-right',
+                                      source.score !== null
+                                        ? source.score >= 70 ? 'text-green-600'
+                                          : source.score >= 45 ? 'text-amber-500'
+                                          : 'text-red-500'
+                                        : 'text-muted-foreground/30',
+                                    )}>
+                                      {source.score !== null ? `${source.score}/100` : '—'}
+                                    </span>
+                                  </div>
+                                </div>
+                                {/* Weight + score bar */}
+                                <div className="relative h-1 bg-muted rounded-full overflow-hidden">
+                                  {/* Weight indicator (total bar width shows relative weight) */}
+                                  <div
+                                    className="absolute inset-y-0 left-0 rounded-full bg-muted-foreground/15"
+                                    style={{ width: `${source.weight}%` }}
+                                  />
+                                  {/* Score fill within the weight area */}
+                                  {source.score !== null && source.weight > 0 && (
+                                    <div
+                                      className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                                      style={{
+                                        width: `${(source.weight / 100) * source.score}%`,
+                                        backgroundColor: source.score >= 70 ? '#22c55e'
+                                          : source.score >= 45 ? '#f59e0b' : '#ef4444',
+                                        opacity: 0.8,
+                                      }}
+                                    />
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          {/* Sources with no data */}
+                          {breakdown.sources.filter(s => s.score === null && s.weight === 0).length > 0 && (
+                            <div className="pt-1 border-t border-border/30">
+                              <p className="text-[10px] text-muted-foreground/40">
+                                No data yet:{' '}
+                                {breakdown.sources
+                                  .filter(s => s.score === null && s.weight === 0)
+                                  .map(s => s.label)
+                                  .join(', ')}
+                              </p>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-[11px] text-muted-foreground/50">
+                          No source data available for this component yet.
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               )
             })}
