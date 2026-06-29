@@ -20,6 +20,15 @@ export interface WeeklyNps {
   total:       number
 }
 
+export interface NpsCohort {
+  role:       string
+  label:      string
+  total:      number
+  nps:        number | null
+  promoters:  number
+  detractors: number
+}
+
 interface Props {
   weeklyData:       WeeklyNps[]
   currentNps:       number | null
@@ -33,6 +42,7 @@ interface Props {
   detractorTexts:   string[]
   promoterTexts:    string[]
   benchmarkP50?:    number | null
+  cohorts?:         NpsCohort[]
 }
 
 interface DiagnosisResult {
@@ -122,6 +132,7 @@ function NpsWhatsAppSender() {
 export function NpsClient({
   weeklyData, currentNps, totalPromoters, totalPassives, totalDetractors,
   totalResponses, trendDirection, brandName, industry, detractorTexts, promoterTexts, benchmarkP50,
+  cohorts = [],
 }: Props) {
   const [diagnosis, setDiagnosis] = useState<DiagnosisResult | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -350,6 +361,40 @@ export function NpsClient({
         <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-red-500 inline-block" />Below 0 Critical</span>
         <span className="ml-auto opacity-50">NPS = % Promoters − % Detractors</span>
       </div>
+
+      {/* NPS by cohort (respondent_role) */}
+      {cohorts.length >= 2 && (
+        <div className="border rounded-2xl bg-card card-shadow p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <p className="text-[13px] font-semibold tracking-tight">NPS by cohort</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Split by who responded</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {cohorts.map(c => {
+              const color =
+                c.nps == null  ? 'text-muted-foreground/40' :
+                c.nps >= 50    ? 'text-green-600'  :
+                c.nps >= 30    ? 'text-foreground'  :
+                c.nps >= 0     ? 'text-amber-500'   :
+                'text-red-500'
+              return (
+                <div key={c.role} className="border rounded-xl p-4">
+                  <p className="eyebrow mb-1.5">{c.label}</p>
+                  <p className={cn('metric text-[26px]', color)}>
+                    {c.nps != null ? `${c.nps >= 0 ? '+' : ''}${c.nps}` : '—'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {c.total} response{c.total === 1 ? '' : 's'}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* AI Diagnosis */}
       {diagnosis && (

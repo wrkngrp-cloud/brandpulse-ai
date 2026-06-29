@@ -14,6 +14,16 @@ import Link from 'next/link'
 
 type CulturalKey = 'community_corporate' | 'traditional_modern' | 'religious_secular' | 'mass_premium' | 'local_global'
 
+const BRAND_TYPES: { value: BrandSettingsData['brandType']; label: string; description: string }[] = [
+  { value: 'fmcg',              label: 'FMCG / Consumer Goods', description: 'Physical products sold through retail or direct' },
+  { value: 'fintech',           label: 'Fintech / Digital Finance', description: 'Payment platforms, digital banks, savings/investment apps' },
+  { value: 'venue',             label: 'Venue / Hospitality', description: 'Restaurants, clubs, hotels, experience venues' },
+  { value: 'b2b_saas',          label: 'B2B SaaS', description: 'Software tools, API platforms, developer products' },
+  { value: 'marketplace',       label: 'Creator Marketplace', description: 'Platforms for creators to sell or build on' },
+  { value: 'beverage_alcohol',  label: 'Alcohol / Beverage', description: 'Regulated consumer beverages' },
+  { value: 'b2b_distribution',  label: 'B2B Distribution', description: 'Trade and supply chain platforms' },
+]
+
 interface BrandSettingsFormProps {
   initial:     BrandSettingsData
   logoUrl:     string | null
@@ -202,6 +212,19 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
             <Input id="websiteUrl" value={data.websiteUrl ?? ''} onChange={e => patch('websiteUrl', e.target.value)} placeholder="https://yourbrand.com" className="max-w-sm" />
           </div>
           <div className="space-y-2">
+            <Label htmlFor="googlePlaceId">Google Place ID</Label>
+            <p className="text-xs text-muted-foreground">
+              Find this in your Google Maps listing URL (starts with ChIJ...). Required for venue reputation tracking.
+            </p>
+            <Input
+              id="googlePlaceId"
+              value={data.googlePlaceId ?? ''}
+              onChange={e => patch('googlePlaceId', e.target.value)}
+              placeholder="ChIJ..."
+              className="max-w-sm font-mono text-xs"
+            />
+          </div>
+          <div className="space-y-2">
             <Label>Category</Label>
             <Select value={data.category} onValueChange={v => patch('category', v ?? '')}>
               <SelectTrigger className="max-w-sm"><SelectValue placeholder="Select category" /></SelectTrigger>
@@ -209,6 +232,30 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                 {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Industry type</Label>
+            <p className="text-xs text-muted-foreground">
+              Sets which signals drive your brand funnel and health scores. Pick the one that fits your business best.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-2 max-w-2xl">
+              {BRAND_TYPES.map(t => {
+                const selected = data.brandType === t.value
+                return (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => patch('brandType', t.value)}
+                    className={`text-left rounded-lg border p-3 transition-colors ${
+                      selected ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-accent'
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{t.label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>
+                  </button>
+                )
+              })}
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="marketSharePct">Estimated market share (%)</Label>

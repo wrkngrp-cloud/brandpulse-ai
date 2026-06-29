@@ -25,6 +25,24 @@ const PLATFORM_LABEL: Record<string, string> = {
   instagram: 'IG',
 }
 
+const AUDIENCE_LABEL: Record<string, string> = {
+  consumer:  'Consumers',
+  creator:   'Creators',
+  developer: 'Developers',
+  retailer:  'Trade partners',
+  media:     'Media',
+  general:   'General',
+}
+
+const AUDIENCE_BAR: Record<string, string> = {
+  consumer:  'bg-blue-500',
+  creator:   'bg-fuchsia-500',
+  developer: 'bg-violet-500',
+  retailer:  'bg-emerald-500',
+  media:     'bg-amber-500',
+  general:   'bg-muted-foreground/40',
+}
+
 interface DayRow {
   day: string
   social_score: number
@@ -121,7 +139,10 @@ async function SentimentData({ days = 84 }: { days: number }) {
   }
   const sector = SECTOR_MAP[(brandRow?.category ?? '').toLowerCase().trim()] ?? 'FMCG'
 
-  const [{ data: daily }, { data: mentions }, { data: lastRun }, { data: heatmapRaw }, { data: benchmarkRow }] = await Promise.all([
+  const thirtyDaysAgo = new Date()
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+  const [{ data: daily }, { data: mentions }, { data: lastRun }, { data: heatmapRaw }, { data: benchmarkRow }, { data: audienceRows }] = await Promise.all([
     supabase
       .from('sentiment_daily')
       .select('day, social_score, positive_pct, neutral_pct, negative_pct, emotion_distribution, platform_breakdown')
@@ -153,6 +174,11 @@ async function SentimentData({ days = 84 }: { days: number }) {
       .eq('sector', sector)
       .eq('metric', 'sentiment')
       .maybeSingle(),
+    supabase
+      .from('mentions')
+      .select('audience_type')
+      .eq('brand_id', bid)
+      .gte('created_at', thirtyDaysAgo.toISOString()),
   ])
 
   const sentimentBenchmarkP50 = (benchmarkRow as { p50: number } | null)?.p50 ?? null
@@ -204,6 +230,18 @@ async function SentimentData({ days = 84 }: { days: number }) {
     positive_pct: r.positive_pct as number | null,
     negative_pct: r.negative_pct as number | null,
   }))
+
+  // Audience-type distribution over the last 30 days. Scaffold — most rows are
+  // 'general' until the classifier tags audience. Surfaces who is talking.
+  const audienceCounts: Record<string, number> = {}
+  for (const r of audienceRows ?? []) {
+    const key = (r.audience_type as string | null) ?? 'general'
+    audienceCounts[key] = (audienceCounts[key] ?? 0) + 1
+  }
+  const audienceTotal = Object.values(audienceCounts).reduce((a, b) => a + b, 0)
+  const audienceEntries = Object.entries(audienceCounts)
+    .map(([type, count]) => ({ type, count, pct: audienceTotal > 0 ? (count / audienceTotal) * 100 : 0 }))
+    .sort((a, b) => b.count - a.count)
 
   return (
     <div className="space-y-6">
@@ -372,6 +410,40 @@ async function SentimentData({ days = 84 }: { days: number }) {
           </div>
         )}
       </div>
+
+      {/* Audience-type distribution */}
+      {audienceTotal > 0 && (
+        <div className="border rounded-2xl bg-card card-shadow p-5 sm:p-6 space-y-4">
+          <div>
+            <p className="eyebrow mb-1">Who&apos;s talking</p>
+            <h3 className="text-[15px] font-semibold tracking-tight">Mentions by audience</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {audienceTotal} mention{audienceTotal === 1 ? '' : 's'} over the last 30 days
+            </p>
+          </div>
+          {/* Stacked bar */}
+          <div className="h-2.5 w-full rounded-full overflow-hidden flex bg-muted">
+            {audienceEntries.map(a => (
+              <div
+                key={a.type}
+                className={AUDIENCE_BAR[a.type] ?? 'bg-muted-foreground/40'}
+                style={{ width: `${a.pct}%` }}
+                title={`${AUDIENCE_LABEL[a.type] ?? a.type} ${Math.round(a.pct)}%`}
+              />
+            ))}
+          </div>
+          {/* Legend pills */}
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {audienceEntries.map(a => (
+              <div key={a.type} className="flex items-center gap-1.5">
+                <span className={`h-2 w-2 rounded-full ${AUDIENCE_BAR[a.type] ?? 'bg-muted-foreground/40'}`} />
+                <span className="text-xs font-medium">{AUDIENCE_LABEL[a.type] ?? a.type}</span>
+                <span className="text-xs text-muted-foreground tabular-nums">{Math.round(a.pct)}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Topic clusters */}
       {mentionTexts.length >= 3 && (

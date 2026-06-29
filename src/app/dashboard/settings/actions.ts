@@ -72,7 +72,9 @@ export async function changePassword(
 const brandSchema = z.object({
   brandName:          z.string().min(1, 'Brand name is required'),
   websiteUrl:         z.string().optional().default(''),
+  googlePlaceId:      z.string().optional().default(''),
   category:           z.string().min(1, 'Category is required'),
+  brandType:          z.enum(['fmcg','fintech','venue','b2b_saas','marketplace','beverage_alcohol','b2b_distribution']).default('fmcg'),
   marketSharePct:     z.number().min(0).max(100).nullable().default(null),
   brandValues:        z.array(z.string()).default([]),
   monitoredHashtags:  z.array(z.string()).default([]),
@@ -130,7 +132,9 @@ export async function updateBrand(
   const { error } = await service.from('brands').update({
     name:                d.brandName,
     website_url:         d.websiteUrl || null,
+    google_place_id:     d.googlePlaceId?.trim() || null,
     category:            d.category,
+    brand_type:          d.brandType,
     market_share_pct:    d.marketSharePct,
     brand_values:        d.brandValues,
     monitored_hashtags:  d.monitoredHashtags,

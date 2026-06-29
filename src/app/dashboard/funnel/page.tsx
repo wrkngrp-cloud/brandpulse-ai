@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { FunnelClient } from './funnel-client'
 import { getActiveBrandId } from '@/lib/active-brand'
-import { computeStageComposite } from '@/lib/bhi'
+import { computeStageComposite, type StageSignal } from '@/lib/bhi'
 
 export const dynamic = 'force-dynamic'
 
@@ -61,6 +61,8 @@ export default async function FunnelPage() {
     { data: advocacyScore },
     { count: activePromoterCount },
     { count: visualAdvocacyCount },
+    { data: fieldReports },
+    { data: reviewSnaps },
   ] = await Promise.all([
     supabase
       .from('sov_snapshots')
@@ -98,8 +100,8 @@ export default async function FunnelPage() {
       .eq('brand_id', bid)
       .eq('type', 'perception_audit'),
     bid
-      ? supabase.from('brands').select('name, category').eq('id', bid).maybeSingle()
-      : supabase.from('brands').select('name, category').limit(1).maybeSingle(),
+      ? supabase.from('brands').select('name, category, brand_type').eq('id', bid).maybeSingle()
+      : supabase.from('brands').select('name, category, brand_type').limit(1).maybeSingle(),
     supabase
       .from('events')
       .select('debrief')
@@ -194,7 +196,7 @@ export default async function FunnelPage() {
       .gte('occurred_at', thirtyDaysAgo.toISOString()),
     supabase
       .from('nps_records')
-      .select('promoter_type')
+      .select('promoter_type, respondent_role')
       .eq('brand_id', bid)
       .gte('created_at', thirtyDaysAgo.toISOString()),
     supabase
@@ -226,9 +228,27 @@ export default async function FunnelPage() {
       .eq('brand_visible', true)
       .in('visual_sentiment', ['positive', 'neutral'])
       .gte('detected_at', thirtyDaysAgo.toISOString()),
+    supabase
+      .from('field_report_outlets')
+      .select('product_available, stock_level, posm_present')
+      .eq('brand_id', bid)
+      .gte('created_at', thirtyDaysAgo.toISOString()),
+    supabase
+      .from('review_platform_snapshots')
+      .select('platform, rating, review_count, review_velocity, period_end')
+      .eq('brand_id', bid)
+      .order('period_end', { ascending: false })
+      .limit(10),
   ])
 
   // ── Shared derived values ──────────────────────────────────────────────────
+
+  const brandType = (brand?.brand_type as string | undefined) ?? 'fmcg'
+  const isFmcgLike   = brandType === 'fmcg' || brandType === 'beverage_alcohol' || brandType === 'b2b_distribution'
+  const isFintech    = brandType === 'fintech'
+  const isVenue      = brandType === 'venue'
+  const isSaasOrMkt  = brandType === 'b2b_saas' || brandType === 'marketplace'
+  const noBroadcast  = isFintech || isSaasOrMkt   // exclude OOH/TV/radio for these
 
   // OOH (active sites only)
   const oohMonthlyReach = (oohSites ?? []).reduce((s, x) => s + (x.daily_traffic ?? 0) * 30, 0)
@@ -312,12 +332,40 @@ export default async function FunnelPage() {
   const ecomUnits    = (ecommerceSales ?? []).reduce((s, e) => s + (e.units ?? 0), 0)
   const referralConv = (referralCodes ?? []).reduce((s, c) => s + (c.conversions ?? 0), 0)
 
+  // Field Intelligence (FMCG/Distribution) — last 30 days of outlet visits
+  const totalFieldReports = (fieldReports ?? []).length
+  const availableReports  = (fieldReports ?? []).filter(r => r.product_available === true).length
+  const stockOutReports   = (fieldReports ?? []).filter(r => r.stock_level === 'out_of_stock' || r.stock_level === 'partial').length
+  const posm_reports      = (fieldReports ?? []).filter(r => r.posm_present === true).length
+  const distributionAvailability = totalFieldReports > 0 ? (availableReports / totalFieldReports) * 100 : null
+  const stockOutRate      = totalFieldReports > 0 ? ((totalFieldReports - stockOutReports) / totalFieldReports) * 100 : null
+  const posmPresenceRate  = totalFieldReports > 0 ? (posm_reports / totalFieldReports) * 100 : null
+
+  // Review platform signals (venue / fintech / saas)
+  const latestGoogleMaps = (reviewSnaps ?? []).find(r => r.platform === 'google_maps')
+  const googleMapsRating = latestGoogleMaps?.rating ? (latestGoogleMaps.rating / 5) * 100 : null
+  const googleMapsVelocity = latestGoogleMaps?.review_velocity ?? null
+
+  const latestAppStore = (reviewSnaps ?? []).find(r => r.platform === 'app_store' || r.platform === 'play_store')
+  const appStoreRating = latestAppStore?.rating ? (latestAppStore.rating / 5) * 100 : null
+
+  const latestG2 = (reviewSnaps ?? []).find(r => r.platform === 'g2' || r.platform === 'capterra')
+  const g2Rating = latestG2?.rating ? (latestG2.rating / 5) * 100 : null
+
   // Loyalty: NPS + customer profiles
-  const npsTotal      = (npsRecords ?? []).length
-  const npsPromoters  = (npsRecords ?? []).filter(n => n.promoter_type === 'promoter').length
-  const npsDetractors = (npsRecords ?? []).filter(n => n.promoter_type === 'detractor').length
+  // For b2b_distribution, prefer trade-partner respondents when present.
+  const tradePartnerNps = (npsRecords ?? []).filter(n => n.respondent_role === 'trade_partner')
+  const npsSource = brandType === 'b2b_distribution' && tradePartnerNps.length > 0
+    ? tradePartnerNps
+    : (npsRecords ?? [])
+  const npsTotal      = npsSource.length
+  const npsPromoters  = npsSource.filter(n => n.promoter_type === 'promoter').length
+  const npsDetractors = npsSource.filter(n => n.promoter_type === 'detractor').length
   const npsValue = npsTotal >= 3 ? ((npsPromoters - npsDetractors) / npsTotal) * 50 + 50 : null
   const npsPromoterShare = npsTotal >= 3 ? (npsPromoters / npsTotal) * 100 : null
+  const npsRawDisplay = brandType === 'b2b_distribution' && tradePartnerNps.length > 0
+    ? `${npsPromoters}P / ${npsDetractors}D of ${npsTotal} partners`
+    : `${npsPromoters}P / ${npsDetractors}D of ${npsTotal}`
 
   const profileCount = (customerProfiles ?? []).length
   const repeatCount  = (customerProfiles ?? []).filter(c => (c.total_orders ?? 0) >= 2).length
@@ -330,106 +378,229 @@ export default async function FunnelPage() {
   const referralActivity = (referralEventCount ?? 0) + referralConv
   const shareRatio = totalEngagements >= 50 ? Math.min(100, (totalShares / totalEngagements) * 500) : null
 
-  // ── Stage composites ────────────────────────────────────────────────────────
+  // ── Reusable signal definitions ─────────────────────────────────────────────
 
-  const awareness = computeStageComposite([
-    { label: 'Social SOV',            value: sovSnap?.social_sov ?? null, weight: 20, scale: 100,       rawDisplay: sovSnap?.social_sov != null ? `${sovSnap.social_sov.toFixed(1)}%` : null },
-    { label: 'OOH Monthly Reach',     value: oohMonthlyReach > 0 ? oohMonthlyReach : null, weight: 18, scale: 5_000_000, rawDisplay: oohMonthlyReach > 0 ? fmtNum(oohMonthlyReach) : null },
-    { label: 'Digital Impressions',   value: digitalImpressions > 0 ? digitalImpressions : null, weight: 12, scale: 5_000_000, rawDisplay: digitalImpressions > 0 ? fmtNum(digitalImpressions) : null },
-    { label: 'Event Attendance',      value: eventAttendance > 0 ? eventAttendance : null, weight: 10, scale: 10_000, rawDisplay: eventAttendance > 0 ? fmtNum(eventAttendance) : null },
-    { label: 'Influencer Post Reach', value: influencerReach > 0 ? influencerReach : null, weight: 8, scale: 2_000_000, rawDisplay: influencerReach > 0 ? fmtNum(influencerReach) : null },
-    { label: 'Press / Earned Reach',  value: pressReach > 0 ? pressReach : null, weight: 10, scale: 5_000_000, rawDisplay: pressReach > 0 ? fmtNum(pressReach) : null },
-    { label: 'TV GRPs Delivered',     value: (tvSchedules ?? []).length > 0 ? tvGrps : null, weight: 8, scale: 500, rawDisplay: (tvSchedules ?? []).length > 0 ? `${fmtNum(tvGrps)} GRPs` : null },
-    { label: 'Radio Spots',           value: (radioSchedules ?? []).length > 0 ? radioSpots : null, weight: 6, scale: 200, rawDisplay: (radioSchedules ?? []).length > 0 ? `${fmtNum(radioSpots)} spots` : null },
-    { label: 'AI Visibility',         value: aiVisScore, weight: 8, scale: 100, rawDisplay: aiVisScore != null ? `${aiVisScore}/100` : null },
-  ])
+  const sigSov: StageSignal = { label: 'Social SOV', value: sovSnap?.social_sov ?? null, weight: 20, scale: 100, rawDisplay: sovSnap?.social_sov != null ? `${sovSnap.social_sov.toFixed(1)}%` : null }
+  const sigOoh: StageSignal = { label: 'OOH Monthly Reach', value: oohMonthlyReach > 0 ? oohMonthlyReach : null, weight: 18, scale: 5_000_000, rawDisplay: oohMonthlyReach > 0 ? fmtNum(oohMonthlyReach) : null }
+  const sigDigitalImp: StageSignal = { label: 'Digital Impressions', value: digitalImpressions > 0 ? digitalImpressions : null, weight: 12, scale: 5_000_000, rawDisplay: digitalImpressions > 0 ? fmtNum(digitalImpressions) : null }
+  const sigEvent: StageSignal = { label: 'Event Attendance', value: eventAttendance > 0 ? eventAttendance : null, weight: 10, scale: 10_000, rawDisplay: eventAttendance > 0 ? fmtNum(eventAttendance) : null }
+  const sigInfluencer: StageSignal = { label: 'Influencer Post Reach', value: influencerReach > 0 ? influencerReach : null, weight: 8, scale: 2_000_000, rawDisplay: influencerReach > 0 ? fmtNum(influencerReach) : null }
+  const sigPress: StageSignal = { label: 'Press / Earned Reach', value: pressReach > 0 ? pressReach : null, weight: 10, scale: 5_000_000, rawDisplay: pressReach > 0 ? fmtNum(pressReach) : null }
+  const sigTv: StageSignal = { label: 'TV GRPs Delivered', value: (tvSchedules ?? []).length > 0 ? tvGrps : null, weight: 8, scale: 500, rawDisplay: (tvSchedules ?? []).length > 0 ? `${fmtNum(tvGrps)} GRPs` : null }
+  const sigRadio: StageSignal = { label: 'Radio Spots', value: (radioSchedules ?? []).length > 0 ? radioSpots : null, weight: 6, scale: 200, rawDisplay: (radioSchedules ?? []).length > 0 ? `${fmtNum(radioSpots)} spots` : null }
+  const sigAiVisAwareness: StageSignal = { label: 'AI Visibility', value: aiVisScore, weight: 8, scale: 100, rawDisplay: aiVisScore != null ? `${aiVisScore}/100` : null }
+  const sigDistribution: StageSignal = { label: 'Distribution Availability', value: distributionAvailability, weight: 12, scale: 100, rawDisplay: distributionAvailability != null ? `${distributionAvailability.toFixed(0)}% outlets` : null }
 
-  const consideration = computeStageComposite([
-    { label: 'Social Engagement Rate', value: avgEngRate != null ? avgEngRate * 10 : null, weight: 25, scale: 100, rawDisplay: avgEngRate != null ? `${avgEngRate.toFixed(2)}% avg` : null },
-    { label: 'Consideration Content',  value: (considerationCount ?? 0) > 0 ? (considerationCount ?? 0) : null, weight: 20, scale: 50, rawDisplay: (considerationCount ?? 0) > 0 ? `${considerationCount} posts` : null },
-    { label: 'Brand Mention Volume',   value: (mentionCount ?? 0) > 0 ? (mentionCount ?? 0) : null, weight: 15, scale: 300, rawDisplay: (mentionCount ?? 0) > 0 ? `${fmtNum(mentionCount ?? 0)} mentions` : null },
-    { label: 'Digital CTR',            value: avgCtr, weight: 20, scale: 0.05, rawDisplay: avgCtr != null ? `${(avgCtr * 100).toFixed(2)}%` : null },
-    { label: 'Video View-Through',     value: avgVvr, weight: 10, scale: 0.50, rawDisplay: avgVvr != null ? `${(avgVvr * 100).toFixed(0)}%` : null },
-    { label: 'AI Visibility Score',    value: aiVisScore, weight: 10, scale: 100, rawDisplay: aiVisScore != null ? `${aiVisScore}/100` : null },
-  ])
+  // ── Stage composites (brand_type aware) ─────────────────────────────────────
 
-  const preference = computeStageComposite([
-    { label: 'Sentiment Score (14d avg)',  value: sentScore14, weight: 28, scale: 100, rawDisplay: sentScore14 != null ? `${sentScore14.toFixed(0)}/100` : null },
-    { label: 'Positive Sentiment % (14d)', value: posPct14, weight: 12, scale: 100, rawDisplay: posPct14 != null ? `${posPct14.toFixed(0)}%` : null },
-    { label: 'Perception Quality',         value: perceptionScore, weight: 20, scale: 100, rawDisplay: perceptionScore != null ? `${perceptionScore}/100` : null },
-    { label: 'Cultural Resonance',         value: crsAvg, weight: 18, scale: 100, rawDisplay: crsAvg != null ? `${crsAvg.toFixed(0)}/100` : null },
-    { label: 'Press Sentiment',            value: pressTotal > 0 ? (pressPositive / pressTotal) * 100 : null, weight: 12, scale: 100, rawDisplay: pressTotal > 0 ? `${pressPositive}/${pressTotal} positive` : null },
-    { label: 'Marketplace Own Rating',     value: ratingAvg != null ? ratingAvg * 20 : null, weight: 10, scale: 100, rawDisplay: ratingAvg != null ? `${ratingAvg.toFixed(1)}★` : null },
-  ])
+  // Awareness
+  let awarenessSignals: StageSignal[]
+  if (isVenue) {
+    awarenessSignals = [sigSov, sigOoh, sigDigitalImp, sigEvent, sigInfluencer, sigPress, sigAiVisAwareness]
+  } else if (noBroadcast) {
+    // fintech / saas / marketplace — no OOH, TV, radio
+    awarenessSignals = [sigSov, sigDigitalImp, sigInfluencer, sigPress, sigAiVisAwareness]
+  } else {
+    // fmcg / beverage_alcohol / b2b_distribution — full media + field distribution
+    awarenessSignals = [sigSov, sigOoh, sigDigitalImp, sigEvent, sigInfluencer, sigPress, sigTv, sigRadio, sigAiVisAwareness, sigDistribution]
+  }
+  const awareness = computeStageComposite(awarenessSignals)
 
-  const action = computeStageComposite([
-    { label: 'Purchase Events',      value: (purchaseSuccessCount ?? 0) > 0 ? (purchaseSuccessCount ?? 0) : null, weight: 20, scale: 50, rawDisplay: (purchaseSuccessCount ?? 0) > 0 ? `${purchaseSuccessCount} purchases` : null },
-    { label: 'E-commerce Sales',     value: ecomUnits > 0 ? ecomUnits : null, weight: 18, scale: 200, rawDisplay: ecomUnits > 0 ? `${fmtNum(ecomUnits)} units` : null },
-    { label: 'Digital Conversions',  value: digitalConversions > 0 ? digitalConversions : null, weight: 18, scale: 500, rawDisplay: digitalConversions > 0 ? `${fmtNum(digitalConversions)} conv` : null },
-    { label: 'Event Lead Capture',   value: leadRate, weight: 15, scale: 100, rawDisplay: totalInt > 0 ? `${leads}/${totalInt} leads` : null },
-    { label: 'OOH Visit-throughs',   value: (oohSites ?? []).length > 0 ? oohVisits : null, weight: 12, scale: 1000, rawDisplay: (oohSites ?? []).length > 0 ? `${fmtNum(oohVisits)} visits` : null },
-    { label: 'Referral Conversions', value: referralConv > 0 ? referralConv : null, weight: 10, scale: 50, rawDisplay: referralConv > 0 ? `${fmtNum(referralConv)} conv` : null },
-    { label: 'SDK Conversions',      value: (sdkConversionCount ?? 0) > 0 ? (sdkConversionCount ?? 0) : null, weight: 7, scale: 100, rawDisplay: (sdkConversionCount ?? 0) > 0 ? `${fmtNum(sdkConversionCount ?? 0)} events` : null },
-  ])
+  // Consideration
+  const sigEngagement: StageSignal = { label: 'Social Engagement Rate', value: avgEngRate != null ? avgEngRate * 10 : null, weight: 25, scale: 100, rawDisplay: avgEngRate != null ? `${avgEngRate.toFixed(2)}% avg` : null }
+  const sigConsiderationContent: StageSignal = { label: 'Consideration Content', value: (considerationCount ?? 0) > 0 ? (considerationCount ?? 0) : null, weight: 20, scale: 50, rawDisplay: (considerationCount ?? 0) > 0 ? `${considerationCount} posts` : null }
+  const sigMentions: StageSignal = { label: 'Brand Mention Volume', value: (mentionCount ?? 0) > 0 ? (mentionCount ?? 0) : null, weight: 15, scale: 300, rawDisplay: (mentionCount ?? 0) > 0 ? `${fmtNum(mentionCount ?? 0)} mentions` : null }
+  const sigCtr: StageSignal = { label: 'Digital CTR', value: avgCtr, weight: 20, scale: 0.05, rawDisplay: avgCtr != null ? `${(avgCtr * 100).toFixed(2)}%` : null }
+  const sigVvr: StageSignal = { label: 'Video View-Through', value: avgVvr, weight: 10, scale: 0.50, rawDisplay: avgVvr != null ? `${(avgVvr * 100).toFixed(0)}%` : null }
+  const sigAiVisConsider: StageSignal = { label: 'AI Visibility Score', value: aiVisScore, weight: 10, scale: 100, rawDisplay: aiVisScore != null ? `${aiVisScore}/100` : null }
 
-  const loyalty = computeStageComposite([
-    { label: 'NPS Score',                value: npsValue, weight: 30, scale: 100, rawDisplay: npsValue != null ? `${npsPromoters}P / ${npsDetractors}D of ${npsTotal}` : null },
-    { label: 'Repeat Customer Rate',     value: repeatRate, weight: 25, scale: 100, rawDisplay: repeatRate != null ? `${repeatCount}/${profileCount} repeat` : null },
-    { label: 'Retention Health',         value: retentionHealth, weight: 22, scale: 100, rawDisplay: retentionHealth != null ? `${retentionHealth.toFixed(0)}/100` : null },
-    { label: 'Loyalty Program Activity', value: (loyaltyEarnCount ?? 0) > 0 ? (loyaltyEarnCount ?? 0) : null, weight: 13, scale: 100, rawDisplay: (loyaltyEarnCount ?? 0) > 0 ? `${fmtNum(loyaltyEarnCount ?? 0)} earns` : null },
-    { label: 'Post-purchase Sentiment', value: sentScore7, weight: 10, scale: 100, rawDisplay: sentScore7 != null ? `${sentScore7.toFixed(0)}/100` : null },
-  ])
+  let considerationSignals: StageSignal[]
+  if (isSaasOrMkt) {
+    considerationSignals = [sigEngagement, sigMentions, sigCtr, sigAiVisConsider]
+  } else {
+    considerationSignals = [sigEngagement, sigConsiderationContent, sigMentions, sigCtr, sigVvr, sigAiVisConsider]
+  }
+  const consideration = computeStageComposite(considerationSignals)
 
-  const advocacy = computeStageComposite([
-    { label: 'Advocacy Score (weekly)', value: advocacyScore?.advocacy_score ?? null, weight: 30, scale: 100, rawDisplay: advocacyScore?.advocacy_score != null ? `${Number(advocacyScore.advocacy_score).toFixed(0)}/100` : null },
-    { label: 'Referral Activity',       value: referralActivity > 0 ? referralActivity : null, weight: 22, scale: 50, rawDisplay: referralActivity > 0 ? `${referralEventCount ?? 0} events + ${referralConv} conv` : null },
-    { label: 'Active Promoters',        value: (activePromoterCount ?? 0) > 0 ? (activePromoterCount ?? 0) : null, weight: 18, scale: 20, rawDisplay: (activePromoterCount ?? 0) > 0 ? `${activePromoterCount} active` : null },
-    { label: 'NPS Promoter Share',      value: npsPromoterShare, weight: 15, scale: 100, rawDisplay: npsPromoterShare != null ? `${npsPromoterShare.toFixed(0)}%` : null },
-    { label: 'Visual Brand Advocacy',   value: (visualAdvocacyCount ?? 0) > 0 ? (visualAdvocacyCount ?? 0) : null, weight: 10, scale: 30, rawDisplay: (visualAdvocacyCount ?? 0) > 0 ? `${visualAdvocacyCount} posts` : null },
-    { label: 'Organic Share Rate',      value: shareRatio, weight: 5, scale: 100, rawDisplay: totalEngagements >= 50 ? `${totalShares} shares / ${fmtNum(totalEngagements)} eng` : null },
-  ])
+  // Preference
+  const sigSentiment14: StageSignal = { label: 'Sentiment Score (14d avg)', value: sentScore14, weight: 28, scale: 100, rawDisplay: sentScore14 != null ? `${sentScore14.toFixed(0)}/100` : null }
+  const sigPosPct14: StageSignal = { label: 'Positive Sentiment % (14d)', value: posPct14, weight: 12, scale: 100, rawDisplay: posPct14 != null ? `${posPct14.toFixed(0)}%` : null }
+  const sigPerception: StageSignal = { label: 'Perception Quality', value: perceptionScore, weight: 20, scale: 100, rawDisplay: perceptionScore != null ? `${perceptionScore}/100` : null }
+  const sigCultural: StageSignal = { label: 'Cultural Resonance', value: crsAvg, weight: 18, scale: 100, rawDisplay: crsAvg != null ? `${crsAvg.toFixed(0)}/100` : null }
+  const sigPressSentiment: StageSignal = { label: 'Press Sentiment', value: pressTotal > 0 ? (pressPositive / pressTotal) * 100 : null, weight: 12, scale: 100, rawDisplay: pressTotal > 0 ? `${pressPositive}/${pressTotal} positive` : null }
+  const sigMarketplaceRating: StageSignal = { label: 'Marketplace Own Rating', value: ratingAvg != null ? ratingAvg * 20 : null, weight: 10, scale: 100, rawDisplay: ratingAvg != null ? `${ratingAvg.toFixed(1)}★` : null }
+  const sigGoogleMapsRating: StageSignal = { label: 'Google Maps Rating', value: googleMapsRating, weight: 20, scale: 100, rawDisplay: latestGoogleMaps?.rating ? `${latestGoogleMaps.rating.toFixed(1)}★` : null }
+  const sigAppStoreRating: StageSignal = { label: 'App Store Rating', value: appStoreRating, weight: 15, scale: 100, rawDisplay: latestAppStore?.rating ? `${latestAppStore.rating.toFixed(1)}/5` : null }
+  const sigG2Rating: StageSignal = { label: 'G2 / Review Platform Rating', value: g2Rating, weight: 20, scale: 100, rawDisplay: latestG2?.rating ? `${latestG2.rating.toFixed(1)}/5` : null }
+
+  let preferenceSignals: StageSignal[]
+  if (isVenue) {
+    preferenceSignals = [sigSentiment14, sigPosPct14, sigCultural, sigPressSentiment, sigPerception, sigGoogleMapsRating]
+  } else if (isFintech) {
+    preferenceSignals = [sigSentiment14, sigPosPct14, sigCultural, sigPressSentiment, sigPerception, sigAppStoreRating]
+  } else if (isSaasOrMkt) {
+    preferenceSignals = [sigSentiment14, sigCultural, sigPressSentiment, sigPerception, sigG2Rating]
+  } else {
+    preferenceSignals = [sigSentiment14, sigPosPct14, sigPerception, sigCultural, sigPressSentiment, sigMarketplaceRating]
+  }
+  const preference = computeStageComposite(preferenceSignals)
+
+  // Action
+  const sigPurchases: StageSignal = { label: 'Purchase Events', value: (purchaseSuccessCount ?? 0) > 0 ? (purchaseSuccessCount ?? 0) : null, weight: 20, scale: 50, rawDisplay: (purchaseSuccessCount ?? 0) > 0 ? `${purchaseSuccessCount} purchases` : null }
+  const sigEcom: StageSignal = { label: 'E-commerce Sales', value: ecomUnits > 0 ? ecomUnits : null, weight: 18, scale: 200, rawDisplay: ecomUnits > 0 ? `${fmtNum(ecomUnits)} units` : null }
+  const sigDigitalConv: StageSignal = { label: 'Digital Conversions', value: digitalConversions > 0 ? digitalConversions : null, weight: 18, scale: 500, rawDisplay: digitalConversions > 0 ? `${fmtNum(digitalConversions)} conv` : null }
+  const sigLeads: StageSignal = { label: 'Event Lead Capture', value: leadRate, weight: 15, scale: 100, rawDisplay: totalInt > 0 ? `${leads}/${totalInt} leads` : null }
+  const sigOohVisits: StageSignal = { label: 'OOH Visit-throughs', value: (oohSites ?? []).length > 0 ? oohVisits : null, weight: 12, scale: 1000, rawDisplay: (oohSites ?? []).length > 0 ? `${fmtNum(oohVisits)} visits` : null }
+  const sigReferralConv: StageSignal = { label: 'Referral Conversions', value: referralConv > 0 ? referralConv : null, weight: 10, scale: 50, rawDisplay: referralConv > 0 ? `${fmtNum(referralConv)} conv` : null }
+  const sigSdkConv: StageSignal = { label: 'SDK Conversions', value: (sdkConversionCount ?? 0) > 0 ? (sdkConversionCount ?? 0) : null, weight: 7, scale: 100, rawDisplay: (sdkConversionCount ?? 0) > 0 ? `${fmtNum(sdkConversionCount ?? 0)} events` : null }
+  const sigStockActive: StageSignal = { label: 'Stock Availability (Active)', value: stockOutRate, weight: 10, scale: 100, rawDisplay: stockOutRate != null ? `${stockOutRate.toFixed(0)}% in-stock` : null }
+
+  let actionSignals: StageSignal[]
+  if (isVenue) {
+    // Venue first-party traffic not yet connected — null signals show the connect state.
+    actionSignals = [
+      { label: 'Reservations', value: null, weight: 35, scale: 100, rawDisplay: null },
+      { label: 'Covers Served', value: null, weight: 35, scale: 100, rawDisplay: null },
+      { label: 'Walk-ins', value: null, weight: 30, scale: 100, rawDisplay: null },
+    ]
+  } else if (isFintech) {
+    // Requires first-party product data (signups / KYC / first transactions).
+    actionSignals = [
+      { label: 'New Signups', value: null, weight: 35, scale: 100, rawDisplay: null },
+      { label: 'KYC Completed', value: null, weight: 35, scale: 100, rawDisplay: null },
+      { label: 'First Transactions', value: null, weight: 30, scale: 100, rawDisplay: null },
+    ]
+  } else if (isSaasOrMkt) {
+    actionSignals = [sigReferralConv, sigDigitalConv, sigSdkConv]
+  } else {
+    // fmcg / beverage_alcohol / b2b_distribution — full action set + in-stock availability
+    actionSignals = [sigPurchases, sigEcom, sigDigitalConv, sigLeads, sigOohVisits, sigReferralConv, sigSdkConv, sigStockActive]
+  }
+  const action = computeStageComposite(actionSignals)
+
+  // Loyalty
+  const sigNps: StageSignal = { label: 'NPS Score', value: npsValue, weight: 30, scale: 100, rawDisplay: npsValue != null ? npsRawDisplay : null }
+  const sigRepeat: StageSignal = { label: 'Repeat Customer Rate', value: repeatRate, weight: 25, scale: 100, rawDisplay: repeatRate != null ? `${repeatCount}/${profileCount} repeat` : null }
+  const sigRetention: StageSignal = { label: 'Retention Health', value: retentionHealth, weight: 22, scale: 100, rawDisplay: retentionHealth != null ? `${retentionHealth.toFixed(0)}/100` : null }
+  const sigLoyaltyActivity: StageSignal = { label: 'Loyalty Program Activity', value: (loyaltyEarnCount ?? 0) > 0 ? (loyaltyEarnCount ?? 0) : null, weight: 13, scale: 100, rawDisplay: (loyaltyEarnCount ?? 0) > 0 ? `${fmtNum(loyaltyEarnCount ?? 0)} earns` : null }
+  const sigPostPurchase: StageSignal = { label: 'Post-purchase Sentiment', value: sentScore7, weight: 10, scale: 100, rawDisplay: sentScore7 != null ? `${sentScore7.toFixed(0)}/100` : null }
+
+  let loyaltySignals: StageSignal[]
+  if (isVenue) {
+    loyaltySignals = [sigNps, sigPostPurchase, sigRetention]
+  } else if (isFintech) {
+    loyaltySignals = [sigNps, sigPostPurchase, sigRetention, sigLoyaltyActivity]
+  } else if (isSaasOrMkt) {
+    loyaltySignals = [sigNps, sigRetention, sigPostPurchase]
+  } else {
+    loyaltySignals = [sigNps, sigRepeat, sigRetention, sigLoyaltyActivity, sigPostPurchase]
+  }
+  const loyalty = computeStageComposite(loyaltySignals)
+
+  // Advocacy
+  const sigAdvocacyScore: StageSignal = { label: 'Advocacy Score (weekly)', value: advocacyScore?.advocacy_score ?? null, weight: 30, scale: 100, rawDisplay: advocacyScore?.advocacy_score != null ? `${Number(advocacyScore.advocacy_score).toFixed(0)}/100` : null }
+  const sigReferralActivity: StageSignal = { label: 'Referral Activity', value: referralActivity > 0 ? referralActivity : null, weight: 22, scale: 50, rawDisplay: referralActivity > 0 ? `${referralEventCount ?? 0} events + ${referralConv} conv` : null }
+  const sigActivePromoters: StageSignal = { label: 'Active Promoters', value: (activePromoterCount ?? 0) > 0 ? (activePromoterCount ?? 0) : null, weight: 18, scale: 20, rawDisplay: (activePromoterCount ?? 0) > 0 ? `${activePromoterCount} active` : null }
+  const sigNpsPromoterShare: StageSignal = { label: 'NPS Promoter Share', value: npsPromoterShare, weight: 15, scale: 100, rawDisplay: npsPromoterShare != null ? `${npsPromoterShare.toFixed(0)}%` : null }
+  const sigVisualAdvocacy: StageSignal = { label: 'Visual Brand Advocacy', value: (visualAdvocacyCount ?? 0) > 0 ? (visualAdvocacyCount ?? 0) : null, weight: 10, scale: 30, rawDisplay: (visualAdvocacyCount ?? 0) > 0 ? `${visualAdvocacyCount} posts` : null }
+  const sigOrganicShare: StageSignal = { label: 'Organic Share Rate', value: shareRatio, weight: 5, scale: 100, rawDisplay: totalEngagements >= 50 ? `${totalShares} shares / ${fmtNum(totalEngagements)} eng` : null }
+  const sigReviewVelocity: StageSignal = { label: 'Google Review Velocity', value: googleMapsVelocity != null ? Math.min(100, googleMapsVelocity * 5) : null, weight: 20, scale: 100, rawDisplay: googleMapsVelocity != null ? `${googleMapsVelocity} new reviews/wk` : null }
+
+  let advocacySignals: StageSignal[]
+  if (isVenue) {
+    advocacySignals = [sigAdvocacyScore, sigVisualAdvocacy, sigNpsPromoterShare, sigOrganicShare, sigReviewVelocity]
+  } else if (isSaasOrMkt) {
+    advocacySignals = [sigAdvocacyScore, sigReferralActivity, sigActivePromoters, sigNpsPromoterShare]
+  } else {
+    advocacySignals = [sigAdvocacyScore, sigReferralActivity, sigActivePromoters, sigNpsPromoterShare, sigVisualAdvocacy, sigOrganicShare]
+  }
+  const advocacy = computeStageComposite(advocacySignals)
 
   const activeCount = (b: { sources: { score: number | null }[] }) =>
     b.sources.filter(s => s.score !== null).length
 
+  // Brand-type appropriate source descriptions
+  const SOURCE_STRINGS: Record<string, {
+    awareness: string; consideration: string; preference: string
+    action: string; loyalty: string; advocacy: string
+  }> = {
+    venue: {
+      awareness:     'SOV · OOH · Digital · Events · Influencer · Press · AI',
+      consideration: 'Engagement · Content · Mentions · CTR · Video · AI',
+      preference:    'Sentiment · Cultural · Press · Perception · Google Maps',
+      action:        'Reservations · Covers · Walk-ins',
+      loyalty:       'NPS · Post-visit sentiment · Retention',
+      advocacy:      'Advocacy · Visual · NPS · Shares · Review velocity',
+    },
+    fintech: {
+      awareness:     'SOV · Digital · Influencer · Press · AI',
+      consideration: 'Engagement · Content · Mentions · CTR · Video · AI',
+      preference:    'Sentiment · Cultural · Press · Perception · App store',
+      action:        'Signups · KYC · First transactions',
+      loyalty:       'NPS · Post-signup sentiment · Retention · Loyalty',
+      advocacy:      'Advocacy · Referrals · Promoters · NPS · Visual · Shares',
+    },
+    saas: {
+      awareness:     'SOV · Digital · Influencer · Press · AI',
+      consideration: 'Engagement · Mentions · CTR · AI',
+      preference:    'Sentiment · Cultural · Press · Perception · G2',
+      action:        'Referrals · Digital · SDK conversions',
+      loyalty:       'NPS · Retention · Post-purchase sentiment',
+      advocacy:      'Advocacy · Referrals · Promoters · NPS',
+    },
+    fmcg: {
+      awareness:     'SOV · OOH · Digital · Press · TV · Radio · AI · Distribution',
+      consideration: 'Engagement · Content · Mentions · CTR · Video · AI',
+      preference:    'Sentiment · Perception · Cultural · Press · Marketplace',
+      action:        'Purchases · Sales · Conversions · Leads · OOH · Stock',
+      loyalty:       'NPS · Repeat rate · Retention · Loyalty · Sentiment',
+      advocacy:      'Advocacy · Referrals · Promoters · NPS · Visual · Shares',
+    },
+  }
+  const srcKey = isVenue ? 'venue' : isFintech ? 'fintech' : isSaasOrMkt ? 'saas' : 'fmcg'
+  const src = SOURCE_STRINGS[srcKey]
+
   const scores = {
     awareness: {
       score:      awareness.score,
-      source:     'SOV · OOH · Digital · Press · TV · Radio · AI',
+      source:     src.awareness,
       dataPoints: activeCount(awareness.breakdown),
       breakdown:  awareness.breakdown.sources,
     },
     consideration: {
       score:      consideration.score,
-      source:     'Engagement · Content · Mentions · CTR · Video · AI',
+      source:     src.consideration,
       dataPoints: activeCount(consideration.breakdown),
       breakdown:  consideration.breakdown.sources,
     },
     preference: {
       score:      preference.score,
-      source:     'Sentiment · Perception · Cultural · Press · Marketplace',
+      source:     src.preference,
       dataPoints: activeCount(preference.breakdown),
       breakdown:  preference.breakdown.sources,
     },
     action: {
       score:      action.score,
-      source:     'Purchases · Sales · Conversions · Leads · OOH · Referrals',
+      source:     src.action,
       dataPoints: activeCount(action.breakdown),
       breakdown:  action.breakdown.sources,
     },
     loyalty: {
       score:      loyalty.score,
-      source:     'NPS · Repeat rate · Retention · Loyalty · Sentiment',
+      source:     src.loyalty,
       dataPoints: activeCount(loyalty.breakdown),
       breakdown:  loyalty.breakdown.sources,
     },
     advocacy: {
       score:      advocacy.score,
-      source:     'Advocacy · Referrals · Promoters · NPS · Visual · Shares',
+      source:     src.advocacy,
       dataPoints: activeCount(advocacy.breakdown),
       breakdown:  advocacy.breakdown.sources,
     },
   }
+
+  // Keep POSM presence available for future field-intelligence surfacing.
+  void posmPresenceRate
 
   return (
     <div className="max-w-3xl space-y-6">

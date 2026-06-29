@@ -11,6 +11,7 @@ import {
 import { BrandEquityClient } from './brand-equity-client'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { SeedDemoPanel } from './seed-demo-panel'
+import { VenueReputationPanel } from './venue-reputation-panel'
 import { getActiveBrandId } from '@/lib/active-brand'
 
 export const dynamic = 'force-dynamic'
@@ -55,6 +56,7 @@ export default async function BrandEquityPage({
     { data: brandEvents },
     { data: digitalPerf },
     { data: influencers },
+    { data: venueSnapshot },
   ] = await Promise.all([
     supabase
       .from('sentiment_daily')
@@ -84,8 +86,8 @@ export default async function BrandEquityPage({
       .eq('brand_id', bid)
       .gte('posted_at', cutoffISO),
     bid
-      ? supabase.from('brands').select('name, category, market_share_pct').eq('id', bid).maybeSingle()
-      : supabase.from('brands').select('name, category, market_share_pct').limit(1).maybeSingle(),
+      ? supabase.from('brands').select('name, category, market_share_pct, brand_type, google_place_id').eq('id', bid).maybeSingle()
+      : supabase.from('brands').select('name, category, market_share_pct, brand_type, google_place_id').limit(1).maybeSingle(),
     supabase
       .from('brand_health_snapshots')
       .select('bhi, snapshot_date')
@@ -120,6 +122,14 @@ export default async function BrandEquityPage({
       .from('influencers')
       .select('latest_post_reach')
       .eq('brand_id', bid),
+    supabase
+      .from('review_platform_snapshots')
+      .select('rating, review_count, review_velocity, period_end, metadata')
+      .eq('brand_id', bid)
+      .eq('platform', 'google_maps')
+      .order('period_end', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ])
 
   // ── 1. Awareness (20%) — multi-source composite
@@ -374,6 +384,13 @@ export default async function BrandEquityPage({
         sector={sector}
         benchmarks={benchmarks}
       />
+
+      {(brand?.brand_type === 'venue' || brand?.google_place_id) && (
+        <VenueReputationPanel
+          snapshot={venueSnapshot ?? null}
+          hasPlaceId={Boolean(brand?.google_place_id)}
+        />
+      )}
 
       {isDemoUser && (
         <SeedDemoPanel />

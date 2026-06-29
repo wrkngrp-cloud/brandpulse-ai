@@ -1,8 +1,18 @@
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { redirect }     from 'next/navigation'
 import Link             from 'next/link'
 import { ArrowLeft }    from 'lucide-react'
-import { NpsClient, type WeeklyNps } from './nps-client'
+import { NpsClient, type WeeklyNps, type NpsCohort } from './nps-client'
+
+const ROLE_LABEL: Record<string, string> = {
+  consumer:      'Consumers',
+  trade_partner: 'Trade partners',
+  retailer:      'Retailers',
+  developer:     'Developers',
+  decision_maker:'Decision makers',
+  end_user:      'End users',
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +36,9 @@ export default async function NpsTrackerPage() {
   const twelveWeeksAgo = new Date()
   twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 84)
 
-  const [{ data: responses }, { data: brand }] = await Promise.all([
+  const bid = await getActiveBrandId(supabase)
+
+  const [{ data: responses }, { data: brand }, { data: npsRoleRecords }] = await Promise.all([
     supabase
       .from('survey_responses')
       .select('answers, collected_at')
@@ -37,7 +49,38 @@ export default async function NpsTrackerPage() {
       .select('name, category')
       .limit(1)
       .maybeSingle(),
+    bid
+      ? supabase
+          .from('nps_records')
+          .select('score, respondent_role')
+          .eq('brand_id', bid)
+      : Promise.resolve({ data: [] as { score: number | null; respondent_role: string | null }[] }),
   ])
+
+  // ── NPS cohort split by respondent_role (scaffold). Shown only when records
+  // span 2+ roles — otherwise the headline NPS already covers consumers.
+  const cohortBuckets: Record<string, { promoters: number; detractors: number; total: number }> = {}
+  for (const r of npsRoleRecords ?? []) {
+    const score = r.score
+    if (typeof score !== 'number') continue
+    const role = (r.respondent_role as string | null) ?? 'consumer'
+    const b = cohortBuckets[role] ?? { promoters: 0, detractors: 0, total: 0 }
+    b.total++
+    if (score >= 9) b.promoters++
+    else if (score <= 6) b.detractors++
+    cohortBuckets[role] = b
+  }
+  const cohorts: NpsCohort[] = Object.entries(cohortBuckets)
+    .map(([role, b]) => ({
+      role,
+      label:     ROLE_LABEL[role] ?? role,
+      total:     b.total,
+      nps:       b.total >= 3 ? Math.round(((b.promoters - b.detractors) / b.total) * 100) : null,
+      promoters: b.promoters,
+      detractors:b.detractors,
+    }))
+    .sort((a, b) => b.total - a.total)
+  const showCohorts = cohorts.length >= 2
 
   const NPS_SECTOR_MAP: Record<string, string> = {
     'fmcg':'FMCG','consumer goods':'FMCG','fintech':'Fintech','financial services':'Fintech',
@@ -182,6 +225,7 @@ export default async function NpsTrackerPage() {
         detractorTexts={detractorTexts}
         promoterTexts={promoterTexts}
         benchmarkP50={npsBenchmarkP50}
+        cohorts={showCohorts ? cohorts : []}
       />
     </div>
   )

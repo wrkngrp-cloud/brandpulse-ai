@@ -18,6 +18,8 @@ import { monthlyReportCron, weeklyDigestCron }  from '@/lib/inngest/functions/sc
 import { youtubeBrandMonitor }         from '@/lib/inngest/functions/youtube-brand-monitor'
 import { whatsappBroadcast }           from '@/lib/inngest/functions/whatsapp-broadcast'
 import { aiVisibilityWeeklyCron, aiVisibilityOnDemand } from '@/lib/inngest/functions/ai-visibility'
+import { googleMapsSync }              from '@/lib/inngest/functions/google-maps-sync'
+import { volumeSurgeCheck }            from '@/lib/inngest/functions/volume-surge-check'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -33,5 +35,7 @@ export const { GET, POST, PUT } = serve({
     youtubeBrandMonitor,
     whatsappBroadcast,
     aiVisibilityWeeklyCron, aiVisibilityOnDemand,
+    googleMapsSync,
+    volumeSurgeCheck,
   ],
 })
