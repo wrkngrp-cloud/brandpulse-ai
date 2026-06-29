@@ -245,3 +245,52 @@ export function computeAwarenessComposite(inputs: AwarenessInputs): {
 
   return { score: composite, breakdown: { sources, composite } }
 }
+
+// ── Generic stage composite (multi-signal, weight-redistributing) ──────────────
+
+export interface StageSignal {
+  label:      string
+  value:      number | null   // null = no data; any number (even 0) = measured
+  weight:     number          // base weight in points (all signals sum to 100)
+  scale:      number          // value that maps to score 100
+  rawDisplay: string | null
+}
+
+export function computeStageComposite(signals: StageSignal[]): {
+  score:     number | null
+  breakdown: ComponentBreakdown
+} {
+  const active = signals.filter(s => s.value !== null && s.value !== undefined)
+
+  if (active.length === 0) {
+    return {
+      score: null,
+      breakdown: {
+        composite: null,
+        sources: signals.map(s => ({
+          label: s.label, rawDisplay: s.rawDisplay, weight: s.weight, score: null,
+        })),
+      },
+    }
+  }
+
+  const totalActiveWeight = active.reduce((sum, s) => sum + s.weight, 0)
+
+  const sources: BreakdownSource[] = signals.map(s => {
+    if (s.value === null || s.value === undefined) {
+      return { label: s.label, rawDisplay: s.rawDisplay, weight: 0, score: null }
+    }
+    const subScore        = Math.min(100, Math.round((s.value / s.scale) * 100))
+    const redistributedWt = Math.round((s.weight / totalActiveWeight) * 100)
+    return { label: s.label, rawDisplay: s.rawDisplay, weight: redistributedWt, score: subScore }
+  })
+
+  const composite = Math.round(
+    active.reduce((sum, s) => {
+      const subScore = Math.min(100, (s.value as number) / s.scale * 100)
+      return sum + subScore * (s.weight / totalActiveWeight)
+    }, 0),
+  )
+
+  return { score: composite, breakdown: { sources, composite } }
+}
