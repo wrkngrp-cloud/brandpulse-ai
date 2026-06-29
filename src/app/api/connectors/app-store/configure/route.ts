@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { z } from 'zod'
 
 const Body = z.object({
@@ -23,18 +24,14 @@ export async function POST(request: NextRequest) {
 
   const { apple_app_id, google_pkg_name } = parsed.data
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .single()
-  if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
 
   const { error } = await supabase
     .from('app_store_configs')
     .upsert(
       {
-        brand_id:        brand.id,
+        brand_id:        brandId,
         apple_app_id:    apple_app_id ?? null,
         google_pkg_name: google_pkg_name ?? null,
       },

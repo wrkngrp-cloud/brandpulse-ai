@@ -6,13 +6,15 @@ import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 import { createServiceClient } from '@/lib/supabase/server'
 
-const ratelimit = new Ratelimit({
-  redis: new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-  }),
-  limiter: Ratelimit.slidingWindow(100, '1 m'),
-})
+const ratelimit = (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
+  ? new Ratelimit({
+      redis: new Redis({
+        url:   process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      }),
+      limiter: Ratelimit.slidingWindow(100, '1 m'),
+    })
+  : null
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -55,13 +57,15 @@ export async function POST(request: NextRequest) {
 
   const { pixel_id, event_type, value, session_id, page_url, referrer, metadata } = parsed.data
 
-  // Rate limit by pixel_id
-  const { success } = await ratelimit.limit(pixel_id)
-  if (!success) {
-    return NextResponse.json(
-      { error: 'Rate limit exceeded' },
-      { status: 429, headers: CORS_HEADERS }
-    )
+  // Rate limit by pixel_id (skipped if Upstash is not configured)
+  if (ratelimit) {
+    const { success } = await ratelimit.limit(pixel_id)
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded' },
+        { status: 429, headers: CORS_HEADERS }
+      )
+    }
   }
 
   const supabase = await createServiceClient()

@@ -94,16 +94,13 @@ export async function POST(request: NextRequest) {
 
   await service
     .from('sdk_events')
-    .upsert(
-      {
-        brand_id:    matchedBrandId,
-        event_type:  'purchase',
-        value:       amount,
-        metadata:    { source: 'paystack', reference },
-        occurred_at: paidAt,
-      },
-      { onConflict: 'brand_id,event_type' }
-    )
+    .insert({
+      brand_id:    matchedBrandId,
+      event_type:  'purchase',
+      value:       amount,
+      metadata:    { source: 'paystack', reference },
+      occurred_at: paidAt,
+    })
 
   return NextResponse.json({ received: true })
 }

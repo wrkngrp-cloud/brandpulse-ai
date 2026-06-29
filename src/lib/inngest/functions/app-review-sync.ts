@@ -124,12 +124,12 @@ export const appReviewSync = inngest.createFunction(
     // ── Step 1: fetch all app_store_configs ───────────────────────────────────
     const configs = await step.run('fetch-configs', async () => {
       const eventData = (event.data as { brand_id?: string } | undefined)
-      const query = supabase
+      let query = supabase
         .from('app_store_configs')
         .select('id, brand_id, apple_app_id, google_pkg_name')
 
       if (eventData?.brand_id) {
-        query.eq('brand_id', eventData.brand_id)
+        query = query.eq('brand_id', eventData.brand_id)
       }
 
       const { data, error } = await query

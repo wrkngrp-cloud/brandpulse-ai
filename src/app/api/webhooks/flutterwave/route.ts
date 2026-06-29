@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { decrypt } from '@/lib/crypto'
+import crypto from 'node:crypto'
 
 export const runtime = 'nodejs'
 
@@ -27,8 +28,11 @@ export async function POST(request: NextRequest) {
   // Flutterwave uses plain secret comparison (not HMAC)
   let matchedBrandId: string | null = null
   for (const config of configs) {
-    const secret = decrypt(config.secret_key)
-    if (secret === verifHash) {
+    const secret    = decrypt(config.secret_key)
+    const sBuf      = Buffer.from(secret)
+    const hBuf      = Buffer.from(verifHash)
+    const match     = sBuf.length === hBuf.length && crypto.timingSafeEqual(sBuf, hBuf)
+    if (match) {
       matchedBrandId = config.brand_id
       break
     }
@@ -90,16 +94,13 @@ export async function POST(request: NextRequest) {
 
   await service
     .from('sdk_events')
-    .upsert(
-      {
-        brand_id:    matchedBrandId,
-        event_type:  'purchase',
-        value:       amount,
-        metadata:    { source: 'flutterwave', reference },
-        occurred_at: occurredAt,
-      },
-      { onConflict: 'brand_id,event_type' }
-    )
+    .insert({
+      brand_id:    matchedBrandId,
+      event_type:  'purchase',
+      value:       amount,
+      metadata:    { source: 'flutterwave', reference },
+      occurred_at: occurredAt,
+    })
 
   return NextResponse.json({ received: true })
 }

@@ -5,7 +5,9 @@ const ALGORITHM = 'aes-256-gcm'
 function getKey(): Buffer {
   const hex = process.env.TOKEN_ENCRYPTION_KEY
   if (!hex || hex === 'PENDING') {
-    // In development without a key, use a deterministic dev key (never use in production)
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('TOKEN_ENCRYPTION_KEY is not set. Refusing to encrypt/decrypt in production.')
+    }
     return Buffer.from('brandpulse-dev-key-not-for-prod!!'.padEnd(32).slice(0, 32))
   }
   return Buffer.from(hex, 'hex')

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { SocialConnectCard } from '@/components/dashboard/social-connect-card'
 import { GA4ConnectCard, type GA4ConnectionData } from '@/components/dashboard/ga4-connect-card'
 import { PaymentConnectCard, type PaymentConfigStatus } from '@/components/dashboard/payment-connect-card'
@@ -14,29 +15,25 @@ export default async function ConnectionsSettingsPage() {
     .from('social_connections')
     .select('platform, account_name, sync_status, last_synced_at')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .single()
+  const brandId = await getActiveBrandId(supabase)
 
   let ga4Connection: GA4ConnectionData | null = null
   let paymentStatus: PaymentConfigStatus = { paystack: false, flutterwave: false }
   let appStoreConfig: AppStoreConfigData | null = null
   let emailStatus: EmailConnectorStatus = { mailchimp: false, brevo: false }
 
-  if (brand) {
+  if (brandId) {
     const { data: ga4Data } = await supabase
       .from('ga4_connections')
       .select('id, property_id, property_name, last_synced_at')
-      .eq('brand_id', brand.id)
+      .eq('brand_id', brandId)
       .maybeSingle()
     ga4Connection = ga4Data ?? null
 
     const { data: webhookConfigs } = await supabase
       .from('webhook_configs')
       .select('provider')
-      .eq('brand_id', brand.id)
+      .eq('brand_id', brandId)
 
     if (webhookConfigs) {
       paymentStatus = {
@@ -49,18 +46,18 @@ export default async function ConnectionsSettingsPage() {
       supabase
         .from('app_store_configs')
         .select('apple_app_id, google_pkg_name')
-        .eq('brand_id', brand.id)
+        .eq('brand_id', brandId)
         .maybeSingle(),
       supabase
         .from('app_reviews')
         .select('rating')
-        .eq('brand_id', brand.id)
+        .eq('brand_id', brandId)
         .order('reviewed_at', { ascending: false })
         .limit(30),
       supabase
         .from('email_connectors')
         .select('provider, last_synced_at')
-        .eq('brand_id', brand.id),
+        .eq('brand_id', brandId),
     ])
 
     if (appCfg) {
