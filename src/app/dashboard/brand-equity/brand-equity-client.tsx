@@ -38,6 +38,19 @@ interface Props {
   days?:                number
   sector?:              string
   benchmarks?:          Record<string, BenchmarkBand>
+  brandType?:           string
+  markers?:             { marker_date: string; label: string; marker_type: string }[]
+}
+
+// Marker reference-line colors by type
+const MARKER_STROKE: Record<string, string> = {
+  product_launch:  '#6366f1', // indigo
+  campaign_launch: '#a855f7', // purple
+  partnership:     '#14b8a6', // teal
+  crisis:          '#ef4444', // red
+  rebrand:         '#f97316', // orange
+  event:           '#22c55e', // green
+  other:           '#94a3b8', // gray
 }
 
 const COMPONENT_META: {
@@ -73,7 +86,7 @@ const ESOV_POSTURE = (esov: number) =>
 
 export function BrandEquityClient({
   bhi, sparkline, sovPct, currentNps, npsTotal, emvRaw, perceptionDimensions, brandName, days = 30,
-  sector = 'FMCG', benchmarks = {}, marketSharePct,
+  sector = 'FMCG', benchmarks = {}, marketSharePct, brandType, markers = [],
 }: Props) {
   const [marketShare,  setMarketShare]  = useState<number>(marketSharePct ?? 5)
   const [targetEsov,   setTargetEsov]   = useState<number>(10)
@@ -122,7 +135,14 @@ export function BrandEquityClient({
       <div className="border rounded-xl p-5 bg-card">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <p className="text-sm font-semibold">Brand Health Index</p>
+            <p className="text-sm font-semibold">
+              Brand Health Index
+              {brandType && (
+                <span className="text-xs text-muted-foreground/60 font-normal ml-2 capitalize">
+                  {brandType.replace('_', ' ')} weights
+                </span>
+              )}
+            </p>
             <p className="text-xs text-muted-foreground">7 components · {bhi.coverage}% data coverage</p>
           </div>
           {bhi.coverage < 70 && (
@@ -458,6 +478,15 @@ export function BrandEquityClient({
                 }}
                 labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
               />
+              {markers.map(m => (
+                <ReferenceLine
+                  key={`${m.marker_date}-${m.label}`}
+                  x={m.marker_date}
+                  stroke={MARKER_STROKE[m.marker_type] ?? MARKER_STROKE.other}
+                  strokeDasharray="3 3"
+                  label={{ value: '🚀', position: 'top', fontSize: 10 }}
+                />
+              ))}
               <Line
                 type="monotone"
                 dataKey="score"

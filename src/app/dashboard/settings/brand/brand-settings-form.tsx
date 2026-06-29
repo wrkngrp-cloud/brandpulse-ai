@@ -224,6 +224,57 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
               className="max-w-sm font-mono text-xs"
             />
           </div>
+          {(data.brandType === 'b2b_saas' || data.brandType === 'marketplace') && (
+            <div className="space-y-4 pt-2 border-t">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Review Platforms</p>
+              <div className="space-y-2">
+                <Label htmlFor="g2Slug">G2 Product Slug</Label>
+                <p className="text-xs text-muted-foreground">
+                  From g2.com/products/[slug]/reviews
+                </p>
+                <Input
+                  id="g2Slug"
+                  value={data.g2Slug ?? ''}
+                  onChange={e => patch('g2Slug', e.target.value)}
+                  placeholder="your-product-name"
+                  className="max-w-sm font-mono text-xs"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="capterraSlug">Capterra Slug</Label>
+                <p className="text-xs text-muted-foreground">
+                  From capterra.com/p/[slug]/
+                </p>
+                <Input
+                  id="capterraSlug"
+                  value={data.capterraSlug ?? ''}
+                  onChange={e => patch('capterraSlug', e.target.value)}
+                  placeholder="your-product-slug"
+                  className="max-w-sm font-mono text-xs"
+                />
+              </div>
+            </div>
+          )}
+
+          {(['fintech', 'b2b_saas', 'marketplace'] as const).includes(data.brandType as 'fintech') && (
+            <div className="space-y-4 pt-2 border-t">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Developer Ecosystem</p>
+              <div className="space-y-2">
+                <Label htmlFor="githubRepo">GitHub Repository</Label>
+                <p className="text-xs text-muted-foreground">owner/repo format, e.g. paystack/paystack-php</p>
+                <Input id="githubRepo" value={data.githubRepo ?? ''} onChange={e => patch('githubRepo', e.target.value)} placeholder="org/repo" className="max-w-sm font-mono text-xs" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="npmPackageName">npm Package</Label>
+                <Input id="npmPackageName" value={data.npmPackageName ?? ''} onChange={e => patch('npmPackageName', e.target.value)} placeholder="@scope/package or package-name" className="max-w-sm font-mono text-xs" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="stackoverflowTag">Stack Overflow Tag</Label>
+                <Input id="stackoverflowTag" value={data.stackoverflowTag ?? ''} onChange={e => patch('stackoverflowTag', e.target.value)} placeholder="paystack" className="max-w-sm font-mono text-xs" />
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label>Category</Label>
             <Select value={data.category} onValueChange={v => patch('category', v ?? '')}>

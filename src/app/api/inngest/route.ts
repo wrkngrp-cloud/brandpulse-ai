@@ -21,6 +21,9 @@ import { aiVisibilityWeeklyCron, aiVisibilityOnDemand } from '@/lib/inngest/func
 import { googleMapsSync }              from '@/lib/inngest/functions/google-maps-sync'
 import { volumeSurgeCheck }            from '@/lib/inngest/functions/volume-surge-check'
 import { regulatoryMentionDetect }     from '@/lib/inngest/functions/regulatory-mention-detect'
+import { reviewAspectClassifier }      from '@/lib/inngest/functions/review-aspect-classifier'
+import { b2bReviewSync }               from '@/lib/inngest/functions/b2b-review-sync'
+import { developerHealthSync }         from '@/lib/inngest/functions/developer-health-sync'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -39,5 +42,8 @@ export const { GET, POST, PUT } = serve({
     googleMapsSync,
     volumeSurgeCheck,
     regulatoryMentionDetect,
+    reviewAspectClassifier,
+    b2bReviewSync,
+    developerHealthSync,
   ],
 })

@@ -123,10 +123,53 @@ const FULL_WEIGHTS: Record<keyof FullBHIComponents, number> = {
   emv:                5,
 }
 
+export type BrandType = 'fmcg' | 'fintech' | 'venue' | 'b2b_saas' | 'marketplace' | 'beverage_alcohol' | 'b2b_distribution'
+
+// Per-vertical BHI weight presets. Every set sums to 100.
+export const BRAND_TYPE_WEIGHTS: Record<BrandType, Record<keyof FullBHIComponents, number>> = {
+  fmcg: {
+    awareness: 20, salience: 15, sentiment: 20,
+    perception: 15, culturalResonance: 15, blendedSov: 10, emv: 5,
+  },
+  beverage_alcohol: {
+    awareness: 22, salience: 15, sentiment: 18,
+    perception: 15, culturalResonance: 15, blendedSov: 10, emv: 5,
+  },
+  fintech: {
+    // trust matters most; OOH/events absent so awareness weight drops
+    awareness: 15, salience: 10, sentiment: 25,
+    perception: 20, culturalResonance: 5, blendedSov: 15, emv: 10,
+  },
+  venue: {
+    // reviews/perception is #1 for venues; salience = top-of-mind dining
+    awareness: 15, salience: 20, sentiment: 20,
+    perception: 25, culturalResonance: 10, blendedSov: 5, emv: 5,
+  },
+  b2b_saas: {
+    // G2/perception drives purchase; LinkedIn SOV matters; cultural resonance minimal
+    awareness: 15, salience: 20, sentiment: 15,
+    perception: 25, culturalResonance: 0, blendedSov: 20, emv: 5,
+  },
+  marketplace: {
+    awareness: 20, salience: 15, sentiment: 20,
+    perception: 20, culturalResonance: 10, blendedSov: 10, emv: 5,
+  },
+  b2b_distribution: {
+    // trade partner perception + SOV matter; cultural resonance minimal
+    awareness: 15, salience: 20, sentiment: 20,
+    perception: 20, culturalResonance: 5, blendedSov: 20, emv: 0,
+  },
+}
+
 export function computeFullBHI(
   components: FullBHIComponents,
   breakdowns?: BHIBreakdowns,
+  brandType?: BrandType,
 ): FullBHIResult {
+  const weights = brandType && BRAND_TYPE_WEIGHTS[brandType]
+    ? BRAND_TYPE_WEIGHTS[brandType]
+    : FULL_WEIGHTS
+
   const keys = Object.keys(components) as (keyof FullBHIComponents)[]
   const available = keys.filter(k => components[k] !== null)
 
@@ -134,13 +177,13 @@ export function computeFullBHI(
     return { score: null, coverage: 0, zone: null, components, breakdowns }
   }
 
-  const totalBaseWeight = keys.reduce((s, k) => s + FULL_WEIGHTS[k], 0)
-  const activeWeight    = available.reduce((s, k) => s + FULL_WEIGHTS[k], 0)
+  const totalBaseWeight = keys.reduce((s, k) => s + weights[k], 0)
+  const activeWeight    = available.reduce((s, k) => s + weights[k], 0)
   const coverage        = Math.round((activeWeight / totalBaseWeight) * 100)
 
   // Renormalise weights to available components
   const score = Number((
-    available.reduce((s, k) => s + ((components[k] as number) * FULL_WEIGHTS[k]), 0) / activeWeight
+    available.reduce((s, k) => s + ((components[k] as number) * weights[k]), 0) / activeWeight
   ).toFixed(1))
 
   return { score, coverage, zone: getBHIZone(score), components, breakdowns }

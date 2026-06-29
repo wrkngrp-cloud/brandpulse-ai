@@ -8,8 +8,12 @@ import {
   type BHIBreakdowns,
   type ComponentBreakdown,
   type BreakdownSource,
+  type BrandType,
 } from '@/lib/bhi'
 import { BrandEquityClient } from './brand-equity-client'
+import { LaunchMarkersPanel } from './launch-markers-panel'
+import { AspectSentimentPanel } from './aspect-sentiment-panel'
+import { DeveloperHealthPanel } from './developer-health-panel'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { SeedDemoPanel } from './seed-demo-panel'
 import { VenueReputationPanel } from './venue-reputation-panel'
@@ -69,6 +73,9 @@ export default async function BrandEquityPage({
     { data: appStoreSnaps },
     { data: regMentions },
     { data: volumeSurgeAlerts },
+    { data: launchMarkers },
+    { data: aspectRows },
+    { data: devHealthSnaps },
   ] = await Promise.all([
     supabase
       .from('sentiment_daily')
@@ -162,6 +169,24 @@ export default async function BrandEquityPage({
       .eq('brand_id', bid)
       .eq('alert_subtype', 'volume_surge')
       .gte('created_at', thirtyDaysAgo.toISOString()),
+    supabase
+      .from('brand_launch_markers')
+      .select('marker_date, label, marker_type')
+      .eq('brand_id', bid)
+      .order('marker_date', { ascending: false })
+      .limit(20),
+    supabase
+      .from('review_aspect_sentiment')
+      .select('aspect, sentiment, score, mention_count, platform, period_end')
+      .eq('brand_id', bid)
+      .order('period_end', { ascending: false })
+      .limit(30),
+    supabase
+      .from('developer_health_snapshots')
+      .select('platform, stars, forks, open_issues, downloads_weekly, question_count, period_end')
+      .eq('brand_id', bid)
+      .order('period_end', { ascending: false })
+      .limit(10),
   ])
 
   // ── 1. Awareness (20%) — multi-source composite
@@ -326,10 +351,10 @@ export default async function BrandEquityPage({
     awareness: awarenessScore, salience: salienceScore, sentiment: sentimentScore,
     perception: perceptionScore, culturalResonance, blendedSov, emv: emvScore,
   }
-  const bhi = computeFullBHI(components, breakdowns)
+  const brandType = (brand?.brand_type ?? 'fmcg') as BrandType
+  const bhi = computeFullBHI(components, breakdowns, brandType)
 
   // ── Trust score (fintech brand types only)
-  const brandType = brand?.brand_type ?? 'fmcg'
   const latestAppStore = (appStoreSnaps ?? []).find(s => s.platform === 'app_store')
   const latestPlayStore = (appStoreSnaps ?? []).find(s => s.platform === 'play_store')
   const bestAppRating   = latestAppStore?.rating ?? latestPlayStore?.rating ?? null
@@ -408,6 +433,40 @@ export default async function BrandEquityPage({
     ? Math.round(((promoters - detractors) / npsScores.length) * 100)
     : null
 
+  // ── Aspect sentiment — deduplicate to latest per aspect+platform ─────────────
+  type AspectRow = {
+    aspect: string; sentiment: 'positive' | 'neutral' | 'negative'
+    score: number; mention_count: number; platform: string; period_end: string | null
+  }
+  const aspectMap = new Map<string, AspectRow>()
+  for (const row of (aspectRows ?? []) as AspectRow[]) {
+    const key = `${row.aspect}:${row.platform}`
+    const existing = aspectMap.get(key)
+    if (!existing ||
+        (row.period_end ?? '') > (existing.period_end ?? '') ||
+        ((row.period_end ?? '') === (existing.period_end ?? '') && row.mention_count > existing.mention_count)
+    ) { aspectMap.set(key, row) }
+  }
+  const aspectScores = Array.from(aspectMap.values())
+
+  // ── Developer health — latest + previous per platform ─────────────────────
+  type DevSnap = {
+    platform: string; stars: number | null; forks: number | null
+    open_issues: number | null; downloads_weekly: number | null
+    question_count: number | null; period_end: string | null
+  }
+  const devRows      = (devHealthSnaps ?? []) as DevSnap[]
+  const githubSnaps  = devRows.filter(r => r.platform === 'github')
+  const npmSnaps     = devRows.filter(r => r.platform === 'npm')
+  const soSnaps      = devRows.filter(r => r.platform === 'stackoverflow')
+  const githubSnap   = githubSnaps[0] ?? null
+  const githubPrev   = githubSnaps[1] ?? null
+  const npmSnap      = npmSnaps[0] ?? null
+  const npmPrev      = npmSnaps[1] ?? null
+  const soSnap       = soSnaps[0] ?? null
+  const hasDevData   = githubSnap != null || npmSnap != null || soSnap != null
+  const isDevBrand   = ['fintech', 'b2b_saas', 'marketplace'].includes(brand?.brand_type ?? '')
+
   // ── BHI history sparkline — uses brand_health_snapshots.bhi (real BHI, not sentiment)
   const sparkline = (bhiHistory ?? [])
     .filter(d => d.bhi != null)
@@ -441,7 +500,11 @@ export default async function BrandEquityPage({
         days={days}
         sector={sector}
         benchmarks={benchmarks}
+        brandType={brandType}
+        markers={launchMarkers ?? []}
       />
+
+      <LaunchMarkersPanel />
 
       {(brand?.brand_type === 'venue' || brand?.google_place_id) && (
         <VenueReputationPanel
@@ -452,6 +515,24 @@ export default async function BrandEquityPage({
 
       {brand?.brand_type === 'fintech' && (
         <TrustPillarCard trust={trustScore} />
+      )}
+
+      {(['venue', 'fintech', 'b2b_saas'] as const).includes(brand?.brand_type as 'venue') && aspectScores.length > 0 && (
+        <AspectSentimentPanel
+          aspects={aspectScores}
+          platform={brand?.brand_type === 'venue' ? 'google_maps' : 'app_store'}
+          brandType={brand?.brand_type ?? 'fmcg'}
+        />
+      )}
+
+      {isDevBrand && hasDevData && (
+        <DeveloperHealthPanel
+          github={githubSnap}
+          githubPrev={githubPrev}
+          npm={npmSnap}
+          npmPrev={npmPrev}
+          stackoverflow={soSnap}
+        />
       )}
 
       {isDemoUser && (

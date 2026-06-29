@@ -7,7 +7,7 @@ export default async function BrandSettingsPage() {
   const supabase = await createClient()
   const { data: brand } = await supabase
     .from('brands')
-    .select('name, website_url, google_place_id, category, brand_type, market_share_pct, brand_values, monitored_hashtags, brand_aliases, brand_voice, cultural_profile, target_segments, logo_url, brand_colors')
+    .select('name, website_url, google_place_id, g2_slug, capterra_slug, github_repo, npm_package_name, stackoverflow_tag, category, brand_type, market_share_pct, brand_values, monitored_hashtags, brand_aliases, brand_voice, cultural_profile, target_segments, logo_url, brand_colors')
     .limit(1)
     .single()
 
@@ -18,6 +18,11 @@ export default async function BrandSettingsPage() {
     brandName:         brand?.name ?? '',
     websiteUrl:        brand?.website_url ?? '',
     googlePlaceId:     brand?.google_place_id ?? '',
+    g2Slug:            brand?.g2_slug ?? '',
+    capterraSlug:      brand?.capterra_slug ?? '',
+    githubRepo:        brand?.github_repo ?? '',
+    npmPackageName:    brand?.npm_package_name ?? '',
+    stackoverflowTag:  brand?.stackoverflow_tag ?? '',
     category:          brand?.category ?? '',
     brandType:         (brand?.brand_type as BrandSettingsData['brandType']) ?? 'fmcg',
     marketSharePct:    brand?.market_share_pct ?? null,

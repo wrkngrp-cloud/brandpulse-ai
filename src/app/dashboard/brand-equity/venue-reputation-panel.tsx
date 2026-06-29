@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Star, MapPin, RefreshCw, TrendingUp, Loader2 } from 'lucide-react'
+import { Star, MapPin, RefreshCw, TrendingUp, Loader2, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -48,6 +48,24 @@ function Stars({ rating }: { rating: number }) {
 export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
   const router = useRouter()
   const [syncing, setSyncing] = useState(false)
+  const [analysing, setAnalysing] = useState(false)
+
+  async function handleAnalyseAspects() {
+    setAnalysing(true)
+    try {
+      const res  = await fetch('/api/sentiment/classify-aspects', { method: 'POST' })
+      const data = await res.json() as { queued?: boolean; error?: string }
+      if (!res.ok || !data.queued) {
+        toast.error(data.error ?? 'Could not start aspect analysis')
+        return
+      }
+      toast.success('Analysing review aspects — check back in a minute')
+    } catch {
+      toast.error('Network error while starting analysis')
+    } finally {
+      setAnalysing(false)
+    }
+  }
 
   async function handleSync() {
     setSyncing(true)
@@ -102,12 +120,20 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
             <p className="text-xs text-muted-foreground">Google Maps star rating and review velocity</p>
           </div>
         </div>
-        <Button size="sm" variant="outline" onClick={handleSync} disabled={syncing}>
-          {syncing
-            ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-            : <RefreshCw className="h-3.5 w-3.5 mr-1.5" />}
-          Sync now
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={handleAnalyseAspects} disabled={analysing}>
+            {analysing
+              ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              : <Sparkles className="h-3.5 w-3.5 mr-1.5" />}
+            Analyse aspects
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleSync} disabled={syncing}>
+            {syncing
+              ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              : <RefreshCw className="h-3.5 w-3.5 mr-1.5" />}
+            Sync now
+          </Button>
+        </div>
       </div>
 
       {rating == null ? (
