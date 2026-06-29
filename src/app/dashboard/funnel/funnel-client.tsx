@@ -12,21 +12,29 @@ import Link from 'next/link'
 
 type StageKey = 'awareness' | 'consideration' | 'preference' | 'action' | 'loyalty' | 'advocacy'
 
+interface BreakdownItem {
+  label:      string
+  rawDisplay: string | null
+  weight:     number
+  score:      number | null
+}
+
 interface StageScore {
-  score: number | null
-  source: string
+  score:      number | null
+  source:     string
   dataPoints: number
+  breakdown:  BreakdownItem[]
 }
 
 interface Props {
-  scores: Record<StageKey, StageScore>
+  scores:    Record<StageKey, StageScore>
   brandName: string
-  industry: string | null
+  industry:  string | null
 }
 
 interface DiagnosisResult {
-  biggestGap: string
-  diagnosis: string
+  biggestGap:      string
+  diagnosis:       string
   recommendations: string[]
 }
 
@@ -38,17 +46,17 @@ interface StageAnalysis {
 }
 
 const STAGES: {
-  key: StageKey
-  label: string
+  key:         StageKey
+  label:       string
   description: string
-  icon: React.ComponentType<{ className?: string }>
+  icon:        React.ComponentType<{ className?: string }>
 }[] = [
-  { key: 'awareness',     label: 'Awareness',     description: 'Share of Voice → Mental Availability (Ehrenberg-Bass)',     icon: Globe  },
-  { key: 'consideration', label: 'Consideration', description: 'Engagement rate → Brand Salience signal',                       icon: Eye    },
-  { key: 'preference',    label: 'Preference',    description: 'Sentiment score → Brand Association quality (Aaker)',            icon: Heart  },
-  { key: 'action',        label: 'Action',        description: 'Lead capture + OOH → 7Ps: Place, Promotion, Process',           icon: Zap    },
-  { key: 'loyalty',       label: 'Loyalty',       description: 'NPS → People, Process, Physical Evidence (7Ps)',                icon: Shield },
-  { key: 'advocacy',      label: 'Advocacy',      description: 'Share rate → Word-of-mouth / Distinctive Assets (Ehrenberg-Bass)', icon: Share2 },
+  { key: 'awareness',     label: 'Awareness',     description: 'Share of Voice · OOH · Events · Digital · Influencer (Ehrenberg-Bass)',  icon: Globe  },
+  { key: 'consideration', label: 'Consideration', description: 'Engagement rate → Brand Salience signal',                                 icon: Eye    },
+  { key: 'preference',    label: 'Preference',    description: 'Sentiment score → Brand Association quality (Aaker)',                      icon: Heart  },
+  { key: 'action',        label: 'Action',        description: 'Lead capture + OOH visit-throughs → 7Ps: Place, Promotion',               icon: Zap    },
+  { key: 'loyalty',       label: 'Loyalty',       description: 'NPS → People, Process, Physical Evidence (7Ps)',                          icon: Shield },
+  { key: 'advocacy',      label: 'Advocacy',      description: 'Share rate → Word-of-mouth / Distinctive Assets (Ehrenberg-Bass)',        icon: Share2 },
 ]
 
 const STAGE_EMPTY: Record<StageKey, { text: string; linkLabel?: string; linkHref?: string }> = {
@@ -91,12 +99,20 @@ function dropOffMeta(from: number | null, to: number | null) {
   return { pct, colorClass, urgent }
 }
 
+function scoreBarColor(score: number | null) {
+  if (score == null) return '#94a3b8'
+  if (score >= 65)   return '#22c55e'
+  if (score >= 40)   return '#f59e0b'
+  return '#ef4444'
+}
+
 export function FunnelClient({ scores, brandName, industry }: Props) {
   const [diagnosis, setDiagnosis]       = useState<DiagnosisResult | null>(null)
   const [isPending, startTransition]    = useTransition()
   const [analyses, setAnalyses]         = useState<Partial<Record<StageKey, StageAnalysis>>>({})
   const [loadingStage, setLoadingStage] = useState<StageKey | null>(null)
-  const [openStage, setOpenStage]       = useState<StageKey | null>(null)
+  const [openAI, setOpenAI]             = useState<StageKey | null>(null)
+  const [openData, setOpenData]         = useState<StageKey | null>(null)
 
   const stageScores = STAGES.map(s => scores[s.key].score)
 
@@ -105,9 +121,8 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
     const hasEnoughData = nullStages.length < STAGES.length - 1
 
     if (!hasEnoughData) {
-      const missing = nullStages.join(', ')
       toast.error(
-        `Not enough data yet to run a full diagnosis. The funnel needs data across at least 2 stages. What's missing: ${missing}.`,
+        `Not enough data yet to run a full diagnosis. The funnel needs data across at least 2 stages. What's missing: ${nullStages.join(', ')}.`,
         { duration: 6000 },
       )
       return
@@ -125,18 +140,17 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
     })
   }
 
-  async function handleStageAnalysis(stage: StageKey, score: number | null) {
+  async function handleStageAI(stage: StageKey, score: number | null) {
     if (loadingStage) return
 
-    // Toggle off if already open and loaded
-    if (openStage === stage && analyses[stage]) {
-      setOpenStage(null)
+    if (openAI === stage && analyses[stage]) {
+      setOpenAI(null)
       return
     }
 
-    setOpenStage(stage)
+    setOpenAI(stage)
+    setOpenData(null)
 
-    // If we already have the analysis, just show it
     if (analyses[stage]) return
 
     setLoadingStage(stage)
@@ -149,16 +163,21 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
       const data = await res.json() as StageAnalysis | { error: string }
       if ('error' in data) {
         toast.error(data.error)
-        setOpenStage(null)
+        setOpenAI(null)
         return
       }
       setAnalyses(prev => ({ ...prev, [stage]: data }))
     } catch {
       toast.error('Analysis failed — please try again.')
-      setOpenStage(null)
+      setOpenAI(null)
     } finally {
       setLoadingStage(null)
     }
+  }
+
+  function toggleData(stage: StageKey) {
+    setOpenData(prev => prev === stage ? null : stage)
+    setOpenAI(null)
   }
 
   return (
@@ -185,13 +204,14 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
       {/* Funnel */}
       <div className="border rounded-xl overflow-hidden bg-card">
         {STAGES.map((stage, idx) => {
-          const { score, source, dataPoints } = scores[stage.key]
-          const Icon      = stage.icon
-          const drop      = dropOffMeta(stageScores[idx], stageScores[idx + 1])
-          const isLast    = idx === STAGES.length - 1
-          const isOpen    = openStage === stage.key
-          const isLoading = loadingStage === stage.key
-          const analysis  = analyses[stage.key]
+          const { score, source, dataPoints, breakdown } = scores[stage.key]
+          const Icon        = stage.icon
+          const drop        = dropOffMeta(stageScores[idx], stageScores[idx + 1])
+          const isLast      = idx === STAGES.length - 1
+          const isDataOpen  = openData === stage.key
+          const isAIOpen    = openAI  === stage.key
+          const isLoading   = loadingStage === stage.key
+          const analysis    = analyses[stage.key]
 
           return (
             <div key={stage.key} className={cn(idx > 0 && 'border-t border-border')}>
@@ -228,16 +248,23 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                     </div>
 
                     <div className="flex items-center justify-between mt-1.5">
-                      <p className="text-[11px] text-muted-foreground/50">
-                        {source} ·{' '}
-                        {dataPoints > 0
-                          ? `${dataPoints} data point${dataPoints !== 1 ? 's' : ''}`
-                          : 'waiting for data'}
-                      </p>
-                      {/* Why this score button */}
+                      {/* Data points toggle */}
                       <button
                         type="button"
-                        onClick={() => handleStageAnalysis(stage.key, score)}
+                        onClick={() => toggleData(stage.key)}
+                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <span>{source}</span>
+                        {dataPoints > 0
+                          ? <span className="opacity-60">· {dataPoints} source{dataPoints !== 1 ? 's' : ''}</span>
+                          : <span className="opacity-40">· waiting for data</span>}
+                        <ChevronDown className={cn('h-3 w-3 ml-0.5 transition-transform', isDataOpen && 'rotate-180')} />
+                      </button>
+
+                      {/* AI analysis button */}
+                      <button
+                        type="button"
+                        onClick={() => handleStageAI(stage.key, score)}
                         disabled={isLoading && loadingStage !== stage.key}
                         className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
                       >
@@ -247,7 +274,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                           <>
                             <Sparkles className="h-3 w-3" />
                             Why this score?
-                            <ChevronRight className={cn('h-3 w-3 transition-transform', isOpen && 'rotate-90')} />
+                            <ChevronRight className={cn('h-3 w-3 transition-transform', isAIOpen && 'rotate-90')} />
                           </>
                         )}
                       </button>
@@ -276,8 +303,63 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                 </div>
               </div>
 
-              {/* Analysis panel */}
-              {isOpen && analysis && (
+              {/* Data points breakdown panel */}
+              {isDataOpen && (
+                <div className="border-t border-border bg-muted px-5 py-4 space-y-3">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Data points &amp; weightings
+                  </p>
+                  {breakdown.length > 0 ? (
+                    <div className="space-y-3">
+                      {breakdown.map(item => (
+                        <div key={item.label} className="space-y-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-xs font-medium text-foreground/80 truncate">{item.label}</span>
+                              {item.rawDisplay && (
+                                <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{item.rawDisplay}</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="text-[10px] text-muted-foreground">
+                                {item.weight > 0 ? `${item.weight}% weight` : 'no data'}
+                              </span>
+                              <span
+                                className="text-xs font-bold tabular-nums w-12 text-right"
+                                style={{ color: scoreBarColor(item.score) }}
+                              >
+                                {item.score !== null ? `${item.score}/100` : '—'}
+                              </span>
+                            </div>
+                          </div>
+                          {/* Two-layer bar: weight track + score fill */}
+                          <div className="relative h-1.5 bg-muted-foreground/10 rounded-full overflow-hidden">
+                            <div
+                              className="absolute inset-y-0 left-0 rounded-full bg-muted-foreground/20"
+                              style={{ width: `${item.weight}%` }}
+                            />
+                            {item.score !== null && item.weight > 0 && (
+                              <div
+                                className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                                style={{
+                                  width: `${(item.weight / 100) * item.score}%`,
+                                  backgroundColor: scoreBarColor(item.score),
+                                  opacity: 0.85,
+                                }}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">No source data yet for this stage.</p>
+                  )}
+                </div>
+              )}
+
+              {/* AI analysis panel */}
+              {isAIOpen && analysis && (
                 <div className="border-t border-dashed border-border bg-muted/20 px-5 py-4 space-y-4">
                   {/* Channels */}
                   <div className="space-y-2">
@@ -349,8 +431,8 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                 </div>
               )}
 
-              {/* Loading state for analysis */}
-              {isOpen && isLoading && (
+              {/* Loading state for AI analysis */}
+              {isAIOpen && isLoading && (
                 <div className="border-t border-dashed border-border bg-muted/20 px-5 py-6 flex items-center gap-2 text-sm text-muted-foreground">
                   <Loader2 className="h-4 w-4 animate-spin shrink-0" />
                   Fetching signals and generating analysis…
