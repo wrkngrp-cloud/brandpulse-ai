@@ -3,6 +3,7 @@ import { redirect }      from 'next/navigation'
 import {
   computeFullBHI,
   computeAwarenessComposite,
+  computeTrustScore,
   type FullBHIComponents,
   type BHIBreakdowns,
   type ComponentBreakdown,
@@ -12,6 +13,7 @@ import { BrandEquityClient } from './brand-equity-client'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { SeedDemoPanel } from './seed-demo-panel'
 import { VenueReputationPanel } from './venue-reputation-panel'
+import { TrustPillarCard } from './trust-pillar-card'
 import { getActiveBrandId } from '@/lib/active-brand'
 
 export const dynamic = 'force-dynamic'
@@ -40,6 +42,13 @@ export default async function BrandEquityPage({
   const cutoffISO  = cutoff.toISOString()
   const todayDate  = new Date().toISOString().split('T')[0]
 
+  const thirtyDaysAgo = new Date()
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+  const fourteenDaysAgo = new Date()
+  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14)
+  const ninetyDaysAgo = new Date()
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
+
   const brandId = await getActiveBrandId(supabase)
   const bid = brandId ?? ''
 
@@ -57,6 +66,9 @@ export default async function BrandEquityPage({
     { data: digitalPerf },
     { data: influencers },
     { data: venueSnapshot },
+    { data: appStoreSnaps },
+    { data: regMentions },
+    { data: volumeSurgeAlerts },
   ] = await Promise.all([
     supabase
       .from('sentiment_daily')
@@ -130,6 +142,26 @@ export default async function BrandEquityPage({
       .order('period_end', { ascending: false })
       .limit(1)
       .maybeSingle(),
+    supabase
+      .from('review_platform_snapshots')
+      .select('platform, rating, review_count, period_end')
+      .eq('brand_id', bid)
+      .in('platform', ['app_store', 'play_store'])
+      .order('period_end', { ascending: false })
+      .limit(4),
+    supabase
+      .from('regulatory_mentions')
+      .select('mention_type, mention_date, source_entity')
+      .eq('brand_id', bid)
+      .gte('mention_date', ninetyDaysAgo.toISOString().split('T')[0])
+      .order('mention_date', { ascending: false })
+      .limit(20),
+    supabase
+      .from('notifications')
+      .select('id')
+      .eq('brand_id', bid)
+      .eq('alert_subtype', 'volume_surge')
+      .gte('created_at', thirtyDaysAgo.toISOString()),
   ])
 
   // ── 1. Awareness (20%) — multi-source composite
@@ -296,6 +328,32 @@ export default async function BrandEquityPage({
   }
   const bhi = computeFullBHI(components, breakdowns)
 
+  // ── Trust score (fintech brand types only)
+  const brandType = brand?.brand_type ?? 'fmcg'
+  const latestAppStore = (appStoreSnaps ?? []).find(s => s.platform === 'app_store')
+  const latestPlayStore = (appStoreSnaps ?? []).find(s => s.platform === 'play_store')
+  const bestAppRating   = latestAppStore?.rating ?? latestPlayStore?.rating ?? null
+
+  let regulatoryStatus: 'clean' | 'under_review' | 'sanctioned' | null = null
+  if ((regMentions ?? []).length > 0) {
+    const hasSanction    = (regMentions ?? []).some(m => m.mention_type === 'sanction')
+    const hasInvestigation = (regMentions ?? []).some(m => m.mention_type === 'investigation')
+    regulatoryStatus = hasSanction ? 'sanctioned' : hasInvestigation ? 'under_review' : 'clean'
+  }
+
+  const sentRows14d      = (sentDays ?? []).filter(d => d.day >= fourteenDaysAgo.toISOString().split('T')[0])
+  const avgPosPct        = sentRows14d.length > 0
+    ? sentRows14d.reduce((s, d) => s + (d.social_score ?? 0), 0) / sentRows14d.length
+    : null
+  const negSentimentTrend = avgPosPct != null ? Math.max(0, 100 - avgPosPct) : null
+
+  const trustScore = computeTrustScore({
+    appStoreRating:     bestAppRating != null ? +bestAppRating : null,
+    regulatoryStatus,
+    complaintSurges30d: (volumeSurgeAlerts ?? []).length,
+    negSentimentTrend,
+  })
+
   // ── Perception radar data (8 dimensions)
   const DIMENSIONS = ['Quality', 'Trust', 'Innovation', 'Value', 'Cultural Relevance', 'Accessibility', 'Reliability', 'Emotional Connection']
   const dimensionAvgs = DIMENSIONS.map((label, idx) => {
@@ -390,6 +448,10 @@ export default async function BrandEquityPage({
           snapshot={venueSnapshot ?? null}
           hasPlaceId={Boolean(brand?.google_place_id)}
         />
+      )}
+
+      {brand?.brand_type === 'fintech' && (
+        <TrustPillarCard trust={trustScore} />
       )}
 
       {isDemoUser && (

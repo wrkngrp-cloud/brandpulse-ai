@@ -246,6 +246,72 @@ export function computeAwarenessComposite(inputs: AwarenessInputs): {
   return { score: composite, breakdown: { sources, composite } }
 }
 
+// ── Trust pillar (fintech / venue brand types) ─────────────────────────────────
+
+export interface TrustInputs {
+  appStoreRating:     number | null   // 0–5 stars
+  regulatoryStatus:   'clean' | 'under_review' | 'sanctioned' | null
+  complaintSurges30d: number          // count of volume_surge alerts in last 30d
+  negSentimentTrend:  number | null   // avg negative_pct from sentiment_daily 14d
+}
+
+export interface TrustScore {
+  score:    number | null
+  grade:    'excellent' | 'good' | 'fair' | 'poor' | null
+  breakdown: {
+    appStoreRating:     { score: number | null; weight: number; display: string | null }
+    regulatoryStanding: { score: number | null; weight: number; display: string | null }
+    reliabilitySignal:  { score: number | null; weight: number; display: string | null }
+    complaintHealth:    { score: number | null; weight: number; display: string | null }
+  }
+}
+
+export function computeTrustScore(inputs: TrustInputs): TrustScore {
+  const appScore = inputs.appStoreRating != null
+    ? Math.min(100, Math.round((inputs.appStoreRating / 5) * 100))
+    : null
+
+  const regScore = inputs.regulatoryStatus === 'clean'        ? 100
+                 : inputs.regulatoryStatus === 'under_review' ? 50
+                 : inputs.regulatoryStatus === 'sanctioned'   ? 0
+                 : null
+
+  const relScore = inputs.negSentimentTrend != null
+    ? Math.max(0, Math.round(100 - inputs.negSentimentTrend * 2))
+    : null
+
+  const compScore = Math.max(0, 100 - inputs.complaintSurges30d * 25)
+
+  const signals = [
+    { score: appScore,  weight: 35 },
+    { score: regScore,  weight: 30 },
+    { score: relScore,  weight: 20 },
+    { score: compScore, weight: 15 },
+  ]
+
+  const active = signals.filter(s => s.score !== null)
+  const breakdown: TrustScore['breakdown'] = {
+    appStoreRating:     { score: appScore,  weight: 35, display: inputs.appStoreRating != null ? `${inputs.appStoreRating.toFixed(1)}/5.0` : null },
+    regulatoryStanding: { score: regScore,  weight: 30, display: inputs.regulatoryStatus ?? null },
+    reliabilitySignal:  { score: relScore,  weight: 20, display: inputs.negSentimentTrend != null ? `${inputs.negSentimentTrend.toFixed(0)}% neg` : null },
+    complaintHealth:    { score: compScore, weight: 15, display: `${inputs.complaintSurges30d} surge${inputs.complaintSurges30d === 1 ? '' : 's'} in 30d` },
+  }
+
+  if (active.length === 0) return { score: null, grade: null, breakdown }
+
+  const totalW    = active.reduce((s, x) => s + x.weight, 0)
+  const composite = Math.round(
+    active.reduce((s, x) => s + (x.score as number) * (x.weight / totalW), 0)
+  )
+
+  const grade: TrustScore['grade'] =
+    composite >= 80 ? 'excellent' :
+    composite >= 60 ? 'good' :
+    composite >= 40 ? 'fair' : 'poor'
+
+  return { score: composite, grade, breakdown }
+}
+
 // ── Generic stage composite (multi-signal, weight-redistributing) ──────────────
 
 export interface StageSignal {

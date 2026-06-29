@@ -20,6 +20,7 @@ import { whatsappBroadcast }           from '@/lib/inngest/functions/whatsapp-br
 import { aiVisibilityWeeklyCron, aiVisibilityOnDemand } from '@/lib/inngest/functions/ai-visibility'
 import { googleMapsSync }              from '@/lib/inngest/functions/google-maps-sync'
 import { volumeSurgeCheck }            from '@/lib/inngest/functions/volume-surge-check'
+import { regulatoryMentionDetect }     from '@/lib/inngest/functions/regulatory-mention-detect'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -37,5 +38,6 @@ export const { GET, POST, PUT } = serve({
     aiVisibilityWeeklyCron, aiVisibilityOnDemand,
     googleMapsSync,
     volumeSurgeCheck,
+    regulatoryMentionDetect,
   ],
 })

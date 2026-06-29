@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { BrandSettingsForm } from './brand-settings-form'
+import { ApiKeysSection } from './api-keys-section'
 import type { BrandSettingsData } from '../actions'
 
 export default async function BrandSettingsPage() {
@@ -44,10 +45,13 @@ export default async function BrandSettingsPage() {
   }
 
   return (
-    <BrandSettingsForm
-      initial={initial}
-      logoUrl={brand?.logo_url ?? null}
-      brandColors={(brand?.brand_colors as string[] | null) ?? []}
-    />
+    <div className="space-y-6">
+      <BrandSettingsForm
+        initial={initial}
+        logoUrl={brand?.logo_url ?? null}
+        brandColors={(brand?.brand_colors as string[] | null) ?? []}
+      />
+      <ApiKeysSection />
+    </div>
   )
 }

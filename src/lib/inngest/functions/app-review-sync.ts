@@ -54,6 +54,30 @@ async function fetchAppleReviews(appleAppId: string): Promise<RawReview[]> {
   }))
 }
 
+async function fetchPlayStoreRating(packageName: string): Promise<{ rating: number; count: number } | null> {
+  try {
+    const url = `https://play.google.com/store/apps/details?id=${packageName}&hl=en&gl=ng`
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BrandPulse/1.0)' },
+    })
+    if (!res.ok) return null
+    const html = await res.text()
+
+    const ratingMatch = html.match(/"starRating":\{"label":"([0-9.]+)"\}/) ||
+                        html.match(/itemprop="ratingValue" content="([0-9.]+)"/)
+    const countMatch  = html.match(/"reviews":"([0-9,]+)"/) ||
+                        html.match(/itemprop="ratingCount" content="([0-9]+)"/)
+
+    if (!ratingMatch) return null
+    const rating = parseFloat(ratingMatch[1])
+    const count  = countMatch ? parseInt(countMatch[1].replace(/,/g, ''), 10) : 0
+
+    return { rating, count }
+  } catch {
+    return null
+  }
+}
+
 async function runSentiment(reviews: RawReview[]): Promise<SentimentResult[]> {
   if (!reviews.length) return []
 
@@ -225,6 +249,66 @@ export const appReviewSync = inngest.createFunction(
             },
             { onConflict: 'brand_id,event_type' }
           )
+      })
+
+      // ── Step 6: write aggregate App Store snapshot → review_platform_snapshots ──
+      await step.run(`review-snapshot-apple-${brand_id}`, async () => {
+        if (!apple_app_id || !appleReviews.length) return
+        const svc = await createServiceClient()
+        const avgRating = appleReviews.reduce((s, r) => s + r.rating, 0) / appleReviews.length
+        const today = new Date().toISOString().split('T')[0]
+
+        const { data: prevSnap } = await svc
+          .from('review_platform_snapshots')
+          .select('review_count')
+          .eq('brand_id', brand_id)
+          .eq('platform', 'app_store')
+          .order('period_end', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        const velocity = Math.max(0, appleReviews.length - (prevSnap?.review_count ?? 0))
+
+        await svc.from('review_platform_snapshots').insert({
+          brand_id,
+          platform:        'app_store',
+          rating:          +avgRating.toFixed(2),
+          review_count:    appleReviews.length,
+          review_velocity: velocity,
+          period_end:      today,
+          metadata: {
+            positive_pct: Math.round(appleReviews.filter(r => r.rating >= 4).length / appleReviews.length * 100),
+            negative_pct: Math.round(appleReviews.filter(r => r.rating <= 2).length / appleReviews.length * 100),
+          },
+        })
+      })
+
+      // ── Step 7: scrape Play Store aggregate rating ───────────────────────────
+      await step.run(`review-snapshot-play-${brand_id}`, async () => {
+        if (!google_pkg_name) return
+        const svc = await createServiceClient()
+        const playData = await fetchPlayStoreRating(google_pkg_name)
+        if (!playData) return
+
+        const today = new Date().toISOString().split('T')[0]
+
+        const { data: prevPlay } = await svc
+          .from('review_platform_snapshots')
+          .select('review_count')
+          .eq('brand_id', brand_id)
+          .eq('platform', 'play_store')
+          .order('period_end', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        await svc.from('review_platform_snapshots').insert({
+          brand_id,
+          platform:        'play_store',
+          rating:          +playData.rating.toFixed(2),
+          review_count:    playData.count,
+          review_velocity: Math.max(0, playData.count - (prevPlay?.review_count ?? 0)),
+          period_end:      today,
+        })
       })
 
       logger.info(`Brand ${brand_id}: ${upserted} reviews upserted`)
