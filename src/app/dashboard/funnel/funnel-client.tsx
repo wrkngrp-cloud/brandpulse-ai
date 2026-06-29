@@ -255,9 +255,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                         className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <span>{source}</span>
-                        {dataPoints > 0
-                          ? <span className="opacity-60">· {dataPoints} source{dataPoints !== 1 ? 's' : ''}</span>
-                          : <span className="opacity-40">· waiting for data</span>}
+                        <span className="opacity-60">· {breakdown.length} signal{breakdown.length !== 1 ? 's' : ''}</span>
                         <ChevronDown className={cn('h-3 w-3 ml-0.5 transition-transform', isDataOpen && 'rotate-180')} />
                       </button>
 
