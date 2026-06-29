@@ -202,12 +202,21 @@ export async function POST(req: NextRequest) {
       : score > 72
       ? ['taste quality', 'value for money', 'nostalgia', 'family meals', 'brand love']
       : ['product quality', 'availability', 'taste', 'health benefits']
+    // Volume split across platforms (Instagram-heavy for Nigerian food brand)
+    const igVol  = Math.round(120 + Math.sin(d * 0.3) * 20)
+    const twVol  = Math.round(60  + Math.cos(d * 0.4) * 10)
+    const tkVol  = Math.round(45  + Math.sin(d * 0.5) * 8)
     sentRows.push({
       brand_id: brandId, day: dAgo(d),
       social_score: score, offline_score: +(score * 0.92 + Math.sin(d) * 2).toFixed(1),
       blended_score: score,
       positive_pct: pos, neutral_pct: neu, negative_pct: neg,
       top_themes: themes,
+      platform_breakdown: {
+        instagram: { volume: igVol, score: +(score + Math.sin(d * 0.2) * 3).toFixed(1), positive_pct: pos, neutral_pct: neu, negative_pct: neg },
+        twitter:   { volume: twVol, score: +(score - 2 + Math.cos(d * 0.3) * 2).toFixed(1), positive_pct: +(pos - 3).toFixed(1), neutral_pct: +(neu + 2).toFixed(1), negative_pct: +(neg + 1).toFixed(1) },
+        tiktok:    { volume: tkVol, score: +(score + 4 + Math.sin(d * 0.6) * 2).toFixed(1), positive_pct: +(pos + 4).toFixed(1), neutral_pct: +(neu - 2).toFixed(1), negative_pct: +(neg - 2).toFixed(1) },
+      },
       emotion_distribution: {
         joy:          +(pos * 0.60).toFixed(1),
         trust:        +(pos * 0.28).toFixed(1),

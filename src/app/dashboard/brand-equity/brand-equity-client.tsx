@@ -216,8 +216,8 @@ export function BrandEquityClient({
 
                   {/* Breakdown panel */}
                   {isOpen && (
-                    <div className="ml-1 mr-1 mb-2 border border-border/50 rounded-lg bg-muted/20 p-3 space-y-2.5">
-                      <p className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">
+                    <div className="ml-1 mr-1 mb-2 border border-border rounded-lg bg-muted p-3 space-y-2.5">
+                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                         Contributing data sources
                       </p>
                       {breakdown && breakdown.sources.length > 0 ? (
@@ -285,7 +285,7 @@ export function BrandEquityClient({
                           )}
                         </>
                       ) : (
-                        <p className="text-[11px] text-muted-foreground/50">
+                        <p className="text-xs text-muted-foreground italic">
                           No source data available for this component yet.
                         </p>
                       )}
