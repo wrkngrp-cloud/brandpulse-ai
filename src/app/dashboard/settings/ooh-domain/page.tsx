@@ -2,6 +2,8 @@ import { createClient }    from '@/lib/supabase/server'
 import { redirect }         from 'next/navigation'
 import { OohDomainClient }  from './ooh-domain-client'
 
+export const dynamic = 'force-dynamic'
+
 export default async function OohDomainPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

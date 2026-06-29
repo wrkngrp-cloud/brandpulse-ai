@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { FieldTeamsClient } from './field-teams-client'
 
+export const dynamic = 'force-dynamic'
+
 export default async function FieldTeamsPage() {
   const supabase = await createClient()
 

@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { BrandSettingsForm } from './brand-settings-form'
+
+export const dynamic = 'force-dynamic'
 import { ApiKeysSection } from './api-keys-section'
 import type { BrandSettingsData } from '../actions'
 

@@ -121,7 +121,7 @@ function SidebarUserBlock({
         <DropdownMenuGroup>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => router.push('/dashboard/settings')}
+            onClick={() => router.push('/dashboard/settings/profile')}
           >
             <Settings className="mr-2 h-4 w-4" />
             Settings

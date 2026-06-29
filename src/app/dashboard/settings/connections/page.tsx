@@ -5,6 +5,8 @@ import { PaymentConnectCard, type PaymentConfigStatus } from '@/components/dashb
 import { AppStoreConnectCard, type AppStoreConfigData } from '@/components/dashboard/app-store-connect-card'
 import { EmailConnectCard, type EmailConnectorStatus } from '@/components/dashboard/email-connect-card'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ConnectionsSettingsPage() {
   const supabase = await createClient()
 
