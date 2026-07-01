@@ -442,9 +442,6 @@ export async function POST(req: NextRequest) {
       lead_phone:       li != null ? `+23480${String(10000000 + (li * 7)).slice(0, 8)}` : null,
       lead_interest:    interests[idx % interests.length],
       capture_method:   'ambassador' as const,
-      notes:            idx === 5  ? 'Shoprite category buyer — follow up with trade team'   :
-                        idx === 18 ? 'Chef Kemisola fan — strong brand advocate, 45k IG'      :
-                        idx === 35 ? 'Diaspora returnee, asked about bulk order'              : null,
       client_uuid:      `evt1-${idx + 1}`,
       occurred_at:      tsAgo(218 - (idx < 36 ? 1 : 0), 8 + (idx % 11)),
     }))
@@ -587,25 +584,25 @@ Amaka Okonkwo led the ambassador team in both raw interactions and lead capture,
 
     // Fatima: 18 interactions (top performer — found the Deputy Governor)
     const fatimaRows = [
-      ...Array.from({ length: 6 }, (_, i) => ({ itype: 'sample',       ambId: a5?.id, li: i, note: i === 1 ? 'FCT Deputy Governor group — 4 people sampled, all positive' : null })),
-      ...Array.from({ length: 5 }, (_, i) => ({ itype: 'new_lead',     ambId: a5?.id, li: i, note: null })),
-      ...Array.from({ length: 3 }, (_, i) => ({ itype: 'photo',        ambId: a5?.id, li: null, note: null })),
-      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a5?.id, li: null, note: null })),
-      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'new_customer', ambId: a5?.id, li: null, note: i === 0 ? 'WhatsApp opt-in confirmed on spot' : null })),
-      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'merch',        ambId: a5?.id, li: null, note: null })),
+      ...Array.from({ length: 6 }, (_, i) => ({ itype: 'sample',       ambId: a5?.id, li: i })),
+      ...Array.from({ length: 5 }, (_, i) => ({ itype: 'new_lead',     ambId: a5?.id, li: i})),
+      ...Array.from({ length: 3 }, (_, i) => ({ itype: 'photo',        ambId: a5?.id, li: null})),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a5?.id, li: null})),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'new_customer', ambId: a5?.id, li: null})),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'merch',        ambId: a5?.id, li: null})),
     ]
 
     // Uche: 14 interactions
     const ucheRows = [
-      ...Array.from({ length: 5 }, (_, i) => ({ itype: 'sample',       ambId: a6?.id, li: i, note: null })),
-      ...Array.from({ length: 4 }, (_, i) => ({ itype: 'new_lead',     ambId: a6?.id, li: i, note: null })),
-      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'photo',        ambId: a6?.id, li: null, note: null })),
-      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a6?.id, li: null, note: null })),
-      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'existing_customer', ambId: a6?.id, li: null, note: null })),
+      ...Array.from({ length: 5 }, (_, i) => ({ itype: 'sample',       ambId: a6?.id, li: i})),
+      ...Array.from({ length: 4 }, (_, i) => ({ itype: 'new_lead',     ambId: a6?.id, li: i})),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'photo',        ambId: a6?.id, li: null})),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a6?.id, li: null})),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'existing_customer', ambId: a6?.id, li: null})),
     ]
 
     const allEvt2Rows = [...fatimaRows, ...ucheRows]
-    const int2 = allEvt2Rows.map(({ itype, ambId, li, note }, idx) => ({
+    const int2 = allEvt2Rows.map(({ itype, ambId, li }, idx) => ({
       event_id:         evt2Id,
       ambassador_id:    ambId,
       interaction_type: itype,
@@ -614,7 +611,6 @@ Amaka Okonkwo led the ambassador team in both raw interactions and lead capture,
       lead_phone:       li != null ? `+23481${String(20000000 + (li * 11)).slice(0, 8)}` : null,
       lead_interest:    ['Jara Rice','Jara Semolina','Jara Spice Mix','Full Range'][idx % 4],
       capture_method:   'ambassador' as const,
-      notes:            note ?? null,
       client_uuid:      `evt2-${idx + 1}`,
       occurred_at:      tsAgo(63 - (idx < 18 ? 1 : 0), 10 + (idx % 8)),
     }))
@@ -714,29 +710,29 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
     const seunRows = [
       ...Array.from({ length: 4 }, (_, i) => ({ itype: 'sample',       ambId: a7?.id, li: i,    note: i === 0 ? 'Influencer with 45k followers — photographed Jara Chilled can' : null })),
       ...Array.from({ length: 3 }, (_, i) => ({ itype: 'new_lead',     ambId: a7?.id, li: i+4,  note: null })),
-      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'photo',        ambId: a7?.id, li: null, note: null })),
-      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a7?.id, li: null, note: null })),
-      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'prize',        ambId: a7?.id, li: null, note: null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'photo',        ambId: a7?.id, li: null})),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a7?.id, li: null})),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'prize',        ambId: a7?.id, li: null})),
     ]
 
     // Nneka: 10 interactions
     const nnekaRows = [
       ...Array.from({ length: 4 }, (_, i) => ({ itype: 'sample',       ambId: a8?.id, li: i,    note: null })),
       ...Array.from({ length: 3 }, (_, i) => ({ itype: 'new_lead',     ambId: a8?.id, li: i+7,  note: null })),
-      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'photo',        ambId: a8?.id, li: null, note: null })),
-      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'engaged',      ambId: a8?.id, li: null, note: null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'photo',        ambId: a8?.id, li: null})),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'engaged',      ambId: a8?.id, li: null})),
     ]
 
     // Biodun: 8 interactions
     const biodunRows = [
       ...Array.from({ length: 3 }, (_, i) => ({ itype: 'sample',       ambId: a9?.id, li: i,    note: i === 1 ? 'Asked about bulk orders for a restaurant' : null })),
       ...Array.from({ length: 2 }, (_, i) => ({ itype: 'new_lead',     ambId: a9?.id, li: i+2,  note: null })),
-      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a9?.id, li: null, note: null })),
-      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'photo',        ambId: a9?.id, li: null, note: null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a9?.id, li: null})),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'photo',        ambId: a9?.id, li: null})),
     ]
 
     const allEvt3Rows = [...seunRows, ...nnekaRows, ...biodunRows]
-    const int3 = allEvt3Rows.map(({ itype, ambId, li, note }, idx) => ({
+    const int3 = allEvt3Rows.map(({ itype, ambId, li }, idx) => ({
       event_id:         evt3Id,
       ambassador_id:    ambId,
       interaction_type: itype,
@@ -745,7 +741,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lead_phone:       li != null ? `+23480${String(30000000 + (li * 13)).slice(0, 8)}` : null,
       lead_interest:    ['Jara Chilled','Jara Rice','Jara Oats'][idx % 3],
       capture_method:   'ambassador' as const,
-      notes:            note ?? null,
       client_uuid:      `evt3-${idx + 1}`,
       occurred_at:      tsAgo(0, 9 + Math.floor(idx * 0.45)),
     }))
@@ -766,7 +761,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lga: 'Eti-Osa',
       vanity_slug: 'jara-lekki', landing_url: 'https://jarafoods.com/summer',
       visits: 2847, qr_scan_count: 631,
-      notes: 'Premium location. 2× higher dwell time vs Apapa route.',
     },
     {
       brand_id: brandId, campaign_id: camp3Id,
@@ -779,7 +773,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lga: 'Surulere',
       vanity_slug: 'jara-surulere', landing_url: 'https://jarafoods.com/summer',
       visits: 1234, qr_scan_count: 289,
-      notes: 'Mainland mass-market reach. Strong Jara Rice brand recall zone.',
     },
     {
       brand_id: brandId, campaign_id: camp3Id,
@@ -792,7 +785,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lga: 'Municipal Area Council',
       vanity_slug: 'jara-transcorp', landing_url: 'https://jarafoods.com/summer',
       visits: 1482, qr_scan_count: 312,
-      notes: 'Rotating 10-second slot. High C-suite and diplomat footfall in the CBD.',
     },
     {
       brand_id: brandId, campaign_id: camp3Id,
@@ -805,7 +797,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lga: 'Oshodi-Isolo',
       vanity_slug: 'jara-oshodi', landing_url: 'https://jarafoods.com/summer',
       visits: 3612, qr_scan_count: 941,
-      notes: 'Highest raw footfall of all Lagos placements. Mass-market audience — best performing for Jara Rice SKU.',
     },
   ]).select('id')
 
@@ -827,7 +818,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lga: 'Ikeja',
       vanity_slug: 'jara-airport', landing_url: 'https://jarafoods.com/nourish',
       visits: 4102, qr_scan_count: 893,
-      notes: 'Targets diaspora returnees and high-income travellers. Airport exclusivity until Dec 2026.',
     },
     {
       brand_id: brandId, campaign_id: camp1Id,
@@ -852,7 +842,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lga: 'Kano Municipal',
       vanity_slug: 'jara-kano', landing_url: 'https://jarafoods.com',
       visits: 891, qr_scan_count: 198,
-      notes: 'First northern placement. Hausa creative variant live. Performance below Lagos average — consider Pidgin/Hausa copy split test.',
     },
     {
       brand_id: brandId, campaign_id: null,
@@ -865,7 +854,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lga: 'Port Harcourt',
       vanity_slug: 'jara-ph', landing_url: 'https://jarafoods.com',
       visits: 1124, qr_scan_count: 267,
-      notes: 'South-South market entry. Oil-belt professional audience — good premium SKU potential.',
     },
   ])
 
@@ -2531,7 +2519,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
     const { data: prom } = await sb.from('promoters').insert({
       brand_id: brandId, name: p.name, email: p.email, phone: p.phone,
       nps_score: p.nps, source: 'nps', status: 'active',
-      notes: `Activated after Summer Vibes NPS pulse. ${p.nps === 10 ? 'Superfan.' : 'Highly satisfied customer.'}`,
     }).select('id').single()
     if (prom?.id) {
       await sb.from('referral_codes').insert({
@@ -2594,7 +2581,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'image', format: 'Feed', platform: 'Instagram',
       status: 'vetted', fit_for_ads: true,
       performance: { impressions: 148000, clicks: 5920, ctr: 4.0, conversions: 890, spend: 320000, roas: 4.2 },
-      notes: 'Our top performer Q4 2025. Market women imagery outperformed product-only shots by 3.1x on CTR. Brief the photographer to keep the setting recognisably local.',
       replication_elements: ['Warm earthy tones (burnt orange, deep brown)', 'Real person — not a model', 'Pidgin tagline: "Rice wey make sense"', 'Product in hand, not on table', '5kg bag prominently visible'],
       tags: ['hero', 'q4-2025', 'instagram', 'top-performer'],
     },
@@ -2604,7 +2590,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'video', format: 'Reel', platform: 'Instagram',
       status: 'vetted', fit_for_ads: true,
       performance: { impressions: 210000, clicks: 6300, ctr: 3.0, conversions: 1260, spend: 480000, roas: 3.8 },
-      notes: 'Ran during Ramadan 2026. Northern Nigeria segment drove 68% of conversions. Hausa voiceover was key — English-only test underperformed by 44%.',
       replication_elements: ['Hausa voiceover for northern Nigeria targeting', 'Cultural timing — Ramadan / suhoor angle', 'Hands-only shot keeps focus on the food', 'Subtitle both languages', '30 seconds max — 85% completion rate'],
       tags: ['ramadan', 'hausa', 'video', 'northern-nigeria', 'vetted'],
     },
@@ -2614,7 +2599,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'image', format: 'Story', platform: 'Facebook',
       status: 'vetted', fit_for_ads: true,
       performance: { impressions: 95000, clicks: 4750, ctr: 5.0, conversions: 1425, spend: 210000, roas: 5.1 },
-      notes: 'Price-led creative outperformed brand-led on Facebook by 2.7x. Facebook audience skews older (25-45) and responds to value signals more than aesthetic.',
       replication_elements: ['Price prominently front and centre', 'Red urgency colour for price sticker', 'White background keeps product the hero', '"Limited time" CTA drives FOMO', 'Facebook Story format (9:16) — separate crop from Feed version'],
       tags: ['price-led', 'facebook', 'conversion', 'vetted'],
     },
@@ -2624,7 +2608,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'copy', format: 'Radio Script', platform: 'Radio',
       status: 'vetted', fit_for_ads: false,
       performance: { impressions: 890000, spend: 1200000 },
-      notes: 'Morning slot (6am-9am) outperforms midday by 2.1x for our category. The testimonial format from a real sounding market woman drives more recall than announcer-only.',
       replication_elements: ['Open with Jara jingle (under 3 seconds)', 'Testimonial voice — female, market-woman tone', 'Price mention in first 10 seconds', 'Repeat brand name 3x minimum', 'Morning slot 6-9am for Lagos and Abuja'],
       tags: ['radio', 'morning-slot', 'testimonial', 'script'],
     },
@@ -2634,7 +2617,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'image', format: 'OOH Billboard', platform: 'Out of Home',
       status: 'vetted', fit_for_ads: true,
       performance: { impressions: 1200000, spend: 850000 },
-      notes: 'Tested on two sites: Ikeja along and LASU Road. LASU Road site showed stronger brand recall (+18%) likely due to slower traffic. Simple designs outperform busy ones on OOH.',
       replication_elements: ['Max 7 words on the headline', 'High contrast — dark background with white/orange text', 'Product size should be minimum 40% of artwork', 'Stockist bar at the bottom drives retail enquiries', 'Serif headline reads as premium'],
       tags: ['ooh', 'billboard', 'lagos', 'vetted'],
     },
@@ -2644,7 +2626,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'copy', format: 'Email', platform: 'Email',
       status: 'vetted', fit_for_ads: false,
       performance: { impressions: 3400, clicks: 680, ctr: 20.0, conversions: 204 },
-      notes: 'Plain text outperformed HTML template by 34% on open rate. Personalised subject line ("Funke, here is what you said") beat generic by 51%.',
       replication_elements: ['Plain text format — higher open rates', 'Personalised subject with first name', 'Acknowledge their specific NPS score', 'Single CTA only', 'Discount code for detractors: "FEEDBACK10"'],
       tags: ['email', 'nps', 'retention', 'template'],
     },
@@ -2654,7 +2635,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'copy', format: 'Brief', platform: 'Instagram',
       status: 'active', fit_for_ads: false,
       performance: { impressions: 62000, clicks: 1860, ctr: 3.0, conversions: 186 },
-      notes: 'Mama Tolu delivers consistently. Her audience trusts her cooking recommendations. Let her keep her natural style — briefs that over-script always underperform.',
       replication_elements: ['Let the creator keep their natural voice', 'Product integration — cooking scene, not product shot', 'Require "authentic use" — not just hold-to-camera', 'Hashtag: #JaraKitchen minimum', 'Brief: max 1 page — creators skip long briefs'],
       tags: ['influencer', 'brief', 'micro-influencer', 'instagram'],
     },
@@ -2664,7 +2644,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'carousel', format: 'Feed Carousel', platform: 'Instagram',
       status: 'vetted', fit_for_ads: true,
       performance: { impressions: 175000, clicks: 8750, ctr: 5.0, conversions: 1312, spend: 390000, roas: 4.8 },
-      notes: 'Carousels drove 2.4x more saves than single images during the festive period. Slide 3 (spice mix) had the highest swipe-through rate — consider leading with it.',
       replication_elements: ['Slide 1 must create curiosity — not reveal everything', 'Price each item on its own slide', 'Final slide is always the CTA', 'Warm red/gold palette for festive angle', 'Include "swipe to see more" text on slide 1'],
       tags: ['christmas', 'carousel', 'festive', 'instagram', 'top-performer'],
     },
@@ -2674,7 +2653,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'image', format: 'Print', platform: 'Print',
       status: 'active', fit_for_ads: false,
       performance: { impressions: 22000 },
-      notes: "Recipe cards distributed at Shoprite Lagos and events. Drives in-store trial better than vouchers. Oga Chef's face drives credibility with the core 30-50 age group.",
       replication_elements: ['Recipe format (not ad) — people keep it', 'Celebrity / chef association for credibility', 'A5 format fits in a handbag', 'QR code to video tutorial on back', 'Brand logo bottom right — understated'],
       tags: ['print', 'recipe-card', 'oga-chef', 'in-store'],
     },
@@ -2684,7 +2662,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'video', format: 'Story / Reel', platform: 'Instagram',
       status: 'active', fit_for_ads: true,
       performance: { impressions: 88000, clicks: 2640, ctr: 3.0, spend: 195000 },
-      notes: 'Currently in testing for Q1 2027 campaign. Before/after format performs well in January when people are in "new year" mindset.',
       replication_elements: ['Before/after contrast is instantly readable', '15 seconds max for awareness play', 'No voiceover — music only in first 3 seconds', 'Open loop — the "after" side should make them want to know more', 'End on strong brand frame'],
       tags: ['video', 'teaser', 'new-year', 'before-after'],
     },
@@ -2695,7 +2672,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'image', format: 'Feed', platform: 'Facebook',
       status: 'active', fit_for_ads: true,
       performance: { impressions: 1240000, clicks: 14880, ctr: 1.2, conversions: 1190, spend: 2100000, roas: 2.1, frequency: 5.8 },
-      notes: 'Original Summer Vibes launch ad — running 82 days unrefreshed. Meta Ads Manager flagging high frequency. Audience is tuning out. Need fresh creative ASAP.',
       replication_elements: ['Orange background aligns with brand palette', '"Beat the Heat" seasonal hook resonated at launch', 'Refresh with lifestyle instead of product-only — market women format likely to reset frequency response'],
       tags: ['summer-vibes', 'facebook', 'active', 'needs-refresh'],
       _created_at: dAgo(82),
@@ -2706,7 +2682,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'video', format: 'Reel', platform: 'Instagram',
       status: 'active', fit_for_ads: true,
       performance: { impressions: 620000, clicks: 13020, ctr: 2.1, conversions: 1116, spend: 890000, roas: 3.2, frequency: 4.2 },
-      notes: 'Good creative but high frequency on core Lagos Millennial segment. CTR declining week-on-week (started at 3.4%, now 2.1%). A/B test with a new script or swap out with a different talent.',
       replication_elements: ['Morning routine format is relatable — keep the scenario', 'Afrobeats hook in first 3 seconds is doing the heavy lifting', 'Talent refresh (new face) often resets frequency decay better than new concept'],
       tags: ['oats', 'reel', 'instagram', 'morning-routine', 'active'],
       _created_at: dAgo(54),
@@ -2717,7 +2692,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       asset_type: 'image', format: 'Display Banner', platform: 'Google',
       status: 'active', fit_for_ads: true,
       performance: { impressions: 3400000, clicks: 85000, ctr: 2.5, conversions: 3825, spend: 1250000, roas: 3.4, frequency: 3.6 },
-      notes: 'GDN banner running 49 days. CTR started at 3.8%, trending toward 2.5% — plan creative refresh within 10-14 days before further decline.',
       replication_elements: ['Price callout critical for Display — always include', '"Nigeria\'s Favourite" social proof claim is strong anchor', 'Refresh headline and image while keeping price callout format'],
       tags: ['google', 'display', 'banner', 'active'],
       _created_at: dAgo(49),
@@ -2736,7 +2710,6 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       status:               rest.status,
       fit_for_ads:          rest.fit_for_ads,
       performance:          rest.performance,
-      notes:                rest.notes,
       replication_elements: rest.replication_elements,
       tags:                 rest.tags,
       ...((_created_at) ? { created_at: _created_at } : {}),
@@ -2780,17 +2753,14 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
   // 3 FSO teams covering different regions
   const { data: lagosTeam } = await sb.from('fso_teams').insert({
     brand_id: brandId, workspace_id: wsId, name: 'Lagos & South-West FSO', active: true,
-    notes: 'Covers Lagos, Ogun, Oyo, Ondo, Osun. Lead: Adebola Adeyemi',
   }).select('id').single()
 
   const { data: northTeam } = await sb.from('fso_teams').insert({
     brand_id: brandId, workspace_id: wsId, name: 'North & FCT FSO', active: true,
-    notes: 'Covers Abuja, Kano, Kaduna, Katsina. Lead: Musa Aliyu',
   }).select('id').single()
 
   const { data: seTeam } = await sb.from('fso_teams').insert({
     brand_id: brandId, workspace_id: wsId, name: 'South-East & South-South FSO', active: true,
-    notes: 'Covers Rivers, Enugu, Anambra, Delta, Cross River. Lead: Chidi Okechi',
   }).select('id').single()
 
   // Field reports: 25 reports across 30 days, 3 regions
