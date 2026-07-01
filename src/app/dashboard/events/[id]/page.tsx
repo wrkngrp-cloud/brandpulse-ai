@@ -106,7 +106,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             </>
           )}
         </div>
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-xl font-semibold">{event.name}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
@@ -229,9 +229,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
               <p className="text-sm font-medium">Ambassador breakdown</p>
               <div className="space-y-2">
                 {((roiReport.metrics as { ambassador_breakdown: { name: string; total: number; leads: number; customers: number }[] }).ambassador_breakdown).map((a, i) => (
-                  <div key={i} className="flex items-center justify-between text-sm">
+                  <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-sm">
                     <span>{a.name}</span>
-                    <span className="text-muted-foreground">{a.total} interactions · {a.leads} leads · {a.customers} customers</span>
+                    <span className="text-muted-foreground text-xs sm:text-sm">{a.total} interactions · {a.leads} leads · {a.customers} customers</span>
                   </div>
                 ))}
               </div>

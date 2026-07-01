@@ -369,7 +369,7 @@ export function GeoAttributionPanel({
               const meta = STATUS_META[aud.status] ?? STATUS_META.draft
               const StatusIcon = meta.icon
               return (
-                <Card key={aud.id} className="p-4 flex items-center justify-between gap-4">
+                <Card key={aud.id} className="p-4 flex flex-wrap items-center justify-between gap-4">
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-sm truncate">{aud.audience_name}</span>

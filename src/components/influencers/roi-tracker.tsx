@@ -148,7 +148,7 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
     <div className="space-y-5">
 
       {/* Header row */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-[15px] font-semibold">Influencer ROI Tracker</h2>
           <p className="text-[12px] text-muted-foreground">Log paid partnerships and measure Earned Media Value vs fee.</p>

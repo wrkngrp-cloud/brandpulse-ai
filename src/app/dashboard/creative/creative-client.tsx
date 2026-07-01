@@ -361,7 +361,7 @@ export function CreativeClient({
   return (
     <div className="space-y-6">
       {/* Tab bar */}
-      <div className="flex border-b">
+      <div className="flex border-b overflow-x-auto">
         {TABS.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -727,7 +727,7 @@ export function CreativeClient({
           {competitorResult && (
             <div className="space-y-4">
               {/* Top metrics */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="border rounded-xl p-3 text-center space-y-1">
                   <p className="text-xs text-muted-foreground">Tone</p>
                   <p className="text-sm font-semibold capitalize">{competitorResult.tone}</p>

@@ -462,7 +462,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold">Influencer Intelligence</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
@@ -551,7 +551,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
               <div className="space-y-3">
                 <Label>Social profiles <FieldTip tip="Paste the full profile URL or just the @handle. BrandPulse auto-detects the platform. Select the platform manually if it does not detect correctly." /></Label>
                 {entries.map((entry, i) => (
-                  <div key={i} className="flex gap-2 items-center">
+                  <div key={i} className="flex flex-wrap sm:flex-nowrap gap-2 items-center">
                     <Input
                       placeholder="instagram.com/handle or @handle"
                       value={entry.input}

@@ -677,7 +677,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               </div>
 
               {/* Social KPI row */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
                   { label: 'Impressions', value: totalImpressions.toLocaleString() },
                   { label: 'Reach',       value: totalReach.toLocaleString() },
@@ -1166,8 +1166,8 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
             <div className="border rounded-xl p-5 bg-card space-y-3">
               <p className="text-sm font-medium">Channel attribution</p>
               <p className="text-xs text-muted-foreground">Which channels are contributing to each campaign objective.</p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
+              <div className="overflow-x-auto -mx-1 px-1">
+                <table className="w-full text-xs min-w-[480px]">
                   <thead>
                     <tr>
                       <th className="text-left text-muted-foreground font-medium pb-2 pr-4">Channel</th>
