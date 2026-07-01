@@ -49,7 +49,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     { data: igConnection },
   ] = await Promise.all([
     supabase.from('event_ambassadors').select('id, name, phone, session_token').eq('event_id', id),
-    supabase.from('event_interactions').select('id, interaction_type, ambassador_id, occurred_at, notes').eq('event_id', id),
+    supabase.from('event_interactions').select('id, interaction_type, ambassador_id, occurred_at').eq('event_id', id),
     supabase.from('event_roi_reports').select('metrics, narrative, generated_at').eq('event_id', id).maybeSingle(),
     supabase.from('event_intercept_responses').select('id').eq('event_id', id),
     supabase.from('visual_mentions')
