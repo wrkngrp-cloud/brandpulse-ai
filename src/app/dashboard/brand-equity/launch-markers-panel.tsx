@@ -257,7 +257,7 @@ export function LaunchMarkersPanel() {
                   {m.label}
                 </span>
                 <span className={cn(
-                  'text-xs font-semibold tabular-nums shrink-0',
+                  'hidden sm:inline text-xs font-semibold tabular-nums shrink-0',
                   delta == null ? 'text-muted-foreground/50'
                     : delta > 0 ? 'text-green-600'
                     : delta < 0 ? 'text-red-500'

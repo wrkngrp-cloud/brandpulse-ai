@@ -524,7 +524,7 @@ export function BrandEquityClient({
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="border rounded-lg p-3 text-center">
             <p className="text-xs text-muted-foreground">Your SOV</p>
             <p className="text-2xl font-bold mt-0.5">

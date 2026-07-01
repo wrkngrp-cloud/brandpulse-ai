@@ -32,11 +32,19 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
   // Default pinned=true (expanded sidebar), hydrate from localStorage
   const [pinned, setPinned] = useState(true)
   const [hydrated, setHydrated] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem(LS_KEY)
     if (saved === 'collapsed') setPinned(false)
     setHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
   }, [])
 
   const toggleSidebar = useCallback(() => {
@@ -74,7 +82,7 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
           'flex flex-col flex-1 min-h-screen min-w-0',
           'md:transition-[padding-left] md:duration-200 md:ease-out',
         )}
-        style={{ paddingLeft: hydrated ? `${contentPad}px` : '256px' }}
+        style={(hydrated && !isMobile) ? { paddingLeft: `${contentPad}px` } : undefined}
       >
         {/* Topbar */}
         <header className="sticky top-0 z-30 h-14 border-b border-border/60 flex items-center gap-3 px-4 sm:px-5 shrink-0 bg-background/92 backdrop-blur-xl backdrop-saturate-150">
