@@ -297,7 +297,7 @@ export async function POST(req: NextRequest) {
 
   /* ── 10. Events ───────────────────────────────────────────────────────── */
 
-  // evt1 — Nourish Nigeria Festival (closed, big Lagos event, Oct 2025)
+  // evt1 — Nourish Nigeria Festival (closed, Oct 2025)
   const { data: evt1 } = await sb.from('events').insert({
     brand_id: brandId, campaign_id: camp1Id,
     name: 'Nourish Nigeria Festival',
@@ -307,7 +307,7 @@ export async function POST(req: NextRequest) {
     expected_attendance: 3000,
     objectives:           { stages: ['Awareness', 'Advocacy'], primary: 'Brand love amplification', secondary: 'Lead capture', tertiary: 'Influencer content creation' },
     activation_mechanics: ['Live cooking demos', 'Recipe sampling', 'Photo booth', 'Social media wall', 'Branded gifts', 'Influencer zone'],
-    kpi_targets:          { expected_leads: 1500, nps_score: 70, social_impressions: 2000000, press_mentions: 10, expected_photo_moments: 500 },
+    kpi_targets:          { expected_leads: 1500, expected_photo_moments: 500 },
     budget: 7_200_000, currency: 'NGN',
     hashtags: ['NourishNigeria', 'JaraFoods', 'JaraFestival2025'],
     status: 'closed',
@@ -333,7 +333,7 @@ export async function POST(req: NextRequest) {
     expected_attendance: 800,
     objectives:           { stages: ['Consideration', 'Action'], primary: 'Community engagement in Abuja market', secondary: 'Lead capture' },
     activation_mechanics: ['Free community meals', 'Recipe cards', 'WhatsApp QR opt-in', 'Branded photobooth'],
-    kpi_targets:          { expected_leads: 400, nps_score: 65, social_impressions: 500000 },
+    kpi_targets:          { expected_leads: 400, expected_photo_moments: 100 },
     budget: 2_200_000, currency: 'NGN',
     hashtags: ['JaraCommunityKitchen', 'JaraFoods', 'AbujaCooks'],
     status: 'reported',
@@ -349,7 +349,7 @@ export async function POST(req: NextRequest) {
     },
   }).select('id').single()
 
-  // evt3 — Jara Summer Vibes Beach Pop-Up (LIVE right now, June 2026)
+  // evt3 — Jara Summer Vibes Eko Atlantic Pop-Up (LIVE today)
   const { data: evt3 } = await sb.from('events').insert({
     brand_id: brandId, campaign_id: camp3Id,
     name: 'Jara Summer Vibes — Eko Atlantic Pop-Up',
@@ -359,7 +359,7 @@ export async function POST(req: NextRequest) {
     expected_attendance: 600,
     objectives:           { stages: ['Awareness', 'Consideration', 'Advocacy'] },
     activation_mechanics: ['Chilled product sampling', 'Branded photo wall', 'DJ set', 'Giveaway spin wheel'],
-    kpi_targets:          { expected_leads: 300, expected_samples: 500, expected_photo_moments: 200, social_impressions: 600000 },
+    kpi_targets:          { expected_leads: 300, expected_samples: 500, expected_photo_moments: 200 },
     budget: 1_800_000, currency: 'NGN',
     hashtags: ['JaraSummerVibes', 'JaraChilled', 'EkoAtlantic'],
     missed_call_number: '+2348080000000',
@@ -372,44 +372,116 @@ export async function POST(req: NextRequest) {
 
   /* ── Event ambassadors + interactions ──────────────────────────────────── */
 
-  // Event 1 — Nourish Nigeria Festival: 4 ambassadors, 72 interactions over 2 days
+  // ── EVT1: Nourish Nigeria Festival — 4 ambassadors, 72 interactions ──────
   if (evt1Id) {
-    const [{ data: amb1 }, { data: amb2 }, { data: amb3 }, { data: amb4 }] = await Promise.all([
-      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Amaka Okonkwo',   phone: '+2348012345678', session_token: 'amb-jara-nourish-amaka-2025'  }).select('id').single(),
-      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Taiwo Fashola',   phone: '+2348098765432', session_token: 'amb-jara-nourish-taiwo-2025'  }).select('id').single(),
-      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Chidi Eze',       phone: '+2348067891234', session_token: 'amb-jara-nourish-chidi-2025'  }).select('id').single(),
-      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Kemi Adeyemi',    phone: '+2348034567890', session_token: 'amb-jara-nourish-kemi-2025'   }).select('id').single(),
+    const [{ data: a1 }, { data: a2 }, { data: a3 }, { data: a4 }] = await Promise.all([
+      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Amaka Okonkwo',  phone: '+2348012345678', session_token: 'amb-jara-nourish-amaka-2025' }).select('id').single(),
+      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Taiwo Fashola',  phone: '+2348098765432', session_token: 'amb-jara-nourish-taiwo-2025' }).select('id').single(),
+      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Chidi Eze',      phone: '+2348067891234', session_token: 'amb-jara-nourish-chidi-2025' }).select('id').single(),
+      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Kemi Adeyemi',   phone: '+2348034567890', session_token: 'amb-jara-nourish-kemi-2025'  }).select('id').single(),
     ])
 
-    const ambIds = [amb1?.id, amb2?.id, amb3?.id, amb4?.id]
-    const names  = ['Amaka Okonkwo', 'Taiwo Fashola', 'Chidi Eze', 'Kemi Adeyemi']
-    const intTypes = [
-      ...Array(30).fill('product_trial'),
-      ...Array(20).fill('lead_capture'),
-      ...Array(12).fill('new_lead'),
-      ...Array(6).fill('nps_intercept'),
-      ...Array(4).fill('new_customer'),
+    // Realistic per-ambassador distributions across 2 days
+    // Interaction types from LiveDashboard TYPE_META: engaged, new_lead, new_customer,
+    // existing_customer, merch, sample, prize, photo
+    const leadNames = [
+      'Chinwe Uba','Bode Salami','Ngozi Obi','Emeka Nwosu','Remi Coker',
+      'Fatima Musa','Yemi Abiola','Ade Oladele','Grace Eze','Tunde Balogun',
+      'Sola Adewale','Ikenna Nwobi','Aisha Bello','Kunle Obi','Amara Eze',
+      'Tobi Alabi','Zainab Umar','Femi Okonkwo','Lara Bello','Nnamdi Eze',
+      'Bisola Adeyemi','Kehinde Fashola','Hakeem Aliyu','Adaeze Nwosu',
     ]
-    const leadNames  = ['Chinwe Uba', 'Bode Salami', 'Ngozi Obi', 'Emeka Nwosu', 'Remi Coker', 'Fatima Musa', 'Yemi Abiola', 'Ade Oladele', 'Grace Eze', 'Tunde Balogun', 'Sola Adewale', 'Ikenna Nwobi', 'Aisha Bello', 'Kunle Obi', 'Amara Eze', 'Tobi Alabi', 'Zainab Umar', 'Femi Okonkwo', 'Lara Bello', 'Nnamdi Eze', 'Bisola Adeyemi', 'Kehinde Fashola', 'Hakeem Aliyu', 'Adaeze Nwosu', 'Seun Taiwo', 'Chisom Eze', 'Bukola Adesanya', 'Musa Ibrahim', 'Taiwo Alabi', 'Nnenna Okonkwo', 'Dare Adewuyi', 'Chiamaka Eze']
-    const interests  = ['Jara Rice', 'Jara Oats', 'Jara Spice Mix', 'Full Range', 'Jara Semolina', 'Jara Chilled']
-    const custTypes  = ['new_prospect', 'lapsed_customer', 'existing_customer', 'influencer', 'trade_buyer']
+    const interests = ['Jara Rice','Jara Oats','Jara Spice Mix','Full Range','Jara Semolina','Jara Chilled']
 
-    const int1 = intTypes.map((itype, i) => ({
+    // Amaka: 22 interactions (top performer)
+    const amakaRows = [
+      ...Array.from({ length: 8  }, (_, i) => ({ itype: 'sample',            ambId: a1?.id, li: i       })),
+      ...Array.from({ length: 6  }, (_, i) => ({ itype: 'new_lead',          ambId: a1?.id, li: i + 8   })),
+      ...Array.from({ length: 3  }, (_, i) => ({ itype: 'photo',             ambId: a1?.id, li: null     })),
+      ...Array.from({ length: 2  }, (_, i) => ({ itype: 'new_customer',      ambId: a1?.id, li: i + 14  })),
+      ...Array.from({ length: 2  }, (_, i) => ({ itype: 'engaged',           ambId: a1?.id, li: null     })),
+      ...Array.from({ length: 1  }, (_, i) => ({ itype: 'merch',             ambId: a1?.id, li: null     })),
+    ]
+
+    // Taiwo: 19 interactions
+    const taiwoRows = [
+      ...Array.from({ length: 7  }, (_, i) => ({ itype: 'sample',            ambId: a2?.id, li: i       })),
+      ...Array.from({ length: 5  }, (_, i) => ({ itype: 'new_lead',          ambId: a2?.id, li: i + 16  })),
+      ...Array.from({ length: 3  }, (_, i) => ({ itype: 'photo',             ambId: a2?.id, li: null     })),
+      ...Array.from({ length: 2  }, (_, i) => ({ itype: 'engaged',           ambId: a2?.id, li: null     })),
+      ...Array.from({ length: 1  }, (_, i) => ({ itype: 'new_customer',      ambId: a2?.id, li: i + 22  })),
+      ...Array.from({ length: 1  }, (_, i) => ({ itype: 'merch',             ambId: a2?.id, li: null     })),
+    ]
+
+    // Chidi: 17 interactions
+    const chidiRows = [
+      ...Array.from({ length: 6  }, (_, i) => ({ itype: 'sample',            ambId: a3?.id, li: i       })),
+      ...Array.from({ length: 5  }, (_, i) => ({ itype: 'new_lead',          ambId: a3?.id, li: i + 8   })),
+      ...Array.from({ length: 2  }, (_, i) => ({ itype: 'photo',             ambId: a3?.id, li: null     })),
+      ...Array.from({ length: 2  }, (_, i) => ({ itype: 'engaged',           ambId: a3?.id, li: null     })),
+      ...Array.from({ length: 1  }, (_, i) => ({ itype: 'new_customer',      ambId: a3?.id, li: i + 18  })),
+      ...Array.from({ length: 1  }, (_, i) => ({ itype: 'existing_customer', ambId: a3?.id, li: null     })),
+    ]
+
+    // Kemi: 14 interactions
+    const kemiRows = [
+      ...Array.from({ length: 5  }, (_, i) => ({ itype: 'sample',            ambId: a4?.id, li: i       })),
+      ...Array.from({ length: 4  }, (_, i) => ({ itype: 'new_lead',          ambId: a4?.id, li: i + 6   })),
+      ...Array.from({ length: 2  }, (_, i) => ({ itype: 'photo',             ambId: a4?.id, li: null     })),
+      ...Array.from({ length: 2  }, (_, i) => ({ itype: 'engaged',           ambId: a4?.id, li: null     })),
+      ...Array.from({ length: 1  }, (_, i) => ({ itype: 'prize',             ambId: a4?.id, li: null     })),
+    ]
+
+    const allEvt1Rows = [...amakaRows, ...taiwoRows, ...chidiRows, ...kemiRows]
+    const int1 = allEvt1Rows.map(({ itype, ambId, li }, idx) => ({
       event_id:         evt1Id,
-      ambassador_id:    ambIds[i % 4],
+      ambassador_id:    ambId,
       interaction_type: itype,
-      customer_type:    custTypes[i % custTypes.length],
-      lead_name:        ['lead_capture', 'new_lead', 'new_customer'].includes(itype) ? (leadNames[i % leadNames.length] ?? `Guest ${i + 1}`) : null,
-      lead_phone:       ['lead_capture', 'new_lead', 'new_customer'].includes(itype) ? `+23480${String(10000000 + i).slice(0, 8)}` : null,
-      lead_interest:    interests[i % interests.length],
+      customer_type:    ['new_prospect','lapsed_customer','existing_customer','influencer'][idx % 4],
+      lead_name:        li != null ? (leadNames[li % leadNames.length] ?? `Guest ${li + 1}`) : null,
+      lead_phone:       li != null ? `+23480${String(10000000 + (li * 7)).slice(0, 8)}` : null,
+      lead_interest:    interests[idx % interests.length],
       capture_method:   'ambassador' as const,
-      notes:            i === 2 ? 'Shoprite category buyer — follow up with trade team' : i === 15 ? 'Chef Kemisola fan — strong brand advocate' : i === 28 ? 'Diaspora returnee, interested in bulk order' : null,
-      client_uuid:      `evt1-${i + 1}`,
-      occurred_at:      tsAgo(218 - (i < 36 ? 1 : 0), 8 + (i % 11)),
+      notes:            idx === 5  ? 'Shoprite category buyer — follow up with trade team'   :
+                        idx === 18 ? 'Chef Kemisola fan — strong brand advocate, 45k IG'      :
+                        idx === 35 ? 'Diaspora returnee, asked about bulk order'              : null,
+      client_uuid:      `evt1-${idx + 1}`,
+      occurred_at:      tsAgo(218 - (idx < 36 ? 1 : 0), 8 + (idx % 11)),
     }))
     await sb.from('event_interactions').insert(int1)
 
-    // Visual mentions for evt1 — photobooth + branded signage detected in Instagram posts
+    // ROI report for evt1
+    await sb.from('event_roi_reports').insert({
+      event_id:     evt1Id,
+      generated_at: tsAgo(216, 8),
+      narrative: `The Nourish Nigeria Festival delivered exceptional results across all key metrics, significantly exceeding targets set for this activation. Total footfall of 2,847 attendees surpassed the 3,000 target by 95%, and the team captured 1,847 qualified leads — 23% above the 1,500 target.
+
+The photo booth zone was the standout ROI driver: 487 branded photo moments generated 312 organic Instagram posts within 24 hours of the event, contributing ₦1.2M in estimated earned media value (EMV). The live cooking demo anchored by Chef Kemisola drew sustained crowd engagement over both days.
+
+From a lead quality perspective, 26 interactions were flagged as high-value trade contacts, including a direct conversation with a Shoprite category buyer. BrandPulse AI estimates these B2B leads carry a pipeline value of ₦8.4M based on average category deal sizes.
+
+Amaka Okonkwo led the ambassador team in both raw interactions and lead capture, demonstrating strong product knowledge and audience engagement. Recommend her for the Summer Vibes activation team.`,
+      metrics: {
+        total_interactions:  72,
+        total_leads:         20,
+        total_new_customers: 4,
+        event_emv:           1_200_000,
+        cost_per_lead:       360_000,
+        cost_per_account:    1_800_000,
+        event_roi:           0.47,
+        new_customer_ratio:  0.056,
+        leads_vs_target:     null,
+        customers_vs_target: null,
+        ambassador_breakdown: [
+          { name: 'Amaka Okonkwo', total: 22, leads: 6, customers: 2, photo_moments: 3, samples: 8  },
+          { name: 'Taiwo Fashola', total: 19, leads: 5, customers: 1, photo_moments: 3, samples: 7  },
+          { name: 'Chidi Eze',     total: 17, leads: 5, customers: 1, photo_moments: 2, samples: 6  },
+          { name: 'Kemi Adeyemi',  total: 14, leads: 4, customers: 0, photo_moments: 2, samples: 5  },
+        ],
+      },
+    })
+
+    // Visual mentions for evt1
     await sb.from('visual_mentions').insert([
       {
         event_id: evt1Id, brand_id: brandId, source_platform: 'instagram',
@@ -419,7 +491,7 @@ export async function POST(req: NextRequest) {
         post_caption: 'What a vibe at the #NourishNigeria festival! The Jara photobooth had everyone lined up 🔥 #JaraFoods',
         post_likes: 2847, post_comments: 143,
         brand_visible: true, confidence: 'high',
-        detected_elements: ['banner', 'signage', 'logo'],
+        detected_elements: ['banner','signage','logo'],
         visual_sentiment: 'positive',
         ai_description: 'Branded Jara Foods photobooth backdrop with logo and brand colours clearly visible. Two attendees posing in front of it.',
         detected_at: tsAgo(217, 14),
@@ -432,7 +504,7 @@ export async function POST(req: NextRequest) {
         post_caption: 'The cooking demo was insane! Jara Spice Mix in the hands of a pro chef 😍 #JaraFoods #NourishNigeria',
         post_likes: 1243, post_comments: 67,
         brand_visible: true, confidence: 'high',
-        detected_elements: ['product', 'logo', 'signage'],
+        detected_elements: ['product','logo','signage'],
         visual_sentiment: 'positive',
         ai_description: 'Jara Spice Mix product packaging prominently visible on the cooking demo counter alongside Jara Foods branded tablecloth.',
         detected_at: tsAgo(218, 11),
@@ -442,10 +514,10 @@ export async function POST(req: NextRequest) {
         post_id: 'nourish-vm-03', post_url: 'https://www.instagram.com/p/demo-nourish-03',
         media_url: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600',
         hashtag: 'JaraFestival2025', creator_username: 'temilolabeauty',
-        post_caption: 'Got the cutest Jara tote at the festival! #JaraFestival2025 #NourishNigeria',
+        post_caption: 'Got the cutest Jara tote at the festival! #JaraFestival2025',
         post_likes: 891, post_comments: 34,
         brand_visible: true, confidence: 'high',
-        detected_elements: ['merch', 'logo'],
+        detected_elements: ['merch','logo'],
         visual_sentiment: 'positive',
         ai_description: 'Branded Jara Foods tote bag with large logo visible. Attendee holding it up at the festival.',
         detected_at: tsAgo(217, 16),
@@ -458,9 +530,9 @@ export async function POST(req: NextRequest) {
         post_caption: 'At the #NourishNigeria festival today. The crowd is amazing!',
         post_likes: 412, post_comments: 18,
         brand_visible: true, confidence: 'medium',
-        detected_elements: ['banner', 'uniform'],
+        detected_elements: ['banner','uniform'],
         visual_sentiment: 'positive',
-        ai_description: 'Jara Foods branded staff uniform visible on event crew members in the background. Brand name partially visible.',
+        ai_description: 'Jara Foods branded staff uniform visible on event crew members in the background.',
         detected_at: tsAgo(218, 13),
       },
       {
@@ -471,7 +543,7 @@ export async function POST(req: NextRequest) {
         post_caption: 'These Jara recipes are giving! Taking notes 📝 #JaraFoods',
         post_likes: 623, post_comments: 29,
         brand_visible: true, confidence: 'medium',
-        detected_elements: ['product', 'creative'],
+        detected_elements: ['product','creative'],
         visual_sentiment: 'positive',
         ai_description: 'Jara Foods recipe cards with brand logo visible on the table at the cooking station.',
         detected_at: tsAgo(217, 10),
@@ -483,8 +555,7 @@ export async function POST(req: NextRequest) {
         hashtag: 'NourishNigeria', creator_username: 'xoxo_chisom',
         post_caption: 'Day 2 at the festival 🎉 #NourishNigeria',
         post_likes: 287, post_comments: 12,
-        brand_visible: false, confidence: null,
-        detected_elements: [],
+        brand_visible: false, confidence: null, detected_elements: [],
         visual_sentiment: 'neutral',
         ai_description: 'No brand presence detected. Crowd shot with no visible Jara Foods branding.',
         detected_at: tsAgo(217, 15),
@@ -496,38 +567,87 @@ export async function POST(req: NextRequest) {
         hashtag: 'JaraFestival2025', creator_username: 'naijavibes24',
         post_caption: 'The cooking competition was top tier! #JaraFestival2025',
         post_likes: 448, post_comments: 21,
-        brand_visible: false, confidence: null,
-        detected_elements: [],
+        brand_visible: false, confidence: null, detected_elements: [],
         visual_sentiment: 'positive',
-        ai_description: 'No brand presence detected. Image shows a cooking pot close-up without visible branding.',
+        ai_description: 'No brand presence detected. Close-up of cooking pot without visible branding.',
         detected_at: tsAgo(218, 12),
       },
     ])
   }
 
-  // Event 2 — Jara Community Kitchen Abuja: 2 ambassadors, 32 interactions, visual mentions
+  // ── EVT2: Jara Community Kitchen Abuja — 2 ambassadors, 32 interactions ──
   if (evt2Id) {
-    const [{ data: amb5 }, { data: amb6 }] = await Promise.all([
+    const [{ data: a5 }, { data: a6 }] = await Promise.all([
       sb.from('event_ambassadors').insert({ event_id: evt2Id, name: 'Fatima Aliyu',  phone: '+2348023456789', session_token: 'amb-jara-abuja-fatima-2026' }).select('id').single(),
       sb.from('event_ambassadors').insert({ event_id: evt2Id, name: 'Uche Onwudiwe', phone: '+2348056781234', session_token: 'amb-jara-abuja-uche-2026'  }).select('id').single(),
     ])
 
-    const int2 = Array.from({ length: 32 }, (_, i) => ({
+    const fatimaLeads = ['Hauwa Musa','Gbenga Afolabi','Sadiya Bello','Chukwu Nze','Rashida Umar','Emeka Obi','Zara Abdullahi','Dele Adeyemi']
+    const ucheLeads   = ['Nkiruka Eze','Tijani Abubakar','Olumide Coker','Adaora Nwosu','Chidinma Eze','Musa Ibrahim']
+
+    // Fatima: 18 interactions (top performer — found the Deputy Governor)
+    const fatimaRows = [
+      ...Array.from({ length: 6 }, (_, i) => ({ itype: 'sample',       ambId: a5?.id, li: i, note: i === 1 ? 'FCT Deputy Governor group — 4 people sampled, all positive' : null })),
+      ...Array.from({ length: 5 }, (_, i) => ({ itype: 'new_lead',     ambId: a5?.id, li: i, note: null })),
+      ...Array.from({ length: 3 }, (_, i) => ({ itype: 'photo',        ambId: a5?.id, li: null, note: null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a5?.id, li: null, note: null })),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'new_customer', ambId: a5?.id, li: null, note: i === 0 ? 'WhatsApp opt-in confirmed on spot' : null })),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'merch',        ambId: a5?.id, li: null, note: null })),
+    ]
+
+    // Uche: 14 interactions
+    const ucheRows = [
+      ...Array.from({ length: 5 }, (_, i) => ({ itype: 'sample',       ambId: a6?.id, li: i, note: null })),
+      ...Array.from({ length: 4 }, (_, i) => ({ itype: 'new_lead',     ambId: a6?.id, li: i, note: null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'photo',        ambId: a6?.id, li: null, note: null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a6?.id, li: null, note: null })),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'existing_customer', ambId: a6?.id, li: null, note: null })),
+    ]
+
+    const allEvt2Rows = [...fatimaRows, ...ucheRows]
+    const int2 = allEvt2Rows.map(({ itype, ambId, li, note }, idx) => ({
       event_id:         evt2Id,
-      ambassador_id:    i % 2 === 0 ? amb5?.id : amb6?.id,
-      interaction_type: i < 18 ? 'product_trial' : i < 26 ? 'lead_capture' : i < 30 ? 'new_lead' : 'nps_intercept',
-      customer_type:    ['new_prospect', 'existing_customer', 'lapsed_customer', 'trade_buyer'][i % 4],
-      lead_name:        i >= 18 && i < 30 ? ['Hauwa Musa', 'Gbenga Afolabi', 'Sadiya Bello', 'Chukwu Nze', 'Rashida Umar', 'Emeka Obi', 'Zara Abdullahi', 'Dele Adeyemi', 'Nkiruka Eze', 'Tijani Abubakar', 'Olumide Coker', 'Adaora Nwosu'][i - 18] : null,
-      lead_phone:       i >= 18 && i < 30 ? `+23481${String(20000000 + i).slice(0, 8)}` : null,
-      lead_interest:    ['Jara Rice', 'Jara Semolina', 'Jara Spice Mix', 'Full Range'][i % 4],
+      ambassador_id:    ambId,
+      interaction_type: itype,
+      customer_type:    ['new_prospect','existing_customer','lapsed_customer','trade_buyer'][idx % 4],
+      lead_name:        li != null ? (([...fatimaLeads,...ucheLeads])[li % 14]) : null,
+      lead_phone:       li != null ? `+23481${String(20000000 + (li * 11)).slice(0, 8)}` : null,
+      lead_interest:    ['Jara Rice','Jara Semolina','Jara Spice Mix','Full Range'][idx % 4],
       capture_method:   'ambassador' as const,
-      notes:            i === 5 ? 'FCT Deputy Governor entourage — 4 people sampled Jara Rice' : i === 22 ? 'WhatsApp opt-in confirmed on spot' : null,
-      client_uuid:      `evt2-${i + 1}`,
-      occurred_at:      tsAgo(63 - Math.floor(i * 0.4), 10 + (i % 8)),
+      notes:            note ?? null,
+      client_uuid:      `evt2-${idx + 1}`,
+      occurred_at:      tsAgo(63 - (idx < 18 ? 1 : 0), 10 + (idx % 8)),
     }))
     await sb.from('event_interactions').insert(int2)
 
-    // Visual mentions for evt2 — community kitchen photobooth
+    // ROI report for evt2
+    await sb.from('event_roi_reports').insert({
+      event_id:     evt2Id,
+      generated_at: tsAgo(61, 9),
+      narrative: `The Jara Community Kitchen Abuja activation outperformed all key metrics, with actual attendance of 1,124 exceeding the 800 target by 40%. The community-first approach resonated strongly in the FCT market — 312 WhatsApp opt-ins represent a high-intent contact database for future campaigns.
+
+The visit by the FCT Deputy Governor generated earned media coverage across 3 Abuja-based news outlets, contributing an estimated ₦280,000 in earned media value beyond what was planned. Fatima Aliyu's handling of the Governor's entourage was exceptional — she converted the moment into a press opportunity that amplified Jara's community credentials.
+
+Cost efficiency was strong: at ₦3,483 per qualified lead against a target of ₦5,500, this activation delivered 37% better efficiency than planned. Recommend scaling the community kitchen format to Port Harcourt and Kano in Q3 2026.`,
+      metrics: {
+        total_interactions:  32,
+        total_leads:         9,
+        total_new_customers: 1,
+        event_emv:           280_000,
+        cost_per_lead:       244_444,
+        cost_per_account:    2_200_000,
+        event_roi:           0.31,
+        new_customer_ratio:  0.031,
+        leads_vs_target:     null,
+        customers_vs_target: null,
+        ambassador_breakdown: [
+          { name: 'Fatima Aliyu',  total: 18, leads: 5, customers: 1, photo_moments: 3, samples: 6 },
+          { name: 'Uche Onwudiwe', total: 14, leads: 4, customers: 0, photo_moments: 2, samples: 5 },
+        ],
+      },
+    })
+
+    // Visual mentions for evt2
     await sb.from('visual_mentions').insert([
       {
         event_id: evt2Id, brand_id: brandId, source_platform: 'instagram',
@@ -536,8 +656,7 @@ export async function POST(req: NextRequest) {
         hashtag: 'JaraCommunityKitchen', creator_username: 'abuja_eats',
         post_caption: 'Free Jara meals at Millennium Park today! God bless Jara Foods 🙏 #JaraCommunityKitchen #AbujaCooks',
         post_likes: 1124, post_comments: 88,
-        brand_visible: true, confidence: 'high',
-        detected_elements: ['banner', 'logo', 'signage'],
+        brand_visible: true, confidence: 'high', detected_elements: ['banner','logo','signage'],
         visual_sentiment: 'positive',
         ai_description: 'Jara Foods branded serving table and banner clearly visible at the community kitchen event.',
         detected_at: tsAgo(62, 13),
@@ -549,8 +668,7 @@ export async function POST(req: NextRequest) {
         hashtag: 'AbujaCooks', creator_username: 'naijalife_abj',
         post_caption: 'The photobooth at #JaraCommunityKitchen is cute sha! #AbujaCooks',
         post_likes: 432, post_comments: 31,
-        brand_visible: true, confidence: 'high',
-        detected_elements: ['creative', 'logo', 'banner'],
+        brand_visible: true, confidence: 'high', detected_elements: ['creative','logo','banner'],
         visual_sentiment: 'positive',
         ai_description: 'Branded Jara photobooth backdrop with full logo visible. Two women posing with Jara branded recipe cards.',
         detected_at: tsAgo(63, 11),
@@ -562,8 +680,7 @@ export async function POST(req: NextRequest) {
         hashtag: 'JaraFoods', creator_username: 'flavors_of_naija',
         post_caption: 'Got the Jara recipe card — trying this at home! #JaraFoods',
         post_likes: 289, post_comments: 14,
-        brand_visible: true, confidence: 'medium',
-        detected_elements: ['product', 'creative'],
+        brand_visible: true, confidence: 'medium', detected_elements: ['product','creative'],
         visual_sentiment: 'positive',
         ai_description: 'Jara Foods recipe card with brand name visible held up by attendee.',
         detected_at: tsAgo(62, 14),
@@ -575,8 +692,7 @@ export async function POST(req: NextRequest) {
         hashtag: 'AbujaCooks', creator_username: 'abuja_community_news',
         post_caption: 'Community spirit in Abuja today! #AbujaCooks',
         post_likes: 178, post_comments: 8,
-        brand_visible: false, confidence: null,
-        detected_elements: [],
+        brand_visible: false, confidence: null, detected_elements: [],
         visual_sentiment: 'neutral',
         ai_description: 'No brand presence detected. Wide shot of crowd with no visible Jara Foods branding.',
         detected_at: tsAgo(63, 12),
@@ -584,26 +700,54 @@ export async function POST(req: NextRequest) {
     ])
   }
 
-  // Event 3 — Jara Summer Vibes Beach Pop-Up (LIVE today): 3 ambassadors, 28 interactions so far
+  // ── EVT3: Jara Summer Vibes Eko Atlantic Pop-Up — 3 ambassadors, LIVE ────
   if (evt3Id) {
-    const [{ data: amb7 }, { data: amb8 }, { data: amb9 }] = await Promise.all([
-      sb.from('event_ambassadors').insert({ event_id: evt3Id, name: 'Seun Adeyemi',   phone: '+2348067001234', session_token: 'amb-jara-summer-seun-2026'  }).select('id').single(),
-      sb.from('event_ambassadors').insert({ event_id: evt3Id, name: 'Nneka Okafor',   phone: '+2348078002345', session_token: 'amb-jara-summer-nneka-2026' }).select('id').single(),
+    const [{ data: a7 }, { data: a8 }, { data: a9 }] = await Promise.all([
+      sb.from('event_ambassadors').insert({ event_id: evt3Id, name: 'Seun Adeyemi',    phone: '+2348067001234', session_token: 'amb-jara-summer-seun-2026'   }).select('id').single(),
+      sb.from('event_ambassadors').insert({ event_id: evt3Id, name: 'Nneka Okafor',    phone: '+2348078002345', session_token: 'amb-jara-summer-nneka-2026'  }).select('id').single(),
       sb.from('event_ambassadors').insert({ event_id: evt3Id, name: 'Biodun Akinwale', phone: '+2348089003456', session_token: 'amb-jara-summer-biodun-2026' }).select('id').single(),
     ])
 
-    const int3 = Array.from({ length: 28 }, (_, i) => ({
+    const summerLeads = ['Kolade Adewale','Priscilla Eze','Bashir Mustapha','Ify Nwosu','Damilola Bello','Chibuzor Eze','Tolu Fashola','Yusuf Abdullahi','Amina Suleiman']
+
+    // Seun: 12 interactions (best so far today)
+    const seunRows = [
+      ...Array.from({ length: 4 }, (_, i) => ({ itype: 'sample',       ambId: a7?.id, li: i,    note: i === 0 ? 'Influencer with 45k followers — photographed Jara Chilled can' : null })),
+      ...Array.from({ length: 3 }, (_, i) => ({ itype: 'new_lead',     ambId: a7?.id, li: i+4,  note: null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'photo',        ambId: a7?.id, li: null, note: null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a7?.id, li: null, note: null })),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'prize',        ambId: a7?.id, li: null, note: null })),
+    ]
+
+    // Nneka: 10 interactions
+    const nnekaRows = [
+      ...Array.from({ length: 4 }, (_, i) => ({ itype: 'sample',       ambId: a8?.id, li: i,    note: null })),
+      ...Array.from({ length: 3 }, (_, i) => ({ itype: 'new_lead',     ambId: a8?.id, li: i+7,  note: null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'photo',        ambId: a8?.id, li: null, note: null })),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'engaged',      ambId: a8?.id, li: null, note: null })),
+    ]
+
+    // Biodun: 8 interactions
+    const biodunRows = [
+      ...Array.from({ length: 3 }, (_, i) => ({ itype: 'sample',       ambId: a9?.id, li: i,    note: i === 1 ? 'Asked about bulk orders for a restaurant' : null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'new_lead',     ambId: a9?.id, li: i+2,  note: null })),
+      ...Array.from({ length: 2 }, (_, i) => ({ itype: 'engaged',      ambId: a9?.id, li: null, note: null })),
+      ...Array.from({ length: 1 }, (_, i) => ({ itype: 'photo',        ambId: a9?.id, li: null, note: null })),
+    ]
+
+    const allEvt3Rows = [...seunRows, ...nnekaRows, ...biodunRows]
+    const int3 = allEvt3Rows.map(({ itype, ambId, li, note }, idx) => ({
       event_id:         evt3Id,
-      ambassador_id:    [amb7?.id, amb8?.id, amb9?.id][i % 3],
-      interaction_type: i < 16 ? 'product_trial' : i < 22 ? 'lead_capture' : i < 25 ? 'new_lead' : 'nps_intercept',
-      customer_type:    ['new_prospect', 'existing_customer', 'lapsed_customer'][i % 3],
-      lead_name:        i >= 16 && i < 25 ? ['Kolade Adewale', 'Priscilla Eze', 'Bashir Mustapha', 'Ify Nwosu', 'Damilola Bello', 'Chibuzor Eze', 'Tolu Fashola', 'Yusuf Abdullahi', 'Amina Suleiman'][i - 16] : null,
-      lead_phone:       i >= 16 && i < 25 ? `+23480${String(30000000 + i).slice(0, 8)}` : null,
-      lead_interest:    ['Jara Chilled', 'Jara Rice', 'Jara Oats'][i % 3],
+      ambassador_id:    ambId,
+      interaction_type: itype,
+      customer_type:    ['new_prospect','existing_customer','lapsed_customer'][idx % 3],
+      lead_name:        li != null ? (summerLeads[li % summerLeads.length]) : null,
+      lead_phone:       li != null ? `+23480${String(30000000 + (li * 13)).slice(0, 8)}` : null,
+      lead_interest:    ['Jara Chilled','Jara Rice','Jara Oats'][idx % 3],
       capture_method:   'ambassador' as const,
-      notes:            i === 3 ? 'Influencer with 45k followers — photographed Jara Chilled can' : i === 12 ? 'Asked about bulk orders for a restaurant' : null,
-      client_uuid:      `evt3-${i + 1}`,
-      occurred_at:      tsAgo(0, 9 + Math.floor(i * 0.35)),
+      notes:            note ?? null,
+      client_uuid:      `evt3-${idx + 1}`,
+      occurred_at:      tsAgo(0, 9 + Math.floor(idx * 0.45)),
     }))
     await sb.from('event_interactions').insert(int3)
   }

@@ -1,7 +1,7 @@
 import { createClient }       from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link                   from 'next/link'
-import { ArrowLeft, Megaphone } from 'lucide-react'
+import { ArrowLeft, Megaphone, Trophy } from 'lucide-react'
 import { LiveDashboard }       from '@/components/events/live-dashboard'
 import { AmbassadorList }      from '@/components/events/ambassador-list'
 import { computeEventMetrics, fmtNGN, fmtPct } from '@/lib/events/roi'
@@ -19,6 +19,12 @@ function fmtNGNLocal(n: number | null | undefined): string {
   if (n == null) return '—'
   return `₦${n.toLocaleString('en-NG', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
 }
+
+const RANK_COLOURS = [
+  'bg-amber-400/15 text-amber-600 dark:text-amber-400',   // 1st — gold
+  'bg-muted text-muted-foreground',                        // 2nd — silver
+  'bg-orange-400/15 text-orange-600 dark:text-orange-400', // 3rd — bronze
+]
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -43,7 +49,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     { data: igConnection },
   ] = await Promise.all([
     supabase.from('event_ambassadors').select('id, name, phone, session_token').eq('event_id', id),
-    supabase.from('event_interactions').select('id, interaction_type, ambassador_id, occurred_at').eq('event_id', id),
+    supabase.from('event_interactions').select('id, interaction_type, ambassador_id, occurred_at, notes').eq('event_id', id),
     supabase.from('event_roi_reports').select('metrics, narrative, generated_at').eq('event_id', id).maybeSingle(),
     supabase.from('event_intercept_responses').select('id').eq('event_id', id),
     supabase.from('visual_mentions')
@@ -80,6 +86,20 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   const sampleConvRate = event.samples_distributed && leadsCount > 0
     ? (leadsCount / event.samples_distributed) * 100
     : null
+
+  // Compute per-ambassador stats for leaderboard (used for closed/reported)
+  const ambLeaderboard = (ambassadors ?? []).map(a => {
+    const mine = (interactions ?? []).filter(i => i.ambassador_id === a.id)
+    return {
+      id:        a.id,
+      name:      a.name,
+      total:     mine.length,
+      leads:     mine.filter(i => i.interaction_type === 'new_lead').length,
+      customers: mine.filter(i => i.interaction_type === 'new_customer').length,
+      samples:   mine.filter(i => i.interaction_type === 'sample').length,
+      photos:    mine.filter(i => i.interaction_type === 'photo').length,
+    }
+  }).sort((a, b) => b.total - a.total)
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -125,7 +145,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         </div>
       </div>
 
-      {/* BTL metrics panel (shown when activation_type is set, for closed/reported status) */}
+      {/* BTL metrics panel */}
       {isBtl && (event.status === 'closed' || event.status === 'reported') && (
         <div className="border rounded-xl p-5 bg-card space-y-4">
           <h2 className="text-sm font-semibold">BTL performance</h2>
@@ -223,21 +243,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             </div>
           )}
 
-          {/* Ambassador breakdown */}
-          {Array.isArray((roiReport.metrics as Record<string, unknown>)?.ambassador_breakdown) && (
-            <div className="border rounded-xl p-5 bg-card space-y-3">
-              <p className="text-sm font-medium">Ambassador breakdown</p>
-              <div className="space-y-2">
-                {((roiReport.metrics as { ambassador_breakdown: { name: string; total: number; leads: number; customers: number }[] }).ambassador_breakdown).map((a, i) => (
-                  <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-sm">
-                    <span>{a.name}</span>
-                    <span className="text-muted-foreground text-xs sm:text-sm">{a.total} interactions · {a.leads} leads · {a.customers} customers</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {(interceptCount?.length ?? 0) > 0 && (
             <p className="text-xs text-muted-foreground">
               {interceptCount?.length} intercept survey response{interceptCount?.length !== 1 ? 's' : ''} collected.
@@ -257,10 +262,57 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         />
       )}
 
-      {/* Ambassador list (planned + live) */}
+      {/* Ambassador performance leaderboard — shown for ALL statuses when there is data */}
+      {ambLeaderboard.length > 0 && ambLeaderboard.some(a => a.total > 0) && (
+        <div className="border rounded-xl p-5 bg-card space-y-4">
+          <div className="flex items-center gap-2">
+            <Trophy className="h-4 w-4 text-amber-500" />
+            <h2 className="text-sm font-semibold">Ambassador leaderboard</h2>
+            <span className="text-xs text-muted-foreground ml-auto">
+              {(interactions ?? []).length} total interactions
+            </span>
+          </div>
+
+          {/* Progress bar leaderboard */}
+          <div className="space-y-3">
+            {ambLeaderboard.map((a, rank) => {
+              const topTotal = ambLeaderboard[0]?.total ?? 1
+              const pct = topTotal > 0 ? (a.total / topTotal) * 100 : 0
+              const rankColour = RANK_COLOURS[rank] ?? 'bg-muted text-muted-foreground'
+              return (
+                <div key={a.id} className="space-y-1.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className={`h-5 w-5 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0 ${rankColour}`}>
+                      {rank + 1}
+                    </span>
+                    <span className="text-sm font-medium flex-1 truncate">{a.name}</span>
+                    <span className="text-sm tabular-nums font-semibold">{a.total}</span>
+                  </div>
+                  {/* Progress bar */}
+                  <div className="ml-7 h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-foreground/70 transition-all"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  {/* Sub-stats */}
+                  <div className="ml-7 flex flex-wrap gap-x-4 gap-y-0.5 text-[11px] text-muted-foreground">
+                    {a.leads > 0    && <span>{a.leads} lead{a.leads !== 1 ? 's' : ''}</span>}
+                    {a.customers > 0 && <span>{a.customers} customer{a.customers !== 1 ? 's' : ''}</span>}
+                    {a.samples > 0  && <span>{a.samples} sample{a.samples !== 1 ? 's' : ''}</span>}
+                    {a.photos > 0   && <span>{a.photos} photo moment{a.photos !== 1 ? 's' : ''}</span>}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Ambassador list with session links (planned + live only) */}
       {(event.status === 'planned' || event.status === 'live') && (
         <div className="border rounded-xl p-5 bg-card space-y-4">
-          <h2 className="text-sm font-semibold">Ambassadors</h2>
+          <h2 className="text-sm font-semibold">Ambassador session links</h2>
           <AmbassadorList
             eventId={id}
             ambassadors={ambassadors ?? []}
@@ -269,7 +321,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         </div>
       )}
 
-      {/* Visual brand mentions (E6) */}
+      {/* Visual brand mentions */}
       <div className="border rounded-xl p-5 bg-card">
         <VisualMentions
           eventId={id}
