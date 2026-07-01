@@ -296,18 +296,20 @@ export async function POST(req: NextRequest) {
   await sb.from('funnel_snapshots').insert(funnelRows)
 
   /* ── 10. Events ───────────────────────────────────────────────────────── */
+
+  // evt1 — Nourish Nigeria Festival (closed, big Lagos event, Oct 2025)
   const { data: evt1 } = await sb.from('events').insert({
     brand_id: brandId, campaign_id: camp1Id,
     name: 'Nourish Nigeria Festival',
-    event_type: 'brand_activation',
+    activation_type: 'concert_festival',
     venue: 'Eko Convention Centre', city: 'Lagos', state: 'Lagos',
     date_start: dAgo(218), date_end: dAgo(217),
     expected_attendance: 3000,
-    objectives:           { primary: 'Brand love amplification', secondary: 'Lead capture', tertiary: 'Influencer content creation' },
-    activation_mechanics: ['Live cooking demos', 'Recipe sampling', 'Photo booth', 'Social media wall', 'Branded gifts'],
-    kpi_targets:          { leads: 1500, nps_score: 70, social_impressions: 2000000, press_mentions: 10 },
+    objectives:           { stages: ['Awareness', 'Advocacy'], primary: 'Brand love amplification', secondary: 'Lead capture', tertiary: 'Influencer content creation' },
+    activation_mechanics: ['Live cooking demos', 'Recipe sampling', 'Photo booth', 'Social media wall', 'Branded gifts', 'Influencer zone'],
+    kpi_targets:          { expected_leads: 1500, nps_score: 70, social_impressions: 2000000, press_mentions: 10, expected_photo_moments: 500 },
     budget: 7_200_000, currency: 'NGN',
-    hashtags: ['#NourishNigeria', '#JaraFoods', '#JaraFestival2025'],
+    hashtags: ['NourishNigeria', 'JaraFoods', 'JaraFestival2025'],
     status: 'closed',
     debrief: {
       actual_attendance: 2847, leads_captured: 1847, nps_achieved: 74,
@@ -316,82 +318,294 @@ export async function POST(req: NextRequest) {
         'Chef Kemisola live demo drew 600 attendees',
         'Trended on X for 6 hours during day 1',
         'Partnership lead from Shoprite category buyer',
+        '487 photobooth moments captured — 312 shared on Instagram',
       ],
     },
   }).select('id').single()
 
+  // evt2 — Jara Community Kitchen Abuja (reported, Mar 2026)
   const { data: evt2 } = await sb.from('events').insert({
     brand_id: brandId, campaign_id: camp2Id,
     name: 'Jara Community Kitchen — Abuja',
-    event_type: 'community_activation',
+    activation_type: 'estate_community',
     venue: 'Millennium Park Pavilion', city: 'Abuja', state: 'FCT',
     date_start: dAgo(63), date_end: dAgo(62),
     expected_attendance: 800,
-    objectives:           { primary: 'Community engagement in Abuja market', secondary: 'Lead capture' },
-    activation_mechanics: ['Free community meals', 'Recipe cards', 'WhatsApp QR opt-in'],
-    kpi_targets:          { leads: 400, nps_score: 65, social_impressions: 500000 },
+    objectives:           { stages: ['Consideration', 'Action'], primary: 'Community engagement in Abuja market', secondary: 'Lead capture' },
+    activation_mechanics: ['Free community meals', 'Recipe cards', 'WhatsApp QR opt-in', 'Branded photobooth'],
+    kpi_targets:          { expected_leads: 400, nps_score: 65, social_impressions: 500000 },
     budget: 2_200_000, currency: 'NGN',
-    hashtags: ['#JaraCommunityKitchen', '#JaraFoods', '#AbujaCooks'],
+    hashtags: ['JaraCommunityKitchen', 'JaraFoods', 'AbujaCooks'],
     status: 'reported',
     debrief: {
       actual_attendance: 1124, leads_captured: 631, nps_achieved: 72,
       social_impressions: 842_000,
       highlights: [
         'Exceeded attendance target by 40%',
-        'FCT Deputy Governor visited',
-        '312 WhatsApp opt-ins captured',
+        'FCT Deputy Governor visited and sampled Jara Rice',
+        '312 WhatsApp opt-ins captured via QR',
+        '94 Instagram-tagged photobooth posts in 48 hours',
       ],
     },
   }).select('id').single()
 
+  // evt3 — Jara Summer Vibes Beach Pop-Up (LIVE right now, June 2026)
+  const { data: evt3 } = await sb.from('events').insert({
+    brand_id: brandId, campaign_id: camp3Id,
+    name: 'Jara Summer Vibes — Eko Atlantic Pop-Up',
+    activation_type: 'sampling',
+    venue: 'Eko Atlantic City Boardwalk', city: 'Lagos', state: 'Lagos',
+    date_start: dAgo(0), date_end: dAgo(-1),
+    expected_attendance: 600,
+    objectives:           { stages: ['Awareness', 'Consideration', 'Advocacy'] },
+    activation_mechanics: ['Chilled product sampling', 'Branded photo wall', 'DJ set', 'Giveaway spin wheel'],
+    kpi_targets:          { expected_leads: 300, expected_samples: 500, expected_photo_moments: 200, social_impressions: 600000 },
+    budget: 1_800_000, currency: 'NGN',
+    hashtags: ['JaraSummerVibes', 'JaraChilled', 'EkoAtlantic'],
+    missed_call_number: '+2348080000000',
+    status: 'live',
+  }).select('id').single()
+
   const evt1Id = evt1?.id
   const evt2Id = evt2?.id
+  const evt3Id = evt3?.id
 
-  /* ── Event ambassadors + interactions ────────────────────────────────── */
+  /* ── Event ambassadors + interactions ──────────────────────────────────── */
+
+  // Event 1 — Nourish Nigeria Festival: 4 ambassadors, 72 interactions over 2 days
   if (evt1Id) {
-    const { data: amb1 } = await sb.from('event_ambassadors').insert({
-      event_id: evt1Id, name: 'Amaka Okonkwo', phone: '+2348012345678',
-      session_token: 'amb-jara-nourish-amaka-2025',
-    }).select('id').single()
-    const { data: amb2 } = await sb.from('event_ambassadors').insert({
-      event_id: evt1Id, name: 'Taiwo Fashola', phone: '+2348098765432',
-      session_token: 'amb-jara-nourish-taiwo-2025',
-    }).select('id').single()
+    const [{ data: amb1 }, { data: amb2 }, { data: amb3 }, { data: amb4 }] = await Promise.all([
+      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Amaka Okonkwo',   phone: '+2348012345678', session_token: 'amb-jara-nourish-amaka-2025'  }).select('id').single(),
+      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Taiwo Fashola',   phone: '+2348098765432', session_token: 'amb-jara-nourish-taiwo-2025'  }).select('id').single(),
+      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Chidi Eze',       phone: '+2348067891234', session_token: 'amb-jara-nourish-chidi-2025'  }).select('id').single(),
+      sb.from('event_ambassadors').insert({ event_id: evt1Id, name: 'Kemi Adeyemi',    phone: '+2348034567890', session_token: 'amb-jara-nourish-kemi-2025'   }).select('id').single(),
+    ])
 
-    const int1 = Array.from({ length: 40 }, (_, i) => ({
+    const ambIds = [amb1?.id, amb2?.id, amb3?.id, amb4?.id]
+    const names  = ['Amaka Okonkwo', 'Taiwo Fashola', 'Chidi Eze', 'Kemi Adeyemi']
+    const intTypes = [
+      ...Array(30).fill('product_trial'),
+      ...Array(20).fill('lead_capture'),
+      ...Array(12).fill('new_lead'),
+      ...Array(6).fill('nps_intercept'),
+      ...Array(4).fill('new_customer'),
+    ]
+    const leadNames  = ['Chinwe Uba', 'Bode Salami', 'Ngozi Obi', 'Emeka Nwosu', 'Remi Coker', 'Fatima Musa', 'Yemi Abiola', 'Ade Oladele', 'Grace Eze', 'Tunde Balogun', 'Sola Adewale', 'Ikenna Nwobi', 'Aisha Bello', 'Kunle Obi', 'Amara Eze', 'Tobi Alabi', 'Zainab Umar', 'Femi Okonkwo', 'Lara Bello', 'Nnamdi Eze', 'Bisola Adeyemi', 'Kehinde Fashola', 'Hakeem Aliyu', 'Adaeze Nwosu', 'Seun Taiwo', 'Chisom Eze', 'Bukola Adesanya', 'Musa Ibrahim', 'Taiwo Alabi', 'Nnenna Okonkwo', 'Dare Adewuyi', 'Chiamaka Eze']
+    const interests  = ['Jara Rice', 'Jara Oats', 'Jara Spice Mix', 'Full Range', 'Jara Semolina', 'Jara Chilled']
+    const custTypes  = ['new_prospect', 'lapsed_customer', 'existing_customer', 'influencer', 'trade_buyer']
+
+    const int1 = intTypes.map((itype, i) => ({
       event_id:         evt1Id,
-      ambassador_id:    i % 2 === 0 ? amb1?.id : amb2?.id,
-      interaction_type: i < 26 ? 'product_trial' : i < 36 ? 'lead_capture' : 'nps_intercept',
-      customer_type:    ['new_prospect', 'lapsed_customer', 'existing_customer', 'influencer'][i % 4],
-      lead_name:        i < 36 ? `Guest ${i + 1}` : null,
-      lead_phone:       i < 36 ? `+23480${String(10000000 + i).slice(0, 8)}` : null,
-      lead_interest:    ['Jara Rice', 'Jara Oats', 'Jara Spice Mix', 'Full Range'][i % 4],
+      ambassador_id:    ambIds[i % 4],
+      interaction_type: itype,
+      customer_type:    custTypes[i % custTypes.length],
+      lead_name:        ['lead_capture', 'new_lead', 'new_customer'].includes(itype) ? (leadNames[i % leadNames.length] ?? `Guest ${i + 1}`) : null,
+      lead_phone:       ['lead_capture', 'new_lead', 'new_customer'].includes(itype) ? `+23480${String(10000000 + i).slice(0, 8)}` : null,
+      lead_interest:    interests[i % interests.length],
       capture_method:   'ambassador' as const,
+      notes:            i === 2 ? 'Shoprite category buyer — follow up with trade team' : i === 15 ? 'Chef Kemisola fan — strong brand advocate' : i === 28 ? 'Diaspora returnee, interested in bulk order' : null,
       client_uuid:      `evt1-${i + 1}`,
-      occurred_at:      tsAgo(218 - Math.floor(i * 0.4), 9 + (i % 10)),
+      occurred_at:      tsAgo(218 - (i < 36 ? 1 : 0), 8 + (i % 11)),
     }))
     await sb.from('event_interactions').insert(int1)
+
+    // Visual mentions for evt1 — photobooth + branded signage detected in Instagram posts
+    await sb.from('visual_mentions').insert([
+      {
+        event_id: evt1Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'nourish-vm-01', post_url: 'https://www.instagram.com/p/demo-nourish-01',
+        media_url: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600',
+        hashtag: 'NourishNigeria', creator_username: 'chefkemisola_ng',
+        post_caption: 'What a vibe at the #NourishNigeria festival! The Jara photobooth had everyone lined up 🔥 #JaraFoods',
+        post_likes: 2847, post_comments: 143,
+        brand_visible: true, confidence: 'high',
+        detected_elements: ['banner', 'signage', 'logo'],
+        visual_sentiment: 'positive',
+        ai_description: 'Branded Jara Foods photobooth backdrop with logo and brand colours clearly visible. Two attendees posing in front of it.',
+        detected_at: tsAgo(217, 14),
+      },
+      {
+        event_id: evt1Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'nourish-vm-02', post_url: 'https://www.instagram.com/p/demo-nourish-02',
+        media_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600',
+        hashtag: 'JaraFoods', creator_username: 'foodie_lagos',
+        post_caption: 'The cooking demo was insane! Jara Spice Mix in the hands of a pro chef 😍 #JaraFoods #NourishNigeria',
+        post_likes: 1243, post_comments: 67,
+        brand_visible: true, confidence: 'high',
+        detected_elements: ['product', 'logo', 'signage'],
+        visual_sentiment: 'positive',
+        ai_description: 'Jara Spice Mix product packaging prominently visible on the cooking demo counter alongside Jara Foods branded tablecloth.',
+        detected_at: tsAgo(218, 11),
+      },
+      {
+        event_id: evt1Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'nourish-vm-03', post_url: 'https://www.instagram.com/p/demo-nourish-03',
+        media_url: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600',
+        hashtag: 'JaraFestival2025', creator_username: 'temilolabeauty',
+        post_caption: 'Got the cutest Jara tote at the festival! #JaraFestival2025 #NourishNigeria',
+        post_likes: 891, post_comments: 34,
+        brand_visible: true, confidence: 'high',
+        detected_elements: ['merch', 'logo'],
+        visual_sentiment: 'positive',
+        ai_description: 'Branded Jara Foods tote bag with large logo visible. Attendee holding it up at the festival.',
+        detected_at: tsAgo(217, 16),
+      },
+      {
+        event_id: evt1Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'nourish-vm-04', post_url: 'https://www.instagram.com/p/demo-nourish-04',
+        media_url: 'https://images.unsplash.com/photo-1543353071-873f17a7a088?w=600',
+        hashtag: 'NourishNigeria', creator_username: 'abuja_lifestyle',
+        post_caption: 'At the #NourishNigeria festival today. The crowd is amazing!',
+        post_likes: 412, post_comments: 18,
+        brand_visible: true, confidence: 'medium',
+        detected_elements: ['banner', 'uniform'],
+        visual_sentiment: 'positive',
+        ai_description: 'Jara Foods branded staff uniform visible on event crew members in the background. Brand name partially visible.',
+        detected_at: tsAgo(218, 13),
+      },
+      {
+        event_id: evt1Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'nourish-vm-05', post_url: 'https://www.instagram.com/p/demo-nourish-05',
+        media_url: 'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=600',
+        hashtag: 'JaraFoods', creator_username: 'lagosfoodcourt',
+        post_caption: 'These Jara recipes are giving! Taking notes 📝 #JaraFoods',
+        post_likes: 623, post_comments: 29,
+        brand_visible: true, confidence: 'medium',
+        detected_elements: ['product', 'creative'],
+        visual_sentiment: 'positive',
+        ai_description: 'Jara Foods recipe cards with brand logo visible on the table at the cooking station.',
+        detected_at: tsAgo(217, 10),
+      },
+      {
+        event_id: evt1Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'nourish-vm-06', post_url: 'https://www.instagram.com/p/demo-nourish-06',
+        media_url: 'https://images.unsplash.com/photo-1519671282429-b44660ead0a7?w=600',
+        hashtag: 'NourishNigeria', creator_username: 'xoxo_chisom',
+        post_caption: 'Day 2 at the festival 🎉 #NourishNigeria',
+        post_likes: 287, post_comments: 12,
+        brand_visible: false, confidence: null,
+        detected_elements: [],
+        visual_sentiment: 'neutral',
+        ai_description: 'No brand presence detected. Crowd shot with no visible Jara Foods branding.',
+        detected_at: tsAgo(217, 15),
+      },
+      {
+        event_id: evt1Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'nourish-vm-07', post_url: 'https://www.instagram.com/p/demo-nourish-07',
+        media_url: 'https://images.unsplash.com/photo-1504567961542-e24d9439a724?w=600',
+        hashtag: 'JaraFestival2025', creator_username: 'naijavibes24',
+        post_caption: 'The cooking competition was top tier! #JaraFestival2025',
+        post_likes: 448, post_comments: 21,
+        brand_visible: false, confidence: null,
+        detected_elements: [],
+        visual_sentiment: 'positive',
+        ai_description: 'No brand presence detected. Image shows a cooking pot close-up without visible branding.',
+        detected_at: tsAgo(218, 12),
+      },
+    ])
   }
 
+  // Event 2 — Jara Community Kitchen Abuja: 2 ambassadors, 32 interactions, visual mentions
   if (evt2Id) {
-    const { data: amb3 } = await sb.from('event_ambassadors').insert({
-      event_id: evt2Id, name: 'Fatima Aliyu', phone: '+2348023456789',
-      session_token: 'amb-jara-abuja-fatima-2026',
-    }).select('id').single()
+    const [{ data: amb5 }, { data: amb6 }] = await Promise.all([
+      sb.from('event_ambassadors').insert({ event_id: evt2Id, name: 'Fatima Aliyu',  phone: '+2348023456789', session_token: 'amb-jara-abuja-fatima-2026' }).select('id').single(),
+      sb.from('event_ambassadors').insert({ event_id: evt2Id, name: 'Uche Onwudiwe', phone: '+2348056781234', session_token: 'amb-jara-abuja-uche-2026'  }).select('id').single(),
+    ])
 
-    const int2 = Array.from({ length: 20 }, (_, i) => ({
+    const int2 = Array.from({ length: 32 }, (_, i) => ({
       event_id:         evt2Id,
-      ambassador_id:    amb3?.id,
-      interaction_type: i < 14 ? 'product_trial' : 'lead_capture',
-      customer_type:    ['new_prospect', 'existing_customer', 'lapsed_customer'][i % 3],
-      lead_name:        `Attendee ${i + 1}`,
-      lead_phone:       `+23481${String(10000000 + i).slice(0, 8)}`,
-      lead_interest:    ['Jara Rice', 'Jara Semolina', 'Jara Spice Mix'][i % 3],
+      ambassador_id:    i % 2 === 0 ? amb5?.id : amb6?.id,
+      interaction_type: i < 18 ? 'product_trial' : i < 26 ? 'lead_capture' : i < 30 ? 'new_lead' : 'nps_intercept',
+      customer_type:    ['new_prospect', 'existing_customer', 'lapsed_customer', 'trade_buyer'][i % 4],
+      lead_name:        i >= 18 && i < 30 ? ['Hauwa Musa', 'Gbenga Afolabi', 'Sadiya Bello', 'Chukwu Nze', 'Rashida Umar', 'Emeka Obi', 'Zara Abdullahi', 'Dele Adeyemi', 'Nkiruka Eze', 'Tijani Abubakar', 'Olumide Coker', 'Adaora Nwosu'][i - 18] : null,
+      lead_phone:       i >= 18 && i < 30 ? `+23481${String(20000000 + i).slice(0, 8)}` : null,
+      lead_interest:    ['Jara Rice', 'Jara Semolina', 'Jara Spice Mix', 'Full Range'][i % 4],
       capture_method:   'ambassador' as const,
+      notes:            i === 5 ? 'FCT Deputy Governor entourage — 4 people sampled Jara Rice' : i === 22 ? 'WhatsApp opt-in confirmed on spot' : null,
       client_uuid:      `evt2-${i + 1}`,
-      occurred_at:      tsAgo(63 - Math.floor(i * 0.3), 10 + (i % 8)),
+      occurred_at:      tsAgo(63 - Math.floor(i * 0.4), 10 + (i % 8)),
     }))
     await sb.from('event_interactions').insert(int2)
+
+    // Visual mentions for evt2 — community kitchen photobooth
+    await sb.from('visual_mentions').insert([
+      {
+        event_id: evt2Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'abuja-vm-01', post_url: 'https://www.instagram.com/p/demo-abuja-01',
+        media_url: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600',
+        hashtag: 'JaraCommunityKitchen', creator_username: 'abuja_eats',
+        post_caption: 'Free Jara meals at Millennium Park today! God bless Jara Foods 🙏 #JaraCommunityKitchen #AbujaCooks',
+        post_likes: 1124, post_comments: 88,
+        brand_visible: true, confidence: 'high',
+        detected_elements: ['banner', 'logo', 'signage'],
+        visual_sentiment: 'positive',
+        ai_description: 'Jara Foods branded serving table and banner clearly visible at the community kitchen event.',
+        detected_at: tsAgo(62, 13),
+      },
+      {
+        event_id: evt2Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'abuja-vm-02', post_url: 'https://www.instagram.com/p/demo-abuja-02',
+        media_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600',
+        hashtag: 'AbujaCooks', creator_username: 'naijalife_abj',
+        post_caption: 'The photobooth at #JaraCommunityKitchen is cute sha! #AbujaCooks',
+        post_likes: 432, post_comments: 31,
+        brand_visible: true, confidence: 'high',
+        detected_elements: ['creative', 'logo', 'banner'],
+        visual_sentiment: 'positive',
+        ai_description: 'Branded Jara photobooth backdrop with full logo visible. Two women posing with Jara branded recipe cards.',
+        detected_at: tsAgo(63, 11),
+      },
+      {
+        event_id: evt2Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'abuja-vm-03', post_url: 'https://www.instagram.com/p/demo-abuja-03',
+        media_url: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600',
+        hashtag: 'JaraFoods', creator_username: 'flavors_of_naija',
+        post_caption: 'Got the Jara recipe card — trying this at home! #JaraFoods',
+        post_likes: 289, post_comments: 14,
+        brand_visible: true, confidence: 'medium',
+        detected_elements: ['product', 'creative'],
+        visual_sentiment: 'positive',
+        ai_description: 'Jara Foods recipe card with brand name visible held up by attendee.',
+        detected_at: tsAgo(62, 14),
+      },
+      {
+        event_id: evt2Id, brand_id: brandId, source_platform: 'instagram',
+        post_id: 'abuja-vm-04', post_url: 'https://www.instagram.com/p/demo-abuja-04',
+        media_url: 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=600',
+        hashtag: 'AbujaCooks', creator_username: 'abuja_community_news',
+        post_caption: 'Community spirit in Abuja today! #AbujaCooks',
+        post_likes: 178, post_comments: 8,
+        brand_visible: false, confidence: null,
+        detected_elements: [],
+        visual_sentiment: 'neutral',
+        ai_description: 'No brand presence detected. Wide shot of crowd with no visible Jara Foods branding.',
+        detected_at: tsAgo(63, 12),
+      },
+    ])
+  }
+
+  // Event 3 — Jara Summer Vibes Beach Pop-Up (LIVE today): 3 ambassadors, 28 interactions so far
+  if (evt3Id) {
+    const [{ data: amb7 }, { data: amb8 }, { data: amb9 }] = await Promise.all([
+      sb.from('event_ambassadors').insert({ event_id: evt3Id, name: 'Seun Adeyemi',   phone: '+2348067001234', session_token: 'amb-jara-summer-seun-2026'  }).select('id').single(),
+      sb.from('event_ambassadors').insert({ event_id: evt3Id, name: 'Nneka Okafor',   phone: '+2348078002345', session_token: 'amb-jara-summer-nneka-2026' }).select('id').single(),
+      sb.from('event_ambassadors').insert({ event_id: evt3Id, name: 'Biodun Akinwale', phone: '+2348089003456', session_token: 'amb-jara-summer-biodun-2026' }).select('id').single(),
+    ])
+
+    const int3 = Array.from({ length: 28 }, (_, i) => ({
+      event_id:         evt3Id,
+      ambassador_id:    [amb7?.id, amb8?.id, amb9?.id][i % 3],
+      interaction_type: i < 16 ? 'product_trial' : i < 22 ? 'lead_capture' : i < 25 ? 'new_lead' : 'nps_intercept',
+      customer_type:    ['new_prospect', 'existing_customer', 'lapsed_customer'][i % 3],
+      lead_name:        i >= 16 && i < 25 ? ['Kolade Adewale', 'Priscilla Eze', 'Bashir Mustapha', 'Ify Nwosu', 'Damilola Bello', 'Chibuzor Eze', 'Tolu Fashola', 'Yusuf Abdullahi', 'Amina Suleiman'][i - 16] : null,
+      lead_phone:       i >= 16 && i < 25 ? `+23480${String(30000000 + i).slice(0, 8)}` : null,
+      lead_interest:    ['Jara Chilled', 'Jara Rice', 'Jara Oats'][i % 3],
+      capture_method:   'ambassador' as const,
+      notes:            i === 3 ? 'Influencer with 45k followers — photographed Jara Chilled can' : i === 12 ? 'Asked about bulk orders for a restaurant' : null,
+      client_uuid:      `evt3-${i + 1}`,
+      occurred_at:      tsAgo(0, 9 + Math.floor(i * 0.35)),
+    }))
+    await sb.from('event_interactions').insert(int3)
   }
 
   /* ── 11. OOH sites ────────────────────────────────────────────────────── */

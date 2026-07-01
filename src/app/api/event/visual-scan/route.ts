@@ -22,10 +22,10 @@ export async function POST(req: NextRequest) {
   const { eventId } = body.data
   const service = await createServiceClient()
 
-  // Fetch event + brand
+  // Fetch event + brand — include creative_url for vision reference
   const { data: ev } = await service
     .from('events')
-    .select('id, brand_id, name, hashtags')
+    .select('id, brand_id, name, hashtags, creative_url')
     .eq('id', eventId)
     .single()
 
@@ -63,8 +63,13 @@ export async function POST(req: NextRequest) {
   if (!images.length)
     return NextResponse.json({ error: 'No image posts found for these hashtags yet.' }, { status: 200, statusText: 'ok' })
 
-  // Run vision detection
-  const { rows } = await runVisualDetection(images, ev.brand_id as string, eventId)
+  // Build creative reference list: event flyer/photobooth + brand creative_urls
+  const eventCreativeUrls: string[] = ev.creative_url ? [ev.creative_url as string] : []
+
+  // Run vision detection — passes event creative as visual reference
+  const { rows } = await runVisualDetection(images, ev.brand_id as string, eventId, undefined, {
+    creativeUrls: eventCreativeUrls,
+  })
 
   // Upsert into visual_mentions (deduplicate by event_id + post_id)
   if (rows.length) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useActionState, useEffect } from 'react'
+import { useState, useActionState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast }    from 'sonner'
 import { createEvent } from '@/app/dashboard/events/actions'
@@ -9,7 +9,7 @@ import { Input }    from '@/components/ui/input'
 import { Label }    from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput } from '@/components/onboarding/brand-profile-fields'
-import { ArrowLeft, ArrowRight, CalendarDays, Check, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CalendarDays, Check, Plus, Trash2, Upload, X, ImageIcon } from 'lucide-react'
 import { FieldTip } from '@/components/ui/field-tip'
 import { cn } from '@/lib/utils'
 import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
@@ -55,6 +55,7 @@ interface WizardData {
   date_end:            string
   hashtags:            string[]
   expected_attendance: string
+  creative_url:        string
   // BTL-specific
   samples_distributed:      string
   collateral_distributed:   string
@@ -82,6 +83,7 @@ interface WizardData {
 const INIT: WizardData = {
   name: '', activation_type: 'event', venue: '', city: '', state: '',
   date_start: '', date_end: '', hashtags: [], expected_attendance: '',
+  creative_url: '',
   samples_distributed: '', collateral_distributed: '', target_community_size: '',
   spend_breakdown: { agency: '', materials: '', sampling: '', logistics: '' },
   objectives: [],
@@ -100,6 +102,8 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
   const [step, setStep] = useState(0)
   const [data, setData] = useState<WizardData>(INIT)
   const [state, action, pending] = useActionState(createEvent, null)
+  const [creativeUploading, setCreativeUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (state?.error) toast.error(state.error)
@@ -142,6 +146,29 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
 
   function removeAmbassador(i: number) {
     setData(prev => ({ ...prev, ambassadors: prev.ambassadors.filter((_, idx) => idx !== i) }))
+  }
+
+  async function handleCreativeFile(file: File) {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Only image files are accepted.')
+      return
+    }
+    setCreativeUploading(true)
+    try {
+      const fd = new FormData()
+      fd.set('file', file)
+      const res  = await fetch('/api/events/creative/upload', { method: 'POST', body: fd })
+      const json = await res.json() as { url?: string; error?: string }
+      if (!res.ok || json.error) {
+        toast.error(json.error ?? 'Upload failed')
+        return
+      }
+      set('creative_url', json.url ?? '')
+    } catch {
+      toast.error('Upload failed — please try again')
+    } finally {
+      setCreativeUploading(false)
+    }
   }
 
   // Steps: 0 Basics, 1 BTL Details (skip if not BTL), 2 Goals, 3 KPI Targets, 4 Budget, 5 Team
@@ -211,6 +238,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
       currency:           data.currency,
       missed_call_number: data.missed_call_number.trim() || undefined,
       ambassadors:        data.ambassadors.filter(a => a.name.trim()),
+      creative_url:       data.creative_url.trim() || undefined,
     }
 
     const fd = new FormData()
@@ -325,6 +353,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                 <Input id="attendance" type="number" min={1} value={data.expected_attendance} onChange={e => set('expected_attendance', e.target.value)} placeholder="500" />
               </div>
             </div>
+
             <TagInput
               label="Event hashtags (for social monitoring)"
               placeholder="Add hashtag and press Enter"
@@ -332,6 +361,65 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
               onChange={v => set('hashtags', v)}
               hint="These hashtags will be monitored on social media during and after the event."
             />
+
+            {/* Event creative upload */}
+            <div className="space-y-2">
+              <Label>
+                Event creative <FieldTip tip="Upload your photobooth backdrop, event flyer, or branded banner. BrandPulse AI will use this as a visual reference when scanning event photos — helping it recognise your specific creative in attendee posts." />
+              </Label>
+              {data.creative_url ? (
+                <div className="relative w-full rounded-xl overflow-hidden border bg-muted/30 aspect-video max-h-48 flex items-center justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={data.creative_url}
+                    alt="Event creative preview"
+                    className="max-h-48 w-auto object-contain"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => set('creative_url', '')}
+                    className="absolute top-2 right-2 h-6 w-6 rounded-full bg-background/80 border flex items-center justify-center hover:bg-background transition-colors"
+                    aria-label="Remove creative"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={creativeUploading}
+                  className={cn(
+                    'w-full border-2 border-dashed rounded-xl p-8 flex flex-col items-center gap-2 transition-colors',
+                    creativeUploading
+                      ? 'opacity-60 cursor-wait border-muted-foreground/20'
+                      : 'border-muted-foreground/20 hover:border-muted-foreground/40 cursor-pointer',
+                  )}
+                >
+                  {creativeUploading
+                    ? <Upload className="h-6 w-6 text-muted-foreground/50 animate-pulse" />
+                    : <ImageIcon className="h-6 w-6 text-muted-foreground/50" />}
+                  <p className="text-sm text-muted-foreground">
+                    {creativeUploading ? 'Uploading…' : 'Upload flyer or photobooth backdrop'}
+                  </p>
+                  <p className="text-xs text-muted-foreground/60">PNG, JPG, WebP up to 10 MB</p>
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                onChange={e => {
+                  const f = e.target.files?.[0]
+                  if (f) void handleCreativeFile(f)
+                  e.target.value = ''
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                Optional — BrandPulse AI will look for this creative when scanning attendee posts for brand visibility.
+              </p>
+            </div>
           </>
         )}
 
