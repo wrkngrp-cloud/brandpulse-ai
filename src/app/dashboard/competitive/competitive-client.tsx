@@ -140,7 +140,7 @@ type Tab = typeof TABS[number]
 
 function TabBar({ active, onSelect }: { active: Tab; onSelect: (t: Tab) => void }) {
   return (
-    <div className="flex gap-1 border-b">
+    <div className="flex gap-1 border-b overflow-x-auto">
       {TABS.map(tab => (
         <button
           key={tab}
@@ -254,7 +254,7 @@ function BriefingTab({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
             <div className="border rounded-lg p-3 space-y-0.5">
               <p className="text-xs text-muted-foreground">Brand</p>
               <p className="font-medium">{brandName}</p>
@@ -298,7 +298,7 @@ function BriefingTab({
 
       {result && (
         <div className="space-y-4">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-1">
               <h2 className="text-base font-semibold">{result.title}</h2>
               <span className={cn('inline-flex text-xs px-2 py-0.5 rounded-full font-medium', CONFIDENCE_STYLE[result.confidence])}>
@@ -444,8 +444,8 @@ function EsovLeagueTab({
         </p>
       </div>
 
-      <div className="border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="border-b bg-muted/30">
               <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Brand</th>
@@ -571,7 +571,7 @@ function SightingsTab({
 
   return (
     <div className="space-y-5 pt-5">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-sm font-semibold">Competitor Activity Feed</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Log what you spot in the field — billboards, events, campaigns.</p>

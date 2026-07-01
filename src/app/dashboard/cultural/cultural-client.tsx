@@ -837,7 +837,7 @@ export function CulturalClient({
                     <span className="text-[10px] text-muted-foreground shrink-0">{date}</span>
                   </div>
                   {preview && <p className="text-xs text-muted-foreground leading-snug">{preview}</p>}
-                  <div className="flex items-center gap-3 pt-0.5">
+                  <div className="flex flex-wrap items-center gap-3 pt-0.5">
                     <span className={cn('text-xs font-semibold tabular-nums', crsColor(a.cultural_score))}>Cultural {Math.round(a.cultural_score)}</span>
                     {a.engagement_score != null && <span className="text-xs text-muted-foreground tabular-nums">Eng {Math.round(a.engagement_score)}</span>}
                     {a.tone_score != null && <span className="text-xs text-muted-foreground tabular-nums">Tone {Math.round(a.tone_score)}</span>}
@@ -861,10 +861,10 @@ export function CulturalClient({
 
       {/* ── Top picks for this brand ────────────────────────────────────────── */}
       <div className="space-y-3">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Star className="h-4 w-4 text-amber-500" />
           <p className="text-sm font-semibold">Top picks for {brandName}</p>
-          <span className="text-xs text-muted-foreground">— ranked by audience fit, next 6 months</span>
+          <span className="hidden sm:inline text-xs text-muted-foreground">— ranked by audience fit, next 6 months</span>
         </div>
         <p className="text-xs text-muted-foreground -mt-1">
           Based on your audience profile
@@ -889,11 +889,11 @@ export function CulturalClient({
 
       {/* ── Full cultural calendar ─────────────────────────────────────────── */}
       <div className="border rounded-xl p-5 bg-card space-y-1">
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
+          <div className="flex flex-wrap items-center gap-2">
             <Globe className="h-4 w-4 text-muted-foreground" />
             <p className="text-sm font-semibold">Full Cultural Calendar</p>
-            <span className="text-xs text-muted-foreground">— Planning calendar covers {calStartYear}–{calEndYear} · {allUpcoming.length} upcoming moments</span>
+            <span className="hidden sm:inline text-xs text-muted-foreground">— Planning calendar covers {calStartYear}–{calEndYear} · {allUpcoming.length} upcoming moments</span>
           </div>
         </div>
 
