@@ -21,7 +21,7 @@ const SETTINGS_LINKS = [
 export function SettingsNav() {
   const pathname = usePathname()
   return (
-    <nav className="flex flex-col gap-0.5">
+    <nav className="flex overflow-x-auto gap-1 pb-1 md:flex-col md:overflow-visible md:gap-0.5 md:pb-0">
       {SETTINGS_LINKS.map(({ label, href, icon: Icon }) => {
         const active = pathname === href
         return (
@@ -29,7 +29,7 @@ export function SettingsNav() {
             key={href}
             href={href}
             className={cn(
-              'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors',
+              'flex shrink-0 items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors',
               active
                 ? 'bg-accent text-accent-foreground font-medium'
                 : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
@@ -42,11 +42,11 @@ export function SettingsNav() {
       })}
 
       {/* Connector management lives under Platform → Connectors */}
-      <div className="mt-3 pt-3 border-t border-border/50">
-        <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">Add integrations</p>
+      <div className="border-l border-border/50 pl-2 ml-1 md:mt-3 md:pt-3 md:border-l-0 md:border-t md:pl-0 md:ml-0 shrink-0">
+        <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 hidden md:block">Add integrations</p>
         <Link
           href="/dashboard/connectors"
-          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+          className="flex shrink-0 items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
         >
           <Plug className="h-4 w-4 shrink-0" />
           All Connectors

@@ -155,7 +155,7 @@ export default async function ConnectorsPage() {
       <section>
         <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">E-commerce Sales</h2>
         <div className="border rounded-xl p-5 bg-card space-y-4">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex items-start gap-3">
               <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
                 <ShoppingCart className="h-4 w-4 text-muted-foreground" />

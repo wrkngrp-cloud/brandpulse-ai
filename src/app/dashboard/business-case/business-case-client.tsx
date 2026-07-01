@@ -252,7 +252,7 @@ export function BusinessCaseClient({
               </div>
             </div>
             <p className="text-[13px] leading-relaxed">{posture.text}</p>
-            <div className="grid grid-cols-3 gap-3 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
               {[
                 { label: 'Your SOV',      value: sov != null ? `${sov.toFixed(1)}%` : '—', note: 'Social mentions' },
                 { label: 'Market Share',  value: marketShare != null ? `${marketShare}%` : '—', note: 'Last reported' },

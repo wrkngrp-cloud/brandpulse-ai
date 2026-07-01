@@ -259,7 +259,8 @@ export function ContentTable({
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border overflow-hidden">
+      <div className="overflow-x-auto -mx-1 px-1">
+      <div className="rounded-lg border overflow-hidden min-w-[640px]">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(hg => (
@@ -292,6 +293,7 @@ export function ContentTable({
             )}
           </TableBody>
         </Table>
+      </div>
       </div>
     </div>
   )

@@ -409,7 +409,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
       <SectionCard title="Target Audience">
         <div className="space-y-3">
           {data.targetSegments.map((seg, i) => (
-            <div key={i} className="grid grid-cols-3 gap-2">
+            <div key={i} className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <Input placeholder="Segment name" value={seg.name} onChange={e => patchSegment(i, 'name', e.target.value)} className="text-sm" />
               <Input placeholder="Demographics" value={seg.demographics ?? ''} onChange={e => patchSegment(i, 'demographics', e.target.value)} className="text-sm" />
               <Input placeholder="Geography" value={seg.geography ?? ''} onChange={e => patchSegment(i, 'geography', e.target.value)} className="text-sm" />

@@ -210,7 +210,7 @@ export function ApiKeysSection() {
       )}
 
       {/* Generate form */}
-      <div className="flex items-end gap-2">
+      <div className="flex flex-wrap items-end gap-2">
         <div className="space-y-1">
           <Label htmlFor="keyName" className="text-xs">Key name</Label>
           <Input
@@ -243,7 +243,7 @@ export function ApiKeysSection() {
             <p className="text-xs text-muted-foreground">
               POST to <code className="font-mono bg-muted px-1 rounded">https://your-domain.com/api/first-party/[type]</code> with your key in the Authorization header.
             </p>
-            <div className="rounded-md bg-muted p-2 font-mono text-xs text-muted-foreground">
+            <div className="rounded-md bg-muted p-2 font-mono text-xs text-muted-foreground overflow-x-auto">
               Authorization: Bearer bp_live_...
             </div>
 
@@ -266,7 +266,7 @@ export function ApiKeysSection() {
                       <p className="text-xs text-muted-foreground">POST /api/first-party/{doc.type}</p>
                       <CopyButton text={doc.example} />
                     </div>
-                    <pre className="text-[11px] font-mono bg-background rounded-md p-2 overflow-auto max-h-52 border">
+                    <pre className="text-[11px] font-mono bg-background rounded-md p-2 overflow-x-auto max-h-52 border">
                       {doc.example}
                     </pre>
                   </div>

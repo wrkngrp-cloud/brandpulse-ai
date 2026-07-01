@@ -121,7 +121,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
   return (
     <div className="max-w-4xl space-y-8 pb-12">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="eyebrow mb-1">Intelligence</p>
           <h1 className="h-display text-[26px] leading-none">AI Visibility Tracker</h1>
@@ -168,7 +168,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
             </p>
           </div>
           {/* Per-platform */}
-          <div className="sm:col-span-3 grid grid-cols-3 gap-3">
+          <div className="sm:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
             <PlatformScore platform="chatgpt"    score={latest.chatgpt_score} />
             <PlatformScore platform="gemini"     score={latest.gemini_score} />
             <PlatformScore platform="perplexity" score={latest.perplexity_score} />

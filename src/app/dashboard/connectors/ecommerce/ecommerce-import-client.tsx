@@ -105,7 +105,7 @@ export function EcommerceImportClient({ campaigns }: Props) {
       {/* Platform selector */}
       <div className="border rounded-xl p-5 space-y-4">
         <h2 className="text-sm font-semibold">Select platform</h2>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {PLATFORMS.map(p => {
             const Icon = p.icon
             return (
@@ -218,7 +218,7 @@ export function EcommerceImportClient({ campaigns }: Props) {
             <h2 className="text-sm font-semibold">Import complete</h2>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="bg-white/60 dark:bg-background/40 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold tabular-nums text-green-700 dark:text-green-400">
                 {result.imported.toLocaleString()}
