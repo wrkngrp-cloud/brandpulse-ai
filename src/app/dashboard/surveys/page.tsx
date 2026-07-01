@@ -100,7 +100,7 @@ async function PerceptionAuditSection() {
   return (
     <div className="space-y-4">
       {/* Section header */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <BarChart2 className="h-4 w-4 text-muted-foreground" />
           <h2 className="text-base font-semibold">Perception Audit</h2>
@@ -124,8 +124,8 @@ async function PerceptionAuditSection() {
             </div>
             <div className="divide-y">
               {dimensionScores.map(dim => (
-                <div key={dim.key} className="flex items-center gap-4 px-5 py-3">
-                  <p className="text-sm w-36 shrink-0">{dim.label}</p>
+                <div key={dim.key} className="flex items-center gap-3 px-4 sm:px-5 py-3">
+                  <p className="text-xs sm:text-sm w-24 sm:w-36 shrink-0">{dim.label}</p>
                   <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                     {dim.avg != null && (
                       <div
@@ -240,7 +240,7 @@ async function SurveyListServer() {
 export default function SurveysPage() {
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Surveys</h1>
           <p className="text-sm text-muted-foreground mt-0.5">

@@ -152,29 +152,31 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
             <h2 className="text-sm font-semibold">Availability by area</h2>
             <span className="text-xs text-muted-foreground">(lowest first)</span>
           </div>
-          <div className="rounded-xl border border-border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-muted/30">
-                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">State</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">LGA</th>
-                  <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Outlets</th>
-                  <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Availability</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {areaBreakdown.map((row, i) => (
-                  <tr key={i} className="hover:bg-muted/20 transition-colors">
-                    <td className="px-4 py-2.5 font-medium">{row.state}</td>
-                    <td className="px-4 py-2.5 text-muted-foreground">{row.lga ?? '—'}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{row.total}</td>
-                    <td className={cn('px-4 py-2.5 text-right tabular-nums font-semibold', availColor(row.pct))}>
-                      {row.pct}%
-                    </td>
+          <div className="overflow-x-auto -mx-1 px-1">
+            <div className="rounded-xl border border-border overflow-hidden min-w-[360px]">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30">
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">State</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">LGA</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Outlets</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Availability</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {areaBreakdown.map((row, i) => (
+                    <tr key={i} className="hover:bg-muted/20 transition-colors">
+                      <td className="px-4 py-2.5 font-medium">{row.state}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{row.lga ?? '—'}</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{row.total}</td>
+                      <td className={cn('px-4 py-2.5 text-right tabular-nums font-semibold', availColor(row.pct))}>
+                        {row.pct}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
       )}

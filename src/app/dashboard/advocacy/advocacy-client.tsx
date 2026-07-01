@@ -87,7 +87,7 @@ export function AdvocacyClient() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Advocacy</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
@@ -243,35 +243,37 @@ export function AdvocacyClient() {
               <div className="px-5 py-4 border-b">
                 <h2 className="font-semibold text-sm">Referral code leaderboard</h2>
               </div>
-              <table className="w-full text-sm">
-                <thead className="border-b bg-muted/40">
-                  <tr>
-                    {['Code', 'Promoter', 'Clicks', 'Unique', 'Conversions', 'Revenue', 'Status'].map(h => (
-                      <th key={h} className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {promoters
-                    .flatMap(p => p.referral_codes.map(c => ({ ...c, promoter: p })))
-                    .sort((a, b) => b.clicks - a.clicks)
-                    .map(c => (
-                      <tr key={c.id} className="hover:bg-muted/20">
-                        <td className="px-4 py-2 font-mono text-xs font-bold">{c.code}</td>
-                        <td className="px-4 py-2 text-muted-foreground">{c.promoter.name}</td>
-                        <td className="px-4 py-2">{c.clicks}</td>
-                        <td className="px-4 py-2">{c.unique_clicks}</td>
-                        <td className="px-4 py-2">{c.conversions}</td>
-                        <td className="px-4 py-2">{formatNGN(c.attributed_revenue)}</td>
-                        <td className="px-4 py-2">
-                          <Badge variant={c.is_active ? 'default' : 'secondary'} className="text-xs">
-                            {c.is_active ? 'Active' : 'Paused'}
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm min-w-[560px]">
+                  <thead className="border-b bg-muted/40">
+                    <tr>
+                      {['Code', 'Promoter', 'Clicks', 'Unique', 'Conversions', 'Revenue', 'Status'].map(h => (
+                        <th key={h} className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {promoters
+                      .flatMap(p => p.referral_codes.map(c => ({ ...c, promoter: p })))
+                      .sort((a, b) => b.clicks - a.clicks)
+                      .map(c => (
+                        <tr key={c.id} className="hover:bg-muted/20">
+                          <td className="px-4 py-2 font-mono text-xs font-bold">{c.code}</td>
+                          <td className="px-4 py-2 text-muted-foreground">{c.promoter.name}</td>
+                          <td className="px-4 py-2">{c.clicks}</td>
+                          <td className="px-4 py-2">{c.unique_clicks}</td>
+                          <td className="px-4 py-2">{c.conversions}</td>
+                          <td className="px-4 py-2">{formatNGN(c.attributed_revenue)}</td>
+                          <td className="px-4 py-2">
+                            <Badge variant={c.is_active ? 'default' : 'secondary'} className="text-xs">
+                              {c.is_active ? 'Active' : 'Paused'}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           ) : (
             <div className="rounded-xl border border-dashed p-12 text-center">
@@ -393,20 +395,22 @@ function PromoterCard({
           {/* Referral codes table */}
           {promoter.referral_codes.length > 0 && (
             <div className="rounded-lg border overflow-hidden">
-              <table className="w-full text-xs">
-                <thead className="bg-muted border-b">
-                  <tr>
-                    {['Code', 'Label', 'Clicks', 'Uniq', 'Conv.', 'Revenue', ''].map(h => (
-                      <th key={h} className="px-3 py-2 text-left font-medium text-muted-foreground">{h}</th>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs min-w-[480px]">
+                  <thead className="bg-muted border-b">
+                    <tr>
+                      {['Code', 'Label', 'Clicks', 'Uniq', 'Conv.', 'Revenue', ''].map(h => (
+                        <th key={h} className="px-3 py-2 text-left font-medium text-muted-foreground">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {promoter.referral_codes.map(c => (
+                      <ReferralCodeRow key={c.id} code={c} />
                     ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {promoter.referral_codes.map(c => (
-                    <ReferralCodeRow key={c.id} code={c} />
-                  ))}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

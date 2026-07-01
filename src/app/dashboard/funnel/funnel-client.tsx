@@ -183,7 +183,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
   return (
     <div className="space-y-6">
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">
           Scores refresh as sentiment, survey, and campaign data arrives.
         </p>
@@ -247,7 +247,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       />
                     </div>
 
-                    <div className="flex items-center justify-between mt-1.5">
+                    <div className="flex flex-wrap items-center justify-between gap-1.5 mt-1.5">
                       {/* Data points toggle */}
                       <button
                         type="button"

@@ -76,7 +76,7 @@ export function LoyaltyClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Loyalty Engine</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Manage points programs, tiers, and member rewards</p>
@@ -195,48 +195,50 @@ export function LoyaltyClient() {
           )}
 
           <div className="rounded-xl border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-muted border-b">
-                <tr>
-                  {['Member', 'Tier', 'Balance', 'Lifetime', 'Status', ''].map(h => (
-                    <th key={h} className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {members.map(m => (
-                  <tr key={m.id} className="hover:bg-muted/20">
-                    <td className="px-4 py-3">
-                      <p className="font-medium">{m.name}</p>
-                      <p className="text-xs text-muted-foreground">{m.email ?? m.phone ?? '—'}</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      {m.tier ? (
-                        <span
-                          className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
-                          style={{ backgroundColor: m.tier.color }}
-                        >
-                          {m.tier.name}
-                        </span>
-                      ) : <span className="text-muted-foreground text-xs">—</span>}
-                    </td>
-                    <td className="px-4 py-3 font-semibold">{m.points_balance.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{m.lifetime_points.toLocaleString()}</td>
-                    <td className="px-4 py-3">
-                      <Badge variant={m.status === 'active' ? 'default' : 'secondary'} className="text-xs capitalize">{m.status}</Badge>
-                    </td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => setAwardFor(awardFor === m.id ? null : m.id)}
-                        className="text-xs text-primary hover:underline"
-                      >
-                        Award pts
-                      </button>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-[480px]">
+                <thead className="bg-muted border-b">
+                  <tr>
+                    {['Member', 'Tier', 'Balance', 'Lifetime', 'Status', ''].map(h => (
+                      <th key={h} className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y">
+                  {members.map(m => (
+                    <tr key={m.id} className="hover:bg-muted/20">
+                      <td className="px-4 py-3">
+                        <p className="font-medium">{m.name}</p>
+                        <p className="text-xs text-muted-foreground">{m.email ?? m.phone ?? '—'}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        {m.tier ? (
+                          <span
+                            className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
+                            style={{ backgroundColor: m.tier.color }}
+                          >
+                            {m.tier.name}
+                          </span>
+                        ) : <span className="text-muted-foreground text-xs">—</span>}
+                      </td>
+                      <td className="px-4 py-3 font-semibold">{m.points_balance.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{m.lifetime_points.toLocaleString()}</td>
+                      <td className="px-4 py-3">
+                        <Badge variant={m.status === 'active' ? 'default' : 'secondary'} className="text-xs capitalize">{m.status}</Badge>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => setAwardFor(awardFor === m.id ? null : m.id)}
+                          className="text-xs text-primary hover:underline"
+                        >
+                          Award pts
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Award points inline */}

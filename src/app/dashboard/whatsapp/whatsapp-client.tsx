@@ -141,7 +141,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
   return (
     <div className="max-w-3xl space-y-8 pb-12">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="eyebrow mb-1">Messaging</p>
           <h1 className="h-display text-[26px] leading-none">WhatsApp</h1>
