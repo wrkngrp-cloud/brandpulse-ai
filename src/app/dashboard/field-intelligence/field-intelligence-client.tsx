@@ -117,7 +117,7 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
   return (
     <div className="space-y-8">
       {/* Header stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Outlets visited"
           value={stats.totalOutlets}

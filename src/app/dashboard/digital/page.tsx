@@ -633,7 +633,7 @@ export default async function DigitalPage({
       {/* Core KPI grid */}
       <div className="space-y-2">
         <h2 className="text-base font-semibold">Core Metrics</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {kpis.map(m => (
             <Card key={m.label} className="border rounded-xl p-4 bg-card space-y-2">
               <div className="flex items-center justify-between">

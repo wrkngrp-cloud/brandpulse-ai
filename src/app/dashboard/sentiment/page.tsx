@@ -280,7 +280,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
       )}
 
       {/* KPI tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
           <p className="eyebrow">Sentiment score</p>
           <div className="flex items-baseline gap-1.5">
@@ -487,7 +487,7 @@ export default async function SentimentPage({
 
       <Suspense fallback={
         <div className="space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[1,2,3,4].map(i => <Skeleton key={i} className="h-24 rounded-xl" />)}
           </div>
           <Skeleton className="h-56 rounded-xl" />

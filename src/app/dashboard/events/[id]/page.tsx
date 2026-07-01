@@ -129,7 +129,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       {isBtl && (event.status === 'closed' || event.status === 'reported') && (
         <div className="border rounded-xl p-5 bg-card space-y-4">
           <h2 className="text-sm font-semibold">BTL performance</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="border rounded-xl p-4 bg-muted/30 space-y-1">
               <p className="text-lg font-semibold tabular-nums">{fmtNGNLocal(costPerContact)}</p>
               <p className="text-xs text-muted-foreground">Cost per person reached</p>
@@ -150,7 +150,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             </div>
           </div>
           {spendBd && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-muted-foreground pt-2 border-t">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs text-muted-foreground pt-2 border-t">
               {spendBd.agency    != null && <span>Agency: {fmtNGNLocal(spendBd.agency)}</span>}
               {spendBd.materials != null && <span>Materials: {fmtNGNLocal(spendBd.materials)}</span>}
               {spendBd.sampling  != null && <span>Sampling: {fmtNGNLocal(spendBd.sampling)}</span>}
@@ -170,7 +170,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           <h2 className="text-base font-semibold">ROI Report</h2>
 
           {/* Key metrics grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: 'Total interactions', value: metrics.total_interactions.toString() },
               { label: 'New leads',          value: metrics.total_leads.toString()        },

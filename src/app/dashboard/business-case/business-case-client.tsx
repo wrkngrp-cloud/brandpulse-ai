@@ -224,7 +224,7 @@ export function BusinessCaseClient({
       {/* KPI Scorecard */}
       <section>
         <SectionHead icon={BarChart3}>Performance Scorecard (90 days)</SectionHead>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <KpiTile icon={Award}       iconColor="text-blue-500"    label="Brand Health"   value={currentBhi != null ? `${currentBhi.toFixed(1)}` : '—'} delta={bhiChange} sub={bhiZone ? `Zone: ${bhiZone}` : undefined} />
           <KpiTile icon={Target}      iconColor="text-violet-500"  label="Share of Voice"  value={sov != null ? `${sov.toFixed(1)}%` : '—'} sub={marketShare ? `Market share: ${marketShare}%` : undefined} />
           <KpiTile icon={TrendingUp}  iconColor="text-emerald-500" label="Avg Sentiment"   value={avgSentiment != null ? `${avgSentiment.toFixed(1)}` : '—'} sub="/ 100" />

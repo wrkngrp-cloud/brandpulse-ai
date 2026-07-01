@@ -268,7 +268,7 @@ function AddTargetForm({
   return (
     <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
       <p className="text-xs font-semibold">New performance target</p>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1">
           <Label className="text-[11px]">Metric</Label>
           <Select value={metric} onValueChange={(v) => v && handleMetricChange(v)}>
@@ -403,7 +403,7 @@ export function CampaignDetailClient({
       </div>
 
       {/* Primary metric tiles — objective-specific */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {primaryMetrics.map(metric => {
           const { value, raw } = getMetricDisplay(metric, agg)
           const b = getBench(metric, raw)

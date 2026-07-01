@@ -276,7 +276,7 @@ function ActivePlanSummary({ plan }: { plan: BudgetPlan }) {
         <TrendingUp className="h-4 w-4 text-primary" />
         <span className="font-semibold text-sm">Active plan: {plan.name}</span>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div><p className="text-xs text-muted-foreground">Total budget</p><p className="font-bold">{formatNGN(plan.total_budget)}</p></div>
         <div><p className="text-xs text-muted-foreground">Spent</p><p className="font-bold">{formatNGN(totalActual)}</p></div>
         <div><p className="text-xs text-muted-foreground">Remaining</p><p className="font-bold">{formatNGN(remaining)}</p></div>
@@ -451,7 +451,7 @@ function AddActualForm({ lineItemId, onSave, onCancel }: { lineItemId: string; o
   return (
     <div className="rounded-lg border bg-blue-50/50 border-blue-200 p-4 space-y-3">
       <p className="text-xs font-medium text-blue-800">Log actual spend</p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
           <Label className="text-xs">Amount (₦) *</Label>
           <Input value={amount} onChange={e => setAmount(e.target.value)} type="number" placeholder="0" className="mt-1 h-8 text-sm" />

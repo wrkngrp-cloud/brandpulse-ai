@@ -117,7 +117,7 @@ export default async function OohSitePage({
       )}
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Total visits" value={site.visits?.toLocaleString() ?? '0'} />
         <StatCard label="Daily traffic est." value={site.daily_traffic ? site.daily_traffic.toLocaleString() : '—'} />
         <StatCard

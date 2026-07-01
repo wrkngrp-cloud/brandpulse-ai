@@ -294,7 +294,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
       </div>
 
       {/* Key stats row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatTile icon={Users} label="Followers" value={fmtFollowers(totalFollowers ?? null)} />
         <StatTile icon={Activity} label="Engagement" value={engRate ? `${(engRate * 100).toFixed(1)}%` : '—'} />
         <StatTile icon={BarChart2} label="Posts tracked" value={String(initialPosts.length)} />

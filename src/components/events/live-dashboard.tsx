@@ -137,7 +137,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
       </div>
 
       {/* Metric tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {Object.entries(TYPE_META).map(([type, meta]) => {
           const Icon = meta.icon
           return (

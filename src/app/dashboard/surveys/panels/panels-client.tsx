@@ -264,7 +264,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                   <div>

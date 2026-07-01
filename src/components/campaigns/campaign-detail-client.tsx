@@ -456,7 +456,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
         <div className="space-y-5">
 
           {/* ── Summary KPI row ── */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               {
                 label: 'Total Spend',
@@ -935,7 +935,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                 return (
                   <div className="border rounded-xl p-5 bg-card space-y-4">
                     <p className="text-sm font-semibold">BTL activations</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
                         <p className="text-lg font-bold tabular-nums">{btlEvents.length}</p>
                         <p className="text-xs text-muted-foreground">Activations</p>

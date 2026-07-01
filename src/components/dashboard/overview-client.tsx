@@ -212,7 +212,7 @@ export function OverviewClient({
         variants={fadeUp}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+        className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3"
       >
         {[
           { icon: MapPin,        label: 'Add OOH Site',   href: '/dashboard/ooh/new',    desc: 'Track outdoor placements'   },

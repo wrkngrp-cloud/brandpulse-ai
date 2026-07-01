@@ -158,7 +158,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
 
       {/* Score summary */}
       {latest ? (
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Overall score */}
           <div className="border rounded-2xl p-6 bg-card flex flex-col items-center justify-center gap-2 sm:col-span-1">
             <ScoreRing score={latest.visibility_score} size={80} />

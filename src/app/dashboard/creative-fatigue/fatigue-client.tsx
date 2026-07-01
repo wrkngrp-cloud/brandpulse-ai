@@ -149,7 +149,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
       </div>
 
       {/* Summary tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Critical',     count: critical.length, color: 'text-red-600',   bg: 'bg-red-50 dark:bg-red-900/10'    },
           { label: 'Watch',        count: watch.length,    color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/10'},

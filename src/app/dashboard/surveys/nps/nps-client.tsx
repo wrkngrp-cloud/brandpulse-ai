@@ -186,7 +186,7 @@ export function NpsClient({
   return (
     <div className="space-y-6">
       {/* KPI row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* NPS score */}
         <div className="border rounded-2xl p-5 bg-card card-shadow col-span-2 sm:col-span-1">
           <p className="eyebrow mb-2">NPS Score</p>

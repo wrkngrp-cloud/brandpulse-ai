@@ -147,7 +147,7 @@ export default async function PRTrackingPage({
       ) : (
         <>
           {/* EMV summary */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="border rounded-xl p-4 bg-card space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <TrendingUp className="h-4 w-4" />

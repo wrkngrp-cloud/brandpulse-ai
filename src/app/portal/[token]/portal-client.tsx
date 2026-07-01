@@ -266,7 +266,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
         {/* ── KPI scoreboard ─────────────────────────────────────── */}
         <section>
           <SectionHeading icon={Activity}>Brand Scorecard</SectionHeading>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {sections.includes('bhi') && (
               <KpiCard
                 icon={Activity}
@@ -733,7 +733,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             <SectionHeading icon={CheckCircle2}>Performance Report</SectionHeading>
             <div className="rounded-2xl border bg-card p-6 space-y-5">
               {/* KPI summary table */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
                 <div className="rounded-xl bg-muted/40 p-4">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">BHI</p>
                   <p className="text-3xl font-bold">{latestBhi != null ? latestBhi.toFixed(1) : '—'}</p>

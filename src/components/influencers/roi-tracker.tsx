@@ -160,7 +160,7 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
 
       {/* Aggregate tiles */}
       {campaigns.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { label: 'Total EMV',     value: fmtNGN(totalEmv),          icon: TrendingUp,       color: 'text-emerald-600' },
             { label: 'Total Fee Paid', value: fmtNGN(totalFee),         icon: DollarSign,       color: 'text-amber-600' },
@@ -322,7 +322,7 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
 
                     <div className="rounded-xl bg-background border p-4 space-y-3">
                       <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">ROI Breakdown</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">Earned Media Value</p>
                           <p className="text-[16px] font-bold text-emerald-600">{fmtNGN(c.emv)}</p>

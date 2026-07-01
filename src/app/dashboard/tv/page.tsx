@@ -175,7 +175,7 @@ export default async function TVPage({
       ) : (
         <>
           {/* Key metrics */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { label: 'GRPs Planned',   value: totalGrpPlanned.toFixed(1),    sub: `Last ${days} days`,          icon: TrendingUp, color: 'text-blue-500' },
               { label: 'GRPs Delivered', value: totalGrpDelivered.toFixed(1),  sub: `${deliveryPct}% delivery`, icon: Activity, color: 'text-emerald-500' },

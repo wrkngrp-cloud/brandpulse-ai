@@ -181,7 +181,7 @@ export default async function RadioPage({
       ) : (
         <>
           {/* Key metrics */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { label: 'Spots Planned',  value: totalSpotPlanned.toLocaleString(), sub: `Last ${days} days`,          icon: Radio,      color: 'text-violet-500' },
               { label: 'Spots Aired',    value: totalSpotAired.toLocaleString(),   sub: `${deliveryPct}% delivery`, icon: Volume2, color: 'text-emerald-500' },

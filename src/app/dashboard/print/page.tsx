@@ -179,7 +179,7 @@ export default async function PrintPage({
       ) : (
         <>
           {/* Key metrics */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { label: 'Total Insertions',   value: totalInsertions.toLocaleString(), sub: `Last ${days} days`,           icon: Newspaper,  color: 'text-amber-600' },
               { label: 'Total Spend',        value: formatNGN(totalSpend),          sub: 'Net cost across all buys', icon: TrendingUp,  color: 'text-indigo-500' },

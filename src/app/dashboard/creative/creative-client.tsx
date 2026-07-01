@@ -904,7 +904,7 @@ export function CreativeClient({
           {videoResult && (
             <div className="space-y-4">
               {/* Score grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
                   { label: 'Hook',       score: videoResult.hook_score,      color: 'text-violet-600' },
                   { label: 'Visual',     score: videoResult.visual_score,    color: 'text-blue-600'   },
