@@ -6,6 +6,62 @@ export interface TourStep {
   position?: 'top' | 'bottom' | 'left' | 'right'
 }
 
+// Route → tour module, for the topbar's "Show me around" button to figure out
+// which tour applies to the page you're currently on. Keep in sync with every
+// TourTrigger placed in src/app/dashboard/**.
+export const TOUR_ROUTE_MODULE: Record<string, string> = {
+  '/dashboard':                       'overview',
+  '/dashboard/sentiment':             'sentiment',
+  '/dashboard/brand-equity':          'brand_health',
+  '/dashboard/content':               'content',
+  '/dashboard/funnel':                'funnel',
+  '/dashboard/surveys/nps':           'nps',
+  '/dashboard/surveys/panels':        'survey_panels',
+  '/dashboard/surveys':               'surveys',
+  '/dashboard/competitive':           'competitive',
+  '/dashboard/marketplace':           'marketplace',
+  '/dashboard/cultural':              'cultural',
+  '/dashboard/field-intelligence':    'field_intelligence',
+  '/dashboard/pr':                    'pr',
+  '/dashboard/campaigns':             'campaigns',
+  '/dashboard/digital':               'digital',
+  '/dashboard/influencers':           'influencers',
+  '/dashboard/ooh':                   'ooh',
+  '/dashboard/events':                'events',
+  '/dashboard/radio':                 'radio',
+  '/dashboard/tv':                    'tv',
+  '/dashboard/print':                 'print',
+  '/dashboard/voice-builder':         'voice_builder',
+  '/dashboard/pre-post':              'pre_post',
+  '/dashboard/creative-library':      'creative_library',
+  '/dashboard/creative-fatigue':      'creative_fatigue',
+  '/dashboard/creative':              'creative',
+  '/dashboard/experiments':           'experiments',
+  '/dashboard/mmm':                   'mmm',
+  '/dashboard/geo-lift':              'geo_lift',
+  '/dashboard/budget':                'budget',
+  '/dashboard/retention':             'retention',
+  '/dashboard/loyalty':               'loyalty',
+  '/dashboard/advocacy':              'advocacy',
+  '/dashboard/cdp':                   'cdp',
+  '/dashboard/board-pack':            'board_pack',
+  '/dashboard/business-case':         'business_case',
+  '/dashboard/methodology':           'methodology',
+  '/dashboard/connectors':            'connectors',
+}
+
+// Longest-prefix match so nested routes (e.g. /dashboard/surveys/nps) resolve
+// to their own module instead of falling back to a shorter parent route.
+export function getModuleForPath(pathname: string): string | null {
+  let best: string | null = null
+  for (const route of Object.keys(TOUR_ROUTE_MODULE)) {
+    if (pathname === route || pathname.startsWith(`${route}/`)) {
+      if (!best || route.length > best.length) best = route
+    }
+  }
+  return best ? TOUR_ROUTE_MODULE[best] : null
+}
+
 export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
 
   overview: [

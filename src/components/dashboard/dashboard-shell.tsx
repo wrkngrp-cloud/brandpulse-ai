@@ -9,6 +9,7 @@ import { Sidebar }            from './sidebar'
 import { BreadcrumbNav }      from './breadcrumb-nav'
 import { ThemeToggle }        from './theme-toggle'
 import { NotificationBell }   from './notification-bell'
+import { GlobalTourButton }   from '@/components/tours/global-tour-button'
 import { UserDropdown }       from './user-dropdown'
 import { MobileNav }          from './mobile-nav'
 import { CommandPalette }     from './command-palette'
@@ -129,6 +130,7 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
 
           {/* Right actions */}
           <div className="flex items-center gap-1">
+            <GlobalTourButton />
             <ThemeToggle />
             <NotificationBell />
             {/* Divider */}
