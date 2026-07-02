@@ -6,6 +6,7 @@ import { EventsList }    from '@/components/events/events-list'
 import { CalendarDays, Plus } from 'lucide-react'
 import { cn }            from '@/lib/utils'
 import { getActiveBrand } from '@/lib/active-brand'
+import { TourTrigger }   from '@/components/tours/tour-trigger'
 
 export default async function EventsPage() {
   const supabase = await createClient()
@@ -28,12 +29,16 @@ export default async function EventsPage() {
           <h1 className="text-xl font-semibold">Events & Activations</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Track ROI from field activations, sponsorships, and events.</p>
         </div>
-        <Link href="/dashboard/events/new" className={cn(buttonVariants({ size: 'sm' }), 'inline-flex items-center')}>
-          <Plus className="h-4 w-4 mr-1.5" />
-          Create event
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="events" autoStart />
+          <Link href="/dashboard/events/new" data-tour="create-event" className={cn(buttonVariants({ size: 'sm' }), 'inline-flex items-center')}>
+            <Plus className="h-4 w-4 mr-1.5" />
+            Create event
+          </Link>
+        </div>
       </div>
 
+      <div data-tour="event-list">
       {!events?.length ? (
         <div className="space-y-4">
           {/* Demo preview card */}
@@ -95,6 +100,7 @@ export default async function EventsPage() {
       ) : (
         <EventsList events={events} />
       )}
+      </div>
     </div>
   )
 }

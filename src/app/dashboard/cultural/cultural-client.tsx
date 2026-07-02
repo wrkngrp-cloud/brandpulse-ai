@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -772,16 +773,20 @@ export function CulturalClient({
     <div className="max-w-3xl mx-auto space-y-6 p-4 sm:p-6">
 
       {/* Header */}
-      <div>
-        <div className="flex items-center gap-2">
-          <Flame className="h-5 w-5 text-orange-500" />
-          <h1 className="text-2xl font-semibold tracking-tight">Cultural Intelligence</h1>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <Flame className="h-5 w-5 text-orange-500" />
+            <h1 className="text-2xl font-semibold tracking-tight">Cultural Intelligence</h1>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            How well {brandName} resonates with Nigerian and West African audiences
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground mt-1">
-          How well {brandName} resonates with Nigerian and West African audiences
-        </p>
+        <TourTrigger module="cultural" autoStart />
       </div>
 
+      <div data-tour="cultural-main" className="space-y-6">
       {/* Drift alert */}
       {showDriftAlert && (
         <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/40 px-4 py-3">
@@ -927,6 +932,7 @@ export function CulturalClient({
         )}
       </div>
 
+      </div>
     </div>
   )
 }

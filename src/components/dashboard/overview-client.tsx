@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
@@ -185,6 +186,10 @@ export function OverviewClient({
   const hasTrend = trendData.length > 1
   const rl = rangeLabelShort(days)
 
+  // The template picker blocks the whole screen on first visit — don't let the
+  // tour prompt race it. Tour auto-start waits until the picker is dismissed.
+  const [pickerOpen, setPickerOpen] = useState(isFirstVisit)
+
   return (
     <div className="space-y-6 max-w-[1400px]">
 
@@ -201,6 +206,7 @@ export function OverviewClient({
         initialWidgetIds={widgetIds ?? DEFAULT_WIDGET_IDS}
         isFirstVisit={isFirstVisit}
         industryTemplate={industryTemplate}
+        onPickerClose={() => setPickerOpen(false)}
       />
 
       {/* ── Page header ──────────────────────────────────────────── */}
@@ -220,7 +226,7 @@ export function OverviewClient({
 
         {/* Date filter + CTA */}
         <div className="hidden sm:flex items-center gap-3 shrink-0">
-          <TourTrigger module="overview" autoStart={true} />
+          <TourTrigger module="overview" autoStart={!pickerOpen} />
           <DateRangeFilter currentDays={days ?? 30} defaultDays={30} />
           <Link
             href="/dashboard/campaigns"

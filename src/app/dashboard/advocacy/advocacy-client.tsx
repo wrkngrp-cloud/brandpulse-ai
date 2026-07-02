@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { cn, formatNGN } from '@/lib/utils'
 import { toast } from 'sonner'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -94,14 +95,17 @@ export function AdvocacyClient() {
             Activate your promoters and track referral performance
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
-          <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="advocacy" autoStart />
+          <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b gap-1">
+      <div className="flex border-b gap-1" data-tour="advocacy-main">
         {([['promoters', 'Promoters'], ['performance', 'Referral Performance']] as [Tab, string][]).map(([id, label]) => (
           <button
             key={id}

@@ -1,4 +1,5 @@
 import { BookOpen, BarChart2, TrendingUp, Target, Users, Palette, Radio, Tv, Newspaper, MapPin, Zap, Award, Globe, Filter, Trophy } from 'lucide-react'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 export const metadata = { title: 'Methodology — BrandPulse AI' }
 
@@ -338,17 +339,22 @@ export default function MethodologyPage() {
     <div className="max-w-4xl space-y-8 pb-16">
 
       {/* Header */}
-      <div className="flex items-start gap-4">
-        <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-          <BookOpen className="h-5 w-5 text-primary" />
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-4">
+          <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+            <BookOpen className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Our Methodology</h1>
+            <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+              How BrandPulse calculates every score, metric, and index — grounded in established measurement frameworks and adapted for the Nigerian and West African market.
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Our Methodology</h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            How BrandPulse calculates every score, metric, and index — grounded in established measurement frameworks and adapted for the Nigerian and West African market.
-          </p>
-        </div>
+        <TourTrigger module="methodology" autoStart />
       </div>
+
+      <div data-tour="methodology-main" />
 
       {/* Intro callout */}
       <div className="border rounded-xl p-5 bg-muted/30 space-y-2">

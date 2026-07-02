@@ -8,6 +8,7 @@ import { Progress }     from '@/components/ui/progress'
 import { cn }           from '@/lib/utils'
 import { AlertTriangle, Eye, RefreshCw, Wand2, FlaskConical, Images, TrendingDown, CheckCircle2 } from 'lucide-react'
 import type { FatiguedAsset } from './page'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 interface Props {
   brandName:   string
@@ -141,15 +142,18 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
   return (
     <div className="max-w-5xl space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Creative Fatigue Monitor</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Active creatives for {brandName} showing frequency, CTR, and age signals. Refresh before they hurt performance.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Creative Fatigue Monitor</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Active creatives for {brandName} showing frequency, CTR, and age signals. Refresh before they hurt performance.
+          </p>
+        </div>
+        <TourTrigger module="creative_fatigue" autoStart />
       </div>
 
       {/* Summary tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-tour="fatigue-main">
         {[
           { label: 'Critical',     count: critical.length, color: 'text-red-600',   bg: 'bg-red-50 dark:bg-red-900/10'    },
           { label: 'Watch',        count: watch.length,    color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/10'},

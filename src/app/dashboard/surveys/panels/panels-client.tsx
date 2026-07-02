@@ -5,6 +5,7 @@ import { Plus, Calendar, Mail, Phone, Play, Trash2, Loader2, ToggleLeft, ToggleR
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 interface Panel {
   id:               string
@@ -118,12 +119,16 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
             Auto-dispatch recurring surveys monthly or quarterly — with full distribution to emails and WhatsApp.
           </p>
         </div>
-        <Button size="sm" onClick={() => setShowForm(v => !v)}>
-          <Plus className="h-3.5 w-3.5 mr-1.5" />
-          New panel
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="survey_panels" autoStart />
+          <Button size="sm" onClick={() => setShowForm(v => !v)}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" />
+            New panel
+          </Button>
+        </div>
       </div>
 
+      <div data-tour="panels-main">
       {/* Create form */}
       {showForm && (
         <div className="rounded-2xl border bg-card p-5 space-y-4">
@@ -298,6 +303,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
           ))}
         </div>
       )}
+      </div>
     </div>
   )
 }

@@ -15,6 +15,7 @@ import { LaunchMarkersPanel } from './launch-markers-panel'
 import { AspectSentimentPanel } from './aspect-sentiment-panel'
 import { DeveloperHealthPanel } from './developer-health-panel'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 import { SeedDemoPanel } from './seed-demo-panel'
 import { VenueReputationPanel } from './venue-reputation-panel'
 import { TrustPillarCard } from './trust-pillar-card'
@@ -483,7 +484,10 @@ export default async function BrandEquityPage({
             {brand?.name ?? 'your brand'}.
           </p>
         </div>
-        <DateRangeFilter currentDays={days} defaultDays={30} />
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="brand_health" autoStart />
+          <DateRangeFilter currentDays={days} defaultDays={30} />
+        </div>
       </div>
 
       <BrandEquityClient

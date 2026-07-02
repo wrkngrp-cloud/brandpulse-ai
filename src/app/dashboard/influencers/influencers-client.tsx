@@ -23,6 +23,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import { PostTracker } from '@/components/influencers/post-tracker'
 import { InfluencerRoiTracker, type InfluencerCampaign } from '@/components/influencers/roi-tracker'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 export interface Influencer {
   id: string
@@ -469,20 +470,22 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
             Discover, score, and track creators for your brand.
           </p>
         </div>
-        {activeTab === 'intelligence' && (
-          <Button
-            size="sm"
-            onClick={() => { setShowForm(v => !v); if (showForm) resetForm() }}
-            variant={showForm ? 'outline' : 'default'}
-            className="shrink-0"
-          >
-            {showForm ? (
-              <><X className="h-4 w-4 mr-1.5" /> Cancel</>
-            ) : (
-              <><Plus className="h-4 w-4 mr-1.5" /> Add influencer</>
-            )}
-          </Button>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="influencers" autoStart />
+          {activeTab === 'intelligence' && (
+            <Button
+              size="sm"
+              onClick={() => { setShowForm(v => !v); if (showForm) resetForm() }}
+              variant={showForm ? 'outline' : 'default'}
+            >
+              {showForm ? (
+                <><X className="h-4 w-4 mr-1.5" /> Cancel</>
+              ) : (
+                <><Plus className="h-4 w-4 mr-1.5" /> Add influencer</>
+              )}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
@@ -674,19 +677,23 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
 
       {/* ── Campaigns Tab ── */}
       {activeTab === 'campaigns' && (
-        <CampaignsTab
-          linked={filteredLinked}
-          uniqueCampaigns={uniqueCampaigns}
-          campaignFilter={campaignFilter}
-          onCampaignFilter={(v) => setCampaignFilter(v ?? 'all')}
-          totalPotentialReach={totalPotentialReach}
-          totalLinked={linkedInfluencers.length}
-        />
+        <div data-tour="influencer-posts">
+          <CampaignsTab
+            linked={filteredLinked}
+            uniqueCampaigns={uniqueCampaigns}
+            campaignFilter={campaignFilter}
+            onCampaignFilter={(v) => setCampaignFilter(v ?? 'all')}
+            totalPotentialReach={totalPotentialReach}
+            totalLinked={linkedInfluencers.length}
+          />
+        </div>
       )}
 
       {/* ── ROI Tracker Tab ── */}
       {activeTab === 'roi' && (
-        <InfluencerRoiTracker initialCampaigns={initialRoiCampaigns} />
+        <div data-tour="influencer-roi">
+          <InfluencerRoiTracker initialCampaigns={initialRoiCampaigns} />
+        </div>
       )}
     </div>
   )

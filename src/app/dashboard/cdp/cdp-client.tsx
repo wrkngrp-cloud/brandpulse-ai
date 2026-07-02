@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { cn, formatNGN } from '@/lib/utils'
 import { toast } from 'sonner'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 interface CustomerProfile {
   id:                   string
@@ -109,15 +110,18 @@ export function CdpClient() {
             Unified profiles merged from surveys, WhatsApp, and reviews
           </p>
         </div>
-        <Button onClick={handleSync} disabled={syncing} size="sm">
-          {syncing
-            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Syncing...</>
-            : <><RefreshCw className="h-4 w-4 mr-2" />Sync data</>}
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="cdp" autoStart />
+          <Button onClick={handleSync} disabled={syncing} size="sm">
+            {syncing
+              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Syncing...</>
+              : <><RefreshCw className="h-4 w-4 mr-2" />Sync data</>}
+          </Button>
+        </div>
       </div>
 
       {/* KPI chips */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" data-tour="cdp-main">
         <KpiChip icon={<Users className="h-3 w-3" />}      label="Total profiles"   value={total} />
         <KpiChip icon={<Star className="h-3 w-3 text-green-500" />}     label="Promoters"   value={promoters} />
         <KpiChip icon={<Minus className="h-3 w-3 text-yellow-500" />}   label="Passives"    value={passives} />

@@ -181,7 +181,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="funnel-main">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">

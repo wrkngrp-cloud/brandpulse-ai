@@ -13,6 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -169,16 +170,19 @@ export default function VoiceBuilderPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div>
-        <p className="eyebrow mb-1">Creative Intelligence</p>
-        <h1 className="h-display text-[26px] leading-none">Voice Builder</h1>
-        <p className="mt-1.5 text-[13px] text-muted-foreground/70 max-w-xl">
-          Extract your brand voice from existing content, then use it to retune captions or generate on-brand copy from any idea.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="eyebrow mb-1">Creative Intelligence</p>
+          <h1 className="h-display text-[26px] leading-none">Voice Builder</h1>
+          <p className="mt-1.5 text-[13px] text-muted-foreground/70 max-w-xl">
+            Extract your brand voice from existing content, then use it to retune captions or generate on-brand copy from any idea.
+          </p>
+        </div>
+        <TourTrigger module="voice_builder" autoStart />
       </div>
 
       {/* Tab bar */}
-      <div className="flex items-center gap-1 border-b border-border/60">
+      <div className="flex items-center gap-1 border-b border-border/60" data-tour="voice-main">
         {TABS.map(t => {
           const locked = (t.id === 'retune' || t.id === 'generate') && !hasVoice
           return (

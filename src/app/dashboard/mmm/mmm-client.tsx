@@ -6,6 +6,7 @@ import { Loader2, TrendingUp, TrendingDown, Zap, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 interface MmmRun {
   id: string
@@ -113,6 +114,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="mmm" autoStart />
           <div className="flex rounded-xl border border-border overflow-hidden">
             {DAYS_OPTIONS.map(opt => (
               <button
@@ -137,6 +139,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
         </div>
       </div>
 
+      <div data-tour="mmm-main">
       {result === null ? (
         <div className="rounded-2xl border bg-card p-12 flex flex-col items-center gap-4 text-center">
           <div className="h-14 w-14 rounded-full bg-muted/40 flex items-center justify-center">
@@ -283,6 +286,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
 
         </div>
       )}
+      </div>
     </div>
   )
 }

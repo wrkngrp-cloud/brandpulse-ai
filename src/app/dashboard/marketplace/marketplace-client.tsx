@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { cn, formatNGN } from '@/lib/utils'
 import { toast } from 'sonner'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 interface MarketplaceProduct {
   id:             string
@@ -73,6 +74,7 @@ export function MarketplaceClient() {
           </p>
         </div>
         <div className="flex gap-2">
+          <TourTrigger module="marketplace" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
             Refresh
@@ -86,7 +88,7 @@ export function MarketplaceClient() {
 
       {/* KPI row */}
       {ownProducts.length > 0 && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="marketplace-main">
           <MiniStat icon={<Package className="h-4 w-4" />}    label="Own products"    value={String(ownProducts.length)} />
           <MiniStat icon={<ShoppingBag className="h-4 w-4" />} label="Competitors"    value={String(competitorProducts.length)} />
           <MiniStat icon={<Star className="h-4 w-4" />}       label="Avg rating"      value={avgRating ? `${avgRating.toFixed(1)} ★` : '—'} />

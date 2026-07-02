@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import type { RetentionRiskData, RetentionSignal } from '@/app/api/retention/risk/route'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 const RISK_COLOR = {
   low:      'text-green-600  bg-green-50  border-green-200',
@@ -67,12 +68,16 @@ export function RetentionClient() {
             Early warning signals based on sentiment, NPS, and brand health trends
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-          <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="retention" autoStart />
+          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
+      <div data-tour="retention-main">
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           {error}
@@ -248,6 +253,7 @@ export function RetentionClient() {
           </p>
         </>
       )}
+      </div>
     </div>
   )
 }

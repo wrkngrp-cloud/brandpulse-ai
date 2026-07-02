@@ -11,6 +11,7 @@ import { FunnelChart } from './funnel-chart'
 import { SovHistoryChart } from '@/components/dashboard/sov-history-chart'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { rangeLabelLong } from '@/lib/range-label'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 async function ContentData({ days }: { days: number }) {
   const supabase = await createClient()
@@ -63,7 +64,7 @@ async function ContentData({ days }: { days: number }) {
     .map(s => ({ date: s.snapshot_date as string, sov_pct: s.social_sov as number }))
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="content-main">
       {/* Top row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
@@ -198,7 +199,10 @@ export default async function ContentPage({
           <h1 className="text-2xl font-semibold tracking-tight">Owned Performance</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Your content, reach, and share of voice</p>
         </div>
-        <DateRangeFilter currentDays={days} defaultDays={30} />
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="content" autoStart />
+          <DateRangeFilter currentDays={days} defaultDays={30} />
+        </div>
       </div>
 
       {/* Success banner */}

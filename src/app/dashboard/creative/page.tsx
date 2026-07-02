@@ -2,6 +2,7 @@ import { createClient }  from '@/lib/supabase/server'
 import { redirect }      from 'next/navigation'
 import { getActiveBrand } from '@/lib/active-brand'
 import { CreativeClient } from './creative-client'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,11 +30,14 @@ export default async function CreativePage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Creative Analysis</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Compare creatives, check brand voice consistency, and analyse competitor content.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Creative Analysis</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Compare creatives, check brand voice consistency, and analyse competitor content.
+          </p>
+        </div>
+        <TourTrigger module="creative" autoStart />
       </div>
 
       <CreativeClient

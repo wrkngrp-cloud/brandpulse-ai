@@ -185,11 +185,12 @@ function KpiTile({ label, value, sub, href }: { label: string; value: string | n
 export function DashboardHero({
   brandName, industry, bhi, sovScore, sentimentScore,
   activeCampaigns, upcomingEvents, dataConnected,
-  initialWidgetIds, isFirstVisit, industryTemplate,
+  initialWidgetIds, isFirstVisit, industryTemplate, onPickerClose,
 }: Props & {
   initialWidgetIds: string[]
   isFirstVisit:     boolean
   industryTemplate: string | null
+  onPickerClose?:   () => void
 }) {
   const router = useRouter()
   const [query, setQuery]           = useState('')
@@ -225,6 +226,7 @@ export function DashboardHero({
           onSelect={(tid, wids) => {
             setWidgetIds(wids)
             setShowPicker(false)
+            onPickerClose?.()
           }}
         />
       )}

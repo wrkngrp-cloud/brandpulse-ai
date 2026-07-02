@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Zap } from 'lucide-react'
 import { AnalysisCard } from './analysis-card'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 async function PrePostHistory() {
   const supabase = await createClient()
@@ -54,6 +55,7 @@ export default async function PrePostPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="pre_post" autoStart />
           <kbd className="text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">⌘⇧P</kbd>
           <span className="text-xs text-muted-foreground">to open widget</span>
         </div>
@@ -64,7 +66,9 @@ export default async function PrePostPage() {
           {[1, 2, 3].map(i => <Skeleton key={i} className="h-40 rounded-xl" />)}
         </div>
       }>
-        <PrePostHistory />
+        <div data-tour="prepost-main">
+          <PrePostHistory />
+        </div>
       </Suspense>
     </div>
   )

@@ -13,6 +13,7 @@ import { EmotionWheel } from './emotion-wheel'
 import { TopicClusters } from './topic-clusters'
 import { SentimentHeatmap } from '@/components/dashboard/sentiment-heatmap'
 import { MentionsList } from './mentions-list'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 const SENTIMENT_BAR: Record<string, string> = {
   positive: 'bg-green-500',
@@ -244,7 +245,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
     .sort((a, b) => b.count - a.count)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="sentiment-main">
       {/* Alert feed */}
       {alerts.length > 0 && (
         <div className="space-y-2">
@@ -480,6 +481,7 @@ export default async function SentimentPage({
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <TourTrigger module="sentiment" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={84} />
           <CrawlHistory />
         </div>

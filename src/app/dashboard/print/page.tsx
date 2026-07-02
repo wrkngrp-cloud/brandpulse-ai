@@ -9,6 +9,7 @@ import { cn, formatNGN }   from '@/lib/utils'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { PrintAiAnalysis } from './print-ai-analysis'
 import { getActiveBrand }  from '@/lib/active-brand'
+import { TourTrigger }     from '@/components/tours/tour-trigger'
 
 export const dynamic = 'force-dynamic'
 
@@ -134,6 +135,7 @@ export default async function PrintPage({
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          <TourTrigger module="print" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={30} />
           <a
             href="/api/templates/print"
@@ -147,6 +149,7 @@ export default async function PrintPage({
         </div>
       </div>
 
+      <div data-tour="print-main">
       {!hasData ? (
         /* ── Empty state ──────────────────────────────────────────────────── */
         <Card className="border rounded-xl p-10 bg-card flex flex-col items-center gap-4 text-center">
@@ -264,6 +267,7 @@ export default async function PrintPage({
           </Card>
         </>
       )}
+      </div>
     </div>
   )
 }

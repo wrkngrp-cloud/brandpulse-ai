@@ -862,28 +862,34 @@ export function CompetitiveClient({
       )}
 
       {activeTab === 'ESOV League' && (
-        <EsovLeagueTab
-          esovLeague={esovLeague}
-          marketShare={marketShare}
-          brandName={brandName}
-        />
+        <div data-tour="competitive-sov">
+          <EsovLeagueTab
+            esovLeague={esovLeague}
+            marketShare={marketShare}
+            brandName={brandName}
+          />
+        </div>
       )}
 
       {activeTab === 'Sightings' && (
-        <SightingsTab
-          competitorNames={competitorNames}
-          initialSightings={sightings}
-        />
+        <div data-tour="competitive-mentions">
+          <SightingsTab
+            competitorNames={competitorNames}
+            initialSightings={sightings}
+          />
+        </div>
       )}
 
       {activeTab === 'Scorecard' && (
-        <ScorecardTab
-          brandName={brandName}
-          brandSov={brandSov}
-          avgSentiment={avgSentiment}
-          esovLeague={esovLeague}
-          marketShare={marketShare}
-        />
+        <div data-tour="competitive-sentiment">
+          <ScorecardTab
+            brandName={brandName}
+            brandSov={brandSov}
+            avgSentiment={avgSentiment}
+            esovLeague={esovLeague}
+            marketShare={marketShare}
+          />
+        </div>
       )}
     </div>
   )

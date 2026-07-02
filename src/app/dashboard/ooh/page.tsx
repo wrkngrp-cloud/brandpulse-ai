@@ -6,6 +6,7 @@ import { cn }               from '@/lib/utils'
 import { MapPin, Plus }     from 'lucide-react'
 import { getActiveBrand }   from '@/lib/active-brand'
 import { OohDashboardClient } from '@/components/ooh/ooh-dashboard-client'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 export default async function OohPage() {
   const supabase = await createClient()
@@ -71,15 +72,19 @@ export default async function OohPage() {
             Billboards, activations, and out-of-home attribution
           </p>
         </div>
-        <Link
-          href="/dashboard/ooh/new"
-          className={cn(buttonVariants({ size: 'sm' }), 'inline-flex items-center')}
-        >
-          <Plus className="h-4 w-4 mr-1.5" />
-          Add site
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="ooh" autoStart />
+          <Link
+            href="/dashboard/ooh/new"
+            className={cn(buttonVariants({ size: 'sm' }), 'inline-flex items-center')}
+          >
+            <Plus className="h-4 w-4 mr-1.5" />
+            Add site
+          </Link>
+        </div>
       </div>
 
+      <div data-tour="ooh-main">
       {!sitesWithCampaign.length ? (
         <div className="border rounded-xl p-12 text-center space-y-3">
           <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mx-auto">
@@ -98,6 +103,7 @@ export default async function OohPage() {
       ) : (
         <OohDashboardClient sites={sitesWithCampaign} appUrl={appUrl} />
       )}
+      </div>
     </div>
   )
 }

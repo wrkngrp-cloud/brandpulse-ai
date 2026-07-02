@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { FunnelClient } from './funnel-client'
 import { getActiveBrandId } from '@/lib/active-brand'
 import { computeStageComposite, type StageSignal } from '@/lib/bhi'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 export const dynamic = 'force-dynamic'
 
@@ -604,12 +605,15 @@ export default async function FunnelPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">Brand Funnel</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          How your audience moves from discovering{' '}
-          {brand?.name ?? 'your brand'} to advocating for it.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">Brand Funnel</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            How your audience moves from discovering{' '}
+            {brand?.name ?? 'your brand'} to advocating for it.
+          </p>
+        </div>
+        <TourTrigger module="funnel" autoStart />
       </div>
 
       <FunnelClient

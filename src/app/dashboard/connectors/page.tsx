@@ -14,6 +14,7 @@ import { PixelCard } from './pixel-card'
 import { ShoppingCart, ArrowRight } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 export const dynamic = 'force-dynamic'
 
@@ -106,13 +107,16 @@ export default async function ConnectorsPage() {
     <div className="max-w-3xl space-y-8 pb-12">
 
       {/* Header */}
-      <div>
-        <p className="eyebrow mb-1">Platform</p>
-        <h1 className="h-display text-[26px] leading-none">All Connectors</h1>
-        <p className="mt-2 text-[13px] text-muted-foreground/70 max-w-xl">
-          Connect your data sources here. Every module in BrandPulse reads from these connections automatically.
-          Connect once — all insights update.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="eyebrow mb-1">Platform</p>
+          <h1 className="h-display text-[26px] leading-none">All Connectors</h1>
+          <p className="mt-2 text-[13px] text-muted-foreground/70 max-w-xl">
+            Connect your data sources here. Every module in BrandPulse reads from these connections automatically.
+            Connect once — all insights update.
+          </p>
+        </div>
+        <TourTrigger module="connectors" autoStart />
       </div>
 
       {/* Context note */}
@@ -140,7 +144,7 @@ export default async function ConnectorsPage() {
       )}
 
       {/* Social Listening */}
-      <section>
+      <section data-tour="social-connectors">
         <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Social Listening</h2>
         <SocialConnectCard connections={connections ?? []} />
       </section>
@@ -152,7 +156,7 @@ export default async function ConnectorsPage() {
       </section>
 
       {/* Paid Media */}
-      <section>
+      <section data-tour="paid-connectors">
         <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Paid Media</h2>
         <MetaAdsConnectCard account={metaAdsAccount} />
       </section>
@@ -165,7 +169,7 @@ export default async function ConnectorsPage() {
 
       {/* Payments & Commerce — hidden for industries that are payment platforms themselves */}
       {!hidePayments && (
-        <section>
+        <section data-tour="payments-connectors">
           <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Payments & Commerce</h2>
           <PaymentConnectCard status={paymentStatus} appUrl={appUrl} />
         </section>

@@ -6,6 +6,7 @@ import { cn }                from '@/lib/utils'
 import { Megaphone, Plus }   from 'lucide-react'
 import { CampaignsList }     from '@/components/campaigns/campaigns-list'
 import { getActiveBrand }    from '@/lib/active-brand'
+import { TourTrigger }       from '@/components/tours/tour-trigger'
 
 export default async function CampaignsPage({
   searchParams,
@@ -61,17 +62,21 @@ export default async function CampaignsPage({
             Organise OOH placements, events, and media spend by campaign.
           </p>
         </div>
-        <Link
-          href="/dashboard/campaigns/new"
-          className={cn(buttonVariants({ size: 'sm' }), 'inline-flex items-center')}
-        >
-          <Plus className="h-4 w-4 mr-1.5" />
-          New campaign
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="campaigns" autoStart />
+          <Link
+            href="/dashboard/campaigns/new"
+            data-tour="new-campaign"
+            className={cn(buttonVariants({ size: 'sm' }), 'inline-flex items-center')}
+          >
+            <Plus className="h-4 w-4 mr-1.5" />
+            New campaign
+          </Link>
+        </div>
       </div>
 
       {/* Channel tabs */}
-      <div className="flex items-center gap-1 border-b overflow-x-auto pb-0">
+      <div className="flex items-center gap-1 border-b overflow-x-auto pb-0" data-tour="campaign-list">
         {BUILT_TABS.map(tab => (
           <Link
             key={tab.key}

@@ -9,6 +9,7 @@ import { cn, formatNGN }   from '@/lib/utils'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { RadioAiAnalysis } from './radio-ai-analysis'
 import { getActiveBrand }  from '@/lib/active-brand'
+import { TourTrigger }     from '@/components/tours/tour-trigger'
 
 export const dynamic = 'force-dynamic'
 
@@ -136,6 +137,7 @@ export default async function RadioPage({
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          <TourTrigger module="radio" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={30} />
           <a
             href="/api/templates/radio"
@@ -149,6 +151,7 @@ export default async function RadioPage({
         </div>
       </div>
 
+      <div data-tour="radio-main">
       {!hasData ? (
         /* ── Empty state ──────────────────────────────────────────────────── */
         <Card className="border rounded-xl p-10 bg-card flex flex-col items-center gap-4 text-center">
@@ -240,6 +243,7 @@ export default async function RadioPage({
           </Card>
         </>
       )}
+      </div>
     </div>
   )
 }

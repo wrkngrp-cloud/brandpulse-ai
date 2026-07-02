@@ -7,6 +7,7 @@ import { MessageSquare, TrendingUp, BarChart2, Users, CheckCircle2, Clock } from
 import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 import { LaunchPerceptionAuditButton } from './launch-perception-audit-button'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -248,6 +249,7 @@ export default function SurveysPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <TourTrigger module="surveys" autoStart />
           <Link
             href="/dashboard/surveys/nps"
             className={buttonVariants({ size: 'sm', variant: 'outline' })}
@@ -259,22 +261,24 @@ export default function SurveysPage() {
         </div>
       </div>
 
-      {/* Perception Audit section */}
-      <Suspense fallback={<Skeleton className="h-72 rounded-xl" />}>
-        <PerceptionAuditSection />
-      </Suspense>
+      <div className="space-y-8" data-tour="surveys-main">
+        {/* Perception Audit section */}
+        <Suspense fallback={<Skeleton className="h-72 rounded-xl" />}>
+          <PerceptionAuditSection />
+        </Suspense>
 
-      {/* Divider */}
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-border" />
-        <p className="text-xs text-muted-foreground shrink-0">All other surveys</p>
-        <div className="h-px flex-1 bg-border" />
+        {/* Divider */}
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" />
+          <p className="text-xs text-muted-foreground shrink-0">All other surveys</p>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        {/* General surveys list */}
+        <Suspense fallback={<Skeleton className="h-48 rounded-xl" />}>
+          <SurveyListServer />
+        </Suspense>
       </div>
-
-      {/* General surveys list */}
-      <Suspense fallback={<Skeleton className="h-48 rounded-xl" />}>
-        <SurveyListServer />
-      </Suspense>
     </div>
   )
 }

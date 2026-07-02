@@ -12,6 +12,7 @@ import { Button }  from '@/components/ui/button'
 import { Badge }   from '@/components/ui/badge'
 import { cn }      from '@/lib/utils'
 import type { CreativeAsset } from './page'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -401,10 +402,11 @@ export function CreativeLibraryClient({ brandId, brandName, assets }: Props) {
             </button>
           </div>
         )}
+        <TourTrigger module="creative_library" autoStart />
       </div>
 
       {/* Filter tabs */}
-      <div className="flex items-center gap-1 flex-wrap">
+      <div className="flex items-center gap-1 flex-wrap" data-tour="library-main">
         <Filter className="h-3.5 w-3.5 text-muted-foreground mr-1" />
         {FILTER_TABS.map(({ id, label, icon: Icon }) => (
           <button

@@ -4,6 +4,7 @@ import { redirect }     from 'next/navigation'
 import Link             from 'next/link'
 import { ArrowLeft }    from 'lucide-react'
 import { NpsClient, type WeeklyNps, type NpsCohort } from './nps-client'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 const ROLE_LABEL: Record<string, string> = {
   consumer:      'Consumers',
@@ -197,19 +198,22 @@ export default async function NpsTrackerPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div>
-        <Link
-          href="/dashboard/surveys"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Surveys
-        </Link>
-        <h1 className="text-xl font-semibold">NPS Tracker</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          12-week rolling Net Promoter Score across all surveys for{' '}
-          {brand?.name ?? 'your brand'}.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <Link
+            href="/dashboard/surveys"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Surveys
+          </Link>
+          <h1 className="text-xl font-semibold">NPS Tracker</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            12-week rolling Net Promoter Score across all surveys for{' '}
+            {brand?.name ?? 'your brand'}.
+          </p>
+        </div>
+        <TourTrigger module="nps" autoStart />
       </div>
 
       <NpsClient

@@ -2,6 +2,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { CompetitiveClient } from './competitive-client'
 import { getActiveBrand } from '@/lib/active-brand'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 export default async function CompetitivePage() {
   const supabase = await createClient()
@@ -103,11 +104,14 @@ export default async function CompetitivePage() {
 
   return (
     <div className="max-w-5xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Competitive Intelligence</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Share of voice, competitor sightings, and AI-generated briefings in one place.
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Competitive Intelligence</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Share of voice, competitor sightings, and AI-generated briefings in one place.
+          </p>
+        </div>
+        <TourTrigger module="competitive" autoStart />
       </div>
 
       <CompetitiveClient

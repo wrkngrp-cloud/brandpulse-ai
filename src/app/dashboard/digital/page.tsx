@@ -15,6 +15,7 @@ import {
 import type { SpendDataPoint, FunnelData, FrequencyPoint } from './digital-charts'
 import { createClient } from '@/lib/supabase/server'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 import {
   getBenchmarks,
   benchCTR, benchCPC, benchCPM, benchROAS, benchFreq, benchCVR,
@@ -483,7 +484,7 @@ export default async function DigitalPage({
   // ── render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="max-w-5xl space-y-8">
+    <div className="max-w-5xl space-y-8" data-tour="digital-main">
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -499,6 +500,7 @@ export default async function DigitalPage({
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <TourTrigger module="digital" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={30} />
           <Link
             href="/dashboard/digital/drafts"

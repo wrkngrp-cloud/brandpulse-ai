@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { cn, formatNGN } from '@/lib/utils'
 import { toast } from 'sonner'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 interface LineItem {
   id:             string
@@ -75,6 +76,7 @@ export function BudgetClient() {
           </p>
         </div>
         <div className="flex gap-2">
+          <TourTrigger module="budget" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
             Refresh
@@ -86,6 +88,7 @@ export function BudgetClient() {
         </div>
       </div>
 
+      <div data-tour="budget-main">
       {/* Active plan summary */}
       {activePlan && (
         <ActivePlanSummary plan={activePlan} />
@@ -256,6 +259,7 @@ export function BudgetClient() {
             )}
           </div>
         ))}
+      </div>
       </div>
     </div>
   )

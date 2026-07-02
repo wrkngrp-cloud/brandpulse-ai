@@ -5,6 +5,7 @@ import { getActiveBrand }       from '@/lib/active-brand'
 import { PrMentionsChart }      from './pr-mentions-chart'
 import { DateRangeFilter }      from '@/components/dashboard/date-range-filter'
 import { TriggerPrCrawlButton } from './trigger-pr-crawl-button'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 interface PressMention {
   id:              string
@@ -121,9 +122,13 @@ export default async function PRTrackingPage({
             Monitor press coverage and understand how earned media shapes your brand health.
           </p>
         </div>
-        <DateRangeFilter currentDays={days} defaultDays={30} />
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="pr" autoStart />
+          <DateRangeFilter currentDays={days} defaultDays={30} />
+        </div>
       </div>
 
+      <div data-tour="pr-main">
       {!hasData ? (
         /* ── Empty state ── */
         <div className="border rounded-xl p-10 text-center space-y-4">
@@ -341,6 +346,7 @@ export default async function PRTrackingPage({
           </div>
         </>
       )}
+      </div>
     </div>
   )
 }

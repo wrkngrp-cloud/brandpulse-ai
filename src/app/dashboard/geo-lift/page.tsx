@@ -3,6 +3,7 @@ import { redirect }            from 'next/navigation'
 import { TrendingUp, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react'
 import { GeoLiftStartForm }    from './geo-lift-start-form'
 import { getActiveBrand }      from '@/lib/active-brand'
+import { TourTrigger }         from '@/components/tours/tour-trigger'
 
 interface GeoLiftStudy {
   id:                 string
@@ -174,16 +175,18 @@ export default async function GeoLiftPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">Geo-Lift Studies</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Measure true incremental brand search uplift by city
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">Geo-Lift Studies</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Measure true incremental brand search uplift by city
+          </p>
+        </div>
+        <TourTrigger module="geo_lift" autoStart />
       </div>
 
-
       {hasStudies && (
-        <div className="space-y-4">
+        <div className="space-y-4" data-tour="geolift-main">
           {(studies ?? []).map(study => (
             <StudyCard key={study.id} study={study as GeoLiftStudy} />
           ))}

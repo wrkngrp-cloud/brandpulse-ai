@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { cn, formatNGN } from '@/lib/utils'
 import { toast } from 'sonner'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 interface LoyaltyTier {
   id:          string
@@ -81,10 +82,13 @@ export function LoyaltyClient() {
           <h1 className="text-2xl font-semibold">Loyalty Engine</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Manage points programs, tiers, and member rewards</p>
         </div>
-        <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
-          <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <TourTrigger module="loyalty" autoStart />
+          <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* KPIs */}
@@ -98,7 +102,7 @@ export function LoyaltyClient() {
       )}
 
       {/* Tabs */}
-      <div className="flex border-b gap-1">
+      <div className="flex border-b gap-1" data-tour="loyalty-main">
         {([['programs', 'Programs'], ['members', 'Members'], ['leaderboard', 'Leaderboard']] as [Tab, string][]).map(([id, label]) => (
           <button
             key={id}

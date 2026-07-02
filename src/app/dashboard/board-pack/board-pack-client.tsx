@@ -3,6 +3,7 @@
 import { useCallback } from 'react'
 import { Download, Mail, Link2, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -195,15 +196,19 @@ export function BoardPackClient({
         <div className="mx-auto max-w-3xl px-4 py-8">
 
           {/* Page title */}
-          <div className="mb-6 no-print">
-            <h1 className="text-xl font-semibold text-gray-900">Board Pack</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              A one-page performance report ready for board or CFO review. Download as PDF or share directly.
-            </p>
+          <div className="mb-6 no-print flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">Board Pack</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                A one-page performance report ready for board or CFO review. Download as PDF or share directly.
+              </p>
+            </div>
+            <TourTrigger module="board_pack" autoStart />
           </div>
 
           {/* ── Print preview pane ─────────────────────────────────────────────── */}
           <div
+            data-tour="boardpack-main"
             id="board-pack-preview"
             className="rounded-2xl border border-gray-200 bg-white shadow-sm print:rounded-none print:border-0 print:shadow-none"
           >

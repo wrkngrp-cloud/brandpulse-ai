@@ -184,7 +184,7 @@ export function NpsClient({
   const chartData = weeklyData.filter(w => w.nps != null)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="nps-main">
       {/* KPI row */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* NPS score */}

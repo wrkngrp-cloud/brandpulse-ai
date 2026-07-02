@@ -359,7 +359,7 @@ export function CreativeClient({
   /* ── Render ──────────────────────────────────────────────────────────────── */
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="creative-main">
       {/* Tab bar */}
       <div className="flex border-b overflow-x-auto">
         {TABS.map(({ id, label, icon: Icon }) => (

@@ -155,12 +155,12 @@ export function BrandEquityClient({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {/* Gauge */}
-          <div className="sm:col-span-1">
+          <div className="sm:col-span-1" data-tour="bhi-gauge">
             <BHIGauge bhi={gaugeProps} sparkline={sparkline} trendLabel={rlLong} />
           </div>
 
           {/* Component breakdown */}
-          <div className="sm:col-span-2 space-y-1">
+          <div className="sm:col-span-2 space-y-1" data-tour="bhi-components">
             {COMPONENT_META.map(meta => {
               const score     = bhi.components[meta.key]
               const available = score != null
@@ -435,7 +435,7 @@ export function BrandEquityClient({
 
       {/* BHI trend chart with tooltips */}
       {sparkline.length > 1 && (
-        <div className="border rounded-xl p-5 bg-card space-y-3">
+        <div className="border rounded-xl p-5 bg-card space-y-3" data-tour="bhi-history">
           <div>
             <p className="text-sm font-semibold">Brand Health Trend</p>
             <p className="text-xs text-muted-foreground">{rlShort} history — hover data points for details</p>

@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 interface Variant {
   id:          string
@@ -118,6 +119,7 @@ export function ExperimentsClient() {
           <p className="text-sm text-muted-foreground mt-0.5">Structured experiments with statistical significance tracking</p>
         </div>
         <div className="flex gap-2">
+          <TourTrigger module="experiments" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
             Refresh
@@ -130,7 +132,7 @@ export function ExperimentsClient() {
       </div>
 
       {experiments.length > 0 && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="experiments-main">
           <StatCard icon={<FlaskConical className="h-4 w-4" />} label="Total"     value={String(experiments.length)} />
           <StatCard icon={<Play className="h-4 w-4" />}         label="Running"   value={String(running)} />
           <StatCard icon={<CheckSquare className="h-4 w-4" />}  label="Concluded" value={String(concluded)} />

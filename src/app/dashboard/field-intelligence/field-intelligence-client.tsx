@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { ClipboardList, MapPin, Package, AlertTriangle, ChevronRight, TrendingDown } from 'lucide-react'
+import { TourTrigger } from '@/components/tours/tour-trigger'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -116,8 +117,12 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
 
   return (
     <div className="space-y-8">
+      <div className="flex justify-end">
+        <TourTrigger module="field_intelligence" autoStart />
+      </div>
+
       {/* Header stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4" data-tour="field-intel-main">
         <StatCard
           label="Outlets visited"
           value={stats.totalOutlets}
