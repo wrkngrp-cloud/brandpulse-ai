@@ -193,6 +193,44 @@ export function OverviewClient({
   return (
     <div className="space-y-6 max-w-[1400px]">
 
+      {/* ── Page header — greeting comes first, always ───────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: -6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-wrap items-end justify-between gap-4"
+      >
+        <div>
+          <p className="eyebrow mb-1.5">{getGreeting()}</p>
+          <h1 className="h-display text-[30px] sm:text-[34px] leading-none">{brandName}</h1>
+          {category && (
+            <p className="mt-2 text-[13px] text-muted-foreground/60">{category}</p>
+          )}
+        </div>
+
+        {/* Tour trigger always reachable, date filter + CTA on wider screens */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
+          <TourTrigger module="overview" autoStart={!pickerOpen} />
+          <div className="hidden sm:flex items-center gap-3">
+            <DateRangeFilter currentDays={days ?? 30} defaultDays={30} />
+            <Link
+              href="/dashboard/campaigns"
+              className="text-[12.5px] text-muted-foreground hover:text-foreground border border-border rounded-xl px-3.5 py-2 transition-colors hover:bg-muted/50"
+            >
+              View all
+            </Link>
+            <Link
+              href="/dashboard/campaigns/new"
+              className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-white rounded-xl px-4 py-2 transition-all hover:opacity-90 active:scale-[0.98]"
+              style={{ background: 'linear-gradient(135deg, #E8763E 0%, #C4501D 100%)', boxShadow: '0 4px 14px -4px oklch(0.585 0.163 37 / 0.55)' }}
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Campaign
+            </Link>
+          </div>
+        </div>
+      </motion.div>
+
       {/* ── AI Ask hero + KPI tiles + widget controls ──────────── */}
       <DashboardHero
         brandName={brandName}
@@ -208,42 +246,6 @@ export function OverviewClient({
         industryTemplate={industryTemplate}
         onPickerClose={() => setPickerOpen(false)}
       />
-
-      {/* ── Page header ──────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: -6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="flex items-end justify-between gap-4"
-      >
-        <div>
-          <p className="eyebrow mb-1.5">{getGreeting()}</p>
-          <h1 className="h-display text-[30px] sm:text-[34px] leading-none">{brandName}</h1>
-          {category && (
-            <p className="mt-2 text-[13px] text-muted-foreground/60">{category}</p>
-          )}
-        </div>
-
-        {/* Date filter + CTA */}
-        <div className="hidden sm:flex items-center gap-3 shrink-0">
-          <TourTrigger module="overview" autoStart={!pickerOpen} />
-          <DateRangeFilter currentDays={days ?? 30} defaultDays={30} />
-          <Link
-            href="/dashboard/campaigns"
-            className="text-[12.5px] text-muted-foreground hover:text-foreground border border-border rounded-xl px-3.5 py-2 transition-colors hover:bg-muted/50"
-          >
-            View all
-          </Link>
-          <Link
-            href="/dashboard/campaigns/new"
-            className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-white rounded-xl px-4 py-2 transition-all hover:opacity-90 active:scale-[0.98]"
-            style={{ background: 'linear-gradient(135deg, #E8763E 0%, #C4501D 100%)', boxShadow: '0 4px 14px -4px oklch(0.585 0.163 37 / 0.55)' }}
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Campaign
-          </Link>
-        </div>
-      </motion.div>
 
       {/* ── First signal strip ───────────────────────────────────── */}
       <motion.div
