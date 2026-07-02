@@ -11,6 +11,8 @@ export default function ResetPasswordPage() {
   const [state, action, pending] = useActionState(updatePassword, null)
 
   return (
+    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
+      <div className="w-full max-w-sm">
     <Card>
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Set new password</CardTitle>
@@ -39,5 +41,7 @@ export default function ResetPasswordPage() {
         </CardFooter>
       </form>
     </Card>
+      </div>
+    </div>
   )
 }

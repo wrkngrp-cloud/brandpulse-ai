@@ -13,8 +13,14 @@ export default function ForgotPasswordPage() {
   const [state, action, pending] = useActionState(forgotPassword, null)
   const sent = state?.error === '__sent__'
 
+  const shell = (c: React.ReactNode) => (
+    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
+      <div className="w-full max-w-sm">{c}</div>
+    </div>
+  )
+
   if (sent) {
-    return (
+    return shell(
       <Card>
         <CardContent className="pt-8 pb-6 text-center space-y-4">
           <CheckCircle2 className="h-10 w-10 text-green-500 mx-auto" />
@@ -35,7 +41,7 @@ export default function ForgotPasswordPage() {
     )
   }
 
-  return (
+  return shell(
     <Card>
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Forgot password?</CardTitle>
@@ -70,3 +76,5 @@ export default function ForgotPasswordPage() {
     </Card>
   )
 }
+
+
