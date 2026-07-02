@@ -11,7 +11,7 @@ import {
   FileSearch, BookOpen, PieChart, Sparkles, ClipboardCheck,
   Plug, BarChart3, Clipboard, AlertTriangle, Heart, Database,
   ShoppingBag, DollarSign, FlaskConical, Activity, Gift,
-  FileText, TrendingUp,
+  FileText, TrendingUp, FileDown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { isPathHidden, type IndustryId } from '@/lib/industry-config'
@@ -101,6 +101,7 @@ const GROWTH: NavEntry[] = [
 ]
 
 const REPORTS: NavEntry[] = [
+  { label: 'Board Pack',    href: '/dashboard/board-pack',    icon: FileDown  },
   { label: 'Business Case', href: '/dashboard/business-case', icon: BarChart3 },
   { label: 'Methodology',   href: '/dashboard/methodology',   icon: BookOpen  },
 ]
