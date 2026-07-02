@@ -291,6 +291,10 @@ export default function OnboardingPage() {
             We will read your website and any connected social accounts to pre-fill your brand profile.
             You confirm everything before anything is saved.
           </p>
+          <p className="text-center text-xs text-muted-foreground/50">
+            Wrong account?{' '}
+            <a href="/api/auth/signout" className="underline hover:text-muted-foreground">Sign out</a>
+          </p>
         </div>
       </div>
     )
@@ -484,6 +488,10 @@ export default function OnboardingPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Change brand name or website
           </Button>
+          <p className="text-center text-xs text-muted-foreground/50 pt-1">
+            Wrong account?{' '}
+            <a href="/api/auth/signout" className="underline hover:text-muted-foreground">Sign out</a>
+          </p>
         </div>
       </div>
     </div>
