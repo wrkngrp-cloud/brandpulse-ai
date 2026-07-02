@@ -160,6 +160,7 @@ export default function OnboardingPage() {
   if (screen === 'industry') {
     return (
       <div className="min-h-screen bg-muted/40 flex flex-col items-center justify-center px-4 py-12">
+        <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-full px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
         <div className="w-full max-w-2xl space-y-8">
           <div className="text-center space-y-2">
             <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
@@ -231,6 +232,7 @@ export default function OnboardingPage() {
   if (screen === 'identify') {
     return (
       <div className="min-h-screen bg-muted/40 flex flex-col items-center justify-center px-4 py-12">
+        <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-full px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
         <div className="w-full max-w-md space-y-8">
           <div className="text-center space-y-2">
             <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
@@ -304,6 +306,7 @@ export default function OnboardingPage() {
   if (screen === 'analysing') {
     return (
       <div className="min-h-screen bg-muted/40 flex flex-col items-center justify-center px-4">
+        <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-full px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
         <div className="w-full max-w-md text-center space-y-6">
           <div className="inline-flex h-12 w-12 rounded-full bg-foreground items-center justify-center">
             <Loader2 className="h-6 w-6 text-background animate-spin" />
@@ -337,6 +340,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-muted/40 py-10 px-4">
+      <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-full px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
       <div className="w-full max-w-xl mx-auto space-y-6">
 
         {/* Header */}

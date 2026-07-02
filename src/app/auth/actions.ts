@@ -82,6 +82,10 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
   const { error } = await supabase.auth.signInWithPassword(parsed.data)
   if (error) return { error: error.message }
 
+  // Login never routes to onboarding directly — only signup does that.
+  // Returning users (including demo accounts) always land on /dashboard;
+  // dashboard/layout.tsx is the single source of truth that bounces
+  // genuinely incomplete accounts (abandoned signup) back to /onboarding.
   redirect('/dashboard')
 }
 

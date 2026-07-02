@@ -11,10 +11,22 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brands } = await supabase
+  let { data: brands, error: brandsError } = await supabase
     .from('brands')
     .select('id, name, category, industry, logo_url')
     .order('created_at', { ascending: true })
+
+  if (brandsError) {
+    // 'industry' can go missing from PostgREST's schema cache after a
+    // migration until it's reloaded server-side — don't let that silently
+    // bounce every signed-in user to onboarding. Retry without it; industry
+    // still resolves below via getIndustryFromCategory.
+    const fallback = await supabase
+      .from('brands')
+      .select('id, name, category, logo_url')
+      .order('created_at', { ascending: true })
+    brands = fallback.data as typeof brands
+  }
 
   const namedBrands = (brands ?? []).filter(b => b.name && b.name.trim() !== '')
   if (!namedBrands.length) redirect('/onboarding')

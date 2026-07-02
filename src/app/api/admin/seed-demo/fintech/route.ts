@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
   await sb.from('workspace_members').insert({ workspace_id: wsId, user_id: userId, role: 'owner' })
 
   /* ── 3. Brand ─────────────────────────────────────────────────────────── */
-  const { data: brand, error: brandErr } = await sb.from('brands').insert({
+  const brandRow = {
     workspace_id:    wsId,
     name:            'PocketPay',
     category:        'Fintech',
@@ -91,8 +91,16 @@ export async function POST(req: NextRequest) {
     ],
     brand_voice: { tone: 'energetic, trustworthy, plain-speaking', personality: 'The savvy friend who always knows how to move money faster', language_mix: { english: 55, pidgin: 35, yoruba: 5, igbo: 5 } },
     bhi_weights:  { awareness: 0.20, consideration: 0.15, preference: 0.20, advocacy: 0.15, nps: 0.15, sentiment: 0.10, sov: 0.05 },
-  }).select('id').single()
-  if (brandErr) return NextResponse.json({ error: brandErr.message }, { status: 500 })
+  }
+  let { data: brand, error: brandErr } = await sb.from('brands').insert(brandRow).select('id').single()
+  if (brandErr?.message.includes('industry')) {
+    // PostgREST schema cache can lag a migration — retry without the
+    // column rather than failing the whole seed; back-fillable later.
+    const { industry: _industry, ...withoutIndustry } = brandRow
+    const retry = await sb.from('brands').insert(withoutIndustry).select('id').single()
+    brand = retry.data; brandErr = retry.error
+  }
+  if (brandErr || !brand) return NextResponse.json({ error: brandErr?.message ?? 'Brand creation failed' }, { status: 500 })
   const brandId = brand.id
 
   /* ── 4. Competitors ───────────────────────────────────────────────────── */
