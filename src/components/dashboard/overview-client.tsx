@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
@@ -16,6 +17,11 @@ import { cn }               from '@/lib/utils'
 import { fadeUp, stagger }  from '@/lib/motion'
 import { rangeLabelShort }  from '@/lib/range-label'
 import type { BHIResult }   from '@/lib/bhi'
+
+const TourTrigger = dynamic(
+  () => import('@/components/tours/tour-trigger').then(m => m.TourTrigger),
+  { ssr: false },
+)
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -189,6 +195,7 @@ export function OverviewClient({
 
         {/* Date filter + CTA */}
         <div className="hidden sm:flex items-center gap-3 shrink-0">
+          <TourTrigger module="overview" autoStart={true} />
           <DateRangeFilter currentDays={days ?? 30} defaultDays={30} />
           <Link
             href="/dashboard/campaigns"
@@ -209,6 +216,7 @@ export function OverviewClient({
 
       {/* ── First signal strip ───────────────────────────────────── */}
       <motion.div
+        data-tour="quick-actions"
         variants={fadeUp}
         initial="hidden"
         animate="visible"
@@ -238,6 +246,7 @@ export function OverviewClient({
 
       {/* ── KPI stat row ─────────────────────────────────────────── */}
       <motion.div
+        data-tour="kpi-row"
         className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
         variants={stagger(0.05)}
         initial="hidden"
@@ -295,6 +304,7 @@ export function OverviewClient({
 
       {/* ── Main bento grid ──────────────────────────────────────── */}
       <motion.div
+        data-tour="bento-grid"
         className="bento-overview"
         variants={stagger(0.08)}
         initial="hidden"
