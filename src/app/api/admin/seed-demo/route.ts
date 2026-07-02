@@ -2882,6 +2882,37 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
     }
   }
 
+  /* ── Commercial manual metrics (Tier 1) ────────────────────────────────── */
+  const today = new Date()
+  const mStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
+  const mEnd   = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]
+
+  const jaraMetrics = [
+    { metric_key: 'monthly_revenue',    value: 285000000 },  // ₦285M monthly revenue
+    { metric_key: 'marketing_spend',    value: 42000000  },  // ₦42M marketing spend
+    { metric_key: 'distribution_reach', value: 12400     },  // 12,400 outlets
+    { metric_key: 'sku_count',          value: 24        },  // 24 active SKUs
+    { metric_key: 'nps_score',          value: 58        },
+    { metric_key: 'repeat_purchase_rate', value: 0.62    },
+    { metric_key: 'market_share_pct',   value: 0.18      },  // 18% category share
+  ]
+
+  try {
+    await sb.from('metric_manual').upsert(
+      jaraMetrics.map(m => ({
+        brand_id:     brandId,
+        metric_key:   m.metric_key,
+        value:        m.value,
+        currency:     'NGN',
+        period_start: mStart,
+        period_end:   mEnd,
+        entered_by:   userId,
+        updated_at:   new Date().toISOString(),
+      })),
+      { onConflict: 'brand_id,metric_key,period_start' }
+    )
+  } catch (_) { /* metric_manual table may not exist in all environments */ }
+
   return NextResponse.json({
     success: true,
     credentials: {
@@ -2948,6 +2979,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       fsoTeams:            3,
       fieldReports:        fieldReportCount,
       fieldOutlets:        fieldOutletCount,
+      metricManual:        jaraMetrics.length,
     },
   })
 }
