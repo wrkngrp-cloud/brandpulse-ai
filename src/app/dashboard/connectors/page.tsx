@@ -2,6 +2,7 @@ import { createClient }        from '@/lib/supabase/server'
 import { redirect }            from 'next/navigation'
 import { getActiveBrand }      from '@/lib/active-brand'
 import Link                   from 'next/link'
+import { getIndustryFromCategory, SUGGESTED_CONNECTORS_BY_INDUSTRY, INDUSTRY_META, type IndustryId } from '@/lib/industry-config'
 import { SocialConnectCard }   from '@/components/dashboard/social-connect-card'
 import { GA4ConnectCard, type GA4ConnectionData }           from '@/components/dashboard/ga4-connect-card'
 import { MetaAdsConnectCard, type MetaAdsAccountData }      from '@/components/dashboard/meta-ads-connect-card'
@@ -21,7 +22,7 @@ export default async function ConnectorsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const brand = await getActiveBrand<{ id: string; name: string }>(supabase, 'id, name')
+  const brand = await getActiveBrand<{ id: string; name: string; category: string | null; industry: string | null }>(supabase, 'id, name, category, industry')
 
   const { data: connections } = await supabase
     .from('social_connections')
@@ -89,6 +90,18 @@ export default async function ConnectorsPage() {
 
   const appUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? ''
 
+  const industry = brand?.industry || getIndustryFromCategory(brand?.category ?? '') as IndustryId
+  const industryMeta   = INDUSTRY_META[industry as IndustryId]
+  const suggestedConns = SUGGESTED_CONNECTORS_BY_INDUSTRY[industry as IndustryId] ?? []
+  const hidePayments   = ['fintech', 'b2b_saas', 'media', 'telco', 'insurance', 'healthcare', 'real_estate'].includes(industry)
+
+  const CONNECTOR_LABEL: Record<string, string> = {
+    meta_ads: 'Meta Ads', google_ads: 'Google Ads', ga4: 'GA4', firebase: 'Firebase',
+    appsflyer: 'AppsFlyer', hubspot: 'HubSpot', csv: 'CSV Upload', paystack: 'Paystack',
+    flutterwave: 'Flutterwave', mailchimp: 'Mailchimp', brevo: 'Brevo',
+    jumia: 'Jumia', konga: 'Konga', instagram: 'Instagram', twitter: 'X (Twitter)',
+  }
+
   return (
     <div className="max-w-3xl space-y-8 pb-12">
 
@@ -104,8 +117,27 @@ export default async function ConnectorsPage() {
 
       {/* Context note */}
       <div className="rounded-xl border bg-muted/20 px-4 py-3 text-[12.5px] text-muted-foreground leading-relaxed">
-        Social and GA4 connections require OAuth. Payment and email connectors use API keys or webhooks — your keys are stored encrypted and never exposed in the UI.
+        Social and GA4 connections require OAuth. Payment and email connectors use API keys or webhooks. Your keys are stored encrypted and never exposed in the UI.
       </div>
+
+      {/* Recommended for industry */}
+      {industryMeta && suggestedConns.length > 0 && (
+        <div className="rounded-xl border bg-card px-4 py-4 space-y-2">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            {industryMeta.icon} Recommended for {industryMeta.label}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {suggestedConns.map(key => (
+              <span key={key} className="text-xs border rounded-full px-3 py-1 bg-muted/40 text-muted-foreground font-medium">
+                {CONNECTOR_LABEL[key] ?? key}
+              </span>
+            ))}
+          </div>
+          <p className="text-[12px] text-muted-foreground/70 leading-relaxed">
+            These are the data sources that matter most for {industryMeta.label} brands. Others are still available below.
+          </p>
+        </div>
+      )}
 
       {/* Social Listening */}
       <section>
@@ -131,11 +163,13 @@ export default async function ConnectorsPage() {
         <PixelCard />
       </section>
 
-      {/* Payments & Commerce */}
-      <section>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Payments & Commerce</h2>
-        <PaymentConnectCard status={paymentStatus} appUrl={appUrl} />
-      </section>
+      {/* Payments & Commerce — hidden for industries that are payment platforms themselves */}
+      {!hidePayments && (
+        <section>
+          <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Payments & Commerce</h2>
+          <PaymentConnectCard status={paymentStatus} appUrl={appUrl} />
+        </section>
+      )}
 
       {/* App Stores & Reviews */}
       <section>

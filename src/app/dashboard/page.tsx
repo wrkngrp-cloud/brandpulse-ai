@@ -4,6 +4,8 @@ import { Suspense } from 'react'
 import { computeFullBHI, type BHIResult } from '@/lib/bhi'
 import { OverviewClient } from '@/components/dashboard/overview-client'
 import { getActiveBrandId } from '@/lib/active-brand'
+import { getIndustryFromCategory } from '@/lib/industry-config'
+import { DEFAULT_WIDGET_IDS, TEMPLATE_BY_INDUSTRY } from '@/lib/widget-catalog'
 
 const NGN_CPM_BENCHMARK = 500
 const NGN_CPE_BENCHMARK = 50
@@ -21,6 +23,7 @@ async function DashboardContent({ days }: { days: number }) {
 
   const [
     { data: brand },
+    { data: dashPrefs },
     { data: sentimentRow },
     { data: sovRow },
     { data: allSurveyResponses },
@@ -35,8 +38,12 @@ async function DashboardContent({ days }: { days: number }) {
     { data: perceptionSurveys },
   ] = await Promise.all([
     brandId
-      ? supabase.from('brands').select('id, name, category').eq('id', brandId).single()
-      : supabase.from('brands').select('id, name, category').limit(1).single(),
+      ? supabase.from('brands').select('id, name, category, industry').eq('id', brandId).single()
+      : supabase.from('brands').select('id, name, category, industry').limit(1).single(),
+    supabase.from('user_dashboard_prefs')
+      .select('template, widget_ids')
+      .eq('brand_id', brandId ?? '')
+      .maybeSingle(),
     supabase.from('sentiment_daily').select('social_score, day, positive_pct, negative_pct').eq('brand_id', brandId ?? '').order('day', { ascending: false }).limit(1).maybeSingle(),
     supabase.from('sov_snapshots').select('social_sov, snapshot_date').eq('brand_id', brandId ?? '').order('snapshot_date', { ascending: false }).limit(1).maybeSingle(),
     supabase.from('survey_responses').select('answers, survey_id, quality_flag').eq('quality_flag', 'ok'),
@@ -134,10 +141,18 @@ async function DashboardContent({ days }: { days: number }) {
 
   const hasAnyData = sentimentScore !== null || sovScore !== null
 
+  const industry = (brand as { industry?: string | null } | null)?.industry
+    || getIndustryFromCategory(brand?.category ?? '')
+
+  const widgetIds       = (dashPrefs?.widget_ids as string[] | null) ?? DEFAULT_WIDGET_IDS
+  const isFirstVisit    = !dashPrefs
+  const industryTemplate = TEMPLATE_BY_INDUSTRY[industry] ?? null
+
   return (
     <OverviewClient
       brandName={brand?.name ?? 'Your brand'}
       category={brand?.category ?? null}
+      industry={industry}
       bhi={bhi}
       sparkline={sparkline}
       sentiment={sentimentRow ?? null}
@@ -153,6 +168,9 @@ async function DashboardContent({ days }: { days: number }) {
       hasAnyData={hasAnyData}
       trendData={trendData}
       days={days}
+      widgetIds={widgetIds}
+      isFirstVisit={isFirstVisit}
+      industryTemplate={industryTemplate}
     />
   )
 }

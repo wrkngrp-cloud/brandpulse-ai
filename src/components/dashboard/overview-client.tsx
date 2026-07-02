@@ -13,10 +13,12 @@ import { BHIGauge }         from '@/components/dashboard/bhi-gauge'
 import { StatCard }         from '@/components/dashboard/stat-card'
 import { TrendChart }       from '@/components/dashboard/trend-chart'
 import { DateRangeFilter }  from '@/components/dashboard/date-range-filter'
+import { DashboardHero }    from '@/components/dashboard/dashboard-hero'
 import { cn }               from '@/lib/utils'
 import { fadeUp, stagger }  from '@/lib/motion'
 import { rangeLabelShort }  from '@/lib/range-label'
 import type { BHIResult }   from '@/lib/bhi'
+import { DEFAULT_WIDGET_IDS } from '@/lib/widget-catalog'
 
 const TourTrigger = dynamic(
   () => import('@/components/tours/tour-trigger').then(m => m.TourTrigger),
@@ -63,6 +65,7 @@ interface SentimentRow {
 export interface OverviewProps {
   brandName:       string
   category:        string | null
+  industry:        string | null
   bhi:             BHIResult
   sparkline:       { date: string; score: number }[]
   sentiment:       SentimentRow | null
@@ -75,6 +78,9 @@ export interface OverviewProps {
   hasAnyData:      boolean
   trendData?:      { date: string; bhi: number | null; sentiment: number | null }[]
   days?:           number
+  widgetIds?:      string[]
+  isFirstVisit?:   boolean
+  industryTemplate?: string | null
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -157,6 +163,7 @@ function Label({ children, className }: { children: React.ReactNode; className?:
 export function OverviewClient({
   brandName,
   category,
+  industry,
   bhi,
   sparkline,
   sentiment,
@@ -169,6 +176,9 @@ export function OverviewClient({
   hasAnyData,
   trendData = [],
   days = 30,
+  widgetIds,
+  isFirstVisit = false,
+  industryTemplate = null,
 }: OverviewProps) {
   // Sparkline data for BHI stat card
   const bhiSpark = sparkline.map(s => ({ date: s.date, value: s.score }))
@@ -177,6 +187,21 @@ export function OverviewClient({
 
   return (
     <div className="space-y-6 max-w-[1400px]">
+
+      {/* ── AI Ask hero + KPI tiles + widget controls ──────────── */}
+      <DashboardHero
+        brandName={brandName}
+        industry={industry}
+        bhi={bhi}
+        sovScore={sovScore}
+        sentimentScore={sentiment?.social_score ?? null}
+        activeCampaigns={activeCampaigns.length}
+        upcomingEvents={upcomingEvents.length}
+        dataConnected={hasAnyData}
+        initialWidgetIds={widgetIds ?? DEFAULT_WIDGET_IDS}
+        isFirstVisit={isFirstVisit}
+        industryTemplate={industryTemplate}
+      />
 
       {/* ── Page header ──────────────────────────────────────────── */}
       <motion.div
