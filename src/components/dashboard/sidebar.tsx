@@ -156,9 +156,10 @@ interface SidebarProps {
   brandName:     string
   brands?:       BrandOption[]
   activeBrandId?: string | null
+  industry?:     string | null
 }
 
-export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, brands = [], activeBrandId = null }: SidebarProps) {
+export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, brands = [], activeBrandId = null, industry = null }: SidebarProps) {
   const [hovering, setHovering] = useState(false)
   const pathname = usePathname()
 
@@ -217,7 +218,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
 
       {/* ── Navigation ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 px-2.5">
-        <DashboardNav expanded={expanded} />
+        <DashboardNav expanded={expanded} industry={industry} />
       </div>
 
       {/* ── Ask AI CTA ─────────────────────────────────────────── */}

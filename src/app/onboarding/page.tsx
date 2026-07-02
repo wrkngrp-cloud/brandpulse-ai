@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { Check, Sparkles, Globe, ArrowRight, ArrowLeft, Loader2, AlertCircle, X, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
+import { INDUSTRY_META, INDUSTRY_IDS, type IndustryId, getIndustryFromCategory } from '@/lib/industry-config'
 
 const LOADING_MESSAGES = [
   'Reading your brand name...',
@@ -39,11 +40,12 @@ const CONFIDENCE_META: Record<string, { label: string; class: string }> = {
 }
 
 type CulturalKey = 'community_corporate' | 'traditional_modern' | 'religious_secular' | 'mass_premium' | 'local_global'
-type Screen = 'identify' | 'analysing' | 'review'
+type Screen = 'industry' | 'identify' | 'analysing' | 'review'
 
 const defaultData: OnboardingData = {
   websiteUrl: '',
   brandName: '',
+  industry: '',
   category: '',
   brandValues: [],
   brandVoice: { adjectives: [], tone: '', dos: [], donts: [], signaturePhrases: [] },
@@ -56,7 +58,7 @@ const defaultData: OnboardingData = {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
-  const [screen, setScreen]   = useState<Screen>('identify')
+  const [screen, setScreen]   = useState<Screen>('industry')
   const [brandName, setBrandName] = useState('')
   const [websiteUrl, setWebsiteUrl] = useState('')
   const [data, setData]       = useState<OnboardingData>(defaultData)
@@ -110,6 +112,7 @@ export default function OnboardingPage() {
       setData({
         websiteUrl,
         brandName,
+        industry:        data.industry,
         category:        result.category || 'Other',
         brandValues:     result.brandValues ?? [],
         brandVoice:      {
@@ -136,7 +139,7 @@ export default function OnboardingPage() {
       setSources(result.inferenceSources ?? ['brand_name'])
     } catch {
       // Inference failed — proceed to review with empty pre-fills
-      setData({ ...defaultData, brandName, websiteUrl })
+      setData({ ...defaultData, industry: data.industry, brandName, websiteUrl })
       setConfidence('Low')
       setSources(['brand_name'])
       setInferError(true)
@@ -151,6 +154,77 @@ export default function OnboardingPage() {
       fd.set('payload', JSON.stringify(data))
       action(fd)
     })
+  }
+
+  // ── Screen 0: Industry picker ─────────────────────────────────────────────
+  if (screen === 'industry') {
+    return (
+      <div className="min-h-screen bg-muted/40 flex flex-col items-center justify-center px-4 py-12">
+        <div className="w-full max-w-2xl space-y-8">
+          <div className="text-center space-y-2">
+            <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
+              <Sparkles className="h-5 w-5 text-background" />
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight">What kind of brand are you?</h1>
+            <p className="text-sm text-muted-foreground">
+              This shapes which modules, metrics and connectors we show you. You can change it any time.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {INDUSTRY_IDS.map(id => {
+              const meta = INDUSTRY_META[id]
+              const selected = data.industry === id
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => patch('industry', id)}
+                  className={cn(
+                    'relative text-left rounded-xl border p-4 transition-all duration-150 bg-card hover:border-foreground/40 hover:shadow-sm',
+                    selected && 'border-foreground ring-2 ring-foreground/10 bg-card shadow-sm',
+                    !selected && 'border-border',
+                  )}
+                >
+                  {selected && (
+                    <span className="absolute top-2.5 right-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground">
+                      <Check className="h-2.5 w-2.5 text-background" />
+                    </span>
+                  )}
+                  <span className="text-2xl leading-none block mb-2">{meta.icon}</span>
+                  <span className="text-[13px] font-semibold leading-snug block">{meta.label}</span>
+                  <span className="text-[11px] text-muted-foreground leading-snug mt-0.5 block line-clamp-2">
+                    {meta.tagline}
+                  </span>
+                  {meta.examples && (
+                    <span className="text-[10px] text-muted-foreground/60 mt-1.5 block truncate">
+                      e.g. {meta.examples}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+
+          <Button
+            className="w-full"
+            size="lg"
+            disabled={!data.industry}
+            onClick={() => {
+              // Pre-fill category from industry selection
+              const industryMeta = INDUSTRY_META[data.industry as IndustryId]
+              if (industryMeta && !data.category) {
+                patch('category', industryMeta.label)
+              }
+              setScreen('identify')
+            }}
+          >
+            Continue
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   // ── Screen 1: Identify ────────────────────────────────────────────────────
@@ -203,6 +277,14 @@ export default function OnboardingPage() {
               Analyse my brand
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
+            <button
+              type="button"
+              onClick={() => setScreen('industry')}
+              className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors pt-1"
+            >
+              <ArrowLeft className="h-3 w-3 inline mr-1" />
+              Change industry
+            </button>
           </div>
 
           <p className="text-center text-xs text-muted-foreground">

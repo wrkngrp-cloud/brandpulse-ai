@@ -24,9 +24,10 @@ interface DashboardShellProps {
   brandName:     string
   brands?:       BrandOption[]
   activeBrandId?: string | null
+  industry?:     string | null
 }
 
-export function DashboardShell({ children, userName, userEmail, brandName, brands = [], activeBrandId = null }: DashboardShellProps) {
+export function DashboardShell({ children, userName, userEmail, brandName, brands = [], activeBrandId = null, industry = null }: DashboardShellProps) {
   const pathname = usePathname()
 
   // Default pinned=true (expanded sidebar), hydrate from localStorage
@@ -74,6 +75,7 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
         brandName={brandName}
         brands={brands}
         activeBrandId={activeBrandId}
+        industry={industry}
       />
 
       {/* Content column */}

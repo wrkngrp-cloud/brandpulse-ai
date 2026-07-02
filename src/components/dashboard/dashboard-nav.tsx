@@ -14,6 +14,7 @@ import {
   FileText, TrendingUp,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { isPathHidden, type IndustryId } from '@/lib/industry-config'
 
 // ── Architecture ──────────────────────────────────────────────────────────────
 //
@@ -251,10 +252,16 @@ function CollapsibleSection({
 
 // ── Main nav ──────────────────────────────────────────────────────────────────
 
-export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
+export function DashboardNav({ expanded = true, industry = null }: { expanded?: boolean; industry?: string | null }) {
   const pathname = usePathname()
   const isActive = (href: string) =>
     href === '/dashboard' ? pathname === '/dashboard' : pathname === href || pathname.startsWith(`${href}/`)
+
+  // Filter nav entries based on industry
+  const ind = industry as IndustryId | null
+  const hide = (href: string) => isPathHidden(href, ind)
+  const filterEntries = (entries: NavEntry[]) =>
+    entries.filter(e => 'divider' in e || !hide(e.href))
 
   return (
     <LayoutGroup>
@@ -264,7 +271,7 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
 
         {/* Brand Health first — the core product value: how is my brand doing? */}
         <SectionLabel expanded={expanded}>Brand Health</SectionLabel>
-        <NavSection entries={BRAND_HEALTH} isActive={isActive} expanded={expanded} />
+        <NavSection entries={filterEntries(BRAND_HEALTH)} isActive={isActive} expanded={expanded} />
 
         {/* Research adjacent to Brand Health — both answer "what do customers think?" */}
         <SectionLabel expanded={expanded}>Research</SectionLabel>
@@ -278,11 +285,11 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
         />
 
         <SectionLabel expanded={expanded}>Intelligence</SectionLabel>
-        <NavSection entries={INTELLIGENCE} isActive={isActive} expanded={expanded} />
+        <NavSection entries={filterEntries(INTELLIGENCE)} isActive={isActive} expanded={expanded} />
 
         {/* CAMPAIGNS — all channels in one section */}
         <SectionLabel expanded={expanded}>Campaigns</SectionLabel>
-        <NavSection entries={CAMPAIGNS} isActive={isActive} expanded={expanded} />
+        <NavSection entries={filterEntries(CAMPAIGNS)} isActive={isActive} expanded={expanded} />
 
         {/* Creative Intelligence — voice, analysis, library, A/B testing */}
         <SectionLabel expanded={expanded}>Creative Intelligence</SectionLabel>
@@ -299,10 +306,10 @@ export function DashboardNav({ expanded = true }: { expanded?: boolean }) {
         <NavItem href="/dashboard/experiments"       icon={FlaskConical}  label="A/B Testing"        active={isActive('/dashboard/experiments')}        expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Measurement</SectionLabel>
-        <NavSection entries={MEASUREMENT} isActive={isActive} expanded={expanded} />
+        <NavSection entries={filterEntries(MEASUREMENT)} isActive={isActive} expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Growth</SectionLabel>
-        <NavSection entries={GROWTH} isActive={isActive} expanded={expanded} />
+        <NavSection entries={filterEntries(GROWTH)} isActive={isActive} expanded={expanded} />
 
         <SectionLabel expanded={expanded}>Reports</SectionLabel>
         <NavSection entries={REPORTS} isActive={isActive} expanded={expanded} />

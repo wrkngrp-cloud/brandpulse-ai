@@ -7,6 +7,7 @@ import { z } from 'zod'
 const onboardingSchema = z.object({
   websiteUrl: z.string().optional().default(''),
   brandName: z.string().min(1, 'Brand name is required'),
+  industry: z.string().min(1, 'Industry is required'),
   category: z.string().min(1, 'Category is required'),
   brandValues: z.array(z.string()).default([]),
   brandVoice: z.object({
@@ -72,6 +73,7 @@ export async function completeOnboarding(
     .update({
       name:             d.brandName,
       website_url:      d.websiteUrl || null,
+      industry:         d.industry,
       category:         d.category,
       brand_values:     d.brandValues,
       brand_voice:      d.brandVoice,

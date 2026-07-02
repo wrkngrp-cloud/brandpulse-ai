@@ -13,7 +13,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const { data: brands } = await supabase
     .from('brands')
-    .select('id, name, category, logo_url')
+    .select('id, name, category, industry, logo_url')
     .order('created_at', { ascending: true })
 
   if (!brands?.length) redirect('/onboarding')
@@ -26,6 +26,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const userName  = (user.user_metadata?.full_name as string | undefined) ?? ''
   const userEmail = user.email ?? ''
 
+  // Derive industry: prefer explicit industry field, fall back to category mapping
+  const { getIndustryFromCategory } = await import('@/lib/industry-config')
+  const industry = (activeBrand as { industry?: string | null }).industry
+    || getIndustryFromCategory((activeBrand as { category?: string | null }).category ?? '')
+
   return (
     <>
       <DashboardShell
@@ -34,6 +39,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         brandName={activeBrand.name}
         brands={brands as BrandOption[]}
         activeBrandId={activeBrand.id}
+        industry={industry}
       >
         {children}
       </DashboardShell>
