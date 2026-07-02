@@ -111,6 +111,7 @@ export function AiCommand() {
       {/* Floating trigger button */}
       {!open && (
         <button
+          data-tour="ask-ai"
           onClick={() => setOpen(true)}
           className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-foreground text-background shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
           aria-label="Open BrandPulse AI"
