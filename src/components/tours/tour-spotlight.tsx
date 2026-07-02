@@ -12,29 +12,31 @@ export type TourSpotlightProps = {
   initialStep?: number
 }
 
-const CARD_W   = 340
-const CARD_H   = 220  // generous estimate
-const OFFSET   =  14
+const CARD_W        = 340
+const CARD_H        = 220  // generous estimate
+const OFFSET        =  14
+const HIGHLIGHT_PAD =   8
 
-function computeCardStyle(
-  step: TourStep,
-): React.CSSProperties {
-  const center: React.CSSProperties = {
-    position:  'fixed',
-    top:       '50%',
-    left:      '50%',
-    transform: 'translate(-50%, -50%)',
-  }
+const CENTER_STYLE: React.CSSProperties = {
+  position:  'fixed',
+  top:       '50%',
+  left:      '50%',
+  transform: 'translate(-50%, -50%)',
+}
 
-  if (!step.target) return center
+function isMostlyInViewport(rect: DOMRect): boolean {
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= window.innerHeight &&
+    rect.right <= window.innerWidth
+  )
+}
 
-  const el = document.querySelector(step.target)
-  if (!el) return center
-
-  const rect = el.getBoundingClientRect()
-  const pos  = step.position ?? 'bottom'
-  const vw   = window.innerWidth
-  const vh   = window.innerHeight
+function computeCardStyle(rect: DOMRect, position: TourStep['position']): React.CSSProperties {
+  const pos = position ?? 'bottom'
+  const vw  = window.innerWidth
+  const vh  = window.innerHeight
 
   let top:  number
   let left: number
@@ -69,22 +71,52 @@ function computeCardStyle(
 }
 
 export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotlightProps) {
-  const [current,   setCurrent]   = useState(initialStep)
-  const [cardStyle, setCardStyle] = useState<React.CSSProperties>({
-    position:  'fixed',
-    top:       '50%',
-    left:      '50%',
-    transform: 'translate(-50%, -50%)',
-  })
+  const [current,    setCurrent]    = useState(initialStep)
+  const [cardStyle,  setCardStyle]  = useState<React.CSSProperties>(CENTER_STYLE)
+  const [targetRect, setTargetRect] = useState<DOMRect | null>(null)
 
   const step     = steps[current]
   const isLast   = current === steps.length - 1
   const isFirst  = current === 0
 
-  // Recompute card position whenever step changes
+  // Track and highlight the step's target element — scroll it into view if
+  // it's off-screen, then keep the highlight box synced while scrolling/resizing.
   useEffect(() => {
     if (!step) return
-    setCardStyle(computeCardStyle(step))
+
+    const el = step.target ? document.querySelector(step.target) : null
+
+    function sync() {
+      if (!el) {
+        setTargetRect(null)
+        setCardStyle(CENTER_STYLE)
+        return
+      }
+      const rect = el.getBoundingClientRect()
+      setTargetRect(rect)
+      setCardStyle(computeCardStyle(rect, step.position))
+    }
+
+    if (!el) {
+      sync()
+      return
+    }
+
+    let settleTimer: ReturnType<typeof setTimeout> | undefined
+    if (!isMostlyInViewport(el.getBoundingClientRect())) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      settleTimer = setTimeout(sync, 380)
+    } else {
+      sync()
+    }
+
+    window.addEventListener('scroll', sync, { passive: true })
+    window.addEventListener('resize', sync)
+    return () => {
+      if (settleTimer) clearTimeout(settleTimer)
+      window.removeEventListener('scroll', sync)
+      window.removeEventListener('resize', sync)
+    }
   }, [current, step])
 
   const handleNext = useCallback(() => {
@@ -116,19 +148,46 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
 
   if (!step) return null
 
+  const hasHighlight = targetRect !== null
+
   return (
     <AnimatePresence>
-      {/* Backdrop */}
+      {/* Click-catcher — dims the whole screen when there's nothing to spotlight,
+          stays invisible (but still catches click-to-skip) when a target is highlighted,
+          since the highlight box below provides the actual dimming in that case. */}
       <motion.div
         key="backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 bg-black/30 z-[9990]"
+        className={`fixed inset-0 z-[9990] ${hasHighlight ? '' : 'bg-black/30'}`}
         onClick={handleSkip}
         aria-hidden="true"
       />
+
+      {/* Spotlight — dims everything except the target's rect, with a highlighted ring */}
+      {targetRect && (
+        <motion.div
+          key={`spotlight-${current}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            position:     'fixed',
+            top:          targetRect.top - HIGHLIGHT_PAD,
+            left:         targetRect.left - HIGHLIGHT_PAD,
+            width:        targetRect.width + HIGHLIGHT_PAD * 2,
+            height:       targetRect.height + HIGHLIGHT_PAD * 2,
+            borderRadius: 14,
+            boxShadow:    '0 0 0 3px #E8763E, 0 0 24px 4px rgba(232,118,62,0.35), 0 0 0 9999px rgba(0,0,0,0.6)',
+            zIndex:       9992,
+            pointerEvents: 'none',
+          }}
+          aria-hidden="true"
+        />
+      )}
 
       {/* Card */}
       <motion.div
