@@ -7,17 +7,18 @@ export default async function HomePage() {
 
   if (!user) redirect('/auth/login')
 
-  // Check for at least one named brand — incomplete onboarding leaves a blank-name brand
+  // Check for at least one named brand (empty-name brand = incomplete onboarding)
   const { data: brands } = await supabase
     .from('brands')
     .select('id, name')
-    .not('name', 'eq', '')
-    .limit(1)
+    .limit(5)
 
-  if (!brands?.length) {
-    // Logged in but no real brand set up — sign out so the login page is the entry point
-    await supabase.auth.signOut()
-    redirect('/auth/login')
+  const namedBrand = (brands ?? []).find(b => b.name && b.name.trim() !== '')
+
+  if (!namedBrand) {
+    // Logged in but no real brand set up — route through signout so the
+    // cookie is properly cleared before sending back to login
+    redirect('/api/auth/signout')
   }
 
   redirect('/dashboard')

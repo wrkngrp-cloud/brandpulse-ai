@@ -16,12 +16,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .select('id, name, category, industry, logo_url')
     .order('created_at', { ascending: true })
 
-  if (!brands?.length) redirect('/onboarding')
+  const namedBrands = (brands ?? []).filter(b => b.name && b.name.trim() !== '')
+  if (!namedBrands.length) redirect('/onboarding')
 
   // Resolve active brand (cookie → first brand)
   const cookieStore = await cookies()
   const storedId = cookieStore.get('active_brand_id')?.value
-  const activeBrand = (storedId ? brands.find(b => b.id === storedId) : null) ?? brands[0]
+  const activeBrand = (storedId ? namedBrands.find(b => b.id === storedId) : null) ?? namedBrands[0]
 
   const userName  = (user.user_metadata?.full_name as string | undefined) ?? ''
   const userEmail = user.email ?? ''
@@ -37,7 +38,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         userName={userName}
         userEmail={userEmail}
         brandName={activeBrand.name}
-        brands={brands as BrandOption[]}
+        brands={namedBrands as BrandOption[]}
         activeBrandId={activeBrand.id}
         industry={industry}
       >
