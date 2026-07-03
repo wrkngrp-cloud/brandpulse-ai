@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { AlertTriangle, Camera, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatPlatformLabel } from '@/lib/utils'
 
 interface RiskFlag {
   title?: string
@@ -85,8 +85,8 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap min-w-0">
           {a.verdict && <VerdictBadge verdict={a.verdict} />}
-          <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium">{a.platform}</span>
-          {a.funnel_goal    && <span className="text-xs text-muted-foreground">{a.funnel_goal}</span>}
+          <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium">{formatPlatformLabel(a.platform)}</span>
+          {a.funnel_goal    && <span className="text-xs text-muted-foreground capitalize">{a.funnel_goal}</span>}
           {a.target_segment && <span className="text-xs text-muted-foreground">· {a.target_segment}</span>}
         </div>
         <p className="text-xs text-muted-foreground shrink-0">

@@ -5,7 +5,7 @@ import {
   Flame, TrendingUp, TrendingDown, Calendar, Sparkles, Loader2,
   AlertTriangle, ChevronRight, ChevronDown, Star, Globe,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatPlatformLabel } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 
@@ -836,8 +836,8 @@ export function CulturalClient({
                 <div key={a.id} className="rounded-lg border bg-muted/30 px-3 py-2.5 space-y-1.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      {a.platform && <span className="text-[10px] font-medium bg-background border rounded px-1.5 py-0.5">{a.platform}</span>}
-                      {a.funnel_goal && <span className="text-[10px] text-muted-foreground">{a.funnel_goal}</span>}
+                      {a.platform && <span className="text-[10px] font-medium bg-background border rounded px-1.5 py-0.5">{formatPlatformLabel(a.platform)}</span>}
+                      {a.funnel_goal && <span className="text-[10px] text-muted-foreground capitalize">{a.funnel_goal}</span>}
                     </div>
                     <span className="text-[10px] text-muted-foreground shrink-0">{date}</span>
                   </div>

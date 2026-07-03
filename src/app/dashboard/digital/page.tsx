@@ -484,7 +484,7 @@ export default async function DigitalPage({
   // ── render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="max-w-5xl space-y-8" data-tour="digital-main">
+    <div className="max-w-5xl space-y-8">
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -584,7 +584,7 @@ export default async function DigitalPage({
       )}
 
       {/* Platform connection cards */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5" data-tour="digital-main">
         {PLATFORMS.map(p => {
           const isConnected = connectedPlatforms.has(p.key)
           const acct        = adAccounts.find(a => a.platform === p.key)

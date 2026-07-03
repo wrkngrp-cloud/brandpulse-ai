@@ -89,7 +89,7 @@ export default async function SurveyDetailPage({
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-2xl font-semibold tracking-tight">{survey.name}</h1>
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLOURS[survey.status] ?? ''}`}>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_COLOURS[survey.status] ?? ''}`}>
               {survey.status}
             </span>
           </div>

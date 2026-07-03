@@ -12,10 +12,12 @@ export type TourSpotlightProps = {
   initialStep?: number
 }
 
-const CARD_W        = 340
+const CARD_W_MAX     = 340
+const VIEWPORT_MARGIN =  16
 const CARD_H        = 220  // generous estimate
 const OFFSET        =  14
 const HIGHLIGHT_PAD =   8
+const HL_EDGE_MARGIN =   4  // keep the ring just inside the screen edge when a target overflows the viewport
 
 const CENTER_STYLE: React.CSSProperties = {
   position:  'fixed',
@@ -33,10 +35,17 @@ function isMostlyInViewport(rect: DOMRect): boolean {
   )
 }
 
+// Card can never be wider than the viewport allows, so it never overflows on
+// narrow phones (e.g. 320px-wide screens where CARD_W_MAX would clip).
+function cardWidth(): number {
+  return Math.min(CARD_W_MAX, window.innerWidth - VIEWPORT_MARGIN * 2)
+}
+
 function computeCardStyle(rect: DOMRect, position: TourStep['position']): React.CSSProperties {
   const pos = position ?? 'bottom'
   const vw  = window.innerWidth
   const vh  = window.innerHeight
+  const cw  = cardWidth()
 
   let top:  number
   let left: number
@@ -44,15 +53,15 @@ function computeCardStyle(rect: DOMRect, position: TourStep['position']): React.
   switch (pos) {
     case 'top':
       top  = rect.top - CARD_H - OFFSET
-      left = rect.left + rect.width / 2 - CARD_W / 2
+      left = rect.left + rect.width / 2 - cw / 2
       break
     case 'bottom':
       top  = rect.bottom + OFFSET
-      left = rect.left + rect.width / 2 - CARD_W / 2
+      left = rect.left + rect.width / 2 - cw / 2
       break
     case 'left':
       top  = rect.top + rect.height / 2 - CARD_H / 2
-      left = rect.left - CARD_W - OFFSET
+      left = rect.left - cw - OFFSET
       break
     case 'right':
       top  = rect.top + rect.height / 2 - CARD_H / 2
@@ -60,14 +69,25 @@ function computeCardStyle(rect: DOMRect, position: TourStep['position']): React.
       break
     default:
       top  = rect.bottom + OFFSET
-      left = rect.left + rect.width / 2 - CARD_W / 2
+      left = rect.left + rect.width / 2 - cw / 2
   }
 
-  // Clamp to viewport with 16px padding
-  left = Math.max(16, Math.min(left, vw - CARD_W - 16))
-  top  = Math.max(16, Math.min(top,  vh - CARD_H - 16))
+  // Clamp to viewport with margin
+  left = Math.max(VIEWPORT_MARGIN, Math.min(left, vw - cw - VIEWPORT_MARGIN))
+  top  = Math.max(VIEWPORT_MARGIN, Math.min(top,  vh - CARD_H - VIEWPORT_MARGIN))
 
   return { position: 'fixed', top, left, transform: 'none' }
+}
+
+// Highlight box clamped to the visible viewport — if the target itself is
+// taller or wider than the screen, the ring still shows a clear boundary at
+// the screen edge instead of rendering fully off-screen and invisible.
+function computeHighlightBox(rect: DOMRect) {
+  const top    = Math.max(rect.top - HIGHLIGHT_PAD, HL_EDGE_MARGIN)
+  const left   = Math.max(rect.left - HIGHLIGHT_PAD, HL_EDGE_MARGIN)
+  const bottom = Math.min(rect.bottom + HIGHLIGHT_PAD, window.innerHeight - HL_EDGE_MARGIN)
+  const right  = Math.min(rect.right + HIGHLIGHT_PAD, window.innerWidth - HL_EDGE_MARGIN)
+  return { top, left, width: Math.max(right - left, 0), height: Math.max(bottom - top, 0) }
 }
 
 export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotlightProps) {
@@ -167,27 +187,30 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
       />
 
       {/* Spotlight — dims everything except the target's rect, with a highlighted ring */}
-      {targetRect && (
-        <motion.div
-          key={`spotlight-${current}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          style={{
-            position:     'fixed',
-            top:          targetRect.top - HIGHLIGHT_PAD,
-            left:         targetRect.left - HIGHLIGHT_PAD,
-            width:        targetRect.width + HIGHLIGHT_PAD * 2,
-            height:       targetRect.height + HIGHLIGHT_PAD * 2,
-            borderRadius: 14,
-            boxShadow:    '0 0 0 3px #E8763E, 0 0 24px 4px rgba(232,118,62,0.35), 0 0 0 9999px rgba(0,0,0,0.6)',
-            zIndex:       9992,
-            pointerEvents: 'none',
-          }}
-          aria-hidden="true"
-        />
-      )}
+      {targetRect && (() => {
+        const box = computeHighlightBox(targetRect)
+        return (
+          <motion.div
+            key={`spotlight-${current}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              position:     'fixed',
+              top:          box.top,
+              left:         box.left,
+              width:        box.width,
+              height:       box.height,
+              borderRadius: 14,
+              boxShadow:    '0 0 0 3px #E8763E, 0 0 24px 4px rgba(232,118,62,0.35), 0 0 0 9999px rgba(0,0,0,0.6)',
+              zIndex:       9992,
+              pointerEvents: 'none',
+            }}
+            aria-hidden="true"
+          />
+        )
+      })()}
 
       {/* Card */}
       <motion.div
@@ -196,7 +219,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.94 }}
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        style={{ ...cardStyle, width: CARD_W, zIndex: 9995 }}
+        style={{ ...cardStyle, width: cardWidth(), zIndex: 9995 }}
         className="bg-background border border-border rounded-xl shadow-xl p-5 space-y-3"
         role="dialog"
         aria-modal="true"

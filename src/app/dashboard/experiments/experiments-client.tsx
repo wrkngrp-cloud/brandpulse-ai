@@ -131,8 +131,9 @@ export function ExperimentsClient() {
         </div>
       </div>
 
+      <div data-tour="experiments-main">
       {experiments.length > 0 && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="experiments-main">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard icon={<FlaskConical className="h-4 w-4" />} label="Total"     value={String(experiments.length)} />
           <StatCard icon={<Play className="h-4 w-4" />}         label="Running"   value={String(running)} />
           <StatCard icon={<CheckSquare className="h-4 w-4" />}  label="Concluded" value={String(concluded)} />
@@ -276,6 +277,7 @@ export function ExperimentsClient() {
             )}
           </div>
         ))}
+      </div>
       </div>
     </div>
   )

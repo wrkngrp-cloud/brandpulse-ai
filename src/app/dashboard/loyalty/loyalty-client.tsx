@@ -101,8 +101,9 @@ export function LoyaltyClient() {
         </div>
       )}
 
+      <div data-tour="loyalty-main">
       {/* Tabs */}
-      <div className="flex border-b gap-1" data-tour="loyalty-main">
+      <div className="flex border-b gap-1">
         {([['programs', 'Programs'], ['members', 'Members'], ['leaderboard', 'Leaderboard']] as [Tab, string][]).map(([id, label]) => (
           <button
             key={id}
@@ -311,6 +312,7 @@ export function LoyaltyClient() {
           )}
         </div>
       )}
+      </div>
     </div>
   )
 }

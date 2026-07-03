@@ -59,7 +59,7 @@ function MentionCard({ m }: { m: VisualMention }) {
         </div>
         {/* Confidence */}
         {m.confidence && (
-          <span className={`absolute top-2 right-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${CONFIDENCE_STYLE[m.confidence] ?? ''}`}>
+          <span className={`absolute top-2 right-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full capitalize ${CONFIDENCE_STYLE[m.confidence] ?? ''}`}>
             {m.confidence}
           </span>
         )}

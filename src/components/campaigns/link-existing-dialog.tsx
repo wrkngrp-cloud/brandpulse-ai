@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { cn, toSentenceCase } from '@/lib/utils'
 import { Link2, X, Loader2, MapPin, CalendarDays, Check } from 'lucide-react'
 import { linkOohSiteToCampaign, linkEventToCampaign } from '@/app/dashboard/campaigns/actions'
 
@@ -181,13 +181,13 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium truncate">{ev.name}</p>
-                      <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0', STATUS_COLOURS[ev.status] ?? 'bg-muted text-muted-foreground')}>
+                      <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0 capitalize', STATUS_COLOURS[ev.status] ?? 'bg-muted text-muted-foreground')}>
                         {ev.status}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground truncate">
                       {ev.city}
-                      {ev.activation_type ? ` · ${ev.activation_type}` : ''}
+                      {ev.activation_type ? ` · ${toSentenceCase(ev.activation_type)}` : ''}
                       {ev.date_start ? ` · ${fmtDate(ev.date_start)}` : ''}
                     </p>
                   </div>

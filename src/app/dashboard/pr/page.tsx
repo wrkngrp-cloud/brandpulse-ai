@@ -304,7 +304,7 @@ export default async function PRTrackingPage({
                       <span>Reach: {fmtReach(mention.estimated_reach)}</span>
                       {mention.sentiment_label && (
                         <span className={`px-1.5 py-0.5 rounded-full font-medium ${SENTIMENT_STYLE[mention.sentiment_label] ?? SENTIMENT_STYLE.neutral}`}>
-                          {mention.sentiment_label}
+                          {mention.sentiment_label.charAt(0).toUpperCase() + mention.sentiment_label.slice(1)}
                         </span>
                       )}
                     </div>

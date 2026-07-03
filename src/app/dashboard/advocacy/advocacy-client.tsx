@@ -104,8 +104,9 @@ export function AdvocacyClient() {
         </div>
       </div>
 
+      <div data-tour="advocacy-main">
       {/* Tabs */}
-      <div className="flex border-b gap-1" data-tour="advocacy-main">
+      <div className="flex border-b gap-1">
         {([['promoters', 'Promoters'], ['performance', 'Referral Performance']] as [Tab, string][]).map(([id, label]) => (
           <button
             key={id}
@@ -290,6 +291,7 @@ export function AdvocacyClient() {
           )}
         </div>
       )}
+      </div>
     </div>
   )
 }

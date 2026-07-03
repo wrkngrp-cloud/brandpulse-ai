@@ -5,7 +5,7 @@ import { Badge }        from '@/components/ui/badge'
 import { Button }       from '@/components/ui/button'
 import { Card }         from '@/components/ui/card'
 import { Progress }     from '@/components/ui/progress'
-import { cn }           from '@/lib/utils'
+import { cn, formatPlatformLabel } from '@/lib/utils'
 import { AlertTriangle, Eye, RefreshCw, Wand2, FlaskConical, Images, TrendingDown, CheckCircle2 } from 'lucide-react'
 import type { FatiguedAsset } from './page'
 import { TourTrigger } from '@/components/tours/tour-trigger'
@@ -63,7 +63,7 @@ function AssetCard({ asset }: { asset: FatiguedAsset }) {
               {meta.label}
             </span>
             <Badge variant="outline" className="text-xs">{ASSET_TYPE_LABELS[asset.asset_type] ?? asset.asset_type}</Badge>
-            {asset.platform && <Badge variant="secondary" className="text-xs">{asset.platform}</Badge>}
+            {asset.platform && <Badge variant="secondary" className="text-xs">{formatPlatformLabel(asset.platform)}</Badge>}
             {asset.fit_for_ads && <Badge className="text-xs bg-emerald-600 text-white hover:bg-emerald-700">Fit for Ads</Badge>}
           </div>
           <h3 className="font-semibold text-sm truncate">{asset.title}</h3>
@@ -152,8 +152,9 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
         <TourTrigger module="creative_fatigue" autoStart />
       </div>
 
+      <div data-tour="fatigue-main">
       {/* Summary tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-tour="fatigue-main">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Critical',     count: critical.length, color: 'text-red-600',   bg: 'bg-red-50 dark:bg-red-900/10'    },
           { label: 'Watch',        count: watch.length,    color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/10'},
@@ -209,6 +210,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
           )}
         </div>
       )}
+      </div>
     </div>
   )
 }

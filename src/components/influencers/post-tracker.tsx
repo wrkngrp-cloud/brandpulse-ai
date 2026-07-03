@@ -222,7 +222,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
             {analysis.campaign_alignment.objective} objective {analysis.campaign_alignment.met ? 'met' : 'not met'}
           </span>
           <span className={cn(
-            'text-[10px] px-1.5 py-0.5 rounded font-medium ml-auto',
+            'text-[10px] px-1.5 py-0.5 rounded font-medium ml-auto capitalize',
             analysis.campaign_alignment.confidence === 'high'
               ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
               : analysis.campaign_alignment.confidence === 'medium'

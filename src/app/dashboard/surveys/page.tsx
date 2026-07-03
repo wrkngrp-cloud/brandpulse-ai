@@ -177,7 +177,7 @@ async function PerceptionAuditSection() {
                     <Users className="h-3 w-3" />
                     {count} {count === 1 ? 'response' : 'responses'}
                   </div>
-                  <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full ${
+                  <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full capitalize ${
                     isLive
                       ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400'
                       : s.status === 'draft'

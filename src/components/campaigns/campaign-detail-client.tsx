@@ -3,7 +3,7 @@
 import Link                from 'next/link'
 import { useRouter }       from 'next/navigation'
 import { useState, useTransition, useRef } from 'react'
-import { cn }              from '@/lib/utils'
+import { cn, formatPlatformLabel } from '@/lib/utils'
 import { buttonVariants, Button } from '@/components/ui/button'
 import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, TrendingUp, Users, Eye, Percent, Sparkles, RefreshCw, Upload, X, Loader2, ImageIcon, ShoppingCart } from 'lucide-react'
 import { CampaignOverview } from './campaign-overview'
@@ -218,7 +218,7 @@ function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; 
       </div>
       <div className="flex items-center gap-2 flex-wrap">
         <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', PLATFORM_COLORS[inf.platform] ?? 'bg-muted text-muted-foreground')}>
-          {inf.platform === 'tiktok' ? 'TikTok' : inf.platform === 'youtube' ? 'YouTube' : inf.platform.charAt(0).toUpperCase() + inf.platform.slice(1)}
+          {formatPlatformLabel(inf.platform)}
         </span>
         {inf.category && (
           <span className="text-xs text-muted-foreground">{inf.category}</span>
@@ -1062,7 +1062,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{inf.name}</p>
-                        <p className="text-xs text-muted-foreground">@{inf.handle} · {inf.platform} · {formatFollowers(inf.followers)}</p>
+                        <p className="text-xs text-muted-foreground">@{inf.handle} · {formatPlatformLabel(inf.platform)} · {formatFollowers(inf.followers)}</p>
                       </div>
                       <CulturalIQBadge score={inf.cultural_iq} />
                     </label>

@@ -181,8 +181,9 @@ export default function VoiceBuilderPage() {
         <TourTrigger module="voice_builder" autoStart />
       </div>
 
+      <div data-tour="voice-main">
       {/* Tab bar */}
-      <div className="flex items-center gap-1 border-b border-border/60" data-tour="voice-main">
+      <div className="flex items-center gap-1 border-b border-border/60">
         {TABS.map(t => {
           const locked = (t.id === 'retune' || t.id === 'generate') && !hasVoice
           return (
@@ -495,6 +496,7 @@ export default function VoiceBuilderPage() {
           )}
         </div>
       )}
+      </div>
     </div>
   )
 }

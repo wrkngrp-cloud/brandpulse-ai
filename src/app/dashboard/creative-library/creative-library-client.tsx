@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import { Button }  from '@/components/ui/button'
 import { Badge }   from '@/components/ui/badge'
-import { cn }      from '@/lib/utils'
+import { cn, formatPlatformLabel, toSentenceCase } from '@/lib/utils'
 import type { CreativeAsset } from './page'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 
@@ -118,10 +118,10 @@ function AssetCard({
         {/* Platform + format */}
         <div className="flex flex-wrap gap-1">
           {asset.platform && (
-            <span className="text-[10px] bg-muted rounded px-1.5 py-0.5 text-muted-foreground">{asset.platform}</span>
+            <span className="text-[10px] bg-muted rounded px-1.5 py-0.5 text-muted-foreground">{formatPlatformLabel(asset.platform)}</span>
           )}
           {asset.format && (
-            <span className="text-[10px] bg-muted rounded px-1.5 py-0.5 text-muted-foreground">{asset.format}</span>
+            <span className="text-[10px] bg-muted rounded px-1.5 py-0.5 text-muted-foreground">{asset.format === 'ooh' ? 'OOH' : toSentenceCase(asset.format)}</span>
           )}
         </div>
 
@@ -405,8 +405,9 @@ export function CreativeLibraryClient({ brandId, brandName, assets }: Props) {
         <TourTrigger module="creative_library" autoStart />
       </div>
 
+      <div data-tour="library-main">
       {/* Filter tabs */}
-      <div className="flex items-center gap-1 flex-wrap" data-tour="library-main">
+      <div className="flex items-center gap-1 flex-wrap">
         <Filter className="h-3.5 w-3.5 text-muted-foreground mr-1" />
         {FILTER_TABS.map(({ id, label, icon: Icon }) => (
           <button
@@ -448,6 +449,7 @@ export function CreativeLibraryClient({ brandId, brandName, assets }: Props) {
           No assets match this filter.
         </div>
       )}
+      </div>
 
       {/* Drawer */}
       {viewAsset && <AssetDrawer asset={viewAsset} onClose={() => setViewAsset(null)} />}

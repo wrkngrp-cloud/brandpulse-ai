@@ -75,8 +75,9 @@ export default async function CampaignsPage({
         </div>
       </div>
 
+      <div data-tour="campaign-list">
       {/* Channel tabs */}
-      <div className="flex items-center gap-1 border-b overflow-x-auto pb-0" data-tour="campaign-list">
+      <div className="flex items-center gap-1 border-b overflow-x-auto pb-0">
         {BUILT_TABS.map(tab => (
           <Link
             key={tab.key}
@@ -120,6 +121,7 @@ export default async function CampaignsPage({
       ) : (
         <CampaignsList campaigns={filtered} />
       )}
+      </div>
     </div>
   )
 }
