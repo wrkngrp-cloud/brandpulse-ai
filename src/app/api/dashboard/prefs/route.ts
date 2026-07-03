@@ -54,23 +54,3 @@ export async function PATCH(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }
-
-// Temporary: lets the current user re-trigger the first-visit template picker
-// for manual mobile QA. Remove once picker/scroll fixes are confirmed on device.
-export async function DELETE() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const brandId = await getActiveBrandId(supabase)
-  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
-
-  const { error } = await supabase
-    .from('user_dashboard_prefs')
-    .delete()
-    .eq('user_id', user.id)
-    .eq('brand_id', brandId)
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ ok: true })
-}
