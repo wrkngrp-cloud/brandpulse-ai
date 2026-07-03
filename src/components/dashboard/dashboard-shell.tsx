@@ -143,7 +143,7 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
         </header>
 
         {/* Page content — route-keyed AnimatePresence for cross-page transitions */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-7 overflow-hidden">
+        <main className="flex-1 p-4 sm:p-6 lg:p-7 overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={pathname}

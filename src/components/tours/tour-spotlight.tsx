@@ -14,16 +14,27 @@ export type TourSpotlightProps = {
 
 const CARD_W_MAX     = 340
 const VIEWPORT_MARGIN =  16
-const CARD_H        = 220  // generous estimate
+const CARD_H        = 260  // generous estimate — body text wraps taller on narrow phones
 const OFFSET        =  14
 const HIGHLIGHT_PAD =   8
 const HL_EDGE_MARGIN =   4  // keep the ring just inside the screen edge when a target overflows the viewport
 
-const CENTER_STYLE: React.CSSProperties = {
-  position:  'fixed',
-  top:       '50%',
-  left:      '50%',
-  transform: 'translate(-50%, -50%)',
+// Centers the card using plain top/left pixel math instead of a CSS
+// `transform: translate(-50%, -50%)`. framer-motion's `animate={{ scale }}`
+// owns the `transform` property on this element, so a manually-set translate
+// gets silently overwritten — the card would render flush against the
+// left/top edge (50% with no offset) instead of centered, invisibly
+// overflowing on any viewport narrower than roughly 2x the card width.
+function computeCenterStyle(): React.CSSProperties {
+  const cw = cardWidth()
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  return {
+    position: 'fixed',
+    top:      Math.max(VIEWPORT_MARGIN, (vh - CARD_H) / 2),
+    left:     Math.max(VIEWPORT_MARGIN, (vw - cw) / 2),
+    transform: 'none',
+  }
 }
 
 function isMostlyInViewport(rect: DOMRect): boolean {
@@ -92,7 +103,7 @@ function computeHighlightBox(rect: DOMRect) {
 
 export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotlightProps) {
   const [current,    setCurrent]    = useState(initialStep)
-  const [cardStyle,  setCardStyle]  = useState<React.CSSProperties>(CENTER_STYLE)
+  const [cardStyle,  setCardStyle]  = useState<React.CSSProperties>(computeCenterStyle)
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null)
 
   const step     = steps[current]
@@ -109,7 +120,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
     function sync() {
       if (!el) {
         setTargetRect(null)
-        setCardStyle(CENTER_STYLE)
+        setCardStyle(computeCenterStyle())
         return
       }
       const rect = el.getBoundingClientRect()

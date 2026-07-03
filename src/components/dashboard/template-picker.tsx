@@ -29,16 +29,16 @@ export function TemplatePicker({ onSelect, defaultTemplateId }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-[9980] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-card border rounded-2xl shadow-2xl overflow-hidden">
-        <div className="p-6 border-b">
+    <div className="fixed inset-0 z-[9980] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="w-full max-w-2xl max-h-[calc(100dvh-2rem)] my-auto bg-card border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        <div className="p-6 border-b shrink-0">
           <h2 className="text-lg font-semibold">Set up your dashboard</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Choose a layout that fits how you work. You can customise it any time.
           </p>
         </div>
 
-        <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
           {DASHBOARD_TEMPLATES.map(t => (
             <button
               key={t.id}
@@ -73,7 +73,7 @@ export function TemplatePicker({ onSelect, defaultTemplateId }: Props) {
           ))}
         </div>
 
-        <div className="px-6 pb-6">
+        <div className="p-6 pt-4 border-t shrink-0">
           <Button className="w-full" size="lg" onClick={confirm} disabled={isPending}>
             {isPending
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Setting up...</>
