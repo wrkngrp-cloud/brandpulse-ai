@@ -254,7 +254,7 @@ export function DashboardHero({
         </p>
 
         {/* AI Ask hero */}
-        <form onSubmit={handleAskSubmit} className="relative group" data-tour="ask-ai">
+        <form onSubmit={handleAskSubmit} className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <input
             ref={inputRef}

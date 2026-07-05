@@ -186,7 +186,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
       {/* ROI report (reported status) */}
       {event.status === 'reported' && roiReport && (
-        <div className="space-y-4">
+        <div className="space-y-4" data-tour="event-report">
           <h2 className="text-base font-semibold">ROI Report</h2>
 
           {/* Key metrics grid */}
