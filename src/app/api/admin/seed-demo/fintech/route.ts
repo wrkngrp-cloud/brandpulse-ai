@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
   const { data: camp1 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'PocketPay Cares',
     description: 'Brand trust recovery campaign after Oct 2025 support crisis. Influencer + digital.',
-    objective: 'brand_awareness', status: 'completed',
+    objective: 'awareness', status: 'completed',
     start_date: dAgo(210), end_date: dAgo(160), total_budget: 12_000_000, currency: 'NGN',
     ai_summary: 'PocketPay Cares reversed the Oct crisis within 6 weeks. Sentiment recovered from 42 to 69. Customer service influencer content drove 4.2M impressions. Trust score +18pts.',
   }).select('id').single()
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
   const { data: camp2 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Refer & Earn',
     description: 'Viral referral programme driving app downloads and first transactions.',
-    objective: 'acquisition', status: 'active',
+    objective: 'conversion', status: 'active',
     start_date: dAgo(45), end_date: dAgo(-45), total_budget: 18_000_000, currency: 'NGN',
     ai_summary: null,
   }).select('id').single()
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
   const { data: camp3 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Series A Announcement',
     description: 'PR and digital push around $8M Series A close. TechCabal + influencer amplification.',
-    objective: 'brand_awareness', status: 'completed',
+    objective: 'awareness', status: 'completed',
     start_date: dAgo(55), end_date: dAgo(35), total_budget: 35_000_000, currency: 'NGN',
     ai_summary: 'Series A announcement generated 9.2M impressions. BrandPulse tracked 340 earned media mentions in 72 hours. Organic social overtook paid 2:1.',
   }).select('id').single()
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
   await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Campus Banking Tour',
     description: 'On-ground events at Lagos, Ibadan and Abuja universities.',
-    objective: 'acquisition', status: 'planned',
+    objective: 'conversion', status: 'planned',
     start_date: dAgo(-14), end_date: dAgo(-74), total_budget: 9_000_000, currency: 'NGN',
   })
 

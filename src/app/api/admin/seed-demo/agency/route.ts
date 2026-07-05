@@ -113,14 +113,14 @@ export async function POST(req: NextRequest) {
   const { data: camp1 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Q2 FMCG Sprint',
     description: 'Integrated FMCG campaign for two retainer clients. OOH + digital + activations.',
-    objective: 'brand_awareness', status: 'active',
+    objective: 'awareness', status: 'active',
     start_date: dAgo(30), end_date: dAgo(-60), total_budget: 22_000_000, currency: 'NGN',
   }).select('id').single()
 
   const { data: camp2 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'PocketPay Influencer Drive',
     description: 'Influencer strategy and execution for PocketPay Refer and Earn campaign.',
-    objective: 'acquisition', status: 'completed',
+    objective: 'conversion', status: 'completed',
     start_date: dAgo(120), end_date: dAgo(75), total_budget: 8_500_000, currency: 'NGN',
     ai_summary: 'Delivered 22 influencer activations across Instagram and TikTok. Total reach 18.4M. Cost per install ₦1,850 against ₦3,200 benchmark. Three creators became long-term brand ambassadors.',
   }).select('id').single()
@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
   const { data: camp3 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Easter Brand Activation Lagos',
     description: 'Field activations and sampling events for FMCG client across Lagos.',
-    objective: 'brand_awareness', status: 'completed',
+    objective: 'awareness', status: 'completed',
     start_date: dAgo(90), end_date: dAgo(60), total_budget: 6_000_000, currency: 'NGN',
     ai_summary: 'Three activation days across Ikeja, Surulere and VI generated 4,200 product samples distributed. Ambassador net promoter score 74. Social amplification added ₦2.1M in earned media value.',
   }).select('id').single()
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
   const { data: camp4 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Bridger CRM Launch',
     description: 'Brand launch and PR strategy for Bridger B2B CRM tool.',
-    objective: 'brand_awareness', status: 'completed',
+    objective: 'awareness', status: 'completed',
     start_date: dAgo(180), end_date: dAgo(130), total_budget: 11_000_000, currency: 'NGN',
     ai_summary: 'Launch campaign placed Bridger in TechCabal, Techpoint and Nairametrics. LinkedIn paid campaign drove 840 demo sign-ups at ₦8,500 CPA. Brand search volume up 340% in first month.',
   }).select('id').single()
@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
   await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Q3 Kano Expansion',
     description: 'OOH and radio push for FMCG client entering northern Nigeria.',
-    objective: 'brand_awareness', status: 'planned',
+    objective: 'awareness', status: 'planned',
     start_date: dAgo(-14), end_date: dAgo(-74), total_budget: 15_000_000, currency: 'NGN',
   })
 

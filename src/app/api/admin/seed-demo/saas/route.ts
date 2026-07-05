@@ -94,10 +94,11 @@ export async function POST(req: NextRequest) {
   await sb.from('workspace_members').insert({ workspace_id: wsId, user_id: userId, role: 'owner' })
 
   /* ── 3. Brand ─────────────────────────────────────────────────────────── */
-  const { data: brand, error: brandErr } = await sb.from('brands').insert({
+  const brandRow = {
     workspace_id:    wsId,
     name:            'Bridger CRM',
     category:        'SaaS / Technology',
+    industry:        'b2b_saas',
     primary_color:   '#0F4C81',
     secondary_color: '#00C6A7',
     brand_values:    ['Built for Nigeria', 'Simplicity', 'Reliability', 'Local First'],
@@ -122,8 +123,16 @@ export async function POST(req: NextRequest) {
       awareness: 0.20, consideration: 0.15, preference: 0.20,
       advocacy: 0.15, nps: 0.15, sentiment: 0.10, sov: 0.05,
     },
-  }).select('id').single()
-  if (brandErr) return NextResponse.json({ error: brandErr.message }, { status: 500 })
+  }
+  let { data: brand, error: brandErr } = await sb.from('brands').insert(brandRow).select('id').single()
+  if (brandErr?.message.includes('industry')) {
+    // PostgREST schema cache can lag a migration — retry without the
+    // column rather than failing the whole seed; back-fillable later.
+    const { industry: _industry, ...withoutIndustry } = brandRow
+    const retry = await sb.from('brands').insert(withoutIndustry).select('id').single()
+    brand = retry.data; brandErr = retry.error
+  }
+  if (brandErr || !brand) return NextResponse.json({ error: brandErr?.message ?? 'Brand creation failed' }, { status: 500 })
   const brandId = brand.id
 
   /* ── 4. Competitors ───────────────────────────────────────────────────── */
@@ -186,7 +195,7 @@ export async function POST(req: NextRequest) {
   const { data: camp4 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Q3 LinkedIn B2B Push',
     description: 'LinkedIn-first acquisition campaign targeting Nigerian sales directors and business owners.',
-    objective: 'acquisition', status: 'planned',
+    objective: 'conversion', status: 'planned',
     start_date: dAgo(-7), end_date: dAgo(-67),
     total_budget: 8_000_000, currency: 'NGN',
     ai_summary: null,
