@@ -142,57 +142,39 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
       el.scrollIntoView({ behavior: 'smooth', block: tallerThanViewport ? 'start' : 'center' })
     }
 
-    // Whether or not a scroll was needed, the target's rect can still be
-    // settling when we measure it — a grid can reflow column count (a purely
-    // horizontal change, e.g. columns collapsing then re-widening as the
-    // step's entrance transition finishes) with no scroll involved at all,
-    // and a smooth-scroll animation can still be running after the check
-    // above kicks it off. Either way, measuring immediately risks locking
-    // the highlight box onto a mid-transition rect — which is exactly what
-    // produced a highlight that clipped the first card of a 4-column row
-    // (its width briefly measured as a narrower, fewer-column layout).
-    // Poll until every edge of the rect — not just its top, which stays
-    // constant during a horizontal-only reflow — stops moving, with a hard
-    // cap so a transition that never quite settles can't hang the tour.
-    let rafId:   number | undefined
-    let maxTimer: ReturnType<typeof setTimeout> | undefined
+    // Counting animation frames to guess "the layout has settled" is
+    // inherently racy — how many frames a transition takes depends on the
+    // browser, GPU load and, critically, whether the tab even has focus
+    // (Chrome throttles requestAnimationFrame and timers hard in background
+    // tabs, so a frame-counted wait behaves completely differently there
+    // than in the foreground tab a real user is looking at). That's how a
+    // highlight clipping the first card of a 4-column row survived local
+    // testing twice: the grid's own outer box was still narrower than its
+    // settled width at measurement time (a genuine box resize, not just an
+    // internal reflow), and polling never sampled at the right moment to
+    // catch it.
+    //
+    // ResizeObserver has none of that guesswork — the browser's own layout
+    // engine calls it exactly when the observed element's box actually
+    // changes size, whatever transition or async render caused it and
+    // however fast or throttled the tab is. Combined with a MutationObserver
+    // watching for attribute changes (framer-motion writes inline
+    // transform/opacity styles directly, which can shift position without a
+    // resize), this re-measures on every real cause of drift instead of
+    // sampling on a timer and hoping it landed after things settled.
+    const resizeObserver = new ResizeObserver(() => sync())
+    resizeObserver.observe(el)
 
-    let lastRect: DOMRect | null = null
-    let stableFrames = 0
-    const REQUIRED_STABLE_FRAMES = 3
-    const MAX_WAIT_MS = 1200
+    const mutationObserver = new MutationObserver(() => sync())
+    mutationObserver.observe(el, { attributes: true, attributeFilter: ['style', 'class'] })
 
-    function rectsMatch(a: DOMRect, b: DOMRect): boolean {
-      return Math.abs(a.top - b.top) < 0.5 &&
-             Math.abs(a.left - b.left) < 0.5 &&
-             Math.abs(a.width - b.width) < 0.5 &&
-             Math.abs(a.height - b.height) < 0.5
-    }
-
-    function poll() {
-      const rect = el!.getBoundingClientRect()
-      if (lastRect !== null && rectsMatch(rect, lastRect)) {
-        stableFrames++
-      } else {
-        stableFrames = 0
-      }
-      lastRect = rect
-      if (stableFrames >= REQUIRED_STABLE_FRAMES) {
-        sync()
-        return
-      }
-      rafId = requestAnimationFrame(poll)
-    }
-    rafId = requestAnimationFrame(poll)
-    // Safety net: guarantee a final sync even if the rect never fully
-    // settles, so the tour can't get stuck mid-transition.
-    maxTimer = setTimeout(sync, MAX_WAIT_MS)
+    sync()
 
     window.addEventListener('scroll', sync, { passive: true })
     window.addEventListener('resize', sync)
     return () => {
-      if (rafId !== undefined) cancelAnimationFrame(rafId)
-      if (maxTimer) clearTimeout(maxTimer)
+      resizeObserver.disconnect()
+      mutationObserver.disconnect()
       window.removeEventListener('scroll', sync)
       window.removeEventListener('resize', sync)
     }
