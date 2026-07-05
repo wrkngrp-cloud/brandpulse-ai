@@ -194,11 +194,9 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
       body:  'BrandPulse compares brand search uplift before, during and after each event and matches ambassador-captured leads to the campaign.',
     },
     {
-      id:       'post-event',
-      title:    'Post-event report',
-      body:     'Once you mark an event as reported, a summary of reach, leads, estimated ROI and sentiment change is generated automatically.',
-      target:   '[data-tour="event-report"]',
-      position: 'top',
+      id:    'post-event',
+      title: 'Post-event report',
+      body:  'Once you mark an event as reported, open it to see a summary of reach, leads, estimated ROI and sentiment change generated automatically.',
     },
   ],
 
