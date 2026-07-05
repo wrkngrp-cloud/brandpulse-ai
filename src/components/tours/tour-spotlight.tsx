@@ -133,9 +133,6 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
       return
     }
 
-    let rafId:   number | undefined
-    let maxTimer: ReturnType<typeof setTimeout> | undefined
-
     if (!isMostlyInViewport(el.getBoundingClientRect())) {
       // Sections taller than the viewport can never be centered — 'center'
       // would clip both ends equally, hiding the heading the user needs to
@@ -143,41 +140,53 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
       // (and as much of it as fits) stays in frame.
       const tallerThanViewport = el.getBoundingClientRect().height > window.innerHeight - HL_EDGE_MARGIN * 2
       el.scrollIntoView({ behavior: 'smooth', block: tallerThanViewport ? 'start' : 'center' })
+    }
 
-      // A fixed delay races the smooth-scroll animation: on longer scrolls
-      // (this tour's targets can sit well below the fold) the animation is
-      // often still running when the old fixed timeout fired, so the
-      // highlight box got computed — and locked in — against a mid-scroll
-      // position instead of the settled one. Poll instead: keep sampling the
-      // rect every frame and only sync once it stops moving between two
-      // consecutive samples, with a hard cap so a scroll that never quite
-      // settles (e.g. rubber-banding) can't hang the tour indefinitely.
-      let lastTop: number | null = null
-      let stableFrames = 0
-      const REQUIRED_STABLE_FRAMES = 3
-      const MAX_WAIT_MS = 1200
+    // Whether or not a scroll was needed, the target's rect can still be
+    // settling when we measure it — a grid can reflow column count (a purely
+    // horizontal change, e.g. columns collapsing then re-widening as the
+    // step's entrance transition finishes) with no scroll involved at all,
+    // and a smooth-scroll animation can still be running after the check
+    // above kicks it off. Either way, measuring immediately risks locking
+    // the highlight box onto a mid-transition rect — which is exactly what
+    // produced a highlight that clipped the first card of a 4-column row
+    // (its width briefly measured as a narrower, fewer-column layout).
+    // Poll until every edge of the rect — not just its top, which stays
+    // constant during a horizontal-only reflow — stops moving, with a hard
+    // cap so a transition that never quite settles can't hang the tour.
+    let rafId:   number | undefined
+    let maxTimer: ReturnType<typeof setTimeout> | undefined
 
-      function poll() {
-        const top = el!.getBoundingClientRect().top
-        if (lastTop !== null && Math.abs(top - lastTop) < 0.5) {
-          stableFrames++
-        } else {
-          stableFrames = 0
-        }
-        lastTop = top
-        if (stableFrames >= REQUIRED_STABLE_FRAMES) {
-          sync()
-          return
-        }
-        rafId = requestAnimationFrame(poll)
+    let lastRect: DOMRect | null = null
+    let stableFrames = 0
+    const REQUIRED_STABLE_FRAMES = 3
+    const MAX_WAIT_MS = 1200
+
+    function rectsMatch(a: DOMRect, b: DOMRect): boolean {
+      return Math.abs(a.top - b.top) < 0.5 &&
+             Math.abs(a.left - b.left) < 0.5 &&
+             Math.abs(a.width - b.width) < 0.5 &&
+             Math.abs(a.height - b.height) < 0.5
+    }
+
+    function poll() {
+      const rect = el!.getBoundingClientRect()
+      if (lastRect !== null && rectsMatch(rect, lastRect)) {
+        stableFrames++
+      } else {
+        stableFrames = 0
+      }
+      lastRect = rect
+      if (stableFrames >= REQUIRED_STABLE_FRAMES) {
+        sync()
+        return
       }
       rafId = requestAnimationFrame(poll)
-      // Safety net: guarantee a final sync even if the scroll position
-      // never fully stabilizes, so the tour can't get stuck mid-scroll.
-      maxTimer = setTimeout(sync, MAX_WAIT_MS)
-    } else {
-      sync()
     }
+    rafId = requestAnimationFrame(poll)
+    // Safety net: guarantee a final sync even if the rect never fully
+    // settles, so the tour can't get stuck mid-transition.
+    maxTimer = setTimeout(sync, MAX_WAIT_MS)
 
     window.addEventListener('scroll', sync, { passive: true })
     window.addEventListener('resize', sync)
