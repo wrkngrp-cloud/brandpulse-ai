@@ -1,10 +1,15 @@
 # BrandPulse AI — Project Rules
 
 ## What this is
-Brand-intelligence SaaS for Nigerian / West African marketing teams.
-Read the PRD set in /docs (Document 1 Foundations, 2 Modules & Data, 3 Roadmap/
-Prompts/Risk, 4 Build Guide) before building any feature. The schema is in
-Document 2; the per-phase build prompts are in Document 3.
+Brand-intelligence SaaS for Nigerian / West African marketing teams, now serving
+7 verticals (see `brand_type` below) — not FMCG-only.
+Read the PRD set in `../docs` (one level above this repo root — Document 1
+Foundations, 2 Modules & Data, 3 Roadmap/Prompts/Risk, 4 Build Guide) before
+building any feature. The schema is in Document 2; the per-phase build prompts
+are in Document 3. The PRDs are not checked into this git repo. This repo's own
+`docs/` folder holds supporting working docs only (`industry-fit-strategy.md`,
+`funnel-signals-explained.md`, `to-100-percent-build-list.md`) — those are not
+the PRD set.
 
 ## Stack (do not deviate without asking)
 Next.js 16 App Router + TypeScript + Turbopack (default) · Supabase (Postgres+Auth+
@@ -30,6 +35,15 @@ for cache/rate-limit.
 - Errors → sonner toasts. Loading → shadcn skeletons. Everything responsive from iPhone SE.
 - Public endpoints (/survey/[id], /ambassador/[token], /go/[slug]) post/redirect via a
   service-role API route that validates the token/slug. NEVER open anon RLS on those tables.
+- Brands carry a `brand_type` (fmcg | fintech | venue | b2b_saas | marketplace |
+  beverage_alcohol | b2b_distribution). Any new funnel/BHI signal, nav item, or
+  connector recommendation MUST branch on `brand_type` (see `src/lib/industry-config.ts`,
+  `src/lib/bhi.ts` `BRAND_TYPE_WEIGHTS`) instead of assuming FMCG. Check
+  `docs/industry-fit-strategy.md` before adding a signal that only makes sense for
+  one vertical.
+- Every dashboard module ships with a first-visit product tour (`data-tour` attributes
+  + an entry in `src/components/tours/tour-definitions.ts`) and is reachable from the
+  persistent topbar "Show me around" trigger. Add both when building a new module.
 
 ## Active brand lookup (critical — always use this)
 ALWAYS use `getActiveBrandId(supabase)` or `getActiveBrand<T>(supabase, 'col1, col2')`
@@ -114,4 +128,7 @@ Warm, confident, plain English. Active voice. Connection before sales. No jargon
 Banned words: delve, underscore, pivotal, crucial, robust, vibrant, leverage, seamless, tapestry.
 
 ## Workflow
-One feature per session. Build → test locally → show me the diff → I confirm → commit.
+Build → test locally → show me the diff → I confirm → commit. A session commits
+as many features/fixes as land cleanly that day (recent sessions have shipped
+5–10 commits) — the constraint is "each commit is one coherent, working change,"
+not "one commit per session."

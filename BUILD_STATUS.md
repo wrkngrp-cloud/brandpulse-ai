@@ -1,7 +1,7 @@
 # BrandPulse AI — Build Status
 
 > Feed this file into your project chat at the start of each session to bring it up to date.
-> Updated after every pushed session. Last updated: 2026-06-28.
+> Updated after every pushed session. Last updated: 2026-07-03.
 
 ---
 
@@ -53,9 +53,9 @@
 ### Not yet built (Phase 2 remaining)
 | Feature | Priority | Notes |
 |---|---|---|
-| Survey distribution (email + WhatsApp send) | High | Surveys exist; no dispatch UI. Need "Send survey" sheet with email list + WhatsApp share link + Inngest job |
-| Competitor management settings | High | API exists (`/api/brand/competitors`); no settings UI to add/edit/remove tracked competitors |
-| Campaign performance view | High | Campaign detail shows linked assets; no aggregated metrics (total spend vs reach, OOH visits rollup, cost-per-lead) |
+| ~~Survey distribution (email + WhatsApp send)~~ | ~~High~~ | ✅ Done — "Send survey" panel, WhatsApp share link + Resend email batches |
+| ~~Competitor management settings~~ | ~~High~~ | ✅ Done — full CRUD at `/dashboard/settings/competitors` |
+| ~~Campaign performance view~~ | ~~High~~ | ✅ Done — aggregated OOH visits, event leads, spend, CPV/CPL |
 | ~~E6 — Visual brand mention detector~~ | ~~Medium~~ | ✅ Done — Claude Haiku Vision; "Scan now" on event detail page |
 | ~~Unified Brand Funnel page~~ | ~~Medium~~ | ✅ Done — `/dashboard/funnel` |
 | ~~Survey templates (all 6)~~ | ~~High~~ | ✅ Done — template picker + `survey-templates.ts` |
@@ -308,6 +308,87 @@ Nav now has 9 logical sections following marketer workflow:
 
 ---
 
+### Phase 7 — World-View Funnel Rebuild ✅ (commits 3bfa09f, 4b6c0b4, 970a2b8, 2026-06-28–29)
+
+| Feature | Notes |
+|---|---|
+| Multi-source BHI breakdown | Every BHI component card expands to show contributing data sources, raw values, redistributed weights, 0–100 sub-scores |
+| Full funnel signal rebuild | 9+6+6+7+5+6 live signals across Awareness/Consideration/Preference/Action/Loyalty/Advocacy via `computeStageComposite()` — missing signals redistribute weight instead of zeroing the stage |
+| Funnel data points breakdown | Click any stage's source row to see each contributing signal, its weight %, and its score |
+
+Awareness composite (world-view model, also used by BHI): Social SOV 30%, OOH Reach 25%, Event Attendance 20%, Digital Impressions 15%, Influencer Reach 10%.
+
+### Phase 7 — Multi-Industry Platform Foundation ✅ (commit ba8e216, 2026-06-29)
+
+Brands now carry a `brand_type` (fmcg | fintech | venue | b2b_saas | marketplace | beverage_alcohol | b2b_distribution), and the funnel/BHI signal set branches by it instead of assuming FMCG for every brand. Full rationale in `docs/industry-fit-strategy.md` and `docs/funnel-signals-explained.md`; remaining scope tracked in `docs/to-100-percent-build-list.md`.
+
+| Feature | Notes |
+|---|---|
+| `brand_type` on brands + settings selector | Drives funnel signal routing per vertical |
+| Signal routing by vertical | Fintech drops OOH/TV/radio, adds app store rating to Preference; venue drops TV/radio, adds Google Maps rating + review velocity; SaaS/marketplace adds G2 rating; FMCG wires Field Intelligence distribution availability + stock-out rate into Awareness/Action |
+| `audience_type` on mentions | consumer/creator/developer/retailer/media/general — sentiment dashboard breakdown |
+| `respondent_role` on nps_records | consumer/trade_partner/retailer/developer/decision_maker/end_user — NPS cohort split in surveys UI |
+| Complaint-surge detector | Daily z-score of negative mention volume vs 30d baseline; fires notification at ≥2σ (8am Lagos cron) |
+| Google Maps connector (venue) | Daily Inngest sync, on-demand `POST /api/venue/sync-maps`, `VenueReputationPanel` on brand equity page |
+
+**Migrations:** 12 new tables — `venue_traffic`, `review_platform_snapshots`, `review_aspect_sentiment`, `fintech_metrics`, `saas_metrics`, `platform_metrics`, `trade_partner_metrics`, `developer_health_snapshots`, `regulatory_mentions`, `sponsorship_events`, `brand_launch_markers`, plus `google_place_id` on brands.
+
+### Phase 7 — Trust Pillar, BHI Presets, B2B/Dev Connectors ✅ (commits 1eb3273, 2accb7a, 2026-06-29)
+
+| Feature | Notes |
+|---|---|
+| Trust Pillar (fintech) | `computeTrustScore()` — app store rating 35%, regulatory standing 30%, reliability 20%, complaint health 15%; `TrustPillarCard` on brand equity |
+| Regulatory mention detector | Weekly Monday 6am Lagos cron, sweeps press mentions for 14 Nigerian regulator names × action terms → `regulatory_mentions` |
+| First-party data API | `brand_api_keys` (SHA-256 hashed `bp_live_...`), `GET/POST/DELETE /api/brand/api-keys`, `POST /api/first-party/[type]` routes brand-authenticated payloads into fintech/saas/venue/platform/trade-partner metrics tables |
+| BHI weight presets | `BRAND_TYPE_WEIGHTS` — 7 vertical-specific weight sets (e.g. fintech weights sentiment 25%/perception 20%, b2b_saas drops cultural resonance to 0%); badge shown in BHI header |
+| Aspect-level review sentiment | Weekly Claude Haiku classifier extracts 8 aspects (food/service/ambiance/value/reliability/feature_quality/support/price_fairness) from Google Maps + app reviews → `review_aspect_sentiment` |
+| G2 / Capterra connector | Weekly scrape of aggregate rating + velocity for b2b_saas/marketplace brands |
+| Developer health connector | Weekly GitHub/npm/Stack Overflow snapshot for fintech/b2b_saas/marketplace brands |
+| Feature/launch markers | `GET/POST/DELETE /api/brand/markers` — 7-day before/after BHI delta per marker, annotated on the BHI sparkline |
+
+### Phase 7 — Connector QA Pass ✅ (commit 1f3695e, 2026-06-30)
+
+9 bugs fixed across Paystack/Flutterwave webhooks (insert instead of overwrite-on-conflict; constant-time hash comparison), App Store review sync (unchained query filter was reprocessing every brand on every event; `.limit(1).single()` → `getActiveBrandId`), Pixel/SDK tracker (missing `pixel.js` loader route; conditional Upstash rate limiter so missing env vars don't crash the ingest endpoint at cold start), and a production hard-fail if `TOKEN_ENCRYPTION_KEY` falls back to the dev default.
+
+### Phase 7 — Full Mobile Responsive Pass ✅ (commits 038c91a…555a065, 45b6492, 2026-07-01)
+
+Every dashboard module audited and fixed for iPhone SE (375px) through tablet (768–1024px) through 4K, using Tailwind responsive classes only — no logic changes. Covers: sentiment, competitive, cultural, funnel, surveys, field intelligence, retention, advocacy, loyalty, WhatsApp, influencers, creative, OOH, events, campaigns, digital, settings, connectors, reports, AI visibility, business case. Also fixed: dashboard shell padding bug on mobile (sidebar-width padding was applying with the sidebar hidden), and the nav drawer's z-index — it was trapped inside the header's `backdrop-blur` stacking context, so it now portals to `document.body`.
+
+### Phase 7 — Industry Selector, Dashboard Redesign, Auth Redesign ✅ (commits 0dd953a, da0e5f6, d8e09b9, 2026-07-02)
+
+| Feature | Route / Key Files | Status |
+|---|---|---|
+| Industry selector in onboarding | Onboarding Screen 0 — 13 visual industry cards before AI brand analysis | ✅ `industry-config.ts` maps each industry to hidden nav paths, suggested connectors, AI prompts, key metrics |
+| Industry-based nav visibility | `dashboard-nav.tsx`, `isPathHidden()` | ✅ e.g. fintech hides OOH/Radio/TV/Print/Field Intelligence/Marketplace; b2b_saas hides OOH/Broadcast/Field/Marketplace/Cultural/Geo-Lift/MMM; agencies see everything |
+| Dashboard redesign — hero + widgets | `/dashboard` | ✅ AI Ask field with rotating industry prompts, 4 KPI tiles, widget controls bar |
+| Widget catalog + templates | `user_dashboard_prefs` | ✅ 24 widgets / 7 categories / 4 industry templates (FMCG CMO, Fintech Growth, Agency, Field Ops); template picker on first login |
+| Manual metric entry (Tier 1) | `metric_manual`, `metric_daily`, `POST/GET /api/dashboard/metrics` | ✅ Industry-specific fields, no connector required |
+| Connectors hub, industry-filtered | `/dashboard/connectors` | ✅ Industry-recommended banner; Payments section hidden for fintech/b2b_saas/telco/media/insurance/healthcare/real_estate |
+| Login/signup/reset redesign | `/auth/*` | ✅ Split-layout login with 4 demo account tiles (Jara, PocketPay, Pinnacle, Bridger); centered signup/reset |
+| CMO Board Pack | `/dashboard/reports/board-pack` | ✅ One-page print-to-PDF + email-share report (BHI, sentiment, SOV, budget, events, NPS, manual metrics) |
+
+### Phase 7 — Product Tour System ✅ (commits 953d817, 86202c6, 0f61159, b4aeb6e, a5546fd, 6a86593, 6decc78, 2026-07-02–03)
+
+Built, then wired end-to-end, then fixed through several rounds of on-device QA:
+- `user_tours` table (RLS) tracks unseen/in_progress/completed/skipped per user per module.
+- `TourSpotlight`: animated backdrop with a real cutout ring around the target element (not just a dimmed screen), off-screen targets auto-scroll into view, keyboard nav (Escape/Arrow/Enter), centering math recomputed live (framer-motion's `animate scale` overwrites a static transform).
+- Every dashboard module now has a 3–5 step tour and a "Show me around" trigger — first-visit auto-start (after the dashboard's template picker closes, not racing it) plus a persistent topbar icon (`global-tour-button.tsx`) that resolves the current module from the route via `getModuleForPath()`.
+- Mobile fixes: card width now responsive (`min(340px, viewport - 32px)`), ring highlight clamps to the visible viewport, and the "Set up your dashboard" template picker was rebuilt with a pinned header/footer + internal scroll region so it can't clip off short viewports (same fix applied to the shared Dialog/Sheet primitives app-wide).
+- Also this session: an app-wide casing pass — raw snake_case DB enum values (status, tone, platform, confidence, sentiment_label, etc.) rendered unstyled in several places; fixed via shared `toSentenceCase()` / `formatPlatformLabel()` helpers.
+
+### Phase 7 — Demo Seeds ✅ (2026-07-02)
+
+Three new full demo accounts, one per underserved vertical, each with brand_type-appropriate data (no OOH/TV/radio/print for verticals where those don't apply):
+- **PocketPay** (fintech) — `commit e431801`
+- **Bridger CRM** (b2b_saas) — `commit 39e7f20` — 365 sentiment days, 180 BHI snapshots, 4 campaigns, 2 events, 6 influencers, 9 SaaS-specific manual metrics
+- **Pinnacle Media** (agency) — `commit da84b69`
+
+### Phase 7 — Bug fixes ✅ (commit 8b80357, 2026-07-02)
+
+`brands.industry` was added to the initial schema migration's `CREATE TABLE` after that migration had already run in production, so the column silently never existed there; PostgREST rejected any query referencing it, and `dashboard/layout.tsx` swallowed the error and treated every signed-in user as brand-less, bouncing them back to onboarding. Fixed with a migration to add the column, a query retry-without-`industry` fallback, and onboarding now only ever entered explicitly from signup/OAuth (never as a silent redirect from a query error).
+
+---
+
 ## Current tech decisions (canonical)
 
 | Decision | What was decided | Why |
@@ -322,6 +403,8 @@ Nav now has 9 logical sections following marketer workflow:
 | Button-as-link | `buttonVariants()` class on `<Link>`, not `<Button asChild>` | Button uses `@base-ui/react/button` which has no `asChild` prop |
 | Tenancy | RLS via `is_workspace_member()` only — never filter in app code | Security + simplicity |
 | Background jobs | Inngest for ALL async work | Handles retries, timeouts, step functions |
+| Industry model | `brand_type` on brands drives funnel/BHI signal routing, weight presets, and nav visibility — never hardcode FMCG-shaped assumptions | One codebase serves 7 verticals; see `docs/industry-fit-strategy.md` |
+| Feature discovery | Every dashboard module ships with a 3–5 step tour (`data-tour` attributes + `TourSpotlight`) and a topbar "Show me around" trigger | First-visit onboarding without a human-written help doc per module |
 
 ---
 
@@ -509,3 +592,13 @@ Nav now has 9 logical sections following marketer workflow:
 | Geo-Lift study page | `src/app/dashboard/geo-lift/page.tsx` |
 | Field Intelligence | `src/app/dashboard/field-intelligence/field-intelligence-client.tsx` |
 | MMM page | `src/app/dashboard/mmm/mmm-client.tsx` |
+| Industry config (nav visibility, prompts, metrics per vertical) | `src/lib/industry-config.ts` |
+| BHI weight presets by brand_type | `src/lib/bhi.ts` (`BRAND_TYPE_WEIGHTS`) |
+| Trust Pillar card (fintech) | `src/components/brand-equity/trust-pillar-card.tsx` |
+| Venue reputation panel (Google Maps) | `src/components/brand-equity/venue-reputation-panel.tsx` |
+| First-party data ingestion | `src/app/api/first-party/[type]/route.ts` |
+| Brand API keys (settings) | `src/app/api/brand/api-keys/route.ts`, `api-keys-section.tsx` |
+| Dashboard widget system | `src/app/dashboard/dashboard-hero.tsx`, `template-picker.tsx`, `src/app/api/dashboard/prefs/route.ts` |
+| Manual metric entry | `src/app/api/dashboard/metrics/route.ts` |
+| Product tour definitions + spotlight | `src/components/tours/tour-definitions.ts`, `tour-spotlight.tsx`, `global-tour-button.tsx` |
+| CMO Board Pack | `src/app/dashboard/reports/board-pack/page.tsx` |

@@ -1023,6 +1023,294 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     )
   } catch (_) { /* metric_manual table may not exist in all environments */ }
 
+  /* ── 18. Funnel snapshots — monthly, 12 months ────────────────────────── */
+  const bgFunnelRows = []
+  for (let m = 11; m >= 0; m--) {
+    const d  = m * 30
+    const ss = sentScore(d)
+    const t  = ss / 100
+    bgFunnelRows.push({
+      brand_id: brandId, snapshot_date: dAgo(d), segment: 'all',
+      awareness:     +(40 + t * 42).toFixed(1),
+      consideration: +(32 + t * 44).toFixed(1),
+      preference:    +(24 + t * 46).toFixed(1),
+      action:        +(15 + t * 34).toFixed(1),
+      loyalty:       +(20 + t * 40).toFixed(1),
+      advocacy:      +(12 + t * 30).toFixed(1),
+      dropoffs: {
+        awareness_to_consideration:  +(38 - t * 14).toFixed(1),
+        consideration_to_preference: +(30 - t * 12).toFixed(1),
+        preference_to_action:        +(45 - t * 15).toFixed(1),
+      },
+    })
+  }
+  await sb.from('funnel_snapshots').insert(bgFunnelRows)
+
+  /* ── 19. Competitor sightings ──────────────────────────────────────────── */
+  await sb.from('competitor_sightings').insert([
+    { brand_id: brandId, competitor_name: 'HubSpot Nigeria',       lat: 6.4550, lng: 3.3841, sighting_type: 'billboard',  city: 'Lagos', state: 'Lagos', spotted_at: dAgo(28), description: 'HubSpot Nigeria LinkedIn Sponsored Content targeting "CRM Nigeria" and "Bridger CRM alternative" comparison keywords — first direct-comparison paid push we have tracked from them.' },
+    { brand_id: brandId, competitor_name: 'Zoho CRM',              lat: 9.0765, lng: 7.3986, sighting_type: 'activation', city: 'Abuja', state: 'FCT',   spotted_at: dAgo(21), description: 'Zoho CRM reseller signage spotted at a Wuse II business park, part of their newly announced Abuja partner network expansion.' },
+    { brand_id: brandId, competitor_name: 'Salesforce Essentials', lat: 6.4281, lng: 3.4219, sighting_type: 'activation', city: 'Lagos', state: 'Lagos', spotted_at: dAgo(35), description: 'Salesforce Essentials booth at the Lagos SME Tech Expo, running live demos targeting sub-50-seat sales teams — Bridger\'s core Pro-tier segment.' },
+    { brand_id: brandId, competitor_name: 'Freshsales',            lat: 6.5833, lng: 3.3500, sighting_type: 'activation', city: 'Lagos', state: 'Lagos', spotted_at: dAgo(14), description: 'Freshsales running a 6-month free trial promo targeted at Nigerian startup founders via LinkedIn DMs and founder Slack communities.' },
+  ])
+
+  /* ── 20. Press mentions (PR tracking) ─────────────────────────────────── */
+  const bgPress = [
+    { headline: 'Bridger CRM Launches "Built for Nigeria" Campaign for SME Sales Teams',    publication: 'TechCabal',    url: 'https://techcabal.com/bridger-built-for-nigeria-launch', pub_date: dAgo(178), sent_score: 0.80, sent_label: 'positive', reach: 140_000, emv:   770_000, is_comp: false, comp: null,               snippet: 'Bridger CRM has launched an integrated campaign positioning itself as the CRM built specifically for how Nigerian SME sales teams operate, with local currency support and WhatsApp-native workflows.' },
+    { headline: 'Nigerian B2B SaaS Founders Push Back on Dollar-Denominated Pricing',        publication: 'Techpoint Africa', url: 'https://techpoint.africa/naira-pricing-b2b-saas', pub_date: dAgo(150), sent_score: 0.20, sent_label: 'neutral',  reach: 90_000,  emv:    45_000, is_comp: false, comp: null,               snippet: 'A growing number of Nigerian B2B software buyers are favouring naira-priced local alternatives over dollar-denominated global tools as forex volatility squeezes IT budgets.' },
+    { headline: 'HubSpot Announces West Africa Pricing Tier',                                publication: 'BusinessDay',  url: 'https://businessday.ng/hubspot-west-africa-pricing',    pub_date: dAgo(30),  sent_score: 0.10, sent_label: 'neutral',  reach: 110_000, emv:   -55_000, is_comp: true,  comp: 'HubSpot Nigeria', snippet: 'HubSpot has introduced a discounted West Africa pricing tier, a move seen as a direct response to growing competition from locally built CRM alternatives such as Bridger CRM.' },
+    { headline: 'Bridger CRM Launches Enterprise Tier at Lagos Demo Day',                     publication: 'TechCabal',    url: 'https://techcabal.com/bridger-enterprise-demo-day',      pub_date: dAgo(21),  sent_score: 0.88, sent_label: 'positive', reach: 180_000, emv: 1_260_000, is_comp: false, comp: null,               snippet: 'Bridger CRM used its Lagos Demo Day to launch an Enterprise tier aimed at Nigerian companies with 200 or more employees, drawing over 140 decision-makers to the event.' },
+    { headline: 'Bridger CRM vs HubSpot: An Honest Comparison for Nigerian Sales Teams',      publication: 'Techpoint Africa', url: 'https://techpoint.africa/bridger-vs-hubspot-comparison', pub_date: dAgo(14),  sent_score: 0.72, sent_label: 'positive', reach: 95_000,  emv:   522_500, is_comp: true,  comp: 'HubSpot Nigeria', snippet: 'Bridger CRM has published a transparent comparison page against HubSpot, which within 72 hours was ranking on the first page of Google for "CRM Nigeria" searches.' },
+    { headline: 'Zoho CRM Expands Partner Network to Eight Nigerian Cities',                  publication: 'BusinessDay',  url: 'https://businessday.ng/zoho-partner-network-expansion',  pub_date: dAgo(24),  sent_score: 0.15, sent_label: 'neutral',  reach: 85_000,  emv:   -42_500, is_comp: true,  comp: 'Zoho CRM',        snippet: 'Zoho CRM has signed reseller agreements in eight additional Nigerian cities, aiming to counter the distribution gap that has favoured Bridger CRM in mid-market accounts.' },
+    { headline: 'Bridger CRM Passes 1,200 Paying Nigerian Businesses',                        publication: 'Nairametrics', url: 'https://nairametrics.com/bridger-crm-1200-customers',    pub_date: dAgo(8),   sent_score: 0.90, sent_label: 'positive', reach: 130_000, emv:   715_000, is_comp: false, comp: null,               snippet: 'Bridger CRM has crossed 1,200 paying customers, growing from 3 beta users in 2024, with the company crediting its local support model and naira-first pricing for the traction.' },
+  ]
+  await sb.from('press_mentions').insert(bgPress.map(m => ({
+    brand_id: brandId, headline: m.headline, publication: m.publication, url: m.url,
+    published_at: m.pub_date, sentiment_score: m.sent_score, sentiment_label: m.sent_label,
+    estimated_reach: m.reach, emv: m.emv, mention_type: 'press' as const,
+    is_competitor: m.is_comp, competitor_name: m.comp, raw_snippet: m.snippet, crawl_source: 'manual',
+  })))
+
+  /* ── 21. Creative analyses ────────────────────────────────────────────── */
+  await sb.from('creative_analyses').insert([
+    {
+      brand_id: brandId, analysis_type: 'compare',
+      input_data: { platform: 'linkedin', creativeA: 'Zenith Logistics customer case study post', creativeB: 'Enterprise tier feature-list carousel' },
+      result: {
+        winner: 'A',
+        why_winner: 'The customer case study scores substantially higher on trust and conversion intent (90 vs 71) — a named Nigerian company with a concrete 28% sales-cycle reduction is exactly the peer proof B2B buyers look for before a demo request.',
+        creative_a: { engagement: 82, cultural_resonance: 84, brand_fit: 88, tone: 85, clarity: 87, risk: 8,  summary: 'Named customer, concrete metric, and Nigerian context make this the highest-converting post format for Bridger. Extend to a short-form video version.' },
+        creative_b: { engagement: 68, cultural_resonance: 60, brand_fit: 74, tone: 66, clarity: 90, risk: 15, summary: 'Clear and accurate but generic — feature carousels perform fine for consideration-stage retargeting, weak for cold LinkedIn reach.' },
+      },
+      created_at: tsAgo(30, 11),
+    },
+    {
+      brand_id: brandId, analysis_type: 'identity',
+      input_data: { captions: ['Bridger CRM is Built for Nigeria. Your pipeline. Your rules. Your team.', 'How do Nigerian sales teams close 40% more deals? Meet Bridger CRM.', 'Enterprise CRM without the enterprise nonsense.', '1,200 Nigerian businesses trust Bridger CRM to manage their pipeline.'], brandValues: ['Built for Nigeria', 'Simplicity', 'Reliability', 'Local First'] },
+      result: {
+        consistency_score: 88,
+        strengths: ['"Built for Nigeria" is repeated and reinforced rather than diluted across captions — strong tagline discipline', 'Concrete numbers (40%, 1,200) appear consistently, matching the practical, credible brand voice', 'Short declarative sentences match the "practical, knowledgeable, friendly" tone'],
+        drift_warnings: ['"Without the enterprise nonsense" is a sharper, more informal register than the other three captions — check it still reads as "practical" rather than dismissive of the category', 'No Pidgin or local-language texture despite it being part of the declared voice — English-only across all four'],
+        adjustments: ['Keep the number-led format as the default template for new captions', 'Test one caption per month with light Pidgin texture to match the brand voice language mix', 'Standardise on either full sentences or fragments — currently mixed within the same content calendar'],
+      },
+      created_at: tsAgo(12, 14),
+    },
+    {
+      brand_id: brandId, analysis_type: 'competitor',
+      input_data: { competitorName: 'HubSpot Nigeria', content: 'HubSpot. The all-in-one CRM platform trusted by over 200,000 businesses worldwide. Start free today.' },
+      result: {
+        tone: 'Global / Authority-led',
+        cultural_fit: 41,
+        engagement_potential: 55,
+        strategic_insights: ['"200,000 businesses worldwide" is a global proof point with zero Nigeria-specific relevance — a gap Bridger\'s local case studies directly exploit', 'No mention of local currency, local support, or Nigerian business context anywhere in the message', '"Start free today" pricing framing does not address the West Africa pricing tier HubSpot itself just announced — messaging and pricing are out of sync'],
+        counter_positions: ['Bridger should keep leading with named Nigerian customers rather than global scale claims — authenticity beats scale in this category locally', 'Directly address the pricing confusion HubSpot has created with its new West Africa tier via the comparison page', 'Emphasise the local support team as a structural advantage global platforms cannot easily replicate'],
+      },
+      created_at: tsAgo(5, 9),
+    },
+  ])
+
+  /* ── 22. Pre-post analyses ────────────────────────────────────────────── */
+  await sb.from('pre_post_analyses').insert([
+    {
+      brand_id: brandId, created_by: userId,
+      content_text: 'Enterprise tier is live. Book your demo this week and see why 1,200 Nigerian businesses trust Bridger CRM.',
+      platform: 'linkedin', target_segment: 'Lagos Professional Enterprises', funnel_goal: 'action',
+      engagement_score: 87, cultural_score: 78, tone_score: 84, clarity_score: 90, risk_score: 8,
+      risk_flags: [],
+      verdict: 'Approve',
+      improvements: ['Add a specific decision-maker persona to the CTA ("Book a demo for your sales director")', 'Pair with a one-line ROI stat for scroll-stopping power'],
+      suggested_rewrite: null,
+    },
+    {
+      brand_id: brandId, created_by: userId,
+      content_text: 'HubSpot is overpriced and out of touch with Nigerian business. Bridger CRM is simply better. Switch now.',
+      platform: 'twitter', target_segment: 'Nigerian SME Owners', funnel_goal: 'preference',
+      engagement_score: 54, cultural_score: 48, tone_score: 26, clarity_score: 78, risk_score: 70,
+      risk_flags: [{ type: 'brand_risk', detail: 'Naming and disparaging HubSpot directly invites a defensive response and reads as insecure rather than confident' }, { type: 'tone_risk', detail: 'Blunt dismissal contradicts the "practical, knowledgeable, friendly" brand voice — the comparison page format is already working, this undercuts it' }],
+      verdict: 'Reject — do not publish',
+      improvements: ['Let the published comparison page carry the direct comparison — keep social posts values-led, not competitor-led', 'Replace the claim with a proof point: a named customer or a specific number'],
+      suggested_rewrite: 'Naira pricing. Local support. Built for how Nigerian sales teams actually work. That is Bridger CRM.',
+    },
+    {
+      brand_id: brandId, created_by: userId,
+      content_text: 'Webinar recap: 5 ways Nigerian SMEs can double pipeline velocity with CRM automation. Watch the replay.',
+      platform: 'linkedin', target_segment: 'Nigerian SME Owners', funnel_goal: 'consideration',
+      engagement_score: 74, cultural_score: 70, tone_score: 80, clarity_score: 85, risk_score: 10,
+      risk_flags: [],
+      verdict: 'Approve — strong cultural fit',
+      improvements: ['Pin a top comment with the replay link for LinkedIn algorithm visibility', 'Add one attendee quote to increase social proof'],
+      suggested_rewrite: null,
+    },
+  ])
+
+  /* ── 23. Crawl runs ────────────────────────────────────────────────────── */
+  await sb.from('crawl_runs').insert(
+    Array.from({ length: 10 }, (_, i) => ({
+      brand_id:       brandId,
+      trigger_type:   i % 3 === 0 ? 'manual' : 'cron',
+      status:         'done',
+      mentions_found: 16 + Math.round(Math.abs(Math.sin(i * 1.2)) * 18),
+      classified:     14 + Math.round(Math.abs(Math.sin(i * 1.2)) * 15),
+      started_at:     tsAgo(i * 3, 6),
+      completed_at:   tsAgo(i * 3, 6),
+    }))
+  )
+
+  /* ── 24. AI conversation sample ────────────────────────────────────────── */
+  await sb.from('ai_conversations').insert({
+    brand_id: brandId, user_id: userId,
+    messages: [
+      { role: 'user', content: 'Why did HubSpot\'s West Africa pricing announcement affect our share of voice?', timestamp: tsAgo(25) },
+      { role: 'assistant', content: 'Bridger CRM\'s SOV dipped from 17.4% to 16.1% in the week following HubSpot\'s West Africa pricing announcement, then recovered. Two mechanics were at play:\n\n**1. Conversation volume shift, not sentiment shift.** HubSpot\'s announcement generated a spike in "CRM Nigeria pricing" conversation that HubSpot itself dominated for about five days — it is a volume story, not a quality-of-brand story. Your sentiment held steady at 73-74 throughout.\n\n**2. The comparison page absorbed the spillover.** Once your Bridger vs HubSpot comparison page started ranking on Google, a meaningful share of that new "CRM Nigeria pricing" search traffic redirected to your content instead of HubSpot\'s, which is why SOV recovered to 17.4% by week three.\n\nThe net effect of a competitor pricing announcement, if you have credible content already in place, tends to grow the total addressable conversation rather than simply take share from you.', timestamp: tsAgo(25) },
+      { role: 'user', content: 'Should we worry about Zoho\'s new resellers in the North?', timestamp: tsAgo(10) },
+      { role: 'assistant', content: 'Worth watching, not worrying yet. Two data points matter:\n\n**1. You have zero Enterprise pipeline in Kano, Kaduna, or Maiduguri today.** Zoho\'s reseller expansion is filling a gap you have not yet contested, not taking share from an existing Bridger position.\n\n**2. North Nigeria represents roughly 28% of Nigerian SME GDP by your own market sizing** — a real opportunity, not just defensive territory. The highest-leverage response is not matching Zoho\'s reseller count but securing one credible local partner in Kano before their network fully locks in distribution. First-mover credibility in an underserved region compounds faster than late competitive parity.', timestamp: tsAgo(10) },
+    ],
+    sources_cited: [
+      { type: 'sov_snapshots',   period: 'Q2 2026', rows: 8 },
+      { type: 'press_mentions',  keyword: 'HubSpot West Africa', count: 2 },
+      { type: 'weekly_briefings', period: 'Enterprise launch', rows: 4 },
+    ],
+  })
+
+  /* ── 25. Budget plan + line items + actuals (Enterprise Launch) ───────── */
+  const { data: bgBudget } = await sb.from('budget_plans').insert({
+    brand_id: brandId, name: 'Bridger Enterprise Tier Launch — Q2 2026',
+    period_start: dAgo(30), period_end: dAgo(-60),
+    total_budget: 22_000_000, currency: 'NGN',
+    status: 'active', notes: 'Enterprise tier go-to-market. LinkedIn-weighted with a flagship Demo Day event.',
+    created_by: userId,
+  }).select('id').single()
+
+  if (bgBudget?.id) {
+    const { data: bgLi1 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: bgBudget.id, channel: 'digital', label: 'LinkedIn + Google Ads — Enterprise targeting', planned_amount: 12_000_000, actual_amount: 8_420_000, currency: 'NGN', campaign_id: camp2Id }).select('id').single()
+    const { data: bgLi2 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: bgBudget.id, channel: 'events',  label: 'Enterprise Demo Day production',           planned_amount: 2_800_000,  actual_amount: 2_800_000, currency: 'NGN', campaign_id: camp2Id }).select('id').single()
+    const { data: bgLi3 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: bgBudget.id, channel: 'pr',      label: 'TechCabal + Techpoint launch coverage',      planned_amount: 1_800_000,  actual_amount: 1_800_000, currency: 'NGN' }).select('id').single()
+    const { data: bgLi4 } = await sb.from('budget_line_items').insert({ brand_id: brandId, plan_id: bgBudget.id, channel: 'content', label: 'Comparison page + case study production',    planned_amount: 1_200_000,  actual_amount: 640_000,   currency: 'NGN' }).select('id').single()
+
+    const bgActuals = [
+      { li: bgLi1?.id, amount: 4_210_000, desc: 'LinkedIn Sponsored Content — Week 1-2', ref: 'LI-BG-101', spent_on: dAgo(24) },
+      { li: bgLi1?.id, amount: 4_210_000, desc: 'Google Ads enterprise keywords — Week 3-4', ref: 'GGL-BG-102', spent_on: dAgo(10) },
+      { li: bgLi2?.id, amount: 2_800_000, desc: 'Demo Day venue + production',            ref: 'EVT-BG-201', spent_on: dAgo(21) },
+      { li: bgLi3?.id, amount: 1_800_000, desc: 'TechCabal + Techpoint launch feature',    ref: 'PR-BG-301',  spent_on: dAgo(21) },
+      { li: bgLi4?.id, amount: 640_000,   desc: 'Bridger vs HubSpot comparison page build', ref: 'CNT-BG-401', spent_on: dAgo(14) },
+    ]
+    for (const a of bgActuals) {
+      if (!a.li) continue
+      await sb.from('budget_actuals').insert({ brand_id: brandId, line_item_id: a.li, amount: a.amount, currency: 'NGN', description: a.desc, reference: a.ref, spent_on: a.spent_on, created_by: userId })
+    }
+  }
+
+  /* ── 26. A/B Experiments ───────────────────────────────────────────────── */
+  const { data: bgExp1 } = await sb.from('ab_experiments').insert({
+    brand_id: brandId, name: 'Enterprise Pricing Page CTA',
+    hypothesis: 'A "Book a demo" CTA will convert better on the Enterprise pricing page than a "Contact sales" CTA, because it sets a clearer, lower-commitment next step',
+    experiment_type: 'creative', metric_primary: 'click_through_rate', metrics_secondary: ['conversion_rate'],
+    status: 'concluded', confidence_target: 95, min_sample_size: 400,
+    started_at: tsAgo(35), concluded_at: tsAgo(18),
+  }).select('id').single()
+
+  const { data: bgExp2 } = await sb.from('ab_experiments').insert({
+    brand_id: brandId, name: 'Trial Signup Form Length',
+    hypothesis: 'A 3-field signup form (name, email, company) will convert more trials than the current 6-field form',
+    experiment_type: 'creative', metric_primary: 'conversion_rate',
+    status: 'running', confidence_target: 95, min_sample_size: 300,
+    started_at: tsAgo(9),
+  }).select('id').single()
+
+  const { data: bgExp3 } = await sb.from('ab_experiments').insert({
+    brand_id: brandId, name: 'Enterprise Trial Nurture Email Subject Line',
+    hypothesis: 'A subject line referencing a named customer result ("How Zenith Logistics cut their sales cycle 28%") will lift open rate over a generic feature-benefit subject line',
+    experiment_type: 'email', metric_primary: 'open_rate',
+    status: 'draft', confidence_target: 90, min_sample_size: 250,
+  }).select('id').single()
+
+  if (bgExp1?.id) {
+    await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: bgExp1.id, name: 'Control — Contact Sales', is_control: true, impressions: 8_400, conversions: 302, revenue: 0, sort_order: 1, content: { cta_text: 'Contact Sales' } })
+    const { data: bgV1v } = await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: bgExp1.id, name: 'Variant — Book a Demo', is_control: false, impressions: 8_350, conversions: 461, revenue: 0, sort_order: 2, content: { cta_text: 'Book a Demo' } }).select('id').single()
+    if (bgV1v?.id) await sb.from('ab_experiments').update({ winner_variant_id: bgV1v.id }).eq('id', bgExp1.id)
+  }
+  if (bgExp2?.id) {
+    await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: bgExp2.id, name: 'Control — 6-field form', is_control: true, impressions: 2_100, conversions: 168, revenue: 0, sort_order: 1, content: { fields: ['name', 'email', 'company', 'phone', 'team_size', 'role'] } })
+    await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: bgExp2.id, name: 'Variant — 3-field form',  is_control: false, impressions: 2_080, conversions: 249, revenue: 0, sort_order: 2, content: { fields: ['name', 'email', 'company'] } })
+  }
+  if (bgExp3?.id) {
+    await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: bgExp3.id, name: 'Control — Feature-Benefit Subject', is_control: true, impressions: 0, conversions: 0, revenue: 0, sort_order: 1, content: { subject: 'Get more out of your Bridger CRM trial' } })
+    await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: bgExp3.id, name: 'Variant — Customer Result Subject', is_control: false, impressions: 0, conversions: 0, revenue: 0, sort_order: 2, content: { subject: 'How Zenith Logistics cut their sales cycle 28% with Bridger' } })
+  }
+
+  /* ── 27. Advocacy scores (weekly for 12 weeks) ────────────────────────── */
+  const bgAdvocacyRows = Array.from({ length: 12 }, (_, i) => {
+    const w = 11 - i
+    const ss = sentScore(w * 7)
+    const vol = Math.round(18 + i * 2.4 + Math.sin(i * 0.7) * 3)
+    const posVol = Math.round(vol * (0.60 + (ss / 100) * 0.18))
+    const negVol = Math.round(vol * (0.08 - (ss / 100) * 0.03))
+    const neuVol = vol - posVol - negVol
+    const reach = Math.round(vol * (2200 + i * 160))
+    const engagement = Math.round(reach * 0.045)
+    const sentRatio = posVol / vol
+    const volScore = Math.min(100, (vol / 45) * 100)
+    const reachScore = Math.min(100, (reach / 90_000) * 100)
+    const engmtScore = Math.min(100, (engagement / 4_500) * 100)
+    const score = (sentRatio * 40) + ((volScore * 0.5 + reachScore * 0.5) * 0.4) + (engmtScore * 0.2)
+    return {
+      brand_id: brandId, week_start: dAgo(w * 7 + 6),
+      ugc_mentions: vol, positive_mentions: posVol, neutral_mentions: neuVol, negative_mentions: negVol,
+      avg_sentiment: +ss.toFixed(2), total_reach: reach, total_engagement: engagement,
+      top_platforms: { twitter: Math.round(vol * 0.65), instagram: Math.round(vol * 0.20), linkedin: Math.round(vol * 0.15) },
+      top_themes: ss > 70 ? ['built for Nigeria', 'local support', 'enterprise launch'] : ['pricing comparison', 'onboarding friction', 'competitor evaluation'],
+      advocacy_score: +Math.min(100, score).toFixed(2),
+      score_delta: i > 0 ? +(Math.sin(i * 0.5) * 2.6).toFixed(2) : 0,
+      score_factors: { sentiment_contribution: +(sentRatio * 40).toFixed(1), volume_contribution: +((volScore * 0.5 + reachScore * 0.5) * 0.4).toFixed(1), engagement_contribution: +(engmtScore * 0.2).toFixed(1) },
+    }
+  })
+  await sb.from('advocacy_scores').insert(bgAdvocacyRows)
+
+  /* ── 28. Promoters + referral codes ───────────────────────────────────── */
+  const bgPromoterData = [
+    { name: 'Chike Okonkwo',   email: 'chike.o@zenithlogistics.ng', phone: '+2348012301001', nps: 10, city: 'Lagos', code: 'BP-BRG01', clicks: 38, conversions: 11 },
+    { name: 'Amara Nwachukwu', email: 'amara.n@example.com',        phone: '+2348023402002', nps: 9,  city: 'Lagos', code: 'BP-BRG02', clicks: 26, conversions: 7  },
+    { name: 'Taiwo Adesanya',  email: 'taiwo.a@example.com',        phone: '+2348045604004', nps: 10, city: 'Abuja', code: 'BP-BRG03', clicks: 19, conversions: 5  },
+    { name: 'Ngozi Ibe',       email: 'ngozi.i@example.com',        phone: '+2348056705005', nps: 9,  city: 'Lagos', code: 'BP-BRG04', clicks: 14, conversions: 4  },
+  ]
+  for (const p of bgPromoterData) {
+    const { data: bgProm } = await sb.from('promoters').insert({
+      brand_id: brandId, name: p.name, email: p.email, phone: p.phone,
+      nps_score: p.nps, source: 'nps', status: 'active',
+    }).select('id').single()
+    if (bgProm?.id) {
+      await sb.from('referral_codes').insert({
+        brand_id: brandId, promoter_id: bgProm.id, code: p.code,
+        destination_url: 'https://bridgercrm.ng/refer',
+        clicks: p.clicks, conversions: p.conversions, is_active: true,
+      })
+    }
+  }
+
+  /* ── 29. Customer profiles (CDP) ──────────────────────────────────────── */
+  await sb.from('customer_profiles').insert([
+    { brand_id: brandId, name: 'Chike Okonkwo',   email: 'chike.o@zenithlogistics.ng', phone: '+2348012301001', nps_score: 10, nps_label: 'promoter', last_seen_at: dAgo(1),  is_promoter: true,  segments: ['promoter', 'enterprise-tier', 'referrer'],       sources: { nps: true, referral: true },  retention_risk_score: 4,  acquisition_source: 'referral' },
+    { brand_id: brandId, name: 'Amara Nwachukwu', email: 'amara.n@example.com',        phone: '+2348023402002', nps_score: 9,  nps_label: 'promoter', last_seen_at: dAgo(3),  is_promoter: true,  segments: ['promoter', 'pro-tier', 'referrer'],              sources: { nps: true, referral: true },  retention_risk_score: 8,  acquisition_source: 'event' },
+    { brand_id: brandId, name: 'Taiwo Adesanya',  email: 'taiwo.a@example.com',        phone: '+2348045604004', nps_score: 10, nps_label: 'promoter', last_seen_at: dAgo(5),  is_promoter: true,  segments: ['promoter', 'enterprise-tier'],                   sources: { nps: true },                  retention_risk_score: 6,  acquisition_source: 'event' },
+    { brand_id: brandId, name: 'Ngozi Ibe',       email: 'ngozi.i@example.com',        phone: '+2348056705005', nps_score: 9,  nps_label: 'promoter', last_seen_at: dAgo(7),  is_promoter: true,  segments: ['promoter', 'pro-tier'],                          sources: { nps: true },                  retention_risk_score: 11, acquisition_source: 'webinar' },
+    { brand_id: brandId, name: 'Bimpe Lawal',     email: 'bimpe.l@example.com',        phone: '+2348034503003', nps_score: 7,  nps_label: 'passive',  last_seen_at: dAgo(16), is_promoter: false, segments: ['passive', 'pro-tier'],                           sources: { nps: true },                  retention_risk_score: 32, acquisition_source: 'linkedin' },
+    { brand_id: brandId, name: 'Segun Adeyinka',  email: 'seguntech@example.com',      phone: '+2348067806006', nps_score: 8,  nps_label: 'passive',  last_seen_at: dAgo(20), is_promoter: false, segments: ['passive', 'starter-tier'],                       sources: { nps: true },                  retention_risk_score: 28, acquisition_source: 'linkedin' },
+    { brand_id: brandId, name: 'Adaeze Ilo',      email: 'adaezeilo@example.com',      phone: '+2348078901007', nps_score: 5,  nps_label: 'detractor', last_seen_at: dAgo(38), is_promoter: false, segments: ['detractor', 'starter-tier', 'churn-risk'],       sources: { nps: true },                  retention_risk_score: 74, acquisition_source: 'trial' },
+    { brand_id: brandId, name: 'Babatunde Lawal', email: 'btlawal@example.com',        phone: '+2348089012008', nps_score: 4,  nps_label: 'detractor', last_seen_at: dAgo(42), is_promoter: false, segments: ['detractor', 'starter-tier', 'support-issue'],    sources: { nps: true },                  retention_risk_score: 81, acquisition_source: 'trial' },
+  ])
+
+  /* ── 30. Creative assets (Creative Library vault) ─────────────────────── */
+  const bgCreativeAssets = [
+    { title: 'Zenith Logistics Case Study — LinkedIn Post', description: 'Named-customer case study: how Zenith Logistics cut sales cycle 28% in 90 days with Bridger CRM. Includes a pull-quote from their sales director.', asset_type: 'copy', format: 'LinkedIn Post', platform: 'LinkedIn', status: 'vetted', fit_for_ads: true, performance: { impressions: 620_000, clicks: 24_800, ctr: 4.0, conversions: 1_240, spend: 480_000, roas: 5.6 }, replication_elements: ['Named customer with a real, checkable metric', 'Direct quote from a decision-maker, not marketing copy', 'One number in the headline, not three'], tags: ['case-study', 'linkedin', 'top-performer'] },
+    { title: 'Bridger vs HubSpot — Comparison Page', description: 'Long-form comparison page: pricing, features, and Nigeria-fit laid out side by side. Ranking on Google for "CRM Nigeria" searches.', asset_type: 'copy', format: 'Landing Page', platform: 'Web', status: 'vetted', fit_for_ads: false, performance: { impressions: 84_000, clicks: 12_600, ctr: 15.0, conversions: 890 }, replication_elements: ['Transparent about where the competitor genuinely wins, not just where Bridger wins', 'Naira pricing shown directly next to converted dollar pricing', 'FAQ section addresses the actual objections sales hears most'], tags: ['comparison', 'seo', 'top-performer'] },
+    { title: 'Enterprise Tier Launch — LinkedIn Carousel', description: '6-slide carousel walking through Enterprise tier features: unlimited contacts, custom workflows, dedicated CSM, multi-currency support.', asset_type: 'carousel', format: 'LinkedIn Carousel', platform: 'LinkedIn', status: 'vetted', fit_for_ads: true, performance: { impressions: 340_000, clicks: 15_300, ctr: 4.5, conversions: 610, spend: 620_000, roas: 3.4 }, replication_elements: ['One feature per slide, no crowding', 'Final slide is always the demo-booking CTA', 'Multi-currency support slide consistently gets the highest dwell time'], tags: ['carousel', 'enterprise', 'linkedin'] },
+    { title: 'Enterprise Demo Day — Event Recap Video', description: '60-second recap of the Enterprise Demo Day: crowd shots, live demo moments, attendee reactions. Used for post-event nurture and future event promotion.', asset_type: 'video', format: 'LinkedIn Video', platform: 'LinkedIn', status: 'vetted', fit_for_ads: false, performance: { impressions: 210_000, clicks: 8_400 }, replication_elements: ['Real attendee reactions outperform staged testimonials', 'Keep energy high in the first 5 seconds — event recaps lose viewers fast otherwise', 'End with next event date, even if not yet confirmed — keeps the pipeline warm'], tags: ['event', 'video', 'recap'] },
+    { title: 'SME Webinar Registration Landing Page', description: 'Registration page for the quarterly SME Growth Webinar Series. Simple form, speaker bios, and past-session replay links.', asset_type: 'copy', format: 'Landing Page', platform: 'Web', status: 'active', fit_for_ads: false, performance: { impressions: 42_000, clicks: 6_300, ctr: 15.0, conversions: 2_400 }, replication_elements: ['Past-session replays build credibility for first-time registrants', 'Keep the form to name, email, company — anything more drops registrations', 'Speaker bio photos increase perceived legitimacy for a free webinar'], tags: ['webinar', 'landing-page', 'lead-gen'] },
+  ]
+  for (const asset of bgCreativeAssets) {
+    await sb.from('creative_assets').insert({ brand_id: brandId, ...asset })
+  }
+
   /* ── Done ─────────────────────────────────────────────────────────────── */
   return NextResponse.json({
     success: true,
@@ -1033,6 +1321,9 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
       sentimentDays: 365, bhiSnapshots: 180, sovSnapshots: 25,
       campaigns: 4, events: 2, influencers: 6, mentions: 70,
       socialPosts: 25, npsRecords: 50, metricManual: 9,
+      funnelSnapshots: 12, competitorSightings: 4, pressMentions: bgPress.length,
+      creativeAnalyses: 3, prePostAnalyses: 3, crawlRuns: 10, abExperiments: 3,
+      advocacyWeeks: 12, promoters: 4, customerProfiles: 8, creativeAssets: bgCreativeAssets.length,
     },
   })
 }
