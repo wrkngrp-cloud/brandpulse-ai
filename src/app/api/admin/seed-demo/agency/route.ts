@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
     name:            'Pinnacle Media Group',
     category:        'Agency',
     industry:        'agency',
+    brand_type:      'agency',
     primary_color:   '#1A1A2E',
     secondary_color: '#E94560',
     brand_values:    ['Creativity', 'Results', 'Cultural Intelligence', 'Transparency'],

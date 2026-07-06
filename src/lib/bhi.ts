@@ -123,7 +123,7 @@ const FULL_WEIGHTS: Record<keyof FullBHIComponents, number> = {
   emv:                5,
 }
 
-export type BrandType = 'fmcg' | 'fintech' | 'venue' | 'b2b_saas' | 'marketplace' | 'beverage_alcohol' | 'b2b_distribution'
+export type BrandType = 'fmcg' | 'fintech' | 'venue' | 'b2b_saas' | 'marketplace' | 'beverage_alcohol' | 'b2b_distribution' | 'agency'
 
 // Some brands (older rows and a few seeds) only carry the onboarding
 // `industry` id, not `brand_type`. Fall back to industry where the mapping
@@ -136,6 +136,7 @@ export function resolveBrandType(
   if (brandType) return brandType as BrandType
   if (industry === 'fintech')  return 'fintech'
   if (industry === 'b2b_saas') return 'b2b_saas'
+  if (industry === 'agency')   return 'agency'
   return 'fmcg'
 }
 
@@ -172,6 +173,12 @@ export const BRAND_TYPE_WEIGHTS: Record<BrandType, Record<keyof FullBHIComponent
     // trade partner perception + SOV matter; cultural resonance minimal
     awareness: 15, salience: 20, sentiment: 20,
     perception: 20, culturalResonance: 5, blendedSov: 20, emv: 0,
+  },
+  agency: {
+    // reputation and trade-press visibility drive new business; no consumer
+    // cultural-resonance component since the agency isn't its own end brand
+    awareness: 10, salience: 15, sentiment: 20,
+    perception: 30, culturalResonance: 0, blendedSov: 20, emv: 5,
   },
 }
 
