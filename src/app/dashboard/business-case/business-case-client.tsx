@@ -7,10 +7,16 @@ import {
 import {
   TrendingUp, TrendingDown, Target, DollarSign, Award,
   AlertCircle, CheckCircle2, ChevronRight, BarChart3,
-  ArrowUpRight, Briefcase,
+  ArrowUpRight, Briefcase, Minus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import {
+  visibleCommercialMetrics,
+  type CommercialMetrics,
+  type CommercialMetricId,
+} from '@/lib/commercial-metrics'
+import type { BrandType } from '@/lib/bhi'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -45,6 +51,8 @@ interface Props {
   spendEfficiency: number | null
   competitors:     string[]
   aiBusinessCase:  AiBusinessCase | null
+  commercial:      CommercialMetrics
+  brandType:       BrandType
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -107,6 +115,75 @@ function SectionHead({ icon: Icon, children }: { icon: React.ElementType; childr
   )
 }
 
+// ── Commercial metric display config ───────────────────────────────────────
+
+const COMMERCIAL_DEFS: Record<CommercialMetricId, {
+  label: string
+  icon: React.ElementType
+  iconColor: string
+  fmt: (v: number) => string
+  goodWhenDown?: boolean
+}> = {
+  revenue:   { label: 'Revenue',         icon: DollarSign, iconColor: 'text-emerald-500', fmt: fmtNGN },
+  spend:     { label: 'Marketing Spend', icon: DollarSign, iconColor: 'text-amber-500',   fmt: fmtNGN },
+  roiPct:    { label: 'Marketing ROI',   icon: TrendingUp, iconColor: 'text-blue-500',    fmt: v => `${v >= 0 ? '+' : ''}${v.toFixed(0)}%` },
+  roas:      { label: 'ROAS',            icon: TrendingUp, iconColor: 'text-blue-500',    fmt: v => `${v.toFixed(1)}x` },
+  cac:       { label: 'CAC',             icon: Target,     iconColor: 'text-violet-500',  fmt: fmtNGN, goodWhenDown: true },
+  cpl:       { label: 'Cost per Lead',   icon: Target,     iconColor: 'text-violet-500',  fmt: fmtNGN, goodWhenDown: true },
+  mql:       { label: 'MQLs',            icon: ArrowUpRight, iconColor: 'text-orange-500', fmt: v => v.toLocaleString('en-NG') },
+  churnRate: { label: 'Churn Rate',      icon: TrendingDown, iconColor: 'text-red-500',   fmt: v => `${(v * 100).toFixed(1)}%`, goodWhenDown: true },
+  ltvToCac:  { label: 'LTV : CAC',       icon: Award,      iconColor: 'text-teal-500',    fmt: v => `${v.toFixed(1)}x` },
+}
+
+function periodDelta(trend: { date: string; value: number }[]): number | null {
+  if (trend.length < 2) return null
+  const prev = trend[trend.length - 2].value
+  const last = trend[trend.length - 1].value
+  if (prev === 0) return null
+  return ((last - prev) / Math.abs(prev)) * 100
+}
+
+function CommercialKpiTile({ id, metric }: { id: CommercialMetricId; metric: CommercialMetrics[CommercialMetricId] }) {
+  const def = COMMERCIAL_DEFS[id]
+
+  if (metric.value == null) {
+    return (
+      <div className="rounded-2xl border border-dashed bg-muted/20 p-5">
+        <div className="flex items-center gap-2 mb-2">
+          <def.icon className={cn('h-4 w-4', def.iconColor)} />
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{def.label}</p>
+        </div>
+        <p className="text-[12px] text-muted-foreground leading-relaxed">{metric.unavailableReason}</p>
+      </div>
+    )
+  }
+
+  const delta = periodDelta(metric.trend)
+  const improved = delta != null ? (def.goodWhenDown ? delta < 0 : delta > 0) : null
+
+  return (
+    <div className="rounded-2xl border bg-card p-5">
+      <div className="flex items-center gap-2 mb-2">
+        <def.icon className={cn('h-4 w-4', def.iconColor)} />
+        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{def.label}</p>
+      </div>
+      <p className="text-[28px] font-bold leading-none tracking-tight">{def.fmt(metric.value)}</p>
+      {delta != null ? (
+        <p className={cn('text-[12px] font-semibold mt-1 flex items-center gap-0.5', improved ? 'text-emerald-600' : 'text-red-600')}>
+          {delta > 0
+            ? <TrendingUp className="h-3.5 w-3.5" />
+            : delta < 0
+              ? <TrendingDown className="h-3.5 w-3.5" />
+              : <Minus className="h-3.5 w-3.5" />}
+          {delta > 0 ? '+' : ''}{delta.toFixed(1)}% vs last month
+        </p>
+      ) : (
+        <p className="text-[11px] text-muted-foreground mt-1">This month</p>
+      )}
+    </div>
+  )
+}
+
 // ── BCG-style campaign portfolio ───────────────────────────────────────────
 
 const BCG_CHANNELS: Record<string, { quadrant: string; color: string }> = {
@@ -126,9 +203,10 @@ export function BusinessCaseClient({
   brand, currentBhi, bhiChange, bhiTrend, sov, marketShare, esov,
   totalSpend, totalBudget, activeCampaigns, campaigns, channelSpend,
   avgNps, npsCount, avgSentiment, mentions30d, spendEfficiency,
-  competitors, aiBusinessCase,
+  competitors, aiBusinessCase, commercial, brandType,
 }: Props) {
   const posture = esovPosture(esov)
+  const commercialIds = visibleCommercialMetrics(brandType)
 
   const channelRows = Object.entries(channelSpend)
     .sort((a, b) => b[1] - a[1])
@@ -225,6 +303,16 @@ export function BusinessCaseClient({
           </div>
         </section>
       )}
+
+      {/* Commercial Performance — the CFO-facing numbers */}
+      <section>
+        <SectionHead icon={DollarSign}>Commercial Performance</SectionHead>
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {commercialIds.map(id => (
+            <CommercialKpiTile key={id} id={id} metric={commercial[id]} />
+          ))}
+        </div>
+      </section>
 
       {/* KPI Scorecard */}
       <section>

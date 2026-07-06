@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect }     from 'next/navigation'
 import { getActiveBrand } from '@/lib/active-brand'
 import { computeLiveBHI } from '@/lib/live-bhi'
+import { computeCommercialMetrics, visibleCommercialMetrics } from '@/lib/commercial-metrics'
+import { resolveBrandType } from '@/lib/bhi'
 import { callAi }       from '@/lib/ai/client'
 import { BusinessCaseClient } from './business-case-client'
 
@@ -12,16 +14,19 @@ export default async function BusinessCasePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const brand = await getActiveBrand<{ id: string; name: string; category: string | null; market_share_pct: number | null; brand_voice: Record<string, unknown> }>(
-    supabase, 'id, name, category, market_share_pct, brand_voice'
+  const brand = await getActiveBrand<{ id: string; name: string; category: string | null; market_share_pct: number | null; brand_voice: Record<string, unknown>; brand_type: string | null; industry: string | null }>(
+    supabase, 'id, name, category, market_share_pct, brand_voice, brand_type, industry'
   )
   if (!brand) redirect('/onboarding')
+
+  const brandType = resolveBrandType(brand.brand_type, brand.industry)
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
   const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
 
   const [
     liveBhi,
+    commercial,
     { data: bhiTrend },
     { data: latestSov },
     { data: campaigns },
@@ -31,6 +36,7 @@ export default async function BusinessCasePage() {
     { data: competitors },
   ] = await Promise.all([
     computeLiveBHI(supabase, brand.id),
+    computeCommercialMetrics(supabase, brand.id),
 
     supabase.from('brand_health_snapshots')
       .select('bhi, snapshot_date')
@@ -123,6 +129,20 @@ export default async function BusinessCasePage() {
       ? `${bhiChange > 0 ? '+' : ''}${bhiChange.toFixed(1)} pts over 90 days`
       : 'trend data unavailable'
 
+    // Only cite commercial metrics that are structurally relevant to this
+    // brand type and that actually have a value this period.
+    const commercialIds = visibleCommercialMetrics(brandType)
+    const commercialLines: string[] = []
+    if (commercialIds.includes('revenue')   && commercial.revenue.value   != null) commercialLines.push(`- Revenue (this month): ₦${commercial.revenue.value.toLocaleString()}`)
+    if (commercialIds.includes('spend')     && commercial.spend.value     != null) commercialLines.push(`- Marketing spend (this month): ₦${commercial.spend.value.toLocaleString()}`)
+    if (commercialIds.includes('roiPct')    && commercial.roiPct.value    != null) commercialLines.push(`- Marketing ROI: ${commercial.roiPct.value >= 0 ? '+' : ''}${commercial.roiPct.value.toFixed(0)}%`)
+    if (commercialIds.includes('roas')      && commercial.roas.value      != null) commercialLines.push(`- ROAS: ${commercial.roas.value.toFixed(1)}x`)
+    if (commercialIds.includes('cac')       && commercial.cac.value       != null) commercialLines.push(`- CAC (cost to acquire a customer): ₦${commercial.cac.value.toLocaleString()}`)
+    if (commercialIds.includes('cpl')       && commercial.cpl.value       != null) commercialLines.push(`- CPL (cost per marketing-qualified lead): ₦${commercial.cpl.value.toLocaleString()}`)
+    if (commercialIds.includes('mql')       && commercial.mql.value       != null) commercialLines.push(`- MQLs generated (this month): ${commercial.mql.value.toLocaleString()}`)
+    if (commercialIds.includes('churnRate') && commercial.churnRate.value != null) commercialLines.push(`- Churn rate: ${(commercial.churnRate.value * 100).toFixed(1)}%`)
+    if (commercialIds.includes('ltvToCac')  && commercial.ltvToCac.value  != null) commercialLines.push(`- LTV to CAC ratio: ${commercial.ltvToCac.value.toFixed(1)}x`)
+
     const prompt = `You are a seasoned Chief Marketing Officer preparing a business case to justify and expand the marketing budget.
 
 Brand: ${brand.name} (${brand.category ?? 'Consumer brand'}, Nigeria)
@@ -140,7 +160,7 @@ PERFORMANCE DATA:
 - Total budget (90d): ₦${totalBudget.toLocaleString()}
 - Active campaigns: ${activeCampaigns}
 - Tracked competitors: ${(competitors ?? []).map(c => c.name).join(', ') || 'none yet'}
-
+${commercialLines.length > 0 ? commercialLines.join('\n') + '\n' : ''}
 Use the Les Binet & Peter Field ESOV model (positive ESOV predicts market share growth), Aaker's brand equity framework, and hard numbers from the data above.
 
 Respond ONLY with valid JSON (no markdown, no code fences):
@@ -191,6 +211,8 @@ Budget ask amounts should be directional, based on the existing spend pattern. K
       spendEfficiency={spendEfficiency}
       competitors={(competitors ?? []).map(c => c.name)}
       aiBusinessCase={aiBusinessCase}
+      commercial={commercial}
+      brandType={brandType}
     />
   )
 }

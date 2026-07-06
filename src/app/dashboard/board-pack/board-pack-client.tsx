@@ -4,14 +4,14 @@ import { useCallback } from 'react'
 import { Download, Mail, Link2, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import {
+  visibleCommercialMetrics,
+  type CommercialMetrics,
+  type CommercialMetricId,
+} from '@/lib/commercial-metrics'
+import type { BrandType } from '@/lib/bhi'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-
-interface ManualMetric {
-  metric_name: string
-  value:       number
-  unit:        string | null
-}
 
 interface Props {
   brand: {
@@ -28,7 +28,8 @@ interface Props {
   recentEventCount:      number
   ambassadorInteractions: number
   avgNps:                number | null
-  manualMetrics:         ManualMetric[]
+  commercial:            CommercialMetrics
+  brandType:             BrandType
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -81,7 +82,74 @@ function TrendIcon({ value }: { value: number | null }) {
   return               <Minus className="h-3.5 w-3.5 text-amber-500" />
 }
 
+// ── Commercial metric display config ─────────────────────────────────────────
+
+const COMMERCIAL_DEFS: Record<CommercialMetricId, {
+  label: string
+  fmt: (v: number) => string
+  goodWhenDown?: boolean
+}> = {
+  revenue:   { label: 'Revenue',         fmt: fmtNGN },
+  spend:     { label: 'Marketing Spend', fmt: fmtNGN },
+  roiPct:    { label: 'Marketing ROI',   fmt: v => `${v >= 0 ? '+' : ''}${v.toFixed(0)}%` },
+  roas:      { label: 'ROAS',            fmt: v => `${v.toFixed(1)}x` },
+  cac:       { label: 'CAC',             fmt: fmtNGN, goodWhenDown: true },
+  cpl:       { label: 'Cost per Lead',   fmt: fmtNGN, goodWhenDown: true },
+  mql:       { label: 'MQLs',            fmt: v => v.toLocaleString('en-NG') },
+  churnRate: { label: 'Churn Rate',      fmt: v => `${(v * 100).toFixed(1)}%`, goodWhenDown: true },
+  ltvToCac:  { label: 'LTV : CAC',       fmt: v => `${v.toFixed(1)}x` },
+}
+
+function periodDelta(trend: { date: string; value: number }[]): number | null {
+  if (trend.length < 2) return null
+  const prev = trend[trend.length - 2].value
+  const last = trend[trend.length - 1].value
+  if (prev === 0) return null
+  return ((last - prev) / Math.abs(prev)) * 100
+}
+
 // ── Sub-components ────────────────────────────────────────────────────────────
+
+function CommercialTile({ id, metric }: {
+  id:     CommercialMetricId
+  metric: CommercialMetrics[CommercialMetricId]
+}) {
+  const def = COMMERCIAL_DEFS[id]
+
+  if (metric.value == null) {
+    return (
+      <div className="flex flex-col justify-between gap-1 rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-3 print:border-gray-300">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">{def.label}</span>
+        <span className="text-[11px] leading-snug text-gray-400">{metric.unavailableReason}</span>
+      </div>
+    )
+  }
+
+  const delta = periodDelta(metric.trend)
+  const improved = delta != null ? (def.goodWhenDown ? delta < 0 : delta > 0) : null
+
+  return (
+    <div className="flex flex-col gap-1 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm print:border-gray-300 print:shadow-none">
+      <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">{def.label}</span>
+      <span className="text-xl font-bold text-gray-900 leading-none tabular-nums">{def.fmt(metric.value)}</span>
+      {delta != null ? (
+        <span className={cn(
+          'flex items-center gap-1 text-[11px] font-semibold tabular-nums',
+          improved ? 'text-emerald-600' : 'text-red-500',
+        )}>
+          {delta > 0
+            ? <TrendingUp className="h-3 w-3" />
+            : delta < 0
+              ? <TrendingDown className="h-3 w-3" />
+              : <Minus className="h-3 w-3" />}
+          {delta > 0 ? '+' : ''}{delta.toFixed(1)}% vs last month
+        </span>
+      ) : (
+        <span className="text-[11px] text-gray-400">This month</span>
+      )}
+    </div>
+  )
+}
 
 function MetricTile({
   label, value, unit, trend,
@@ -117,8 +185,10 @@ export function BoardPackClient({
   recentEventCount,
   ambassadorInteractions,
   avgNps,
-  manualMetrics,
+  commercial,
+  brandType,
 }: Props) {
+  const commercialIds = visibleCommercialMetrics(brandType)
 
   const label    = bhiLabel(bhi)
   const bhiScore = bhi != null ? bhi.toFixed(0) : 'N/A'
@@ -263,6 +333,18 @@ export function BoardPackClient({
                 />
               </div>
 
+              {/* Commercial Performance — the CFO-facing numbers */}
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+                  Commercial Performance
+                </p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {commercialIds.map(id => (
+                    <CommercialTile key={id} id={id} metric={commercial[id]} />
+                  ))}
+                </div>
+              </div>
+
               {/* Campaign summary */}
               <div className="rounded-xl bg-gray-50 px-5 py-4 print:bg-gray-100">
                 <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1">
@@ -296,25 +378,6 @@ export function BoardPackClient({
                       : ''}
                     .
                   </p>
-                </div>
-              )}
-
-              {/* Manual metrics (if any) */}
-              {manualMetrics.length > 0 && (
-                <div className="rounded-xl bg-gray-50 px-5 py-4 print:bg-gray-100">
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-2">
-                    Additional Metrics
-                  </p>
-                  <ul className="space-y-1">
-                    {manualMetrics.slice(0, 5).map((m, i) => (
-                      <li key={i} className="flex items-center justify-between text-[13px] text-gray-700">
-                        <span className="capitalize">{m.metric_name.replace(/_/g, ' ')}</span>
-                        <span className="font-semibold tabular-nums">
-                          {m.unit === 'NGN' ? fmtNGN(m.value) : `${m.value.toLocaleString('en-NG')}${m.unit ? ' ' + m.unit : ''}`}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               )}
 

@@ -2,6 +2,8 @@ import { createClient }   from '@/lib/supabase/server'
 import { redirect }        from 'next/navigation'
 import { getActiveBrand }  from '@/lib/active-brand'
 import { computeLiveBHI }  from '@/lib/live-bhi'
+import { computeCommercialMetrics } from '@/lib/commercial-metrics'
+import { resolveBrandType } from '@/lib/bhi'
 import { BoardPackClient } from './board-pack-client'
 
 export const dynamic = 'force-dynamic'
@@ -12,10 +14,12 @@ export default async function BoardPackPage() {
   if (!user) redirect('/auth/login')
 
   const brand = await getActiveBrand<{
-    id:       string
-    name:     string
-    category: string | null
-  }>(supabase, 'id, name, category')
+    id:         string
+    name:       string
+    category:   string | null
+    brand_type: string | null
+    industry:   string | null
+  }>(supabase, 'id, name, category, brand_type, industry')
   if (!brand) redirect('/onboarding')
 
   const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
@@ -25,12 +29,14 @@ export default async function BoardPackPage() {
   // ── Core queries ──────────────────────────────────────────────────────────
   const [
     liveBhi,
+    commercial,
     { data: latestSentiment },
     { data: latestSov },
     { data: campaigns },
     { data: recentEvents },
   ] = await Promise.all([
     computeLiveBHI(supabase, brand.id),
+    computeCommercialMetrics(supabase, brand.id),
 
     supabase
       .from('sentiment_daily')
@@ -81,20 +87,6 @@ export default async function BoardPackPage() {
     ambassadorInteractions = count ?? 0
   }
 
-  // ── metric_manual (may not exist yet) ─────────────────────────────────────
-  let manualMetrics: { metric_name: string; value: number; unit: string | null }[] = []
-  try {
-    const { data } = await supabase
-      .from('metric_manual')
-      .select('metric_name, value, unit')
-      .eq('brand_id', brand.id)
-      .order('recorded_at', { ascending: false })
-      .limit(20)
-    manualMetrics = (data ?? []) as typeof manualMetrics
-  } catch {
-    // Table not yet created -- skip gracefully
-  }
-
   // ── Derived values ────────────────────────────────────────────────────────
   const bhi       = liveBhi.score
   const sentiment = latestSentiment?.social_score != null ? Number(latestSentiment.social_score) : null
@@ -123,7 +115,8 @@ export default async function BoardPackPage() {
       recentEventCount={(recentEvents ?? []).length}
       ambassadorInteractions={ambassadorInteractions}
       avgNps={avgNps}
-      manualMetrics={manualMetrics}
+      commercial={commercial}
+      brandType={resolveBrandType(brand.brand_type, brand.industry)}
     />
   )
 }
