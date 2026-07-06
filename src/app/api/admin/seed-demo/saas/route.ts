@@ -99,6 +99,7 @@ export async function POST(req: NextRequest) {
     name:            'Bridger CRM',
     category:        'SaaS / Technology',
     industry:        'b2b_saas',
+    brand_type:      'b2b_saas',
     primary_color:   '#0F4C81',
     secondary_color: '#00C6A7',
     brand_values:    ['Built for Nigeria', 'Simplicity', 'Reliability', 'Local First'],

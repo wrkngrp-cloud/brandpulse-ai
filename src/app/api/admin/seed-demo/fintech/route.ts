@@ -79,6 +79,7 @@ export async function POST(req: NextRequest) {
     name:            'PocketPay',
     category:        'Fintech',
     industry:        'fintech',
+    brand_type:      'fintech',
     primary_color:   '#6C3FE8',
     secondary_color: '#F0A500',
     market_share_pct: 8.4,
