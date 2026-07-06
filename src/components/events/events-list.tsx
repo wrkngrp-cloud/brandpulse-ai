@@ -59,7 +59,7 @@ function activationBadgeClass(type: string): string {
 }
 
 function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })
 }
 
 function EventRow({ ev }: { ev: Event }) {

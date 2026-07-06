@@ -982,7 +982,7 @@ export function CreativeClient({
                   <span className="text-muted-foreground truncate">{analysisSummary(a)}</span>
                 </div>
                 <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
-                  {new Date(a.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                  {new Date(a.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', timeZone: 'Africa/Lagos' })}
                 </span>
               </li>
             ))}

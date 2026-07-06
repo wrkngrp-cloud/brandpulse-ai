@@ -520,7 +520,7 @@ function StepCampaign({ state, setState }: { state: WizardState; setState: React
         <Label htmlFor="campaign_name">Campaign name</Label>
         <Input
           id="campaign_name"
-          placeholder={`e.g. ${new Date().toLocaleDateString('en-NG', { month: 'short', year: 'numeric' })} Brand Awareness`}
+          placeholder={`e.g. ${new Date().toLocaleDateString('en-NG', { month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })} Brand Awareness`}
           value={state.campaign_name}
           onChange={e => set('campaign_name', e.target.value)}
         />

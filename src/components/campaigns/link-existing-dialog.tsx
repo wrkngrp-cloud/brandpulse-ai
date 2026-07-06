@@ -37,7 +37,7 @@ interface LinkEventDialogProps {
 
 function fmtDate(d: string | null) {
   if (!d) return ''
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })
 }
 
 export function LinkOohSiteDialog({ campaignId, availableSites }: LinkOohDialogProps) {

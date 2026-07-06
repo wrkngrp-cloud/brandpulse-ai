@@ -44,7 +44,7 @@ const TYPE_META: Record<string, { label: string; color: string; icon: React.Elem
 function buildHourlyData(interactions: Interaction[]): { hour: string; count: number }[] {
   const buckets: Record<string, number> = {}
   for (const ia of interactions) {
-    const h = new Date(ia.occurred_at).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: false })
+    const h = new Date(ia.occurred_at).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Africa/Lagos' })
     const key = h.slice(0, 2) + ':00'
     buckets[key] = (buckets[key] ?? 0) + 1
   }

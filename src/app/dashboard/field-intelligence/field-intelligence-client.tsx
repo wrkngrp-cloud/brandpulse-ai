@@ -204,7 +204,7 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
                     <div className="min-w-0">
                       <p className="text-sm font-semibold truncate">{r.fso_name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(r.report_date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+                        {new Date(r.report_date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
                         {r.state ? ` · ${r.state}` : ''}
                         {r.lga   ? ` · ${r.lga}`   : ''}
                         {' · '}{teamName(r.fso_teams)}
@@ -246,7 +246,7 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
                 <p className="text-xs text-muted-foreground">
                   {c.outlet_name && `${c.outlet_name} · `}
                   {c.state}{c.lga ? ` · ${c.lga}` : ''}{' · '}
-                  {new Date(c.report_date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+                  {new Date(c.report_date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
                 </p>
               </div>
             ))}

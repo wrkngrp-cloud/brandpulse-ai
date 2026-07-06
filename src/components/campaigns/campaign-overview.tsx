@@ -83,7 +83,7 @@ function daysBetween(a: string, b: string) {
 
 function fmtDateShort(d: string | null) {
   if (!d) return '—'
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
 }
 
 function formatFollowers(n: number | null): string {

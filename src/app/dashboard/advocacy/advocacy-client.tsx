@@ -579,7 +579,7 @@ function CandidateRow({
         </span>
         <span className="flex-1 text-muted-foreground line-clamp-1">
           {candidate.verbatim ?? 'Score only — no verbatim'} ·{' '}
-          {new Date(candidate.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+          {new Date(candidate.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
         </span>
         {!open && (
           <button

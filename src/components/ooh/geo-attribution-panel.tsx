@@ -66,7 +66,7 @@ const STATUS_META: Record<string, { label: string; color: string; icon: React.El
 }
 
 function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lagos' })
 }
 
 // Haversine distance in metres

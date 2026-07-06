@@ -132,7 +132,7 @@ export function MetaAdsConnectCard({ account: initialAccount }: Props) {
       {account?.last_synced_at && (
         <p className="text-[11px] text-muted-foreground/50 mt-3 pl-12">
           Last synced {new Date(account.last_synced_at).toLocaleDateString('en-NG', {
-            day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+            day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lagos'
           })}
         </p>
       )}

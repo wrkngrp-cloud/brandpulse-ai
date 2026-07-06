@@ -235,7 +235,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
                   )}
                 </div>
                 <p className="text-[11px] text-muted-foreground shrink-0">
-                  {new Date(c.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+                  {new Date(c.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
                 </p>
               </div>
             ))}

@@ -77,7 +77,7 @@ interface PortalData {
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
 }
 
 function fmtNGN(naira: number) {
@@ -181,7 +181,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
   const zone      = latestBhi != null ? bhiZone(latestBhi) : null
 
   const reportTitle = `${brand.name} — Brand Intelligence Report`
-  const reportPeriod = `Last ${days} days · as of ${new Date(data.asOf).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })}`
+  const reportPeriod = `Last ${days} days · as of ${new Date(data.asOf).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}`
 
   // Build NPS weekly buckets
   const npsWeeks: { week: string; score: number }[] = []
@@ -583,7 +583,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
 
                   <p className="text-[11px] text-muted-foreground">
                     SOV data from social listening · updates weekly
-                    {sovCompetitor?.snapshot_date && ` · last snapshot ${new Date(sovCompetitor.snapshot_date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}`}
+                    {sovCompetitor?.snapshot_date && ` · last snapshot ${new Date(sovCompetitor.snapshot_date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}`}
                   </p>
                 </div>
               )
@@ -627,7 +627,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                           {s.description && (
                             <p className="text-[12.5px] text-muted-foreground leading-snug">{s.description}</p>
                           )}
-                          <p className="text-[11px] text-muted-foreground/60 mt-1">{new Date(s.spotted_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                          <p className="text-[11px] text-muted-foreground/60 mt-1">{new Date(s.spotted_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}</p>
                         </div>
                       </li>
                     ))}
@@ -658,7 +658,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                           <div className="flex items-center gap-2 mt-0.5">
                             <span className="text-[11px] text-muted-foreground">{m.publication}</span>
                             <span className="text-muted-foreground/30">·</span>
-                            <span className="text-[11px] text-muted-foreground">{new Date(m.published_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</span>
+                            <span className="text-[11px] text-muted-foreground">{new Date(m.published_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}</span>
                             {m.competitor_name && <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded font-medium text-muted-foreground">{m.competitor_name}</span>}
                           </div>
                         </div>
@@ -803,7 +803,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               This report is confidential and intended solely for the named recipient.
             </p>
             <p className="text-[11px] text-muted-foreground">
-              Generated {new Date(data.asOf).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              Generated {new Date(data.asOf).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lagos' })}
             </p>
           </div>
           <p className="text-[10px] text-muted-foreground/50 mt-2">

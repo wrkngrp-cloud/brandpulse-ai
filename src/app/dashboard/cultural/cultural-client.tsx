@@ -556,7 +556,7 @@ function CalendarRow({
     <div className="flex items-start gap-3 py-2.5 border-b last:border-0">
       <div className="shrink-0 flex flex-col items-center justify-center w-11 h-11 rounded-lg bg-muted text-center">
         <span className="text-[10px] text-muted-foreground leading-tight">
-          {new Date(moment.date + 'T00:00:00').toLocaleDateString('en-NG', { month: 'short' })}
+          {new Date(moment.date + 'T00:00:00').toLocaleDateString('en-NG', { month: 'short', timeZone: 'Africa/Lagos' })}
         </span>
         <span className="text-sm font-bold leading-tight">
           {new Date(moment.date + 'T00:00:00').getDate()}
@@ -644,7 +644,7 @@ function TopPickCard({
             </span>
           </div>
           <p className="text-[11px] text-muted-foreground">
-            {new Date(moment.date + 'T00:00:00').toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })}
+            {new Date(moment.date + 'T00:00:00').toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}
             {' · '}
             <span className={cn('font-medium', daysAway <= 14 ? 'text-red-600' : daysAway <= 30 ? 'text-amber-600' : 'text-muted-foreground')}>
               {daysAway === 0 ? 'Today' : daysAway === 1 ? 'Tomorrow' : `${daysAway} days away`}
@@ -830,7 +830,7 @@ export function CulturalClient({
           <div className="border-t pt-4 mt-2 space-y-2">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Breakdown — last 30 days</p>
             {analyses.map(a => {
-              const date = new Date(a.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
+              const date = new Date(a.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
               const preview = a.content_text ? a.content_text.slice(0, 80) + (a.content_text.length > 80 ? '…' : '') : null
               return (
                 <div key={a.id} className="rounded-lg border bg-muted/30 px-3 py-2.5 space-y-1.5">

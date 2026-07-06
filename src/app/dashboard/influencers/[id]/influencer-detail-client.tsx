@@ -298,7 +298,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
         <StatTile icon={Users} label="Followers" value={fmtFollowers(totalFollowers ?? null)} />
         <StatTile icon={Activity} label="Engagement" value={engRate ? `${(engRate * 100).toFixed(1)}%` : '—'} />
         <StatTile icon={BarChart2} label="Posts tracked" value={String(initialPosts.length)} />
-        <StatTile icon={Calendar} label="Added" value={new Date(inf.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })} />
+        <StatTile icon={Calendar} label="Added" value={new Date(inf.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })} />
       </div>
 
       {/* Two-column layout */}
@@ -610,11 +610,11 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           <div className="border rounded-2xl p-4 bg-card space-y-2 text-xs text-muted-foreground">
             <div className="flex justify-between">
               <span>Added</span>
-              <span>{new Date(inf.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+              <span>{new Date(inf.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}</span>
             </div>
             <div className="flex justify-between">
               <span>Last updated</span>
-              <span>{new Date(inf.updated_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+              <span>{new Date(inf.updated_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}</span>
             </div>
           </div>
         </div>

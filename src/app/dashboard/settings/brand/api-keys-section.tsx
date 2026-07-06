@@ -179,7 +179,7 @@ export function ApiKeysSection() {
             <span className="text-xs text-muted-foreground/70 shrink-0">{k.name}</span>
             <span className="text-xs text-muted-foreground/50 shrink-0">
               {k.last_used_at
-                ? `Last used ${new Date(k.last_used_at).toLocaleDateString()}`
+                ? `Last used ${new Date(k.last_used_at).toLocaleDateString('en-NG', { timeZone: 'Africa/Lagos' })}`
                 : 'Never used'}
             </span>
             <button

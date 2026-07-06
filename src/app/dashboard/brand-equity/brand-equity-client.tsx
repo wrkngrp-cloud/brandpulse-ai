@@ -449,7 +449,7 @@ export function BrandEquityClient({
                 tickLine={false}
                 axisLine={false}
                 interval="preserveStartEnd"
-                tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+                tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
                 fontFamily="var(--font-sans)"
               />
               <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }} tickLine={false} axisLine={false} tickCount={5} fontFamily="var(--font-sans)" />
@@ -468,7 +468,7 @@ export function BrandEquityClient({
               )}
               <RechartTooltip
                 formatter={(v) => [typeof v === 'number' ? Math.round(v) : v, 'BHI Score']}
-                labelFormatter={(v) => typeof v === 'string' ? new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' }) : String(v)}
+                labelFormatter={(v) => typeof v === 'string' ? new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' }) : String(v)}
                 contentStyle={{
                   background: '#14182B',
                   border: '1px solid rgba(255,255,255,0.10)',

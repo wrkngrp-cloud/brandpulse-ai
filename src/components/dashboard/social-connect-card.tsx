@@ -69,7 +69,7 @@ export function SocialConnectCard({ connections }: { connections: ConnectionStat
                     <p className="text-xs text-muted-foreground">
                       {conn.account_name}
                       {conn.last_synced_at && (
-                        <> · synced {new Date(conn.last_synced_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</>
+                        <> · synced {new Date(conn.last_synced_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}</>
                       )}
                     </p>
                   )}

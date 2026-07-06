@@ -129,7 +129,7 @@ export default async function OohSitePage({
         <StatCard
           label="Campaign"
           value={site.campaign_start && site.campaign_end
-            ? `${new Date(site.campaign_start).toLocaleDateString('en-GB', { day:'numeric',month:'short' })} – ${new Date(site.campaign_end).toLocaleDateString('en-GB', { day:'numeric',month:'short' })}`
+            ? `${new Date(site.campaign_start).toLocaleDateString('en-GB', { day:'numeric',month:'short', timeZone: 'Africa/Lagos' })} – ${new Date(site.campaign_end).toLocaleDateString('en-GB', { day:'numeric',month:'short', timeZone: 'Africa/Lagos' })}`
             : '—'}
         />
       </div>

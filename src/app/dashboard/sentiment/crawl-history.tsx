@@ -107,7 +107,7 @@ export function CrawlHistory() {
                     </div>
                     <span className="text-[10px] text-muted-foreground">
                       {new Date(run.started_at).toLocaleString('en-NG', {
-                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lagos',
                       })}
                     </span>
                   </div>

@@ -146,7 +146,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
                 <p className="text-xs text-muted-foreground mt-0.5 truncate">{team.notes}</p>
               )}
               <p className="text-xs text-muted-foreground mt-0.5">
-                Created {new Date(team.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}
+                Created {new Date(team.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}
               </p>
             </div>
             <button

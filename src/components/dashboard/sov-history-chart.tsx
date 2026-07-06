@@ -19,7 +19,7 @@ function CustomTooltip({ active, payload, label }: {
   return (
     <div className="bg-[#14182B] border border-white/10 rounded-xl shadow-2xl px-3.5 py-2.5">
       <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-white/40 mb-1.5">
-        {label ? new Date(label).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: '2-digit' }) : ''}
+        {label ? new Date(label).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'Africa/Lagos' }) : ''}
       </p>
       <p className="text-[15px] font-bold tabular-nums" style={{ color: '#2B59FF' }}>
         {payload[0].value.toFixed(1)}%
@@ -61,7 +61,7 @@ export function SovHistoryChart({ data, days }: { data: SovPoint[]; days?: numbe
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
-            tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+            tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
             fontFamily="var(--font-sans)"
           />
           <YAxis

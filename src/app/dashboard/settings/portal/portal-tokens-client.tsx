@@ -165,7 +165,7 @@ export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit,
                 <p className="text-[12px] text-muted-foreground">
                   {(t.brands as { name: string } | null)?.name ?? '—'} ·{' '}
                   {t.last_accessed
-                    ? `Last viewed ${new Date(t.last_accessed).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}`
+                    ? `Last viewed ${new Date(t.last_accessed).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}`
                     : 'Not yet viewed'}
                 </p>
                 <div className="flex flex-wrap gap-1 mt-1.5">

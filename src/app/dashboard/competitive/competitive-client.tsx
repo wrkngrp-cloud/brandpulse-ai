@@ -309,7 +309,7 @@ function BriefingTab({
               </span>
               {lastBriefing && !loading && (
                 <p className="text-xs text-muted-foreground">
-                  Last generated {new Date(lastBriefing.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  Last generated {new Date(lastBriefing.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}
                 </p>
               )}
             </div>
@@ -716,7 +716,7 @@ function SightingsTab({
                   )}
                 </div>
                 <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  {new Date(s.spotted_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  {new Date(s.spotted_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}
                 </span>
               </div>
               {s.description && (

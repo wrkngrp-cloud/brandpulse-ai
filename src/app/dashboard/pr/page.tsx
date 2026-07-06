@@ -47,7 +47,7 @@ function fmtEmv(n: number | null): string {
 }
 
 function fmtDate(d: string): string {
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })
 }
 
 export default async function PRTrackingPage({
@@ -107,7 +107,7 @@ export default async function PRTrackingPage({
   for (const m of brandMentions) {
     const d = new Date(m.published_at)
     if (d < sixMonthsAgo) continue
-    const label = d.toLocaleDateString('en-NG', { month: 'short' })
+    const label = d.toLocaleDateString('en-NG', { month: 'short', timeZone: 'Africa/Lagos' })
     monthlyMap[label] = (monthlyMap[label] ?? 0) + 1
   }
   const monthlyData = Object.entries(monthlyMap).map(([month, mentions]) => ({ month, mentions }))

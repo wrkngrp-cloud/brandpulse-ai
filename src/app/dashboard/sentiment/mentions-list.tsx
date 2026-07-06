@@ -167,7 +167,7 @@ export function MentionsList({ initialMentions }: { initialMentions: Mention[] }
                   </span>
                 )}
                 <span className="text-xs text-muted-foreground">
-                  {new Date(m.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+                  {new Date(m.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
                 </span>
                 <DisputeMenu mention={m} onDisputed={handleDisputed} />
               </div>

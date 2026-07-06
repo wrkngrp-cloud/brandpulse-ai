@@ -53,7 +53,7 @@ export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId, tota
   }
 
   const chartData = upliftRows.map(r => ({
-    week: new Date(r.week_start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+    week: new Date(r.week_start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' }),
     'Search index':  r.search_index ?? 0,
     'OOH visits':    r.ooh_visits,
   }))

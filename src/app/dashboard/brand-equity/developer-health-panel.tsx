@@ -63,7 +63,7 @@ function Metric({
 export function DeveloperHealthPanel({ github, githubPrev, npm, npmPrev, stackoverflow }: Props) {
   const lastSynced = github?.period_end ?? npm?.period_end ?? stackoverflow?.period_end ?? null
   const lastSyncedLabel = lastSynced
-    ? new Date(lastSynced).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+    ? new Date(lastSynced).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })
     : null
 
   return (

@@ -26,7 +26,7 @@ interface MonthlyReportResult {
 }
 
 function getMonthLabel(): string {
-  return new Date().toLocaleString('en-GB', { month: 'long', year: 'numeric' })
+  return new Date().toLocaleString('en-GB', { month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })
 }
 
 function thirtyDaysAgo(): string {

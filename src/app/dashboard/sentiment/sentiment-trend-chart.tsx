@@ -20,7 +20,7 @@ interface Props {
 }
 
 function shortDate(d: string) {
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
 }
 
 function CustomTooltip({ active, payload, label }: {

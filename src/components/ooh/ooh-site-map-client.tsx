@@ -20,7 +20,7 @@ interface OohSiteMapClientProps {
 
 function fmtDate(iso: string | null | undefined) {
   if (!iso) return ''
-  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'Africa/Lagos' })
 }
 
 export function OohSiteMapClient({

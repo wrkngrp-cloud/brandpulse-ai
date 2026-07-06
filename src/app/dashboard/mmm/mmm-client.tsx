@@ -171,7 +171,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
               </div>
               <div className="shrink-0 text-right">
                 <p className="text-[11px] text-muted-foreground">{result.window_days}d window</p>
-                <p className="text-[11px] text-muted-foreground">{new Date(result.ran_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</p>
+                <p className="text-[11px] text-muted-foreground">{new Date(result.ran_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}</p>
               </div>
             </div>
           </div>

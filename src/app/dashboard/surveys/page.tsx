@@ -169,7 +169,7 @@ async function PerceptionAuditSection() {
                   <p className="text-sm font-medium truncate group-hover:underline">{s.name}</p>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Clock className="h-3 w-3 shrink-0" />
-                    {new Date(s.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {new Date(s.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}
                   </div>
                 </div>
                 <div className="flex items-center gap-3 ml-4 shrink-0">

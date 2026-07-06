@@ -95,7 +95,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
   const latest = scores[0] ?? null
 
   const chartData = [...scores].reverse().map(s => ({
-    week: new Date(s.week_of).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }),
+    week: new Date(s.week_of).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', timeZone: 'Africa/Lagos' }),
     score: s.visibility_score,
     chatgpt: s.chatgpt_score,
     gemini: s.gemini_score,
@@ -164,7 +164,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
             <ScoreRing score={latest.visibility_score} size={80} />
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">AI Visibility Score</p>
             <p className="text-[11px] text-muted-foreground">
-              Week of {new Date(latest.week_of).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' })}
+              Week of {new Date(latest.week_of).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', timeZone: 'Africa/Lagos' })}
             </p>
           </div>
           {/* Per-platform */}
@@ -283,7 +283,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
                   )}
                 </div>
                 <p className="text-[11px] text-muted-foreground shrink-0">
-                  {new Date(c.checked_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+                  {new Date(c.checked_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
                 </p>
               </div>
             ))}

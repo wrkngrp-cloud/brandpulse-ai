@@ -35,7 +35,7 @@ function aggregateByDay(visits: Visit[]): { date: string; visits: number }[] {
   return Object.entries(counts)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, visits]) => ({
-      date: new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+      date: new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' }),
       visits,
     }))
 }

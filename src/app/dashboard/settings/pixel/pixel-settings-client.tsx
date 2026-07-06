@@ -248,6 +248,7 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
                         hour: '2-digit',
                         minute: '2-digit',
                         second: '2-digit',
+                        timeZone: 'Africa/Lagos',
                       })}
                     </td>
                   </tr>

@@ -126,7 +126,7 @@ export function ContentTable({
       cell: ({ row }) => (
         <span className="text-xs text-muted-foreground whitespace-nowrap">
           {row.original.posted_at
-            ? new Date(row.original.posted_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
+            ? new Date(row.original.posted_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
             : '—'}
         </span>
       ),

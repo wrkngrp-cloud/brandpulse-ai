@@ -52,7 +52,7 @@ function platformColor(p: string) {
 }
 
 function fmtDate(s: string) {
-  return new Date(s).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+  return new Date(s).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })
 }
 
 export default function DraftsPage() {

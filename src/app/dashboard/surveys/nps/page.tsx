@@ -26,7 +26,7 @@ function isoWeekStart(date: Date): Date {
 }
 
 function weekLabel(date: Date): string {
-  return date.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'UTC' })
+  return date.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
 }
 
 export default async function NpsTrackerPage() {

@@ -61,7 +61,7 @@ function buildSummary(props: Props): string {
 
   if (parts.length === 0) return `${brandName}'s dashboard is ready. Start by connecting data or running a campaign.`
 
-  const month = new Date().toLocaleString('en-NG', { month: 'long' })
+  const month = new Date().toLocaleString('en-NG', { month: 'long', timeZone: 'Africa/Lagos' })
   return `${month}: ${parts.join(', ')}.`
 }
 

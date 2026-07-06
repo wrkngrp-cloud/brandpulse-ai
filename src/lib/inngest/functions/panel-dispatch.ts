@@ -59,7 +59,7 @@ export const panelDispatch = inngest.createFunction(
       const { data, error } = await supabase.from('surveys').insert({
         brand_id:    panel.brand_id,
         workspace_id: panel.workspace_id,
-        name:        `${panel.name} — ${new Date().toLocaleDateString('en-NG', { month: 'long', year: 'numeric' })}`,
+        name:        `${panel.name} — ${new Date().toLocaleDateString('en-NG', { month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}`,
         type:        panel.template_key,
         status:      'active',
         is_panel:    true,
@@ -82,7 +82,7 @@ export const panelDispatch = inngest.createFunction(
           await resend.emails.send({
             from:    `${brandName} <surveys@brandpulse.ai>`,
             to:      batch,
-            subject: `${brandName} — ${panel.name} (${new Date().toLocaleDateString('en-NG', { month: 'long' })})`,
+            subject: `${brandName} — ${panel.name} (${new Date().toLocaleDateString('en-NG', { month: 'long', timeZone: 'Africa/Lagos' })})`,
             html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a;">
               <p style="font-size:15px;line-height:1.6;">${brandName} is running its ${panel.cadence} tracking survey. It takes less than 2 minutes.</p>
               <p style="margin:28px 0;"><a href="${surveyUrl}" style="display:inline-block;background:#1a1a1a;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;">Take the survey</a></p>

@@ -107,7 +107,7 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
   const reviews  = (snapshot?.metadata?.recent_reviews ?? []).slice(0, 3)
 
   const lastSynced = snapshot?.period_end
-    ? new Date(snapshot.period_end).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+    ? new Date(snapshot.period_end).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })
     : null
 
   return (

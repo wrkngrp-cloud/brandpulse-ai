@@ -204,7 +204,7 @@ export default async function ConnectorsPage() {
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {ecommerceStats.totalOrders.toLocaleString()} orders · sources: {ecommerceStats.sources.join(', ')}
                     {ecommerceStats.lastImportAt && (
-                      <> · last import {new Date(ecommerceStats.lastImportAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</>
+                      <> · last import {new Date(ecommerceStats.lastImportAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}</>
                     )}
                   </p>
                 ) : (

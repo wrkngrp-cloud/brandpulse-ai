@@ -56,7 +56,7 @@ const fmtNGN = (k: number) => {
 }
 
 function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
 }
 
 const ESOV_POSTURE: Record<string, { label: string; color: string; bg: string; text: string }> = {

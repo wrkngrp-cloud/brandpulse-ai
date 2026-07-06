@@ -32,7 +32,7 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null
 
   const date = label
-    ? new Date(label).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: '2-digit' })
+    ? new Date(label).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'Africa/Lagos' })
     : ''
 
   return (
@@ -63,7 +63,7 @@ function CustomTooltip({ active, payload, label }: {
 
 function DateTick({ x, y, payload }: { x?: number; y?: number; payload?: { value: string } }) {
   if (!payload?.value) return null
-  const label = new Date(payload.value).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
+  const label = new Date(payload.value).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
   return (
     <text x={x} y={(y ?? 0) + 12} textAnchor="middle" fontSize={10} fill="currentColor" className="text-muted-foreground opacity-40" fontFamily="var(--font-sans)">
       {label}

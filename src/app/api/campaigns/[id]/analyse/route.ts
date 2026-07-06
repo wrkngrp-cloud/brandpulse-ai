@@ -56,7 +56,7 @@ export async function POST(
     : null
 
   const fmtDate = (d: string | null) =>
-    d ? new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'
+    d ? new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' }) : '—'
 
   const oohLines = (oohSites ?? []).length === 0
     ? '  No OOH sites'

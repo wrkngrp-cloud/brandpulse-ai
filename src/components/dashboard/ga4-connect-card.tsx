@@ -120,7 +120,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
                 <span className="text-muted-foreground">Last synced</span>
                 <span>
                   {new Date(connection.last_synced_at).toLocaleDateString('en-NG', {
-                    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+                    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lagos',
                   })}
                 </span>
               </div>

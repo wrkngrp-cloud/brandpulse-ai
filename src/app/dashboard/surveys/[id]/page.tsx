@@ -94,7 +94,7 @@ export default async function SurveyDetailPage({
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            {templateLabel} · created {new Date(survey.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}
+            {templateLabel} · created {new Date(survey.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}
           </p>
         </div>
         <StatusToggle surveyId={survey.id} status={survey.status} />
@@ -176,7 +176,7 @@ export default async function SurveyDetailPage({
               return (
                 <div key={r.id} className="border rounded-xl p-4 space-y-2">
                   <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
-                    <span>{new Date(r.collected_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    <span>{new Date(r.collected_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}</span>
                     <div className="flex items-center gap-2">
                       {r.source && <span className="bg-muted px-1.5 py-0.5 rounded">{r.source}</span>}
                       <span className={r.quality_flag === 'ok' ? 'text-green-600' : 'text-amber-500'}>

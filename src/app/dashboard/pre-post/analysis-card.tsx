@@ -90,7 +90,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
           {a.target_segment && <span className="text-xs text-muted-foreground">· {a.target_segment}</span>}
         </div>
         <p className="text-xs text-muted-foreground shrink-0">
-          {new Date(a.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}
+          {new Date(a.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}
         </p>
       </div>
 

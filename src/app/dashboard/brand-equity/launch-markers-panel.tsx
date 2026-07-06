@@ -52,7 +52,7 @@ const TYPE_LABEL: Record<string, string> = Object.fromEntries(
 )
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })
 }
 
 export function LaunchMarkersPanel() {

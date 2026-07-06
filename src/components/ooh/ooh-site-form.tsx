@@ -453,7 +453,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
       {/* Auto-save indicator */}
       {!defaultValues && (draftSaving || draftSavedAt) && (
         <p className="text-xs text-muted-foreground text-right">
-          {draftSaving ? 'Saving draft…' : `Draft saved ${draftSavedAt?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+          {draftSaving ? 'Saving draft…' : `Draft saved ${draftSavedAt?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lagos' })}`}
         </p>
       )}
 

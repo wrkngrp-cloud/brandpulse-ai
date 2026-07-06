@@ -237,7 +237,7 @@ export function RetentionClient() {
                         <p className="text-sm text-muted-foreground italic">No verbatim provided</p>
                       )}
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {new Date(d.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {new Date(d.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}
                       </p>
                     </div>
                   </div>
@@ -248,7 +248,7 @@ export function RetentionClient() {
 
           {/* Footer note */}
           <p className="text-xs text-muted-foreground">
-            Computed at {new Date(data.computed_at).toLocaleString('en-GB')} from last 30 days of sentiment, NPS, and brand health data.
+            Computed at {new Date(data.computed_at).toLocaleString('en-GB', { timeZone: 'Africa/Lagos' })} from last 30 days of sentiment, NPS, and brand health data.
             Go to <a href="/dashboard/advocacy" className="underline text-foreground">Advocacy</a> to activate promoters as a counter-measure.
           </p>
         </>

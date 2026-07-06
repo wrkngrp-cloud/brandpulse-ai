@@ -87,7 +87,7 @@ export interface OverviewProps {
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
 }
 
 function fmtCompact(n: number, currency = 'NGN') {

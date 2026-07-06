@@ -610,7 +610,7 @@ export default async function DigitalPage({
                   </Badge>
                   {acct.last_synced_at && (
                     <p className="text-[10px] text-muted-foreground">
-                      Synced {new Date(acct.last_synced_at).toLocaleDateString('en-NG')}
+                      Synced {new Date(acct.last_synced_at).toLocaleDateString('en-NG', { timeZone: 'Africa/Lagos' })}
                     </p>
                   )}
                   {acct.sync_status === 'error' && (

@@ -117,10 +117,10 @@ export function BillingClient({
           <div className="text-right">
             <p className="text-2xl font-bold">{fmtNGN(planDisplay[currentPlan]?.priceNGN ?? 0)}</p>
             {trialEndsAt && subscriptionStatus === 'trialing' && (
-              <p className="text-[12px] text-muted-foreground">Trial ends {new Date(trialEndsAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'long' })}</p>
+              <p className="text-[12px] text-muted-foreground">Trial ends {new Date(trialEndsAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', timeZone: 'Africa/Lagos' })}</p>
             )}
             {currentPeriodEnd && subscriptionStatus === 'active' && (
-              <p className="text-[12px] text-muted-foreground">Renews {new Date(currentPeriodEnd).toLocaleDateString('en-NG', { day: 'numeric', month: 'long' })}</p>
+              <p className="text-[12px] text-muted-foreground">Renews {new Date(currentPeriodEnd).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', timeZone: 'Africa/Lagos' })}</p>
             )}
           </div>
         </div>

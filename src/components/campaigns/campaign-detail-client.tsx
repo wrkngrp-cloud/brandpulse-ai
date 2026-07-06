@@ -162,7 +162,7 @@ const EVENT_STATUS: Record<string, string> = {
 
 function fmtDate(d: string | null) {
   if (!d) return '—'
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })
 }
 
 function fmtMoney(amount: number | null, currency = 'NGN') {
@@ -357,7 +357,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
     const day  = d.getDay() === 0 ? 6 : d.getDay() - 1  // Mon=0
     const mon  = new Date(d)
     mon.setDate(d.getDate() - day)
-    const key  = mon.toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
+    const key  = mon.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
     weeklyImpressions[key] = (weeklyImpressions[key] ?? 0) + (post.impressions ?? 0)
   }
   const weeklyChartData = Object.entries(weeklyImpressions).map(([week, impressions]) => ({ week, impressions }))

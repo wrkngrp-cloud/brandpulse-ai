@@ -55,7 +55,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 function fmtDate(d: string | null) {
   if (!d) return null
-  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+  return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })
 }
 
 function fmtBudget(amount: number | null, currency: string) {

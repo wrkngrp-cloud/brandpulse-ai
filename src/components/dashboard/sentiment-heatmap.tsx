@@ -49,7 +49,7 @@ function cellLabel(score: number | null): string {
 
 function fmt(d: string) {
   return new Date(d + 'T12:00:00').toLocaleDateString('en-NG', {
-    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos',
   })
 }
 
@@ -111,7 +111,7 @@ function buildGrid(data: HeatmapDay[]): { cells: Cell[]; months: MonthLabel[]; t
     // Month label at first day of each new month (use col of that week)
     const month = cur.getMonth()
     if (month !== lastMonth && row === 0) {
-      months.push({ label: cur.toLocaleDateString('en-NG', { month: 'short' }), col })
+      months.push({ label: cur.toLocaleDateString('en-NG', { month: 'short', timeZone: 'Africa/Lagos' }), col })
       lastMonth = month
     }
 

@@ -101,7 +101,7 @@ function SurveyRow({ survey, appUrl }: { survey: Survey; appUrl: string }) {
           <p className="text-xs text-muted-foreground">
             {survey.type ? `${getTemplateLabel(survey.type)} · ` : ''}
             {new Date(survey.created_at).toLocaleDateString('en-NG', {
-              day: 'numeric', month: 'short', year: 'numeric',
+              day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos',
             })}
           </p>
         </div>

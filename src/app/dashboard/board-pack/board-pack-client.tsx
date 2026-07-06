@@ -59,11 +59,11 @@ function bhiColor(bhi: number | null): string {
 }
 
 function monthYear(): string {
-  return new Date().toLocaleDateString('en-NG', { month: 'long', year: 'numeric' })
+  return new Date().toLocaleDateString('en-NG', { month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })
 }
 
 function todayFull(): string {
-  return new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })
 }
 
 function initials(name: string): string {

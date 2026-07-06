@@ -63,9 +63,9 @@ function StudyCard({ study }: { study: GeoLiftStudy }) {
               {STATUS_LABEL[study.status] ?? study.status}
             </span>
             <span className="text-xs text-muted-foreground">
-              {new Date(study.study_start).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+              {new Date(study.study_start).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
               {' — '}
-              {new Date(study.study_end).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}
+              {new Date(study.study_end).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}
             </span>
           </div>
           <h3 className="text-sm font-semibold">

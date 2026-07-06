@@ -76,13 +76,13 @@ function computeAlerts(daily: DayRow[]): Alert[] {
 
     if (delta <= -20) {
       alerts.push({ type: 'crash', severity: 'critical', date: curr.day,
-        message: `Sentiment crashed ${Math.abs(Math.round(delta))} points on ${new Date(curr.day).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}` })
+        message: `Sentiment crashed ${Math.abs(Math.round(delta))} points on ${new Date(curr.day).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}` })
     } else if (delta <= -10) {
       alerts.push({ type: 'crash', severity: 'warning', date: curr.day,
-        message: `Sentiment dropped ${Math.abs(Math.round(delta))} points on ${new Date(curr.day).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}` })
+        message: `Sentiment dropped ${Math.abs(Math.round(delta))} points on ${new Date(curr.day).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}` })
     } else if (delta >= 20) {
       alerts.push({ type: 'spike', severity: 'watch', date: curr.day,
-        message: `Positive surge of ${Math.round(delta)} points on ${new Date(curr.day).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })} — capture what drove this` })
+        message: `Positive surge of ${Math.round(delta)} points on ${new Date(curr.day).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })} — capture what drove this` })
     }
   }
 
@@ -257,9 +257,9 @@ async function SentimentData({ days = 84 }: { days: number }) {
               'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-400'
             const aiQuestion =
               a.type === 'spike'
-                ? `What drove the positive sentiment surge on ${new Date(a.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}? What can we do to sustain it?`
+                ? `What drove the positive sentiment surge on ${new Date(a.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}? What can we do to sustain it?`
                 : a.type === 'crash'
-                  ? `Why did our sentiment score drop on ${new Date(a.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}? What caused this and how do we recover?`
+                  ? `Why did our sentiment score drop on ${new Date(a.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}? What caused this and how do we recover?`
                   : `We have had sustained negative sentiment for several days. What is driving this and what actions should we take?`
             return (
               <div key={i} className={`flex items-start justify-between gap-3 border rounded-lg px-3.5 py-2.5 text-sm ${colorClass}`}>

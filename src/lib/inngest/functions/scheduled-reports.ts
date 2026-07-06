@@ -28,7 +28,7 @@ export const monthlyReportCron = inngest.createFunction(
   async () => {
     const supabase = await createServiceClient()
     const since = thirtyDaysAgo()
-    const month = new Date().toLocaleString('en-GB', { month: 'long', year: 'numeric' })
+    const month = new Date().toLocaleString('en-GB', { month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })
 
     // Find all workspaces with at least one brand
     const { data: brands } = await supabase

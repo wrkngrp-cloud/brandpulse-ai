@@ -267,7 +267,7 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
         {profile.last_seen_at && (
           <div className="flex items-center gap-1.5">
             <Calendar className="h-3 w-3 shrink-0" />
-            <span>Last seen {new Date(profile.last_seen_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <span>Last seen {new Date(profile.last_seen_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}</span>
           </div>
         )}
       </div>
