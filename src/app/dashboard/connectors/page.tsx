@@ -6,6 +6,7 @@ import { getIndustryFromCategory, SUGGESTED_CONNECTORS_BY_INDUSTRY, INDUSTRY_MET
 import { SocialConnectCard }   from '@/components/dashboard/social-connect-card'
 import { GA4ConnectCard, type GA4ConnectionData }           from '@/components/dashboard/ga4-connect-card'
 import { MetaAdsConnectCard, type MetaAdsAccountData }      from '@/components/dashboard/meta-ads-connect-card'
+import { HubSpotConnectCard, type HubSpotConnectionData }   from '@/components/dashboard/hubspot-connect-card'
 import { PaymentConnectCard, type PaymentConfigStatus }     from '@/components/dashboard/payment-connect-card'
 import { AppStoreConnectCard, type AppStoreConfigData }     from '@/components/dashboard/app-store-connect-card'
 import { EmailConnectCard, type EmailConnectorStatus }      from '@/components/dashboard/email-connect-card'
@@ -31,6 +32,7 @@ export default async function ConnectorsPage() {
 
   let ga4Connection:    GA4ConnectionData | null  = null
   let metaAdsAccount:  MetaAdsAccountData | null  = null
+  let hubspotConnection: HubSpotConnectionData | null = null
   let paymentStatus:   PaymentConfigStatus        = { paystack: false, flutterwave: false }
   let appStoreConfig:  AppStoreConfigData | null  = null
   let emailStatus:     EmailConnectorStatus       = { mailchimp: false, brevo: false }
@@ -41,9 +43,10 @@ export default async function ConnectorsPage() {
   // whatsappStats removed — WhatsApp connector hidden during beta
 
   if (brand?.id) {
-    const [ga4Res, metaAdsRes, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
+    const [ga4Res, metaAdsRes, hubspotRes, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
       supabase.from('ga4_connections').select('id, property_id, property_name, last_synced_at').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('digital_ad_accounts').select('id, account_name, ad_account_id, sync_status, last_synced_at').eq('brand_id', brand.id).eq('platform', 'meta').maybeSingle(),
+      supabase.from('hubspot_connections').select('id, portal_id, last_synced_at').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('webhook_configs').select('provider').eq('brand_id', brand.id),
       supabase.from('app_store_configs').select('apple_app_id, google_pkg_name').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('app_reviews').select('rating').eq('brand_id', brand.id).order('reviewed_at', { ascending: false }).limit(30),
@@ -51,8 +54,9 @@ export default async function ConnectorsPage() {
       supabase.from('ecommerce_sales').select('source, imported_at').eq('brand_id', brand.id).order('imported_at', { ascending: false }).limit(200),
     ])
 
-    ga4Connection   = ga4Res.data ?? null
-    metaAdsAccount  = metaAdsRes.data ?? null
+    ga4Connection     = ga4Res.data ?? null
+    metaAdsAccount    = metaAdsRes.data ?? null
+    hubspotConnection = hubspotRes.data ?? null
 
     if (webhookRes.data) {
       paymentStatus = {
@@ -159,6 +163,12 @@ export default async function ConnectorsPage() {
       <section data-tour="paid-connectors">
         <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Paid Media</h2>
         <MetaAdsConnectCard account={metaAdsAccount} />
+      </section>
+
+      {/* CRM */}
+      <section>
+        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">CRM</h2>
+        <HubSpotConnectCard connection={hubspotConnection} />
       </section>
 
       {/* Website Pixel */}

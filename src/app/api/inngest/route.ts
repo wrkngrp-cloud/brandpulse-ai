@@ -25,6 +25,7 @@ import { regulatoryMentionDetect }     from '@/lib/inngest/functions/regulatory-
 import { reviewAspectClassifier }      from '@/lib/inngest/functions/review-aspect-classifier'
 import { b2bReviewSync }               from '@/lib/inngest/functions/b2b-review-sync'
 import { developerHealthSync }         from '@/lib/inngest/functions/developer-health-sync'
+import { hubspotDailySync }            from '@/lib/inngest/functions/hubspot-daily-sync'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -46,5 +47,6 @@ export const { GET, POST, PUT } = serve({
     reviewAspectClassifier,
     b2bReviewSync,
     developerHealthSync,
+    hubspotDailySync,
   ],
 })
