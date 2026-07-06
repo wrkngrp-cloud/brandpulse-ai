@@ -1,6 +1,20 @@
 import { AlertCircle, CheckCircle2, Briefcase } from 'lucide-react'
 import { callAi } from '@/lib/ai/client'
-import { SectionHead } from './business-case-client'
+
+// SectionHead from business-case-client.tsx is a Client Component that
+// takes an `icon` component-type prop — Server Components can't pass a
+// function reference like that across the RSC boundary into a Client
+// Component ("Functions cannot be passed directly to Client Components"),
+// so this heading is duplicated inline rather than imported.
+function SectionHead({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2.5 mb-5">
+      <Icon className="h-4.5 w-4.5 text-muted-foreground shrink-0" />
+      <h2 className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground">{children}</h2>
+      <div className="flex-1 h-px bg-border/60" />
+    </div>
+  )
+}
 
 // This is its own async Server Component, rendered inside a <Suspense>
 // boundary by the page, specifically so the board-grade AI call (a real

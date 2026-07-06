@@ -96,7 +96,7 @@ function KpiTile({ icon: Icon, iconColor, label, value, delta, sub }: {
   )
 }
 
-export function SectionHead({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
+function SectionHead({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2.5 mb-5">
       <Icon className="h-4.5 w-4.5 text-muted-foreground shrink-0" />
