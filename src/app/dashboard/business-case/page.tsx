@@ -1,11 +1,13 @@
+import { Suspense }     from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { redirect }     from 'next/navigation'
 import { getActiveBrand } from '@/lib/active-brand'
 import { computeLiveBHI } from '@/lib/live-bhi'
 import { computeCommercialMetrics, visibleCommercialMetrics } from '@/lib/commercial-metrics'
 import { resolveBrandType } from '@/lib/bhi'
-import { callAi }       from '@/lib/ai/client'
+import { Skeleton }     from '@/components/ui/skeleton'
 import { BusinessCaseClient } from './business-case-client'
+import { AiExecutiveBrief } from './ai-executive-brief'
 
 export const dynamic = 'force-dynamic'
 
@@ -114,81 +116,19 @@ export default async function BusinessCasePage() {
     }
   }
 
-  // AI-generated business case
-  let aiBusinessCase: {
-    headline:    string
-    case:        string
-    roi_argument: string
-    risks:       string[]
-    asks:        { amount: string; channel: string; rationale: string }[]
-    proof_points: string[]
-  } | null = null
-
-  try {
-    const bhiTrendStr = bhiChange != null
-      ? `${bhiChange > 0 ? '+' : ''}${bhiChange.toFixed(1)} pts over 90 days`
-      : 'trend data unavailable'
-
-    // Only cite commercial metrics that are structurally relevant to this
-    // brand type and that actually have a value this period.
-    const commercialIds = visibleCommercialMetrics(brandType)
-    const commercialLines: string[] = []
-    if (commercialIds.includes('revenue')   && commercial.revenue.value   != null) commercialLines.push(`- Revenue (this month): ₦${commercial.revenue.value.toLocaleString()}`)
-    if (commercialIds.includes('spend')     && commercial.spend.value     != null) commercialLines.push(`- Marketing spend (this month): ₦${commercial.spend.value.toLocaleString()}`)
-    if (commercialIds.includes('roiPct')    && commercial.roiPct.value    != null) commercialLines.push(`- Marketing ROI: ${commercial.roiPct.value >= 0 ? '+' : ''}${commercial.roiPct.value.toFixed(0)}%`)
-    if (commercialIds.includes('roas')      && commercial.roas.value      != null) commercialLines.push(`- ROAS: ${commercial.roas.value.toFixed(1)}x`)
-    if (commercialIds.includes('cac')       && commercial.cac.value       != null) commercialLines.push(`- CAC (cost to acquire a customer): ₦${commercial.cac.value.toLocaleString()}`)
-    if (commercialIds.includes('cpl')       && commercial.cpl.value       != null) commercialLines.push(`- CPL (cost per marketing-qualified lead): ₦${commercial.cpl.value.toLocaleString()}`)
-    if (commercialIds.includes('mql')       && commercial.mql.value       != null) commercialLines.push(`- MQLs generated (this month): ${commercial.mql.value.toLocaleString()}`)
-    if (commercialIds.includes('churnRate') && commercial.churnRate.value != null) commercialLines.push(`- Churn rate: ${(commercial.churnRate.value * 100).toFixed(1)}%`)
-    if (commercialIds.includes('ltvToCac')  && commercial.ltvToCac.value  != null) commercialLines.push(`- LTV to CAC ratio: ${commercial.ltvToCac.value.toFixed(1)}x`)
-
-    const prompt = `You are a seasoned Chief Marketing Officer preparing a business case to justify and expand the marketing budget.
-
-Brand: ${brand.name} (${brand.category ?? 'Consumer brand'}, Nigeria)
-Period: Last 90 days
-
-PERFORMANCE DATA:
-- Brand Health Index: ${currentBhi != null ? `${currentBhi.toFixed(1)}/100` : 'N/A'} (${bhiTrendStr})
-- Share of Voice: ${sov != null ? `${sov.toFixed(1)}%` : 'N/A'}
-- Market Share: ${marketShare != null ? `${marketShare}%` : 'N/A'}
-- ESOV (SOV minus market share): ${esov != null ? (esov > 0 ? '+' : '') + esov.toFixed(1) + '%' : 'N/A'}
-- Avg Sentiment: ${avgSentiment != null ? avgSentiment.toFixed(1) : 'N/A'}/100
-- NPS: ${avgNps != null ? avgNps.toFixed(1) : 'N/A'} (${npsScores.length} responses)
-- Brand mentions (30d): ${mentions30d ?? 0}
-- Total media spend (90d): ₦${totalSpend.toLocaleString()}
-- Total budget (90d): ₦${totalBudget.toLocaleString()}
-- Active campaigns: ${activeCampaigns}
-- Tracked competitors: ${(competitors ?? []).map(c => c.name).join(', ') || 'none yet'}
-${commercialLines.length > 0 ? commercialLines.join('\n') + '\n' : ''}
-Use the Les Binet & Peter Field ESOV model (positive ESOV predicts market share growth), Aaker's brand equity framework, and hard numbers from the data above.
-
-Respond ONLY with valid JSON (no markdown, no code fences):
-{
-  "headline": "one-sentence business case headline (under 15 words)",
-  "case": "2-3 sentence executive summary making the investment case. Plain English, no jargon.",
-  "roi_argument": "1-2 sentences on why this spend generates return, using the data above. Cite specific numbers.",
-  "risks": ["risk 1 if budget NOT approved", "risk 2", "risk 3"],
-  "asks": [
-    {"amount": "₦X", "channel": "channel name", "rationale": "one sentence why this channel"},
-    {"amount": "₦X", "channel": "channel name", "rationale": "..."},
-    {"amount": "₦X", "channel": "channel name", "rationale": "..."}
-  ],
-  "proof_points": ["data point 1", "data point 2", "data point 3"]
-}
-
-Budget ask amounts should be directional, based on the existing spend pattern. Keep all items under 20 words each.`
-
-    const raw = await callAi({
-      tier:      'boardGrade',
-      system:    'You produce board-grade marketing investment cases backed by real data. JSON only, no commentary.',
-      messages:  [{ role: 'user', content: prompt }],
-      maxTokens: 600,
-    })
-    aiBusinessCase = JSON.parse(raw.trim())
-  } catch {
-    // Non-fatal — page still renders with data
-  }
+  // Only cite commercial metrics that are structurally relevant to this
+  // brand type and that actually have a value this period.
+  const commercialIds = visibleCommercialMetrics(brandType)
+  const commercialLines: string[] = []
+  if (commercialIds.includes('revenue')   && commercial.revenue.value   != null) commercialLines.push(`- Revenue (this month): ₦${commercial.revenue.value.toLocaleString()}`)
+  if (commercialIds.includes('spend')     && commercial.spend.value     != null) commercialLines.push(`- Marketing spend (this month): ₦${commercial.spend.value.toLocaleString()}`)
+  if (commercialIds.includes('roiPct')    && commercial.roiPct.value    != null) commercialLines.push(`- Marketing ROI: ${commercial.roiPct.value >= 0 ? '+' : ''}${commercial.roiPct.value.toFixed(0)}%`)
+  if (commercialIds.includes('roas')      && commercial.roas.value      != null) commercialLines.push(`- ROAS: ${commercial.roas.value.toFixed(1)}x`)
+  if (commercialIds.includes('cac')       && commercial.cac.value       != null) commercialLines.push(`- CAC (cost to acquire a customer): ₦${commercial.cac.value.toLocaleString()}`)
+  if (commercialIds.includes('cpl')       && commercial.cpl.value       != null) commercialLines.push(`- CPL (cost per marketing-qualified lead): ₦${commercial.cpl.value.toLocaleString()}`)
+  if (commercialIds.includes('mql')       && commercial.mql.value       != null) commercialLines.push(`- MQLs generated (this month): ${commercial.mql.value.toLocaleString()}`)
+  if (commercialIds.includes('churnRate') && commercial.churnRate.value != null) commercialLines.push(`- Churn rate: ${(commercial.churnRate.value * 100).toFixed(1)}%`)
+  if (commercialIds.includes('ltvToCac')  && commercial.ltvToCac.value  != null) commercialLines.push(`- LTV to CAC ratio: ${commercial.ltvToCac.value.toFixed(1)}x`)
 
   return (
     <BusinessCaseClient
@@ -210,9 +150,29 @@ Budget ask amounts should be directional, based on the existing spend pattern. K
       mentions30d={mentions30d ?? 0}
       spendEfficiency={spendEfficiency}
       competitors={(competitors ?? []).map(c => c.name)}
-      aiBusinessCase={aiBusinessCase}
       commercial={commercial}
       brandType={brandType}
-    />
+    >
+      <Suspense fallback={<Skeleton className="h-52 rounded-2xl" />}>
+        <AiExecutiveBrief
+          brandName={brand.name}
+          brandCategory={brand.category}
+          currentBhi={currentBhi}
+          bhiChange={bhiChange}
+          sov={sov}
+          marketShare={marketShare}
+          esov={esov}
+          avgSentiment={avgSentiment}
+          avgNps={avgNps}
+          npsCount={npsScores.length}
+          mentions30d={mentions30d ?? 0}
+          totalSpend={totalSpend}
+          totalBudget={totalBudget}
+          activeCampaigns={activeCampaigns}
+          competitors={(competitors ?? []).map(c => c.name)}
+          commercialLines={commercialLines}
+        />
+      </Suspense>
+    </BusinessCaseClient>
   )
 }
