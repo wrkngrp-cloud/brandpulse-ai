@@ -2882,35 +2882,42 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
     }
   }
 
-  /* ── Commercial manual metrics (Tier 1) ────────────────────────────────── */
+  /* ── Commercial manual metrics (Tier 1) — 6 months, oldest first ───────── */
+  // Canonical keys: revenue_monthly and total_spend (renamed from
+  // monthly_revenue / marketing_spend, same current-month values). No
+  // new_customers / churn / MQL keys here on purpose — a mass-retail FMCG
+  // brand sells through trade, so a per-customer acquisition cost has no
+  // meaning. Jara's commercial view is revenue, spend and return on spend.
+  // Series follow the arc: Reconnect campaign growth Mar-May → strong summer.
+  // The last value in each series is the current month.
   const today = new Date()
-  const mStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
-  const mEnd   = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]
+  const monthBounds = (monthsAgo: number) => ({
+    start: new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1).toISOString().split('T')[0],
+    end:   new Date(today.getFullYear(), today.getMonth() - monthsAgo + 1, 0).toISOString().split('T')[0],
+  })
 
-  const jaraMetrics = [
-    { metric_key: 'monthly_revenue',    value: 285000000 },  // ₦285M monthly revenue
-    { metric_key: 'marketing_spend',    value: 42000000  },  // ₦42M marketing spend
-    { metric_key: 'distribution_reach', value: 12400     },  // 12,400 outlets
-    { metric_key: 'sku_count',          value: 24        },  // 24 active SKUs
-    { metric_key: 'nps_score',          value: 58        },
-    { metric_key: 'repeat_purchase_rate', value: 0.62    },
-    { metric_key: 'market_share_pct',   value: 0.18      },  // 18% category share
-  ]
+  const jaraSeries: Record<string, number[]> = {
+    revenue_monthly:      [232_000_000, 241_000_000, 255_000_000, 266_000_000, 276_000_000, 285_000_000],
+    total_spend:          [30_000_000, 34_000_000, 40_000_000, 44_000_000, 43_000_000, 42_000_000],
+    distribution_reach:   [10800, 11200, 11600, 11900, 12200, 12400],
+    sku_count:            [22, 22, 23, 23, 24, 24],
+    nps_score:            [52, 53, 55, 56, 57, 58],
+    repeat_purchase_rate: [0.55, 0.57, 0.58, 0.60, 0.61, 0.62],
+    market_share_pct:     [0.165, 0.170, 0.172, 0.175, 0.178, 0.18],
+  }
 
   try {
-    await sb.from('metric_manual').upsert(
-      jaraMetrics.map(m => ({
-        brand_id:     brandId,
-        metric_key:   m.metric_key,
-        value:        m.value,
-        currency:     'NGN',
-        period_start: mStart,
-        period_end:   mEnd,
-        entered_by:   userId,
-        updated_at:   new Date().toISOString(),
-      })),
-      { onConflict: 'brand_id,metric_key,period_start' }
-    )
+    const metricRows = []
+    for (const [key, series] of Object.entries(jaraSeries)) {
+      for (let i = 0; i < series.length; i++) {
+        const { start, end } = monthBounds(series.length - 1 - i)
+        metricRows.push({
+          brand_id: brandId, metric_key: key, value: series[i], currency: 'NGN',
+          period_start: start, period_end: end, entered_by: userId, updated_at: new Date().toISOString(),
+        })
+      }
+    }
+    await sb.from('metric_manual').upsert(metricRows, { onConflict: 'brand_id,metric_key,period_start' })
   } catch (_) { /* metric_manual table may not exist in all environments */ }
 
   return NextResponse.json({
@@ -2979,7 +2986,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       fsoTeams:            3,
       fieldReports:        fieldReportCount,
       fieldOutlets:        fieldOutletCount,
-      metricManual:        jaraMetrics.length,
+      metricManual:        Object.keys(jaraSeries).length,
     },
   })
 }

@@ -1000,37 +1000,45 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
   }
   await sb.from('cultural_resonance_scores').insert(crsInserts)
 
-  /* ── 17. Manual metrics (SaaS-specific) ──────────────────────────────── */
-  const today    = new Date()
-  const mStart   = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
-  const mEnd     = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]
+  /* ── 17. Manual metrics (SaaS-specific) — 6 months, oldest first ──────── */
+  // Canonical commercial keys: mrr, total_spend, new_customers (newly won
+  // accounts this period, distinct from the paying_customers total base),
+  // mql_count, churn_rate, plus explicit overrides cac / ltv / ltv_cac_ratio.
+  // Series follow the Bridger arc: steady compounding growth through the
+  // Enterprise tier launch. The last value in each series is the current month.
+  const today = new Date()
+  const monthBounds = (monthsAgo: number) => ({
+    start: new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1).toISOString().split('T')[0],
+    end:   new Date(today.getFullYear(), today.getMonth() - monthsAgo + 1, 0).toISOString().split('T')[0],
+  })
 
-  const bridgerMetrics = [
-    { metric_key: 'mrr',                   value: 4000000  },
-    { metric_key: 'arr',                   value: 48000000 },
-    { metric_key: 'paying_customers',      value: 1200     },
-    { metric_key: 'churn_rate',            value: 0.018    },
-    { metric_key: 'net_revenue_retention', value: 1.12     },
-    { metric_key: 'cac',                   value: 35000    },
-    { metric_key: 'ltv',                   value: 420000   },
-    { metric_key: 'ltv_cac_ratio',         value: 12.0     },
-    { metric_key: 'trial_to_paid_rate',    value: 0.28     },
-  ]
+  const bridgerSeries: Record<string, number[]> = {
+    mrr:                   [3_100_000, 3_300_000, 3_500_000, 3_700_000, 3_850_000, 4_000_000],
+    arr:                   [37_200_000, 39_600_000, 42_000_000, 44_400_000, 46_200_000, 48_000_000],
+    paying_customers:      [1005, 1050, 1095, 1140, 1172, 1200],
+    new_customers:         [48, 55, 61, 70, 74, 78],
+    total_spend:           [1_800_000, 2_000_000, 2_200_000, 2_500_000, 2_600_000, 2_700_000],
+    mql_count:             [320, 360, 410, 470, 510, 540],
+    churn_rate:            [0.024, 0.023, 0.021, 0.020, 0.019, 0.018],
+    net_revenue_retention: [1.06, 1.07, 1.09, 1.10, 1.11, 1.12],
+    cac:                   [39000, 38200, 37000, 36200, 35600, 35000],
+    ltv:                   [350000, 365000, 380000, 395000, 408000, 420000],
+    ltv_cac_ratio:         [9.0, 9.6, 10.3, 10.9, 11.5, 12.0],
+    trial_to_paid_rate:    [0.22, 0.23, 0.25, 0.26, 0.27, 0.28],
+  }
 
   try {
-    await sb.from('metric_manual').upsert(
-      bridgerMetrics.map(m => ({
-        brand_id:     brandId,
-        metric_key:   m.metric_key,
-        value:        m.value,
-        currency:     'NGN',
-        period_start: mStart,
-        period_end:   mEnd,
-        entered_by:   userId,
-        updated_at:   new Date().toISOString(),
-      })),
-      { onConflict: 'brand_id,metric_key,period_start' }
-    )
+    const metricRows = []
+    for (const [key, series] of Object.entries(bridgerSeries)) {
+      for (let i = 0; i < series.length; i++) {
+        const { start, end } = monthBounds(series.length - 1 - i)
+        metricRows.push({
+          brand_id: brandId, metric_key: key, value: series[i], currency: 'NGN',
+          period_start: start, period_end: end, entered_by: userId, updated_at: new Date().toISOString(),
+        })
+      }
+    }
+    await sb.from('metric_manual').upsert(metricRows, { onConflict: 'brand_id,metric_key,period_start' })
   } catch (_) { /* metric_manual table may not exist in all environments */ }
 
   /* ── 18. Funnel snapshots — monthly, 12 months ────────────────────────── */

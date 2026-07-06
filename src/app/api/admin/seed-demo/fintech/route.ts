@@ -397,21 +397,42 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  /* ── 16. Manual metrics ───────────────────────────────────────────────── */
+  /* ── 16. Manual metrics — 6 months of history, oldest first ───────────── */
+  // Canonical commercial keys: total_spend, new_customers, cac (explicit
+  // override), arpu, churn_rate. Series follow the PocketPay arc: referral
+  // viral growth through Q1 2026 → Series A peak → settled growth. The last
+  // value in each series is the current month.
   const today = new Date()
-  const mStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
-  const mEnd   = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]
+  const monthBounds = (monthsAgo: number) => ({
+    start: new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1).toISOString().split('T')[0],
+    end:   new Date(today.getFullYear(), today.getMonth() - monthsAgo + 1, 0).toISOString().split('T')[0],
+  })
+
+  const pocketPaySeries: Record<string, number[]> = {
+    mau:           [480000, 515000, 555000, 600000, 630000, 650000],
+    dau:           [150000, 163000, 178000, 194000, 203000, 210000],
+    downloads_mtd: [30000, 34000, 39000, 47000, 44000, 45000],
+    total_spend:   [22_000_000, 26_000_000, 30_000_000, 36_000_000, 40_000_000, 38_000_000],
+    new_customers: [8200, 10400, 12800, 15200, 14000, 14500],
+    cac:           [2680, 2500, 2340, 2370, 2860, 2800],
+    arpu:          [1300, 1340, 1380, 1400, 1430, 1450],
+    churn_rate:    [0.058, 0.054, 0.049, 0.046, 0.044, 0.042],
+    referral_rate: [0.11, 0.13, 0.15, 0.17, 0.175, 0.18],
+    nps_score:     [61, 62, 64, 66, 67, 68],
+  }
+
   try {
-    await sb.from('metric_manual').upsert([
-      { brand_id: brandId, metric_key: 'mau',           value: 650000, currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-      { brand_id: brandId, metric_key: 'dau',           value: 210000, currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-      { brand_id: brandId, metric_key: 'downloads_mtd', value: 45000,  currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-      { brand_id: brandId, metric_key: 'cac',           value: 2800,   currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-      { brand_id: brandId, metric_key: 'arpu',          value: 1450,   currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-      { brand_id: brandId, metric_key: 'churn_rate',    value: 0.042,  currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-      { brand_id: brandId, metric_key: 'referral_rate', value: 0.18,   currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-      { brand_id: brandId, metric_key: 'nps_score',     value: 68,     currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-    ], { onConflict: 'brand_id,metric_key,period_start' })
+    const metricRows = []
+    for (const [key, series] of Object.entries(pocketPaySeries)) {
+      for (let i = 0; i < series.length; i++) {
+        const { start, end } = monthBounds(series.length - 1 - i)
+        metricRows.push({
+          brand_id: brandId, metric_key: key, value: series[i], currency: 'NGN',
+          period_start: start, period_end: end, entered_by: userId, updated_at: new Date().toISOString(),
+        })
+      }
+    }
+    await sb.from('metric_manual').upsert(metricRows, { onConflict: 'brand_id,metric_key,period_start' })
   } catch (_) { /* metric_manual may not exist in all environments */ }
 
   /* ── 17. Funnel snapshots — monthly, 12 months ────────────────────────── */

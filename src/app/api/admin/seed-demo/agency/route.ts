@@ -369,17 +369,38 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  /* ── 15. Manual metrics ───────────────────────────────────────────────── */
+  /* ── 15. Manual metrics — 6 months of history, oldest first ───────────── */
+  // Canonical key: revenue_monthly (agency fee income). total_ad_spend stays
+  // under its own name — it is client media spend managed, not Pinnacle's own
+  // marketing spend, so it must not feed CAC or ROI maths. No acquisition
+  // funnel metrics for the agency's own biz-dev — out of scope by design.
+  // Series follow the Pinnacle arc: two FMCG retainer wins → Abuja expansion
+  // → strong June. The last value in each series is the current month.
   const today = new Date()
-  const mStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
-  const mEnd   = new Date(today.getFullYear(), today.getMonth()+1, 0).toISOString().split('T')[0]
+  const monthBounds = (monthsAgo: number) => ({
+    start: new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1).toISOString().split('T')[0],
+    end:   new Date(today.getFullYear(), today.getMonth() - monthsAgo + 1, 0).toISOString().split('T')[0],
+  })
+
+  const pinnacleSeries: Record<string, number[]> = {
+    revenue_monthly: [14_200_000, 15_000_000, 16_800_000, 17_500_000, 18_000_000, 18_500_000],
+    active_clients:  [5, 6, 6, 7, 7, 7],
+    campaign_count:  [3, 4, 4, 5, 5, 5],
+    total_ad_spend:  [41_000_000, 46_000_000, 52_000_000, 56_000_000, 59_000_000, 62_000_000],
+  }
+
   try {
-    await sb.from('metric_manual').upsert([
-      { brand_id: brandId, metric_key: 'monthly_revenue', value: 18500000, currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-      { brand_id: brandId, metric_key: 'active_clients',  value: 7,        currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-      { brand_id: brandId, metric_key: 'campaign_count',  value: 5,        currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-      { brand_id: brandId, metric_key: 'total_ad_spend',  value: 62000000, currency: 'NGN', period_start: mStart, period_end: mEnd, entered_by: userId, updated_at: new Date().toISOString() },
-    ], { onConflict: 'brand_id,metric_key,period_start' })
+    const metricRows = []
+    for (const [key, series] of Object.entries(pinnacleSeries)) {
+      for (let i = 0; i < series.length; i++) {
+        const { start, end } = monthBounds(series.length - 1 - i)
+        metricRows.push({
+          brand_id: brandId, metric_key: key, value: series[i], currency: 'NGN',
+          period_start: start, period_end: end, entered_by: userId, updated_at: new Date().toISOString(),
+        })
+      }
+    }
+    await sb.from('metric_manual').upsert(metricRows, { onConflict: 'brand_id,metric_key,period_start' })
   } catch (_) { /* metric_manual may not exist in all environments */ }
 
   /* ── 16. Funnel snapshots — monthly, 12 months ────────────────────────── */
