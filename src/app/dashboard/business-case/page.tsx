@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect }     from 'next/navigation'
 import { getActiveBrand } from '@/lib/active-brand'
+import { computeLiveBHI } from '@/lib/live-bhi'
 import { callAi }       from '@/lib/ai/client'
 import { BusinessCaseClient } from './business-case-client'
 
@@ -20,7 +21,7 @@ export default async function BusinessCasePage() {
   const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
 
   const [
-    { data: latestBhi },
+    liveBhi,
     { data: bhiTrend },
     { data: latestSov },
     { data: campaigns },
@@ -29,11 +30,7 @@ export default async function BusinessCasePage() {
     { data: sentimentTrend },
     { data: competitors },
   ] = await Promise.all([
-    supabase.from('brand_health_snapshots')
-      .select('bhi, snapshot_date')
-      .eq('brand_id', brand.id)
-      .order('snapshot_date', { ascending: false })
-      .limit(1).maybeSingle(),
+    computeLiveBHI(supabase, brand.id),
 
     supabase.from('brand_health_snapshots')
       .select('bhi, snapshot_date')
@@ -77,7 +74,7 @@ export default async function BusinessCasePage() {
   ])
 
   // Derived metrics
-  const currentBhi       = latestBhi?.bhi != null ? Number(latestBhi.bhi) : null
+  const currentBhi       = liveBhi.score
   const firstBhi         = bhiTrend && bhiTrend.length > 1 ? Number(bhiTrend[0].bhi) : null
   const bhiChange        = currentBhi != null && firstBhi != null ? currentBhi - firstBhi : null
 

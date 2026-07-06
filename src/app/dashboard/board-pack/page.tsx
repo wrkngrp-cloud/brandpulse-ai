@@ -1,6 +1,7 @@
 import { createClient }   from '@/lib/supabase/server'
 import { redirect }        from 'next/navigation'
 import { getActiveBrand }  from '@/lib/active-brand'
+import { computeLiveBHI }  from '@/lib/live-bhi'
 import { BoardPackClient } from './board-pack-client'
 
 export const dynamic = 'force-dynamic'
@@ -23,19 +24,13 @@ export default async function BoardPackPage() {
 
   // ── Core queries ──────────────────────────────────────────────────────────
   const [
-    { data: latestBhi },
+    liveBhi,
     { data: latestSentiment },
     { data: latestSov },
     { data: campaigns },
     { data: recentEvents },
   ] = await Promise.all([
-    supabase
-      .from('brand_health_snapshots')
-      .select('bhi, snapshot_date')
-      .eq('brand_id', brand.id)
-      .order('snapshot_date', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+    computeLiveBHI(supabase, brand.id),
 
     supabase
       .from('sentiment_daily')
@@ -101,7 +96,7 @@ export default async function BoardPackPage() {
   }
 
   // ── Derived values ────────────────────────────────────────────────────────
-  const bhi       = latestBhi?.bhi               != null ? Number(latestBhi.bhi)               : null
+  const bhi       = liveBhi.score
   const sentiment = latestSentiment?.social_score != null ? Number(latestSentiment.social_score) : null
   const sov       = latestSov?.social_sov         != null ? Number(latestSov.social_sov)         : null
 

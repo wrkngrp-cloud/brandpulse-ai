@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Suspense } from 'react'
-import { computeFullBHI, type BHIResult } from '@/lib/bhi'
+import { computeFullBHI, resolveBrandType, type BHIResult } from '@/lib/bhi'
 import { OverviewClient } from '@/components/dashboard/overview-client'
 import { getActiveBrandId } from '@/lib/active-brand'
 import { getIndustryFromCategory } from '@/lib/industry-config'
@@ -38,8 +38,8 @@ async function DashboardContent({ days }: { days: number }) {
     { data: perceptionSurveys },
   ] = await Promise.all([
     brandId
-      ? supabase.from('brands').select('id, name, category, industry').eq('id', brandId).single()
-      : supabase.from('brands').select('id, name, category, industry').limit(1).single(),
+      ? supabase.from('brands').select('id, name, category, industry, brand_type').eq('id', brandId).single()
+      : supabase.from('brands').select('id, name, category, industry, brand_type').limit(1).single(),
     supabase.from('user_dashboard_prefs')
       .select('template, widget_ids')
       .eq('brand_id', brandId ?? '')
@@ -104,6 +104,7 @@ async function DashboardContent({ days }: { days: number }) {
   }
 
   // ── Full 7-component BHI (same formula as Brand Equity page) ─────────────
+  const brandType = resolveBrandType(brand?.brand_type, brand?.industry)
   const fullBhi = computeFullBHI({
     awareness:         sovScore,
     salience:          salienceScore,
@@ -112,7 +113,7 @@ async function DashboardContent({ days }: { days: number }) {
     culturalResonance: null,
     blendedSov:        sovScore,
     emv:               emvScore,
-  })
+  }, undefined, brandType)
 
   // Map to BHIResult shape for gauge (show 3 most readable components)
   const bhi: BHIResult = {
