@@ -37,7 +37,7 @@ import { isPathHidden, type IndustryId } from '@/lib/industry-config'
 //    Broadcast: Radio · TV · Print
 
 type NavEntry =
-  | { label: string; href: string; icon: React.ElementType }
+  | { label: string; href: string; icon: React.ElementType; prefetch?: boolean }
   | { divider: true }
 
 // ── Section data ──────────────────────────────────────────────────────────────
@@ -100,9 +100,16 @@ const GROWTH: NavEntry[] = [
   { label: 'Customer Data',  href: '/dashboard/cdp',       icon: Database      },
 ]
 
+// Board Pack and Business Case each fan out into ~10+ Supabase queries
+// (computeLiveBHI + computeCommercialMetrics + their own report data) to
+// stay accurate to the second. Next.js prefetches every visible sidebar
+// link by default, so leaving these on prefetch means every dashboard
+// load fires that full query burst twice more in the background just from
+// the sidebar rendering — enough concurrent load to occasionally 503.
+// Reports aren't a rapid-tap flow like Sentiment/Funnel, so skip prefetch.
 const REPORTS: NavEntry[] = [
-  { label: 'Board Pack',    href: '/dashboard/board-pack',    icon: FileDown  },
-  { label: 'Business Case', href: '/dashboard/business-case', icon: BarChart3 },
+  { label: 'Board Pack',    href: '/dashboard/board-pack',    icon: FileDown,  prefetch: false },
+  { label: 'Business Case', href: '/dashboard/business-case', icon: BarChart3, prefetch: false },
   { label: 'Methodology',   href: '/dashboard/methodology',   icon: BookOpen  },
 ]
 
@@ -125,13 +132,14 @@ function InSectionDivider({ expanded }: { expanded: boolean }) {
 }
 
 function NavItem({
-  href, icon: Icon, label, active, expanded,
+  href, icon: Icon, label, active, expanded, prefetch,
 }: {
-  href: string; icon: React.ElementType; label: string; active: boolean; expanded: boolean
+  href: string; icon: React.ElementType; label: string; active: boolean; expanded: boolean; prefetch?: boolean
 }) {
   return (
     <Link
       href={href}
+      prefetch={prefetch}
       className={cn(
         'relative flex items-center gap-3 h-[38px] rounded-xl transition-colors duration-150 group',
         expanded ? 'px-3' : 'px-0 justify-center',
@@ -178,6 +186,7 @@ function NavSection({
             label={entry.label}
             active={isActive(entry.href)}
             expanded={expanded}
+            prefetch={entry.prefetch}
           />
         )
       })}
