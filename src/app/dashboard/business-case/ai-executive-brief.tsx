@@ -103,9 +103,19 @@ Budget ask amounts should be directional, based on the existing spend pattern. K
       tier:      'boardGrade',
       system:    'You produce board-grade marketing investment cases backed by real data. JSON only, no commentary.',
       messages:  [{ role: 'user', content: prompt }],
-      maxTokens: 600,
+      maxTokens: 1200,
     })
-    return JSON.parse(raw.trim())
+
+    // Robust JSON extraction: find the outermost { … } regardless of any
+    // wrapping text, same pattern used by api/ai/business-case/route.ts —
+    // guards against stray preamble/fences, not just truncation.
+    const start = raw.indexOf('{')
+    const end   = raw.lastIndexOf('}')
+    if (start === -1 || end === -1 || end <= start) {
+      console.error('[business-case] No JSON object found in AI response. Raw (500):', raw.slice(0, 500))
+      return null
+    }
+    return JSON.parse(raw.slice(start, end + 1))
   } catch (err) {
     console.error('[business-case] AI executive brief generation failed:', err)
     return null
