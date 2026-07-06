@@ -218,11 +218,9 @@ function AddDealDialog({ campaigns, brandId, onAdded }: { campaigns: Campaign[];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <Button size="sm">
-          <Plus className="h-4 w-4 mr-1.5" />
-          Add deal
-        </Button>
+      <DialogTrigger render={<Button size="sm" />}>
+        <Plus className="h-4 w-4 mr-1.5" />
+        Add deal
       </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>

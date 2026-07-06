@@ -125,6 +125,20 @@ const FULL_WEIGHTS: Record<keyof FullBHIComponents, number> = {
 
 export type BrandType = 'fmcg' | 'fintech' | 'venue' | 'b2b_saas' | 'marketplace' | 'beverage_alcohol' | 'b2b_distribution'
 
+// Some brands (older rows and a few seeds) only carry the onboarding
+// `industry` id, not `brand_type`. Fall back to industry where the mapping
+// is unambiguous so a fintech or B2B SaaS brand never silently gets FMCG
+// weights and funnel signals.
+export function resolveBrandType(
+  brandType: string | null | undefined,
+  industry:  string | null | undefined,
+): BrandType {
+  if (brandType) return brandType as BrandType
+  if (industry === 'fintech')  return 'fintech'
+  if (industry === 'b2b_saas') return 'b2b_saas'
+  return 'fmcg'
+}
+
 // Per-vertical BHI weight presets. Every set sums to 100.
 export const BRAND_TYPE_WEIGHTS: Record<BrandType, Record<keyof FullBHIComponents, number>> = {
   fmcg: {

@@ -59,11 +59,9 @@ export function CrawlHistory() {
 
   return (
     <Sheet onOpenChange={open => { if (open) load() }}>
-      <SheetTrigger>
-        <Button size="sm" variant="outline">
-          <History className="h-3.5 w-3.5 mr-1.5" />
-          Crawl history
-        </Button>
+      <SheetTrigger render={<Button size="sm" variant="outline" />}>
+        <History className="h-3.5 w-3.5 mr-1.5" />
+        Crawl history
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>

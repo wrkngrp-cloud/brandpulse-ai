@@ -218,7 +218,10 @@ function BriefingTab({
   competitorNames: string[]
   lastBriefing: { content: Record<string, unknown>; created_at: string } | null
 }) {
-  const stored = lastBriefing?.content as unknown as BriefingResult | null
+  // `?? null` matters: with no stored briefing `lastBriefing?.content` is
+  // undefined, and `undefined !== null` made hasBriefing true — so neither
+  // the empty state nor a briefing rendered (blank Briefing tab).
+  const stored = (lastBriefing?.content as unknown as BriefingResult | undefined) ?? null
   const [loading, setLoading]   = useState(false)
   const [result, setResult]     = useState<BriefingResult | null>(stored)
   const [error, setError]       = useState<string | null>(null)

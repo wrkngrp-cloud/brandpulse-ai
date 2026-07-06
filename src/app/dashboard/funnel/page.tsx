@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { FunnelClient } from './funnel-client'
 import { getActiveBrandId } from '@/lib/active-brand'
-import { computeStageComposite, type StageSignal } from '@/lib/bhi'
+import { computeStageComposite, resolveBrandType, type StageSignal } from '@/lib/bhi'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 
 export const dynamic = 'force-dynamic'
@@ -101,8 +101,8 @@ export default async function FunnelPage() {
       .eq('brand_id', bid)
       .eq('type', 'perception_audit'),
     bid
-      ? supabase.from('brands').select('name, category, brand_type').eq('id', bid).maybeSingle()
-      : supabase.from('brands').select('name, category, brand_type').limit(1).maybeSingle(),
+      ? supabase.from('brands').select('name, category, industry, brand_type').eq('id', bid).maybeSingle()
+      : supabase.from('brands').select('name, category, industry, brand_type').limit(1).maybeSingle(),
     supabase
       .from('events')
       .select('debrief')
@@ -244,7 +244,7 @@ export default async function FunnelPage() {
 
   // ── Shared derived values ──────────────────────────────────────────────────
 
-  const brandType = (brand?.brand_type as string | undefined) ?? 'fmcg'
+  const brandType: string = resolveBrandType(brand?.brand_type as string | undefined, brand?.industry as string | undefined)
   const isFmcgLike   = brandType === 'fmcg' || brandType === 'beverage_alcohol' || brandType === 'b2b_distribution'
   const isFintech    = brandType === 'fintech'
   const isVenue      = brandType === 'venue'

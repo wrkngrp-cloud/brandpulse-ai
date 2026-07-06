@@ -375,5 +375,11 @@ export const TEMPLATE_MAP = Object.fromEntries(
 ) as Record<SurveyType, SurveyTemplateDefinition>
 
 export function getTemplateLabel(type: string): string {
-  return TEMPLATE_MAP[type as SurveyType]?.label ?? type
+  const known = TEMPLATE_MAP[type as SurveyType]?.label
+  if (known) return known
+  // Humanise unknown types (e.g. legacy 'brand_recall' → 'Brand Recall', 'nps' → 'NPS')
+  return type
+    .replace(/_/g, ' ')
+    .replace(/\b[a-z]/g, c => c.toUpperCase())
+    .replace(/\bNps\b/g, 'NPS')
 }

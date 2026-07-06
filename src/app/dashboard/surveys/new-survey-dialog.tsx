@@ -60,11 +60,9 @@ export function NewSurveyDialog() {
 
   return (
     <Dialog open={open} onOpenChange={v => { setOpen(v); if (!v) reset() }}>
-      <DialogTrigger>
-        <Button size="sm">
-          <Plus className="h-4 w-4 mr-1.5" />
-          New survey
-        </Button>
+      <DialogTrigger render={<Button size="sm" />}>
+        <Plus className="h-4 w-4 mr-1.5" />
+        New survey
       </DialogTrigger>
 
       <DialogContent className={cn('transition-all', step === 'pick' ? 'sm:max-w-2xl' : 'sm:max-w-sm')}>

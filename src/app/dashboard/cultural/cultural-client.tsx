@@ -808,7 +808,7 @@ export function CulturalClient({
             <p className="text-sm font-medium text-muted-foreground">Cultural Resonance Score</p>
             <p className="text-xs text-muted-foreground mt-0.5">
               {analysisCount > 0
-                ? `Averaged from ${analysisCount} content analysis${analysisCount === 1 ? '' : 'es'} in the last 30 days`
+                ? `Averaged from ${analysisCount} content ${analysisCount === 1 ? 'analysis' : 'analyses'} in the last 30 days`
                 : 'Run Pre-Post analyses to populate this score'}
             </p>
           </div>

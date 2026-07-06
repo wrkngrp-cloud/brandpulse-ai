@@ -9,6 +9,7 @@ import {
   type ComponentBreakdown,
   type BreakdownSource,
   type BrandType,
+  resolveBrandType,
 } from '@/lib/bhi'
 import { BrandEquityClient } from './brand-equity-client'
 import { LaunchMarkersPanel } from './launch-markers-panel'
@@ -106,8 +107,8 @@ export default async function BrandEquityPage({
       .eq('brand_id', bid)
       .gte('posted_at', cutoffISO),
     bid
-      ? supabase.from('brands').select('name, category, market_share_pct, brand_type, google_place_id').eq('id', bid).maybeSingle()
-      : supabase.from('brands').select('name, category, market_share_pct, brand_type, google_place_id').limit(1).maybeSingle(),
+      ? supabase.from('brands').select('name, category, industry, market_share_pct, brand_type, google_place_id').eq('id', bid).maybeSingle()
+      : supabase.from('brands').select('name, category, industry, market_share_pct, brand_type, google_place_id').limit(1).maybeSingle(),
     supabase
       .from('brand_health_snapshots')
       .select('bhi, snapshot_date')
@@ -352,7 +353,7 @@ export default async function BrandEquityPage({
     awareness: awarenessScore, salience: salienceScore, sentiment: sentimentScore,
     perception: perceptionScore, culturalResonance, blendedSov, emv: emvScore,
   }
-  const brandType = (brand?.brand_type ?? 'fmcg') as BrandType
+  const brandType: BrandType = resolveBrandType(brand?.brand_type, brand?.industry)
   const bhi = computeFullBHI(components, breakdowns, brandType)
 
   // ── Trust score (fintech brand types only)
@@ -466,7 +467,7 @@ export default async function BrandEquityPage({
   const npmPrev      = npmSnaps[1] ?? null
   const soSnap       = soSnaps[0] ?? null
   const hasDevData   = githubSnap != null || npmSnap != null || soSnap != null
-  const isDevBrand   = ['fintech', 'b2b_saas', 'marketplace'].includes(brand?.brand_type ?? '')
+  const isDevBrand   = ['fintech', 'b2b_saas', 'marketplace'].includes(brandType)
 
   // ── BHI history sparkline — uses brand_health_snapshots.bhi (real BHI, not sentiment)
   const sparkline = (bhiHistory ?? [])
@@ -510,22 +511,22 @@ export default async function BrandEquityPage({
 
       <LaunchMarkersPanel />
 
-      {(brand?.brand_type === 'venue' || brand?.google_place_id) && (
+      {(brandType === 'venue' || brand?.google_place_id) && (
         <VenueReputationPanel
           snapshot={venueSnapshot ?? null}
           hasPlaceId={Boolean(brand?.google_place_id)}
         />
       )}
 
-      {brand?.brand_type === 'fintech' && (
+      {brandType === 'fintech' && (
         <TrustPillarCard trust={trustScore} />
       )}
 
-      {(['venue', 'fintech', 'b2b_saas'] as const).includes(brand?.brand_type as 'venue') && aspectScores.length > 0 && (
+      {(['venue', 'fintech', 'b2b_saas'] as const).includes(brandType as 'venue') && aspectScores.length > 0 && (
         <AspectSentimentPanel
           aspects={aspectScores}
-          platform={brand?.brand_type === 'venue' ? 'google_maps' : 'app_store'}
-          brandType={brand?.brand_type ?? 'fmcg'}
+          platform={brandType === 'venue' ? 'google_maps' : 'app_store'}
+          brandType={brandType}
         />
       )}
 

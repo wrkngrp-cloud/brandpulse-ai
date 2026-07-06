@@ -1,17 +1,41 @@
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
+import { resolveBrandType } from '@/lib/bhi'
 import { BrandSettingsForm } from './brand-settings-form'
 
 export const dynamic = 'force-dynamic'
 import { ApiKeysSection } from './api-keys-section'
 import type { BrandSettingsData } from '../actions'
 
+type BrandRow = {
+  name: string | null
+  website_url: string | null
+  google_place_id: string | null
+  g2_slug: string | null
+  capterra_slug: string | null
+  github_repo: string | null
+  npm_package_name: string | null
+  stackoverflow_tag: string | null
+  category: string | null
+  industry: string | null
+  brand_type: string | null
+  market_share_pct: number | null
+  brand_values: unknown
+  monitored_hashtags: unknown
+  brand_aliases: unknown
+  brand_voice: unknown
+  cultural_profile: unknown
+  target_segments: unknown
+  logo_url: string | null
+  brand_colors: unknown
+}
+
 export default async function BrandSettingsPage() {
   const supabase = await createClient()
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('name, website_url, google_place_id, g2_slug, capterra_slug, github_repo, npm_package_name, stackoverflow_tag, category, brand_type, market_share_pct, brand_values, monitored_hashtags, brand_aliases, brand_voice, cultural_profile, target_segments, logo_url, brand_colors')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<BrandRow>(
+    supabase,
+    'name, website_url, google_place_id, g2_slug, capterra_slug, github_repo, npm_package_name, stackoverflow_tag, category, industry, brand_type, market_share_pct, brand_values, monitored_hashtags, brand_aliases, brand_voice, cultural_profile, target_segments, logo_url, brand_colors',
+  )
 
   const rawVoice = (brand?.brand_voice ?? {}) as Record<string, unknown>
   const rawSegs  = (brand?.target_segments ?? []) as Record<string, unknown>[]
@@ -26,7 +50,7 @@ export default async function BrandSettingsPage() {
     npmPackageName:    brand?.npm_package_name ?? '',
     stackoverflowTag:  brand?.stackoverflow_tag ?? '',
     category:          brand?.category ?? '',
-    brandType:         (brand?.brand_type as BrandSettingsData['brandType']) ?? 'fmcg',
+    brandType:         resolveBrandType(brand?.brand_type, brand?.industry) as BrandSettingsData['brandType'],
     marketSharePct:    brand?.market_share_pct ?? null,
     brandValues:       (brand?.brand_values as string[]) ?? [],
     monitoredHashtags: (brand?.monitored_hashtags as string[]) ?? [],

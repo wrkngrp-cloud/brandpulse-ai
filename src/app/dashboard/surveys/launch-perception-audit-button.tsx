@@ -36,11 +36,9 @@ export function LaunchPerceptionAuditButton() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <Button size="sm" variant="outline">
-          <Plus className="h-4 w-4 mr-1.5" />
-          Launch Perception Audit
-        </Button>
+      <DialogTrigger render={<Button size="sm" variant="outline" />}>
+        <Plus className="h-4 w-4 mr-1.5" />
+        Launch Perception Audit
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
