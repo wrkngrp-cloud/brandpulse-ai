@@ -106,7 +106,8 @@ Budget ask amounts should be directional, based on the existing spend pattern. K
       maxTokens: 600,
     })
     return JSON.parse(raw.trim())
-  } catch {
+  } catch (err) {
+    console.error('[business-case] AI executive brief generation failed:', err)
     return null
   }
 }
