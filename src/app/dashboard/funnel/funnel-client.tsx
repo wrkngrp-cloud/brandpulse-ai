@@ -92,11 +92,12 @@ function scoreColor(score: number) {
 
 function dropOffMeta(from: number | null, to: number | null) {
   if (from == null || to == null || from === 0)
-    return { pct: null, colorClass: 'text-muted-foreground/40', urgent: false }
+    return { pct: null, isLift: false, colorClass: 'text-muted-foreground/40', urgent: false }
   const pct = Math.round(((from - to) / from) * 100)
+  const isLift = pct < 0
   const urgent = pct > 30
-  const colorClass = pct <= 15 ? 'text-green-600' : pct <= 30 ? 'text-amber-500' : 'text-red-500'
-  return { pct, colorClass, urgent }
+  const colorClass = isLift ? 'text-green-600' : pct <= 15 ? 'text-green-600' : pct <= 30 ? 'text-amber-500' : 'text-red-500'
+  return { pct: Math.abs(pct), isLift, colorClass, urgent }
 }
 
 function scoreBarColor(score: number | null) {
@@ -446,7 +447,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                   {drop.pct != null ? (
                     <>
                       <span className={cn('text-xs font-semibold tabular-nums', drop.colorClass)}>
-                        {drop.pct}% drop-off
+                        {drop.pct}% {drop.isLift ? 'lift' : 'drop-off'}
                       </span>
                       {drop.urgent && (
                         <span className="flex items-center gap-0.5 text-[10px] font-medium text-red-500 ml-1">
