@@ -53,6 +53,18 @@ function buildSnippet(pixelId: string): string {
 window.__bp.track('page_view',1,{url:location.href,ref:document.referrer});`
 }
 
+function buildLeadSnippet(pixelId: string): string {
+  return `fetch('https://brandpulse.ai/api/sdk/event', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    pixel_id: '${pixelId}',
+    event_type: 'lead',
+    metadata: { name: 'Jane Doe', email: 'jane@company.com' },
+  }),
+});`
+}
+
 export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: initialEvents }: Props) {
   const [pixelId, setPixelId] = useState<string | null>(initialPixelId)
   const [events, setEvents] = useState<SdkEvent[]>(initialEvents)
@@ -128,6 +140,7 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
   }
 
   const snippet = buildSnippet(pixelId)
+  const leadSnippet = buildLeadSnippet(pixelId)
 
   return (
     <div className="space-y-6">
@@ -157,6 +170,25 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
         </div>
         <pre className="bg-muted rounded-lg p-4 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border">
           {snippet}
+        </pre>
+      </div>
+
+      {/* Lead capture snippet */}
+      <div className="border rounded-xl p-5 bg-card space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Code2 className="h-4 w-4 text-primary" />
+            <p className="text-sm font-semibold">Lead capture snippet</p>
+          </div>
+          <CopyButton text={leadSnippet} label="Lead snippet" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Fire a <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">lead</code> event
+          from your contact form&apos;s submit handler. These events power the MQL and
+          Cost Per Lead numbers on your Board Pack and Business Case.
+        </p>
+        <pre className="bg-muted rounded-lg p-4 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border">
+          {leadSnippet}
         </pre>
       </div>
 

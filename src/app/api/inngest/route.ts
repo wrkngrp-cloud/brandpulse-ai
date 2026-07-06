@@ -9,6 +9,7 @@ import { competitiveWeeklyBriefing }   from '@/lib/inngest/functions/competitive
 import { ga4DailySync }                from '@/lib/inngest/functions/ga4-daily-sync'
 import { appReviewSync }               from '@/lib/inngest/functions/app-review-sync'
 import { metaAdsDailySync }            from '@/lib/inngest/functions/meta-ads-daily-sync'
+import { commercialMetricsRollup }     from '@/lib/inngest/functions/commercial-metrics-rollup'
 import { prCrawl }                     from '@/lib/inngest/functions/pr-crawl'
 import { geoLiftStudy }                from '@/lib/inngest/functions/geo-lift-study'
 import { campaignTargetMonitor }       from '@/lib/inngest/functions/campaign-target-monitor'
@@ -33,7 +34,7 @@ export const { GET, POST, PUT } = serve({
   functions: [
     syncSocialPosts, crawlMentions, eventRoiReport, eventVisualDetect,
     oohSearchUplift, competitiveWeeklyBriefing, ga4DailySync, appReviewSync,
-    metaAdsDailySync, prCrawl, geoLiftStudy, campaignTargetMonitor,
+    metaAdsDailySync, commercialMetricsRollup, prCrawl, geoLiftStudy, campaignTargetMonitor,
     emailConnectorSync, panelDailyCheck, panelDispatch,
     monthlyReportCron, weeklyDigestCron,
     youtubeBrandMonitor,

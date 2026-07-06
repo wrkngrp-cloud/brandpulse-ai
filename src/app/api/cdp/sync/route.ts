@@ -15,6 +15,8 @@ interface ProfileDraft {
   nps_label?:           string
   last_nps_at?:         string
   is_promoter?:         boolean
+  total_orders?:        number
+  total_spend?:         number
   sources:              Record<string, boolean>
 }
 
@@ -91,6 +93,34 @@ export async function POST() {
     profileMap.set(key, existing)
   }
 
+  // ── 2b. Purchase events (Paystack / Flutterwave successful charges) ────────
+  const { data: purchases } = await supabase
+    .from('purchase_events')
+    .select('customer_email, customer_phone, amount, source, occurred_at')
+    .eq('brand_id', brand.id)
+    .eq('status', 'success')
+    .order('occurred_at', { ascending: true })
+
+  for (const p of purchases ?? []) {
+    const email = p.customer_email?.toLowerCase().trim() || undefined
+    const phone = p.customer_phone?.trim() || undefined
+    const key = email ?? phone
+    if (!key) continue
+
+    const existing = profileMap.get(key) ?? { sources: {} }
+    if (email && !existing.email) existing.email = email
+    if (phone && !existing.phone) existing.phone = phone
+    if (!existing.first_seen_at || p.occurred_at < existing.first_seen_at) {
+      existing.first_seen_at = p.occurred_at
+      existing.acquisition_source = p.source
+    }
+    if (!existing.last_seen_at || p.occurred_at > existing.last_seen_at) existing.last_seen_at = p.occurred_at
+    existing.sources.purchase = true
+    existing.total_orders = (existing.total_orders ?? 0) + 1
+    existing.total_spend  = (existing.total_spend ?? 0) + Number(p.amount ?? 0)
+    profileMap.set(key, existing)
+  }
+
   // ── 3. NPS records ─────────────────────────────────────────────────────────
   const { data: npsRecords } = await supabase
     .from('nps_records')
@@ -161,6 +191,8 @@ export async function POST() {
       last_nps_at:        draft.last_nps_at ?? null,
       is_promoter:        !!promoterId,
       promoter_id:        promoterId ?? null,
+      total_orders:       draft.total_orders ?? 0,
+      total_spend:        draft.total_spend ?? 0,
       sources:            draft.sources,
       last_synced_at:     now,
       updated_at:         now,
@@ -202,6 +234,7 @@ export async function POST() {
     sources_processed: {
       surveys:    (surveys?.length ?? 0),
       whatsapp:   (waContacts?.length ?? 0),
+      purchases:  (purchases?.length ?? 0),
       nps:        (npsRecords?.length ?? 0),
       reviews:    (reviews?.length ?? 0),
     },
