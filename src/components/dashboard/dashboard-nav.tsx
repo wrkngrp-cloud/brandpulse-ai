@@ -11,7 +11,7 @@ import {
   FileSearch, BookOpen, PieChart, Sparkles, ClipboardCheck,
   Plug, BarChart3, Clipboard, AlertTriangle, Heart, Database,
   ShoppingBag, DollarSign, FlaskConical, Activity, Gift,
-  FileText, TrendingUp, FileDown,
+  FileText, TrendingUp, FileDown, MessageCircle, Video, Eye,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { isPathHidden, type IndustryId } from '@/lib/industry-config'
@@ -37,7 +37,7 @@ import { isPathHidden, type IndustryId } from '@/lib/industry-config'
 //    Broadcast: Radio · TV · Print
 
 type NavEntry =
-  | { label: string; href: string; icon: React.ElementType; prefetch?: boolean }
+  | { label: string; href: string; icon: React.ElementType; prefetch?: boolean; comingSoon?: boolean }
   | { divider: true }
 
 // ── Section data ──────────────────────────────────────────────────────────────
@@ -55,6 +55,8 @@ const INTELLIGENCE: NavEntry[] = [
   { label: 'Cultural Insights',  href: '/dashboard/cultural',           icon: Globe       },
   { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: Clipboard   },
   { label: 'PR Tracking',        href: '/dashboard/pr',                 icon: FileSearch  },
+  { label: 'YouTube',            href: '/dashboard/youtube',            icon: Video,      comingSoon: true },
+  { label: 'AI Visibility',      href: '/dashboard/ai-visibility',      icon: Eye,        comingSoon: true },
 ]
 
 // Campaigns: one section, three channel groups separated by thin dividers.
@@ -71,6 +73,7 @@ const CAMPAIGNS: NavEntry[] = [
   { label: 'Radio',               href: '/dashboard/radio',       icon: Radio       },
   { label: 'TV',                  href: '/dashboard/tv',          icon: Tv          },
   { label: 'Print',               href: '/dashboard/print',       icon: Newspaper   },
+  { label: 'WhatsApp',            href: '/dashboard/whatsapp',    icon: MessageCircle, comingSoon: true },
 ]
 
 const CREATIVE_LAB_PATHS = ['/dashboard/voice-builder', '/dashboard/pre-post', '/dashboard/creative']
@@ -131,11 +134,40 @@ function InSectionDivider({ expanded }: { expanded: boolean }) {
   return <div className="mx-3 my-1 h-px bg-sidebar-border/40" />
 }
 
+function ComingSoonBadge() {
+  return (
+    <span className="text-[9px] font-bold uppercase tracking-wide bg-primary/15 text-primary rounded px-1 py-0.5 leading-none shrink-0">
+      Soon
+    </span>
+  )
+}
+
 function NavItem({
-  href, icon: Icon, label, active, expanded, prefetch,
+  href, icon: Icon, label, active, expanded, prefetch, comingSoon,
 }: {
-  href: string; icon: React.ElementType; label: string; active: boolean; expanded: boolean; prefetch?: boolean
+  href: string; icon: React.ElementType; label: string; active: boolean; expanded: boolean; prefetch?: boolean; comingSoon?: boolean
 }) {
+  if (comingSoon) {
+    return (
+      <div
+        className={cn(
+          'relative flex items-center gap-3 h-[38px] rounded-xl cursor-default select-none',
+          expanded ? 'px-3' : 'px-0 justify-center',
+          'text-sidebar-foreground/30',
+        )}
+        title={`${label} — coming soon`}
+      >
+        <Icon className={cn('shrink-0', expanded ? 'h-[15px] w-[15px]' : 'h-[16px] w-[16px]')} />
+        {expanded && (
+          <>
+            <span className="flex-1 text-[13px] font-medium whitespace-nowrap leading-none">{label}</span>
+            <ComingSoonBadge />
+          </>
+        )}
+      </div>
+    )
+  }
+
   return (
     <Link
       href={href}
@@ -187,6 +219,7 @@ function NavSection({
             active={isActive(entry.href)}
             expanded={expanded}
             prefetch={entry.prefetch}
+            comingSoon={entry.comingSoon}
           />
         )
       })}

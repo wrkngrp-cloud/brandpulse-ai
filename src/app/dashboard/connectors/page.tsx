@@ -6,14 +6,13 @@ import { getIndustryFromCategory, SUGGESTED_CONNECTORS_BY_INDUSTRY, INDUSTRY_MET
 import { SocialConnectCard }   from '@/components/dashboard/social-connect-card'
 import { GA4ConnectCard, type GA4ConnectionData }           from '@/components/dashboard/ga4-connect-card'
 import { MetaAdsConnectCard, type MetaAdsAccountData }      from '@/components/dashboard/meta-ads-connect-card'
-import { GoogleAdsConnectCard, type GoogleAdsAccountData }  from '@/components/dashboard/google-ads-connect-card'
-import { HubSpotConnectCard, type HubSpotConnectionData }   from '@/components/dashboard/hubspot-connect-card'
+import { ComingSoonConnectorCard }                           from '@/components/dashboard/coming-soon-connector-card'
 import { PaymentConnectCard, type PaymentConfigStatus }     from '@/components/dashboard/payment-connect-card'
 import { AppStoreConnectCard, type AppStoreConfigData }     from '@/components/dashboard/app-store-connect-card'
 import { EmailConnectCard, type EmailConnectorStatus }      from '@/components/dashboard/email-connect-card'
 // WhatsAppConnectCard hidden until dedicated number is configured
 import { PixelCard } from './pixel-card'
-import { ShoppingCart, ArrowRight } from 'lucide-react'
+import { ShoppingCart, ArrowRight, Search, Users, Music2 } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
@@ -33,8 +32,6 @@ export default async function ConnectorsPage() {
 
   let ga4Connection:    GA4ConnectionData | null  = null
   let metaAdsAccount:  MetaAdsAccountData | null  = null
-  let googleAdsAccount: GoogleAdsAccountData | null = null
-  let hubspotConnection: HubSpotConnectionData | null = null
   let paymentStatus:   PaymentConfigStatus        = { paystack: false, flutterwave: false }
   let appStoreConfig:  AppStoreConfigData | null  = null
   let emailStatus:     EmailConnectorStatus       = { mailchimp: false, brevo: false }
@@ -45,11 +42,9 @@ export default async function ConnectorsPage() {
   // whatsappStats removed — WhatsApp connector hidden during beta
 
   if (brand?.id) {
-    const [ga4Res, metaAdsRes, googleAdsRes, hubspotRes, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
+    const [ga4Res, metaAdsRes, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
       supabase.from('ga4_connections').select('id, property_id, property_name, last_synced_at').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('digital_ad_accounts').select('id, account_name, ad_account_id, sync_status, last_synced_at').eq('brand_id', brand.id).eq('platform', 'meta').maybeSingle(),
-      supabase.from('digital_ad_accounts').select('id, account_name, ad_account_id, sync_status, last_synced_at').eq('brand_id', brand.id).eq('platform', 'google').maybeSingle(),
-      supabase.from('hubspot_connections').select('id, portal_id, last_synced_at').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('webhook_configs').select('provider').eq('brand_id', brand.id),
       supabase.from('app_store_configs').select('apple_app_id, google_pkg_name').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('app_reviews').select('rating').eq('brand_id', brand.id).order('reviewed_at', { ascending: false }).limit(30),
@@ -59,8 +54,6 @@ export default async function ConnectorsPage() {
 
     ga4Connection     = ga4Res.data ?? null
     metaAdsAccount    = metaAdsRes.data ?? null
-    googleAdsAccount  = googleAdsRes.data ?? null
-    hubspotConnection = hubspotRes.data ?? null
 
     if (webhookRes.data) {
       paymentStatus = {
@@ -168,14 +161,38 @@ export default async function ConnectorsPage() {
         <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Paid Media</h2>
         <div className="space-y-3">
           <MetaAdsConnectCard account={metaAdsAccount} />
-          <GoogleAdsConnectCard account={googleAdsAccount} />
+          {/* Google Ads is built (see google-ads-connect-card.tsx) but needs a
+              Google Ads developer token before it can go live — see
+              docs/connector-setup-guide.md. */}
+          <ComingSoonConnectorCard
+            icon={<Search className="h-5 w-5 text-[#4285F4]" />}
+            iconBg="bg-[#4285F4]/10"
+            label="Google Ads"
+            description="Sync search and display campaign performance."
+          />
+          {/* TikTok has OAuth routes but no sync job or dashboard UI yet —
+              see docs/connector-setup-guide.md. */}
+          <ComingSoonConnectorCard
+            icon={<Music2 className="h-5 w-5 text-foreground" />}
+            iconBg="bg-foreground/10"
+            label="TikTok Ads"
+            description="Sync campaign, ad group, and creative performance."
+          />
         </div>
       </section>
 
       {/* CRM */}
       <section>
         <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">CRM</h2>
-        <HubSpotConnectCard connection={hubspotConnection} />
+        {/* HubSpot is built (see hubspot-connect-card.tsx) but needs a HubSpot
+            developer app registered before it can go live — see
+            docs/connector-setup-guide.md. */}
+        <ComingSoonConnectorCard
+          icon={<Users className="h-5 w-5 text-[#FF7A59]" />}
+          iconBg="bg-[#FF7A59]/10"
+          label="HubSpot"
+          description="Read your marketing qualified lead count from HubSpot."
+        />
       </section>
 
       {/* Website Pixel */}
