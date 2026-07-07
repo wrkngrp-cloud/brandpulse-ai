@@ -26,9 +26,13 @@ export function TourTrigger({ module, autoStart = false, variant = 'default', cl
   useEffect(() => {
     if (!steps.length) { setChecked(true); return }
 
-    getTourStatuses([module]).then(statuses => {
-      const status = statuses[module]
-      const isUnseen = !status || status === 'unseen'
+    getTourStatuses([module]).then(({ statuses, isDemo }) => {
+      // Demo accounts are shared logins — the DB can't tell one visitor from
+      // the next, so "seen" lives in this browser's storage instead. A new
+      // person on a new device/browser always starts fresh.
+      const isUnseen = isDemo
+        ? !window.localStorage.getItem(`bp_tour_seen_${module}`)
+        : !statuses[module] || statuses[module] === 'unseen'
 
       if (isUnseen && autoStart) {
         const timer = setTimeout(() => setActive(true), 1500)
@@ -43,6 +47,7 @@ export function TourTrigger({ module, autoStart = false, variant = 'default', cl
     async (status: 'completed' | 'skipped') => {
       setActive(false)
       setChecked(true)
+      window.localStorage.setItem(`bp_tour_seen_${module}`, '1')
       await markTourStatus(module, status)
     },
     [module],
