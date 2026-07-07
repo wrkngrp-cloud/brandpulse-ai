@@ -26,6 +26,7 @@ import { reviewAspectClassifier }      from '@/lib/inngest/functions/review-aspe
 import { b2bReviewSync }               from '@/lib/inngest/functions/b2b-review-sync'
 import { developerHealthSync }         from '@/lib/inngest/functions/developer-health-sync'
 import { hubspotDailySync }            from '@/lib/inngest/functions/hubspot-daily-sync'
+import { googleAdsDailySync }          from '@/lib/inngest/functions/google-ads-daily-sync'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -48,5 +49,6 @@ export const { GET, POST, PUT } = serve({
     b2bReviewSync,
     developerHealthSync,
     hubspotDailySync,
+    googleAdsDailySync,
   ],
 })
