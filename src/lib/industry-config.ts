@@ -120,10 +120,6 @@ export const HIDDEN_PATHS_BY_INDUSTRY: Record<IndustryId, string[]> = {
     '/dashboard/mmm',              // requires custom MMM model setup — advanced only
   ],
   fintech: [
-    '/dashboard/ooh',
-    '/dashboard/radio',
-    '/dashboard/tv',
-    '/dashboard/print',
     '/dashboard/field-intelligence',
     '/dashboard/marketplace',
   ],
@@ -145,10 +141,6 @@ export const HIDDEN_PATHS_BY_INDUSTRY: Record<IndustryId, string[]> = {
     '/dashboard/field-intelligence',
   ],
   b2b_saas: [
-    '/dashboard/ooh',
-    '/dashboard/radio',
-    '/dashboard/tv',
-    '/dashboard/print',
     '/dashboard/field-intelligence',
     '/dashboard/marketplace',
     '/dashboard/cultural',
