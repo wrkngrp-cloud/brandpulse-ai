@@ -1338,7 +1338,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     seeded: {
       sentimentDays: 365, bhiSnapshots: 180, sovSnapshots: 25,
       campaigns: 4, events: 2, influencers: 6, mentions: 70,
-      socialPosts: 25, npsRecords: 50, metricManual: 9,
+      socialPosts: 25, npsRecords: 50, metricManual: Object.keys(bridgerSeries).length,
       funnelSnapshots: 12, competitorSightings: 4, pressMentions: bgPress.length,
       creativeAnalyses: 3, prePostAnalyses: 3, crawlRuns: 10, abExperiments: 3,
       advocacyWeeks: 12, promoters: 4, customerProfiles: 8, creativeAssets: bgCreativeAssets.length,

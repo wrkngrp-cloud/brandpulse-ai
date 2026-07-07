@@ -793,7 +793,7 @@ export async function POST(req: NextRequest) {
     brand: 'PocketPay', workspace: 'PocketPay (Pro plan)',
     seeded: {
       sentimentDays: 365, bhiSnapshots: 180, sovSnapshots: 26, campaigns: 4, events: 2, influencers: 8,
-      mentions: 75, socialPosts: 30, npsRecords: 60, metricManual: 8, funnelSnapshots: 12,
+      mentions: 75, socialPosts: 30, npsRecords: 60, metricManual: Object.keys(pocketPaySeries).length, funnelSnapshots: 12,
       competitorSightings: 5, pressMentions: ppPress.length, creativeAnalyses: 3, prePostAnalyses: 3,
       crawlRuns: 10, abExperiments: 3, advocacyWeeks: 12, loyaltyMembers: 8, promoters: 4,
       customerProfiles: 8, creativeAssets: ppCreativeAssets.length,

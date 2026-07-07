@@ -682,7 +682,7 @@ export async function POST(req: NextRequest) {
     brand: 'Pinnacle Media Group', workspace: 'Pinnacle Media (Pro plan)',
     seeded: {
       sentimentDays: 365, bhiSnapshots: 180, sovSnapshots: 26, campaigns: 5, events: 3, influencers: 8,
-      mentions: 80, socialPosts: 30, npsRecords: 50, metricManual: 4, funnelSnapshots: 12,
+      mentions: 80, socialPosts: 30, npsRecords: 50, metricManual: Object.keys(pinnacleSeries).length, funnelSnapshots: 12,
       competitorSightings: 4, pressMentions: pmPress.length, creativeAnalyses: 3, prePostAnalyses: 3,
       crawlRuns: 10, geoLiftStudies: 1, abExperiments: 2, advocacyWeeks: 12, promoters: 3,
       creativeAssets: pmCreativeAssets.length,
