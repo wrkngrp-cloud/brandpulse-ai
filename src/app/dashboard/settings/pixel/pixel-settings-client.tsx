@@ -65,6 +65,30 @@ function buildLeadSnippet(pixelId: string): string {
 });`
 }
 
+function buildSignupSnippetReactNative(pixelId: string): string {
+  return `fetch('https://brandpulse.ai/api/sdk/event', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    pixel_id: '${pixelId}',
+    event_type: 'signup',
+    metadata: { email: user.email, phone: user.phone },
+  }),
+});`
+}
+
+function buildSignupSnippetFlutter(pixelId: string): string {
+  return `await http.post(
+  Uri.parse('https://brandpulse.ai/api/sdk/event'),
+  headers: {'Content-Type': 'application/json'},
+  body: jsonEncode({
+    'pixel_id': '${pixelId}',
+    'event_type': 'signup',
+    'metadata': {'email': user.email, 'phone': user.phone},
+  }),
+);`
+}
+
 export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: initialEvents }: Props) {
   const [pixelId, setPixelId] = useState<string | null>(initialPixelId)
   const [events, setEvents] = useState<SdkEvent[]>(initialEvents)
@@ -141,6 +165,8 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
 
   const snippet = buildSnippet(pixelId)
   const leadSnippet = buildLeadSnippet(pixelId)
+  const signupSnippetRN      = buildSignupSnippetReactNative(pixelId)
+  const signupSnippetFlutter = buildSignupSnippetFlutter(pixelId)
 
   return (
     <div className="space-y-6">
@@ -190,6 +216,41 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
         <pre className="bg-muted rounded-lg p-4 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border">
           {leadSnippet}
         </pre>
+      </div>
+
+      {/* Mobile app signup snippet */}
+      <div className="border rounded-xl p-5 bg-card space-y-4">
+        <div className="flex items-center gap-2">
+          <Code2 className="h-4 w-4 text-primary" />
+          <p className="text-sm font-semibold">Mobile app signup snippet</p>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          If your product is a mobile app, growth usually starts with a signup, not a website form.
+          Fire a <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">signup</code> event
+          from your app&apos;s registration-complete handler and BrandPulse will count real
+          new customers from it instead of estimating them from payments alone. This is what
+          powers CAC and new customers on Board Pack and Business Case for app-based brands.
+        </p>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-muted-foreground">React Native</p>
+            <CopyButton text={signupSnippetRN} label="React Native snippet" />
+          </div>
+          <pre className="bg-muted rounded-lg p-4 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border">
+            {signupSnippetRN}
+          </pre>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-muted-foreground">Flutter</p>
+            <CopyButton text={signupSnippetFlutter} label="Flutter snippet" />
+          </div>
+          <pre className="bg-muted rounded-lg p-4 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border">
+            {signupSnippetFlutter}
+          </pre>
+        </div>
       </div>
 
       {/* How to use */}

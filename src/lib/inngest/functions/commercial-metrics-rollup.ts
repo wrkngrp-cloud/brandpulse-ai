@@ -8,7 +8,13 @@ import { createServiceClient } from '@/lib/supabase/server'
  * calendar month so computeCommercialMetrics() picks it up with zero changes:
  *   - total_spend      ← digital_performance_daily (only if an ad account is connected)
  *   - revenue_monthly  ← purchase_events + ecommerce_sales (only if rows exist)
- *   - new_customers    ← first-ever purchase identities in purchase_events
+ *   - new_customers    ← first-ever identity this period, preferring app
+ *                        signups (sdk_events, event_type 'signup') when the
+ *                        brand has any this period, falling back to
+ *                        first-ever purchase identities in purchase_events.
+ *                        Signups are the right signal for apps whose growth
+ *                        event is "created an account," not a payment — a
+ *                        payments app's own users, a SaaS trial, etc.
  *   - mql_count        ← sdk_events with event_type 'lead'
  *
  * Every upsert is independent and strictly conditional: if a brand has no
@@ -144,27 +150,72 @@ export const commercialMetricsRollup = inngest.createFunction(
             )
           }
 
-          // ── 4. new_customers — first-ever purchase identities this period ──
-          // Identity = customer_email (lowercased), falling back to customer_phone.
-          // A customer is "new" only if their earliest successful purchase for
-          // this brand, across all time, falls inside the current period.
-          const firstPurchaseAt = new Map<string, string>()
-          for (const p of purchases) {
-            const email = p.customer_email?.toLowerCase().trim()
-            const phone = p.customer_phone?.trim()
-            const key = email || phone
-            if (!key) continue
-            const existing = firstPurchaseAt.get(key)
-            if (!existing || p.occurred_at < existing) firstPurchaseAt.set(key, p.occurred_at)
+          // ── 4. new_customers — prefer app signups, fall back to purchases ──
+          // Identity = metadata.email (lowercased), falling back to
+          // metadata.phone then metadata.user_id. A customer is "new" only
+          // if their earliest signup event for this brand, across all time,
+          // falls inside the current period.
+          const signupRows: { metadata: Record<string, unknown> | null; occurred_at: string }[] = []
+          for (let from = 0; ; from += PAGE_SIZE) {
+            const { data: rows, error } = await supabase
+              .from('sdk_events')
+              .select('metadata, occurred_at')
+              .eq('brand_id', brand.id)
+              .eq('event_type', 'signup')
+              .range(from, from + PAGE_SIZE - 1)
+            if (error) throw new Error(`sdk_events (signup) fetch failed: ${error.message}`)
+            if (!rows?.length) break
+            signupRows.push(...(rows as typeof signupRows))
+            if (rows.length < PAGE_SIZE) break
           }
 
-          let newCustomers = 0
-          for (const [, firstAt] of firstPurchaseAt) {
-            if (inPeriod(firstAt)) newCustomers++
-          }
+          const periodSignups = signupRows.filter(r => inPeriod(r.occurred_at))
 
-          if (newCustomers > 0) {
-            await upsertMetric('new_customers', newCustomers, 'Auto-synced from purchase-based customer identity')
+          if (periodSignups.length > 0) {
+            // Real signup activity this period — this is the authoritative
+            // signal for apps whose growth event is a signup, not a payment.
+            const firstSignupAt = new Map<string, string>()
+            for (const r of signupRows) {
+              const meta  = (r.metadata ?? {}) as Record<string, unknown>
+              const email = typeof meta.email === 'string' ? meta.email.toLowerCase().trim() : undefined
+              const phone = typeof meta.phone === 'string' ? meta.phone.trim() : undefined
+              const userId = typeof meta.user_id === 'string' ? meta.user_id.trim() : undefined
+              const key = email || phone || userId
+              if (!key) continue
+              const existing = firstSignupAt.get(key)
+              if (!existing || r.occurred_at < existing) firstSignupAt.set(key, r.occurred_at)
+            }
+
+            let newCustomersFromSignups = 0
+            for (const [, firstAt] of firstSignupAt) {
+              if (inPeriod(firstAt)) newCustomersFromSignups++
+            }
+
+            if (newCustomersFromSignups > 0) {
+              await upsertMetric('new_customers', newCustomersFromSignups, 'Auto-synced from app signup events')
+            }
+          } else if (periodPurchases.length > 0) {
+            // No signup tracking this period — fall back to first-ever
+            // purchase identities, the right signal for businesses whose
+            // "new customer" is whoever made their first payment.
+            const firstPurchaseAt = new Map<string, string>()
+            for (const p of purchases) {
+              const email = p.customer_email?.toLowerCase().trim()
+              const phone = p.customer_phone?.trim()
+              const key = email || phone
+              if (!key) continue
+              const existing = firstPurchaseAt.get(key)
+              if (!existing || p.occurred_at < existing) firstPurchaseAt.set(key, p.occurred_at)
+            }
+
+            let newCustomers = 0
+            for (const [, firstAt] of firstPurchaseAt) {
+              if (inPeriod(firstAt)) newCustomers++
+            }
+
+            if (newCustomers > 0) {
+              await upsertMetric('new_customers', newCustomers, 'Auto-synced from purchase-based customer identity')
+            }
           }
 
           // ── 5. mql_count — tracking-pixel lead events ──────────────────────
