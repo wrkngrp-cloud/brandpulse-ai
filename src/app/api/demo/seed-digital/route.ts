@@ -4,7 +4,8 @@ import { createClient as createAdmin } from '@supabase/supabase-js'
 
 export const runtime = 'nodejs'
 
-const SEED_SECRET = 'seed-jara-demo-2026'
+// Gated by the shared ADMIN_SECRET env var (fail closed if unset).
+const SEED_SECRET = process.env.ADMIN_SECRET
 
 type Platform = 'meta' | 'google'
 type Campaign = { id: string; name: string }
@@ -174,7 +175,7 @@ function generateDays(brandId: string): DailyRow[] {
 const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
 
 export async function POST(req: NextRequest) {
-  const isAdminSeed = req.headers.get('x-seed-secret') === SEED_SECRET
+  const isAdminSeed = !!SEED_SECRET && req.headers.get('x-seed-secret') === SEED_SECRET
 
   let brandId: string
 
