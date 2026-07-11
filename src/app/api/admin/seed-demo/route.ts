@@ -12,7 +12,9 @@ import { createClient }              from '@supabase/supabase-js'
 
 const DEMO_EMAIL    = 'demo@jarafoods.brandpulse.ai'
 const DEMO_PASSWORD = 'Demo@Jara2026!'
-const SEED_SECRET   = 'seed-jara-demo-2026'
+// Gated by the shared ADMIN_SECRET env var (fail closed if unset) — never a
+// hardcoded literal, which would be committed to git and let anyone reseed.
+const SEED_SECRET   = process.env.ADMIN_SECRET
 const BASE          = new Date()
 
 /* ── Date helpers ────────────────────────────────────────────────────────── */
@@ -46,11 +48,11 @@ function sentScore(d: number): number {
 
 /* ───────────────────────────────────────────────────────────────────────────
    POST /api/admin/seed-demo
-   Header: x-seed-secret: seed-jara-demo-2026
+   Header: x-seed-secret: <value of ADMIN_SECRET env var>
 ────────────────────────────────────────────────────────────────────────────*/
 
 export async function POST(req: NextRequest) {
-  if (req.headers.get('x-seed-secret') !== SEED_SECRET) {
+  if (!SEED_SECRET || req.headers.get('x-seed-secret') !== SEED_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

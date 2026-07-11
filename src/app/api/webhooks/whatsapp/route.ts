@@ -1,9 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import crypto from 'node:crypto'
+
+export const runtime = 'nodejs'
+
+// Africa's Talking does not sign its webhooks, so we authenticate inbound calls
+// with a shared secret carried in the callback URL (?key=…) or an x-webhook-secret
+// header. Without this, anyone could POST fake NPS replies and inbound messages.
+// Register the callback as: /api/webhooks/whatsapp?key=<WHATSAPP_INBOUND_SECRET>
+function verifyInboundSecret(request: NextRequest): boolean {
+  const expected = process.env.WHATSAPP_INBOUND_SECRET
+  if (!expected) return false // fail closed: no secret configured → reject
+  const provided =
+    request.nextUrl.searchParams.get('key') ??
+    request.headers.get('x-webhook-secret') ??
+    ''
+  const a = Buffer.from(provided)
+  const b = Buffer.from(expected)
+  return a.length === b.length && crypto.timingSafeEqual(a, b)
+}
 
 // Africa's Talking WhatsApp inbound webhook
 // Registers at: https://dashboard.africastalking.com → SMS → Callback URL → /api/webhooks/whatsapp
 export async function POST(request: NextRequest) {
+  if (!verifyInboundSecret(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   let body: Record<string, unknown>
   try {
     const text = await request.text()

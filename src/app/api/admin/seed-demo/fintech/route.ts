@@ -10,7 +10,8 @@ import { createClient }              from '@supabase/supabase-js'
 
 const DEMO_EMAIL    = 'demo@pocketpay.brandpulse.ai'
 const DEMO_PASSWORD = 'Demo@PocketPay2026!'
-const SEED_SECRET   = 'seed-pocketpay-demo-2026'
+// Gated by the shared ADMIN_SECRET env var (fail closed if unset).
+const SEED_SECRET   = process.env.ADMIN_SECRET
 const BASE          = new Date()
 
 function dAgo(n: number): string {
@@ -39,7 +40,7 @@ function sentScore(d: number): number {
 }
 
 export async function POST(req: NextRequest) {
-  if (req.headers.get('x-seed-secret') !== SEED_SECRET)
+  if (!SEED_SECRET || req.headers.get('x-seed-secret') !== SEED_SECRET)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const sb = createClient(
