@@ -31,7 +31,7 @@ export async function POST() {
   let sendResult: { ids: string[] } | null = null
   try {
     sendResult = await inngest.send({
-      name: 'brandpulse/crawl.requested',
+      name: 'brandgauge/crawl.requested',
       data: { triggeredBy: user.id, runId: runId ?? undefined },
     })
     console.log('[trigger] inngest.send result:', JSON.stringify(sendResult))
@@ -81,6 +81,6 @@ export async function GET() {
   return NextResponse.json({
     eventKey:   eventKey  ? `${eventKey.slice(0, 8)}...` : 'NOT SET',
     signingKey: signingKey ? `${signingKey.slice(0, 16)}...` : 'NOT SET',
-    inngestAppId: 'brandpulse-ai',
+    inngestAppId: 'brandgauge',
   })
 }

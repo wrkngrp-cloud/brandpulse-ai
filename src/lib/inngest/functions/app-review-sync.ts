@@ -58,7 +58,7 @@ async function fetchPlayStoreRating(packageName: string): Promise<{ rating: numb
   try {
     const url = `https://play.google.com/store/apps/details?id=${packageName}&hl=en&gl=ng`
     const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BrandPulse/1.0)' },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BrandGauge/1.0)' },
     })
     if (!res.ok) return null
     const html = await res.text()
@@ -114,7 +114,7 @@ export const appReviewSync = inngest.createFunction(
     name:    'App Store Reviews Sync (weekly)',
     triggers: [
       { cron: 'TZ=Africa/Lagos 0 7 * * 0' },
-      { event: 'brandpulse/app.reviews.sync' },
+      { event: 'brandgauge/app.reviews.sync' },
     ],
     retries: 2,
   },

@@ -79,7 +79,7 @@ export function MetricEntryDrawer({ industry, onClose, onSaved }: Props) {
 
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           <p className="text-xs text-muted-foreground leading-relaxed">
-            No connector needed. Enter your numbers manually and BrandPulse will compute your ROI metrics.
+            No connector needed. Enter your numbers manually and BrandGauge will compute your ROI metrics.
             Confidence shows as "Manual input" until a connector upgrades it automatically.
           </p>
 

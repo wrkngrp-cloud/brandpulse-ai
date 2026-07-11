@@ -144,7 +144,7 @@ export function HubSpotConnectCard({ connection: initialConnection }: HubSpotCon
           </a>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
             You will be redirected to HubSpot to grant read access to your contacts.
-            BrandPulse only counts lifecycle stages. It never edits or creates anything in HubSpot.
+            BrandGauge only counts lifecycle stages. It never edits or creates anything in HubSpot.
           </p>
         </div>
       )}

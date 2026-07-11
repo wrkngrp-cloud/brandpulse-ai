@@ -11,7 +11,7 @@ export const competitiveWeeklyBriefing = inngest.createFunction(
     name: 'Competitive Weekly Briefing (Monday 8am Lagos)',
     triggers: [
       { cron: 'TZ=Africa/Lagos 0 8 * * 1' },
-      { event: 'brandpulse/competitive.briefing.requested' },
+      { event: 'brandgauge/competitive.briefing.requested' },
     ],
     retries: 2,
   },
@@ -215,11 +215,11 @@ Return ONLY valid JSON — no markdown fences — in this exact shape:
           top3 || 'No recommendations generated.',
           '',
           '-- ',
-          'BrandPulse AI | View full briefing at your dashboard',
+          'BrandGauge | View full briefing at your dashboard',
         ].join('\n')
 
         await resend.emails.send({
-          from:    'BrandPulse AI <briefings@brandpulse.ai>',
+          from:    'BrandGauge <briefings@brandgauge.app>',
           to:      userRecord.email,
           subject: `Your weekly competitive briefing — ${brand.name}`,
           text:    emailBody,

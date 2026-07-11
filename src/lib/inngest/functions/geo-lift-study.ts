@@ -118,7 +118,7 @@ export const geoLiftStudy = inngest.createFunction(
   {
     id:       'geo-lift-study',
     name:     'Geo-Lift: Run city-level search trend study',
-    triggers: [{ event: 'brandpulse/geo-lift.study-requested' }],
+    triggers: [{ event: 'brandgauge/geo-lift.study-requested' }],
     retries:  2,
   },
   async ({

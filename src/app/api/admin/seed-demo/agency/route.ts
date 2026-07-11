@@ -7,7 +7,7 @@ import { createClient }              from '@supabase/supabase-js'
               → Abuja expansion → strong position June 2026
 ───────────────────────────────────────────────────────────────────────────── */
 
-const DEMO_EMAIL    = 'demo@pinnaclemedia.brandpulse.ai'
+const DEMO_EMAIL    = 'demo@pinnaclemedia.brandgauge.app'
 const DEMO_PASSWORD = 'Demo@Pinnacle2026!'
 // Gated by the shared ADMIN_SECRET env var (fail closed if unset).
 const SEED_SECRET   = process.env.ADMIN_SECRET

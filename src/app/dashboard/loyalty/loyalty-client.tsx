@@ -380,7 +380,7 @@ function NewProgramForm({ onSave, onCancel }: { onSave: (d: Record<string, unkno
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label className="text-xs">Program name *</Label>
-          <Input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. BrandPulse Rewards" className="mt-1" />
+          <Input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. BrandGauge Rewards" className="mt-1" />
         </div>
         <div>
           <Label className="text-xs">Points currency name</Label>

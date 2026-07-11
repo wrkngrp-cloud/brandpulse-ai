@@ -463,7 +463,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           <Link2 className="h-3.5 w-3.5 shrink-0" />
           {customDomain
             ? <span>Links use your custom domain: <strong className="text-foreground font-mono">{customDomain}</strong></span>
-            : <span>Links use the BrandPulse platform domain. Want to use your own?</span>}
+            : <span>Links use the BrandGauge platform domain. Want to use your own?</span>}
         </div>
         <Link
           href="/dashboard/settings/ooh-domain"

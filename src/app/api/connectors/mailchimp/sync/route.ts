@@ -7,7 +7,7 @@ export async function POST() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  await inngest.send({ name: 'brandpulse/email-connectors.sync-requested' })
+  await inngest.send({ name: 'brandgauge/email-connectors.sync-requested' })
 
   return NextResponse.json({ success: true, message: 'Email sync triggered' })
 }

@@ -138,7 +138,7 @@ export default async function PRTrackingPage({
           <div className="space-y-1">
             <p className="text-sm font-medium">Monitoring your press mentions</p>
             <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
-              BrandPulse crawls Nigerian publications nightly at 7 AM Lagos time — searching for {brand.name} across The Punch, Vanguard, BusinessDay, TechCabal, Nairametrics, and 6 more outlets.
+              BrandGauge crawls Nigerian publications nightly at 7 AM Lagos time — searching for {brand.name} across The Punch, Vanguard, BusinessDay, TechCabal, Nairametrics, and 6 more outlets.
             </p>
           </div>
           <div className="flex flex-col items-center gap-3">

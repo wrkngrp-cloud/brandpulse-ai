@@ -45,7 +45,7 @@ function detectPostType(url: string, platform: string): string | null {
 
 async function fetchTikTokOembed(url: string): Promise<OembedResult> {
   const endpoint = `https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}`
-  const res  = await fetch(endpoint, { headers: { 'User-Agent': 'BrandPulse/1.0' }, signal: AbortSignal.timeout(8000) })
+  const res  = await fetch(endpoint, { headers: { 'User-Agent': 'BrandGauge/1.0' }, signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error('TikTok oEmbed failed')
   const data = await res.json() as { title?: string; author_name?: string; thumbnail_url?: string; author_url?: string }
   return {
@@ -60,7 +60,7 @@ async function fetchTikTokOembed(url: string): Promise<OembedResult> {
 
 async function fetchYoutubeOembed(url: string): Promise<OembedResult> {
   const endpoint = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`
-  const res  = await fetch(endpoint, { headers: { 'User-Agent': 'BrandPulse/1.0' }, signal: AbortSignal.timeout(8000) })
+  const res  = await fetch(endpoint, { headers: { 'User-Agent': 'BrandGauge/1.0' }, signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error('YouTube oEmbed failed')
   const data = await res.json() as { title?: string; author_name?: string; thumbnail_url?: string }
   const postType = url.includes('/shorts/') ? 'short' : 'video'
@@ -76,7 +76,7 @@ async function fetchYoutubeOembed(url: string): Promise<OembedResult> {
 
 async function fetchTwitterOembed(url: string): Promise<OembedResult> {
   const endpoint = `https://publish.twitter.com/oembed?url=${encodeURIComponent(url)}&omit_script=true`
-  const res  = await fetch(endpoint, { headers: { 'User-Agent': 'BrandPulse/1.0' }, signal: AbortSignal.timeout(8000) })
+  const res  = await fetch(endpoint, { headers: { 'User-Agent': 'BrandGauge/1.0' }, signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error('Twitter oEmbed failed')
   const data = await res.json() as { author_name?: string; html?: string }
   // Extract text from HTML: strip tags, keep readable text

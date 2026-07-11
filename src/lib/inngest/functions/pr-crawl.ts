@@ -167,7 +167,7 @@ export const prCrawl = inngest.createFunction(
     name:     'PR: Crawl press mentions from Nigerian outlets (nightly)',
     triggers: [
       { cron: 'TZ=Africa/Lagos 0 7 * * *' },
-      { event: 'brandpulse/pr.crawl-requested' },
+      { event: 'brandgauge/pr.crawl-requested' },
     ],
     retries: 2,
   },

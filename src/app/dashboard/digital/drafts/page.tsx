@@ -112,7 +112,7 @@ export default function DraftsPage() {
         <p className="text-sm font-medium text-blue-800 dark:text-blue-300">How publishing works</p>
         <p className="text-xs text-blue-700 dark:text-blue-400">
           Drafts are saved here until you are ready to go live. Once you connect your Meta or Google Ads account, use the
-          {' '}<strong>Publish</strong> button to send the campaign to the platform. Until then, drafts remain private on BrandPulse AI.
+          {' '}<strong>Publish</strong> button to send the campaign to the platform. Until then, drafts remain private on BrandGauge.
         </p>
       </div>
 

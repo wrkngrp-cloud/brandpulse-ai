@@ -1,5 +1,5 @@
 -- Purchase Events: captures Paystack / Flutterwave / manual payment signals
--- These feed the Action → Loyalty stages of the BrandPulse funnel
+-- These feed the Action → Loyalty stages of the BrandGauge funnel
 
 create table if not exists purchase_events (
   id              uuid primary key default gen_random_uuid(),

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 export const runtime = 'edge'
 
-// Served as the loader script: <script src="https://brandpulse.ai/api/sdk/pixel.js" data-pid="..."></script>
+// Served as the loader script: <script src="https://brandgauge.app/api/sdk/pixel.js" data-pid="..."></script>
 // Sets window.bp(event_type, value?, metadata?) that POSTs to /api/sdk/event.
 const SCRIPT = `(function(w,d){
   var s=d.currentScript||d.querySelector('script[data-pid]');

@@ -122,7 +122,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
           <div>
             <p className="font-semibold">WhatsApp not configured</p>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
-              Add your WhatsApp Business API credentials to start sending. All sends come from your BrandPulse-verified number.
+              Add your WhatsApp Business API credentials to start sending. All sends come from your BrandGauge-verified number.
             </p>
           </div>
           <div className="text-left bg-muted/40 rounded-lg p-4 text-xs font-mono space-y-1 max-w-sm mx-auto">

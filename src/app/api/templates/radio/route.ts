@@ -34,7 +34,7 @@ const DURATIONS = ['10', '15', '30', '45', '60']
 
 export async function GET() {
   const wb = new ExcelJS.Workbook()
-  wb.creator = 'BrandPulse AI'
+  wb.creator = 'BrandGauge'
   wb.created = new Date()
 
   // ── Hidden lists sheet ──────────────────────────────────────────────────
@@ -50,7 +50,7 @@ export async function GET() {
   // Title row
   ws.mergeCells('A1:M1')
   const titleCell = ws.getCell('A1')
-  titleCell.value = 'BrandPulse Radio Buy Template'
+  titleCell.value = 'BrandGauge Radio Buy Template'
   titleCell.font = { bold: true, size: 14, color: { argb: 'FF1E3A5F' } }
   titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEBF3FF' } }
   titleCell.alignment = { horizontal: 'center', vertical: 'middle' }
@@ -154,14 +154,14 @@ export async function GET() {
   const inst = wb.addWorksheet('Instructions')
 
   const instData = [
-    ['BrandPulse Radio Buy Template — Instructions', ''],
+    ['BrandGauge Radio Buy Template — Instructions', ''],
     ['', ''],
     ['HOW TO USE THIS TEMPLATE', ''],
     ['', ''],
     ['1.', 'Fill in one row per radio spot booking. Each row represents a single spot (or a block of identical spots on the same station/date/time).'],
     ['2.', 'Use the dropdown menus in columns A (Station), B (Daypart), E (Duration), and L (Status) to ensure consistent data.'],
     ['3.', 'The Net Cost (column K) calculates automatically: Rate Card × (1 - Discount%) × Spots Planned.'],
-    ['4.', 'Upload this file to BrandPulse via the Radio Intelligence page → Upload Media Plan button.'],
+    ['4.', 'Upload this file to BrandGauge via the Radio Intelligence page → Upload Media Plan button.'],
     ['', ''],
     ['COLUMN GUIDE', ''],
     ['', ''],
@@ -181,7 +181,7 @@ export async function GET() {
     ['', ''],
     ['TIPS', ''],
     ['', ''],
-    ['•', 'Keep station names consistent — BrandPulse matches them to the reference database for reach estimates.'],
+    ['•', 'Keep station names consistent — BrandGauge matches them to the reference database for reach estimates.'],
     ['•', 'Upload weekly after confirmation reports arrive from your media buying agency.'],
     ['•', 'The system will auto-match your stations to reach data and compute estimated CPT.'],
   ]
@@ -204,7 +204,7 @@ export async function GET() {
   return new NextResponse(buffer, {
     headers: {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'Content-Disposition': 'attachment; filename="brandpulse-radio-buy-template.xlsx"',
+      'Content-Disposition': 'attachment; filename="brandgauge-radio-buy-template.xlsx"',
     },
   })
 }

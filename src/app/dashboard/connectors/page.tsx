@@ -113,7 +113,7 @@ export default async function ConnectorsPage() {
           <p className="eyebrow mb-1">Platform</p>
           <h1 className="h-display text-[26px] leading-none">All Connectors</h1>
           <p className="mt-2 text-[13px] text-muted-foreground/70 max-w-xl">
-            Connect your data sources here. Every module in BrandPulse reads from these connections automatically.
+            Connect your data sources here. Every module in BrandGauge reads from these connections automatically.
             Connect once — all insights update.
           </p>
         </div>

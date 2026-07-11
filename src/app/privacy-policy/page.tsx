@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — BrandPulse AI',
+  title: 'Privacy Policy — BrandGauge',
 }
 
-const CONTACT_EMAIL = 'privacy@brandpulse.ai'
+const CONTACT_EMAIL = 'privacy@brandgauge.app'
 const EFFECTIVE_DATE = 'June 11, 2026'
 
 export default function PrivacyPolicyPage() {
@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage() {
       <header className="border-b">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="font-semibold text-sm tracking-tight">
-            BrandPulse AI
+            BrandGauge
           </Link>
         </div>
       </header>
@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         <p className="text-muted-foreground leading-7">
-          BrandPulse AI helps Nigerian and West African marketing teams understand how their
+          BrandGauge helps Nigerian and West African marketing teams understand how their
           brands are perceived online. This policy explains what data we collect when you connect
           your social accounts, how we store it, and the rights you have over it.
         </p>
@@ -51,7 +51,7 @@ export default function PrivacyPolicyPage() {
         </Section>
 
         <Section title="2. How we use it">
-          <p>We use the data you share exclusively to power your BrandPulse AI workspace:</p>
+          <p>We use the data you share exclusively to power your BrandGauge workspace:</p>
           <ul className="mt-3 space-y-2 list-disc list-inside text-muted-foreground">
             <li>Calculating your Brand Health Index, sentiment scores, and share of voice</li>
             <li>Populating your Content Performance table and analytics dashboards</li>
@@ -59,7 +59,7 @@ export default function PrivacyPolicyPage() {
             <li>Scoring content before posting with the Pre-Post Widget</li>
           </ul>
           <p className="mt-3">
-            Your data is never used to train AI models, shared with other BrandPulse customers,
+            Your data is never used to train AI models, shared with other BrandGauge customers,
             or used for any purpose outside your workspace.
           </p>
         </Section>
@@ -82,7 +82,7 @@ export default function PrivacyPolicyPage() {
 
         <Section title="4. We never sell your data">
           <p>
-            BrandPulse AI does not sell, rent, license, or otherwise transfer your data to any
+            BrandGauge does not sell, rent, license, or otherwise transfer your data to any
             third party for commercial purposes. Full stop.
           </p>
           <p className="mt-3">
@@ -95,7 +95,7 @@ export default function PrivacyPolicyPage() {
 
         <Section title="5. Third-party platforms">
           <p>
-            Connecting a social account means BrandPulse AI accesses data from that platform on
+            Connecting a social account means BrandGauge accesses data from that platform on
             your behalf. Your use of those platforms remains governed by their own terms and
             privacy policies:
           </p>
@@ -104,8 +104,8 @@ export default function PrivacyPolicyPage() {
             <li>X (Twitter): x.com/en/privacy</li>
           </ul>
           <p className="mt-3">
-            You can revoke BrandPulse AI&apos;s access to any platform at any time from that
-            platform&apos;s app permissions settings, independently of deleting your BrandPulse account.
+            You can revoke BrandGauge&apos;s access to any platform at any time from that
+            platform&apos;s app permissions settings, independently of deleting your BrandGauge account.
           </p>
         </Section>
 
@@ -144,7 +144,7 @@ export default function PrivacyPolicyPage() {
         </Section>
 
         <div className="border-t pt-8 text-xs text-muted-foreground">
-          BrandPulse AI &mdash; Lagos, Nigeria. This policy may be updated from time to time.
+          BrandGauge &mdash; Lagos, Nigeria. This policy may be updated from time to time.
           Continued use of the service after changes constitutes acceptance.
         </div>
       </main>

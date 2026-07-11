@@ -57,7 +57,7 @@ export async function startGeoLiftStudy(
 
   // Fire the Inngest event
   await inngest.send({
-    name: 'brandpulse/geo-lift.study-requested',
+    name: 'brandgauge/geo-lift.study-requested',
     data: {
       studyId:       study.id,
       brandId,

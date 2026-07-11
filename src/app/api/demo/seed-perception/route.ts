@@ -5,7 +5,7 @@
  *
  * This route remains available as a manual top-up for existing demo accounts
  * that were seeded before the main seed absorbed this logic. It is restricted
- * to demo@jarafoods.brandpulse.ai only.
+ * to demo@jarafoods.brandgauge.app only.
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
@@ -33,7 +33,7 @@ function varyScore(base: number): number {
   return Math.round(clamp(base + variance) * 2) / 2  // round to nearest 0.5
 }
 
-const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
+const DEMO_EMAIL = 'demo@jarafoods.brandgauge.app'
 
 export async function POST() {
   const supabase = await createClient()

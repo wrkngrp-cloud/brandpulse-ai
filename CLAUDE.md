@@ -1,4 +1,4 @@
-# BrandPulse AI — Project Rules
+# BrandGauge — Project Rules
 
 This file is the contract for working in this repo. It is meant to be self-sufficient:
 if you follow it, you should not need to guess how things are done here. When it and the
@@ -137,8 +137,8 @@ structured response.
   fail-closed if unset. Never hardcode a secret in source.
 
 ## WhatsApp Deep Integration — Model A (Phase 4)
-Architecture: BrandPulse-owned WABA. All sends originate from BrandPulse's own WhatsApp
-Business number. Users manage contacts and templates inside BrandPulse UI only; they never
+Architecture: BrandGauge-owned WABA. All sends originate from BrandGauge's own WhatsApp
+Business number. Users manage contacts and templates inside BrandGauge UI only; they never
 touch an API key or external platform.
 API: Meta Cloud API v20.0.
 Send endpoint: POST `https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages`.
@@ -225,7 +225,7 @@ Commit straight to `main` is the established habit, but pushing/merging to `main
 by review tooling; when it is, open a PR and leave it for me unless I say otherwise.
 
 ## Project skills
-- `bp-feature` — build a BrandPulse feature end to end the standard way.
+- `bp-feature` — build a BrandGauge feature end to end the standard way.
 - `bp-ai-prompt` — construct a prompt with the mandatory 3-layer + cultural block.
 - `bp-supabase-rls` — apply the standard RLS policy to every new table.
 - `bp-connector` — build a third-party connector (OAuth + encrypted tokens + Inngest sync).

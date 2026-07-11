@@ -10,7 +10,7 @@ import { createClient }              from '@supabase/supabase-js'
               June 2026 (now): strong summer position
 ───────────────────────────────────────────────────────────────────────────── */
 
-const DEMO_EMAIL    = 'demo@jarafoods.brandpulse.ai'
+const DEMO_EMAIL    = 'demo@jarafoods.brandgauge.app'
 const DEMO_PASSWORD = 'Demo@Jara2026!'
 // Gated by the shared ADMIN_SECRET env var (fail closed if unset).
 const SEED_SECRET   = process.env.ADMIN_SECRET

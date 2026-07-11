@@ -13,7 +13,7 @@ export async function POST() {
   const brand = { id: brandId }
 
   await inngest.send({
-    name: 'brandpulse/competitive.briefing.requested',
+    name: 'brandgauge/competitive.briefing.requested',
     data: { brand_id: brand.id },
   })
   return NextResponse.json({ ok: true })

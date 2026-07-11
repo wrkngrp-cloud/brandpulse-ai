@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 
-const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
+const DEMO_EMAIL = 'demo@jarafoods.brandgauge.app'
 
 // Idempotent — safe to call multiple times. Upserts data so re-running
 // extends all series up to today without duplicating rows.

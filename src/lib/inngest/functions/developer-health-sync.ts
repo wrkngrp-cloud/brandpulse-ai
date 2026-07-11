@@ -11,7 +11,7 @@ async function fetchGitHubRepo(repo: string): Promise<{
     const res = await fetch(`https://api.github.com/repos/${repo}`, {
       headers: {
         Accept: 'application/vnd.github.v3+json',
-        'User-Agent': 'BrandPulse/1.0',
+        'User-Agent': 'BrandGauge/1.0',
         // Use token if available for higher rate limit
         ...(process.env.GITHUB_TOKEN ? { Authorization: `token ${process.env.GITHUB_TOKEN}` } : {}),
       },
@@ -58,7 +58,7 @@ export const developerHealthSync = inngest.createFunction(
     name: 'Developer Health Sync (GitHub/npm/StackOverflow)',
     triggers: [
       { cron: 'TZ=Africa/Lagos 0 8 * * 3' }, // weekly Wednesday 8am Lagos
-      { event: 'brandpulse/developer.health.sync' },
+      { event: 'brandgauge/developer.health.sync' },
     ],
     retries: 2,
   },

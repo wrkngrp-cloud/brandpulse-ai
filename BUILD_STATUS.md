@@ -1,4 +1,4 @@
-# BrandPulse AI — Build Status
+# BrandGauge — Build Status
 
 > Feed this file into your project chat at the start of each session to bring it up to date.
 > Updated after every pushed session. Last updated: 2026-07-03.
@@ -108,7 +108,7 @@
 | Feature | Notes |
 |---|---|
 | Audio Transcription Module | Whisper pipeline for radio spot transcription; pending API access |
-| ~~BrandPulse JS Pixel / SDK~~ | ✅ Done — `POST /api/sdk/event`, `sdk_events` table, pixel settings at `/dashboard/settings/pixel` |
+| ~~BrandGauge JS Pixel / SDK~~ | ✅ Done — `POST /api/sdk/event`, `sdk_events` table, pixel settings at `/dashboard/settings/pixel` |
 | ~~WhatsApp Broadcasting~~ | ✅ Done — Inngest batch broadcast, `/dashboard/whatsapp` (hidden — needs SIM) |
 | Competitive SOV auto-discovery | Automated competitor handle detection from social conversation |
 | ~~Brand Tracking Panel~~ | ✅ Done — `/dashboard/surveys/panels`, all CRUD APIs, Inngest cron (9am Lagos daily), email + WhatsApp dispatch |
@@ -119,8 +119,8 @@
 
 ### Phase 4 — WhatsApp Deep Integration ✅ (2026-06-24)
 
-**Architecture: Model A — BrandPulse-owned WABA, Meta Cloud API v20.0**
-Users never touch an API key. Contacts + templates managed entirely inside BrandPulse UI.
+**Architecture: Model A — BrandGauge-owned WABA, Meta Cloud API v20.0**
+Users never touch an API key. Contacts + templates managed entirely inside BrandGauge UI.
 
 | Component | Route / File | Status |
 |---|---|---|
@@ -142,7 +142,7 @@ Required env vars (add to Vercel):
 - `WHATSAPP_APP_SECRET` — for webhook HMAC verification
 - `WHATSAPP_VERIFY_TOKEN` — any string you choose for webhook handshake
 
-Webhook URL to register in Meta: `https://brandpulse.ai/api/whatsapp/webhook`
+Webhook URL to register in Meta: `https://brandgauge.app/api/whatsapp/webhook`
 
 ---
 
@@ -161,7 +161,7 @@ Webhook URL to register in Meta: `https://brandpulse.ai/api/whatsapp/webhook`
 | **AI Brand Voice Builder** | | |
 | UI + API | `/dashboard/voice-builder`, `POST /api/ai/brand-voice-builder` | ✅ (was already built) |
 | `getActiveBrandId` fix | `api/ai/brand-voice-builder/route.ts` | ✅ fixed |
-| **BrandPulse SDK / Pixel** | | |
+| **BrandGauge SDK / Pixel** | | |
 | DB migration | `20260624003000_sdk_events.sql` (sdk_events + pixel_configs) | ✅ (was already built) |
 | Track endpoint | `POST /api/sdk/event` (rate-limited via Upstash) | ✅ (was already built) |
 | Pixel setup | `GET/POST /api/sdk/pixel` | ✅ fixed (getActiveBrandId) |
@@ -273,9 +273,9 @@ All planned Phase 6 modules are now built.
 
 **Geo Audience sync (2026-06-28):** `POST /api/ooh/geo-audiences/[id]/sync` — calls Meta reach estimate API with the site's lat/lng + fence radius. Returns `users_lower_bound` / `users_upper_bound`, stores as `estimated_reach`, marks status `active`. Requires Meta Ads connected in Connectors.
 
-**Meta Ads Connector (2026-06-28):** `MetaAdsConnectCard` added to Connectors page under Paid Media. Shows connection status from `digital_ad_accounts`. Connect → `GET /api/ads/meta/connect?return_to=connectors` (scope: `ads_read,ads_management,read_insights`). Disconnect → `DELETE /api/ads/meta/connect`. Full OAuth: connect stores `{userId, brandId, returnTo}` in Redis state (10 min TTL); callback reads brandId directly (no DB brand lookup — multi-brand safe); redirects back to the originating page (`connectors` or `digital`). Daily sync: `metaAdsDailySync` Inngest function (5 AM Lagos), token auto-refresh 7 days before expiry, upserts into `digital_performance_daily`. Env vars required: `META_APP_ID`, `META_APP_SECRET`. Redirect URI to whitelist in Meta App Dashboard: `https://brandpulse.ai/api/ads/meta/callback`.
+**Meta Ads Connector (2026-06-28):** `MetaAdsConnectCard` added to Connectors page under Paid Media. Shows connection status from `digital_ad_accounts`. Connect → `GET /api/ads/meta/connect?return_to=connectors` (scope: `ads_read,ads_management,read_insights`). Disconnect → `DELETE /api/ads/meta/connect`. Full OAuth: connect stores `{userId, brandId, returnTo}` in Redis state (10 min TTL); callback reads brandId directly (no DB brand lookup — multi-brand safe); redirects back to the originating page (`connectors` or `digital`). Daily sync: `metaAdsDailySync` Inngest function (5 AM Lagos), token auto-refresh 7 days before expiry, upserts into `digital_performance_daily`. Env vars required: `META_APP_ID`, `META_APP_SECRET`. Redirect URI to whitelist in Meta App Dashboard: `https://brandgauge.app/api/ads/meta/callback`.
 
-**Meta Data Deletion callback (2026-06-28):** `POST /api/auth/meta/deauthorize` — validates signed_request (HMAC-SHA256), returns `{url, confirmation_code}`. Register in Meta App Dashboard → Facebook Login → Data Deletion Request URL: `https://brandpulse.ai/api/auth/meta/deauthorize`. Required before App Review submission.
+**Meta Data Deletion callback (2026-06-28):** `POST /api/auth/meta/deauthorize` — validates signed_request (HMAC-SHA256), returns `{url, confirmation_code}`. Register in Meta App Dashboard → Facebook Login → Data Deletion Request URL: `https://brandgauge.app/api/auth/meta/deauthorize`. Required before App Review submission.
 
 ---
 
@@ -464,8 +464,8 @@ Three new full demo accounts, one per underserved vertical, each with brand_type
 
 **What was built this session (commits 34770bc, d4baeaa):**
 
-1. **BrandPulse SDK + Lifecycle integrations — architecture decided (PRD updated, build Phase 3):**
-   - SDK-first approach: BrandPulse JS Pixel + React/Flutter SDK → `sdk_events` table feeds Action/Loyalty/Advocacy stages
+1. **BrandGauge SDK + Lifecycle integrations — architecture decided (PRD updated, build Phase 3):**
+   - SDK-first approach: BrandGauge JS Pixel + React/Flutter SDK → `sdk_events` table feeds Action/Loyalty/Advocacy stages
    - GA4 connector (OAuth, daily Inngest cron, maps GA4 events to funnel stages)
    - Paystack/Flutterwave webhook connector (purchase → Action; repeat purchase → Loyalty)
    - App Store / Google Play rating fetcher (weekly Inngest cron, haiku sentiment on reviews)
@@ -499,7 +499,7 @@ Three new full demo accounts, one per underserved vertical, each with brand_type
    - "Funnel" added to sidebar nav between Pre-Post and Competitive
 
 **Phase 3 channel architecture (planned — see PRD Document 2 sections 7.9–7.12):**
-- **Digital** (7.9): Meta Ads + X Ads + Google Ads OAuth; create/manage campaigns from BrandPulse; daily ROAS/CTR/CPC pull; AI creative fatigue alerts + budget reallocation
+- **Digital** (7.9): Meta Ads + X Ads + Google Ads OAuth; create/manage campaigns from BrandGauge; daily ROAS/CTR/CPC pull; AI creative fatigue alerts + budget reallocation
 - **Radio** (7.10): Excel/CSV media plan import (Claude maps columns); 40+ Nigerian station DB; per-spot tracker; daypart efficiency ranking
 - **TV** (7.11): Same import flow; NTA/AIT/Channels/DSTV channel DB; GRP/CPRP tracking; underdelivery alerts
 - **Print** (7.12): Publication DB; QR is PRIMARY attribution; per-placement QR auto-generation; CPT analytics

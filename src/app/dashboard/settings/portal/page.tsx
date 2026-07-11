@@ -21,7 +21,7 @@ export default async function PortalSettingsPage() {
       brands={brands ?? []}
       plan={workspace?.plan ?? 'starter'}
       portalLimit={planRow?.portal_links ?? 0}
-      appUrl={process.env.APP_URL ?? 'https://brandpulse.ai'}
+      appUrl={process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'}
     />
   )
 }

@@ -172,7 +172,7 @@ function generateDays(brandId: string): DailyRow[] {
   return rows
 }
 
-const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
+const DEMO_EMAIL = 'demo@jarafoods.brandgauge.app'
 
 export async function POST(req: NextRequest) {
   const isAdminSeed = !!SEED_SECRET && req.headers.get('x-seed-secret') === SEED_SECRET

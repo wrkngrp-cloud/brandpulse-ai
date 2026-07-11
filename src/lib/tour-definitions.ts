@@ -150,7 +150,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:       'new-campaign',
       title:    'Create a campaign',
-      body:     'Hit New Campaign to define your objectives, budget, channels and dates. BrandPulse will start tracking impact from day one.',
+      body:     'Hit New Campaign to define your objectives, budget, channels and dates. BrandGauge will start tracking impact from day one.',
       target:   '[data-tour="new-campaign"]',
       position: 'bottom',
     },
@@ -172,7 +172,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'events-intro',
       title: 'Log every BTL activation',
-      body:  'Road shows, trade fairs, store launches, pop-ups and consumer activations all count. BrandPulse turns each one into a measurable data point.',
+      body:  'Road shows, trade fairs, store launches, pop-ups and consumer activations all count. BrandGauge turns each one into a measurable data point.',
     },
     {
       id:       'event-list',
@@ -191,7 +191,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'attribution',
       title: 'How event ROI is measured',
-      body:  'BrandPulse compares brand search uplift before, during and after each event and matches ambassador-captured leads to the campaign.',
+      body:  'BrandGauge compares brand search uplift before, during and after each event and matches ambassador-captured leads to the campaign.',
     },
     {
       id:    'post-event',
@@ -216,7 +216,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:       'post-tracker',
       title:    'All their posts in one feed',
-      body:     'BrandPulse pulls every tagged post into the post tracker so you can see reach, likes, comments and sentiment without chasing screenshots.',
+      body:     'BrandGauge pulls every tagged post into the post tracker so you can see reach, likes, comments and sentiment without chasing screenshots.',
       target:   '[data-tour="influencer-posts"]',
       position: 'bottom',
     },
@@ -236,7 +236,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'competitive-intro',
       title: 'See where you stand against competitors',
-      body:  'Add your main competitors and BrandPulse will track their share of voice, mention volume and sentiment alongside yours.',
+      body:  'Add your main competitors and BrandGauge will track their share of voice, mention volume and sentiment alongside yours.',
     },
     {
       id:       'sov-comparison',
@@ -262,7 +262,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'add-competitor',
       title: 'Add a competitor',
-      body:  'Type their brand name and handles in the Competitive settings. BrandPulse starts tracking from the next crawl, usually within 24 hours.',
+      body:  'Type their brand name and handles in the Competitive settings. BrandGauge starts tracking from the next crawl, usually within 24 hours.',
     },
   ],
 
@@ -270,12 +270,12 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'connectors-intro',
       title: 'Connect your data sources',
-      body:  'BrandPulse works best when it can see all your data. Connect social accounts, ad platforms and CRM tools to get the full picture.',
+      body:  'BrandGauge works best when it can see all your data. Connect social accounts, ad platforms and CRM tools to get the full picture.',
     },
     {
       id:       'social-connectors',
       title:    'Social media accounts',
-      body:     'Link your Instagram Business and X accounts so BrandPulse can pull mentions, engagement and reach directly. No manual exports.',
+      body:     'Link your Instagram Business and X accounts so BrandGauge can pull mentions, engagement and reach directly. No manual exports.',
       target:   '[data-tour="social-connectors"]',
       position: 'bottom',
     },
@@ -304,7 +304,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'sentiment-intro',
       title: 'What people are saying, every night',
-      body:  'BrandPulse crawls X and Instagram for mentions of your brand at 4 AM Lagos time and scores the tone of every conversation.',
+      body:  'BrandGauge crawls X and Instagram for mentions of your brand at 4 AM Lagos time and scores the tone of every conversation.',
     },
     {
       id:       'sentiment-main',
@@ -416,7 +416,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'panels-new',
       title: 'Create a new panel',
-      body:  'Hit New panel, pick a survey template and a cadence, and add your recipient list. BrandPulse handles the rest.',
+      body:  'Hit New panel, pick a survey template and a cadence, and add your recipient list. BrandGauge handles the rest.',
     },
   ],
 
@@ -429,14 +429,14 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:       'marketplace-main',
       title:    'Your products and the competition',
-      body:     'Filter between your own listings and competitor products. Add a snapshot any time you check a price, rating or shelf position so BrandPulse can chart the trend.',
+      body:     'Filter between your own listings and competitor products. Add a snapshot any time you check a price, rating or shelf position so BrandGauge can chart the trend.',
       target:   '[data-tour="marketplace-main"]',
       position: 'top',
     },
     {
       id:    'marketplace-add',
       title: 'Add a product to track',
-      body:  'Hit Add product and paste the marketplace listing link. BrandPulse keeps an eye on price and rating changes from there.',
+      body:  'Hit Add product and paste the marketplace listing link. BrandGauge keeps an eye on price and rating changes from there.',
     },
   ],
 
@@ -536,7 +536,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'ooh-add',
       title: 'Add your first site',
-      body:  'Hit Add site and drop a pin. BrandPulse starts tracking branded vanity link clicks and search uplift for that location from day one.',
+      body:  'Hit Add site and drop a pin. BrandGauge starts tracking branded vanity link clicks and search uplift for that location from day one.',
     },
   ],
 
@@ -544,7 +544,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'radio-intro',
       title: 'Reconcile your radio buy',
-      body:  'Upload your agency buy plan, then log what actually aired, and BrandPulse reconciles delivery against spend across every station.',
+      body:  'Upload your agency buy plan, then log what actually aired, and BrandGauge reconciles delivery against spend across every station.',
     },
     {
       id:       'radio-main',
@@ -564,7 +564,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'tv-intro',
       title: 'Reconcile your TV buy',
-      body:  'Upload your agency buy plan, then log what actually aired, and BrandPulse reconciles GRP delivery against spend across every channel.',
+      body:  'Upload your agency buy plan, then log what actually aired, and BrandGauge reconciles GRP delivery against spend across every channel.',
     },
     {
       id:       'tv-main',
@@ -584,7 +584,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'print-intro',
       title: 'Newspaper and magazine, tracked',
-      body:  'Log your print placements and BrandPulse tracks readership, spend and QR scan attribution across Nigeria’s leading publications.',
+      body:  'Log your print placements and BrandGauge tracks readership, spend and QR scan attribution across Nigeria’s leading publications.',
     },
     {
       id:       'print-main',
@@ -603,8 +603,8 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
   voice_builder: [
     {
       id:    'voice-intro',
-      title: 'Teach BrandPulse your voice',
-      body:  'Paste a handful of your best posts or captions and BrandPulse extracts a brand voice profile, tone, vocabulary, dos and don’ts, that every other tool in BrandPulse can write in.',
+      title: 'Teach BrandGauge your voice',
+      body:  'Paste a handful of your best posts or captions and BrandGauge extracts a brand voice profile, tone, vocabulary, dos and don’ts, that every other tool in BrandGauge can write in.',
     },
     {
       id:       'voice-main',
@@ -716,7 +716,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'experiments-new',
       title: 'Start a new experiment',
-      body:  'Hit New experiment, define your hypothesis and variants, and BrandPulse tracks significance automatically as results arrive.',
+      body:  'Hit New experiment, define your hypothesis and variants, and BrandGauge tracks significance automatically as results arrive.',
     },
   ],
 
@@ -736,7 +736,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'mmm-run',
       title: 'Run your first analysis',
-      body:  'Pick a time window and hit Run analysis. BrandPulse needs a few weeks of campaign activity across channels to produce a useful read.',
+      body:  'Pick a time window and hit Run analysis. BrandGauge needs a few weeks of campaign activity across channels to produce a useful read.',
     },
   ],
 
@@ -756,7 +756,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'geolift-start',
       title: 'Start a new study',
-      body:  'Pick a treatment city, a comparable control city, and a date range. BrandPulse handles the statistical comparison from there.',
+      body:  'Pick a treatment city, a comparable control city, and a date range. BrandGauge handles the statistical comparison from there.',
     },
   ],
 
@@ -889,7 +889,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:       'bizcase-main',
       title:    'An AI executive brief',
-      body:     'BrandPulse writes a board-ready summary from your actual performance data. It needs a few weeks of campaign and sentiment history to produce a strong narrative.',
+      body:     'BrandGauge writes a board-ready summary from your actual performance data. It needs a few weeks of campaign and sentiment history to produce a strong narrative.',
       target:   '[data-tour="bizcase-main"]',
       position: 'top',
     },
@@ -904,7 +904,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:    'methodology-intro',
       title: 'How every score is calculated',
-      body:  'This page explains the measurement frameworks behind every score and index in BrandPulse, adapted for the Nigerian and West African market.',
+      body:  'This page explains the measurement frameworks behind every score and index in BrandGauge, adapted for the Nigerian and West African market.',
     },
     {
       id:       'methodology-main',

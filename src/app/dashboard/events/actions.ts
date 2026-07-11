@@ -139,7 +139,7 @@ export async function goLive(eventId: string): Promise<EventState> {
   const { error } = await service.from('events').update({ status: 'live' }).eq('id', eventId)
   if (error) return { error: error.message }
 
-  await inngest.send({ name: 'brandpulse/event.live', data: { eventId } })
+  await inngest.send({ name: 'brandgauge/event.live', data: { eventId } })
   return { success: true }
 }
 
@@ -189,7 +189,7 @@ export async function submitDebrief(
   if (error) return { error: error.message }
 
   // Debrief saved — NOW trigger ROI report generation
-  await inngest.send({ name: 'brandpulse/event.closed', data: { eventId } })
+  await inngest.send({ name: 'brandgauge/event.closed', data: { eventId } })
 
   return { success: true }
 }
@@ -200,7 +200,7 @@ export async function skipDebriefAndGenerate(eventId: string): Promise<EventStat
   const result = await getBrandId()
   if ('error' in result) return { error: result.error }
 
-  await inngest.send({ name: 'brandpulse/event.closed', data: { eventId } })
+  await inngest.send({ name: 'brandgauge/event.closed', data: { eventId } })
   return { success: true }
 }
 

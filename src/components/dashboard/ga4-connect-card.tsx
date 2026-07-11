@@ -165,7 +165,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
           </a>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
             You will be redirected to Google to grant Analytics read access.
-            BrandPulse only reads data — it never modifies your GA4 property.
+            BrandGauge only reads data — it never modifies your GA4 property.
           </p>
         </div>
       )}

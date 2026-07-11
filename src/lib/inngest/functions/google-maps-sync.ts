@@ -37,7 +37,7 @@ export const googleMapsSync = inngest.createFunction(
     name:    'Google Maps Venue Reputation Sync (daily)',
     triggers: [
       { cron: 'TZ=Africa/Lagos 0 9 * * *' }, // daily 9am Lagos
-      { event: 'brandpulse/venue.maps.sync' },
+      { event: 'brandgauge/venue.maps.sync' },
     ],
     retries: 2,
   },

@@ -156,7 +156,7 @@ export function VisualMentions({ eventId, initialData, hasIgConnection, hasHasht
         <div>
           <h2 className="text-sm font-semibold">Visual brand mentions</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            BrandPulse AI scans event hashtag photos for logos, merch, and branded materials
+            BrandGauge scans event hashtag photos for logos, merch, and branded materials
           </p>
         </div>
         <button

@@ -797,7 +797,7 @@ export function CreativeClient({
               <p className="text-sm font-medium">Video creative analysis</p>
             </div>
             <p className="text-sm text-muted-foreground">
-              Upload a video or image. BrandPulse scores the first frame on hook strength, visual quality, sound-off viewability, and CTA clarity for the Nigerian market.
+              Upload a video or image. BrandGauge scores the first frame on hook strength, visual quality, sound-off viewability, and CTA clarity for the Nigerian market.
             </p>
           </div>
 

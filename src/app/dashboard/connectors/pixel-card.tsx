@@ -5,6 +5,9 @@ import { Copy, Check, Code2, ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
+// Must be a host we control today; NEXT_PUBLIC_APP_URL flips it at domain cutover.
+const SDK_BASE = process.env.NEXT_PUBLIC_APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+
 export function PixelCard() {
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
@@ -12,7 +15,7 @@ export function PixelCard() {
   const snippet = `;(function(w,d,s){
   w.__bp=w.__bp||{q:[],track:function(e,v,m){this.q.push({e,v,m,t:Date.now()})}};
   var el=d.createElement(s);el.async=1;
-  el.src='https://cdn.brandpulse.ai/pixel.js';
+  el.src='${SDK_BASE}/api/sdk/pixel.js';
   d.head.appendChild(el);
   w.__bp.track('page_view',1,{url:location.href,ref:document.referrer});
 })(window,document,'script');`
@@ -31,7 +34,7 @@ export function PixelCard() {
           <Code2 className="h-4.5 w-4.5 text-white" />
         </div>
         <div className="flex-1">
-          <p className="text-[13.5px] font-semibold">BrandPulse Pixel & SDK</p>
+          <p className="text-[13.5px] font-semibold">BrandGauge Pixel & SDK</p>
           <p className="text-[12px] text-muted-foreground">JS snippet for websites. React Native + Flutter SDK for mobile apps.</p>
         </div>
         <button
@@ -82,8 +85,8 @@ window.__bp.track('cta_click', 1, { label: 'Order Now' });`}</pre>
             <p className="text-[12px] text-muted-foreground">React Native and Flutter SDKs are available. Install via npm or pub.dev:</p>
             <div className="flex flex-wrap gap-2 mt-2">
               {[
-                { label: 'React Native', cmd: 'npm install @brandpulse/rn-sdk' },
-                { label: 'Flutter', cmd: 'flutter pub add brandpulse_sdk' },
+                { label: 'React Native', cmd: 'npm install @brandgauge/rn-sdk' },
+                { label: 'Flutter', cmd: 'flutter pub add brandgauge_sdk' },
               ].map(({ label, cmd }) => (
                 <div key={label} className="rounded-lg bg-muted px-3 py-2 flex items-center gap-2">
                   <code className="text-[11.5px] font-mono text-foreground">{cmd}</code>
@@ -96,7 +99,7 @@ window.__bp.track('cta_click', 1, { label: 'Order Now' });`}</pre>
           </div>
 
           <p className="text-[11.5px] text-muted-foreground">
-            Events appear in the BrandPulse Funnel and Campaign Attribution dashboards within 5 minutes of firing.
+            Events appear in the BrandGauge Funnel and Campaign Attribution dashboards within 5 minutes of firing.
           </p>
         </div>
       )}

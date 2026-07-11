@@ -44,7 +44,7 @@ export const emailConnectorSync = inngest.createFunction(
     name: 'Email connector sync (daily 7 AM Lagos)',
     triggers: [
       { cron: 'TZ=Africa/Lagos 0 7 * * *' },
-      { event: 'brandpulse/email-connectors.sync-requested' },
+      { event: 'brandgauge/email-connectors.sync-requested' },
     ],
     concurrency: { limit: 3 },
   },

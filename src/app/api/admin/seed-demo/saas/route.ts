@@ -9,7 +9,7 @@ import { createClient }              from '@supabase/supabase-js'
               Recent position: strong, stable ~78
 ───────────────────────────────────────────────────────────────────────────── */
 
-const DEMO_EMAIL    = 'demo@bridgercrm.brandpulse.ai'
+const DEMO_EMAIL    = 'demo@bridgercrm.brandgauge.app'
 const DEMO_PASSWORD = 'Demo@Bridger2026!'
 // Gated by the shared ADMIN_SECRET env var (fail closed if unset).
 const SEED_SECRET   = process.env.ADMIN_SECRET

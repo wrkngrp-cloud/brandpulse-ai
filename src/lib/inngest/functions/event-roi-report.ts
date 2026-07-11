@@ -7,7 +7,7 @@ export const eventRoiReport = inngest.createFunction(
   {
     id:       'event-roi-report',
     name:     'Event ROI Report',
-    triggers: [{ event: 'brandpulse/event.closed' }],
+    triggers: [{ event: 'brandgauge/event.closed' }],
     retries:  3,
   },
   async ({ event, step }) => {

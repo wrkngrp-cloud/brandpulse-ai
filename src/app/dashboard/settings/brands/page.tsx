@@ -22,7 +22,7 @@ export default async function BrandsSettingsPage() {
       activeBrandId={workspace?.active_brand_id ?? null}
       plan="beta"
       brandLimit={-1}
-      isDemoUser={user?.email === 'demo@jarafoods.brandpulse.ai'}
+      isDemoUser={user?.email === 'demo@jarafoods.brandgauge.app'}
     />
   )
 }

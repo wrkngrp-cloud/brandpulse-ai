@@ -12,7 +12,7 @@ export async function POST() {
   if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
 
   await inngest.send({
-    name: 'brandpulse/reviews.classify.aspects',
+    name: 'brandgauge/reviews.classify.aspects',
     data: { brand_id: brandId },
   })
 

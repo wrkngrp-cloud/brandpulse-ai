@@ -54,7 +54,7 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
                 <polyline points="2,10 6,6 9.5,13 13.5,7.5 18,10" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <span className="font-bold text-[15px] tracking-tight text-gradient-blue">BrandPulse</span>
+            <span className="font-bold text-[15px] tracking-tight text-gradient-blue">BrandGauge</span>
           </div>
           <button
             onClick={() => setOpen(false)}

@@ -10,7 +10,7 @@ import { createClient }              from '@supabase/supabase-js'
               June 2026 (now): strong summer position
 ───────────────────────────────────────────────────────────────────────────── */
 
-const DEMO_EMAIL    = 'demo@jarafoods.brandpulse.ai'
+const DEMO_EMAIL    = 'demo@jarafoods.brandgauge.app'
 const DEMO_PASSWORD = 'Demo@Jara2026!'
 // Gated by the shared ADMIN_SECRET env var (fail closed if unset) — never a
 // hardcoded literal, which would be committed to git and let anyone reseed.
@@ -457,7 +457,7 @@ export async function POST(req: NextRequest) {
 
 The photo booth zone was the standout ROI driver: 487 branded photo moments generated 312 organic Instagram posts within 24 hours of the event, contributing ₦1.2M in estimated earned media value (EMV). The live cooking demo anchored by Chef Kemisola drew sustained crowd engagement over both days.
 
-From a lead quality perspective, 26 interactions were flagged as high-value trade contacts, including a direct conversation with a Shoprite category buyer. BrandPulse AI estimates these B2B leads carry a pipeline value of ₦8.4M based on average category deal sizes.
+From a lead quality perspective, 26 interactions were flagged as high-value trade contacts, including a direct conversation with a Shoprite category buyer. BrandGauge estimates these B2B leads carry a pipeline value of ₦8.4M based on average category deal sizes.
 
 Amaka Okonkwo led the ambassador team in both raw interactions and lead capture, demonstrating strong product knowledge and audience engagement. Recommend her for the Summer Vibes activation team.`,
       metrics: {

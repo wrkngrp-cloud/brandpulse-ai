@@ -114,7 +114,7 @@ export function AiCommand() {
           data-tour="ask-ai"
           onClick={() => setOpen(true)}
           className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-foreground text-background shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
-          aria-label="Open BrandPulse AI"
+          aria-label="Open BrandGauge"
         >
           <MessageSquare className="h-5 w-5" />
         </button>
@@ -127,7 +127,7 @@ export function AiCommand() {
           <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-green-500" />
-              <span className="text-sm font-semibold">BrandPulse AI</span>
+              <span className="text-sm font-semibold">BrandGauge</span>
             </div>
             <div className="flex items-center gap-1">
               <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setOpen(false)}>

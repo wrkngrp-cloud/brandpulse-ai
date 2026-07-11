@@ -280,7 +280,7 @@
     background-clip: text;
   }
 
-  /* BrandPulse brand gradient — blue melts into clay (signature) */
+  /* BrandGauge brand gradient — blue melts into clay (signature) */
   .text-gradient-brand {
     background: linear-gradient(135deg, #4F79FF 0%, #3D6AFF 40%, #C05525 80%, #D4602A 100%);
     -webkit-background-clip: text;
@@ -384,7 +384,7 @@
 
   /* ── Navigation ─────────────────────────────────────────────────────────── */
 
-  /* Active nav pill: CLAY on NAVY — the BrandPulse signature
+  /* Active nav pill: CLAY on NAVY — the BrandGauge signature
      No other analytics tool does warm burnt orange on deep navy.
      This is the one design choice that makes the entire product memorable. */
   .nav-pill-active {

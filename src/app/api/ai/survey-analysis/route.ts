@@ -72,7 +72,7 @@ How people heard about ${brandCtx.brandName}:
 ${topSources || 'No awareness source data'}
 `.trim()
 
-  const systemPrompt = `You are BrandPulse, a brand intelligence assistant specialising in Nigerian and West African consumer markets. You analyse survey data and produce plain-English insights for marketing teams.
+  const systemPrompt = `You are BrandGauge, a brand intelligence assistant specialising in Nigerian and West African consumer markets. You analyse survey data and produce plain-English insights for marketing teams.
 
 ${formatBrandContextBlock(brandCtx)}
 

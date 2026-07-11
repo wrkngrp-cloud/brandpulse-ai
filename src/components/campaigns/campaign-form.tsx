@@ -129,7 +129,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
 
           {/* Multi-select objectives */}
           <div className="space-y-2">
-            <Label>Campaign objectives <span className="text-muted-foreground font-normal text-xs">(select all that apply)</span> <FieldTip tip="Objectives tell the AI what this campaign was trying to achieve. After the campaign ends, BrandPulse measures whether each objective moved." /></Label>
+            <Label>Campaign objectives <span className="text-muted-foreground font-normal text-xs">(select all that apply)</span> <FieldTip tip="Objectives tell the AI what this campaign was trying to achieve. After the campaign ends, BrandGauge measures whether each objective moved." /></Label>
             <div className="grid grid-cols-2 gap-2">
               {OBJECTIVES.map(o => {
                 const selected = objectives.includes(o.value)

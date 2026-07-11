@@ -40,12 +40,16 @@ function CopyButton({ text, label }: { text: string; label: string }) {
   )
 }
 
+// Snippet URLs must point at a host we control today; NEXT_PUBLIC_APP_URL flips
+// them to the custom domain at cutover.
+const SDK_BASE = process.env.NEXT_PUBLIC_APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+
 function buildSnippet(pixelId: string): string {
   return `;(function(w,d,s,id){
   w.__bp=w.__bp||{q:[],track:function(e,v,m){this.q.push({e,v,m,t:Date.now()})}};
   var el=d.createElement(s);
   el.async=1;
-  el.src='https://brandpulse.ai/api/sdk/pixel.js';
+  el.src='${SDK_BASE}/api/sdk/pixel.js';
   el.setAttribute('data-pixel-id',id);
   d.head.appendChild(el);
 })(window,document,'script','${pixelId}');
@@ -54,7 +58,7 @@ window.__bp.track('page_view',1,{url:location.href,ref:document.referrer});`
 }
 
 function buildLeadSnippet(pixelId: string): string {
-  return `fetch('https://brandpulse.ai/api/sdk/event', {
+  return `fetch('${SDK_BASE}/api/sdk/event', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -66,7 +70,7 @@ function buildLeadSnippet(pixelId: string): string {
 }
 
 function buildSignupSnippetReactNative(pixelId: string): string {
-  return `fetch('https://brandpulse.ai/api/sdk/event', {
+  return `fetch('${SDK_BASE}/api/sdk/event', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -79,7 +83,7 @@ function buildSignupSnippetReactNative(pixelId: string): string {
 
 function buildSignupSnippetFlutter(pixelId: string): string {
   return `await http.post(
-  Uri.parse('https://brandpulse.ai/api/sdk/event'),
+  Uri.parse('${SDK_BASE}/api/sdk/event'),
   headers: {'Content-Type': 'application/json'},
   body: jsonEncode({
     'pixel_id': '${pixelId}',
@@ -227,7 +231,7 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
         <p className="text-sm text-muted-foreground">
           If your product is a mobile app, growth usually starts with a signup, not a website form.
           Fire a <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">signup</code> event
-          from your app&apos;s registration-complete handler and BrandPulse will count real
+          from your app&apos;s registration-complete handler and BrandGauge will count real
           new customers from it instead of estimating them from payments alone. This is what
           powers CAC and new customers on Board Pack and Business Case for app-based brands.
         </p>

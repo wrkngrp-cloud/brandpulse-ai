@@ -144,7 +144,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
             <div>
               <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">No AI platform keys configured</p>
               <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5 leading-relaxed">
-                Add at least one key to start tracking. All three are optional — BrandPulse will check whichever platforms are configured.
+                Add at least one key to start tracking. All three are optional — BrandGauge will check whichever platforms are configured.
               </p>
             </div>
           </div>
