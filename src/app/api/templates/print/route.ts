@@ -24,7 +24,7 @@ const STATUSES = ['Scheduled', 'Published', 'Cancelled']
 
 export async function GET() {
   const wb = new ExcelJS.Workbook()
-  wb.creator = 'BrandPulse AI'
+  wb.creator = 'BrandGauge'
   wb.created = new Date()
 
   // ── Hidden lists sheet ──────────────────────────────────────────────────
@@ -40,7 +40,7 @@ export async function GET() {
   // Title row
   ws.mergeCells('A1:L1')
   const titleCell = ws.getCell('A1')
-  titleCell.value = 'BrandPulse Print Placement Template'
+  titleCell.value = 'BrandGauge Print Placement Template'
   titleCell.font = { bold: true, size: 14, color: { argb: 'FF1E3A5F' } }
   titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEBF3FF' } }
   titleCell.alignment = { horizontal: 'center', vertical: 'middle' }
@@ -148,15 +148,15 @@ export async function GET() {
   const inst = wb.addWorksheet('Instructions')
 
   const instData = [
-    ['BrandPulse Print Placement Template — Instructions', ''],
+    ['BrandGauge Print Placement Template — Instructions', ''],
     ['', ''],
     ['HOW TO USE THIS TEMPLATE', ''],
     ['', ''],
     ['1.', 'Fill in one row per print ad placement. Each row represents one edition of one publication.'],
     ['2.', 'Use dropdowns in columns A (Publication), C (Position), D (Size), E (Colour), and K (Status).'],
     ['3.', 'Net Cost (column I) auto-calculates: Rate Card × (1 - Discount%) × Insertions.'],
-    ['4.', 'If you have a landing page URL for QR attribution, enter it in the Attribution URL column. BrandPulse will generate a vanity link automatically.'],
-    ['5.', 'Upload to BrandPulse via the Print Intelligence page → Upload Media Plan.'],
+    ['4.', 'If you have a landing page URL for QR attribution, enter it in the Attribution URL column. BrandGauge will generate a vanity link automatically.'],
+    ['5.', 'Upload to BrandGauge via the Print Intelligence page → Upload Media Plan.'],
     ['', ''],
     ['COLUMN GUIDE', ''],
     ['', ''],
@@ -169,13 +169,13 @@ export async function GET() {
     ['Rate Card (₦)',    'Published rate card cost per insertion in Naira.'],
     ['Discount %',       'Agency or direct advertiser discount percentage.'],
     ['Net Cost (₦)',     'Auto-calculated total net cost across all insertions.'],
-    ['Attribution URL',  'The landing page you want QR code readers to reach. BrandPulse generates a trackable vanity URL automatically.'],
+    ['Attribution URL',  'The landing page you want QR code readers to reach. BrandGauge generates a trackable vanity URL automatically.'],
     ['Status',           'Scheduled = booked; Published = confirmed on paper; Cancelled = dropped.'],
     ['Notes',            'Any additional notes (e.g. special instructions, creative reference).'],
     ['', ''],
     ['QR ATTRIBUTION', ''],
     ['', ''],
-    ['•', 'When you provide an Attribution URL, BrandPulse creates a short QR-friendly link (e.g. brandpulse.ai/go/punch-20260615).'],
+    ['•', 'When you provide an Attribution URL, BrandGauge creates a short QR-friendly link (e.g. brandgauge.app/go/punch-20260615).'],
     ['•', 'Every QR scan is logged and counted in the Print Intelligence dashboard.'],
     ['•', 'This lets you measure real-world engagement from print placements.'],
   ]
@@ -198,7 +198,7 @@ export async function GET() {
   return new NextResponse(buffer, {
     headers: {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'Content-Disposition': 'attachment; filename="brandpulse-print-placement-template.xlsx"',
+      'Content-Disposition': 'attachment; filename="brandgauge-print-placement-template.xlsx"',
     },
   })
 }

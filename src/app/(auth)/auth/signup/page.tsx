@@ -20,7 +20,7 @@ export default function SignupPage() {
           <div className="h-7 w-7 rounded-lg bg-foreground flex items-center justify-center">
             <BarChart2 className="h-3.5 w-3.5 text-background" />
           </div>
-          <span className="font-bold text-[14px]">BrandPulse AI</span>
+          <span className="font-bold text-[14px]">BrandGauge</span>
         </div>
 
         <h1 className="text-2xl font-bold mb-1">Create your account</h1>

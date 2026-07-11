@@ -195,7 +195,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
             expanded ? 'opacity-100 delay-75' : 'opacity-0',
           )}
         >
-          BrandPulse
+          BrandGauge
         </span>
 
         {/* Collapse/expand toggle */}

@@ -5,9 +5,8 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine,
 } from 'recharts'
-import { Sparkles, Loader2, Users, TrendingUp, TrendingDown, Minus, MessageCircle, Send } from 'lucide-react'
+import { Sparkles, Loader2, Users, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
@@ -72,59 +71,6 @@ const CUSTOM_TOOLTIP = ({ active, payload, label }: {
           {isPositive ? '+' : ''}{Math.round(val)}
         </span>
       </div>
-    </div>
-  )
-}
-
-function NpsWhatsAppSender() {
-  const [phones, setPhones] = useState('')
-  const [pending, startT]   = useTransition()
-  const [sent, setSent]     = useState<{ sent: number; failed: number } | null>(null)
-
-  function send() {
-    const list = phones.split(/[\n,;]+/).map(p => p.trim()).filter(Boolean)
-    if (!list.length) { toast.error('Enter at least one phone number'); return }
-    startT(async () => {
-      const res  = await fetch('/api/whatsapp/nps', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phones: list }),
-      })
-      const data = await res.json()
-      if (!res.ok) { toast.error(data.error ?? 'Failed'); return }
-      setSent(data)
-      setPhones('')
-      toast.success(`NPS sent to ${data.sent} contact${data.sent === 1 ? '' : 's'}`)
-    })
-  }
-
-  return (
-    <div className="rounded-2xl border bg-card p-5 space-y-4">
-      <div className="flex items-center gap-2">
-        <MessageCircle className="h-4 w-4 text-green-500" />
-        <p className="text-[13px] font-semibold">Send NPS via WhatsApp</p>
-      </div>
-      <p className="text-[12.5px] text-muted-foreground">
-        Sends a 0-10 NPS question via WhatsApp. Replies are captured automatically and appear in your NPS score.
-        Requires the Africa's Talking WhatsApp API (set AFRICAS_TALKING_API_KEY in environment variables).
-      </p>
-      {sent && (
-        <div className="rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 p-3">
-          <p className="text-[12.5px] text-green-700 dark:text-green-400">
-            Sent to {sent.sent} · Failed: {sent.failed}
-          </p>
-        </div>
-      )}
-      <Textarea
-        value={phones}
-        onChange={e => setPhones(e.target.value)}
-        placeholder={`+2348012345678\n+2348087654321`}
-        className="min-h-[80px] text-[13px] font-mono"
-      />
-      <p className="text-[11.5px] text-muted-foreground">One number per line, with country code. e.g. +234...</p>
-      <Button size="sm" onClick={send} disabled={pending || !phones.trim()}>
-        {pending ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Send className="h-3.5 w-3.5 mr-1.5" />}
-        Send NPS
-      </Button>
     </div>
   )
 }

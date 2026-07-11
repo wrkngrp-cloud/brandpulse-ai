@@ -349,7 +349,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                 <Input id="date_end" type="date" value={data.date_end} min={data.date_start} onChange={e => set('date_end', e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="attendance">Expected attendance <FieldTip tip="Your target or estimated turnout. After the event, BrandPulse compares this to actual leads captured and ambassador reports to show your conversion rate." /></Label>
+                <Label htmlFor="attendance">Expected attendance <FieldTip tip="Your target or estimated turnout. After the event, BrandGauge compares this to actual leads captured and ambassador reports to show your conversion rate." /></Label>
                 <Input id="attendance" type="number" min={1} value={data.expected_attendance} onChange={e => set('expected_attendance', e.target.value)} placeholder="500" />
               </div>
             </div>
@@ -365,7 +365,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
             {/* Event creative upload */}
             <div className="space-y-2">
               <Label>
-                Event creative <FieldTip tip="Upload your photobooth backdrop, event flyer, or branded banner. BrandPulse AI will use this as a visual reference when scanning event photos — helping it recognise your specific creative in attendee posts." />
+                Event creative <FieldTip tip="Upload your photobooth backdrop, event flyer, or branded banner. BrandGauge will use this as a visual reference when scanning event photos — helping it recognise your specific creative in attendee posts." />
               </Label>
               {data.creative_url ? (
                 <div className="relative w-full rounded-xl overflow-hidden border bg-muted/30 aspect-video max-h-48 flex items-center justify-center">
@@ -417,7 +417,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                 }}
               />
               <p className="text-xs text-muted-foreground">
-                Optional — BrandPulse AI will look for this creative when scanning attendee posts for brand visibility.
+                Optional — BrandGauge will look for this creative when scanning attendee posts for brand visibility.
               </p>
             </div>
           </>
@@ -451,7 +451,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
               <p className="text-sm font-medium">Spend breakdown</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="spend_agency">Agency fee (₦) <FieldTip tip="Breaking down spend per line lets BrandPulse calculate cost-per-lead and cost-per-customer accurately at debrief. Leave any line blank if it does not apply." /></Label>
+                  <Label htmlFor="spend_agency">Agency fee (₦) <FieldTip tip="Breaking down spend per line lets BrandGauge calculate cost-per-lead and cost-per-customer accurately at debrief. Leave any line blank if it does not apply." /></Label>
                   <Input id="spend_agency" type="number" min={0} value={data.spend_breakdown.agency} onChange={e => setSpend('agency', e.target.value)} placeholder="0" />
                 </div>
                 <div className="space-y-2">
@@ -539,7 +539,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {showReach && (
                 <div className="space-y-2">
-                  <Label htmlFor="expected_reach">Expected reach <FieldTip tip="The total number of unique people you expect to encounter your brand at this activation. BrandPulse will compare actuals to this at debrief." /></Label>
+                  <Label htmlFor="expected_reach">Expected reach <FieldTip tip="The total number of unique people you expect to encounter your brand at this activation. BrandGauge will compare actuals to this at debrief." /></Label>
                   <Input id="expected_reach" type="number" min={0} value={data.kpi_targets.expected_reach} onChange={e => setKpi('expected_reach', e.target.value)} placeholder="10000" />
                 </div>
               )}

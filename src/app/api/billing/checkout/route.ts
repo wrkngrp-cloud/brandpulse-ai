@@ -4,7 +4,7 @@ import { stripe, STRIPE_PRICES } from '@/lib/stripe'
 import { z } from 'zod'
 
 const Body = z.object({ plan: z.enum(['growth', 'pro', 'agency', 'enterprise']) })
-const APP_URL = process.env.APP_URL ?? 'https://brandpulse.ai'
+const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
 export async function POST(request: NextRequest) {
   if (!stripe) return NextResponse.json({ error: 'Billing not configured.' }, { status: 503 })

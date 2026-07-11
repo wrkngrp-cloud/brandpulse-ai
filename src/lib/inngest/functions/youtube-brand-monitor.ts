@@ -50,7 +50,7 @@ export const youtubeBrandMonitor = inngest.createFunction(
     name: 'YouTube Brand Monitor',
     triggers: [
       { cron: 'TZ=Africa/Lagos 0 9 * * *' },
-      { event: 'brandpulse/youtube.monitor.requested' },
+      { event: 'brandgauge/youtube.monitor.requested' },
     ],
     retries: 1,
   },

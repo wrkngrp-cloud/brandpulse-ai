@@ -226,7 +226,7 @@ export function BoardPackClient({
         ? `- Active campaign budget: ${fmtNGNFull(totalBudget)}`
         : '',
       ``,
-      `Report prepared with BrandPulse AI.`,
+      `Report prepared with BrandGauge.`,
     ].filter(l => l !== '').join('\n')
   )
 
@@ -297,7 +297,7 @@ export function BoardPackClient({
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-sm font-semibold text-gray-800">{monthYear()}</p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">Prepared with BrandPulse AI</p>
+                  <p className="text-[11px] text-gray-400 mt-0.5">Prepared with BrandGauge</p>
                 </div>
               </div>
 
@@ -394,7 +394,7 @@ export function BoardPackClient({
               {/* Footer */}
               <div className="border-t border-gray-100 pt-4">
                 <p className="text-[11px] text-gray-400 leading-relaxed">
-                  Data from BrandPulse AI. Generated {todayFull()}. Figures reflect available connected data sources.
+                  Data from BrandGauge. Generated {todayFull()}. Figures reflect available connected data sources.
                 </p>
               </div>
 

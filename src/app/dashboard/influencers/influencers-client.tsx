@@ -552,7 +552,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
 
               {/* Social profile inputs */}
               <div className="space-y-3">
-                <Label>Social profiles <FieldTip tip="Paste the full profile URL or just the @handle. BrandPulse auto-detects the platform. Select the platform manually if it does not detect correctly." /></Label>
+                <Label>Social profiles <FieldTip tip="Paste the full profile URL or just the @handle. BrandGauge auto-detects the platform. Select the platform manually if it does not detect correctly." /></Label>
                 {entries.map((entry, i) => (
                   <div key={i} className="flex flex-wrap sm:flex-nowrap gap-2 items-center">
                     <Input

@@ -20,7 +20,7 @@ const DEMOS = [
     industry: 'FMCG',
     icon:     '🛒',
     tagline:  'Nigerian packaged goods brand with 12-month brand health story arc',
-    email:    'demo@jarafoods.brandpulse.ai',
+    email:    'demo@jarafoods.brandgauge.app',
     password: 'Demo@Jara2026!',
   },
   {
@@ -29,7 +29,7 @@ const DEMOS = [
     industry: 'Fintech',
     icon:     '💳',
     tagline:  'Mobile payments app — PR crisis, recovery, Series A growth story',
-    email:    'demo@pocketpay.brandpulse.ai',
+    email:    'demo@pocketpay.brandgauge.app',
     password: 'Demo@PocketPay2026!',
   },
   {
@@ -38,7 +38,7 @@ const DEMOS = [
     industry: 'Agency',
     icon:     '🏆',
     tagline:  'Full-service Lagos marketing agency managing multiple client brands',
-    email:    'demo@pinnaclemedia.brandpulse.ai',
+    email:    'demo@pinnaclemedia.brandgauge.app',
     password: 'Demo@Pinnacle2026!',
   },
   {
@@ -47,7 +47,7 @@ const DEMOS = [
     industry: 'B2B SaaS',
     icon:     '⚙',
     tagline:  'Nigerian CRM tool — MRR, churn, NRR and enterprise launch story',
-    email:    'demo@bridgercrm.brandpulse.ai',
+    email:    'demo@bridgercrm.brandgauge.app',
     password: 'Demo@Bridger2026!',
   },
 ]
@@ -128,7 +128,7 @@ function LoginContent() {
             <div className="h-8 w-8 rounded-lg bg-background/10 flex items-center justify-center">
               <BarChart2 className="h-4 w-4 text-background" />
             </div>
-            <span className="font-bold text-[15px] tracking-tight">BrandPulse AI</span>
+            <span className="font-bold text-[15px] tracking-tight">BrandGauge</span>
           </div>
 
           <h2 className="text-[28px] font-bold leading-tight mb-4">
@@ -151,7 +151,7 @@ function LoginContent() {
         </div>
 
         <p className="text-[11px] text-background/30">
-          BrandPulse AI. Made for Nigerian and West African brands.
+          BrandGauge. Made for Nigerian and West African brands.
         </p>
       </div>
 
@@ -166,7 +166,7 @@ function LoginContent() {
               <div className="h-7 w-7 rounded-lg bg-foreground flex items-center justify-center">
                 <BarChart2 className="h-3.5 w-3.5 text-background" />
               </div>
-              <span className="font-bold text-[14px]">BrandPulse AI</span>
+              <span className="font-bold text-[14px]">BrandGauge</span>
             </div>
 
             <h1 className="text-2xl font-bold mb-1">Welcome back</h1>

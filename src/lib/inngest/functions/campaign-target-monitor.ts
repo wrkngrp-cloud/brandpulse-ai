@@ -167,7 +167,7 @@ export const campaignTargetMonitor = inngest.createFunction(
 
               if (user?.email) {
                 await resend.emails.send({
-                  from:    'BrandPulse AI <alerts@brandpulse.ai>',
+                  from:    'BrandGauge <alerts@brandgauge.app>',
                   to:      user.email,
                   subject: `Campaign alert: ${title}`,
                   text:    [
@@ -175,10 +175,10 @@ export const campaignTargetMonitor = inngest.createFunction(
                     '',
                     body,
                     '',
-                    'View your campaign on BrandPulse AI to make adjustments.',
+                    'View your campaign on BrandGauge to make adjustments.',
                     '',
                     '-- ',
-                    'BrandPulse AI | Campaign Target Monitor',
+                    'BrandGauge | Campaign Target Monitor',
                   ].join('\n'),
                 })
               }

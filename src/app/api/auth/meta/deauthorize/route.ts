@@ -1,6 +1,6 @@
 // Meta Data Deletion Request callback — required by Meta for all apps using Facebook Login.
 // Register this URL in Meta App Dashboard → Facebook Login → Settings → Data Deletion Request URL
-// URL to register: https://brandpulse.ai/api/auth/meta/deauthorize
+// URL to register: https://brandgauge.app/api/auth/meta/deauthorize
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createHmac }               from 'crypto'
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   const secret = process.env.META_APP_SECRET
   if (!secret) return NextResponse.json({ error: 'Not configured' }, { status: 500 })
 
-  const APP_URL = process.env.APP_URL ?? 'https://brandpulse.ai'
+  const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
   let signedRequest: string | null = null
 

@@ -254,7 +254,7 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
   const voice = brandCtx.brandVoice as { adjectives?: string[]; tone?: string }
   const segments = (brandCtx.targetSegments as Array<{ name?: string }> | null)?.map(s => s?.name ?? '').filter(Boolean).join(', ')
 
-  const systemPrompt = `You are BrandPulse, the brand intelligence assistant for ${brandCtx.brandName}. You answer any brand question by reasoning over the connected data provided to you, and you always cite which data you used. You serve marketers, not analysts, so you explain plainly and lead with the answer.
+  const systemPrompt = `You are BrandGauge, the brand intelligence assistant for ${brandCtx.brandName}. You answer any brand question by reasoning over the connected data provided to you, and you always cite which data you used. You serve marketers, not analysts, so you explain plainly and lead with the answer.
 
 Connected data sources: Brand Health Index (BHI), Social Sentiment (X + Instagram), Share of Voice, Survey NPS, OOH attribution (vanity-link visits per site), Campaign Intelligence (active campaigns, channels, budgets), Events & Activations, Social connections.
 

@@ -50,7 +50,7 @@ async function scrapeWebsite(url: string): Promise<string | null> {
     const timeout = setTimeout(() => controller.abort(), 5000)
     const res = await fetch(normalised, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'BrandPulse/1.0 (brand intelligence platform)' },
+      headers: { 'User-Agent': 'BrandGauge/1.0 (brand intelligence platform)' },
     })
     clearTimeout(timeout)
     if (!res.ok) return null

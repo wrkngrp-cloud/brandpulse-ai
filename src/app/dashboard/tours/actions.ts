@@ -5,9 +5,9 @@ import { createClient } from '@/lib/supabase/server'
 // actually at the keyboard, so user_tours (keyed by user_id) can only ever
 // remember "seen" for the first person who tried it — everyone after that
 // silently never sees the tour. Demo accounts all follow the same seed
-// pattern: demo@{brand}.brandpulse.ai.
+// pattern: demo@{brand}.brandgauge.app.
 function isDemoEmail(email: string | null | undefined): boolean {
-  return !!email && email.startsWith('demo@') && email.endsWith('.brandpulse.ai')
+  return !!email && email.startsWith('demo@') && email.endsWith('.brandgauge.app')
 }
 
 export async function markTourStatus(module: string, status: 'completed' | 'skipped') {

@@ -5,7 +5,7 @@
  *
  * This route remains available as a manual top-up for existing demo accounts
  * that were seeded before the main seed absorbed this logic. It is restricted
- * to demo@jarafoods.brandpulse.ai only.
+ * to demo@jarafoods.brandgauge.app only.
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
@@ -25,7 +25,7 @@ const AWARENESS_ANSWERS = Array.from({ length: 20 }, (_, i) =>
   i < 16 ? 'Yes — I know them well' : 'I have heard of them'
 )
 
-const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
+const DEMO_EMAIL = 'demo@jarafoods.brandgauge.app'
 
 export async function POST() {
   const supabase = await createClient()

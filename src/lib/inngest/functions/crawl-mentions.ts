@@ -10,7 +10,7 @@ export const crawlMentions = inngest.createFunction(
     name: 'Crawl X mentions and score sentiment (nightly)',
     triggers: [
       { cron: 'TZ=Africa/Lagos 0 4 * * *' },
-      { event: 'brandpulse/crawl.requested' },
+      { event: 'brandgauge/crawl.requested' },
     ],
   },
   async ({ event, step, logger }) => {

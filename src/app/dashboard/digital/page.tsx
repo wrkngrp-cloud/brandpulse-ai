@@ -195,7 +195,7 @@ export default async function DigitalPage({
     }
   }
 
-  const DEMO_EMAIL  = 'demo@jarafoods.brandpulse.ai'
+  const DEMO_EMAIL  = 'demo@jarafoods.brandgauge.app'
   const isDemoUser  = user?.email === DEMO_EMAIL
   const hasRealData = perfRows.length > 0
   const isDemo      = !hasRealData && isDemoUser

@@ -92,7 +92,7 @@ export const reviewAspectClassifier = inngest.createFunction(
     name: 'Review Aspect Sentiment Classifier (weekly)',
     triggers: [
       { cron: 'TZ=Africa/Lagos 0 23 * * 0' },
-      { event: 'brandpulse/reviews.classify.aspects' },
+      { event: 'brandgauge/reviews.classify.aspects' },
     ],
     retries: 1,
   },

@@ -14,7 +14,7 @@ export const oohSearchUplift = inngest.createFunction(
   {
     id:      'ooh-search-uplift',
     name:    'OOH: Compute search uplift correlation',
-    triggers: [{ event: 'brandpulse/ooh.search-uplift-requested' }],
+    triggers: [{ event: 'brandgauge/ooh.search-uplift-requested' }],
     retries: 2,
   },
   async ({ event, step }: { event: UpliftEvent; step: { run: <T>(name: string, fn: () => Promise<T>) => Promise<T> } }) => {

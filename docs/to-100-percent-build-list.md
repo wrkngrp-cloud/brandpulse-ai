@@ -261,7 +261,7 @@ This alone moves FMCG from 70% to ~85% with zero new data collection.
 
 ## What requires first-party data from the brand
 
-Some signals cannot be derived from public data or external APIs — the brand must connect their own systems. BrandPulse builds the ingestion layer; the brand enables the connection.
+Some signals cannot be derived from public data or external APIs — the brand must connect their own systems. BrandGauge builds the ingestion layer; the brand enables the connection.
 
 | Signal | Industry | How the brand connects it |
 |---|---|---|
@@ -274,7 +274,7 @@ Some signals cannot be derived from public data or external APIs — the brand m
 | Order fill rate, retailer reorder rate | Distribution | ERP/order management integration |
 | Retail channel split | FMCG | POS integration or distributor data feed |
 
-For all of these, we build a **First-Party Data Connector** pattern: brand generates an API key in BrandPulse settings, their backend (or a CSV export) posts to `/api/first-party/[metric-type]`, we validate and store in the appropriate table. No direct database access required from the brand's side.
+For all of these, we build a **First-Party Data Connector** pattern: brand generates an API key in BrandGauge settings, their backend (or a CSV export) posts to `/api/first-party/[metric-type]`, we validate and store in the appropriate table. No direct database access required from the brand's side.
 
 ---
 

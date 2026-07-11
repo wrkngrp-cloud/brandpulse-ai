@@ -194,7 +194,7 @@ export function BillingClient({
             <p className="text-[12.5px] text-muted-foreground">Unlimited brands · Custom SLA · Dedicated onboarding</p>
           </div>
           <a
-            href="mailto:hello@brandpulse.ai?subject=Enterprise enquiry"
+            href="mailto:hello@brandgauge.app?subject=Enterprise enquiry"
             className="inline-flex items-center justify-center rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
           >
             Contact us

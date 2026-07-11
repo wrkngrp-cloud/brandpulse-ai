@@ -9,7 +9,7 @@ import './globals.css'
 const geistMono = Geist_Mono({ variable: '--font-mono', subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'BrandPulse AI',
+  title: 'BrandGauge',
   description: 'Brand intelligence for Nigerian and West African marketers',
 }
 

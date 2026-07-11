@@ -4,7 +4,7 @@ import { callAi } from '@/lib/ai/client'
 import { Resend } from 'resend'
 
 const resend  = new Resend(process.env.RESEND_API_KEY)
-const APP_URL = process.env.APP_URL ?? 'https://brandpulse.ai'
+const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
 function thirtyDaysAgo() {
   const d = new Date()
@@ -111,7 +111,7 @@ Return JSON only:
       if (!adminEmails.length || !process.env.RESEND_API_KEY) continue
 
       await resend.emails.send({
-        from:    'BrandPulse AI <reports@brandpulse.ai>',
+        from:    'BrandGauge <reports@brandgauge.app>',
         to:      adminEmails,
         subject: `Monthly brand report — ${brand.name} — ${month}`,
         html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a;">
@@ -124,7 +124,7 @@ Return JSON only:
             <p style="margin:8px 0 0;font-size:14px;">${result.top_priority ?? ''}</p>
           </div>
           <p style="margin:28px 0;"><a href="${APP_URL}/dashboard/brand-equity" style="display:inline-block;background:#1a1a1a;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">View full report</a></p>
-          <p style="font-size:12px;color:#aaa;border-top:1px solid #eee;padding-top:16px;">BrandPulse AI · Unsubscribe from monthly reports in Settings</p>
+          <p style="font-size:12px;color:#aaa;border-top:1px solid #eee;padding-top:16px;">BrandGauge · Unsubscribe from monthly reports in Settings</p>
         </div>`,
       }).catch(() => null)
 
@@ -206,7 +206,7 @@ export const weeklyDigestCron = inngest.createFunction(
       if (!emails.length || !process.env.RESEND_API_KEY) continue
 
       await resend.emails.send({
-        from:    'BrandPulse AI <digest@brandpulse.ai>',
+        from:    'BrandGauge <digest@brandgauge.app>',
         to:      emails,
         subject: `Your week in brand — ${brand.name}`,
         html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a;">
@@ -228,7 +228,7 @@ export const weeklyDigestCron = inngest.createFunction(
           ${alertsHtml ? `<h3 style="font-size:14px;margin-bottom:8px;">Alerts this week</h3><ul style="padding-left:16px;margin:0 0 20px;">${alertsHtml}</ul>` : ''}
 
           <p style="margin:24px 0;"><a href="${APP_URL}/dashboard" style="display:inline-block;background:#1a1a1a;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">Open dashboard</a></p>
-          <p style="font-size:12px;color:#aaa;border-top:1px solid #eee;padding-top:16px;">BrandPulse AI · Manage digest preferences in Settings</p>
+          <p style="font-size:12px;color:#aaa;border-top:1px solid #eee;padding-top:16px;">BrandGauge · Manage digest preferences in Settings</p>
         </div>`,
       }).catch(() => null)
 

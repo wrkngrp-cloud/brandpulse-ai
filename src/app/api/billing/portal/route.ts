@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 
-const APP_URL = process.env.APP_URL ?? 'https://brandpulse.ai'
+const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
 export async function POST() {
   if (!stripe) return NextResponse.json({ error: 'Billing not configured.' }, { status: 503 })

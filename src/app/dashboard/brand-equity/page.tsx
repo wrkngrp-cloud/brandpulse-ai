@@ -36,7 +36,7 @@ export default async function BrandEquityPage({
   const params = await searchParams
   const days = Math.min(365, Math.max(7, Number(params.days ?? 30)))
 
-  const DEMO_EMAIL = 'demo@jarafoods.brandpulse.ai'
+  const DEMO_EMAIL = 'demo@jarafoods.brandgauge.app'
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')

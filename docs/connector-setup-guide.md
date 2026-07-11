@@ -61,7 +61,7 @@ Current status of each, checked directly against `vercel env ls` and the actual 
 
 ## 4. WhatsApp Deep Integration
 
-**What it unlocks:** Sending WhatsApp campaign broadcasts, NPS surveys, and survey dispatch directly from BrandPulse, with delivery tracking and opt-out handling. Fully built in the code, just not visible in the nav yet (shows "Coming soon").
+**What it unlocks:** Sending WhatsApp campaign broadcasts, NPS surveys, and survey dispatch directly from BrandGauge, with delivery tracking and opt-out handling. Fully built in the code, just not visible in the nav yet (shows "Coming soon").
 
 **What's missing:** A dedicated phone number registered as a WhatsApp Business Account (WABA) — not a number already active on regular WhatsApp or WhatsApp Business App.
 

@@ -133,7 +133,7 @@ export function MediaPlanUploadDialog({
           <DialogHeader>
             <DialogTitle>Upload {TYPE_LABELS[type]}</DialogTitle>
             <DialogDescription>
-              Upload your {TYPE_LABELS[type].toLowerCase()} in .xlsx format. BrandPulse will import
+              Upload your {TYPE_LABELS[type].toLowerCase()} in .xlsx format. BrandGauge will import
               each row and match stations/channels/publications to the reference database.
             </DialogDescription>
           </DialogHeader>

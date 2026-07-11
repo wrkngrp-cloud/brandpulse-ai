@@ -286,7 +286,7 @@ export function GeoAttributionPanel({
           <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">How it works</h4>
           <ol className="text-xs text-blue-700 dark:text-blue-400 space-y-1 list-decimal list-inside">
             <li>Define a geo-fence radius around this OOH site (e.g., 500m)</li>
-            <li>BrandPulse builds an audience of people who visited that area</li>
+            <li>BrandGauge builds an audience of people who visited that area</li>
             <li>The audience syncs to Meta Ads or Google Ads</li>
             <li>Anyone who saw your billboard then sees the matching ad in their feed — the same creative, closing the loop</li>
           </ol>

@@ -2,12 +2,16 @@ import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getActiveBrandId } from '@/lib/active-brand'
 
+// Snippet URLs must point at a host we control today; APP_URL flips them to the
+// custom domain at cutover without customers re-installing anything old-URL-based.
+const SDK_BASE = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+
 function buildSnippet(pixelId: string): string {
   return `;(function(w,d,s,id){
   w.__bp=w.__bp||{q:[],track:function(e,v,m){this.q.push({e,v,m,t:Date.now()})}};
   var el=d.createElement(s);
   el.async=1;
-  el.src='https://brandpulse.ai/api/sdk/pixel.js';
+  el.src='${SDK_BASE}/api/sdk/pixel.js';
   el.setAttribute('data-pixel-id',id);
   d.head.appendChild(el);
 })(window,document,'script','${pixelId}');

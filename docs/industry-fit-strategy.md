@@ -1,11 +1,11 @@
-# BrandPulse AI — Industry Fit Strategy
+# BrandGauge — Industry Fit Strategy
 *Four-vertical audit: Fintech · Creator/SaaS · Hospitality/Venues · FMCG/Trade*
 
 ---
 
 ## The headline finding
 
-BrandPulse is not broken for other industries — it is mis-labelled and partially wired. The scoring engine (`computeStageComposite`, weight redistribution, null-safe composites) is the right architecture for every industry. The funnel shape (6 stages from awareness to advocacy) is correct for every industry. What's wrong is that roughly half the signals in the Action, Loyalty, and Advocacy stages are named and scaled for an FMCG brand selling physical units. A digital bank, a nightclub, or a SaaS platform sees those signals, gets null/zero, and the funnel looks broken — even though the brand is healthy.
+BrandGauge is not broken for other industries — it is mis-labelled and partially wired. The scoring engine (`computeStageComposite`, weight redistribution, null-safe composites) is the right architecture for every industry. The funnel shape (6 stages from awareness to advocacy) is correct for every industry. What's wrong is that roughly half the signals in the Action, Loyalty, and Advocacy stages are named and scaled for an FMCG brand selling physical units. A digital bank, a nightclub, or a SaaS platform sees those signals, gets null/zero, and the funnel looks broken — even though the brand is healthy.
 
 Two fixes unlock most of it. Everything else is additive.
 
@@ -37,7 +37,7 @@ Every single vertical audit independently concluded the same thing: the signals 
 | `fmcg` | Jara Foods, Indomie, PZ Cussons, consumer goods |
 | `fintech` | Paystack, OPay, Cowrywise, Piggyvest, Kuda |
 | `venue` | Praia Lagos, Hard Rock Cafe, restaurants, hotels |
-| `b2b_saas` | BrandPulse itself, Mainstack (B2B side), HRM tools |
+| `b2b_saas` | BrandGauge itself, Mainstack (B2B side), HRM tools |
 | `marketplace` | Selar, Mainstack (creator side), Jumia sellers |
 | `beverage_alcohol` | Guinness, Heineken, NB — regulated category, inherits `fmcg` + compliance layer |
 | `b2b_distribution` | OmniRetail, Tolaram trade arm |
@@ -187,7 +187,7 @@ Ranked by: cross-vertical impact × speed of delivery.
 
 ## What NOT to do
 
-- Do not split the product into separate "BrandPulse for Fintech" and "BrandPulse for FMCG" SKUs. One platform, configurable by brand type.
+- Do not split the product into separate "BrandGauge for Fintech" and "BrandGauge for FMCG" SKUs. One platform, configurable by brand type.
 - Do not remove OOH/TV/radio signals. Some fintechs (OPay) and venues (Hard Rock) do run mass media. Let them contribute when data exists; the weight redistributor handles null gracefully.
 - Do not rebuild the scoring engine. `computeStageComposite` and `computeAwarenessComposite` are correctly designed. The only change is the signal *arrays* fed into them.
 - Do not add every gap signal at once. Tier 1 (5 items) is the minimum viable multi-industry platform. Everything else is expansion.

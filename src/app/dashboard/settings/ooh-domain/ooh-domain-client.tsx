@@ -19,11 +19,11 @@ interface OohDomainClientProps {
   appHost:       string
 }
 
-type Tier = 'brandpulse' | 'subdomain' | 'main-domain'
+type Tier = 'brandgauge' | 'subdomain' | 'main-domain'
 
 export function OohDomainClient({ brandName, currentDomain, appUrl, appHost }: OohDomainClientProps) {
   const [state, formAction, pending] = useActionState(saveOohDomain, null)
-  const [tier,        setTier]       = useState<Tier>(currentDomain ? 'subdomain' : 'brandpulse')
+  const [tier,        setTier]       = useState<Tier>(currentDomain ? 'subdomain' : 'brandgauge')
   const [inputDomain, setInputDomain] = useState(currentDomain ?? '')
   const [removing,    setRemoving]   = useState(false)
 
@@ -49,7 +49,7 @@ export function OohDomainClient({ brandName, currentDomain, appUrl, appHost }: O
 
   const exampleSlug   = 'morelife'
   const brandSlug     = brandName.toLowerCase().replace(/[^a-z0-9]/g, '')
-  const brandpulseUrl = `${appUrl}/go/${brandSlug}-${exampleSlug}`
+  const brandgaugeUrl = `${appUrl}/go/${brandSlug}-${exampleSlug}`
   const subdomainUrl  = inputDomain ? `https://${inputDomain}/${exampleSlug}` : `https://go.${brandSlug}.com/${exampleSlug}`
   const mainDomainUrl = `https://${brandSlug}.com/${exampleSlug}`
 
@@ -59,14 +59,14 @@ export function OohDomainClient({ brandName, currentDomain, appUrl, appHost }: O
       {/* Tier picker */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <TierCard
-          active={tier === 'brandpulse'}
-          onClick={() => setTier('brandpulse')}
+          active={tier === 'brandgauge'}
+          onClick={() => setTier('brandgauge')}
           icon={<Link2 className="h-4 w-4" />}
-          title="BrandPulse does it"
+          title="BrandGauge does it"
           badge="Easiest"
           badgeColor="green"
           description="Your links live on our domain. Zero setup. Ideal for getting started fast."
-          example={brandpulseUrl}
+          example={brandgaugeUrl}
         />
         <TierCard
           active={tier === 'subdomain'}
@@ -91,7 +91,7 @@ export function OohDomainClient({ brandName, currentDomain, appUrl, appHost }: O
       </div>
 
       {/* Tier content */}
-      {tier === 'brandpulse' && (
+      {tier === 'brandgauge' && (
         <div className="border rounded-xl p-5 space-y-4">
           <div className="flex items-start gap-3">
             <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
@@ -103,8 +103,8 @@ export function OohDomainClient({ brandName, currentDomain, appUrl, appHost }: O
             </div>
           </div>
           <div className="bg-muted/50 border rounded-lg px-3 py-2.5 flex items-center justify-between gap-3">
-            <span className="text-xs font-mono break-all">{brandpulseUrl}</span>
-            <Button type="button" variant="ghost" size="sm" className="h-7 px-2 shrink-0 text-xs" onClick={() => copy(brandpulseUrl)}>
+            <span className="text-xs font-mono break-all">{brandgaugeUrl}</span>
+            <Button type="button" variant="ghost" size="sm" className="h-7 px-2 shrink-0 text-xs" onClick={() => copy(brandgaugeUrl)}>
               <Copy className="h-3 w-3 mr-1" /> Copy
             </Button>
           </div>
@@ -290,7 +290,7 @@ function DnsInstructions({ domain, appHost, onCopy }: { domain: string; appHost:
         </table>
       </div>
       <p className="text-xs text-muted-foreground">
-        DNS propagation typically takes 5–30 minutes. Once live, test by visiting <code className="bg-muted px-1 rounded">https://{domain}/test</code> — you should see a BrandPulse 302 redirect.
+        DNS propagation typically takes 5–30 minutes. Once live, test by visiting <code className="bg-muted px-1 rounded">https://{domain}/test</code> — you should see a BrandGauge 302 redirect.
       </p>
     </div>
   )

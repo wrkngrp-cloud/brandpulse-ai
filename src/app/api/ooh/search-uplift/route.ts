@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   if (!site) return NextResponse.json({ error: 'Site not found' }, { status: 404 })
 
   await inngest.send({
-    name: 'brandpulse/ooh.search-uplift-requested',
+    name: 'brandgauge/ooh.search-uplift-requested',
     data: { siteId, brandId, keyword },
   })
 

@@ -1,7 +1,7 @@
 import { BookOpen, BarChart2, TrendingUp, Target, Users, Palette, Radio, Tv, Newspaper, MapPin, Zap, Award, Globe, Filter, Trophy } from 'lucide-react'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 
-export const metadata = { title: 'Methodology — BrandPulse AI' }
+export const metadata = { title: 'Methodology — BrandGauge' }
 
 const sections = [
   {
@@ -44,7 +44,7 @@ const sections = [
       },
       {
         heading: 'Budget-to-ESOV Simulator',
-        text: 'Enter a target ESOV and BrandPulse estimates the additional media investment required. The model uses your current SOV-to-spend ratio as a baseline multiplier. Output is directional, not a guarantee — it is designed to anchor budget conversations with finance stakeholders.',
+        text: 'Enter a target ESOV and BrandGauge estimates the additional media investment required. The model uses your current SOV-to-spend ratio as a baseline multiplier. Output is directional, not a guarantee — it is designed to anchor budget conversations with finance stakeholders.',
       },
     ],
   },
@@ -66,7 +66,7 @@ const sections = [
       },
       {
         heading: 'Emotion detection',
-        text: 'Beyond positive/negative, BrandPulse maps mentions to the Plutchik eight-emotion model: Joy, Trust, Anticipation, Surprise, Fear, Sadness, Disgust, and Anger. This lets brand managers distinguish between a high-sentiment score driven by genuine affection versus one driven by hype, and catch subtle shifts like rising fear or disgust before they become visible in overall scores.',
+        text: 'Beyond positive/negative, BrandGauge maps mentions to the Plutchik eight-emotion model: Joy, Trust, Anticipation, Surprise, Fear, Sadness, Disgust, and Anger. This lets brand managers distinguish between a high-sentiment score driven by genuine affection versus one driven by hype, and catch subtle shifts like rising fear or disgust before they become visible in overall scores.',
       },
       {
         heading: 'Automated alerts',
@@ -120,11 +120,11 @@ const sections = [
     body: [
       {
         heading: 'Calculation',
-        text: 'Respondents rate their likelihood to recommend the brand on a 0–10 scale. Promoters score 9–10. Passives score 7–8. Detractors score 0–6. NPS = ((Promoters − Detractors) ÷ Total Respondents) × 100. Range is −100 (all detractors) to +100 (all promoters). A minimum of three NPS responses is required before BrandPulse will display a score, to avoid misleading single-response readings.',
+        text: 'Respondents rate their likelihood to recommend the brand on a 0–10 scale. Promoters score 9–10. Passives score 7–8. Detractors score 0–6. NPS = ((Promoters − Detractors) ÷ Total Respondents) × 100. Range is −100 (all detractors) to +100 (all promoters). A minimum of three NPS responses is required before BrandGauge will display a score, to avoid misleading single-response readings.',
       },
       {
         heading: 'Nigerian market benchmarks',
-        text: 'NPS benchmarks vary significantly by category. Financial services typically score 20–40. Telcos typically score 5–25. FMCG typically scores 30–55. Fintech and digital-first brands typically score 40–65. BrandPulse does not apply a universal benchmark because category context matters more than absolute number.',
+        text: 'NPS benchmarks vary significantly by category. Financial services typically score 20–40. Telcos typically score 5–25. FMCG typically scores 30–55. Fintech and digital-first brands typically score 40–65. BrandGauge does not apply a universal benchmark because category context matters more than absolute number.',
       },
     ],
   },
@@ -142,11 +142,11 @@ const sections = [
       },
       {
         heading: 'Cultural calibration',
-        text: 'Most AI content scoring tools are trained on Western English-language datasets and systematically misread Nigerian cultural signals. BrandPulse uses a cultural interpretation layer that accounts for Pidgin expressions, Nigerian slang lifecycles, festival and religious calendar sensitivity, and regional nuance (Lagos vs Abuja vs Port Harcourt audience expectations).',
+        text: 'Most AI content scoring tools are trained on Western English-language datasets and systematically misread Nigerian cultural signals. BrandGauge uses a cultural interpretation layer that accounts for Pidgin expressions, Nigerian slang lifecycles, festival and religious calendar sensitivity, and regional nuance (Lagos vs Abuja vs Port Harcourt audience expectations).',
       },
       {
         heading: 'Image and video analysis',
-        text: 'Upload an image or video alongside text. For videos, BrandPulse extracts the first frame automatically (no upload processing required) and uses computer vision to assess the hook, visual quality, sound-off viewability, and CTA visibility — the four most important video performance indicators for Nigerian social platforms where data costs mean many users watch without sound.',
+        text: 'Upload an image or video alongside text. For videos, BrandGauge extracts the first frame automatically (no upload processing required) and uses computer vision to assess the hook, visual quality, sound-off viewability, and CTA visibility — the four most important video performance indicators for Nigerian social platforms where data costs mean many users watch without sound.',
       },
     ],
   },
@@ -226,15 +226,15 @@ const sections = [
     body: [
       {
         heading: 'Primary attribution: vanity links',
-        text: 'Every OOH placement can be assigned a branded vanity URL (e.g. brand.com/go/ikeja-junction). When an audience member scans or types that URL, BrandPulse logs the visit, timestamps it, and links it to the specific billboard. This is the primary attribution method because it produces deterministic, one-to-one conversion data with no modelling assumptions.',
+        text: 'Every OOH placement can be assigned a branded vanity URL (e.g. brand.com/go/ikeja-junction). When an audience member scans or types that URL, BrandGauge logs the visit, timestamps it, and links it to the specific billboard. This is the primary attribution method because it produces deterministic, one-to-one conversion data with no modelling assumptions.',
       },
       {
         heading: 'Secondary corroboration: search uplift',
-        text: 'BrandPulse computes a Pearson correlation coefficient between weekly billboard visit counts and weekly Google branded search volume (via Google Trends) for the same time period. A correlation above 0.6 is interpreted as meaningful evidence that OOH exposure is driving branded search behaviour — a standard corroboration methodology used by GroupM and Kinetic Worldwide.',
+        text: 'BrandGauge computes a Pearson correlation coefficient between weekly billboard visit counts and weekly Google branded search volume (via Google Trends) for the same time period. A correlation above 0.6 is interpreted as meaningful evidence that OOH exposure is driving branded search behaviour — a standard corroboration methodology used by GroupM and Kinetic Worldwide.',
       },
       {
         heading: 'GeoLift studies',
-        text: 'For brands running OOH in multiple cities, BrandPulse can run a GeoLift study: a treatment city (where OOH is active) is compared against a control city (no OOH) and Pearson correlation is computed between the two cities\' sentiment or sales-proxy signals. This isolates the incremental effect of the OOH spend from organic brand momentum.',
+        text: 'For brands running OOH in multiple cities, BrandGauge can run a GeoLift study: a treatment city (where OOH is active) is compared against a control city (no OOH) and Pearson correlation is computed between the two cities\' sentiment or sales-proxy signals. This isolates the incremental effect of the OOH spend from organic brand momentum.',
       },
     ],
   },
@@ -247,12 +247,12 @@ const sections = [
     subtitle: 'Daypart efficiency analysis and agency post-buy reconciliation for Nigerian radio buys.',
     body: [
       {
-        heading: 'How data enters BrandPulse',
-        text: 'Radio data is logged from your media agency\'s buy plan and post-buy report — either via CSV upload or manual entry. BrandPulse does not monitor live broadcasts. Spots Planned comes from your approved buy; Spots Aired comes from the delivery confirmation your agency provides after each flight. Dayparts follow the Nigerian radio industry standard: Morning Drive (06:00–10:00), Daytime (10:00–15:00), Afternoon Drive (15:00–19:00), Evening (19:00–22:00), and Late Night (22:00–06:00).',
+        heading: 'How data enters BrandGauge',
+        text: 'Radio data is logged from your media agency\'s buy plan and post-buy report — either via CSV upload or manual entry. BrandGauge does not monitor live broadcasts. Spots Planned comes from your approved buy; Spots Aired comes from the delivery confirmation your agency provides after each flight. Dayparts follow the Nigerian radio industry standard: Morning Drive (06:00–10:00), Daytime (10:00–15:00), Afternoon Drive (15:00–19:00), Evening (19:00–22:00), and Late Night (22:00–06:00).',
       },
       {
         heading: 'Daypart Efficiency Ranking',
-        text: 'BrandPulse holds a static listenership database for Nigerian stations (Beat FM, Cool FM, Wazobia FM, Naija FM, Smooth FM, Rhythm FM, and others). The AI combines your logged spend and spot count with the station\'s reach figures to compute cost-per-impression per daypart. Dayparts are then ranked by efficiency, giving you a clear reallocation guide for your next buy.',
+        text: 'BrandGauge holds a static listenership database for Nigerian stations (Beat FM, Cool FM, Wazobia FM, Naija FM, Smooth FM, Rhythm FM, and others). The AI combines your logged spend and spot count with the station\'s reach figures to compute cost-per-impression per daypart. Dayparts are then ranked by efficiency, giving you a clear reallocation guide for your next buy.',
       },
     ],
   },
@@ -265,8 +265,8 @@ const sections = [
     subtitle: 'GRP reconciliation and prime time vs fringe efficiency analysis for logged TV buys.',
     body: [
       {
-        heading: 'How data enters BrandPulse',
-        text: 'TV data is logged from your media agency\'s buy plan and post-buy delivery report — either via CSV upload or manual entry. BrandPulse does not monitor live broadcasts or detect spots on air. GRPs Planned and Spots Planned come from your approved buy; GRPs Delivered and Spots Aired come from the post-buy confirmation your agency provides after each flight.',
+        heading: 'How data enters BrandGauge',
+        text: 'TV data is logged from your media agency\'s buy plan and post-buy delivery report — either via CSV upload or manual entry. BrandGauge does not monitor live broadcasts or detect spots on air. GRPs Planned and Spots Planned come from your approved buy; GRPs Delivered and Spots Aired come from the post-buy confirmation your agency provides after each flight.',
       },
       {
         heading: 'Core metrics',
@@ -274,7 +274,7 @@ const sections = [
       },
       {
         heading: 'AI analysis',
-        text: 'The AI layer compares your logged planned vs delivered GRPs to surface underdelivery, ranks programmes by cost-efficiency, and analyses prime time versus fringe allocation. BrandPulse holds a channel database covering NTA, AIT, Channels TV, TVC, Africa Magic, SuperSport, and major regional stations — these are reference records for matching and efficiency benchmarking, not live monitoring feeds.',
+        text: 'The AI layer compares your logged planned vs delivered GRPs to surface underdelivery, ranks programmes by cost-efficiency, and analyses prime time versus fringe allocation. BrandGauge holds a channel database covering NTA, AIT, Channels TV, TVC, Africa Magic, SuperSport, and major regional stations — these are reference records for matching and efficiency benchmarking, not live monitoring feeds.',
       },
     ],
   },
@@ -288,11 +288,11 @@ const sections = [
     body: [
       {
         heading: 'Readership calculation',
-        text: 'Readership = Circulation × Pass-Along Multiplier. Each publication in the BrandPulse database carries a validated pass-along multiplier — the average number of additional readers per copy sold. For mass dailies like The Punch and Vanguard, this is typically 3–4×. For business titles like BusinessDay, it is closer to 2×. Multipliers are sourced from APCON-registered readership studies.',
+        text: 'Readership = Circulation × Pass-Along Multiplier. Each publication in the BrandGauge database carries a validated pass-along multiplier — the average number of additional readers per copy sold. For mass dailies like The Punch and Vanguard, this is typically 3–4×. For business titles like BusinessDay, it is closer to 2×. Multipliers are sourced from APCON-registered readership studies.',
       },
       {
         heading: 'QR attribution (primary)',
-        text: 'BrandPulse auto-generates a unique QR code and vanity URL for each print placement. When readers scan the QR code, the visit is logged and attributed directly to that edition and publication. This makes print attribution deterministic rather than modelled. The Nigerian average QR scan rate for print is approximately 0.3% of estimated readership — any placement exceeding this benchmark is a top performer.',
+        text: 'BrandGauge auto-generates a unique QR code and vanity URL for each print placement. When readers scan the QR code, the visit is logged and attributed directly to that edition and publication. This makes print attribution deterministic rather than modelled. The Nigerian average QR scan rate for print is approximately 0.3% of estimated readership — any placement exceeding this benchmark is a top performer.',
       },
       {
         heading: 'Cost Per Thousand (CPT)',
@@ -310,7 +310,7 @@ const sections = [
     body: [
       {
         heading: 'Weekly AI briefing',
-        text: 'Every Monday at 08:00 Lagos time, BrandPulse generates a competitive briefing for each brand. The briefing synthesises the past week\'s competitor sightings, SOV movements, sentiment shifts, and campaign signals into a structured narrative with strategic implications and recommended responses. The briefing is delivered in the app and via email.',
+        text: 'Every Monday at 08:00 Lagos time, BrandGauge generates a competitive briefing for each brand. The briefing synthesises the past week\'s competitor sightings, SOV movements, sentiment shifts, and campaign signals into a structured narrative with strategic implications and recommended responses. The briefing is delivered in the app and via email.',
       },
       {
         heading: 'ESOV League',
@@ -347,7 +347,7 @@ export default function MethodologyPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Our Methodology</h1>
             <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-              How BrandPulse calculates every score, metric, and index — grounded in established measurement frameworks and adapted for the Nigerian and West African market.
+              How BrandGauge calculates every score, metric, and index — grounded in established measurement frameworks and adapted for the Nigerian and West African market.
             </p>
           </div>
         </div>
@@ -360,7 +360,7 @@ export default function MethodologyPage() {
       <div className="border rounded-xl p-5 bg-muted/30 space-y-2">
         <p className="text-sm font-medium">Built for African brand realities</p>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Most brand intelligence tools were built for US and European markets and retrofitted for Africa. BrandPulse is built the other way around. Every formula, every benchmark, every AI calibration starts with the Nigerian market and expands outward. Where we apply international frameworks — BrandZ, NPS, Les Binet ESOV theory, Pearson correlation for media attribution — we adapt the parameters, thresholds, and language models for local context.
+          Most brand intelligence tools were built for US and European markets and retrofitted for Africa. BrandGauge is built the other way around. Every formula, every benchmark, every AI calibration starts with the Nigerian market and expands outward. Where we apply international frameworks — BrandZ, NPS, Les Binet ESOV theory, Pearson correlation for media attribution — we adapt the parameters, thresholds, and language models for local context.
         </p>
       </div>
 
@@ -391,9 +391,9 @@ export default function MethodologyPage() {
       {/* Marketing Frameworks */}
       <div className="space-y-4">
         <div>
-          <h2 className="text-lg font-semibold">Marketing Frameworks Behind BrandPulse</h2>
+          <h2 className="text-lg font-semibold">Marketing Frameworks Behind BrandGauge</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Every metric in BrandPulse is grounded in established academic and practitioner frameworks. Here is how we apply them — in plain terms.
+            Every metric in BrandGauge is grounded in established academic and practitioner frameworks. Here is how we apply them — in plain terms.
           </p>
         </div>
 
@@ -401,27 +401,27 @@ export default function MethodologyPage() {
           {
             name: "Aaker's Brand Equity Model",
             where: 'Brand Equity Tracker, BHI, Voice Builder',
-            body: "David Aaker defines brand equity as the premium a brand adds to a product beyond its functional value. He identifies five sources: Brand Loyalty, Brand Awareness, Perceived Quality, Brand Associations, and Other Proprietary Assets. BrandPulse maps these directly: Loyalty → NPS and repeat survey responses; Awareness → Share of Voice; Perceived Quality → Brand Perception Audit ratings; Associations → Cultural Resonance and Voice Builder alignment; Proprietary Assets → EMV from earned media. When your BHI is high, you are building Aaker equity — not just vanity metrics.",
+            body: "David Aaker defines brand equity as the premium a brand adds to a product beyond its functional value. He identifies five sources: Brand Loyalty, Brand Awareness, Perceived Quality, Brand Associations, and Other Proprietary Assets. BrandGauge maps these directly: Loyalty → NPS and repeat survey responses; Awareness → Share of Voice; Perceived Quality → Brand Perception Audit ratings; Associations → Cultural Resonance and Voice Builder alignment; Proprietary Assets → EMV from earned media. When your BHI is high, you are building Aaker equity — not just vanity metrics.",
           },
           {
             name: "Kapferer Brand Identity Prism",
             where: 'Brand Voice Builder',
-            body: "Jean-Noël Kapferer's prism has six facets: Physique (visual identity), Personality (tone of voice), Culture (values and origin), Relationship (how the brand interacts with consumers), Reflection (the customer archetype the brand projects), and Self-image (how customers see themselves when they use the brand). BrandPulse's Brand Voice Builder translates this into the five fields you fill in: tone adjectives map to Personality, dos and don'ts map to Culture and Relationship, and signature phrases reflect your Physique and Self-image. Every piece of content reviewed by BrandPulse AI is scored against this prism.",
+            body: "Jean-Noël Kapferer's prism has six facets: Physique (visual identity), Personality (tone of voice), Culture (values and origin), Relationship (how the brand interacts with consumers), Reflection (the customer archetype the brand projects), and Self-image (how customers see themselves when they use the brand). BrandGauge's Brand Voice Builder translates this into the five fields you fill in: tone adjectives map to Personality, dos and don'ts map to Culture and Relationship, and signature phrases reflect your Physique and Self-image. Every piece of content reviewed by BrandGauge is scored against this prism.",
           },
           {
             name: 'ESOV — Binet & Field Model',
             where: 'Business Case, Share of Voice',
-            body: "Les Binet and Peter Field, in 'The Long and Short of It' (2013, IPA Databank, 1,400 campaigns), established that Excess Share of Voice — your SOV minus your market share — is the single strongest predictor of long-run market share growth. A positive ESOV of +5 to +10 points, sustained over 12–18 months, corresponds to roughly +1 point of market share gain per year in FMCG. BrandPulse calculates your ESOV in real time and flags it prominently in the Business Case and SOV dashboards. The benchmark holds in Nigerian FMCG and QSR categories — the mechanism (mental salience via repeated exposure) is universal.",
+            body: "Les Binet and Peter Field, in 'The Long and Short of It' (2013, IPA Databank, 1,400 campaigns), established that Excess Share of Voice — your SOV minus your market share — is the single strongest predictor of long-run market share growth. A positive ESOV of +5 to +10 points, sustained over 12–18 months, corresponds to roughly +1 point of market share gain per year in FMCG. BrandGauge calculates your ESOV in real time and flags it prominently in the Business Case and SOV dashboards. The benchmark holds in Nigerian FMCG and QSR categories — the mechanism (mental salience via repeated exposure) is universal.",
           },
           {
             name: "7Ps of Marketing Mix",
             where: 'Campaigns, Business Case',
-            body: "The original 4Ps (Product, Price, Place, Promotion) were extended to 7Ps by Booms and Bitner for service businesses by adding People, Process, and Physical Evidence. BrandPulse touches all seven through its campaign architecture: Promotion maps to social and paid campaigns; Place maps to OOH, radio, and digital channel tracking; People maps to Influencer and Ambassador tracking; Process maps to Survey and Funnel diagnostics. When the Business Case AI identifies gaps, it frames them in 7Ps language so your board presentation has a recognised strategic structure.",
+            body: "The original 4Ps (Product, Price, Place, Promotion) were extended to 7Ps by Booms and Bitner for service businesses by adding People, Process, and Physical Evidence. BrandGauge touches all seven through its campaign architecture: Promotion maps to social and paid campaigns; Place maps to OOH, radio, and digital channel tracking; People maps to Influencer and Ambassador tracking; Process maps to Survey and Funnel diagnostics. When the Business Case AI identifies gaps, it frames them in 7Ps language so your board presentation has a recognised strategic structure.",
           },
           {
             name: "Porter's Five Forces",
             where: 'Competitive Intelligence',
-            body: "Michael Porter's Five Forces — Competitive Rivalry, Threat of New Entrants, Supplier Power, Buyer Power, and Threat of Substitutes — is the standard framework for understanding industry attractiveness and competitive position. BrandPulse uses it as the lens for Competitive Intelligence: Rival SOV and sighting frequency signal Competitive Rivalry intensity; new competitor appearances in your category signal New Entrant threats. When the Competitive AI briefing warns you about an escalating competitor, it is Porter's Rivalry lens applied to your real-time SOV and sighting data.",
+            body: "Michael Porter's Five Forces — Competitive Rivalry, Threat of New Entrants, Supplier Power, Buyer Power, and Threat of Substitutes — is the standard framework for understanding industry attractiveness and competitive position. BrandGauge uses it as the lens for Competitive Intelligence: Rival SOV and sighting frequency signal Competitive Rivalry intensity; new competitor appearances in your category signal New Entrant threats. When the Competitive AI briefing warns you about an escalating competitor, it is Porter's Rivalry lens applied to your real-time SOV and sighting data.",
           },
           {
             name: 'BCG Matrix — Campaign Portfolio',
@@ -431,22 +431,22 @@ export default function MethodologyPage() {
           {
             name: 'Ansoff Growth Matrix',
             where: 'Business Case, AI Strategic Recommendations',
-            body: "Igor Ansoff's matrix maps growth strategy on two axes: Markets (existing vs new) and Products (existing vs new). Market Penetration (existing product, existing market) — grow BHI and SOV in your current category; this is where most of BrandPulse's diagnostics point first. Market Development (existing product, new market) — expand to a new city or demographic; Cultural Intelligence and Survey segmentation support this. Product Development (new product, existing market) — launch a new SKU; Pre-Post Intelligence can measure how well it lands. Diversification (new product, new market) — highest risk, highest reward. When BrandPulse AI identifies opportunities, it references which quadrant the opportunity sits in.",
+            body: "Igor Ansoff's matrix maps growth strategy on two axes: Markets (existing vs new) and Products (existing vs new). Market Penetration (existing product, existing market) — grow BHI and SOV in your current category; this is where most of BrandGauge's diagnostics point first. Market Development (existing product, new market) — expand to a new city or demographic; Cultural Intelligence and Survey segmentation support this. Product Development (new product, existing market) — launch a new SKU; Pre-Post Intelligence can measure how well it lands. Diversification (new product, new market) — highest risk, highest reward. When BrandGauge identifies opportunities, it references which quadrant the opportunity sits in.",
           },
           {
             name: 'SWOT Analysis',
             where: 'AI Insights, Business Case',
-            body: "SWOT (Strengths, Weaknesses, Opportunities, Threats) is the most widely-used strategic planning tool. BrandPulse generates SWOT inputs automatically: Strengths — high BHI components, positive sentiment drivers, high NPS; Weaknesses — low-scoring BHI components, negative sentiment themes, low survey perception scores; Opportunities — positive ESOV position, underserved audience segments (survey data), cultural moments your competitors are missing; Threats — negative ESOV, rising competitor SOV, competitor sightings in your core category. The Business Case AI synthesises these into the Risks and Asks sections of the board report.",
+            body: "SWOT (Strengths, Weaknesses, Opportunities, Threats) is the most widely-used strategic planning tool. BrandGauge generates SWOT inputs automatically: Strengths — high BHI components, positive sentiment drivers, high NPS; Weaknesses — low-scoring BHI components, negative sentiment themes, low survey perception scores; Opportunities — positive ESOV position, underserved audience segments (survey data), cultural moments your competitors are missing; Threats — negative ESOV, rising competitor SOV, competitor sightings in your core category. The Business Case AI synthesises these into the Risks and Asks sections of the board report.",
           },
           {
             name: 'Ehrenberg-Bass Mental Availability',
             where: 'Share of Voice, Sentiment, Creative Analysis',
-            body: "Byron Sharp's 'How Brands Grow' (2010) established that brand growth comes primarily from reaching all buyers in the category with distinctive brand assets — not from loyalty programs or narrow targeting. Mental Availability (being thought of in a buying situation) is driven by the number of category entry points you own. BrandPulse tracks this through SOV (how much of the category conversation you own), Sentiment (are those mentions positive enough to build memory structures), Creative Distinctiveness (via Creative Analysis scoring), and Cultural Resonance (are your distinctive assets landing in the right cultural context). A rising BHI at consistent SOV = growing mental availability.",
+            body: "Byron Sharp's 'How Brands Grow' (2010) established that brand growth comes primarily from reaching all buyers in the category with distinctive brand assets — not from loyalty programs or narrow targeting. Mental Availability (being thought of in a buying situation) is driven by the number of category entry points you own. BrandGauge tracks this through SOV (how much of the category conversation you own), Sentiment (are those mentions positive enough to build memory structures), Creative Distinctiveness (via Creative Analysis scoring), and Cultural Resonance (are your distinctive assets landing in the right cultural context). A rising BHI at consistent SOV = growing mental availability.",
           },
           {
             name: 'Perceptual Mapping',
             where: 'Competitive Intelligence, Brand Perception Audit',
-            body: "Perceptual maps plot brands in a two-dimensional space defined by attributes that consumers use to differentiate them — e.g., Premium vs Affordable on one axis, Traditional vs Modern on the other. BrandPulse's Brand Perception Audit survey captures eight dimensions that can be plotted as a radar chart against competitor perceptions. The Competitive Intelligence sightings and SOV data anchor your position in the category conversation relative to rivals. Over time, you can see whether your brand is moving toward or away from the position you want to own.",
+            body: "Perceptual maps plot brands in a two-dimensional space defined by attributes that consumers use to differentiate them — e.g., Premium vs Affordable on one axis, Traditional vs Modern on the other. BrandGauge's Brand Perception Audit survey captures eight dimensions that can be plotted as a radar chart against competitor perceptions. The Competitive Intelligence sightings and SOV data anchor your position in the category conversation relative to rivals. Over time, you can see whether your brand is moving toward or away from the position you want to own.",
           },
         ].map(fw => (
           <div key={fw.name} className="rounded-2xl border bg-card overflow-hidden">
@@ -465,7 +465,7 @@ export default function MethodologyPage() {
       <div className="border rounded-xl p-5 space-y-2 bg-muted/20">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">A note on AI usage</p>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          BrandPulse uses three tiers of AI depending on task complexity. Cultural tasks — sentiment classification, Pre-Post scoring, cultural resonance — use our fastest model, calibrated specifically for Nigerian linguistic patterns. Structural analysis tasks — creative comparison, influencer scoring, funnel diagnosis, competitive briefings — use our mid-tier model. Board-grade outputs — business cases, strategic recommendations requiring deep synthesis — use our most capable model.
+          BrandGauge uses three tiers of AI depending on task complexity. Cultural tasks — sentiment classification, Pre-Post scoring, cultural resonance — use our fastest model, calibrated specifically for Nigerian linguistic patterns. Structural analysis tasks — creative comparison, influencer scoring, funnel diagnosis, competitive briefings — use our mid-tier model. Board-grade outputs — business cases, strategic recommendations requiring deep synthesis — use our most capable model.
         </p>
       </div>
     </div>

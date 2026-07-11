@@ -155,11 +155,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No data sheet found in the workbook.' }, { status: 400 })
   }
 
-  // Read header row (row 2 for BrandPulse templates, row 1 for generic)
+  // Read header row (row 2 for BrandGauge templates, row 1 for generic)
   const firstRow = ws.getRow(1)
   const secondRow = ws.getRow(2)
   const headerRowIndex = String(secondRow.getCell(1).value ?? '').length > 0 &&
-    String(firstRow.getCell(1).value ?? '').toLowerCase().includes('brandpulse')
+    String(firstRow.getCell(1).value ?? '').toLowerCase().includes('brandgauge')
     ? 2
     : 1
 

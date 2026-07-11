@@ -62,7 +62,7 @@ export const b2bReviewSync = inngest.createFunction(
     name: 'B2B Review Platform Sync (G2/Capterra)',
     triggers: [
       { cron: 'TZ=Africa/Lagos 0 10 * * 1' }, // weekly Monday 10am Lagos
-      { event: 'brandpulse/b2b.reviews.sync' },
+      { event: 'brandgauge/b2b.reviews.sync' },
     ],
     retries: 2,
   },

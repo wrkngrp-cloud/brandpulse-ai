@@ -1,5 +1,5 @@
 -- WhatsApp Deep Integration (Phase 4 — Model A)
--- BrandPulse-owned WABA via Meta Cloud API v20.0
+-- BrandGauge-owned WABA via Meta Cloud API v20.0
 
 create table whatsapp_contacts (
   id             uuid        primary key default gen_random_uuid(),

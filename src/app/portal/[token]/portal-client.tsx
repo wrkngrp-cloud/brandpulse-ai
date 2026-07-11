@@ -799,7 +799,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
         <footer className="border-t pt-6 pb-4">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <p className="text-[11px] text-muted-foreground">
-              Prepared by <strong>{brand.name}</strong> marketing team using BrandPulse AI.
+              Prepared by <strong>{brand.name}</strong> marketing team using BrandGauge.
               This report is confidential and intended solely for the named recipient.
             </p>
             <p className="text-[11px] text-muted-foreground">
@@ -807,7 +807,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             </p>
           </div>
           <p className="text-[10px] text-muted-foreground/50 mt-2">
-            Powered by BrandPulse AI · Data sourced from connected social, campaign, and survey platforms.
+            Powered by BrandGauge · Data sourced from connected social, campaign, and survey platforms.
             Figures represent the selected period and may not reflect full historical performance.
           </p>
         </footer>

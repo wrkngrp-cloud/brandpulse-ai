@@ -1,18 +1,18 @@
-# BrandPulse AI — A Complete Guide
+# BrandGauge — A Complete Guide
 
 ## Opening
 
-BrandPulse AI is a brand intelligence platform built for Nigerian and West African marketing teams. It collects data from every place a brand shows up — social media, billboards, app stores, ad campaigns, field reports, surveys, and AI assistants — turns that data into a single score, and then helps teams understand what is driving that score up or down.
+BrandGauge is a brand intelligence platform built for Nigerian and West African marketing teams. It collects data from every place a brand shows up — social media, billboards, app stores, ad campaigns, field reports, surveys, and AI assistants — turns that data into a single score, and then helps teams understand what is driving that score up or down.
 
-The people it serves are brand managers, CMOs, and marketing leads at consumer companies in Nigeria. They spend money across channels that are difficult to connect: a radio ad in Abuja, a billboard in Lekki, a Meta campaign running across the country, a product activation at a supermarket in Ibadan. Before BrandPulse, measuring the effect of any of this required commissioning separate trackers, paying research agencies, waiting weeks for data, and then manually assembling the story. Most teams did not bother.
+The people it serves are brand managers, CMOs, and marketing leads at consumer companies in Nigeria. They spend money across channels that are difficult to connect: a radio ad in Abuja, a billboard in Lekki, a Meta campaign running across the country, a product activation at a supermarket in Ibadan. Before BrandGauge, measuring the effect of any of this required commissioning separate trackers, paying research agencies, waiting weeks for data, and then manually assembling the story. Most teams did not bother.
 
-Africa presents two specific problems that global tools ignore. First, the cultural context matters enormously. Brands that land in Lagos do not automatically land in Kano. Sentiment that reads as sarcastic in English may be affectionate in Pidgin. A campaign that resonates during Ramadan needs a different read during the Christmas season. Second, a large share of brand activity happens offline. More than half the marketing budget at a typical Nigerian FMCG company goes to out-of-home advertising and field activations — channels that Google Analytics cannot track. BrandPulse was built to handle both.
+Africa presents two specific problems that global tools ignore. First, the cultural context matters enormously. Brands that land in Lagos do not automatically land in Kano. Sentiment that reads as sarcastic in English may be affectionate in Pidgin. A campaign that resonates during Ramadan needs a different read during the Christmas season. Second, a large share of brand activity happens offline. More than half the marketing budget at a typical Nigerian FMCG company goes to out-of-home advertising and field activations — channels that Google Analytics cannot track. BrandGauge was built to handle both.
 
 ---
 
 ## The Core Idea: Brand Health Index (BHI)
 
-Every screen in BrandPulse feeds a single number called the Brand Health Index, or BHI. The score runs from 0 to 100 and sits in one of four zones: At Risk (below 40), Building (40 to 65), Healthy (65 to 80), and Leading (above 80). The zones are not cosmetic. They are calibrated against real Nigerian market data — sector benchmarks derived from 2024–2025 industry reports. A score of 52 is average for FMCG. A score of 47 is average for fintech. Knowing where you sit in your own category is what makes the number useful.
+Every screen in BrandGauge feeds a single number called the Brand Health Index, or BHI. The score runs from 0 to 100 and sits in one of four zones: At Risk (below 40), Building (40 to 65), Healthy (65 to 80), and Leading (above 80). The zones are not cosmetic. They are calibrated against real Nigerian market data — sector benchmarks derived from 2024–2025 industry reports. A score of 52 is average for FMCG. A score of 47 is average for fintech. Knowing where you sit in your own category is what makes the number useful.
 
 The full BHI has seven components. Each one captures a different dimension of brand strength.
 
@@ -24,13 +24,13 @@ The full BHI has seven components. Each one captures a different dimension of br
 
 **Perception (15%)** comes from structured surveys. The platform's Perception Audit survey asks respondents to rate the brand on eight dimensions: Quality, Trust, Innovation, Value, Cultural Relevance, Accessibility, Reliability, and Emotional Connection. The average rating across those dimensions, normalised to a 0–100 scale, feeds this component.
 
-**Cultural Resonance (15%)** is the score that sets BrandPulse apart. It measures how well the brand's content and campaigns land culturally — does it feel Nigerian, or does it feel imported? The score feeds from Pre-Post Analysis results (see the Creative section below) and is calibrated to capture whether content connects with the values, humour, and references that resonate in West Africa.
+**Cultural Resonance (15%)** is the score that sets BrandGauge apart. It measures how well the brand's content and campaigns land culturally — does it feel Nigerian, or does it feel imported? The score feeds from Pre-Post Analysis results (see the Creative section below) and is calibrated to capture whether content connects with the values, humour, and references that resonate in West Africa.
 
 **Blended SOV (10%)** is social share of voice: the percentage of total category conversation on social media that belongs to the brand, compared to tracked competitors.
 
 **Earned Media Value (5%)** estimates the monetary value of organic social engagement. It applies a Nigerian market CPM rate of ₦500 per 1,000 impressions and a CPE rate of ₦50 per engagement, then normalises the result to a 0–100 scale against a ₦10M benchmark.
 
-The weights are not fixed. BrandPulse ships with seven preset weight profiles, one per industry vertical. For a fintech company, trust matters more than cultural resonance — so Sentiment jumps to 25% and Cultural Resonance drops to 5%. For a restaurant or venue, Perception (what people say in reviews) gets 25% because reviews drive footfall. For a B2B SaaS company, G2-style perception and LinkedIn share of voice matter most, so Cultural Resonance drops to zero entirely. Each preset is a deliberate model of what actually drives brand strength in that category, not a generic one-size-fits-all formula.
+The weights are not fixed. BrandGauge ships with seven preset weight profiles, one per industry vertical. For a fintech company, trust matters more than cultural resonance — so Sentiment jumps to 25% and Cultural Resonance drops to 5%. For a restaurant or venue, Perception (what people say in reviews) gets 25% because reviews drive footfall. For a B2B SaaS company, G2-style perception and LinkedIn share of voice matter most, so Cultural Resonance drops to zero entirely. Each preset is a deliberate model of what actually drives brand strength in that category, not a generic one-size-fits-all formula.
 
 ---
 
@@ -50,7 +50,7 @@ The Sentiment module shows what people are saying about the brand on X and Insta
 
 The dashboard shows the current sentiment score, percentage positive, percentage negative, and raw mention count. Below the KPI tiles, a weekly trend chart plots score, positive share, and negative share over time. A calendar heatmap stretches back up to 13 months, showing sentiment by day across a GitHub-contribution-style grid. There is a platform breakdown panel showing X and Instagram separately, and an emotion wheel showing the distribution of classified emotions (joy, trust, anger, fear, and so on) across the selected window.
 
-BrandPulse also shows who is talking — whether mentions come from consumers, creators, developers, trade partners, or media. This audience segmentation is a useful early signal for whether a brand's messaging is reaching its intended audience.
+BrandGauge also shows who is talking — whether mentions come from consumers, creators, developers, trade partners, or media. This audience segmentation is a useful early signal for whether a brand's messaging is reaching its intended audience.
 
 Alerts surface automatically. A sentiment crash of 20 points in a single day triggers a critical alert. A sustained stretch of more than 60% negative mentions for three days triggers a warning. Every alert has a "Find out why" button that pre-fills the AI command layer with an investigation question.
 
@@ -82,7 +82,7 @@ The Pre-Post widget is a keyboard-shortcut-accessible overlay (Cmd+Shift+P) that
 
 OOH Intelligence tracks every outdoor advertising site the brand is running. Each site has a location (state, LGA, GPS coordinates), format type (billboard, bus shelter, LED screen, etc.), daily traffic estimate, monthly cost, campaign dates, and a photo.
 
-Attribution is handled with branded vanity links. When a site is created, the platform generates a short URL (e.g., `go.brandpulse.ai/lekki-jul`) that maps to the landing page. The brand prints this on the billboard. Every scan or typed visit is counted and attributed to that specific site. QR codes are available as a secondary option.
+Attribution is handled with branded vanity links. When a site is created, the platform generates a short URL (e.g., `go.brandgauge.app/lekki-jul`) that maps to the landing page. The brand prints this on the billboard. Every scan or typed visit is counted and attributed to that specific site. QR codes are available as a secondary option.
 
 The Geo-Lift Study tool takes this further. It compares search volume for brand-related terms in the city where the billboard is running (treatment) against a matched city that saw no OOH activity (control). The comparison produces a lift percentage and confidence score, answering the question: did the billboard actually move anything?
 
@@ -100,7 +100,7 @@ Each stage shows a composite score and the data sources that fed it. The AI Funn
 
 ### Surveys and Panels
 
-BrandPulse has a built-in survey engine. Teams can create surveys from scratch or use templates: Perception Audit (the 8-dimension brand questionnaire), Awareness Check, NPS, B2B Intercept, and Product Launch tracker. Surveys are distributed by email, in-app, WhatsApp, or shareable link.
+BrandGauge has a built-in survey engine. Teams can create surveys from scratch or use templates: Perception Audit (the 8-dimension brand questionnaire), Awareness Check, NPS, B2B Intercept, and Product Launch tracker. Surveys are distributed by email, in-app, WhatsApp, or shareable link.
 
 Survey Panels automate the distribution. A panel is a recurring schedule (monthly or quarterly) that sends a survey template to a configured list of recipients and creates a new survey instance automatically. The AI NPS Diagnosis reads the open-text responses from NPS surveys and identifies the top themes driving promoters vs. detractors.
 
@@ -124,13 +124,13 @@ The Advocacy module tracks the brand's promoter programme. Customers who score 9
 
 The Connectors hub is where all data sources are wired up. Social listening uses OAuth-connected X and Instagram accounts. Web analytics connects through GA4 OAuth, pulling sessions, users, page views, bounce rate, and conversion events daily. Digital advertising connects through Meta Ads OAuth, syncing campaign spend, impressions, reach, clicks, CTR, CPC, CPM, ROAS, and video view rates daily.
 
-Payment webhooks from Paystack and Flutterwave feed the purchase stage of the funnel. App Store and Play Store apps are linked by entering an Apple App ID or Google package name — the platform then polls both stores for ratings, review counts, and recent review text. Email marketing platforms (Mailchimp and Brevo) connect via API key to sync subscriber and engagement data. The SDK pixel is a lightweight JavaScript snippet that brands embed on their websites or apps to fire custom brand interaction events directly into BrandPulse.
+Payment webhooks from Paystack and Flutterwave feed the purchase stage of the funnel. App Store and Play Store apps are linked by entering an Apple App ID or Google package name — the platform then polls both stores for ratings, review counts, and recent review text. Email marketing platforms (Mailchimp and Brevo) connect via API key to sync subscriber and engagement data. The SDK pixel is a lightweight JavaScript snippet that brands embed on their websites or apps to fire custom brand interaction events directly into BrandGauge.
 
 ---
 
 ## Background Intelligence
 
-BrandPulse runs a fleet of scheduled background jobs through Inngest, a durable workflow platform that retries failed jobs and provides a full execution log.
+BrandGauge runs a fleet of scheduled background jobs through Inngest, a durable workflow platform that retries failed jobs and provides a full execution log.
 
 Every night at 4am Lagos time, the mention crawler pulls the last 24 hours of X mentions for every connected brand, runs them through sentiment classification, and updates the daily sentiment aggregate and SOV snapshot. At 5am, Meta Ads data syncs. At 6am, GA4 data syncs. At 8am, the volume surge check fires — it looks at whether yesterday's mention count was more than two standard deviations above the rolling average, and if so, creates a notification alert. At 9am, Google Maps pulls updated ratings for all venue brands.
 
@@ -142,7 +142,7 @@ Other jobs run on demand: the App Store review sync, the event ROI report (trigg
 
 ## The AI Layer
 
-AI runs through every part of the product, but it does not all run the same model. BrandPulse uses four routing tiers.
+AI runs through every part of the product, but it does not all run the same model. BrandGauge uses four routing tiers.
 
 Cultural and sentiment classification — the work that requires understanding Nigerian language patterns, Pidgin expressions, and local cultural context — routes to Claude Haiku. It is the fastest and most cost-efficient model, and for high-volume classification of thousands of daily mentions, that matters.
 
@@ -152,13 +152,13 @@ Board-grade business cases route to Claude Opus, the most capable model in the f
 
 The fourth tier is the chat interface, which also uses Sonnet. Conversations are stored and can be resumed across sessions. The system never displays which model answered a question.
 
-The model names never appear in the UI. From the user's perspective, they are talking to BrandPulse AI.
+The model names never appear in the UI. From the user's perspective, they are talking to BrandGauge.
 
 ---
 
 ## Who It Is Built For
 
-BrandPulse ships with seven industry vertical presets, each reflecting a different model of what brand health means in that category.
+BrandGauge ships with seven industry vertical presets, each reflecting a different model of what brand health means in that category.
 
 **FMCG** (consumer packaged goods) is the default. Awareness and sentiment carry equal weight at 20% each because FMCG brands compete on reach and emotional connection. Cultural resonance is a full 15% because local relevance drives shelf sales.
 
@@ -178,20 +178,20 @@ BrandPulse ships with seven industry vertical presets, each reflecting a differe
 
 ## The Technical Foundation
 
-BrandPulse runs on Next.js 16 with the App Router, TypeScript throughout, and Supabase as the database and authentication layer. Postgres Row-Level Security enforces multi-tenancy — every query is automatically scoped to the user's workspace, so it is structurally impossible for one customer to see another's data. Background jobs run on Inngest, which provides durable execution, retries, and a visual job history. AI calls go through a shared client in `lib/ai/client.ts` that handles the four-tier routing. The UI is built on shadcn/ui with Tailwind, and charts use Recharts. All API keys and credentials are stored server-side only, encrypted at rest, and never passed to the browser.
+BrandGauge runs on Next.js 16 with the App Router, TypeScript throughout, and Supabase as the database and authentication layer. Postgres Row-Level Security enforces multi-tenancy — every query is automatically scoped to the user's workspace, so it is structurally impossible for one customer to see another's data. Background jobs run on Inngest, which provides durable execution, retries, and a visual job history. AI calls go through a shared client in `lib/ai/client.ts` that handles the four-tier routing. The UI is built on shadcn/ui with Tailwind, and charts use Recharts. All API keys and credentials are stored server-side only, encrypted at rest, and never passed to the browser.
 
 ---
 
 ## What Makes It Different
 
-Five things make BrandPulse genuinely different from generic analytics tools.
+Five things make BrandGauge genuinely different from generic analytics tools.
 
 **It was designed for Nigeria, not adapted for it.** The market benchmarks, the cultural profile system, the Pidgin-aware sentiment model, the NGN-denominated EMV formula, the Lagos-time cron schedules — these are not cosmetic localisations. They reflect how the market actually works.
 
-**It connects offline and online in one score.** A billboard in Surulere and a Meta campaign running nationally both feed the same Brand Health Index. Most tools cannot do this. BrandPulse treats OOH, events, and field reports as first-class data sources.
+**It connects offline and online in one score.** A billboard in Surulere and a Meta campaign running nationally both feed the same Brand Health Index. Most tools cannot do this. BrandGauge treats OOH, events, and field reports as first-class data sources.
 
 **The AI reads your data, not the internet.** When a marketer asks "why did our sentiment drop this week?", the answer comes from the brand's actual mentions, actual SOV snapshot, and actual campaign history — not a generic response about brand crises. The system builds a live data snapshot for every question.
 
-**Brand health is a number, not a report.** Marketing teams in Nigeria have historically received brand health data six weeks after the period it covers, in a 40-page PDF they cannot act on. BrandPulse produces a score that updates every morning. A team can see on a Tuesday that something happened on Monday.
+**Brand health is a number, not a report.** Marketing teams in Nigeria have historically received brand health data six weeks after the period it covers, in a 40-page PDF they cannot act on. BrandGauge produces a score that updates every morning. A team can see on a Tuesday that something happened on Monday.
 
-**It tracks how AI assistants see the brand.** As consumers start asking ChatGPT, Gemini, and Perplexity for product recommendations, what those models say about a brand becomes a new kind of share of voice. BrandPulse is one of the first platforms to measure this directly, generating category-relevant questions weekly and recording whether the brand is mentioned, where, and in what tone.
+**It tracks how AI assistants see the brand.** As consumers start asking ChatGPT, Gemini, and Perplexity for product recommendations, what those models say about a brand becomes a new kind of share of voice. BrandGauge is one of the first platforms to measure this directly, generating category-relevant questions weekly and recording whether the brand is mentioned, where, and in what tone.

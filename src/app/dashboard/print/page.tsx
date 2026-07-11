@@ -175,7 +175,7 @@ export default async function PrintPage({
             <MediaPlanUploadDialog type="print" templateUrl="/api/templates/print" />
           </div>
           <p className="text-xs text-muted-foreground max-w-xs">
-            Add an Attribution URL per placement and BrandPulse generates a QR-trackable
+            Add an Attribution URL per placement and BrandGauge generates a QR-trackable
             vanity link automatically — no extra setup needed.
           </p>
         </Card>

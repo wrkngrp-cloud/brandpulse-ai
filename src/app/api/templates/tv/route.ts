@@ -25,7 +25,7 @@ const DURATIONS = ['10', '15', '30', '45', '60']
 
 export async function GET() {
   const wb = new ExcelJS.Workbook()
-  wb.creator = 'BrandPulse AI'
+  wb.creator = 'BrandGauge'
   wb.created = new Date()
 
   // ── Hidden lists sheet ──────────────────────────────────────────────────
@@ -41,7 +41,7 @@ export async function GET() {
   // Title row
   ws.mergeCells('A1:O1')
   const titleCell = ws.getCell('A1')
-  titleCell.value = 'BrandPulse TV Buy Template'
+  titleCell.value = 'BrandGauge TV Buy Template'
   titleCell.font = { bold: true, size: 14, color: { argb: 'FF1E3A5F' } }
   titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEBF3FF' } }
   titleCell.alignment = { horizontal: 'center', vertical: 'middle' }
@@ -143,14 +143,14 @@ export async function GET() {
   const inst = wb.addWorksheet('Instructions')
 
   const instData = [
-    ['BrandPulse TV Buy Template — Instructions', ''],
+    ['BrandGauge TV Buy Template — Instructions', ''],
     ['', ''],
     ['HOW TO USE THIS TEMPLATE', ''],
     ['', ''],
     ['1.', 'Fill in one row per TV spot booking. Each row represents a single spot or block of identical spots on the same channel/date.'],
     ['2.', 'Use dropdowns in columns A (Channel), C (Daypart), F (Duration), and N (Status).'],
     ['3.', 'Net Cost (column M) auto-calculates: Rate Card × (1 - Discount%) × Spots Planned.'],
-    ['4.', 'Upload to BrandPulse via the TV Intelligence page → Upload Media Plan.'],
+    ['4.', 'Upload to BrandGauge via the TV Intelligence page → Upload Media Plan.'],
     ['', ''],
     ['COLUMN GUIDE', ''],
     ['', ''],
@@ -189,7 +189,7 @@ export async function GET() {
   return new NextResponse(buffer, {
     headers: {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'Content-Disposition': 'attachment; filename="brandpulse-tv-buy-template.xlsx"',
+      'Content-Disposition': 'attachment; filename="brandgauge-tv-buy-template.xlsx"',
     },
   })
 }

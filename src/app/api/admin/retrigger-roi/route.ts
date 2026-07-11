@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
   // Fire Inngest for each stuck event
   await Promise.all(
     toRetrigger.map(e =>
-      inngest.send({ name: 'brandpulse/event.closed', data: { eventId: e.id } })
+      inngest.send({ name: 'brandgauge/event.closed', data: { eventId: e.id } })
     )
   )
 

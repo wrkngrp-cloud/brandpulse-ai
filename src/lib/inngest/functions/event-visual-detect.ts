@@ -9,8 +9,8 @@ export const eventVisualDetect = inngest.createFunction(
     id: 'event-visual-detect',
     name: 'Event Visual Brand Detection (E6)',
     triggers: [
-      { event: 'brandpulse/event.live' },
-      { event: 'brandpulse/event.visual-scan' },
+      { event: 'brandgauge/event.live' },
+      { event: 'brandgauge/event.visual-scan' },
     ],
   },
   async ({ event, step }) => {

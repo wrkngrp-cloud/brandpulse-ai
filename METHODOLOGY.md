@@ -1,6 +1,6 @@
-# BrandPulse AI — Detailed Methodology
+# BrandGauge — Detailed Methodology
 
-> Internal reference document. Every score, metric, index, and AI output in BrandPulse is defined here with exact formulas, data sources, calibration rationale, and known limitations. Use this document to review, challenge, and refine our measurement approach.
+> Internal reference document. Every score, metric, index, and AI output in BrandGauge is defined here with exact formulas, data sources, calibration rationale, and known limitations. Use this document to review, challenge, and refine our measurement approach.
 
 ---
 
@@ -216,7 +216,7 @@ Minimum 3 responses required to display.
 These are directional, not guaranteed. NPS is more meaningful as a trend direction indicator than as an absolute cross-category comparison.
 
 ### 12-week trend
-BrandPulse displays a 12-week rolling NPS trend. The trend direction is computed by comparing the most recent 4 weeks against the prior 4 weeks. "Rising," "Falling," and "Stable" are assigned based on whether the difference exceeds ±5 NPS points.
+BrandGauge displays a 12-week rolling NPS trend. The trend direction is computed by comparing the most recent 4 weeks against the prior 4 weeks. "Rising," "Falling," and "Stable" are assigned based on whether the difference exceeds ±5 NPS points.
 
 ---
 
@@ -255,7 +255,7 @@ When a visual is uploaded alongside text:
 **Why first frame?** The first 2–3 seconds determine whether a viewer stops scrolling. The hook quality is the strongest predictor of video completion rate on Instagram Reels and TikTok in the Nigerian market.
 
 ### Post-campaign comparison
-BrandPulse computes the delta between the pre-publication score baseline and the post-period sentiment average. This is stored for trend analysis and feeds the Cultural Resonance Score.
+BrandGauge computes the delta between the pre-publication score baseline and the post-period sentiment average. This is stored for trend analysis and feeds the Cultural Resonance Score.
 
 ---
 
@@ -290,7 +290,7 @@ These three emotions are the strongest purchase-intent predictors in Nigerian co
 - Christmas / Boxing Day season
 - Detty December (the uniquely Nigerian entertainment season running Dec 15–Jan 5)
 
-Brands producing culturally relevant content around these moments consistently outperform category averages on engagement and brand recall in BrandPulse pre-post analysis data.
+Brands producing culturally relevant content around these moments consistently outperform category averages on engagement and brand recall in BrandGauge pre-post analysis data.
 
 ---
 
@@ -415,7 +415,7 @@ Returns: strengths (what is consistent), drift warnings (where content deviates 
 | CTA Visibility | How clear, prominent, and actionable the call to action is |
 | Sound-Off Score | How well the video communicates with sound muted — through text overlays, captions, and visual storytelling |
 
-**Sound-off calibration:** Research from Meta Nigeria and TikTok Africa indicates that 40–60% of video on Nigerian social platforms is watched without sound, driven by data cost awareness, public viewing environments, and mobile battery management. Sound-off score is therefore weighted as a significant performance indicator in the BrandPulse scoring model.
+**Sound-off calibration:** Research from Meta Nigeria and TikTok Africa indicates that 40–60% of video on Nigerian social platforms is watched without sound, driven by data cost awareness, public viewing environments, and mobile battery management. Sound-off score is therefore weighted as a significant performance indicator in the BrandGauge scoring model.
 
 **Overall score:** Average of the four dimensions.
 
@@ -424,7 +424,7 @@ Returns: strengths (what is consistent), drift warnings (where content deviates 
 ## 11. OOH Intelligence
 
 ### Primary attribution: vanity links
-Each OOH placement is assigned a unique vanity URL (`APP_URL/go/{vanity_slug}`). When a consumer visits the URL, BrandPulse:
+Each OOH placement is assigned a unique vanity URL (`APP_URL/go/{vanity_slug}`). When a consumer visits the URL, BrandGauge:
 1. Logs the visit with timestamp, referrer, and device type to `ooh_visits`
 2. Attributes the visit to the specific `ooh_site` record
 3. Increments the `visits` counter on the site
@@ -458,7 +458,7 @@ Where `signal` is typically sentiment score or vanity link visits. A positive co
 - Spots Planned vs Spots Aired (delivery rate = aired / planned)
 - Cost per Spot (net cost / aired spots)
 - Total Spend per station and daypart
-- Estimated reach per spot (sourced from BrandPulse station database)
+- Estimated reach per spot (sourced from BrandGauge station database)
 
 ### Nigerian daypart standards
 | Daypart | Hours (Lagos time) |
@@ -520,7 +520,7 @@ Channel coverage: NTA, AIT, Channels TV, TVC, Arise TV, Africa Magic (DSTV), Sup
 Readership = Circulation × Pass-Along Multiplier × Insertions
 ```
 
-Pass-along multipliers by publication type (BrandPulse database, sourced from APCON-registered readership studies):
+Pass-along multipliers by publication type (BrandGauge database, sourced from APCON-registered readership studies):
 | Publication type | Typical multiplier |
 |---|---|
 | Mass daily (Punch, Vanguard, Sun) | 3.5–4.5× |
@@ -628,13 +628,13 @@ Isolate the causal effect of a media investment (typically OOH or events) in one
 4. AI interprets: if treatment and control are highly correlated, the treatment city's results may be explained by broader market forces, not the campaign. If correlation is low or negative, the campaign likely drove incremental results.
 
 ### Known limitation
-GeoLift requires consistent data collection in both cities. If social data is skewed toward one city (common in Nigeria where Lagos dominates social volume), the study will be less reliable for other cities. BrandPulse flags this limitation when Lagos is the control.
+GeoLift requires consistent data collection in both cities. If social data is skewed toward one city (common in Nigeria where Lagos dominates social volume), the study will be less reliable for other cities. BrandGauge flags this limitation when Lagos is the control.
 
 ---
 
 ## 18. AI Model Routing
 
-BrandPulse routes AI tasks to three tiers to balance quality and cost:
+BrandGauge routes AI tasks to three tiers to balance quality and cost:
 
 | Tier | Model | Used for |
 |---|---|---|
@@ -677,7 +677,7 @@ No model names are displayed in the product interface.
 
 ### Planned (ideated, not yet built)
 - **Audio Transcription Module**: Radio spot and podcast ad performance tracking via Whisper transcription + Haiku analysis. Waiting on API access.
-- **SDK + JS Pixel**: BrandPulse website pixel for Action and Loyalty stage direct data capture. Feeds funnel bottom.
+- **SDK + JS Pixel**: BrandGauge website pixel for Action and Loyalty stage direct data capture. Feeds funnel bottom.
 - **WhatsApp Broadcasting**: Campaign-level WhatsApp message sends for survey distribution and event reminders.
 - **Competitive SOV auto-discovery**: Automated competitor handle detection from social conversation (currently manual).
 - **Brand Tracking Panel**: Monthly recurring survey panel for tracking aided/unaided awareness, brand preference, and purchase intent over time (as distinct from one-off surveys).

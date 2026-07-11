@@ -13,7 +13,7 @@ export async function POST() {
   const brand = { id: brandId }
 
   await inngest.send({
-    name: 'brandpulse/youtube.monitor.requested',
+    name: 'brandgauge/youtube.monitor.requested',
     data: { brand_id: brand.id },
   })
 

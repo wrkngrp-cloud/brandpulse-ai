@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
-const APP_URL = process.env.APP_URL ?? 'https://brandpulse.ai'
+const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
 const Body = z.object({
   phones: z.array(z.string().min(6)).min(1).max(500),

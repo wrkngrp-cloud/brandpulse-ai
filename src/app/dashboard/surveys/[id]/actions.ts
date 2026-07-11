@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-const APP_URL = process.env.APP_URL ?? 'https://brandpulse.ai'
+const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
 export async function sendSurveyEmails(
   surveyId: string,
@@ -51,7 +51,7 @@ export async function sendSurveyEmails(
       </p>
       <p style="font-size: 13px; color: #aaa; margin-top: 32px; border-top: 1px solid #eee; padding-top: 16px;">
         You received this because ${brandName} invited your feedback.
-        This survey is powered by BrandPulse AI.
+        This survey is powered by BrandGauge.
       </p>
     </div>
   `
@@ -65,7 +65,7 @@ export async function sendSurveyEmails(
   let sent = 0
   for (const batch of batches) {
     const { error } = await resend.emails.send({
-      from: `${brandName} <surveys@brandpulse.ai>`,
+      from: `${brandName} <surveys@brandgauge.app>`,
       to:   batch,
       subject,
       html,

@@ -8,9 +8,10 @@ import { createClient }              from '@supabase/supabase-js'
               → Apr 2026 Series A announcement peak → settled growth
 ───────────────────────────────────────────────────────────────────────────── */
 
-const DEMO_EMAIL    = 'demo@pocketpay.brandpulse.ai'
+const DEMO_EMAIL    = 'demo@pocketpay.brandgauge.app'
 const DEMO_PASSWORD = 'Demo@PocketPay2026!'
-const SEED_SECRET   = 'seed-pocketpay-demo-2026'
+// Gated by the shared ADMIN_SECRET env var (fail closed if unset).
+const SEED_SECRET   = process.env.ADMIN_SECRET
 const BASE          = new Date()
 
 function dAgo(n: number): string {
@@ -39,7 +40,7 @@ function sentScore(d: number): number {
 }
 
 export async function POST(req: NextRequest) {
-  if (req.headers.get('x-seed-secret') !== SEED_SECRET)
+  if (!SEED_SECRET || req.headers.get('x-seed-secret') !== SEED_SECRET)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const sb = createClient(
@@ -135,7 +136,7 @@ export async function POST(req: NextRequest) {
     description: 'PR and digital push around $8M Series A close. TechCabal + influencer amplification.',
     objective: 'awareness', status: 'completed',
     start_date: dAgo(55), end_date: dAgo(35), total_budget: 35_000_000, currency: 'NGN',
-    ai_summary: 'Series A announcement generated 9.2M impressions. BrandPulse tracked 340 earned media mentions in 72 hours. Organic social overtook paid 2:1.',
+    ai_summary: 'Series A announcement generated 9.2M impressions. BrandGauge tracked 340 earned media mentions in 72 hours. Organic social overtook paid 2:1.',
   }).select('id').single()
 
   await sb.from('campaigns').insert({
