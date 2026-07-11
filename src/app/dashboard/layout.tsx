@@ -11,10 +11,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  let { data: brands, error: brandsError } = await supabase
+  const { data: initialBrands, error: brandsError } = await supabase
     .from('brands')
     .select('id, name, category, industry, logo_url')
     .order('created_at', { ascending: true })
+  let brands = initialBrands
 
   if (brandsError) {
     // 'industry' can go missing from PostgREST's schema cache after a
