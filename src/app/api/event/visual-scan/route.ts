@@ -20,16 +20,19 @@ export async function POST(req: NextRequest) {
   if (!body.success) return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
 
   const { eventId } = body.data
-  const service = await createServiceClient()
 
-  // Fetch event + brand — include creative_url for vision reference
-  const { data: ev } = await service
+  // Fetch the event through the RLS client so the events_all policy scopes it to
+  // the caller's workspace — reading it via the service client would let any
+  // authenticated user scan another tenant's event and spend their Instagram token.
+  const { data: ev } = await supabase
     .from('events')
     .select('id, brand_id, name, hashtags, creative_url')
     .eq('id', eventId)
     .single()
 
   if (!ev) return NextResponse.json({ error: 'Event not found' }, { status: 404 })
+
+  const service = await createServiceClient()
   if (!ev.hashtags?.length)
     return NextResponse.json({ error: 'No hashtags configured for this event. Add hashtags in event settings.' }, { status: 422 })
 

@@ -19,7 +19,9 @@ export async function POST(req: NextRequest) {
   const service = await createServiceClient()
 
   const [{ data: survey }, { data: responses }, brandCtx] = await Promise.all([
-    service.from('surveys').select('name, questions').eq('id', surveyId).single(),
+    // Scope the survey to the active brand — without this, any authenticated user
+    // could read another tenant's survey questions and responses by guessing an id.
+    service.from('surveys').select('name, questions').eq('id', surveyId).eq('brand_id', brand.id).single(),
     service.from('survey_responses')
       .select('answers, quality_flag, collected_at')
       .eq('survey_id', surveyId)

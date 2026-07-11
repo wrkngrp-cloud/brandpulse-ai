@@ -35,11 +35,21 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Cannot delete the last brand in a workspace.' }, { status: 400 })
   }
 
-  const service = await createServiceClient()
-  const { error } = await service.from('brands').delete().eq('id', id)
+  // Delete through the RLS client so the brands_all policy (is_workspace_member)
+  // scopes this to the caller's own workspace — a service-role delete here would
+  // let any authenticated user delete another tenant's brand by id.
+  const { data: deleted, error } = await supabase
+    .from('brands')
+    .delete()
+    .eq('id', id)
+    .select('id')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (!deleted || deleted.length === 0) {
+    return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
+  }
 
   // Clear active_brand_id if it was pointing to this brand
+  const service = await createServiceClient()
   await service.from('workspaces').update({ active_brand_id: null })
     .eq('active_brand_id', id)
 
