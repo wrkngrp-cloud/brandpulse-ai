@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Pause, Play, RotateCcw } from 'lucide-react'
 import {
   AiScene, CompetitiveScene, FunnelScene, GaugeScene, OohScene,
-  OutroScene, SentimentScene, WhatsAppScene, easeOut, win,
+  OutroScene, SentimentScene, WhatsAppScene, darkSceneVars, easeOut, win,
 } from './scenes'
 
 type SceneComp = (props: { t: number }) => React.ReactNode
@@ -108,8 +108,8 @@ export function DemoPlayer() {
 
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-white/[0.09] bg-[#0B1022] shadow-[0_48px_140px_-40px_rgba(224,106,50,0.25)]">
-      {/* stage */}
-      <div className="relative aspect-video w-full">
+      {/* stage — always cinematic dark, regardless of page theme */}
+      <div className="relative aspect-video w-full" style={darkSceneVars}>
         <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_50%_0%,rgba(43,89,255,0.10),transparent_70%)]" />
         <div key={index} className="absolute inset-x-4 inset-y-4 sm:inset-x-10 sm:inset-y-8">
           {chapter.Comp ? <chapter.Comp t={local} /> : <TitleCard t={local} title={chapter.title ?? ''} sub={chapter.sub} />}
