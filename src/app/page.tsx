@@ -1,11 +1,18 @@
 import { redirect }    from 'next/navigation'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { LandingPage }  from '@/components/landing/landing-page'
+
+export const metadata: Metadata = {
+  title: 'BrandGauge — Brand intelligence for West African marketers',
+  description: 'Read sentiment in Pidgin, Yoruba, Igbo and Hausa, measure every channel from Instagram to billboards, and turn it into numbers your board will trust.',
+}
 
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) redirect('/auth/login')
+  if (!user) return <LandingPage />
 
   // Check for at least one named brand (empty-name brand = incomplete onboarding)
   const { data: brands } = await supabase
