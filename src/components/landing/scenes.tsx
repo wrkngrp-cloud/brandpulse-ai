@@ -24,6 +24,7 @@ export const CLAY = '#D4602A'
 export const BLUE = '#2B59FF'
 
 export const lightSceneVars: CSSProperties = {
+  '--s-map':    "url('/landing/ooh-map-light.png')",
   '--s-panel':  '#FFFFFF',
   '--s-line':   'rgba(20,24,43,0.10)',
   '--s-strong': '#14182B',
@@ -35,6 +36,7 @@ export const lightSceneVars: CSSProperties = {
 } as CSSProperties
 
 export const darkSceneVars: CSSProperties = {
+  '--s-map':    "url('/landing/ooh-map-dark.png')",
   '--s-panel':  'rgba(17,24,48,0.92)',
   '--s-line':   'rgba(255,255,255,0.09)',
   '--s-strong': '#F4EDE4',
@@ -111,7 +113,7 @@ export function GaugeScene({ t }: { t: number }) {
     { label: 'Survey',    value: 71 },
   ]
   return (
-    <Panel className="flex h-full w-full items-center justify-center gap-10 p-6">
+    <Panel className="flex h-full w-full flex-col items-center justify-center gap-4 p-4 @xl:flex-row @xl:gap-10 @xl:p-6">
       <div className="flex flex-col items-center gap-3">
         <Label>Brand Health Index</Label>
         <svg width="220" height="138" viewBox="0 0 200 138" className="overflow-visible">
@@ -143,7 +145,7 @@ export function GaugeScene({ t }: { t: number }) {
           <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" /> Healthy
         </span>
       </div>
-      <div className="flex w-[240px] flex-col gap-3">
+      <div className="flex w-full max-w-[280px] flex-col gap-3 @xl:w-[240px]">
         <div className="grid grid-cols-3 gap-2 text-center">
           {pills.map((c, i) => {
             const p = easeOut(win(t, 0.35 + i * 0.08, 0.5 + i * 0.08))
@@ -169,7 +171,7 @@ export function GaugeScene({ t }: { t: number }) {
               strokeDasharray={300} strokeDashoffset={300 * (1 - sparkDraw)} />
           </svg>
         </div>
-        <p className="text-[11px] leading-relaxed text-[var(--s-mut)]" style={{ opacity: win(t, 0.7, 0.85) }}>
+        <p className="hidden text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.7, 0.85) }}>
           Weighted for your industry. Fintech counts trust signals; FMCG counts shelf and share of voice.
         </p>
       </div>
@@ -189,8 +191,8 @@ export function SentimentScene({ t }: { t: number }) {
   const pts = [42, 38, 44, 40, 52, 49, 58, 61, 57, 66, 70, 68]
   const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${i * (280 / 11)} ${80 - (p / 100) * 72}`).join(' ')
   return (
-    <Panel className="flex h-full w-full gap-6 p-6">
-      <div className="flex w-[52%] flex-col gap-2.5">
+    <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:flex-row @xl:gap-6 @xl:p-6">
+      <div className="flex w-full flex-col gap-2.5 @xl:w-[52%]">
         <div className="flex items-center justify-between">
           <Label>Live mentions</Label>
           <div className="flex gap-1.5"><Tag tone="blue">X</Tag><Tag tone="clay">Instagram</Tag></div>
@@ -199,7 +201,7 @@ export function SentimentScene({ t }: { t: number }) {
           const p = easeOut(win(t, 0.08 + i * 0.16, 0.24 + i * 0.16))
           const tagged = win(t, 0.2 + i * 0.16, 0.28 + i * 0.16) > 0.5
           return (
-            <div key={i} className="flex items-start gap-2 rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2"
+            <div key={i} className={`flex items-start gap-2 rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2 ${i === 3 ? 'hidden @xl:flex' : ''}`}
               style={{ opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>
               <p className="flex-1 text-[11.5px] leading-snug text-[var(--s-body)]">{m.text}</p>
               <div className="flex shrink-0 flex-col items-end gap-1">
@@ -220,7 +222,7 @@ export function SentimentScene({ t }: { t: number }) {
         <div className="flex gap-2" style={{ opacity: win(t, 0.55, 0.7) }}>
           <Tag tone="green">68 positive</Tag><Tag>21 neutral</Tag><Tag tone="red">11 negative</Tag>
         </div>
-        <p className="text-[11px] leading-relaxed text-[var(--s-mut)]" style={{ opacity: win(t, 0.65, 0.8) }}>
+        <p className="hidden text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.65, 0.8) }}>
           Pidgin, Yoruba, Igbo and Hausa classified correctly. No lost-in-translation scores.
         </p>
       </div>
@@ -243,10 +245,10 @@ export function FunnelScene({ t }: { t: number }) {
   ]
   const srcs = ['Meta Ads', 'GA4', 'Paystack', 'Pixel']
   return (
-    <Panel className="flex h-full w-full flex-col gap-5 p-6">
-      <div className="flex items-center justify-between">
+    <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:gap-5 @xl:p-6">
+      <div className="flex flex-col gap-2 @xl:flex-row @xl:items-center @xl:justify-between">
         <Label>Funnel · live connector data</Label>
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           {srcs.map((s, i) => (
             <span key={s} style={{ opacity: win(t, 0.05 + i * 0.06, 0.15 + i * 0.06) }}><Tag tone="blue">{s}</Tag></span>
           ))}
@@ -296,8 +298,8 @@ export function WhatsAppScene({ t }: { t: number }) {
   ]
   const nps = Math.round(58 * easeOut(win(t, 0.55, 0.85)))
   return (
-    <Panel className="flex h-full w-full gap-6 p-6">
-      <div className="flex w-1/2 flex-col gap-2.5">
+    <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:flex-row @xl:gap-6 @xl:p-6">
+      <div className="flex w-full flex-col gap-2.5 @xl:w-1/2">
         <div className="flex items-center justify-between">
           <Label>WhatsApp survey · NPS wave 4</Label>
           <Tag tone="green">Opt-in only</Tag>
@@ -319,11 +321,11 @@ export function WhatsAppScene({ t }: { t: number }) {
       </div>
       <div className="flex flex-1 flex-col items-center justify-center gap-3">
         <Label>Net Promoter Score</Label>
-        <span className="text-6xl font-extrabold text-[var(--s-strong)]" style={{ fontFamily: 'var(--font-display)' }}>+{nps}</span>
+        <span className="text-5xl font-extrabold text-[var(--s-strong)] @xl:text-6xl" style={{ fontFamily: 'var(--font-display)' }}>+{nps}</span>
         <div className="flex gap-2" style={{ opacity: win(t, 0.7, 0.85) }}>
           <Tag tone="green">61% promoters</Tag><Tag tone="red">3% detractors</Tag>
         </div>
-        <p className="max-w-[220px] text-center text-[11px] leading-relaxed text-[var(--s-mut)]" style={{ opacity: win(t, 0.78, 0.92) }}>
+        <p className="hidden max-w-[220px] text-center text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.78, 0.92) }}>
           Surveys go where your customers already reply: WhatsApp, email, in-app and link.
         </p>
       </div>
@@ -332,27 +334,56 @@ export function WhatsAppScene({ t }: { t: number }) {
 }
 
 // ————— Scene 5: offline attribution —————
+/** OOH sites plotted on the Lagos basemap in public/landing/ooh-map-*.png.
+ *  left/top percentages are Web-Mercator projections of the real coordinates
+ *  for the frame baked into that asset (center 3.412,6.516 · z11) — regenerate
+ *  both together via scripts if the frame ever changes. */
+const OOH_SITES = [
+  { name: 'Lekki–Epe Expressway',    left: 61.0, top: 70.0, hero: true },
+  { name: 'Ozumba Mbadiwe, VI',      left: 51.8, top: 75.8, hero: false },
+  { name: 'Third Mainland Bridge',   left: 48.5, top: 56.4, hero: false },
+  { name: 'Allen Avenue, Ikeja',     left: 38.9, top: 25.1, hero: false },
+  { name: 'Apapa–Oshodi Expressway', left: 39.8, top: 60.0, hero: false },
+]
 export function OohScene({ t }: { t: number }) {
   const url = 'brandgauge.app/go/jara-lekki'
-  const typed = url.slice(0, Math.floor(url.length * win(t, 0.15, 0.5)))
+  const typed = url.slice(0, Math.floor(url.length * win(t, 0.35, 0.65)))
   const lift = Math.round(18 * easeOut(win(t, 0.6, 0.85)))
   return (
-    <Panel className="flex h-full w-full gap-6 p-6">
-      <div className="flex w-1/2 flex-col justify-center gap-3">
-        <Label>OOH site · Lekki–Epe Expressway</Label>
-        <div className="rounded-xl bg-gradient-to-br from-[#1A2342] to-[#10162C] p-4"
-          style={{ opacity: easeOut(win(t, 0.02, 0.2)) }}>
-          <div className="flex h-20 items-center justify-center rounded-lg border border-dashed border-white/15 bg-white/[0.03]">
-            <span className="text-lg font-extrabold tracking-tight text-[#F4EDE4]" style={{ fontFamily: 'var(--font-display)' }}>
-              JARA <span className="text-[#E06A32]">FOODS</span>
-            </span>
-          </div>
-          <div className="mt-3 flex items-center justify-between">
-            <span className="font-mono text-[10px] text-white/45">48-sheet billboard · 6.5195°N 3.6180°E</span>
-            <Tag tone="clay">Live</Tag>
-          </div>
+    <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:flex-row @xl:gap-6 @xl:p-6">
+      <div className="flex w-full flex-col justify-center gap-3 @xl:w-[55%]">
+        <div className="flex items-center justify-between">
+          <Label>OOH sites · Lagos</Label>
+          <Tag tone="clay">5 live</Tag>
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2.5">
+        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[var(--s-line)]"
+          style={{ opacity: easeOut(win(t, 0.02, 0.18)) }}>
+          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: 'var(--s-map)' }} />
+          {OOH_SITES.map((s, i) => {
+            const drop = pop(win(t, 0.12 + i * 0.09, 0.3 + i * 0.09))
+            // deterministic pulse: phase loops with t so Remotion frames stay pure
+            const phase = ((t * 3 + i * 0.23) % 1)
+            return (
+              <div key={s.name} className="absolute" style={{ left: `${s.left}%`, top: `${s.top}%`, transform: 'translate(-50%, -100%)' }}>
+                <div className="absolute left-1/2 top-full h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+                  style={{ borderColor: CLAY, opacity: drop * 0.5 * (1 - phase), transform: `translate(-50%,-50%) scale(${0.3 + phase * 0.9})` }} />
+                <svg viewBox="0 0 24 24" className="h-5 w-5" style={{ opacity: Math.min(1, drop), transform: `scale(${drop})`, transformOrigin: 'bottom center' }}>
+                  <path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Z" fill={s.hero ? CLAY : BLUE} stroke="white" strokeWidth="1.5" />
+                  <circle cx="12" cy="9" r="2.6" fill="white" />
+                </svg>
+                {s.hero && (
+                  <div className="absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded-md border border-[var(--s-line)] bg-[var(--s-panel)] px-2 py-1"
+                    style={{ opacity: easeOut(win(t, 0.5, 0.62)), boxShadow: 'var(--s-shadow)' }}>
+                    <p className="text-[10px] font-bold text-[var(--s-strong)]">Lekki–Epe Expressway</p>
+                    <p className="font-mono text-[8.5px] text-[var(--s-mut)]">48-sheet · 3,412 visits</p>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+          <span className="absolute bottom-1 right-1.5 text-[7px] text-[var(--s-mut)]">© OpenStreetMap · © CARTO</span>
+        </div>
+        <div className="hidden items-center gap-2 rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2.5 @xl:flex">
           <span className="h-2 w-2 rounded-full" style={{ background: CLAY }} />
           <span className="font-mono text-[11px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: CLAY }}>▍</span></span>
         </div>
@@ -377,7 +408,7 @@ export function OohScene({ t }: { t: number }) {
             </div>
           )
         })}
-        <p className="text-[11px] leading-relaxed text-[var(--s-mut)]" style={{ opacity: win(t, 0.72, 0.88) }}>
+        <p className="hidden text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.72, 0.88) }}>
           Billboards, radio, TV and print measured with vanity links and search uplift. Not gut feeling.
         </p>
       </div>
@@ -398,7 +429,7 @@ export function AiScene({ t }: { t: number }) {
     { name: 'ChatGPT', score: 82 }, { name: 'Gemini', score: 74 }, { name: 'Perplexity', score: 68 },
   ]
   return (
-    <Panel className="flex h-full w-full flex-col gap-4 p-6">
+    <Panel className="flex h-full w-full flex-col gap-3 p-4 @xl:gap-4 @xl:p-6">
       <div className="flex items-center gap-2 rounded-xl border px-4 py-3" style={{ borderColor: 'rgba(212,96,42,0.35)', background: 'rgba(212,96,42,0.05)' }}>
         <span className="text-[13px]" style={{ color: CLAY }}>✦</span>
         <span className="text-[12.5px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: CLAY }}>▍</span></span>
@@ -446,10 +477,10 @@ export function CompetitiveScene({ t }: { t: number }) {
   const sweep = easeInOut(win(t, 0.08, 0.55))
   let acc = 0
   return (
-    <Panel className="flex h-full w-full gap-6 p-6">
-      <div className="flex w-[45%] flex-col items-center justify-center gap-3">
+    <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:flex-row @xl:gap-6 @xl:p-6">
+      <div className="flex w-full flex-col items-center justify-center gap-3 @xl:w-[45%]">
         <Label>Share of voice</Label>
-        <svg viewBox="0 0 120 120" className="w-full max-w-[180px] -rotate-90">
+        <svg viewBox="0 0 120 120" className="w-full max-w-[130px] -rotate-90 @xl:max-w-[180px]">
           {share.map(s => {
             const C = 2 * Math.PI * 46
             const frac = (s.v / 100) * sweep
