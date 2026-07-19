@@ -83,7 +83,11 @@ function Label({ children }: { children: React.ReactNode }) {
 const CX = 100, CY = 108, R = 82
 function ptOnArc(angleDeg: number) {
   const rad = (angleDeg * Math.PI) / 180
-  return { x: CX + R * Math.cos(rad), y: CY - R * Math.sin(rad) }
+  // Round to 3 decimals so the SVG coordinate serialises identically on the
+  // server and the client. Full-precision floats stringify differently across
+  // the two and trip a hydration mismatch that repaints the whole gauge.
+  const round = (n: number) => Math.round(n * 1000) / 1000
+  return { x: round(CX + R * Math.cos(rad)), y: round(CY - R * Math.sin(rad)) }
 }
 const START = ptOnArc(225)
 const END   = ptOnArc(315)

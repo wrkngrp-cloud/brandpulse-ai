@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion, useInView } from 'framer-motion'
 import { ArrowRight, Moon, Sun } from 'lucide-react'
-import { VideoHero } from './video-hero'
+import { DemoPlayer } from './demo-player'
 import { HorizontalTour } from './horizontal-tour'
 import { AiScene, CLAY, CompetitiveScene, GaugeMark, darkSceneVars, lightSceneVars } from './scenes'
 
@@ -174,7 +174,7 @@ function Hero() {
 
         {/* the unveil film, framed and held in the viewer's hand */}
         <motion.div id="demo" {...rise} transition={{ ...rise.transition, delay: 0.72 }} className="relative mx-auto mt-16 max-w-4xl scroll-mt-28">
-          <Tilt><VideoHero /></Tilt>
+          <Tilt><DemoPlayer /></Tilt>
         </motion.div>
 
         {/* connector marquee */}
