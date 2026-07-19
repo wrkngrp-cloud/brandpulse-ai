@@ -1,0 +1,6 @@
+@import 'tailwindcss';
+@source "../../src/components/landing";
+@source "./";
+
+/* Satoshi is loaded at runtime via FontFace + staticFile in Unveil.tsx —
+   webpack cannot resolve absolute /fonts urls from CSS in the Remotion bundle. */

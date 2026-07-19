@@ -364,7 +364,7 @@ export function OohScene({ t }: { t: number }) {
             // deterministic pulse: phase loops with t so Remotion frames stay pure
             const phase = ((t * 3 + i * 0.23) % 1)
             return (
-              <div key={s.name} className="absolute" style={{ left: `${s.left}%`, top: `${s.top}%`, transform: 'translate(-50%, -100%)' }}>
+              <div key={s.name} className="absolute" style={{ left: `${s.left}%`, top: `${s.top}%`, transform: 'translate(-50%, -100%)', zIndex: s.hero ? 10 : 1 }}>
                 <div className="absolute left-1/2 top-full h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border"
                   style={{ borderColor: CLAY, opacity: drop * 0.5 * (1 - phase), transform: `translate(-50%,-50%) scale(${0.3 + phase * 0.9})` }} />
                 <svg viewBox="0 0 24 24" className="h-5 w-5" style={{ opacity: Math.min(1, drop), transform: `scale(${drop})`, transformOrigin: 'bottom center' }}>
