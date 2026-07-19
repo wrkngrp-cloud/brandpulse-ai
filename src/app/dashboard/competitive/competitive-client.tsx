@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import {
   Trophy, TrendingUp, TrendingDown, MapPin, Plus, Loader2, RefreshCw,
-  ChevronDown, ChevronUp, AlertCircle, Lightbulb, Eye, CheckCircle2,
+  ChevronDown, ChevronUp, AlertCircle, Lightbulb, Eye, CheckCircle2, ArrowRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -225,15 +226,17 @@ function BriefingTab({
   const [loading, setLoading]   = useState(false)
   const [result, setResult]     = useState<BriefingResult | null>(stored)
   const [error, setError]       = useState<string | null>(null)
+  const [errorCta, setErrorCta] = useState<{ label: string; href: string } | null>(null)
   const hasBriefing = result !== null
 
   async function generate() {
     setLoading(true)
     setError(null)
+    setErrorCta(null)
     try {
       const res  = await fetch('/api/ai/competitive-briefing', { method: 'POST' })
-      const data = await res.json() as BriefingResult & { error?: string }
-      if (!res.ok) { setError(data.error ?? 'Generation failed'); return }
+      const data = await res.json() as BriefingResult & { error?: string; cta?: { label: string; href: string } }
+      if (!res.ok) { setError(data.error ?? 'Generation failed'); setErrorCta(data.cta ?? null); return }
       setResult(data)
     } catch {
       setError('Network error. Try again.')
@@ -241,6 +244,21 @@ function BriefingTab({
       setLoading(false)
     }
   }
+
+  const errorBlock = error ? (
+    <div className="rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-3 space-y-2">
+      <p className="text-sm text-amber-800 leading-relaxed">{error}</p>
+      {errorCta && (
+        <Link
+          href={errorCta.href}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-900 border border-amber-300 rounded-full px-3 py-1.5 hover:bg-amber-100 transition-colors"
+        >
+          {errorCta.label}
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      )}
+    </div>
+  ) : null
 
   return (
     <div className="space-y-5 pt-5">
@@ -283,7 +301,7 @@ function BriefingTab({
             </div>
           )}
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {errorBlock}
 
           <Button onClick={generate} disabled={loading} className="w-full">
             {loading
@@ -320,7 +338,7 @@ function BriefingTab({
             </Button>
           </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {errorBlock}
 
           <div className="border rounded-xl bg-muted/40 px-5 py-4">
             <p className="text-sm leading-relaxed">{result.executive_summary}</p>

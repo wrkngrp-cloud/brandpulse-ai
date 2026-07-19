@@ -33,7 +33,9 @@ export async function POST(req: NextRequest) {
 
   const okResponses = (responses ?? []).filter(r => r.quality_flag === 'ok')
   if (okResponses.length === 0) {
-    return NextResponse.json({ error: 'No quality responses to analyse yet' }, { status: 400 })
+    return NextResponse.json({
+      error: 'This survey has no usable responses yet. Share the survey link with your audience, then run the analysis once the first responses arrive.',
+    }, { status: 400 })
   }
 
   // Compute NPS breakdown

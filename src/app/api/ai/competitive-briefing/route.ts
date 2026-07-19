@@ -2,16 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
 import { buildBrandContext, formatBrandContextBlock } from '@/lib/ai/brand-context'
+import { getActiveBrand } from '@/lib/active-brand'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, market_share_pct')
-    .limit(1).single()
+  const brand = await getActiveBrand<{ id: string; market_share_pct: number | null }>(supabase, 'id, market_share_pct')
   if (!brand) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
 
   const service = await createServiceClient()
@@ -62,6 +60,15 @@ export async function POST(req: NextRequest) {
       .limit(1).maybeSingle(),
     buildBrandContext(brand.id),
   ])
+
+  // Without any social signal there is nothing to compare — say what is
+  // missing and point at the fix instead of generating an empty briefing.
+  if (!sovSnap && (mentions ?? []).length === 0 && (sentimentRows ?? []).length === 0) {
+    return NextResponse.json({
+      error: 'We need social data before we can write a competitive briefing. Connect X or Instagram, then run a crawl from the Sentiment page. Once mentions and share of voice arrive, this briefing writes itself.',
+      cta: { label: 'Connect a social account', href: '/dashboard/connectors' },
+    }, { status: 422 })
+  }
 
   // ── SOV & ESOV ─────────────────────────────────────────────────────────────
   const competitorData = sovSnap?.competitor_data as {

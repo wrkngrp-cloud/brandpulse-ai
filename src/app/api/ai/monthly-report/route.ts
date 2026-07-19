@@ -127,6 +127,19 @@ export async function POST(request: NextRequest) {
 
   // Pre-post analyses
   const prePostRows = prePostRes.data ?? []
+
+  // Nothing happened in the window and nothing is connected — say what to
+  // fix instead of generating a report full of "no data".
+  if (
+    sentimentRows.length === 0 && sovRows.length === 0 && surveyRows.length === 0 &&
+    (socialRes.data ?? []).length === 0 && prePostRows.length === 0
+  ) {
+    return NextResponse.json({
+      error: 'There is no activity to report for the last 30 days. Connect your data sources and the report writes itself from your live sentiment, share of voice, surveys and social results.',
+      cta: { label: 'Open Connectors', href: '/dashboard/connectors' },
+    }, { status: 422 })
+  }
+
   const avgCulturalScore = prePostRows.length
     ? (prePostRows.reduce((s, r) => s + (r.cultural_score ?? 0), 0) / prePostRows.length).toFixed(1)
     : 'no data'

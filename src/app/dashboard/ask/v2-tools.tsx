@@ -620,17 +620,19 @@ export function BusinessCaseTab() {
 export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState<string | null>(null)
+  const [errorCta, setErrorCta] = useState<{ label: string; href: string } | null>(null)
   const [result,  setResult]  = useState<MonthlyReportResult | null>(null)
 
   async function generate() {
     setLoading(true)
     setError(null)
+    setErrorCta(null)
     setResult(null)
 
     try {
       const res  = await fetch('/api/ai/monthly-report', { method: 'POST' })
-      const data = await res.json() as MonthlyReportResult & { error?: string }
-      if (!res.ok) { setError(data.error ?? 'Something went wrong.'); return }
+      const data = await res.json() as MonthlyReportResult & { error?: string; cta?: { label: string; href: string } }
+      if (!res.ok) { setError(data.error ?? 'Something went wrong.'); setErrorCta(data.cta ?? null); return }
       setResult(data)
     } catch {
       setError('Network error. Check your connection and try again.')
@@ -704,9 +706,20 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
         </div>
 
         {error && (
-          <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5 text-left">
-            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-            {error}
+          <div className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-left space-y-2">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{error}</span>
+            </div>
+            {errorCta && (
+              <Link
+                href={errorCta.href}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-900 border border-amber-300 rounded-full px-3 py-1.5 hover:bg-amber-100 transition-colors ml-6"
+              >
+                {errorCta.label}
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            )}
           </div>
         )}
 
