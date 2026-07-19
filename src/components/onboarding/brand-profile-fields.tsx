@@ -76,12 +76,21 @@ export function CulturalSlider({ left, right, hint, value, onChange }: {
   )
 }
 
-export function SectionCard({ title, children, className }: {
+export function SectionCard({ title, children, className, badge }: {
   title: string; children: React.ReactNode; className?: string
+  /** Small chip next to the title, e.g. "Suggested" on AI-prefilled onboarding sections. */
+  badge?: string
 }) {
   return (
     <div className={cn('border rounded-xl p-5 space-y-4 bg-card', className)}>
-      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <div className="flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        {badge && (
+          <span className="text-[10px] font-semibold uppercase tracking-wide rounded-full border border-border bg-muted/50 text-muted-foreground px-2 py-0.5">
+            {badge}
+          </span>
+        )}
+      </div>
       {children}
     </div>
   )
