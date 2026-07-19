@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion, useInView } from 'framer-motion'
 import { ArrowRight, Moon, Sun } from 'lucide-react'
-import { DemoPlayer } from './demo-player'
+import { VideoHero } from './video-hero'
 import { HorizontalTour } from './horizontal-tour'
 import { AiScene, CLAY, CompetitiveScene, GaugeMark, darkSceneVars, lightSceneVars } from './scenes'
 
@@ -41,7 +41,7 @@ function Wordmark({ className = 'text-xl' }: { className?: string }) {
 function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
-      <div className="mx-auto mt-4 flex max-w-6xl items-center justify-between rounded-2xl border px-5 py-3 backdrop-blur-xl sm:mx-6 lg:mx-auto"
+      <div className="mx-4 mt-4 flex max-w-6xl items-center justify-between rounded-2xl border px-4 py-3 backdrop-blur-xl sm:mx-6 sm:px-5 lg:mx-auto"
         style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-glass)' }}>
         <Link href="/" className="flex items-center gap-2.5" style={{ color: 'var(--lp-ink)' }}>
           <GaugeMark className="h-7 w-7" />
@@ -159,7 +159,7 @@ function Hero() {
           from Instagram to a billboard on the expressway, and turns it all into numbers your
           board will trust.
         </motion.p>
-        <motion.div {...rise} transition={{ ...rise.transition, delay: 0.6 }} className="mt-9 flex items-center justify-center gap-4">
+        <motion.div {...rise} transition={{ ...rise.transition, delay: 0.6 }} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Link href="/auth/signup"
             className="group flex items-center gap-2 rounded-full px-6 py-3.5 text-[14px] font-bold text-white shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
             style={{ background: 'var(--lp-clay)' }}>
@@ -174,7 +174,7 @@ function Hero() {
 
         {/* the unveil film, framed and held in the viewer's hand */}
         <motion.div id="demo" {...rise} transition={{ ...rise.transition, delay: 0.72 }} className="relative mx-auto mt-16 max-w-4xl scroll-mt-28">
-          <Tilt><DemoPlayer /></Tilt>
+          <Tilt><VideoHero /></Tilt>
         </motion.div>
 
         {/* connector marquee */}
@@ -264,7 +264,7 @@ function DeepDives() {
             <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>{s.title}</h3>
             <p className="mt-4 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{s.body}</p>
           </div>
-          <div className="h-[360px] flex-1"><s.Comp t={1} /></div>
+          <div className="@container h-[430px] flex-1 sm:h-[360px]"><s.Comp t={1} /></div>
         </motion.div>
       ))}
     </section>
@@ -293,7 +293,7 @@ function Industries() {
       </motion.p>
       <motion.div {...rise} className="mt-10 flex flex-wrap justify-center gap-3">
         {list.map((v, i) => (
-          <button key={v.name} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
+          <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
             className="rounded-full border px-5 py-2.5 text-[13px] transition-all duration-200"
             style={active === i
               ? { borderColor: 'var(--lp-clay)', color: 'var(--lp-clay)', background: 'rgba(212,96,42,0.08)', transform: 'translateY(-2px)' }

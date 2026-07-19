@@ -98,7 +98,7 @@ export function HorizontalTour() {
                       </div>
                       <p className="hidden max-w-[260px] text-[12px] leading-relaxed sm:block" style={{ color: 'var(--lp-mut)' }}>{panel.body}</p>
                     </div>
-                    <div className="h-[400px]">
+                    <div className="@container h-[420px] sm:h-[400px]">
                       <panel.Comp t={sceneT} />
                     </div>
                   </div>

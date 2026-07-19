@@ -40,3 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .claude/worktrees/
+
+# Remotion video project
+video/node_modules/
+video/out/
+.remotion/
