@@ -36,7 +36,15 @@ const SOURCE_LABELS: Record<string, string> = {
 const CONFIDENCE_META: Record<string, { label: string; class: string }> = {
   High:   { label: 'High confidence', class: 'bg-green-50 text-green-700 border-green-200' },
   Medium: { label: 'Medium confidence', class: 'bg-amber-50 text-amber-700 border-amber-200' },
-  Low:    { label: 'Low confidence — review carefully', class: 'bg-muted text-muted-foreground border-border' },
+  Low:    { label: 'Low confidence, review carefully', class: 'bg-muted text-muted-foreground border-border' },
+}
+
+function StepBadge({ step, label }: { step: number; label?: string }) {
+  return (
+    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70">
+      Brand setup · Step {step} of 3{label ? ` · ${label}` : ''}
+    </p>
+  )
 }
 
 type CulturalKey = 'community_corporate' | 'traditional_modern' | 'religious_secular' | 'mass_premium' | 'local_global'
@@ -166,6 +174,7 @@ export default function OnboardingPage() {
             <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
               <Sparkles className="h-5 w-5 text-background" />
             </div>
+            <StepBadge step={1} />
             <h1 className="text-2xl font-semibold tracking-tight">What kind of brand are you?</h1>
             <p className="text-sm text-muted-foreground">
               This shapes which modules, metrics and connectors we show you. You can change it any time.
@@ -220,7 +229,7 @@ export default function OnboardingPage() {
               setScreen('identify')
             }}
           >
-            Continue
+            Next: name your brand
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </div>
@@ -238,9 +247,10 @@ export default function OnboardingPage() {
             <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
               <Sparkles className="h-5 w-5 text-background" />
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight">Set up your brand</h1>
+            <StepBadge step={2} />
+            <h1 className="text-2xl font-semibold tracking-tight">Tell us who you are</h1>
             <p className="text-sm text-muted-foreground">
-              Give us a starting point — we will do the research and pre-fill the rest.
+              We will research your brand and draft a profile for you to review in the next step.
             </p>
           </div>
 
@@ -260,7 +270,7 @@ export default function OnboardingPage() {
               <Label htmlFor="websiteUrl" className="flex items-center gap-1.5">
                 <Globe className="h-3.5 w-3.5 text-muted-foreground" />
                 Website URL
-                <span className="text-muted-foreground font-normal">(optional — improves accuracy)</span>
+                <span className="text-muted-foreground font-normal">(optional, improves accuracy)</span>
               </Label>
               <Input
                 id="websiteUrl"
@@ -276,7 +286,7 @@ export default function OnboardingPage() {
               onClick={runInference}
               disabled={!brandName.trim()}
             >
-              Analyse my brand
+              Draft my profile with AI
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
             <button
@@ -290,8 +300,8 @@ export default function OnboardingPage() {
           </div>
 
           <p className="text-center text-xs text-muted-foreground">
-            We will read your website and any connected social accounts to pre-fill your brand profile.
-            You confirm everything before anything is saved.
+            We read your website and public pages, then suggest a profile as a head start.
+            You review every suggestion in the next step. Nothing is saved until you approve it.
           </p>
           <p className="text-center text-xs text-muted-foreground/50">
             Wrong account?{' '}
@@ -312,9 +322,13 @@ export default function OnboardingPage() {
             <Loader2 className="h-6 w-6 text-background animate-spin" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Analysing {brandName}</h2>
+            <StepBadge step={2} />
+            <h2 className="text-lg font-semibold">Drafting a profile for {brandName}</h2>
             <p className="text-sm text-muted-foreground transition-all duration-500 min-h-[20px]">
               {LOADING_MESSAGES[msgIdx]}
+            </p>
+            <p className="text-xs text-muted-foreground/70">
+              Next you review our suggestions and correct anything we got wrong.
             </p>
           </div>
           {websiteUrl && (
@@ -344,14 +358,15 @@ export default function OnboardingPage() {
       <div className="w-full max-w-xl mx-auto space-y-6">
 
         {/* Header */}
-        <div className="text-center space-y-1">
+        <div className="text-center space-y-1.5">
+          <StepBadge step={3} label="last one" />
           <h1 className="text-2xl font-semibold tracking-tight">
-            {inferError ? 'Set up your brand' : "Here's your brand profile"}
+            {inferError ? 'Build your brand profile' : 'Check our suggestions'}
           </h1>
           <p className="text-sm text-muted-foreground">
             {inferError
-              ? "We couldn't analyse your brand automatically — fill in the details below."
-              : 'Review what we found. Edit anything that looks off. Everything can be updated in settings later.'}
+              ? 'We could not research your brand automatically, so fill in the details below yourself.'
+              : `This is our best guess at ${data.brandName || 'your brand'}, drawn from public signals. Keep what fits, fix what does not, then save to finish setup.`}
           </p>
         </div>
 
@@ -359,18 +374,19 @@ export default function OnboardingPage() {
         {!inferError ? (
           <div className={cn('rounded-xl border px-4 py-3 flex flex-wrap items-center gap-2 text-sm', confidenceMeta.class)}>
             <Sparkles className="h-3.5 w-3.5 shrink-0" />
-            <span className="font-medium">{confidenceMeta.label}</span>
-            <span className="text-xs opacity-70">Based on: {sourceLabels}</span>
+            <span className="font-medium">AI suggestions, nothing saved yet</span>
+            <span className="text-xs opacity-80">{confidenceMeta.label}</span>
+            <span className="text-xs opacity-70">Drawn from: {sourceLabels}</span>
           </div>
         ) : (
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-center gap-2 text-sm text-amber-700">
             <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>AI analysis unavailable — fields are empty. Fill them in below or add a website URL and try again.</span>
+            <span>AI research was unavailable, so the fields below are empty. Fill them in yourself, or go back, add a website URL and try again.</span>
           </div>
         )}
 
         {/* ── Category & Values ── */}
-        <SectionCard title="Category & Values">
+        <SectionCard title="Category & Values" badge={inferError ? undefined : 'Suggested'}>
           <div className="space-y-2">
             <Label className="text-sm font-medium">Category</Label>
             <Select value={data.category} onValueChange={v => patch('category', v ?? '')}>
@@ -389,7 +405,7 @@ export default function OnboardingPage() {
         </SectionCard>
 
         {/* ── Brand Voice ── */}
-        <SectionCard title="Brand Voice">
+        <SectionCard title="Brand Voice" badge={inferError ? undefined : 'Suggested'}>
           <TagInput
             label="Voice adjectives"
             placeholder="e.g. bold, warm, direct"
@@ -420,7 +436,7 @@ export default function OnboardingPage() {
         </SectionCard>
 
         {/* ── Cultural Profile ── */}
-        <SectionCard title="Cultural Positioning">
+        <SectionCard title="Cultural Positioning" badge={inferError ? undefined : 'Suggested'}>
           <p className="text-xs text-muted-foreground -mt-2">
             Where does your brand sit on each cultural axis? This shapes how the AI reads sentiment and cultural fit.
           </p>
@@ -436,7 +452,7 @@ export default function OnboardingPage() {
         </SectionCard>
 
         {/* ── Target Audience ── */}
-        <SectionCard title="Target Audience">
+        <SectionCard title="Target Audience" badge={inferError ? undefined : 'Suggested'}>
           <div className="space-y-3">
             {data.targetSegments.map((seg, i) => (
               <div key={i} className="border rounded-lg p-4 space-y-2.5 bg-background">
@@ -479,10 +495,13 @@ export default function OnboardingPage() {
             disabled={!data.brandName.trim() || !data.category || isPending}
           >
             {isPending
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
-              : <><Check className="h-4 w-4 mr-2" /> Looks good — take me in</>
+              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving your profile...</>
+              : <><Check className="h-4 w-4 mr-2" /> Save profile and open my dashboard</>
             }
           </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            You can change any of this later in Settings.
+          </p>
           <Button
             type="button"
             variant="ghost"

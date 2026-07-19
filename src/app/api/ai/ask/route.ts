@@ -32,6 +32,30 @@ export async function POST(request: Request) {
   const question = body.question?.trim()
   if (!question) return NextResponse.json({ error: 'Question is required' }, { status: 400 })
 
+  // With no data connected there is nothing to answer from — skip the AI call
+  // and tell the user exactly what to set up, with links to the fix.
+  const [
+    { count: connectionCount },
+    { count: mentionCount },
+    { count: brandSurveyCount },
+    { count: campaignCount },
+  ] = await Promise.all([
+    supabase.from('social_connections').select('id', { count: 'exact', head: true }).eq('brand_id', brandId),
+    supabase.from('mentions').select('id', { count: 'exact', head: true }).eq('brand_id', brandId),
+    supabase.from('surveys').select('id', { count: 'exact', head: true }).eq('brand_id', brandId),
+    supabase.from('campaigns').select('id', { count: 'exact', head: true }).eq('brand_id', brandId),
+  ])
+
+  if (!connectionCount && !mentionCount && !brandSurveyCount && !campaignCount) {
+    return NextResponse.json({
+      error: 'We do not have any of your brand data yet, so there is nothing to answer from. Connect a social account and we start reading your mentions tonight, or launch a survey to hear from your customers directly.',
+      ctas: [
+        { label: 'Connect a data source', href: '/dashboard/connectors' },
+        { label: 'Launch a survey',       href: '/dashboard/surveys' },
+      ],
+    }, { status: 422 })
+  }
+
   const service = await createServiceClient()
 
   // Load prior conversation if continuing

@@ -15,6 +15,7 @@ import { StatCard }         from '@/components/dashboard/stat-card'
 import { TrendChart }       from '@/components/dashboard/trend-chart'
 import { DateRangeFilter }  from '@/components/dashboard/date-range-filter'
 import { DashboardHero }    from '@/components/dashboard/dashboard-hero'
+import { ConnectChecklist, type ConnectChecklistItem } from '@/components/dashboard/connect-checklist'
 import { cn }               from '@/lib/utils'
 import { fadeUp, stagger }  from '@/lib/motion'
 import { rangeLabelShort }  from '@/lib/range-label'
@@ -82,6 +83,8 @@ export interface OverviewProps {
   widgetIds?:      string[]
   isFirstVisit?:   boolean
   industryTemplate?: string | null
+  checklistItems?: ConnectChecklistItem[]
+  checklistDismissed?: boolean
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -180,6 +183,8 @@ export function OverviewClient({
   widgetIds,
   isFirstVisit = false,
   industryTemplate = null,
+  checklistItems = [],
+  checklistDismissed = true,
 }: OverviewProps) {
   // Sparkline data for BHI stat card
   const bhiSpark = sparkline.map(s => ({ date: s.date, value: s.score }))
@@ -230,6 +235,9 @@ export function OverviewClient({
           </div>
         </div>
       </motion.div>
+
+      {/* ── First-run setup checklist ────────────────────────────── */}
+      <ConnectChecklist items={checklistItems} serverDismissed={checklistDismissed} />
 
       {/* ── AI Ask hero + KPI tiles + widget controls ──────────── */}
       <DashboardHero

@@ -4,8 +4,10 @@ import { Suspense } from 'react'
 import { computeFullBHI, resolveBrandType, type BHIResult } from '@/lib/bhi'
 import { OverviewClient } from '@/components/dashboard/overview-client'
 import { getActiveBrandId } from '@/lib/active-brand'
-import { getIndustryFromCategory } from '@/lib/industry-config'
+import { getIndustryFromCategory, SUGGESTED_CONNECTORS_BY_INDUSTRY, type IndustryId } from '@/lib/industry-config'
 import { DEFAULT_WIDGET_IDS, TEMPLATE_BY_INDUSTRY } from '@/lib/widget-catalog'
+import { getTourStatuses } from '@/app/dashboard/tours/actions'
+import type { ConnectChecklistItem } from '@/components/dashboard/connect-checklist'
 
 const NGN_CPM_BENCHMARK = 500
 const NGN_CPE_BENCHMARK = 50
@@ -36,6 +38,11 @@ async function DashboardContent({ days }: { days: number }) {
     { data: socialPosts },
     { data: awarenessCheckSurveys },
     { data: perceptionSurveys },
+    { data: socialConnections },
+    { count: surveyCount },
+    { data: ga4Connection },
+    { data: metaAdsAccount },
+    { data: webhookConfigs },
   ] = await Promise.all([
     brandId
       ? supabase.from('brands').select('id, name, category, industry, brand_type').eq('id', brandId).single()
@@ -56,6 +63,11 @@ async function DashboardContent({ days }: { days: number }) {
     supabase.from('social_posts').select('impressions, reach, likes, comments, shares').eq('brand_id', brandId ?? '').gte('posted_at', cutoffISO),
     supabase.from('surveys').select('id').eq('brand_id', brandId ?? '').in('type', ['awareness_check', 'b2_intercept']),
     supabase.from('surveys').select('id').eq('brand_id', brandId ?? '').eq('type', 'perception_audit'),
+    supabase.from('social_connections').select('id').eq('brand_id', brandId ?? '').limit(1),
+    supabase.from('surveys').select('id', { count: 'exact', head: true }).eq('brand_id', brandId ?? ''),
+    supabase.from('ga4_connections').select('id').eq('brand_id', brandId ?? '').maybeSingle(),
+    supabase.from('digital_ad_accounts').select('id').eq('brand_id', brandId ?? '').eq('platform', 'meta').maybeSingle(),
+    supabase.from('webhook_configs').select('provider').eq('brand_id', brandId ?? '').limit(1),
   ])
 
   // ── Sentiment score ──────────────────────────────────────────────────────
@@ -149,6 +161,53 @@ async function DashboardContent({ days }: { days: number }) {
   const isFirstVisit    = !dashPrefs
   const industryTemplate = TEMPLATE_BY_INDUSTRY[industry] ?? null
 
+  // ── First-run connect checklist ───────────────────────────────────────────
+  // Recommendations branch on the brand's industry (never assume FMCG).
+  const suggestedConnectors = SUGGESTED_CONNECTORS_BY_INDUSTRY[industry as IndustryId] ?? []
+  const checklistItems: ConnectChecklistItem[] = [
+    {
+      id:          'social',
+      label:       'Connect X or Instagram',
+      description: 'We read your mentions nightly and turn them into sentiment and share of voice.',
+      href:        '/dashboard/connectors',
+      done:        (socialConnections ?? []).length > 0,
+    },
+    {
+      id:          'ga4',
+      label:       'Connect Google Analytics',
+      description: 'Website traffic feeds your funnel and campaign reporting.',
+      href:        '/dashboard/connectors',
+      done:        !!ga4Connection,
+    },
+    {
+      id:          'meta_ads',
+      label:       'Connect Meta Ads',
+      description: 'Ad spend and results flow into your ROI and budget views.',
+      href:        '/dashboard/connectors',
+      done:        !!metaAdsAccount,
+    },
+    ...(suggestedConnectors.includes('paystack') || suggestedConnectors.includes('flutterwave')
+      ? [{
+          id:          'payments',
+          label:       'Add your payment webhook',
+          description: 'Paystack or Flutterwave purchases link marketing to real revenue.',
+          href:        '/dashboard/connectors',
+          done:        (webhookConfigs ?? []).length > 0,
+        }]
+      : []),
+    {
+      id:          'survey',
+      label:       'Launch your first survey',
+      description: 'Survey answers power your NPS, awareness and perception scores.',
+      href:        '/dashboard/surveys',
+      done:        (surveyCount ?? 0) > 0,
+    },
+  ]
+  // Demo accounts get an empty status map back, so dismissal falls to the
+  // browser's localStorage inside the component (same pattern as tours).
+  const { statuses: checklistStatuses } = await getTourStatuses(['connect_checklist'])
+  const checklistDismissed = !!checklistStatuses['connect_checklist']
+
   return (
     <OverviewClient
       brandName={brand?.name ?? 'Your brand'}
@@ -172,6 +231,8 @@ async function DashboardContent({ days }: { days: number }) {
       widgetIds={widgetIds}
       isFirstVisit={isFirstVisit}
       industryTemplate={industryTemplate}
+      checklistItems={checklistItems}
+      checklistDismissed={checklistDismissed}
     />
   )
 }

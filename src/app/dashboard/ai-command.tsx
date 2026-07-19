@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { MessageSquare, X, Send, Loader2, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { MessageSquare, X, Send, Loader2, ChevronDown, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
@@ -11,12 +12,18 @@ interface Source {
   detail: string
 }
 
+interface Cta {
+  label: string
+  href: string
+}
+
 interface Message {
   role: 'user' | 'assistant'
   content: string
   sources?: Source[]
   confidence?: 'High' | 'Medium' | 'Low'
   collectionRecommendation?: string | null
+  actions?: Cta[]
 }
 
 const CONFIDENCE_CLASS: Record<string, string> = {
@@ -65,10 +72,11 @@ export function AiCommand() {
       })
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({})) as { error?: string }
+        const err = await res.json().catch(() => ({})) as { error?: string; ctas?: Cta[] }
         setMessages(prev => [...prev, {
           role: 'assistant',
           content: err.error ?? 'Something went wrong. Please try again.',
+          actions: err.ctas,
         }])
         return
       }
@@ -194,6 +202,22 @@ export function AiCommand() {
                     {m.collectionRecommendation && (
                       <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
                         <span className="font-medium">To get a better answer:</span> {m.collectionRecommendation}
+                      </div>
+                    )}
+
+                    {/* Fix-it links when data is missing */}
+                    {m.actions && m.actions.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {m.actions.map(a => (
+                          <Link
+                            key={a.href + a.label}
+                            href={a.href}
+                            className="inline-flex items-center gap-1 text-[11px] font-medium border rounded-full px-2.5 py-1 hover:bg-muted transition-colors"
+                          >
+                            {a.label}
+                            <ArrowRight className="h-3 w-3" />
+                          </Link>
+                        ))}
                       </div>
                     )}
                   </div>

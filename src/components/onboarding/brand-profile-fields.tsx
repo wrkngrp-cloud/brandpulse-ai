@@ -64,24 +64,49 @@ export function TagInput({ label, placeholder, values, onChange, hint }: {
 export function CulturalSlider({ left, right, hint, value, onChange }: {
   left: string; right: string; hint: string; value: number; onChange: (v: number) => void
 }) {
+  // 0 = fully the left pole, 100 = fully the right pole, 50 = balanced.
+  const leansRight = value > 50
+  const leansLeft  = value < 50
+  const scoreLabel = leansLeft
+    ? `Leans ${left.toLowerCase()}`
+    : leansRight
+    ? `Leans ${right.toLowerCase()}`
+    : 'Balanced'
   return (
     <div className="space-y-1.5">
-      <div className="flex justify-between text-xs font-medium text-muted-foreground">
-        <span>{left}</span><span>{right}</span>
+      <div className="flex items-center justify-between gap-2 text-xs font-medium">
+        <span className={cn(leansLeft ? 'text-foreground' : 'text-muted-foreground')}>{left}</span>
+        <span className="shrink-0 rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10.5px] font-semibold tabular-nums text-muted-foreground">
+          {value} / 100 · {scoreLabel}
+        </span>
+        <span className={cn(leansRight ? 'text-foreground' : 'text-muted-foreground')}>{right}</span>
       </div>
       <input type="range" min={0} max={100} value={value}
+        aria-label={`${left} to ${right}: ${value} out of 100`}
         onChange={e => onChange(Number(e.target.value))} className="w-full accent-primary" />
-      <p className="text-xs text-muted-foreground">{hint}</p>
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-xs text-muted-foreground">{hint}</p>
+        <p className="shrink-0 text-[10px] text-muted-foreground/60">0 is all {left.toLowerCase()}, 100 is all {right.toLowerCase()}</p>
+      </div>
     </div>
   )
 }
 
-export function SectionCard({ title, children, className }: {
+export function SectionCard({ title, children, className, badge }: {
   title: string; children: React.ReactNode; className?: string
+  /** Small chip next to the title, e.g. "Suggested" on AI-prefilled onboarding sections. */
+  badge?: string
 }) {
   return (
     <div className={cn('border rounded-xl p-5 space-y-4 bg-card', className)}>
-      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <div className="flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        {badge && (
+          <span className="text-[10px] font-semibold uppercase tracking-wide rounded-full border border-border bg-muted/50 text-muted-foreground px-2 py-0.5">
+            {badge}
+          </span>
+        )}
+      </div>
       {children}
     </div>
   )

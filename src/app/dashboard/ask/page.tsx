@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Send, Loader2, Sparkles, Plus, MessageSquare,
-  TrendingUp, FileText, Filter,
+  TrendingUp, FileText, Filter, ArrowRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -17,12 +18,15 @@ import { MonthlyReportTab, BusinessCaseTab, FunnelDiagnosticTab } from './v2-too
 
 interface Source { label: string; detail: string }
 
+interface Cta { label: string; href: string }
+
 interface Message {
   role: 'user' | 'assistant'
   content: string
   sources?: Source[]
   confidence?: 'High' | 'Medium' | 'Low'
   collectionRecommendation?: string | null
+  actions?: Cta[]
 }
 
 interface ConversationSummary {
@@ -159,8 +163,12 @@ function AskPageContent() {
       })
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({})) as { error?: string }
-        setMessages(prev => [...prev, { role: 'assistant', content: err.error ?? 'Something went wrong. Please try again.' }])
+        const err = await res.json().catch(() => ({})) as { error?: string; ctas?: Cta[] }
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: err.error ?? 'Something went wrong. Please try again.',
+          actions: err.ctas,
+        }])
         return
       }
 
@@ -371,6 +379,21 @@ function AskPageContent() {
                         <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 leading-relaxed max-w-2xl">
                           <span className="font-medium">To get a better answer: </span>
                           {m.collectionRecommendation}
+                        </div>
+                      )}
+
+                      {m.role === 'assistant' && m.actions && m.actions.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {m.actions.map(a => (
+                            <Link
+                              key={a.href + a.label}
+                              href={a.href}
+                              className="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-3 py-1.5 hover:bg-muted transition-colors"
+                            >
+                              {a.label}
+                              <ArrowRight className="h-3 w-3" />
+                            </Link>
+                          ))}
                         </div>
                       )}
                     </div>

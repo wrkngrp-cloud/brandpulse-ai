@@ -71,6 +71,13 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
       body:  'Everything you need to measure, analyse and justify your marketing spend is here. Let us show you around in under a minute.',
     },
     {
+      id:       'connect-checklist',
+      title:    'Connect your data first',
+      body:     'BrandGauge reads from the sources you connect. Work through this setup checklist to plug in your social accounts, analytics and ads, and every score on this page starts filling in. Each item takes you straight to the right place.',
+      target:   '[data-tour="connect-checklist"]',
+      position: 'bottom',
+    },
+    {
       id:       'quick-actions',
       title:    'Start something new',
       body:     'Pin an OOH site, create an event, launch a consumer survey or run a quick pre-post content check without leaving this page.',

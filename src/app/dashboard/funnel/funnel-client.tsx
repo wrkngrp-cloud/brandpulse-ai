@@ -123,8 +123,14 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
 
     if (!hasEnoughData) {
       toast.error(
-        `Not enough data yet to run a full diagnosis. The funnel needs data across at least 2 stages. What's missing: ${nullStages.join(', ')}.`,
-        { duration: 6000 },
+        `Not enough data yet for a full diagnosis. The funnel needs scores on at least 2 stages. Still empty: ${nullStages.join(', ')}. Connect the data sources that feed these stages and the diagnosis unlocks.`,
+        {
+          duration: 8000,
+          action: {
+            label:   'Open Connectors',
+            onClick: () => { window.location.href = '/dashboard/connectors' },
+          },
+        },
       )
       return
     }
