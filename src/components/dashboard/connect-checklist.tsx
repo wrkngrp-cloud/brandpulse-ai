@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { Check, ArrowRight, X, Plug } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -25,11 +25,17 @@ export function ConnectChecklist({ items, serverDismissed }: {
   const doneCount = items.filter(i => i.done).length
   const allDone   = items.length > 0 && doneCount === items.length
 
-  const [dismissed, setDismissed] = useState(serverDismissed)
+  const [dismissedNow, setDismissedNow] = useState(false)
 
-  useEffect(() => {
-    if (window.localStorage.getItem(STORAGE_KEY)) setDismissed(true)
-  }, [])
+  // Browser-side dismissal (demo accounts and instant hide after clicking X).
+  // useSyncExternalStore lets the server render assume "not dismissed" and the
+  // client correct it without setting state from an effect.
+  const locallyDismissed = useSyncExternalStore(
+    () => () => {},
+    () => !!window.localStorage.getItem(STORAGE_KEY),
+    () => false,
+  )
+  const dismissed = serverDismissed || locallyDismissed || dismissedNow
 
   // Once every source is connected the job is done — record it so the list
   // stays gone on every device, then stop rendering.
@@ -43,7 +49,7 @@ export function ConnectChecklist({ items, serverDismissed }: {
   if (dismissed || allDone || items.length === 0) return null
 
   function dismiss() {
-    setDismissed(true)
+    setDismissedNow(true)
     window.localStorage.setItem(STORAGE_KEY, '1')
     markTourStatus('connect_checklist', 'skipped')
   }
