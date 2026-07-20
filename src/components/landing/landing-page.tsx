@@ -508,7 +508,7 @@ function CursorField() {
       <div className="absolute left-0 top-0 h-[620px] w-[620px] rounded-full blur-[85px]"
         style={{
           transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
-          background: 'radial-gradient(circle, rgba(212,96,42,0.38), rgba(43,89,255,0.14) 45%, transparent 72%)',
+          background: 'radial-gradient(circle, rgba(212,96,42,0.20), rgba(43,89,255,0.08) 45%, transparent 72%)',
           willChange: 'transform',
         }} />
       {/* a defined ring right at the cursor, so the pointer itself reads as the source */}
@@ -516,7 +516,7 @@ function CursorField() {
         style={{
           transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
           border: '1px solid var(--lp-clay)',
-          opacity: 0.35,
+          opacity: 0.18,
           willChange: 'transform',
         }} />
       {/* dot grid revealed in place around the pointer via a cursor-tracking radial mask */}
@@ -524,7 +524,7 @@ function CursorField() {
         style={{
           backgroundImage: 'radial-gradient(var(--lp-clay) 1.6px, transparent 1.6px)',
           backgroundSize: '26px 26px',
-          opacity: 0.95,
+          opacity: 0.5,
           WebkitMaskImage: 'radial-gradient(260px circle at var(--lp-x, -999px) var(--lp-y, -999px), rgba(0,0,0,0.95), transparent 72%)',
           maskImage: 'radial-gradient(260px circle at var(--lp-x, -999px) var(--lp-y, -999px), rgba(0,0,0,0.95), transparent 72%)',
         }} />
