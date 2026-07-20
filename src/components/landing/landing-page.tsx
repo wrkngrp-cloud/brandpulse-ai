@@ -16,21 +16,21 @@ const rise = {
 }
 
 // ————— theme palettes —————
-const LIGHT = {
+export const LIGHT = {
   '--lp-bg': '#FBF9F5', '--lp-ink': '#14182B', '--lp-mut': 'rgba(20,24,43,0.55)',
   '--lp-line': 'rgba(20,24,43,0.10)', '--lp-card': '#FFFFFF', '--lp-glass': 'rgba(255,255,255,0.75)',
   '--lp-chip': 'rgba(20,24,43,0.04)', '--lp-clay': CLAY, '--lp-band': '#14182B', '--lp-band-ink': '#F4EDE4',
   '--lp-dot': 'rgba(20,24,43,0.10)',
 } as React.CSSProperties
 
-const DARK = {
+export const DARK = {
   '--lp-bg': '#080C1A', '--lp-ink': '#F4EDE4', '--lp-mut': 'rgba(244,237,228,0.52)',
   '--lp-line': 'rgba(255,255,255,0.10)', '--lp-card': '#0E1430', '--lp-glass': 'rgba(11,16,34,0.75)',
   '--lp-chip': 'rgba(255,255,255,0.04)', '--lp-clay': '#E06A32', '--lp-band': '#0E1430', '--lp-band-ink': '#F4EDE4',
   '--lp-dot': 'rgba(255,255,255,0.10)',
 } as React.CSSProperties
 
-function Wordmark({ className = 'text-xl' }: { className?: string }) {
+export function Wordmark({ className = 'text-xl' }: { className?: string }) {
   return (
     <span className={`font-extrabold tracking-tight ${className}`} style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
       Brand<span style={{ color: 'var(--lp-clay)' }}>Gauge</span>
@@ -38,7 +38,7 @@ function Wordmark({ className = 'text-xl' }: { className?: string }) {
   )
 }
 
-function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
+export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       <div className="mx-4 mt-4 flex max-w-6xl items-center justify-between rounded-2xl border px-4 py-3 backdrop-blur-xl sm:mx-6 sm:px-5 lg:mx-auto"
@@ -48,9 +48,10 @@ function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
           <Wordmark />
         </Link>
         <nav className="hidden items-center gap-7 font-mono text-[11px] uppercase tracking-[0.18em] md:flex" style={{ color: 'var(--lp-mut)' }}>
-          <a href="#tour" className="transition-opacity hover:opacity-60">Product</a>
-          <a href="#builtforhere" className="transition-opacity hover:opacity-60">Why us</a>
-          <a href="#industries" className="transition-opacity hover:opacity-60">Industries</a>
+          <a href="/#tour" className="transition-opacity hover:opacity-60">Product</a>
+          <Link href="/features" className="transition-opacity hover:opacity-60">Features</Link>
+          <Link href="/use-cases" className="transition-opacity hover:opacity-60">Industries</Link>
+          <a href="/#builtforhere" className="transition-opacity hover:opacity-60">Why us</a>
         </nav>
         <div className="flex items-center gap-2.5">
           <button onClick={onToggle} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -60,7 +61,7 @@ function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
           </button>
           <Link href="/auth/login" className="hidden text-[13px] font-medium transition-opacity hover:opacity-70 sm:block" style={{ color: 'var(--lp-ink)' }}>Sign in</Link>
           <Link href="/auth/signup"
-            className="rounded-full px-4 py-2 text-[13px] font-bold text-white shadow-[0_8px_28px_rgba(212,96,42,0.35)] transition-transform hover:scale-[1.04]"
+            className="whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-bold text-white shadow-[0_8px_28px_rgba(212,96,42,0.35)] transition-transform hover:scale-[1.04]"
             style={{ background: 'var(--lp-clay)' }}>
             Start free
           </Link>
@@ -181,7 +182,7 @@ function Hero() {
         <div className="relative mt-16 overflow-hidden" style={{ maskImage: 'linear-gradient(90deg, transparent, black 12%, black 88%, transparent)' }}>
           <div className="flex w-max animate-[lp-marquee_26s_linear_infinite] gap-10 font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--lp-mut)' }}>
             {[...Array(2)].flatMap((_, k) =>
-              ['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'App Store', 'WhatsApp Cloud API', 'Mailchimp', 'Google Maps', 'YouTube'].map(c => (
+              ['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
                 <span key={`${k}-${c}`} className="flex items-center gap-10">
                   <span>{c}</span><span style={{ color: 'var(--lp-clay)' }}>·</span>
                 </span>
@@ -197,8 +198,8 @@ function Hero() {
 
 const DIFFS = [
   { n: '01', title: 'It speaks your market’s language', body: 'Sentiment models that understand Pidgin, Yoruba, Igbo and Hausa, tuned on how customers here actually talk about brands. Global tools guess. This one knows.' },
-  { n: '02', title: 'WhatsApp is a first-class channel', body: 'Surveys, NPS and campaign messages over WhatsApp with consent built in. Research goes where the replies are.' },
-  { n: '03', title: 'Offline media finally measured', body: 'Billboards, radio, TV and print get vanity links, search uplift and geo attribution. The biggest slice of your budget stops being a blind spot.' },
+  { n: '02', title: 'Your field team becomes a data source', body: 'Ambassadors capture leads at events through a phone-first app, field officers log store visits, and it all lands on the same dashboard as your ads.' },
+  { n: '03', title: 'Offline media finally measured', body: 'Billboards, radio, TV and print get vanity links, geo attribution and AI media-plan analysis. The biggest slice of your budget stops being a blind spot.' },
   { n: '04', title: 'Numbers for the boardroom', body: 'CAC, ROI, funnel lift and an AI-written business case, generated from live connector data. Walk into the budget meeting with proof.' },
   { n: '05', title: 'Tracks how AI talks about you', body: 'A weekly check on what ChatGPT, Gemini and Perplexity say when customers ask about your category. A channel your competitors ignore.' },
   { n: '06', title: 'Built for seven industries', body: 'FMCG, fintech, venues, B2B SaaS, marketplaces, beverages and distribution. The index, funnel and recommendations reshape for each.' },
@@ -274,7 +275,7 @@ function DeepDives() {
 function Industries() {
   const list = [
     { name: 'FMCG', hint: 'Shelf visibility, share of voice, distributor pull' },
-    { name: 'Fintech', hint: 'Trust signals, app reviews, USSD complaints' },
+    { name: 'Fintech', hint: 'Trust signals: social comments, street discourse, NPS' },
     { name: 'Venues & Restaurants', hint: 'Footfall, Google Maps reviews, event ROI' },
     { name: 'B2B SaaS', hint: 'G2 reviews, developer health, pipeline lift' },
     { name: 'Marketplaces', hint: 'Seller ratings, GMV attribution, buyer NPS' },
@@ -339,7 +340,7 @@ function FinalCta() {
   )
 }
 
-function Footer() {
+export function Footer() {
   return (
     <footer className="border-t px-6 py-10" style={{ borderColor: 'var(--lp-line)' }}>
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
@@ -351,6 +352,8 @@ function Footer() {
           Made for West African marketers
         </p>
         <div className="flex gap-6 text-[12px]" style={{ color: 'var(--lp-mut)' }}>
+          <Link href="/features" className="transition-opacity hover:opacity-60">Features</Link>
+          <Link href="/use-cases" className="transition-opacity hover:opacity-60">Industries</Link>
           <Link href="/privacy-policy" className="transition-opacity hover:opacity-60">Privacy</Link>
           <a href="mailto:hello@brandgauge.app" className="transition-opacity hover:opacity-60">Contact</a>
         </div>

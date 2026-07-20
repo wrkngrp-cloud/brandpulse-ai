@@ -4,7 +4,7 @@ import {
 } from 'remotion'
 import {
   AiScene, CompetitiveScene, FunnelScene, GaugeMark, GaugeScene, OohScene,
-  SentimentScene, WhatsAppScene, lightSceneVars,
+  SentimentScene, SurveyScene, lightSceneVars,
 } from '../../src/components/landing/scenes'
 
 export const FPS = 30
@@ -35,7 +35,7 @@ const BEATS: Beat[] = [
   { kind: 'chapter', dur: 195, Comp: SentimentScene, headline: 'Understand the street, in its own words', side: 'left' },
   { kind: 'word', dur: 66, word: 'MEASURE', dot: BLUE },
   { kind: 'chapter', dur: 195, Comp: FunnelScene, headline: 'Defend your marketing spend to the CEO', side: 'left' },
-  { kind: 'chapter', dur: 180, Comp: WhatsAppScene, headline: 'Hear from customers where they actually reply', side: 'right' },
+  { kind: 'chapter', dur: 180, Comp: SurveyScene, headline: 'Hear from customers, scored as replies land', side: 'right' },
   { kind: 'word', dur: 66, word: 'PROVE', dot: CLAY },
   { kind: 'chapter', dur: 210, Comp: OohScene, headline: 'Prove the billboard on the expressway worked', side: 'right' },
   { kind: 'chapter', dur: 180, Comp: AiScene, headline: 'Know what AI tells customers about you', side: 'left' },
