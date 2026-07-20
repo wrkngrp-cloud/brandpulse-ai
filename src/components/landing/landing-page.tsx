@@ -101,6 +101,28 @@ function CircleMotif({ className = '', size = 320 }: { className?: string; size?
   )
 }
 
+/** Faint decorative echo of the BHI gauge arc (225°→315°, ticks at 40/65/80) —
+ *  ties "we measure it" into the page's negative space instead of a generic pattern. */
+function GaugeArcMotif({ className = '', size = 520, color = 'var(--lp-clay)', opacity = 0.1 }:
+  { className?: string; size?: number; color?: string; opacity?: number }) {
+  const R = 92
+  const toXY = (deg: number) => {
+    const r = (deg * Math.PI) / 180
+    return { x: (100 + R * Math.cos(r)).toFixed(2), y: (100 - R * Math.sin(r)).toFixed(2) }
+  }
+  const start = toXY(225), end = toXY(315)
+  const d = `M ${start.x} ${start.y} A ${R} ${R} 0 1 1 ${end.x} ${end.y}`
+  return (
+    <svg width={size} height={size} viewBox="0 0 200 200" className={className} aria-hidden>
+      <path d={d} fill="none" stroke={color} strokeOpacity={opacity} strokeWidth="1.4" strokeLinecap="round" strokeDasharray="1 8" />
+      {[40, 65, 80].map(pct => {
+        const p = toXY(225 - (pct / 100) * 270)
+        return <circle key={pct} cx={p.x} cy={p.y} r="2.2" fill={color} fillOpacity={opacity * 1.4} />
+      })}
+    </svg>
+  )
+}
+
 function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
@@ -207,67 +229,96 @@ const DIFFS = [
 
 function Differentiators() {
   return (
-    <section id="builtforhere" className="relative mx-auto max-w-6xl scroll-mt-24 px-6 py-28">
-      <motion.p {...rise} className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>Why BrandGauge</motion.p>
-      <motion.h2 {...rise} className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl"
-        style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
-        Built for here. Not adapted for here.
-      </motion.h2>
-      <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {DIFFS.map((d, i) => (
-          <motion.div key={d.n} {...rise} transition={{ ...rise.transition, delay: i * 0.05 }}
-            className="group relative overflow-hidden rounded-2xl border p-7 transition-all duration-300 hover:-translate-y-1.5"
-            style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', boxShadow: '0 1px 2px rgba(20,24,43,0.04)' }}>
-            {/* clay corner sweep on hover */}
-            <div className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-              style={{ background: 'rgba(212,96,42,0.22)' }} />
-            <span className="font-mono text-[11px]" style={{ color: 'var(--lp-clay)' }}>{d.n}</span>
-            <h3 className="mt-3 text-[17px] font-bold leading-snug" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>{d.title}</h3>
-            <p className="mt-2.5 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{d.body}</p>
-          </motion.div>
-        ))}
+    <section id="builtforhere" className="relative overflow-hidden scroll-mt-24 py-28">
+      {/* patterned backdrop: dot grid + adire motif + gauge echo + washes */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(var(--lp-dot) 1px, transparent 1px)',
+          backgroundSize: '26px 26px',
+          maskImage: 'radial-gradient(65% 70% at 50% 0%, black, transparent)',
+        }} />
+        <div className="absolute -left-20 -top-16 opacity-40"><CircleMotif size={200} /></div>
+        <div className="absolute -bottom-32 -right-24"><GaugeArcMotif size={560} opacity={0.24} /></div>
+        <div className="absolute right-0 top-0 h-[360px] w-[560px] rounded-full blur-[130px]"
+          style={{ background: 'rgba(43,89,255,0.08)' }} />
+        <div className="absolute -bottom-40 left-0 h-[340px] w-[600px] rounded-full blur-[130px]"
+          style={{ background: 'rgba(212,96,42,0.09)' }} />
       </div>
 
-      {/* stats band */}
-      <motion.div {...rise} className="mt-16 grid grid-cols-2 gap-4 rounded-2xl border p-8 text-center sm:grid-cols-4"
-        style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-chip)' }}>
-        {[
-          { v: 4,  s: '',  label: 'languages read natively' },
-          { v: 7,  s: '',  label: 'industry playbooks' },
-          { v: 10, s: '+', label: 'live connectors' },
-          { v: 5,  s: '',  label: 'offline channels measured' },
-        ].map(st => (
-          <div key={st.label}>
-            <p className="text-4xl font-black tabular-nums" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-clay)' }}>
-              <CountUp to={st.v} suffix={st.s} />
-            </p>
-            <p className="mt-1 text-[12px]" style={{ color: 'var(--lp-mut)' }}>{st.label}</p>
-          </div>
-        ))}
-      </motion.div>
+      <div className="relative mx-auto max-w-6xl px-6">
+        <motion.p {...rise} className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>Why BrandGauge</motion.p>
+        <motion.h2 {...rise} className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl"
+          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          Built for here. Not adapted for here.
+        </motion.h2>
+        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {DIFFS.map((d, i) => (
+            <motion.div key={d.n} {...rise} transition={{ ...rise.transition, delay: i * 0.05 }}
+              className="group relative overflow-hidden rounded-2xl border p-7 transition-all duration-300 hover:-translate-y-1.5"
+              style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', boxShadow: '0 1px 2px rgba(20,24,43,0.04)' }}>
+              {/* clay corner sweep on hover */}
+              <div className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                style={{ background: 'rgba(212,96,42,0.22)' }} />
+              <span className="font-mono text-[11px]" style={{ color: 'var(--lp-clay)' }}>{d.n}</span>
+              <h3 className="mt-3 text-[17px] font-bold leading-snug" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>{d.title}</h3>
+              <p className="mt-2.5 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{d.body}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* stats band */}
+        <motion.div {...rise} className="relative mt-16 grid grid-cols-2 gap-4 rounded-2xl border p-8 text-center sm:grid-cols-4"
+          style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-chip)' }}>
+          <div className="pointer-events-none absolute -bottom-16 -right-10"><GaugeArcMotif size={220} opacity={0.3} /></div>
+          {[
+            { v: 4,  s: '',  label: 'languages read natively' },
+            { v: 7,  s: '',  label: 'industry playbooks' },
+            { v: 10, s: '+', label: 'live connectors' },
+            { v: 5,  s: '',  label: 'offline channels measured' },
+          ].map(st => (
+            <div key={st.label} className="relative">
+              <p className="text-4xl font-black tabular-nums" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-clay)' }}>
+                <CountUp to={st.v} suffix={st.s} />
+              </p>
+              <p className="mt-1 text-[12px]" style={{ color: 'var(--lp-mut)' }}>{st.label}</p>
+            </div>
+          ))}
+        </motion.div>
+      </div>
     </section>
   )
 }
 
 function DeepDives() {
   return (
-    <section className="mx-auto max-w-6xl space-y-24 px-6 py-16">
-      {[
-        { Comp: AiScene, kicker: 'AI command layer', title: 'Ask your data anything',
-          body: 'Plain questions, straight answers, sourced from your own numbers. And once a week, BrandGauge asks the big AI assistants about your category and scores how you show up.' },
-        { Comp: CompetitiveScene, kicker: 'Competitive intelligence', title: 'Know their moves before Monday',
-          body: 'Share of voice, competitor sightings and an auto-written briefing at the start of every week. When a rival cuts prices, you hear it from us first.' },
-      ].map((s, i) => (
-        <motion.div key={s.kicker} {...rise}
-          className={`flex flex-col gap-10 lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
-          <div className="lg:w-[38%]">
-            <p className="font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--lp-clay)' }}>{s.kicker}</p>
-            <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>{s.title}</h3>
-            <p className="mt-4 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{s.body}</p>
-          </div>
-          <div className="@container h-[430px] flex-1 sm:h-[360px]"><s.Comp t={1} /></div>
-        </motion.div>
-      ))}
+    <section className="relative overflow-hidden py-16">
+      {/* patterned backdrop: diagonal wash pair + a faint circle motif cropped at the edge */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-32 top-1/4 opacity-30"><CircleMotif size={380} /></div>
+        <div className="absolute -right-20 top-0 h-[360px] w-[520px] rounded-full blur-[140px]"
+          style={{ background: 'rgba(212,96,42,0.07)' }} />
+        <div className="absolute -left-10 bottom-0 h-[320px] w-[480px] rounded-full blur-[140px]"
+          style={{ background: 'rgba(43,89,255,0.08)' }} />
+      </div>
+
+      <div className="relative mx-auto max-w-6xl space-y-24 px-6">
+        {[
+          { Comp: AiScene, kicker: 'AI command layer', title: 'Ask your data anything',
+            body: 'Plain questions, straight answers, sourced from your own numbers. And once a week, BrandGauge asks the big AI assistants about your category and scores how you show up.' },
+          { Comp: CompetitiveScene, kicker: 'Competitive intelligence', title: 'Know their moves before Monday',
+            body: 'Share of voice, competitor sightings and an auto-written briefing at the start of every week. When a rival cuts prices, you hear it from us first.' },
+        ].map((s, i) => (
+          <motion.div key={s.kicker} {...rise}
+            className={`flex flex-col gap-10 lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
+            <div className="lg:w-[38%]">
+              <p className="font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--lp-clay)' }}>{s.kicker}</p>
+              <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>{s.title}</h3>
+              <p className="mt-4 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{s.body}</p>
+            </div>
+            <div className="@container h-[430px] flex-1 sm:h-[360px]"><s.Comp t={1} /></div>
+          </motion.div>
+        ))}
+      </div>
     </section>
   )
 }
@@ -284,28 +335,45 @@ function Industries() {
   ]
   const [active, setActive] = useState(1)
   return (
-    <section id="industries" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-24 text-center">
-      <motion.h2 {...rise} className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
-        One gauge. Seven industries.
-      </motion.h2>
-      <motion.p {...rise} className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
-        Pick your industry once. The health index, funnel signals and connector
-        recommendations reshape themselves around how your business actually works.
-      </motion.p>
-      <motion.div {...rise} className="mt-10 flex flex-wrap justify-center gap-3">
-        {list.map((v, i) => (
-          <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
-            className="rounded-full border px-5 py-2.5 text-[13px] transition-all duration-200"
-            style={active === i
-              ? { borderColor: 'var(--lp-clay)', color: 'var(--lp-clay)', background: 'rgba(212,96,42,0.08)', transform: 'translateY(-2px)' }
-              : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
-            {v.name}
-          </button>
-        ))}
-      </motion.div>
-      <p className="mx-auto mt-6 h-6 max-w-md font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: 'var(--lp-mut)' }}>
-        {list[active].hint}
-      </p>
+    <section id="industries" className="relative overflow-hidden scroll-mt-24 py-24 text-center">
+      {/* patterned backdrop: radial dot grid bookending the hero + a large centred gauge echo
+          ("one gauge" made literal in the negative space) */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(var(--lp-dot) 1px, transparent 1px)',
+          backgroundSize: '26px 26px',
+          maskImage: 'radial-gradient(60% 65% at 50% 50%, black, transparent)',
+        }} />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <GaugeArcMotif size={620} opacity={0.22} />
+        </div>
+        <div className="absolute left-1/2 top-0 h-[300px] w-[560px] -translate-x-1/2 rounded-full blur-[130px]"
+          style={{ background: 'rgba(212,96,42,0.07)' }} />
+      </div>
+
+      <div className="relative mx-auto max-w-6xl px-6">
+        <motion.h2 {...rise} className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          One gauge. Seven industries.
+        </motion.h2>
+        <motion.p {...rise} className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
+          Pick your industry once. The health index, funnel signals and connector
+          recommendations reshape themselves around how your business actually works.
+        </motion.p>
+        <motion.div {...rise} className="mt-10 flex flex-wrap justify-center gap-3">
+          {list.map((v, i) => (
+            <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
+              className="rounded-full border px-5 py-2.5 text-[13px] transition-all duration-200"
+              style={active === i
+                ? { borderColor: 'var(--lp-clay)', color: 'var(--lp-clay)', background: 'rgba(212,96,42,0.08)', transform: 'translateY(-2px)' }
+                : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
+              {v.name}
+            </button>
+          ))}
+        </motion.div>
+        <p className="mx-auto mt-6 h-6 max-w-md font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: 'var(--lp-mut)' }}>
+          {list[active].hint}
+        </p>
+      </div>
     </section>
   )
 }
@@ -321,6 +389,9 @@ function FinalCta() {
         }} />
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[320px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px]"
           style={{ background: 'rgba(224,106,50,0.20)' }} />
+        <div className="pointer-events-none absolute -right-16 -top-16">
+          <GaugeArcMotif size={300} color="#F4EDE4" opacity={0.2} />
+        </div>
         <motion.h2 {...rise} className="relative mx-auto max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-band-ink)' }}>
           Your brand already has a reputation. Start measuring it.
