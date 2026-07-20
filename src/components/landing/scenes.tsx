@@ -289,31 +289,35 @@ export function FunnelScene({ t }: { t: number }) {
   )
 }
 
-// ————— Scene 4: WhatsApp surveys —————
-export function WhatsAppScene({ t }: { t: number }) {
+// ————— Scene 4: surveys & NPS (email + in-app + shareable link) —————
+export function SurveyScene({ t }: { t: number }) {
   const replies = [
-    { text: '9 — una dey try, keep am up', score: 9 },
-    { text: '10! Best app for transfers, no wahala', score: 10 },
-    { text: '6 — app good but charges too much', score: 6 },
+    { text: '9 — una dey try, keep am up', score: 9, via: 'Email' },
+    { text: '10! Best app for transfers, no wahala', score: 10, via: 'Link' },
+    { text: '6 — app good but charges too much', score: 6, via: 'In-app' },
   ]
   const nps = Math.round(58 * easeOut(win(t, 0.55, 0.85)))
   return (
     <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:flex-row @xl:gap-6 @xl:p-6">
       <div className="flex w-full flex-col gap-2.5 @xl:w-1/2">
         <div className="flex items-center justify-between">
-          <Label>WhatsApp survey · NPS wave 4</Label>
+          <Label>NPS survey · wave 4</Label>
           <Tag tone="green">Opt-in only</Tag>
         </div>
-        <div className="rounded-2xl rounded-tr-sm bg-[#1F5C46] px-3 py-2 text-[11.5px] leading-snug text-white/95"
-          style={{ opacity: easeOut(win(t, 0.05, 0.18)) }}>
-          Quick one 🙏 On a scale of 0–10, how likely are you to recommend PocketPay to a friend?
+        <div className="flex gap-1.5" style={{ opacity: easeOut(win(t, 0.03, 0.14)) }}>
+          <Tag tone="blue">Email</Tag><Tag tone="blue">In-app</Tag><Tag tone="blue">Share link</Tag>
+        </div>
+        <div className="rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2 text-[11.5px] leading-snug text-[var(--s-body)]"
+          style={{ opacity: easeOut(win(t, 0.08, 0.2)) }}>
+          On a scale of 0–10, how likely are you to recommend PocketPay to a friend?
         </div>
         {replies.map((r, i) => {
           const p = easeOut(win(t, 0.22 + i * 0.14, 0.36 + i * 0.14))
           return (
-            <div key={i} className="mr-10 flex items-center gap-2 self-start rounded-2xl rounded-tl-sm border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2"
-              style={{ opacity: p, transform: `translateX(${(1 - p) * -16}px)` }}>
+            <div key={i} className="flex items-center gap-2 self-start rounded-xl border border-[var(--s-line)] bg-[var(--s-panel)] px-3 py-2 @xl:mr-10"
+              style={{ opacity: p, transform: `translateX(${(1 - p) * -16}px)`, boxShadow: '0 1px 3px rgba(20,24,43,0.05)' }}>
               <p className="text-[11.5px] text-[var(--s-body)]">{r.text}</p>
+              <Tag>{r.via}</Tag>
               <Tag tone={r.score >= 9 ? 'green' : r.score >= 7 ? 'dim' : 'red'}>{r.score}</Tag>
             </div>
           )
@@ -326,7 +330,7 @@ export function WhatsAppScene({ t }: { t: number }) {
           <Tag tone="green">61% promoters</Tag><Tag tone="red">3% detractors</Tag>
         </div>
         <p className="hidden max-w-[220px] text-center text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.78, 0.92) }}>
-          Surveys go where your customers already reply: WhatsApp, email, in-app and link.
+          Email, in-app and shareable-link surveys, with every reply scored as it lands.
         </p>
       </div>
     </Panel>
@@ -392,8 +396,8 @@ export function OohScene({ t }: { t: number }) {
         <Label>Attribution · last 30 days</Label>
         {[
           { label: 'Vanity link visits', value: '3,412', p: 0.9 },
-          { label: 'Branded search uplift', value: `+${lift}%`, p: 0.62, clay: true },
-          { label: 'New customers within 5km', value: '208', p: 0.38 },
+          { label: 'New customers within 5km', value: `${Math.round(lift * 11.6)}`, p: 0.62, clay: true },
+          { label: 'Geo-retargeting audience', value: '12,400', p: 0.38 },
         ].map((row, i) => {
           const p = easeOut(win(t, 0.35 + i * 0.12, 0.6 + i * 0.12))
           return (
@@ -409,7 +413,7 @@ export function OohScene({ t }: { t: number }) {
           )
         })}
         <p className="hidden text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.72, 0.88) }}>
-          Billboards, radio, TV and print measured with vanity links and search uplift. Not gut feeling.
+          Billboards, radio, TV and print measured with vanity links and geo attribution. Not gut feeling.
         </p>
       </div>
     </Panel>
@@ -423,7 +427,7 @@ export function AiScene({ t }: { t: number }) {
   const answers = [
     'Negative spike traces to a 14-hour USSD outage on Tuesday.',
     '62% of negative mentions were in Hausa. Top phrase: "ba ya aiki" (it is not working).',
-    'Recommend: WhatsApp service update to northern segments + status page link.',
+    'Recommend: service-status notice to northern segments + in-app banner.',
   ]
   const platforms = [
     { name: 'ChatGPT', score: 82 }, { name: 'Gemini', score: 74 }, { name: 'Perplexity', score: 68 },

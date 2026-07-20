@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useMotionValueEvent, useScroll } from 'framer-motion'
-import { FunnelScene, GaugeScene, OohScene, SentimentScene, WhatsAppScene, clamp01 } from './scenes'
+import { FunnelScene, GaugeScene, OohScene, SentimentScene, SurveyScene, clamp01 } from './scenes'
 
 const PANELS = [
   {
@@ -24,16 +24,16 @@ const PANELS = [
     body: 'CAC, ROI and funnel movement from Meta Ads, GA4, Paystack and your site pixel.',
   },
   {
-    Comp: WhatsAppScene,
-    kicker: '04 · WhatsApp research',
-    title: 'Surveys where people actually reply',
-    body: 'NPS waves over WhatsApp, opt-in and NDPR-aware, scored as replies land.',
+    Comp: SurveyScene,
+    kicker: '04 · Surveys & NPS',
+    title: 'Ask, and score every reply live',
+    body: 'NPS waves by email, in-app and shareable link, opt-in and NDPR-aware, scored as replies land.',
   },
   {
     Comp: OohScene,
     kicker: '05 · Offline attribution',
     title: 'From billboard to bank alert',
-    body: 'Vanity links, search uplift and geo attribution for OOH, radio, TV and print.',
+    body: 'Vanity links, geo attribution and AI media-plan analysis for OOH, radio, TV and print.',
   },
 ]
 
