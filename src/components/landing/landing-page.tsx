@@ -178,9 +178,9 @@ function Hero() {
         </h1>
         <motion.p {...rise} transition={{ ...rise.transition, delay: 0.5 }}
           className="mx-auto mt-6 max-w-2xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--lp-mut)' }}>
-          BrandGauge reads sentiment in Pidgin, Yoruba, Igbo and Hausa, measures every channel
-          from Instagram to a billboard on the expressway, and turns it all into numbers your
-          board will trust.
+          BrandGauge reads sentiment in Pidgin, Yoruba, Igbo and Hausa. It measures every
+          channel, from Instagram to a billboard on the expressway. Then it turns it all
+          into numbers your board will trust.
         </motion.p>
         <motion.div {...rise} transition={{ ...rise.transition, delay: 0.6 }} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Link href="/auth/signup"
@@ -220,7 +220,7 @@ function Hero() {
 
 const DIFFS = [
   { n: '01', title: 'It speaks your market’s language', body: 'Sentiment models that understand Pidgin, Yoruba, Igbo and Hausa, tuned on how customers here actually talk about brands. Global tools guess. This one knows.' },
-  { n: '02', title: 'Your field team becomes a data source', body: 'Ambassadors capture leads at events through a phone-first app, field officers log store visits, and it all lands on the same dashboard as your ads.' },
+  { n: '02', title: 'Your field team becomes a data source', body: 'Ambassadors capture leads at events through a phone-first app. Field officers log store visits. It all lands on the same dashboard as your ads.' },
   { n: '03', title: 'Offline media finally measured', body: 'Billboards, radio, TV and print get vanity links, geo attribution and AI media-plan analysis. The biggest slice of your budget stops being a blind spot.' },
   { n: '04', title: 'Numbers for the boardroom', body: 'CAC, ROI, funnel lift and an AI-written business case, generated from live connector data. Walk into the budget meeting with proof.' },
   { n: '05', title: 'Tracks how AI talks about you', body: 'A weekly check on what ChatGPT, Gemini and Perplexity say when customers ask about your category. A channel your competitors ignore.' },
@@ -304,7 +304,7 @@ function DeepDives() {
       <div className="relative mx-auto max-w-6xl space-y-24 px-6">
         {[
           { Comp: AiScene, kicker: 'AI command layer', title: 'Ask your data anything',
-            body: 'Plain questions, straight answers, sourced from your own numbers. And once a week, BrandGauge asks the big AI assistants about your category and scores how you show up.' },
+            body: 'Plain questions, straight answers, sourced from your own numbers. And once a week, BrandGauge asks the big AI assistants about your category. It scores how you show up.' },
           { Comp: CompetitiveScene, kicker: 'Competitive intelligence', title: 'Know their moves before Monday',
             body: 'Share of voice, competitor sightings and an auto-written briefing at the start of every week. When a rival cuts prices, you hear it from us first.' },
         ].map((s, i) => (

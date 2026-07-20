@@ -29,7 +29,7 @@ const INDUSTRIES: Industry[] = [
     jobs: [
       { title: 'Know if the street still loves the brand', how: 'Cultural sentiment reads Pidgin, Yoruba, Igbo and Hausa mentions from X and Instagram daily, next to share of voice against the brands you fight for shelf space.' },
       { title: 'Prove the billboard and the radio spot worked', how: 'Vanity links, geo attribution and AI analysis of your radio and TV media plans turn offline spend into numbers.' },
-      { title: 'See what the field sees', how: 'Field officers log store visits and sightings in a phone-first app; activations report live event ROI with ambassador-captured leads.' },
+      { title: 'See what the field sees', how: 'Field officers log store visits and sightings in a phone-first app. Activations report live event ROI with ambassador-captured leads.' },
     ],
     modules: ['Brand Health Index', 'Cultural sentiment', 'Share of voice', 'OOH + geo attribution', 'Radio/TV/print import', 'Field intelligence', 'Events'],
   },
@@ -57,9 +57,9 @@ const INDUSTRIES: Industry[] = [
     id: 'saas', name: 'B2B SaaS',
     who: 'For marketing leads at software companies selling to Nigerian and West African businesses.',
     jobs: [
-      { title: 'Tie brand work to pipeline', how: 'MQLs from your site pixel and forms, funnel lift stage by stage, and CAC from your ad accounts, in the same view as brand sentiment.' },
+      { title: 'Tie brand work to pipeline', how: 'See MQLs from your site pixel and forms, funnel lift stage by stage, and CAC from your ad accounts, all in the same view as brand sentiment.' },
       { title: 'Feed in the metrics only you have', how: 'A first-party data API takes signups, activations or retention numbers from your own stack, and they join the funnel like any connector.' },
-      { title: 'Walk into Monday knowing the category', how: 'Share of voice and an auto-written competitive briefing covering what rivals shipped, said and got dragged for.' },
+      { title: 'Walk into Monday knowing the category', how: 'Get share of voice and an auto-written competitive briefing covering what rivals shipped, said and got dragged for.' },
     ],
     modules: ['Funnel + MQLs', 'First-party data API', 'Competitive briefing', 'AI command layer', 'BHI SaaS preset'],
   },
@@ -67,7 +67,7 @@ const INDUSTRIES: Industry[] = [
     id: 'marketplaces', name: 'Marketplaces',
     who: 'For marketplace and platform teams balancing buyer growth with seller trust.',
     jobs: [
-      { title: 'See both sides of the market', how: 'Buyer NPS through email and in-app surveys on one side; seller sentiment from social mentions on the other.' },
+      { title: 'See both sides of the market', how: 'See buyer NPS through email and in-app surveys on one side, and seller sentiment from social mentions on the other.' },
       { title: 'Attribute GMV to marketing', how: 'Paystack and pixel data connect campaign spend to transactions, so growth spend answers for itself.' },
       { title: 'Watch category share of voice', how: 'Track how loudly your marketplace is talked about against rivals, week by week.' },
     ],
@@ -77,7 +77,7 @@ const INDUSTRIES: Industry[] = [
     id: 'beverage', name: 'Beverage & Alcohol',
     who: 'For brand teams whose product lives in venues, events and cultural moments.',
     jobs: [
-      { title: 'Own the cultural moment', how: 'Sentiment and share of voice tracked through Detty December, match days and festival season, in the languages the celebration happens in.' },
+      { title: 'Own the cultural moment', how: 'Track sentiment and share of voice through Detty December, match days and festival season, in the languages the celebration happens in.' },
       { title: 'Measure sponsorships and activations', how: 'Event dashboards, ambassador lead capture and field sightings show what a sponsorship actually moved.' },
       { title: 'Make OOH answer for itself', how: 'Billboards near your key venues get vanity links and geo attribution to nearby new customers.' },
     ],
@@ -88,7 +88,7 @@ const INDUSTRIES: Industry[] = [
     who: 'For distribution businesses managing trade partners, coverage and field teams.',
     jobs: [
       { title: 'Score trade partner health', how: 'Manual and first-party metrics track partner performance next to brand signals, with the BHI weighted for distribution.' },
-      { title: 'Make field reports count', how: 'Field officers log visits, stock checks and sightings from their phones; it all lands on the dashboard the same day.' },
+      { title: 'Make field reports count', how: 'Field officers log visits, stock checks and sightings from their phones. It all lands on the dashboard the same day.' },
       { title: 'Keep coverage honest', how: 'Geo data from field activity shows where you are actually present versus where the plan says you are.' },
     ],
     modules: ['Field intelligence (FSO)', 'First-party data API', 'BHI distribution preset', 'AI command layer'],
