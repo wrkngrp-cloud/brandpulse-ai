@@ -388,7 +388,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
       setShowForm(false)
       toast.success(`${influencer.name} added.`)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Something went wrong.')
+      toast.error(err instanceof Error ? err.message : "Couldn't add this influencer. Try again.")
     } finally {
       setSubmitting(false)
     }
@@ -583,6 +583,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
                         size="icon"
                         className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
                         onClick={() => removeEntry(i)}
+                        aria-label="Remove this platform"
                       >
                         <X className="h-4 w-4" />
                       </Button>

@@ -38,7 +38,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
       setShowForm(false)
       toast.success('Field team created')
     } catch {
-      toast.error('Could not create team')
+      toast.error('Could not create team. Try again.')
     } finally {
       setCreating(false)
     }
@@ -56,7 +56,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
       setTeams(prev => prev.map(t => t.id === team.id ? { ...t, active: !t.active } : t))
       toast.success(team.active ? 'Team deactivated' : 'Team activated')
     } catch {
-      toast.error('Could not update team')
+      toast.error('Could not update team. Try again.')
     } finally {
       setToggling(null)
     }

@@ -261,7 +261,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
 
       {/* Back + header */}
       <div className="flex items-start gap-3">
-        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 mt-0.5" onClick={() => router.back()}>
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 mt-0.5" onClick={() => router.back()} aria-label="Back to influencers">
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1 min-w-0">

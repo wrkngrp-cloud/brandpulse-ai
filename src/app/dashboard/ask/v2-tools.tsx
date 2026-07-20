@@ -83,7 +83,7 @@ interface MonthlyReportResult {
 
 function printHtml(title: string, body: string) {
   const w = window.open('', '_blank')
-  if (!w) { toast.error('Pop-up blocked — allow pop-ups to export PDF.'); return }
+  if (!w) { toast.error('Pop-up blocked. Allow pop-ups for this site to export the PDF.'); return }
   w.document.write(`<!DOCTYPE html>
 <html>
 <head>
@@ -124,7 +124,7 @@ async function copyText(text: string) {
     await navigator.clipboard.writeText(text)
     toast.success('Copied to clipboard')
   } catch {
-    toast.error('Copy failed — try again')
+    toast.error('Copy failed. Try again.')
   }
 }
 

@@ -175,7 +175,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
       }
       setAnalyses(prev => ({ ...prev, [stage]: data }))
     } catch {
-      toast.error('Analysis failed — please try again.')
+      toast.error("Couldn't analyze this stage. Try again.")
       setOpenAI(null)
     } finally {
       setLoadingStage(null)

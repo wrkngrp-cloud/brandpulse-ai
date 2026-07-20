@@ -114,7 +114,7 @@ export default async function ConnectorsPage() {
           <h1 className="h-display text-[26px] leading-none">All Connectors</h1>
           <p className="mt-2 text-[13px] text-muted-foreground/70 max-w-xl">
             Connect your data sources here. Every module in BrandGauge reads from these connections automatically.
-            Connect once — all insights update.
+            Connect once. Every module updates automatically.
           </p>
         </div>
         <TourTrigger module="connectors" autoStart />
@@ -264,7 +264,7 @@ export default async function ConnectorsPage() {
           <li>X captures direct @mentions via the free-tier user-context API. No paid bearer token needed.</li>
           <li>Instagram captures posts where your account is tagged and posts using your brand hashtags.</li>
           <li>Mentions are collected nightly at 4 AM Lagos time, or trigger a manual crawl from the Sentiment page.</li>
-          <li>GA4 syncs daily at 6 AM Lagos time — use Sync now for on-demand 30-day totals.</li>
+          <li>GA4 syncs daily at 6 AM Lagos time. Use Sync now for on-demand 30-day totals.</li>
           <li>Meta Ads syncs campaign performance daily at 6 AM Lagos time. The connection also enables geo-retargeting audiences from OOH sites.</li>
           <li>Payment webhooks fire in real time and link purchases to the brand funnel.</li>
           <li>App Store reviews sync every Sunday at 7 AM Lagos time.</li>

@@ -41,18 +41,18 @@ export function MetaAdsConnectCard({ account: initialAccount }: Props) {
 
     if (connected === 'meta') {
       toastFired.current = true
-      toast.success('Meta Ads connected — data will sync tonight at 5 AM Lagos time')
+      toast.success('Meta Ads connected. Data will sync tonight at 5 AM Lagos time.')
       window.history.replaceState({}, '', window.location.pathname)
     } else if (error) {
       const messages: Record<string, string> = {
-        oauth_cancelled:        'OAuth cancelled — please try again',
-        token_exchange_failed:  'Could not exchange the authorisation code',
-        no_workspace:           'No workspace found',
-        no_brand:               'No brand found — complete onboarding first',
-        db_error:               'Failed to save the connection — please try again',
-        oauth_failed:           'Meta Ads connection failed',
-        invalid_state:          'Session expired — please try again',
-        meta_not_configured:    'Meta Ads is not configured on this server — add META_APP_ID and META_APP_SECRET',
+        oauth_cancelled:        'OAuth cancelled. Try connecting again.',
+        token_exchange_failed:  'Could not exchange the authorisation code. Try again.',
+        no_workspace:           'No workspace found.',
+        no_brand:               'No brand found. Complete onboarding first.',
+        db_error:               'Failed to save the connection. Try again.',
+        oauth_failed:           'Meta Ads connection failed. Try again.',
+        invalid_state:          'Session expired. Try connecting again.',
+        meta_not_configured:    'Meta Ads is not configured on this server. Add META_APP_ID and META_APP_SECRET.',
       }
       const reason = searchParams.get('reason') ?? ''
       if (messages[error]) {
@@ -66,11 +66,11 @@ export function MetaAdsConnectCard({ account: initialAccount }: Props) {
     setLoading('disconnect')
     try {
       const res = await fetch('/api/ads/meta/connect', { method: 'DELETE' })
-      if (!res.ok) throw new Error('Failed to disconnect')
+      if (!res.ok) throw new Error("Couldn't disconnect Meta Ads. Try again.")
       setAccount(null)
       toast.success('Meta Ads disconnected')
     } catch {
-      toast.error('Failed to disconnect')
+      toast.error("Couldn't disconnect Meta Ads. Try again.")
     } finally {
       setLoading(null)
     }

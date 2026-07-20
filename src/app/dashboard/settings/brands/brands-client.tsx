@@ -80,7 +80,7 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ name: editName.trim() }),
     })
-    if (!res.ok) { toast.error('Failed to rename'); return }
+    if (!res.ok) { toast.error("Couldn't rename brand. Try again."); return }
     setBrands(b => b.map(x => x.id === editingId ? { ...x, name: editName.trim() } : x))
     setEditingId(null)
     toast.success('Brand renamed')
@@ -90,7 +90,7 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
     if (!confirm(`Delete "${name}"? All data for this brand will be permanently removed.`)) return
     const res = await fetch(`/api/brands/${id}`, { method: 'DELETE' })
     const data = await res.json()
-    if (!res.ok) { toast.error(data.error ?? 'Failed to delete'); return }
+    if (!res.ok) { toast.error(data.error ?? "Couldn't delete brand. Try again."); return }
     const remaining = brands.filter(b => b.id !== id)
     setBrands(remaining)
     if (activeBrandId === id && remaining.length) {
@@ -108,7 +108,7 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
       toast.success(`Demo data seeded: ${data.secondBrand} created with ${data.seeded.length} data sets`)
       router.refresh()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Seed failed')
+      toast.error(err instanceof Error ? err.message : "Couldn't seed demo data. Try again.")
     } finally {
       setSeeding(false)
     }
@@ -162,7 +162,7 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
                     onKeyDown={e => { if (e.key === 'Enter') renameBrand(); if (e.key === 'Escape') setEditingId(null) }}
                     className="h-7 text-sm max-w-[200px]"
                   />
-                  <Button size="sm" className="h-7 px-2" onClick={renameBrand}>Save</Button>
+                  <Button size="sm" className="h-7 px-2" onClick={renameBrand}>Save name</Button>
                   <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => setEditingId(null)}>Cancel</Button>
                 </div>
               ) : (
@@ -191,6 +191,7 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
               <Button
                 variant="ghost" size="icon" className="h-7 w-7"
                 onClick={() => { setEditingId(brand.id); setEditName(brand.name) }}
+                aria-label={`Rename ${brand.name}`}
               >
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
@@ -198,6 +199,7 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
                 variant="ghost" size="icon" className="h-7 w-7 hover:text-destructive"
                 onClick={() => deleteBrand(brand.id, brand.name)}
                 disabled={brands.length <= 1}
+                aria-label={`Delete ${brand.name}`}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>

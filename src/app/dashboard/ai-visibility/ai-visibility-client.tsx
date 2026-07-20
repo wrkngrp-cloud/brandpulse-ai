@@ -107,10 +107,10 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
     try {
       const res = await fetch('/api/ai-visibility/check', { method: 'POST' })
       const data = await res.json() as { queued?: boolean; error?: string }
-      if (!res.ok || data.error) { toast.error(data.error ?? 'Check failed'); return }
-      toast.success('Visibility check queued — results appear in 2-3 minutes')
+      if (!res.ok || data.error) { toast.error(data.error ?? "Couldn't start the visibility check. Try again."); return }
+      toast.success('Visibility check queued. Results appear in 2-3 minutes.')
     } catch {
-      toast.error('Network error')
+      toast.error("Couldn't reach the server. Check your connection and try again.")
     } finally {
       setRunning(false)
     }

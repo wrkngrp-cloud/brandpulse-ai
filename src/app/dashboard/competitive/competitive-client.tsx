@@ -191,7 +191,7 @@ function StringList({ items, icon: Icon, iconClass }: {
   icon?: React.ElementType
   iconClass?: string
 }) {
-  if (!items?.length) return <p className="text-sm text-muted-foreground">No data.</p>
+  if (!items?.length) return <p className="text-sm text-muted-foreground">None identified in this briefing.</p>
   return (
     <ul className="space-y-2">
       {items.map((item, i) => (
