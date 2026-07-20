@@ -26,36 +26,36 @@ interface Feature {
 const FEATURES: Feature[] = [
   {
     n: '01', title: 'Brand Health Index',
-    body: 'Five signal families blend into one score your CEO can ask about, weighted for your industry. A fintech counts trust; an FMCG counts shelf and share of voice. Signals you have not connected yet redistribute their weight instead of dragging the score down.',
+    body: 'Five signal families blend into one score your CEO can ask about, weighted for your industry. A fintech counts trust. An FMCG counts shelf and share of voice. Signals you have not connected yet redistribute their weight instead of dragging the score down.',
     chips: ['Industry-weighted score', 'Six-stage funnel', 'Trust pillar', '30-day trend'],
     Scene: GaugeScene,
   },
   {
     n: '02', title: 'Cultural sentiment',
-    body: 'BrandGauge reads mentions from X and Instagram in Pidgin, Yoruba, Igbo and Hausa, and classifies them the way a Lagos marketer would. "This brand no try" is negative. Every mention carries its language, platform and aspect, so you see what people praise and what they drag.',
+    body: 'BrandGauge reads mentions from X and Instagram in Pidgin, Yoruba, Igbo and Hausa. It classifies them the way a Lagos marketer would. "This brand no try" is negative. Every mention carries its language, platform and aspect, so you see what people praise and what they drag.',
     chips: ['4 languages', 'X + Instagram mentions', 'Aspect tags', 'Per-platform breakdown'],
     Scene: SentimentScene,
   },
   {
     n: '03', title: 'Commercial proof',
-    body: 'CAC, ROI, MQLs and funnel lift pulled live from Meta Ads, GA4, Paystack and your site pixel. Budget pacing flags overspend before month end, and an AI-written business case turns the numbers into something you can hand to the board.',
+    body: 'CAC, ROI, MQLs and funnel lift pulled live from Meta Ads, GA4, Paystack and your site pixel. Budget pacing flags overspend before month end. An AI-written business case turns the numbers into something you can hand to the board.',
     chips: ['CAC / ROI / MQLs', 'Budget pacing', 'AI business case', 'Board pack'],
     Scene: FunnelScene,
   },
   {
     n: '04', title: 'Offline and OOH attribution',
-    body: 'Every billboard, radio spot, TV flight and print placement gets a branded vanity link and a place on the map. Geo attribution ties nearby new customers back to the site, and your media plans import straight from Excel with AI analysis of daypart efficiency and delivery.',
+    body: 'Every billboard, radio spot, TV flight and print placement gets a branded vanity link and a place on the map. Geo attribution ties nearby new customers back to the site. Your media plans import straight from Excel, with AI analysis of daypart efficiency and delivery.',
     chips: ['Site map + geo attribution', 'Vanity links', 'Geo-retargeting audiences', 'Radio / TV / print import'],
     Scene: OohScene,
   },
   {
     n: '05', title: 'Surveys and NPS',
-    body: 'Ask your customers directly, by email, in-app or a shareable link. Replies score live as they land, NPS waves track movement over time, and consent is built in from the first question.',
+    body: 'Ask your customers directly, by email, in-app or a shareable link. Replies score live as they land. NPS waves track movement over time. Consent is built in from the first question.',
     chips: ['Email · in-app · link', 'Live NPS scoring', 'Opt-in, NDPR-aware'],
   },
   {
     n: '06', title: 'Competitive intelligence',
-    body: 'Share of voice against the competitors you name, competitor sightings from the field, and an auto-written briefing waiting for you every Monday morning. When a rival cuts prices, you hear it from us first.',
+    body: 'See share of voice against your named competitors, competitor sightings from the field, and an auto-written briefing every Monday morning. When a rival cuts prices, you hear it from us first.',
     chips: ['Share of voice', 'Monday briefing', 'Competitor sightings'],
   },
   {
@@ -65,12 +65,12 @@ const FEATURES: Feature[] = [
   },
   {
     n: '08', title: 'Creative intelligence',
-    body: 'A library of every asset you run, fatigue alerts before an ad wears out, and a brand voice builder that checks content against how your brand actually speaks, before it goes out.',
+    body: 'A library holds every asset you run. Fatigue alerts fire before an ad wears out. A brand voice builder checks new content against how your brand actually speaks, before it goes out.',
     chips: ['Creative library', 'Fatigue alerts', 'Voice builder', 'Pre-post check'],
   },
   {
     n: '09', title: 'AI command layer',
-    body: 'Ask a plain question, get a straight answer sourced from your own numbers. Monthly reports write themselves, and a weekly check tracks how AI assistants describe your brand when customers ask about your category.',
+    body: 'Ask a plain question, get a straight answer sourced from your own numbers. Monthly reports write themselves. A weekly check tracks how AI assistants describe your brand when customers ask about your category.',
     chips: ['Ask anything', 'Monthly AI reports', 'AI visibility check'],
   },
   {
