@@ -113,12 +113,12 @@ export default function VoiceBuilderPage() {
         body: JSON.stringify({ samples: filled, brandName }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Failed')
+      if (!res.ok) throw new Error(data.error ?? "Couldn't build your brand voice. Try again.")
       setVoiceResult(data)
       setHasVoice(true)
-      if (data.saved) toast.success('Brand voice saved — Retune and Generate tabs are now active')
+      if (data.saved) toast.success('Brand voice saved. Retune and Generate tabs are now active.')
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Something went wrong')
+      toast.error(err instanceof Error ? err.message : "Couldn't build your brand voice. Try again.")
     } finally {
       setBuilding(false)
     }
@@ -136,10 +136,10 @@ export default function VoiceBuilderPage() {
         body: JSON.stringify({ mode: 'retune', input: retuneInput, platform: retunePlatform || undefined }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Failed')
+      if (!res.ok) throw new Error(data.error ?? "Couldn't retune that caption. Try again.")
       setRetuneResult(data)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Something went wrong')
+      toast.error(err instanceof Error ? err.message : "Couldn't retune that caption. Try again.")
     } finally {
       setRetuning(false)
     }
@@ -157,10 +157,10 @@ export default function VoiceBuilderPage() {
         body: JSON.stringify({ mode: 'generate', input: genInput, platform: genPlatform || undefined, count: genCount }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Failed')
+      if (!res.ok) throw new Error(data.error ?? "Couldn't generate captions. Try again.")
       setGenResults(data.captions ?? [])
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Something went wrong')
+      toast.error(err instanceof Error ? err.message : "Couldn't generate captions. Try again.")
     } finally {
       setGenerating(false)
     }
@@ -332,7 +332,7 @@ export default function VoiceBuilderPage() {
               <div className="p-4 bg-muted/30">
                 <p className="text-[12px] text-muted-foreground">
                   {voiceResult.saved
-                    ? '✓ Saved to your brand profile — Retune and Generate tabs now use this voice.'
+                    ? '✓ Saved to your brand profile. Retune and Generate tabs now use this voice.'
                     : 'Select a brand to save the voice profile.'}
                 </p>
               </div>

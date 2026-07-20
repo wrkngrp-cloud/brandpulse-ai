@@ -48,14 +48,14 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
     } else if (error?.startsWith('ga4_')) {
       toastFired.current = true
       const messages: Record<string, string> = {
-        ga4_denied:           'Access denied — you must grant Analytics permission',
-        ga4_token_failed:     'Could not exchange the authorisation code',
-        ga4_no_property:      'No GA4 property found on your Google account',
-        ga4_invalid_state:    'Session expired — please try again',
-        ga4_not_configured:   'Google OAuth is not configured on this server',
-        ga4_db_error:         'Failed to save the connection — please try again',
+        ga4_denied:           'Access denied. You must grant Analytics permission.',
+        ga4_token_failed:     'Could not exchange the authorisation code. Try again.',
+        ga4_no_property:      'No GA4 property found on your Google account.',
+        ga4_invalid_state:    'Session expired. Try connecting again.',
+        ga4_not_configured:   'Google OAuth is not configured on this server.',
+        ga4_db_error:         'Failed to save the connection. Try again.',
       }
-      toast.error(messages[error] ?? 'GA4 connection failed')
+      toast.error(messages[error] ?? 'GA4 connection failed. Try again.')
     }
   }, [searchParams])
 
@@ -64,11 +64,11 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
     try {
       const res  = await fetch('/api/connectors/ga4/sync', { method: 'POST' })
       const data = await res.json()
-      if (!res.ok) { toast.error(data.error ?? 'Sync failed'); return }
-      toast.success(`Synced — ${data.sessions?.toLocaleString()} sessions in the last 30 days`)
+      if (!res.ok) { toast.error(data.error ?? "Couldn't sync GA4. Try again."); return }
+      toast.success(`Synced. ${data.sessions?.toLocaleString()} sessions in the last 30 days.`)
       setConnection(prev => prev ? { ...prev, last_synced_at: new Date().toISOString() } : prev)
     } catch {
-      toast.error('Sync failed')
+      toast.error("Couldn't sync GA4. Try again.")
     } finally {
       setLoading(null)
     }
@@ -79,11 +79,11 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
     try {
       const res  = await fetch('/api/connectors/ga4/disconnect', { method: 'POST' })
       const data = await res.json()
-      if (!res.ok) { toast.error(data.error ?? 'Failed to disconnect'); return }
+      if (!res.ok) { toast.error(data.error ?? "Couldn't disconnect GA4. Try again."); return }
       toast.success('GA4 disconnected')
       setConnection(null)
     } catch {
-      toast.error('Failed to disconnect')
+      toast.error("Couldn't disconnect GA4. Try again.")
     } finally {
       setLoading(null)
     }

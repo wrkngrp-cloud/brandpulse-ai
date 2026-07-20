@@ -67,11 +67,11 @@ export function HubSpotConnectCard({ connection: initialConnection }: HubSpotCon
     try {
       const res  = await fetch('/api/connectors/hubspot/disconnect', { method: 'POST' })
       const data = await res.json()
-      if (!res.ok) { toast.error(data.error ?? 'Failed to disconnect'); return }
+      if (!res.ok) { toast.error(data.error ?? "Couldn't disconnect HubSpot. Try again."); return }
       toast.success('HubSpot disconnected')
       setConnection(null)
     } catch {
-      toast.error('Failed to disconnect')
+      toast.error("Couldn't disconnect HubSpot. Try again.")
     } finally {
       setLoading(null)
     }

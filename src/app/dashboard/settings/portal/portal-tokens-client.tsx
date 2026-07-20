@@ -69,7 +69,7 @@ export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit,
       toast.success('Portal link created')
       setLabel('Client portal')
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed')
+      toast.error(err instanceof Error ? err.message : "Couldn't create portal link. Try again.")
     } finally {
       setCreating(false)
     }
@@ -175,7 +175,7 @@ export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit,
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => copyLink(t.token)}>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => copyLink(t.token)} aria-label="Copy portal link">
                   <Copy className="h-3.5 w-3.5" />
                 </Button>
                 <a
@@ -183,10 +183,11 @@ export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit,
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Open portal in a new tab"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>
-                <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-destructive" onClick={() => deleteToken(t.id)}>
+                <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-destructive" onClick={() => deleteToken(t.id)} aria-label="Delete portal token">
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>

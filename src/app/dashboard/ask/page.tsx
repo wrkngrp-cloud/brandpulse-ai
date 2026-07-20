@@ -433,6 +433,7 @@ function AskPageContent() {
                     className="h-11 w-11 shrink-0"
                     onClick={() => send(input)}
                     disabled={!input.trim() || loading}
+                    aria-label="Send message"
                   >
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   </Button>

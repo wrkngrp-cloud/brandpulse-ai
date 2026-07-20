@@ -84,7 +84,7 @@ export function CdpClient() {
       const res = await fetch('/api/cdp/sync', { method: 'POST' })
       if (!res.ok) throw new Error('Sync failed')
       const d = await res.json()
-      toast.success(`Sync complete — ${d.synced} profiles processed`)
+      toast.success(`Sync complete. ${d.synced} profiles processed.`)
       load(search, npsFilter, page)
     } catch {
       toast.error('Sync failed. Please try again.')

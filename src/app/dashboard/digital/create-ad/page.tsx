@@ -1760,7 +1760,7 @@ export default function CreateAdPage() {
       toast.success('Ad draft saved. View it in Ad Drafts.')
       router.push('/dashboard/digital/drafts')
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Something went wrong')
+      toast.error(err instanceof Error ? err.message : "Couldn't save your draft. Try again.")
     } finally {
       setSaving(false)
     }
@@ -1771,7 +1771,7 @@ export default function CreateAdPage() {
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => router.push('/dashboard/digital')}>
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => router.push('/dashboard/digital')} aria-label="Back to digital campaigns">
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex items-start gap-3">

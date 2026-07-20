@@ -42,20 +42,20 @@ export function GoogleAdsConnectCard({ account: initialAccount }: Props) {
 
     if (connected === 'google_ads') {
       toastFired.current = true
-      toast.success('Google Ads connected — data will sync tonight at 5:30 AM Lagos time')
+      toast.success('Google Ads connected. Data will sync tonight at 5:30 AM Lagos time.')
       window.history.replaceState({}, '', window.location.pathname)
     } else if (error) {
       const messages: Record<string, string> = {
-        oauth_cancelled:           'OAuth cancelled — please try again',
-        token_exchange_failed:     'Could not exchange the authorisation code',
-        account_list_failed:       'Could not list your Google Ads accounts — please try again',
-        no_ad_accounts:            'No Google Ads accounts found for this Google login',
-        no_workspace:              'No workspace found',
-        no_brand:                  'No brand found — complete onboarding first',
-        db_error:                  'Failed to save the connection — please try again',
-        oauth_failed:              'Google Ads connection failed',
-        invalid_state:             'Session expired — please try again',
-        google_ads_not_configured: "Google Ads isn't configured on this server yet — needs a developer token",
+        oauth_cancelled:           'OAuth cancelled. Try connecting again.',
+        token_exchange_failed:     'Could not exchange the authorisation code. Try again.',
+        account_list_failed:       'Could not list your Google Ads accounts. Try again.',
+        no_ad_accounts:            'No Google Ads accounts found for this Google login.',
+        no_workspace:              'No workspace found.',
+        no_brand:                  'No brand found. Complete onboarding first.',
+        db_error:                  'Failed to save the connection. Try again.',
+        oauth_failed:              'Google Ads connection failed. Try again.',
+        invalid_state:             'Session expired. Try connecting again.',
+        google_ads_not_configured: "Google Ads isn't configured on this server yet. It needs a developer token.",
       }
       const reason = searchParams.get('reason') ?? ''
       if (messages[error]) {
@@ -69,11 +69,11 @@ export function GoogleAdsConnectCard({ account: initialAccount }: Props) {
     setLoading('disconnect')
     try {
       const res = await fetch('/api/ads/google-ads/connect', { method: 'DELETE' })
-      if (!res.ok) throw new Error('Failed to disconnect')
+      if (!res.ok) throw new Error("Couldn't disconnect Google Ads. Try again.")
       setAccount(null)
       toast.success('Google Ads disconnected')
     } catch {
-      toast.error('Failed to disconnect')
+      toast.error("Couldn't disconnect Google Ads. Try again.")
     } finally {
       setLoading(null)
     }

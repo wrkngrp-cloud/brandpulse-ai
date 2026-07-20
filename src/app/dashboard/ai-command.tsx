@@ -138,10 +138,10 @@ export function AiCommand() {
               <span className="text-sm font-semibold">BrandGauge</span>
             </div>
             <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setOpen(false)}>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setOpen(false)} aria-label="Minimize chat">
                 <ChevronDown className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setOpen(false); setMessages([]); setConvId(null) }}>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setOpen(false); setMessages([]); setConvId(null) }} aria-label="Close and clear chat">
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -254,6 +254,7 @@ export function AiCommand() {
               className="h-8 w-8 shrink-0 mb-0.5"
               onClick={() => send(input)}
               disabled={!input.trim() || loading}
+              aria-label="Send message"
             >
               {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
             </Button>

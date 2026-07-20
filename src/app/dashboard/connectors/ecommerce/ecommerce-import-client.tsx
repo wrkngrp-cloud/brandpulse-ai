@@ -86,14 +86,14 @@ export function EcommerceImportClient({ campaigns }: Props) {
       const data = await res.json()
 
       if (!res.ok) {
-        toast.error(data.error ?? 'Import failed')
+        toast.error(data.error ?? "Couldn't import your file. Try again.")
         return
       }
 
       setResult(data as ImportResult)
       toast.success(`Imported ${data.imported} orders`)
     } catch {
-      toast.error('Import failed — check your connection and try again')
+      toast.error("Couldn't import your file. Check your connection and try again.")
     } finally {
       setImporting(false)
     }

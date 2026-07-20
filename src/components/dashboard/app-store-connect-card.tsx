@@ -41,7 +41,7 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
       })
       const data = await res.json()
       if (!res.ok) {
-        toast.error(data.error ?? 'Failed to save')
+        toast.error(data.error ?? "Couldn't save your app IDs. Try again.")
         return
       }
       toast.success('App store IDs saved. Sync will run next Sunday at 7 AM Lagos time.')
@@ -54,7 +54,7 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
       setAppleAppId('')
       setGooglePkgName('')
     } catch {
-      toast.error('Failed to save')
+      toast.error("Couldn't save your app IDs. Try again.")
     } finally {
       setLoading(null)
     }
@@ -66,12 +66,12 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
       const res = await fetch('/api/connectors/app-store/sync', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) {
-        toast.error(data.error ?? 'Sync failed')
+        toast.error(data.error ?? "Couldn't sync app store data. Try again.")
         return
       }
       toast.success(data.message ?? 'Sync queued')
     } catch {
-      toast.error('Sync failed')
+      toast.error("Couldn't sync app store data. Try again.")
     } finally {
       setLoading(null)
     }
