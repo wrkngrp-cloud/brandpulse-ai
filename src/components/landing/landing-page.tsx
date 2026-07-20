@@ -153,8 +153,8 @@ function Hero() {
           backgroundSize: '26px 26px',
           maskImage: 'radial-gradient(75% 55% at 50% 32%, black, transparent)',
         }} />
-        <div className="absolute -left-24 top-40 opacity-70"><CircleMotif /></div>
-        <div className="absolute -right-16 top-[560px] opacity-50"><CircleMotif size={220} /></div>
+        <div className="absolute -left-24 top-40 opacity-70"><div className="lp-par lp-par-b"><CircleMotif /></div></div>
+        <div className="absolute -right-16 top-[560px] opacity-50"><div className="lp-par lp-par-a"><CircleMotif size={220} /></div></div>
         <div className="absolute left-1/2 top-[-180px] h-[420px] w-[820px] -translate-x-1/2 rounded-full blur-[130px]"
           style={{ background: 'rgba(43,89,255,0.10)' }} />
         <div className="absolute left-1/2 top-[380px] h-[380px] w-[700px] -translate-x-1/2 rounded-full blur-[130px]"
@@ -237,8 +237,8 @@ function Differentiators() {
           backgroundSize: '26px 26px',
           maskImage: 'radial-gradient(65% 70% at 50% 0%, black, transparent)',
         }} />
-        <div className="absolute -left-20 -top-16 opacity-40"><CircleMotif size={200} /></div>
-        <div className="absolute -bottom-32 -right-24"><GaugeArcMotif size={560} opacity={0.24} /></div>
+        <div className="absolute -left-20 -top-16 opacity-40"><div className="lp-par lp-par-a"><CircleMotif size={200} /></div></div>
+        <div className="absolute -bottom-32 -right-24"><div className="lp-par lp-par-b"><GaugeArcMotif size={560} opacity={0.24} /></div></div>
         <div className="absolute right-0 top-0 h-[360px] w-[560px] rounded-full blur-[130px]"
           style={{ background: 'rgba(43,89,255,0.08)' }} />
         <div className="absolute -bottom-40 left-0 h-[340px] w-[600px] rounded-full blur-[130px]"
@@ -269,7 +269,7 @@ function Differentiators() {
         {/* stats band */}
         <motion.div {...rise} className="relative mt-16 grid grid-cols-2 gap-4 rounded-2xl border p-8 text-center sm:grid-cols-4"
           style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-chip)' }}>
-          <div className="pointer-events-none absolute -bottom-16 -right-10"><GaugeArcMotif size={220} opacity={0.3} /></div>
+          <div className="pointer-events-none absolute -bottom-16 -right-10"><div className="lp-par lp-par-c"><GaugeArcMotif size={220} opacity={0.3} /></div></div>
           {[
             { v: 4,  s: '',  label: 'languages read natively' },
             { v: 7,  s: '',  label: 'industry playbooks' },
@@ -294,7 +294,7 @@ function DeepDives() {
     <section className="relative overflow-hidden py-16">
       {/* patterned backdrop: diagonal wash pair + a faint circle motif cropped at the edge */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 top-1/4 opacity-30"><CircleMotif size={380} /></div>
+        <div className="absolute -left-32 top-1/4 opacity-30"><div className="lp-par lp-par-b"><CircleMotif size={380} /></div></div>
         <div className="absolute -right-20 top-0 h-[360px] w-[520px] rounded-full blur-[140px]"
           style={{ background: 'rgba(212,96,42,0.07)' }} />
         <div className="absolute -left-10 bottom-0 h-[320px] w-[480px] rounded-full blur-[140px]"
@@ -345,7 +345,7 @@ function Industries() {
           maskImage: 'radial-gradient(60% 65% at 50% 50%, black, transparent)',
         }} />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <GaugeArcMotif size={620} opacity={0.22} />
+          <div className="lp-par lp-par-a"><GaugeArcMotif size={620} opacity={0.22} /></div>
         </div>
         <div className="absolute left-1/2 top-0 h-[300px] w-[560px] -translate-x-1/2 rounded-full blur-[130px]"
           style={{ background: 'rgba(212,96,42,0.07)' }} />
@@ -390,7 +390,7 @@ function FinalCta() {
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[320px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px]"
           style={{ background: 'rgba(224,106,50,0.20)' }} />
         <div className="pointer-events-none absolute -right-16 -top-16">
-          <GaugeArcMotif size={300} color="#F4EDE4" opacity={0.2} />
+          <div className="lp-par lp-par-c"><GaugeArcMotif size={300} color="#F4EDE4" opacity={0.2} /></div>
         </div>
         <motion.h2 {...rise} className="relative mx-auto max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-band-ink)' }}>
@@ -433,8 +433,109 @@ export function Footer() {
   )
 }
 
+/**
+ * Cursor-reactive backdrop driver. Desktop pointer-fine only, and respects
+ * prefers-reduced-motion. A single rAF loop eases the pointer toward its target and
+ * writes the result to CSS custom properties on the root element (`--lp-x/--lp-y` in
+ * viewport px for the spotlight mask, `--lp-px/--lp-py` normalised -0.5..0.5 for
+ * parallax, `--lp-glow` for fade). Nothing here calls setState on move, so the
+ * backdrop animates with zero React re-renders. Returns whether the effect is live so
+ * the caller can skip rendering the overlay entirely on touch / reduced-motion.
+ */
+function useCursorBackdrop(ref: React.RefObject<HTMLElement | null>) {
+  const [active, setActive] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof window === 'undefined' || !window.matchMedia) return
+    const fine = window.matchMedia('(pointer: fine)')
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (!fine.matches || reduce.matches) return
+    const activateId = requestAnimationFrame(() => setActive(true))
+
+    const tgt = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+    const cur = { x: tgt.x, y: tgt.y }
+    let raf = 0
+    let running = false
+    let lastMove = 0
+
+    const write = () => {
+      el.style.setProperty('--lp-x', cur.x.toFixed(1) + 'px')
+      el.style.setProperty('--lp-y', cur.y.toFixed(1) + 'px')
+      el.style.setProperty('--lp-px', (cur.x / window.innerWidth - 0.5).toFixed(4))
+      el.style.setProperty('--lp-py', (cur.y / window.innerHeight - 0.5).toFixed(4))
+    }
+    const tick = () => {
+      cur.x += (tgt.x - cur.x) * 0.14
+      cur.y += (tgt.y - cur.y) * 0.14
+      write()
+      const settled = Math.hypot(tgt.x - cur.x, tgt.y - cur.y) < 0.4
+      if (settled && performance.now() - lastMove > 250) { running = false; return }
+      raf = requestAnimationFrame(tick)
+    }
+    const run = () => { if (!running) { running = true; raf = requestAnimationFrame(tick) } }
+    const onMove = (e: PointerEvent) => {
+      tgt.x = e.clientX
+      tgt.y = e.clientY
+      lastMove = performance.now()
+      el.style.setProperty('--lp-glow', '1')
+      run()
+    }
+    const onLeave = () => el.style.setProperty('--lp-glow', '0')
+
+    write()
+    window.addEventListener('pointermove', onMove, { passive: true })
+    document.addEventListener('pointerleave', onLeave)
+    window.addEventListener('blur', onLeave)
+    return () => {
+      cancelAnimationFrame(activateId)
+      cancelAnimationFrame(raf)
+      window.removeEventListener('pointermove', onMove)
+      document.removeEventListener('pointerleave', onLeave)
+      window.removeEventListener('blur', onLeave)
+    }
+  }, [ref])
+  return active
+}
+
+/** Viewport-fixed layer that trails the cursor: a soft clay glow plus the Adire dot-grid
+ *  lighting up in place through a radial mask that follows the pointer. Sits behind all
+ *  content (main sets `isolation: isolate`). Movement is transform / mask only. */
+function CursorField() {
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10"
+      style={{ opacity: 'var(--lp-glow, 0)', transition: 'opacity 0.5s ease' }}>
+      {/* clay glow blob, moved by transform (compositor-only) */}
+      <div className="absolute left-0 top-0 h-[620px] w-[620px] rounded-full blur-[85px]"
+        style={{
+          transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
+          background: 'radial-gradient(circle, rgba(212,96,42,0.38), rgba(43,89,255,0.14) 45%, transparent 72%)',
+          willChange: 'transform',
+        }} />
+      {/* a defined ring right at the cursor, so the pointer itself reads as the source */}
+      <div className="absolute left-0 top-0 h-[70px] w-[70px] rounded-full"
+        style={{
+          transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
+          border: '1px solid var(--lp-clay)',
+          opacity: 0.35,
+          willChange: 'transform',
+        }} />
+      {/* dot grid revealed in place around the pointer via a cursor-tracking radial mask */}
+      <div className="absolute inset-0"
+        style={{
+          backgroundImage: 'radial-gradient(var(--lp-clay) 1.6px, transparent 1.6px)',
+          backgroundSize: '26px 26px',
+          opacity: 0.95,
+          WebkitMaskImage: 'radial-gradient(260px circle at var(--lp-x, -999px) var(--lp-y, -999px), rgba(0,0,0,0.95), transparent 72%)',
+          maskImage: 'radial-gradient(260px circle at var(--lp-x, -999px) var(--lp-y, -999px), rgba(0,0,0,0.95), transparent 72%)',
+        }} />
+    </div>
+  )
+}
+
 export function LandingPage() {
   const [dark, setDark] = useState(false)
+  const rootRef = useRef<HTMLElement>(null)
+  const cursorLive = useCursorBackdrop(rootRef)
   useEffect(() => {
     const id = requestAnimationFrame(() => {
       if (window.localStorage.getItem('bg-landing-theme') === 'dark') setDark(true)
@@ -449,9 +550,19 @@ export function LandingPage() {
   }
   return (
     <main
+      ref={rootRef}
       className="min-h-screen antialiased transition-colors duration-500"
-      style={{ ...(dark ? DARK : LIGHT), ...(dark ? darkSceneVars : lightSceneVars), background: 'var(--lp-bg)', color: 'var(--lp-ink)' }}
+      style={{ ...(dark ? DARK : LIGHT), ...(dark ? darkSceneVars : lightSceneVars), background: 'var(--lp-bg)', color: 'var(--lp-ink)', isolation: 'isolate' }}
     >
+      {/* parallax drift for the Adire motifs, keyed off the eased cursor custom properties.
+          Vars default to 0, so touch / reduced-motion renders these perfectly static. */}
+      <style>{`
+        .lp-par { will-change: transform }
+        .lp-par-a { transform: translate3d(calc(var(--lp-px,0) * 22px), calc(var(--lp-py,0) * 22px), 0) }
+        .lp-par-b { transform: translate3d(calc(var(--lp-px,0) * -30px), calc(var(--lp-py,0) * -30px), 0) }
+        .lp-par-c { transform: translate3d(calc(var(--lp-px,0) * 16px), calc(var(--lp-py,0) * -18px), 0) }
+      `}</style>
+      {cursorLive && <CursorField />}
       <Nav dark={dark} onToggle={toggle} />
       <Hero />
       <div id="tour" className="scroll-mt-20"><HorizontalTour /></div>
