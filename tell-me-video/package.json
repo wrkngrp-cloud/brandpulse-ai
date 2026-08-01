@@ -6,6 +6,9 @@
   "type": "commonjs",
   "scripts": {
     "analyze": "node scripts/analyze-audio.mjs",
+    "rasterize": "node scripts/rasterize-sleeve.mjs",
+    "probe": "node scripts/probe-art.mjs",
+    "assets": "node scripts/make-grain.mjs && node scripts/make-title-mask.mjs",
     "dev": "remotion studio src/index.ts",
     "still": "remotion still src/index.ts TellMe out/still.png",
     "render": "remotion render src/index.ts TellMe out/tell-me.mp4"

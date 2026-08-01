@@ -72,7 +72,29 @@ export const TellMe: React.FC<TellMeProps> = ({ layers = {} }) => {
           style={{ position: 'absolute', inset: 0, width: artPx, height: artPx, display: 'block' }}
         />
         {on.water && (
-          <Water src={src} artPx={artPx} frame={frame} timeSec={timeSec} liveliness={insideness} />
+          <>
+            <Water src={src} artPx={artPx} frame={frame} timeSec={timeSec} liveliness={insideness} />
+            {/*
+              The hand-lettered title and its cloud sit low in the panel, right
+              where the ripple is strongest, so the water would visibly wobble
+              the lettering. Paint a still copy back over the top through a mask
+              cut from the artwork itself (scripts/make-title-mask.mjs). The
+              wordmark sits on the picture rather than in the water, so a still
+              edge with water sliding under it is also the honest reading.
+            */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundImage: `url(${src})`,
+                backgroundSize: `${artPx}px ${artPx}px`,
+                maskImage: `url(${staticFile('title-mask.png')})`,
+                maskSize: `${artPx}px ${artPx}px`,
+                WebkitMaskImage: `url(${staticFile('title-mask.png')})`,
+                WebkitMaskSize: `${artPx}px ${artPx}px`,
+              }}
+            />
+          </>
         )}
       </div>
 

@@ -3,7 +3,9 @@ import { Config } from '@remotion/cli/config'
 Config.setVideoImageFormat('jpeg')
 Config.setJpegQuality(95)
 Config.setCodec('h264')
-Config.setCrf(17)
+// The picture is flat illustration and gradients, which encode cleanly; 20 is
+// visually transparent here and keeps a 4-minute 1080p master a sane size.
+Config.setCrf(20)
 Config.setConcurrency(4)
 
 // Software GL: there is no GPU here, and the film leans on blur and blend modes.

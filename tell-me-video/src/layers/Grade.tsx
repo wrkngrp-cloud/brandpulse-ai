@@ -104,7 +104,7 @@ export const Grade: React.FC<{
           position: 'absolute',
           inset: 0,
           background:
-            'radial-gradient(72% 76% at 50% 46%, transparent 42%, rgba(24,16,10,0.30) 82%, rgba(18,12,8,0.52) 100%)',
+            'radial-gradient(74% 78% at 50% 46%, transparent 44%, rgba(24,16,10,0.22) 84%, rgba(18,12,8,0.40) 100%)',
           opacity: 0.35 + insideness * 0.65,
         }}
       />
