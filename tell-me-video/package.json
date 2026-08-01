@@ -1,0 +1,25 @@
+{
+  "name": "tell-me-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Animated cover-art music video for \"Tell Me\" — Dwin, The Stoic x Sewa (prod. Nuel Beatz)",
+  "type": "commonjs",
+  "scripts": {
+    "analyze": "node scripts/analyze-audio.mjs",
+    "dev": "remotion studio src/index.ts",
+    "still": "remotion still src/index.ts TellMe out/still.png",
+    "render": "remotion render src/index.ts TellMe out/tell-me.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.492",
+    "@remotion/media-utils": "^4.0.492",
+    "@types/react": "^19.2.17",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.492",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "mpg123-decoder": "^1.0.3"
+  }
+}
