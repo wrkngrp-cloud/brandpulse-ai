@@ -9,6 +9,10 @@
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createDateLabels } from '@/lib/demo/date-labels'
+
+// These top-ups create their surveys as of now, so the name carries today's quarter.
+const L = createDateLabels(new Date())
 
 export const runtime = 'nodejs'
 
@@ -65,7 +69,7 @@ export async function POST() {
       .insert({
         brand_id: brand.id,
         type:     'awareness_check',
-        name:     'Brand Awareness Check Q2 2025',
+        name:     `Brand Awareness Check ${L.quarter(0)}`,
         status:   'active',
       })
       .select('id')
@@ -111,7 +115,7 @@ export async function POST() {
       .insert({
         brand_id: brand.id,
         type:     'post_purchase_nps',
-        name:     'Customer NPS Survey Q2 2025',
+        name:     `Customer NPS Survey ${L.quarter(0)}`,
         status:   'active',
       })
       .select('id')

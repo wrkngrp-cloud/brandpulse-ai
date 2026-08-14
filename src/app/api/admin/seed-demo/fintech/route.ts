@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
+import { createDateLabels }          from '@/lib/demo/date-labels'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: PocketPay — Nigerian fintech (payments + savings app)
-   Story arc: solid start → Oct 2025 PR crisis (viral support tweet) →
-              Nov 2025 PocketPay Cares recovery → Q1 2026 referral viral growth
-              → Apr 2026 Series A announcement peak → settled growth
+
+   Story arc, measured in days back from whenever the seed runs:
+     ~365–270  solid start
+     ~270–230  PR crisis: a viral support thread drags sentiment 71 → 42
+     ~230–180  PocketPay Cares recovery campaign
+     ~180–100  referral programme drives viral growth
+     ~100–40   Series A announcement peak
+     ~40–0     today: settled growth
+
+   Nothing here is pinned to a calendar month. The rows are placed relative to
+   "now" and the narrative copy reads its month names off the same offsets via
+   ARC + L below, so the story stays true no matter when the seed is run.
 ───────────────────────────────────────────────────────────────────────────── */
 
 const DEMO_EMAIL    = 'demo@pocketpay.brandgauge.app'
@@ -13,6 +23,22 @@ const DEMO_PASSWORD = 'Demo@PocketPay2026!'
 // Gated by the shared ADMIN_SECRET env var (fail closed if unset).
 const SEED_SECRET   = process.env.ADMIN_SECRET
 const BASE          = new Date()
+
+// Month/quarter labels for the narrative copy, derived from the same offsets.
+const L = createDateLabels(BASE)
+
+/* ── Story-arc anchors (days back from now) ──────────────────────────────── */
+/* The sentiment model and every piece of narrative copy below both read these,
+   so an AI answer can never name a month the data has already moved past. */
+
+const ARC = {
+  crisisStart:   270,  // the viral support thread lands, sentiment turns down
+  crisisTrough:  230,  // sentiment bottoms out at ~42
+  caresLaunch:   210,  // PocketPay Cares recovery campaign goes live
+  recovered:     180,  // sentiment back to ~69
+  seriesA:        50,  // Series A announcement
+  now:             0,
+} as const
 
 function dAgo(n: number): string {
   const d = new Date(BASE)
@@ -29,9 +55,9 @@ function tsAgo(daysBack: number, hour = 10): string {
 
 function sentScore(d: number): number {
   let base: number
-  if      (d >= 270) base = 71
-  else if (d >= 230) base = 71 - (d - 230) / 40 * 29
-  else if (d >= 180) base = 42 + (230 - d) / 50 * 27
+  if      (d >= ARC.crisisStart)  base = 71
+  else if (d >= ARC.crisisTrough) base = 71 - (d - 230) / 40 * 29
+  else if (d >= ARC.recovered)    base = 42 + (230 - d) / 50 * 27
   else if (d >= 100) base = 69 + (180 - d) / 80 * 10
   else if (d >= 40)  base = 79 + (100 - d) / 60 * 2
   else               base = 81 - (40 - d) * 0.07
@@ -117,10 +143,10 @@ export async function POST(req: NextRequest) {
   /* ── 5. Campaigns ─────────────────────────────────────────────────────── */
   const { data: camp1 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'PocketPay Cares',
-    description: 'Brand trust recovery campaign after Oct 2025 support crisis. Influencer + digital.',
+    description: `Brand trust recovery campaign after the ${L.monthYear(ARC.crisisTrough)} support crisis. Influencer + digital.`,
     objective: 'awareness', status: 'completed',
     start_date: dAgo(210), end_date: dAgo(160), total_budget: 12_000_000, currency: 'NGN',
-    ai_summary: 'PocketPay Cares reversed the Oct crisis within 6 weeks. Sentiment recovered from 42 to 69. Customer service influencer content drove 4.2M impressions. Trust score +18pts.',
+    ai_summary: `PocketPay Cares reversed the ${L.month(ARC.crisisTrough)} crisis within 6 weeks. Sentiment recovered from 42 to 69. Customer service influencer content drove 4.2M impressions. Trust score +18pts.`,
   }).select('id').single()
 
   const { data: camp2 } = await sb.from('campaigns').insert({
@@ -346,7 +372,7 @@ export async function POST(req: NextRequest) {
 
   /* ── 13. NPS survey + records ─────────────────────────────────────────── */
   const { data: npsS } = await sb.from('surveys').insert({
-    brand_id: brandId, name: 'PocketPay NPS Q2 2026', type: 'nps_basic', status: 'active',
+    brand_id: brandId, name: `PocketPay NPS ${L.quarter(0)}`, type: 'nps_basic', status: 'active',
     questions: [{ id: 'q1', text: 'How likely are you to recommend PocketPay to a friend?', type: 'nps' }],
   }).select('id').single()
 
@@ -401,8 +427,8 @@ export async function POST(req: NextRequest) {
   /* ── 16. Manual metrics — 6 months of history, oldest first ───────────── */
   // Canonical commercial keys: total_spend, new_customers, cac (explicit
   // override), arpu, churn_rate. Series follow the PocketPay arc: referral
-  // viral growth through Q1 2026 → Series A peak → settled growth. The last
-  // value in each series is the current month.
+  // viral growth → Series A peak → settled growth. The last value in each
+  // series is the current month.
   const today = new Date()
   const monthBounds = (monthsAgo: number) => ({
     start: new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1).toISOString().split('T')[0],
@@ -474,7 +500,7 @@ export async function POST(req: NextRequest) {
   const ppPress = [
     { headline: 'PocketPay Users Report Delayed Transfers, Frozen Accounts',                       publication: 'The Punch',        url: 'https://punchng.com/pocketpay-transfer-delays',        pub_date: dAgo(230), sent_score: -0.58, sent_label: 'negative', reach: 210_000, emv:  -840_000, is_comp: false, comp: null,      snippet: 'Multiple PocketPay users have taken to Twitter to complain of delayed transfers and unexplained account freezes over the past week, with some reporting locked funds for over 72 hours.' },
     { headline: 'PocketPay Launches "PocketPay Cares" After Social Media Backlash',                 publication: 'Nairametrics',     url: 'https://nairametrics.com/pocketpay-cares-launch',       pub_date: dAgo(205), sent_score: 0.35,  sent_label: 'neutral',  reach: 140_000, emv:   210_000, is_comp: false, comp: null,      snippet: 'PocketPay has announced a dedicated customer support initiative and public apology following a wave of complaints about transaction failures and support response times.' },
-    { headline: 'PocketPay Sentiment Rebounds as Cares Campaign Lands with Users',                  publication: 'TechCabal',        url: 'https://techcabal.com/pocketpay-cares-recovery',        pub_date: dAgo(165), sent_score: 0.78,  sent_label: 'positive', reach: 180_000, emv:   990_000, is_comp: false, comp: null,      snippet: 'PocketPay appears to have turned a corner after its October crisis, with independent brand tracking showing sentiment recovering from the low 40s back into the high 60s within six weeks.' },
+    { headline: 'PocketPay Sentiment Rebounds as Cares Campaign Lands with Users',                  publication: 'TechCabal',        url: 'https://techcabal.com/pocketpay-cares-recovery',        pub_date: dAgo(165), sent_score: 0.78,  sent_label: 'positive', reach: 180_000, emv:   990_000, is_comp: false, comp: null,      snippet: `PocketPay appears to have turned a corner after its ${L.month(ARC.crisisTrough)} crisis, with independent brand tracking showing sentiment recovering from the low 40s back into the high 60s within six weeks.` },
     { headline: 'Nigerian Fintechs Race for Series A as Investor Appetite Returns',                 publication: 'BusinessDay',      url: 'https://businessday.ng/fintech-series-a-2026',          pub_date: dAgo(48),  sent_score: 0.05,  sent_label: 'neutral',  reach: 95_000,  emv:    47_500, is_comp: false, comp: null,      snippet: 'A wave of Nigerian payment startups including PocketPay are closing fresh funding rounds as investor confidence in the sector recovers after a slow 2025.' },
     { headline: 'PocketPay Closes $8M Series A Led by Pan-African Fund',                            publication: 'TechCabal',        url: 'https://techcabal.com/pocketpay-series-a-close',        pub_date: dAgo(50),  sent_score: 0.91,  sent_label: 'positive', reach: 260_000, emv: 1_430_000, is_comp: false, comp: null,      snippet: 'PocketPay has closed an $8M Series A round to expand its savings and payments product, with plans to double its Lagos engineering team and launch a merchant offering.' },
     { headline: 'OPay Reports Record Transaction Volumes in Q1',                                    publication: 'TechCabal',        url: 'https://techcabal.com/opay-q1-transaction-volumes',     pub_date: dAgo(60),  sent_score: 0.40,  sent_label: 'neutral',  reach: 220_000, emv:   -88_000, is_comp: true,  comp: 'OPay',    snippet: 'OPay says it processed a record volume of transactions in the first quarter, citing continued growth in its agent banking network across Nigeria.' },
@@ -581,21 +607,21 @@ export async function POST(req: NextRequest) {
   await sb.from('ai_conversations').insert({
     brand_id: brandId, user_id: userId,
     messages: [
-      { role: 'user', content: 'Why did our sentiment crash in October 2025?', timestamp: tsAgo(200) },
-      { role: 'assistant', content: 'The October 2025 crash (69 → 42 over roughly three weeks) traces back to a single viral thread: a user reported a frozen account and a failed transfer that took four days to resolve. Three things amplified it:\n\n**1. Support response time.** Median first-response time that month was 18 hours against a target of under 2. The delay itself became the story, independent of the original transaction issue.\n\n**2. Copycat complaints.** Once the thread passed 10K retweets, dozens of unrelated users piled on with older, smaller complaints — a pile-on effect common in fintech Twitter.\n\n**3. Silence.** PocketPay did not respond publicly for 36 hours. In a trust-sensitive category like payments, silence reads as confirmation.\n\nThe recovery came from PocketPay Cares: public acknowledgement, a visible support-team-led content series, and a published fix timeline. Sentiment moved from 42 to 69 in six weeks.', timestamp: tsAgo(200) },
+      { role: 'user', content: `Why did our sentiment crash in ${L.monthYear(ARC.crisisTrough)}?`, timestamp: tsAgo(200) },
+      { role: 'assistant', content: `The ${L.monthYear(ARC.crisisTrough)} crash (69 → 42 over roughly three weeks) traces back to a single viral thread: a user reported a frozen account and a failed transfer that took four days to resolve. Three things amplified it:\n\n**1. Support response time.** Median first-response time that month was 18 hours against a target of under 2. The delay itself became the story, independent of the original transaction issue.\n\n**2. Copycat complaints.** Once the thread passed 10K retweets, dozens of unrelated users piled on with older, smaller complaints — a pile-on effect common in fintech Twitter.\n\n**3. Silence.** PocketPay did not respond publicly for 36 hours. In a trust-sensitive category like payments, silence reads as confirmation.\n\nThe recovery came from PocketPay Cares: public acknowledgement, a visible support-team-led content series, and a published fix timeline. Sentiment moved from 42 to 69 in six weeks.`, timestamp: tsAgo(200) },
       { role: 'user', content: 'How do we avoid this happening again now that Series A news is drawing more attention to us?', timestamp: tsAgo(48) },
-      { role: 'assistant', content: 'Two things matter most with more eyes on the brand:\n\n**1. Speed of first response, not resolution.** Users forgive slow fixes more easily than slow acknowledgement. A same-day public response, even without a resolution, prevents the pile-on dynamic that hurt you in October.\n\n**2. Keep the trust content flowing, not just growth content.** Series A and Refer & Earn content is acquisition-focused. Without the occasional Cares-style trust post, growth-heavy feeds read as tone-deaf if an incident happens. Recommend one trust or support-spotlight post per two weeks going forward as insurance.', timestamp: tsAgo(48) },
+      { role: 'assistant', content: `Two things matter most with more eyes on the brand:\n\n**1. Speed of first response, not resolution.** Users forgive slow fixes more easily than slow acknowledgement. A same-day public response, even without a resolution, prevents the pile-on dynamic that hurt you in ${L.month(ARC.crisisTrough)}.\n\n**2. Keep the trust content flowing, not just growth content.** Series A and Refer & Earn content is acquisition-focused. Without the occasional Cares-style trust post, growth-heavy feeds read as tone-deaf if an incident happens. Recommend one trust or support-spotlight post per two weeks going forward as insurance.`, timestamp: tsAgo(48) },
     ],
     sources_cited: [
-      { type: 'sentiment_daily', period: 'Oct 2025', rows: 30 },
+      { type: 'sentiment_daily', period: L.monthYearShort(ARC.crisisTrough), rows: 30 },
       { type: 'mentions',        keyword: 'PocketPay account frozen', count: 6 },
-      { type: 'press_mentions',  period: 'Oct-Dec 2025', rows: 3 },
+      { type: 'press_mentions',  period: L.monthRange(ARC.crisisTrough, ARC.recovered), rows: 3 },
     ],
   })
 
   /* ── 24. Budget plan + line items + actuals (Refer & Earn) ────────────── */
   const { data: ppBudget } = await sb.from('budget_plans').insert({
-    brand_id: brandId, name: 'PocketPay Refer & Earn — Q2 2026',
+    brand_id: brandId, name: `PocketPay Refer & Earn — ${L.quarter(45)}`,
     period_start: dAgo(45), period_end: dAgo(-45),
     total_budget: 18_000_000, currency: 'NGN',
     status: 'active', notes: 'Viral referral push. Digital-heavy with influencer seeding.',
@@ -777,7 +803,7 @@ export async function POST(req: NextRequest) {
 
   /* ── 30. Creative assets (Creative Library vault) ─────────────────────── */
   const ppCreativeAssets = [
-    { title: 'PocketPay Cares — Support Team Testimonial', description: 'Real support agents speaking on-camera about fixing the October incident and what changed. 30s cut for Instagram and Twitter.', asset_type: 'video', format: 'Feed', platform: 'Instagram', status: 'vetted', fit_for_ads: true, performance: { impressions: 1_200_000, clicks: 38_000, ctr: 3.2, conversions: 5_200, spend: 900_000, roas: 4.1 }, replication_elements: ['Real employees, never actors', 'Acknowledge the problem in the first 5 seconds', 'End on a concrete fix, not just an apology', 'Keep under 30 seconds — attention drops fast on trust content'], tags: ['trust', 'crisis-recovery', 'video', 'top-performer'] },
+    { title: 'PocketPay Cares — Support Team Testimonial', description: `Real support agents speaking on-camera about fixing the ${L.month(ARC.crisisTrough)} incident and what changed. 30s cut for Instagram and Twitter.`, asset_type: 'video', format: 'Feed', platform: 'Instagram', status: 'vetted', fit_for_ads: true, performance: { impressions: 1_200_000, clicks: 38_000, ctr: 3.2, conversions: 5_200, spend: 900_000, roas: 4.1 }, replication_elements: ['Real employees, never actors', 'Acknowledge the problem in the first 5 seconds', 'End on a concrete fix, not just an apology', 'Keep under 30 seconds — attention drops fast on trust content'], tags: ['trust', 'crisis-recovery', 'video', 'top-performer'] },
     { title: 'Refer & Earn — Static Feed Ad', description: 'Simple product card: phone mockup showing the referral screen, "₦3,000 for 3 friends" headline, single CTA button.', asset_type: 'image', format: 'Feed', platform: 'Instagram', status: 'vetted', fit_for_ads: true, performance: { impressions: 980_000, clicks: 46_000, ctr: 4.7, conversions: 6_800, spend: 640_000, roas: 5.3 }, replication_elements: ['Lead with the naira amount, not the word "reward"', 'Phone mockup builds instant credibility on how the flow works', 'Single CTA only — extra buttons drop conversion'], tags: ['referral', 'conversion', 'top-performer'] },
     { title: 'Series A Announcement — Social Card', description: 'Clean announcement card: PocketPay logo, "$8M Series A" headline, investor logo strip beneath.', asset_type: 'image', format: 'Feed', platform: 'Twitter', status: 'vetted', fit_for_ads: false, performance: { impressions: 620_000, clicks: 9_200, ctr: 1.5 }, replication_elements: ['Investor logos add third-party credibility', 'Keep the headline number-first', 'Route to press/LinkedIn — not the main consumer feed'], tags: ['pr', 'announcement', 'series-a'] },
     { title: 'Push Notification Copy Bank — Referral Reminders', description: 'A/B tested push copy library for referral reminder nudges, sorted by tested click-through rate.', asset_type: 'copy', format: 'Push Notification', platform: 'App', status: 'vetted', fit_for_ads: false, performance: { impressions: 410_000, clicks: 28_700, ctr: 7.0 }, replication_elements: ['Lead with the cash amount, always', 'Keep under 40 characters for lock-screen visibility', 'Rotate copy every 2 weeks to avoid fatigue'], tags: ['push', 'referral', 'copy-bank'] },

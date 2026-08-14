@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
+import { createDateLabels }          from '@/lib/demo/date-labels'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Jara Foods Ltd — Nigerian FMCG brand
-   Story arc: healthy baseline → Oct 2025 competitor campaign dip →
-              Nov–Dec 2025 Nourish Nigeria recovery + festive peak →
-              Jan–Feb 2026 post-holiday stabilisation →
-              Mar–May 2026 Reconnect campaign growth →
-              June 2026 (now): strong summer position
+
+   Story arc, measured in days back from whenever the seed runs:
+     ~365–290  healthy baseline
+     ~290–250  ChowMate "Festive Blitz" pulls sentiment down
+     ~250–170  Nourish Nigeria recovery, rising into the festive peak
+     ~170–110  post-holiday stabilisation
+     ~110–30   Reconnect campaign growth
+     ~30–0     today: strong position, Summer Vibes in market
+
+   Nothing here is pinned to a calendar month. The rows are placed relative to
+   "now" and the narrative copy reads its month names off the same offsets via
+   ARC + L below, so the story stays true no matter when the seed is run.
 ───────────────────────────────────────────────────────────────────────────── */
 
 const DEMO_EMAIL    = 'demo@jarafoods.brandgauge.app'
@@ -15,6 +23,22 @@ const DEMO_PASSWORD = 'Demo@Jara2026!'
 // Gated by the shared ADMIN_SECRET env var (fail closed if unset).
 const SEED_SECRET   = process.env.ADMIN_SECRET
 const BASE          = new Date()
+
+// Month/quarter labels for the narrative copy, derived from the same offsets.
+const L = createDateLabels(BASE)
+
+/* ── Story-arc anchors (days back from now) ──────────────────────────────── */
+/* The sentiment model and every piece of narrative copy below both read these,
+   so a briefing can never name a month the data has already moved past. */
+
+const ARC = {
+  blitzStart:      290,  // ChowMate "Festive Blitz" launches, sentiment turns down
+  blitzTrough:     250,  // sentiment bottoms out at ~48
+  recoveryStart:   250,  // Nourish Nigeria campaign begins the climb
+  festivePeak:     170,  // festive season high
+  postHolidayDip:  110,  // post-holiday stabilisation ends
+  now:               0,
+} as const
 
 /* ── Date helpers ────────────────────────────────────────────────────────── */
 
@@ -35,10 +59,10 @@ function tsAgo(daysBack: number, hour = 10): string {
 
 function sentScore(d: number): number {
   let base: number
-  if      (d >= 290) base = 67
-  else if (d >= 250) base = 65 - (d - 250) / 40 * 17        // ChowMate blitz
-  else if (d >= 170) base = 48 + (250 - d) / 80 * 32        // recovery + festive
-  else if (d >= 110) base = 80 - (d - 110) / 60 * 18        // post-holiday dip
+  if      (d >= ARC.blitzStart)  base = 67
+  else if (d >= ARC.blitzTrough) base = 65 - (d - 250) / 40 * 17        // ChowMate blitz
+  else if (d >= ARC.festivePeak) base = 48 + (250 - d) / 80 * 32        // recovery + festive
+  else if (d >= ARC.postHolidayDip) base = 80 - (d - 110) / 60 * 18        // post-holiday dip
   else if (d >= 30)  base = 62 + (110 - d) / 80 * 11        // Reconnect campaign
   else               base = 71 + (30 - d) * 0.13            // summer
   const noise = Math.sin(d * 1.7) * 2.5 + Math.cos(d * 0.9) * 1.8
@@ -317,7 +341,7 @@ export async function POST(req: NextRequest) {
     activation_mechanics: ['Live cooking demos', 'Recipe sampling', 'Photo booth', 'Social media wall', 'Branded gifts'],
     kpi_targets:          { leads: 1500, nps_score: 70, social_impressions: 2000000, press_mentions: 10 },
     budget: 7_200_000, currency: 'NGN',
-    hashtags: ['#NourishNigeria', '#JaraFoods', '#JaraFestival2025'],
+    hashtags: ['#NourishNigeria', '#JaraFoods', `#JaraFestival${L.year(218)}`],
     status: 'closed',
     debrief: {
       actual_attendance: 2847, leads_captured: 1847, nps_achieved: 74,
@@ -479,7 +503,7 @@ export async function POST(req: NextRequest) {
       lga: 'Ikeja',
       vanity_slug: 'jara-airport', landing_url: 'https://jarafoods.com/nourish',
       visits: 4102, qr_scan_count: 893,
-      notes: 'Targets diaspora returnees and high-income travellers. Airport exclusivity until Dec 2026.',
+      notes: `Targets diaspora returnees and high-income travellers. Airport exclusivity until ${L.monthYearShort(-180)}.`,
     },
     {
       brand_id: brandId, campaign_id: camp1Id,
@@ -673,7 +697,7 @@ export async function POST(req: NextRequest) {
   /* ── 13. Surveys, responses, NPS records ──────────────────────────────── */
   const { data: survey } = await sb.from('surveys').insert({
     brand_id: brandId,
-    name: 'Jara Brand Health Survey — Q2 2026',
+    name: `Jara Brand Health Survey — ${L.quarter(0)}`,
     type: 'nps',
     questions: [
       { id: 'q1', type: 'single_choice', text: 'How did you first discover Jara Foods?', options: ['TV/Radio', 'Social Media', 'Friend/Family', 'Supermarket', 'Event'] },
@@ -773,7 +797,7 @@ export async function POST(req: NextRequest) {
   const { data: perceptionSurvey } = await sb.from('surveys').insert({
     brand_id: brandId,
     type:     'perception_audit',
-    name:     'Brand Perception Audit Q2 2025',
+    name:     `Brand Perception Audit ${L.quarter(50)}`,
     status:   'live',
   }).select('id').single()
 
@@ -806,7 +830,7 @@ export async function POST(req: NextRequest) {
   const { data: awarenessSurvey } = await sb.from('surveys').insert({
     brand_id: brandId,
     type:     'awareness_check',
-    name:     'Brand Awareness Check Q2 2025',
+    name:     `Brand Awareness Check ${L.quarter(98)}`,
     status:   'live',
   }).select('id').single()
 
@@ -833,7 +857,7 @@ export async function POST(req: NextRequest) {
   const { data: postNpsSurvey } = await sb.from('surveys').insert({
     brand_id: brandId,
     type:     'post_purchase_nps',
-    name:     'Customer NPS Survey Q2 2025',
+    name:     `Customer NPS Survey ${L.quarter(80)}`,
     status:   'live',
   }).select('id').single()
 
@@ -883,7 +907,7 @@ export async function POST(req: NextRequest) {
     const { data: recallSurvey } = await sb.from('surveys').insert({
       brand_id:  brandId,
       type:      'brand_recall',
-      name:      'Jara Brand Recall — Q1 2026',
+      name:      `Jara Brand Recall — ${L.quarter(75)}`,
       status:    'closed',
       panel_id:  panel2.id,
       is_panel:  true,
@@ -1445,7 +1469,7 @@ export async function POST(req: NextRequest) {
         competitor_threats: [
           'ChowMate UNILAG activation targets 18-24 segment with brand sampling and student ambassador programme',
           'NutriNg Foods "Clean Label" rebrand launching next quarter — credibility play in health segment',
-          'ChowMate planning 8 new Lekki-Ajah billboards starting July 2026',
+          `ChowMate planning 8 new Lekki-Ajah billboards starting ${L.monthYear(28 - 31)}`,
         ],
         opportunities: [
           'Summer Vibes pre-launch: seeding @chefkemisola ahead of competitors closes the Gen-Z gap',
@@ -1455,7 +1479,7 @@ export async function POST(req: NextRequest) {
         recommendations: [
           { action: 'Brief @chefkemisola for Summer Vibes Reel by end of week', rationale: 'Influencer seeding 2 weeks before paid launch historically drives 40% lower CPM for Jara campaigns.', priority: 'High' as const },
           { action: 'Prepare Gen-Z counter-narrative social pack for UNILAG/LASU audiences', rationale: 'ChowMate campus activation will start generating UGC within 10 days — preemptive content is cheaper than defensive response.', priority: 'High' as const },
-          { action: 'Restock Kano and Maiduguri to 120% before Sallah', rationale: 'October 2025 stockout threads cost 8 points of SOV. Distribution consistency is the fastest brand health lever.', priority: 'Medium' as const },
+          { action: 'Restock Kano and Maiduguri to 120% before Sallah', rationale: `The ${L.monthYear(ARC.blitzStart)} stockout threads cost 8 points of SOV. Distribution consistency is the fastest brand health lever.`, priority: 'Medium' as const },
         ],
         data_gaps: [
           'No TikTok listening — ChowMate Gen-Z activity on platform unmonitored',
@@ -1586,14 +1610,14 @@ export async function POST(req: NextRequest) {
           'ChowMate reportedly in talks with two Gen-Z TikTok creators (500k+ followers each)',
         ],
         opportunities: [
-          'Sallah seeding: brief @AdaezeFoods and @HijabChic for July cultural content — exclusivity window closes soon',
+          'Sallah seeding: brief @AdaezeFoods and @HijabChic for the cultural window — the exclusivity window closes soon',
           'Kano restocking ahead of Sallah creates first-mover advantage in Northern market recovery',
           'NPS promoter micro-advocacy campaign: 200 promoters at 57% NPS promoter rate = est. 2M organic impressions',
           'TikTok trial: 4-week Summer Vibes extension at ₦400k could close Gen-Z gap before ChowMate locks creator relationships',
         ],
         recommendations: [
-          { action: 'Brief Sallah creators by July 1 (2 weeks away)', rationale: 'Cultural moments drive 2.4x engagement vs standard ads for Jara\'s audience. ChowMate has not booked Sallah talent — first mover wins.', priority: 'High' as const },
-          { action: 'Restock Kano and Maiduguri to 120% ahead of Sallah window', rationale: 'October 2025 stockout threads amplified ChowMate\'s SOV gain by 8 points. Prevention is cheaper than recovery.', priority: 'High' as const },
+          { action: 'Brief Sallah creators within the next two weeks', rationale: 'Cultural moments drive 2.4x engagement vs standard ads for Jara\'s audience. ChowMate has not booked Sallah talent — first mover wins.', priority: 'High' as const },
+          { action: 'Restock Kano and Maiduguri to 120% ahead of Sallah window', rationale: `The ${L.monthYear(ARC.blitzStart)} stockout threads amplified ChowMate's SOV gain by 8 points. Prevention is cheaper than recovery.`, priority: 'High' as const },
           { action: 'Launch TikTok account with 4-week Summer Vibes extension (₦400k trial)', rationale: 'ChowMate earns 22% of its SOV on TikTok. Jara has zero presence. Low cost to test before Q4 budget lock.', priority: 'Medium' as const },
           { action: 'Activate 200 NPS promoters with Summer Vibes shareable kits', rationale: 'Promoter UGC converts at 3x paid CTR. The Summer Vibes high-sentiment window is the ideal moment to capture organic amplification.', priority: 'Medium' as const },
         ],
@@ -1620,30 +1644,30 @@ export async function POST(req: NextRequest) {
     messages: [
       {
         role: 'user',
-        content: 'Why did our sentiment drop so sharply in October 2025?',
+        content: `Why did our sentiment drop so sharply in ${L.monthYear(ARC.blitzStart)}?`,
         timestamp: tsAgo(30),
       },
       {
         role: 'assistant',
-        content: 'The October 2025 dip (65 → 48 over 30 days) aligns with ChowMate\'s "Festive Blitz" campaign that launched October 3rd. Three factors drove it:\n\n**1. Share of voice collapse.** ChowMate increased paid social spend by ~340% that month, dominating FMCG conversation. Jara\'s blended SOV fell from 22% to 14%.\n\n**2. Price perception hit.** ChowMate introduced a -18% promotional price during school resumption — exactly when your audience is budget-sensitive. Mentions linking "Jara" and "too expensive" peaked in week 2 of October.\n\n**3. Distribution noise amplified.** Two Twitter threads about Jara stockouts in Kano and Maiduguri went semi-viral (~180K combined impressions), layering negative sentiment on top of the competitive pressure.\n\nThe recovery from November was driven by the Nourish Nigeria campaign, which successfully reanchored Jara around community and authenticity. The Lagos festival alone generated 3.4M social impressions at 89% positive sentiment.',
+        content: `The ${L.monthYear(ARC.blitzStart)} dip (65 → 48 over 30 days) aligns with ChowMate's "Festive Blitz" campaign that launched on the ${L.ordinalDay(ARC.blitzStart)}. Three factors drove it:\n\n**1. Share of voice collapse.** ChowMate increased paid social spend by ~340% that month, dominating FMCG conversation. Jara\'s blended SOV fell from 22% to 14%.\n\n**2. Price perception hit.** ChowMate introduced a -18% promotional price during school resumption — exactly when your audience is budget-sensitive. Mentions linking "Jara" and "too expensive" peaked in the second week of ${L.month(ARC.blitzStart)}.\n\n**3. Distribution noise amplified.** Two Twitter threads about Jara stockouts in Kano and Maiduguri went semi-viral (~180K combined impressions), layering negative sentiment on top of the competitive pressure.\n\nThe recovery from ${L.month(ARC.blitzTrough)} was driven by the Nourish Nigeria campaign, which successfully reanchored Jara around community and authenticity. The Lagos festival alone generated 3.4M social impressions at 89% positive sentiment.`,
         timestamp: tsAgo(30),
       },
       {
         role: 'user',
-        content: 'What should we do if ChowMate runs another aggressive campaign this October?',
+        content: 'What should we do if ChowMate runs another aggressive campaign like that one?',
         timestamp: tsAgo(29),
       },
       {
         role: 'assistant',
-        content: 'Three defensive plays, ranked by impact:\n\n**1. Pre-empt with a cultural moment.** Jara\'s cultural IQ is your moat. Own Sallah (late Sept) and October 1 Independence Day before ChowMate can fill that space. Brief @chefkemisola and @foodie_naija now for Q3 content — exclusivity windows are critical.\n\n**2. Lock down distribution visibility.** The October 2025 stockout threads did outsized damage. Work with your supply team to ensure Kano, Maiduguri and Ibadan are fully stocked by September 15. A visible stockout during a competitor blitz is a multiplier.\n\n**3. Activate your promoter base.** You currently have 57% promoters in NPS. Build a micro-advocacy programme — send promoters shareable content packs and limited-edition products pre-October. Your best defence against paid SOV is genuine community voice.',
+        content: `Three defensive plays, ranked by impact:\n\n**1. Pre-empt with a cultural moment.** Jara\'s cultural IQ is your moat. Own the next Sallah window and October 1 Independence Day before ChowMate can fill that space. Brief @chefkemisola and @foodie_naija now for ${L.quarter(-90)} content — exclusivity windows are critical.\n\n**2. Lock down distribution visibility.** The ${L.monthYear(ARC.blitzStart)} stockout threads did outsized damage. Work with your supply team to get Kano, Maiduguri and Ibadan fully stocked before the next festive build-up. A visible stockout during a competitor blitz is a multiplier.\n\n**3. Activate your promoter base.** You currently have 57% promoters in NPS. Build a micro-advocacy programme — send promoters shareable content packs and limited-edition products ahead of the window. Your best defence against paid SOV is genuine community voice.`,
         timestamp: tsAgo(29),
       },
     ],
     sources_cited: [
-      { type: 'sentiment_daily',  period: 'Oct 2025',  rows: 31 },
-      { type: 'sov_snapshots',    period: 'Q4 2025',   rows: 12 },
+      { type: 'sentiment_daily',  period: L.monthYearShort(ARC.blitzStart), rows: 31 },
+      { type: 'sov_snapshots',    period: L.quarter(ARC.blitzTrough),       rows: 12 },
       { type: 'mentions',         keyword: 'ChowMate', count: 8  },
-      { type: 'nps_records',      period: 'Q2 2026',   rows: 100 },
+      { type: 'nps_records',      period: L.quarter(30),                    rows: 100 },
     ],
   })
 
@@ -2246,9 +2270,9 @@ export async function POST(req: NextRequest) {
       asset_type: 'image', format: 'Feed', platform: 'Instagram',
       status: 'vetted', fit_for_ads: true,
       performance: { impressions: 148000, clicks: 5920, ctr: 4.0, conversions: 890, spend: 320000, roas: 4.2 },
-      notes: 'Our top performer Q4 2025. Market women imagery outperformed product-only shots by 3.1x on CTR. Brief the photographer to keep the setting recognisably local.',
+      notes: `Our top performer in ${L.quarter(ARC.festivePeak)}. Market women imagery outperformed product-only shots by 3.1x on CTR. Brief the photographer to keep the setting recognisably local.`,
       replication_elements: ['Warm earthy tones (burnt orange, deep brown)', 'Real person — not a model', 'Pidgin tagline: "Rice wey make sense"', 'Product in hand, not on table', '5kg bag prominently visible'],
-      tags: ['hero', 'q4-2025', 'instagram', 'top-performer'],
+      tags: ['hero', L.quarter(ARC.festivePeak).toLowerCase().replace(' ', '-'), 'instagram', 'top-performer'],
     },
     {
       title: 'Ramadan Healing Recipe Reel',
@@ -2336,7 +2360,7 @@ export async function POST(req: NextRequest) {
       asset_type: 'video', format: 'Story / Reel', platform: 'Instagram',
       status: 'active', fit_for_ads: true,
       performance: { impressions: 88000, clicks: 2640, ctr: 3.0, spend: 195000 },
-      notes: 'Currently in testing for Q1 2027 campaign. Before/after format performs well in January when people are in "new year" mindset.',
+      notes: `Currently in testing for the ${L.quarter(-180)} campaign. Before/after format performs well in January when people are in "new year" mindset.`,
       replication_elements: ['Before/after contrast is instantly readable', '15 seconds max for awareness play', 'No voiceover — music only in first 3 seconds', 'Open loop — the "after" side should make them want to know more', 'End on strong brand frame'],
       tags: ['video', 'teaser', 'new-year', 'before-after'],
     },

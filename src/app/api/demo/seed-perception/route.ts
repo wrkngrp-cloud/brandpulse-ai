@@ -9,6 +9,10 @@
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createDateLabels } from '@/lib/demo/date-labels'
+
+// These top-ups create their surveys as of now, so the name carries today's quarter.
+const L = createDateLabels(new Date())
 
 export const runtime = 'nodejs'
 
@@ -72,7 +76,7 @@ export async function POST() {
       .insert({
         brand_id: brand.id,
         type:     'perception_audit',
-        name:     'Brand Perception Audit Q2 2025',
+        name:     `Brand Perception Audit ${L.quarter(0)}`,
         status:   'active',
       })
       .select('id')

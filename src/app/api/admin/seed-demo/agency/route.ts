@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
+import { createDateLabels }          from '@/lib/demo/date-labels'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Pinnacle Media Group — full-service Lagos marketing agency
-   Story arc: solid mid-tier → lost a major client → won two FMCG retainers
-              → Abuja expansion → strong position June 2026
+
+   Story arc, measured in days back from whenever the seed runs:
+     ~365–200  solid mid-tier agency
+     ~200–130  lost a major client
+     ~130–60   won two FMCG retainers
+     ~60–30    Abuja office opens
+     ~30–0     today: strong position, FMCG Sprint in market
+
+   Nothing here is pinned to a calendar quarter. The rows are placed relative
+   to "now" and the campaign names and narrative copy read their quarter labels
+   off the same offsets via L below, so the story stays true whenever it runs.
 ───────────────────────────────────────────────────────────────────────────── */
 
 const DEMO_EMAIL    = 'demo@pinnaclemedia.brandgauge.app'
@@ -12,6 +22,14 @@ const DEMO_PASSWORD = 'Demo@Pinnacle2026!'
 // Gated by the shared ADMIN_SECRET env var (fail closed if unset).
 const SEED_SECRET   = process.env.ADMIN_SECRET
 const BASE          = new Date()
+
+// Quarter/month labels for names and narrative copy, from the same offsets.
+const L = createDateLabels(BASE)
+
+// Campaign names carry a quarter, so they have to be derived once and reused
+// everywhere they are referenced (budgets, geo-lift, creative, AI answers).
+const SPRINT_CAMPAIGN = `${L.quarter(30)} FMCG Sprint`      // active: dAgo(30) → dAgo(-60)
+const KANO_CAMPAIGN   = `${L.quarter(-14)} Kano Expansion`  // planned: starts dAgo(-14)
 
 function dAgo(n: number): string {
   const d = new Date(BASE)
@@ -113,7 +131,7 @@ export async function POST(req: NextRequest) {
 
   /* ── 5. Campaigns ─────────────────────────────────────────────────────── */
   const { data: camp1 } = await sb.from('campaigns').insert({
-    brand_id: brandId, name: 'Q2 FMCG Sprint',
+    brand_id: brandId, name: SPRINT_CAMPAIGN,
     description: 'Integrated FMCG campaign for two retainer clients. OOH + digital + activations.',
     objective: 'awareness', status: 'active',
     start_date: dAgo(30), end_date: dAgo(-60), total_budget: 22_000_000, currency: 'NGN',
@@ -144,7 +162,7 @@ export async function POST(req: NextRequest) {
   }).select('id').single()
 
   await sb.from('campaigns').insert({
-    brand_id: brandId, name: 'Q3 Kano Expansion',
+    brand_id: brandId, name: KANO_CAMPAIGN,
     description: 'OOH and radio push for FMCG client entering northern Nigeria.',
     objective: 'awareness', status: 'planned',
     start_date: dAgo(-14), end_date: dAgo(-74), total_budget: 15_000_000, currency: 'NGN',
@@ -304,7 +322,7 @@ export async function POST(req: NextRequest) {
     { c: 'Fee negotiations with Pinnacle were tough. Worth it in the end though', s: 'neutral', p: 'twitter' },
     { c: 'The cultural intelligence angle Pinnacle brings is genuinely different', s: 'positive', p: 'instagram' },
     { c: 'Hoping Pinnacle does not get too big and lose the boutique feel', s: 'neutral', p: 'twitter' },
-    { c: 'Pinnacle delivered under budget on our Q1 campaign. Rare in this industry', s: 'positive', p: 'twitter' },
+    { c: 'Pinnacle delivered under budget on our last campaign. Rare in this industry', s: 'positive', p: 'twitter' },
   ]
   const handles = ['@adaeze_ng','@kunle_mktg','@temi_brand','@ify_agency','@chidex_ng','@mosun_pr','@dayo_media','@nnamdi_pr','@sola_comms','@aisha_brand']
   const mentionInserts = []
@@ -335,7 +353,7 @@ export async function POST(req: NextRequest) {
 
   /* ── 13. NPS survey + records ─────────────────────────────────────────── */
   const { data: npsS } = await sb.from('surveys').insert({
-    brand_id: brandId, name: 'Pinnacle Client NPS Q2 2026', type: 'nps_basic', status: 'active',
+    brand_id: brandId, name: `Pinnacle Client NPS ${L.quarter(0)}`, type: 'nps_basic', status: 'active',
     questions: [{ id: 'q1', text: 'How likely are you to recommend Pinnacle Media to a peer?', type: 'nps' }],
   }).select('id').single()
   if (npsS) {
@@ -376,7 +394,7 @@ export async function POST(req: NextRequest) {
   // marketing spend, so it must not feed CAC or ROI maths. No acquisition
   // funnel metrics for the agency's own biz-dev — out of scope by design.
   // Series follow the Pinnacle arc: two FMCG retainer wins → Abuja expansion
-  // → strong June. The last value in each series is the current month.
+  // → strong current month. The last value in each series is the current month.
   const today = new Date()
   const monthBounds = (monthsAgo: number) => ({
     start: new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1).toISOString().split('T')[0],
@@ -431,14 +449,14 @@ export async function POST(req: NextRequest) {
   await sb.from('competitor_sightings').insert([
     { brand_id: brandId, competitor_name: "Noah's Ark Communications", lat: 6.4550, lng: 3.3841, sighting_type: 'billboard',  city: 'Lagos', state: 'Lagos', spotted_at: dAgo(16), description: "Noah's Ark billboard credit line spotted on a new bank retainer's Lekki campaign — first visible proof of the rumoured bank account win." },
     { brand_id: brandId, competitor_name: 'X3M Ideas',                 lat: 9.0765, lng: 7.3986, sighting_type: 'activation', city: 'Abuja', state: 'FCT',   spotted_at: dAgo(24), description: 'X3M Ideas ran a telco activation at Wuse Market — aggressive footprint as they pitch for the fintech account currently on our roster.' },
-    { brand_id: brandId, competitor_name: 'DDB Lagos',                 lat: 6.4281, lng: 3.4219, sighting_type: 'activation', city: 'Lagos', state: 'Lagos', spotted_at: dAgo(35), description: 'DDB Lagos credentials deck circulating among our FMCG client contacts ahead of the Q3 renewal conversation — worth a pre-emptive check-in.' },
+    { brand_id: brandId, competitor_name: 'DDB Lagos',                 lat: 6.4281, lng: 3.4219, sighting_type: 'activation', city: 'Lagos', state: 'Lagos', spotted_at: dAgo(35), description: `DDB Lagos credentials deck circulating among our FMCG client contacts ahead of the ${L.quarter(-60)} renewal conversation — worth a pre-emptive check-in.` },
     { brand_id: brandId, competitor_name: 'Insight BBDO',              lat: 6.6018, lng: 3.3515, sighting_type: 'billboard',  city: 'Lagos', state: 'Lagos', spotted_at: dAgo(9),  description: 'Insight BBDO OOH creative for a new beverage client at Oshodi — strong production value but generic "premium" positioning, no cultural anchor.' },
   ])
 
   /* ── 18. Press mentions (PR tracking) ─────────────────────────────────── */
   const pmPress = [
     { headline: 'Pinnacle Media Group Opens Abuja Office, Signals National Ambitions',       publication: 'BusinessDay',  url: 'https://businessday.ng/pinnacle-abuja-office',        pub_date: dAgo(60),  sent_score: 0.82, sent_label: 'positive', reach: 110_000, emv:   605_000, is_comp: false, comp: null,        snippet: 'Lagos agency Pinnacle Media Group has opened a permanent Abuja office, part of a broader push to serve government-adjacent and northern FMCG clients.' },
-    { headline: 'Pinnacle Media Wins Two New FMCG Retainers in Q1',                          publication: 'Marketing Edge', url: 'https://marketingedge.com.ng/pinnacle-fmcg-retainers', pub_date: dAgo(75),  sent_score: 0.88, sent_label: 'positive', reach: 40_000,  emv:   220_000, is_comp: false, comp: null,        snippet: 'Pinnacle Media Group has added two FMCG retainer accounts to its roster this quarter, continuing a run of new business wins into 2026.' },
+    { headline: `Pinnacle Media Wins Two New FMCG Retainers in ${L.quarter(75)}`,                          publication: 'Marketing Edge', url: 'https://marketingedge.com.ng/pinnacle-fmcg-retainers', pub_date: dAgo(75),  sent_score: 0.88, sent_label: 'positive', reach: 40_000,  emv:   220_000, is_comp: false, comp: null,        snippet: `Pinnacle Media Group has added two FMCG retainer accounts to its roster this quarter, continuing a run of new business wins into ${L.year(75)}.` },
     { headline: "Noah's Ark Communications Rumoured to Have Won Major Bank Retainer",         publication: 'Marketing Edge', url: 'https://marketingedge.com.ng/noahs-ark-bank-retainer',  pub_date: dAgo(18),  sent_score: 0.10, sent_label: 'neutral',  reach: 35_000,  emv:   -17_500, is_comp: true,  comp: "Noah's Ark", snippet: "Industry sources suggest Noah's Ark Communications has secured a major banking client retainer, a segment where Pinnacle Media has been actively pitching." },
     { headline: 'Pinnacle Media Delivers Bridger CRM Launch Campaign',                        publication: 'Techpoint Africa', url: 'https://techpoint.africa/pinnacle-bridger-launch',    pub_date: dAgo(128), sent_score: 0.75, sent_label: 'positive', reach: 60_000,  emv:   330_000, is_comp: false, comp: null,        snippet: "Pinnacle Media's PR and content strategy for Bridger CRM's launch placed the B2B SaaS brand in TechCabal, Techpoint, and Nairametrics within its first month." },
     { headline: 'X3M Ideas Pitching Aggressively for Fintech Accounts, Sources Say',           publication: 'Marketing Edge', url: 'https://marketingedge.com.ng/x3m-fintech-pitching',    pub_date: dAgo(10),  sent_score: 0.02, sent_label: 'neutral',  reach: 30_000,  emv:    -6_000, is_comp: true,  comp: 'X3M Ideas', snippet: 'X3M Ideas has reportedly intensified pitching activity in the fintech category, an account type where Pinnacle Media currently holds a key retainer.' },
@@ -455,7 +473,7 @@ export async function POST(req: NextRequest) {
   await sb.from('creative_analyses').insert([
     {
       brand_id: brandId, analysis_type: 'compare',
-      input_data: { platform: 'instagram', creativeA: 'Surulere sampling activation recap reel', creativeB: 'Q2 FMCG Sprint static product ad' },
+      input_data: { platform: 'instagram', creativeA: 'Surulere sampling activation recap reel', creativeB: `${SPRINT_CAMPAIGN} static product ad` },
       result: {
         winner: 'A',
         why_winner: 'The activation recap scores well ahead on engagement and cultural resonance (89 vs 70) — real crowd footage and ambassador energy sell "proof of execution" far better than a polished static ad, which is the exact thing prospective clients want to see in Pinnacle\'s own feed.',
@@ -543,7 +561,7 @@ export async function POST(req: NextRequest) {
       { role: 'user', content: "Why is X3M pitching so aggressively for our fintech account?", timestamp: tsAgo(9) },
       { role: 'assistant', content: "Two signals point to timing, not just opportunism:\n\n**1. Renewal window visibility.** Your fintech retainer is roughly 6 weeks from its natural renewal conversation. Agencies typically intensify pitching 4-8 weeks ahead of a known or estimated renewal date, and X3M's activity started right at that window.\n\n**2. Category momentum.** X3M has no fintech logo on its public roster right now. Winning a fintech account, even a smaller one, gives them a credential they currently lack entirely — the strategic value to them is higher than the account's fee alone would suggest.\n\nThe defensible move is to start the renewal conversation now rather than waiting for the client to raise it, and to bring a credentials refresh that leads with the fintech-specific results you already have.", timestamp: tsAgo(9) },
       { role: 'user', content: 'Should we be worried about losing the FMCG client to DDB Lagos?', timestamp: tsAgo(30) },
-      { role: 'assistant', content: 'Moderate risk, manageable with the right move. DDB\'s credentials deck circulating among your client contacts is a classic pre-renewal signal, but it is a deck, not a signed deal — no visible campaign work has appeared yet, which usually takes 6-10 weeks to materialise after a pitch win.\n\nThe highest-leverage response is proactive, not reactive: schedule a mid-quarter results review with the client before DDB gets a formal pitch slot. Clients rarely switch agencies mid-flight when the current agency is visibly ahead of schedule on results — use the Q2 FMCG Sprint numbers to make that case now.', timestamp: tsAgo(30) },
+      { role: 'assistant', content: `Moderate risk, manageable with the right move. DDB's credentials deck circulating among your client contacts is a classic pre-renewal signal, but it is a deck, not a signed deal — no visible campaign work has appeared yet, which usually takes 6-10 weeks to materialise after a pitch win.\n\nThe highest-leverage response is proactive, not reactive: schedule a mid-quarter results review with the client before DDB gets a formal pitch slot. Clients rarely switch agencies mid-flight when the current agency is visibly ahead of schedule on results — use the ${SPRINT_CAMPAIGN} numbers to make that case now.`, timestamp: tsAgo(30) },
     ],
     sources_cited: [
       { type: 'competitor_sightings', period: 'Last 60 days', rows: 4 },
@@ -551,9 +569,9 @@ export async function POST(req: NextRequest) {
     ],
   })
 
-  /* ── 23. Budget plan + line items + actuals (Q2 FMCG Sprint) ──────────── */
+  /* ── 23. Budget plan + line items + actuals (the FMCG Sprint) ─────────── */
   const { data: pmBudget } = await sb.from('budget_plans').insert({
-    brand_id: brandId, name: 'Q2 FMCG Sprint — Client Budget',
+    brand_id: brandId, name: `${SPRINT_CAMPAIGN} — Client Budget`,
     period_start: dAgo(30), period_end: dAgo(-60),
     total_budget: 22_000_000, currency: 'NGN',
     status: 'active', notes: 'Managed on behalf of two FMCG retainer clients. OOH + digital weighted toward Lagos.',
@@ -575,7 +593,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  /* ── 24. Geo-Lift study (Q2 FMCG Sprint OOH) ───────────────────────────── */
+  /* ── 24. Geo-Lift study (the FMCG Sprint OOH) ──────────────────────────── */
   const pmMakeWeekly = (weeks: number, baseT: number, baseC: number, liftPct: number) =>
     Array.from({ length: weeks }, (_, i) => ({
       week: dAgo((weeks - i) * 7),
@@ -588,7 +606,7 @@ export async function POST(req: NextRequest) {
     study_start: dAgo(30), study_end: dAgo(-60),
     lift_pct: 9.6, confidence: 79.8, correlation: 0.7610, status: 'running',
     weekly_data: pmMakeWeekly(4, 48, 40, 9.6),
-    ai_interpretation: 'Early signal from the Q2 FMCG Sprint OOH placements: +9.6% branded search uplift in Lagos versus the Ibadan control after four weeks. Confidence still building toward the 90% threshold — recommend reporting this alongside the digital media results in the next client review.',
+    ai_interpretation: `Early signal from the ${SPRINT_CAMPAIGN} OOH placements: +9.6% branded search uplift in Lagos versus the Ibadan control after four weeks. Confidence still building toward the 90% threshold — recommend reporting this alongside the digital media results in the next client review.`,
   })
 
   /* ── 25. A/B Experiments ───────────────────────────────────────────────── */
@@ -671,7 +689,7 @@ export async function POST(req: NextRequest) {
     { title: 'Pinnacle Credentials Deck — 2026', description: '18-page agency credentials deck: case studies, client logos, team bios, and results by category. Primary new-business tool.', asset_type: 'copy', format: 'Pitch Deck', platform: 'PDF', status: 'vetted', fit_for_ads: false, performance: { impressions: 4_200 }, replication_elements: ['Lead with results, not agency history', 'Named client results only — no vague claims', 'Keep under 20 pages — prospects skim, they do not read'], tags: ['pitch', 'credentials', 'new-business'] },
     { title: 'Surulere Sampling Activation Recap Reel', description: '45-second recap of the FMCG client Easter sampling activation: crowd energy, ambassador interactions, product handoffs.', asset_type: 'video', format: 'Reel', platform: 'Instagram', status: 'vetted', fit_for_ads: false, performance: { impressions: 89_000, clicks: 3_200 }, replication_elements: ['Crowd shot in the first 2 seconds, not the fifth', 'Real ambassador voices over polished narration', 'Use as proof-of-execution content for future pitches'], tags: ['activation', 'recap', 'proof-of-work'] },
     { title: 'PocketPay Influencer Brief Template', description: 'Standardised creator brief format used across the PocketPay Refer & Earn influencer drive: messaging pillars, do/dont list, deliverables.', asset_type: 'copy', format: 'Brief', platform: 'Instagram', status: 'active', fit_for_ads: false, performance: { impressions: 18_400 }, replication_elements: ['One page maximum — creators skip long briefs', 'Let creators keep their natural voice', 'Clear deliverable count and deadline up front'], tags: ['influencer', 'brief', 'template'] },
-    { title: 'Q2 FMCG Sprint — Client Results One-Pager', description: 'Single-page client report: campaign reach, spend efficiency, and sentiment lift, formatted for a board-level audience.', asset_type: 'copy', format: 'One-Pager', platform: 'PDF', status: 'vetted', fit_for_ads: false, performance: { impressions: 6 }, replication_elements: ['Three numbers maximum on the page', 'Lead with the number the client cares about most, not the one that flatters the agency', 'One-pager format forces prioritisation — resist the urge to add a second page'], tags: ['reporting', 'client-facing', 'template'] },
+    { title: `${SPRINT_CAMPAIGN} — Client Results One-Pager`, description: 'Single-page client report: campaign reach, spend efficiency, and sentiment lift, formatted for a board-level audience.', asset_type: 'copy', format: 'One-Pager', platform: 'PDF', status: 'vetted', fit_for_ads: false, performance: { impressions: 6 }, replication_elements: ['Three numbers maximum on the page', 'Lead with the number the client cares about most, not the one that flatters the agency', 'One-pager format forces prioritisation — resist the urge to add a second page'], tags: ['reporting', 'client-facing', 'template'] },
   ]
   for (const asset of pmCreativeAssets) {
     await sb.from('creative_assets').insert({ brand_id: brandId, ...asset })

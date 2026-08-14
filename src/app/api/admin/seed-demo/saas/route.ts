@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
+import { createDateLabels }          from '@/lib/demo/date-labels'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Bridger CRM — Nigerian B2B SaaS brand
-   Story arc: solid baseline → Zoho Nigeria launch dip (d~260-220) →
-              Built for Nigeria campaign recovery (d~220-150) →
-              Enterprise tier announcement lift (d~150-70) →
-              Recent position: strong, stable ~78
+
+   Story arc, measured in days back from whenever the seed runs:
+     ~365–260  solid baseline
+     ~260–220  Zoho Nigeria launch pulls sentiment down
+     ~220–150  Built for Nigeria campaign recovery
+     ~150–70   Enterprise tier announcement lift
+     ~70–0     today: strong and stable around 78
+
+   Nothing here is pinned to a calendar quarter. The rows are placed relative
+   to "now" and the campaign names and narrative copy read their quarter labels
+   off the same offsets via L below, so the story stays true whenever it runs.
 ───────────────────────────────────────────────────────────────────────────── */
 
 const DEMO_EMAIL    = 'demo@bridgercrm.brandgauge.app'
@@ -14,6 +22,13 @@ const DEMO_PASSWORD = 'Demo@Bridger2026!'
 // Gated by the shared ADMIN_SECRET env var (fail closed if unset).
 const SEED_SECRET   = process.env.ADMIN_SECRET
 const BASE          = new Date()
+
+// Quarter/month labels for names and narrative copy, from the same offsets.
+const L = createDateLabels(BASE)
+
+// camp4 is a planned campaign whose name carries its quarter, so it is derived
+// once and reused wherever the campaign is named (social copy included).
+const LINKEDIN_CAMPAIGN = `${L.quarter(-7)} LinkedIn B2B Push`  // planned: starts dAgo(-7)
 
 /* ── Date helpers ────────────────────────────────────────────────────────── */
 
@@ -195,7 +210,7 @@ export async function POST(req: NextRequest) {
   }).select('id').single()
 
   const { data: camp4 } = await sb.from('campaigns').insert({
-    brand_id: brandId, name: 'Q3 LinkedIn B2B Push',
+    brand_id: brandId, name: LINKEDIN_CAMPAIGN,
     description: 'LinkedIn-first acquisition campaign targeting Nigerian sales directors and business owners.',
     objective: 'conversion', status: 'planned',
     start_date: dAgo(-7), end_date: dAgo(-67),
@@ -678,7 +693,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     { c: 'Bridger Enterprise is live. Unlimited contacts. Custom workflows. Dedicated CSM. Pricing that makes sense in Nigeria. #BridgerEnterprise',                                p: 'twitter',   fs: 'action',        li: 5120,  co: 712,  sh: 2200, er: 8.0,  ai: 91, d: 5,   cmp: camp2Id },
     { c: 'Our customers close more deals with Bridger CRM. Here is what they say. Thread of unfiltered reviews below. #BridgerCRM #NigerianSME',                                   p: 'twitter',   fs: 'advocacy',      li: 3840,  co: 541,  sh: 1480, er: 6.2,  ai: 89, d: 15,  cmp: camp2Id },
     { c: 'SME Webinar Series recap. Session 3 was our best yet: 820 live attendees, 38% trial conversion. Next session in 2 weeks. #BridgerWebinar',                               p: 'instagram', fs: 'advocacy',      li: 2140,  co: 312,  sh: 620,  er: 4.5,  ai: 83, d: 55,  cmp: camp3Id },
-    { c: 'Q3 LinkedIn B2B Push is coming. Nigerian sales leaders: we have something big planned. Stay tuned. #BridgerCRM #LinkedInNigeria',                                         p: 'twitter',   fs: 'awareness',     li: 1680,  co: 198,  sh: 420,  er: 2.8,  ai: 75, d: 2,   cmp: camp4Id },
+    { c: `${LINKEDIN_CAMPAIGN} is coming. Nigerian sales leaders: we have something big planned. Stay tuned. #BridgerCRM #LinkedInNigeria`,                                         p: 'twitter',   fs: 'awareness',     li: 1680,  co: 198,  sh: 420,  er: 2.8,  ai: 75, d: 2,   cmp: camp4Id },
     { c: 'Bridger CRM is the only CRM with a local support team in Lagos. Real humans. Real Nigerians. Real fast. #BuiltForNigeria #BridgerCRM',                                   p: 'twitter',   fs: 'consideration', li: 3920,  co: 498,  sh: 1310, er: 6.1,  ai: 87, d: 18,  cmp: camp2Id },
     { c: 'Enterprise CRM without the enterprise nonsense. Bridger Enterprise is live. Book your demo this week. #BridgerEnterprise',                                                p: 'instagram', fs: 'action',        li: 4200,  co: 580,  sh: 1820, er: 7.4,  ai: 90, d: 10,  cmp: camp2Id },
     { c: 'Nigerian founders: your sales pipeline deserves better. Bridger CRM trial is free for 30 days. No credit card. No jargon. #BridgerCRM',                                  p: 'twitter',   fs: 'action',        li: 2640,  co: 310,  sh: 820,  er: 4.0,  ai: 81, d: 22,  cmp: camp2Id },
@@ -721,7 +736,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
   /* ── 13. NPS survey + 50 responses ───────────────────────────────────── */
   const { data: survey } = await sb.from('surveys').insert({
     brand_id: brandId,
-    name: 'Bridger CRM Customer NPS Survey Q2 2026',
+    name: `Bridger CRM Customer NPS Survey ${L.quarter(0)}`,
     type: 'nps',
     questions: [
       { id: 'q1', type: 'single_choice', text: 'How did you first discover Bridger CRM?', options: ['LinkedIn', 'Referral / Word of mouth', 'Google Search', 'Event / Webinar', 'Tech Media (TechCabal / Techpoint)'] },
@@ -827,13 +842,13 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
         ],
         competitor_threats: [
           'HubSpot West Africa pricing announcement targets the same SME segment Bridger owns',
-          'Zoho CRM Nigeria partner network expanding to 8 new cities in Q3',
+          `Zoho CRM Nigeria partner network expanding to 8 new cities in ${L.quarter(-90)}`,
           'Freshsales running aggressive LinkedIn campaigns targeting Nigerian HR and sales directors',
         ],
         opportunities: [
           'Enterprise launch window: HubSpot pricing backlash creates natural switching conversation to join',
           'Port Harcourt and Kano are underserved by all competitors: first-mover advantage available',
-          'Partner channel: onboard 5 top Nigerian IT consultancies as Bridger resellers before Q4',
+          `Partner channel: onboard 5 top Nigerian IT consultancies as Bridger resellers before ${L.quarter(-180)}`,
         ],
         recommendations: [
           { action: 'Brief @taiwo.crm and @seguntech to post Enterprise launch content on day 1', rationale: 'Influencer seeding at launch historically reduces enterprise CPL by 35% for Bridger. B2B Twitter influencers drive demo requests faster than paid ads.', priority: 'High' as const },
@@ -947,7 +962,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
         competitor_threats: [
           'HubSpot Nigeria is planning a Nigerian case study campaign: first credible content play for the local market',
           'Salesforce Essentials is reportedly reducing price by 20% for sub-50-seat teams next quarter',
-          'Odoo implementing a Nigeria-specific onboarding track in Q3',
+          `Odoo implementing a Nigeria-specific onboarding track in ${L.quarter(-90)}`,
         ],
         opportunities: [
           'North Nigeria first-mover: Lagos success story is strong enough to expand. One Kano reseller could unlock the entire North',
@@ -1185,7 +1200,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
       { role: 'assistant', content: 'Worth watching, not worrying yet. Two data points matter:\n\n**1. You have zero Enterprise pipeline in Kano, Kaduna, or Maiduguri today.** Zoho\'s reseller expansion is filling a gap you have not yet contested, not taking share from an existing Bridger position.\n\n**2. North Nigeria represents roughly 28% of Nigerian SME GDP by your own market sizing** — a real opportunity, not just defensive territory. The highest-leverage response is not matching Zoho\'s reseller count but securing one credible local partner in Kano before their network fully locks in distribution. First-mover credibility in an underserved region compounds faster than late competitive parity.', timestamp: tsAgo(10) },
     ],
     sources_cited: [
-      { type: 'sov_snapshots',   period: 'Q2 2026', rows: 8 },
+      { type: 'sov_snapshots',   period: L.quarter(25), rows: 8 },
       { type: 'press_mentions',  keyword: 'HubSpot West Africa', count: 2 },
       { type: 'weekly_briefings', period: 'Enterprise launch', rows: 4 },
     ],
@@ -1193,7 +1208,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
 
   /* ── 25. Budget plan + line items + actuals (Enterprise Launch) ───────── */
   const { data: bgBudget } = await sb.from('budget_plans').insert({
-    brand_id: brandId, name: 'Bridger Enterprise Tier Launch — Q2 2026',
+    brand_id: brandId, name: `Bridger Enterprise Tier Launch — ${L.quarter(30)}`,
     period_start: dAgo(30), period_end: dAgo(-60),
     total_budget: 22_000_000, currency: 'NGN',
     status: 'active', notes: 'Enterprise tier go-to-market. LinkedIn-weighted with a flagship Demo Day event.',
