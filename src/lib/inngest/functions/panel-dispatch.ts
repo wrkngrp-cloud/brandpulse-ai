@@ -1,8 +1,7 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
-import { Resend } from 'resend'
+import { getResend } from '@/lib/email/resend-client'
 
-const resend  = new Resend(process.env.RESEND_API_KEY)
 const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
 // ── Daily cron: find panels due and fire dispatch events ─────────────────────
@@ -74,6 +73,9 @@ export const panelDispatch = inngest.createFunction(
 
     if (panel.recipient_emails?.length > 0) {
       await step.run('send-emails', async () => {
+        const resend = getResend()
+        if (!resend) return { sent: 0, skipped: 'RESEND_API_KEY not set' }
+
         const batches: string[][] = []
         for (let i = 0; i < panel.recipient_emails.length; i += 50) {
           batches.push(panel.recipient_emails.slice(i, i + 50))

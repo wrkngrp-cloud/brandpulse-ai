@@ -47,6 +47,13 @@ Upstash Redis for cache / rate-limit / OAuth state.
 ## Hard rules
 - Multi-tenancy is enforced by RLS via `is_workspace_member()`. Never filter tenancy in
   app code as a substitute for RLS. See "Data access" for the one place this matters most.
+- NEVER construct an SDK client at module scope in an Inngest function file. Every job is
+  imported into `src/app/api/inngest/route.ts`, so a constructor that throws on a missing
+  env var (`new Resend(undefined)` does) fails at module evaluation and takes the WHOLE
+  serve endpoint down with a 500. Inngest then cannot sync or run ANY function, and the
+  symptom looks nothing like the cause. Build clients lazily inside the handler and skip
+  the step when the key is absent — see `getResend()` in `src/lib/email/resend-client.ts`.
+  (This is what silently killed all background jobs; found and fixed on 2026-08-14.)
 - All AI and external-API calls are server-side. NEVER expose `ANTHROPIC_API_KEY`,
   `OPENAI_API_KEY`, or `SUPABASE_SERVICE_ROLE_KEY` to the client.
 - Write the SQL migration BEFORE the API route that uses it.

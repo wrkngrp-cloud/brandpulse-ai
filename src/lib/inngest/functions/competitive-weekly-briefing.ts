@@ -1,9 +1,8 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
-import { Resend } from 'resend'
+import { getResend } from '@/lib/email/resend-client'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 export const competitiveWeeklyBriefing = inngest.createFunction(
   {
@@ -217,6 +216,12 @@ Return ONLY valid JSON — no markdown fences — in this exact shape:
           '-- ',
           'BrandGauge | View full briefing at your dashboard',
         ].join('\n')
+
+        const resend = getResend()
+        if (!resend) {
+          logger.warn('[competitive-weekly-briefing] RESEND_API_KEY not set — briefing saved, email skipped')
+          return { sent: false, email: userRecord.email }
+        }
 
         await resend.emails.send({
           from:    'BrandGauge <briefings@brandgauge.app>',

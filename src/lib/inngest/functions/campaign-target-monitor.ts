@@ -1,8 +1,7 @@
 import { inngest } from '@/lib/inngest/client'
 import { createServiceClient } from '@/lib/supabase/server'
-import { Resend } from 'resend'
+import { getResend } from '@/lib/email/resend-client'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 interface Target {
   id:                   string
@@ -165,7 +164,8 @@ export const campaignTargetMonitor = inngest.createFunction(
               const user = usersData?.users?.find(u => u.user_metadata?.brand_id === brandId)
                 ?? usersData?.users?.[0]
 
-              if (user?.email) {
+              const resend = getResend()
+              if (user?.email && resend) {
                 await resend.emails.send({
                   from:    'BrandGauge <alerts@brandgauge.app>',
                   to:      user.email,

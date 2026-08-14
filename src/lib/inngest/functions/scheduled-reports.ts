@@ -1,9 +1,8 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
-import { Resend } from 'resend'
+import { getResend } from '@/lib/email/resend-client'
 
-const resend  = new Resend(process.env.RESEND_API_KEY)
 const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
 function thirtyDaysAgo() {
@@ -108,7 +107,8 @@ Return JSON only:
         .filter(u => userIds.includes(u.id) && u.email)
         .map(u => u.email!)
 
-      if (!adminEmails.length || !process.env.RESEND_API_KEY) continue
+      const resend = getResend()
+      if (!adminEmails.length || !resend) continue
 
       await resend.emails.send({
         from:    'BrandGauge <reports@brandgauge.app>',
@@ -203,7 +203,8 @@ export const weeklyDigestCron = inngest.createFunction(
         .filter(u => userIds.includes(u.id) && u.email)
         .map(u => u.email!)
 
-      if (!emails.length || !process.env.RESEND_API_KEY) continue
+      const resend = getResend()
+      if (!emails.length || !resend) continue
 
       await resend.emails.send({
         from:    'BrandGauge <digest@brandgauge.app>',
