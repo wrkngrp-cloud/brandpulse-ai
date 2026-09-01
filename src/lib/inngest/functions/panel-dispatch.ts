@@ -2,7 +2,13 @@ import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 
-const resend  = new Resend(process.env.RESEND_API_KEY)
+// Constructed lazily: the Resend SDK throws when the key is absent, and building
+// the app should not require a mail credential.
+let resendClient: Resend | null = null
+function getResend() {
+  resendClient ??= new Resend(process.env.RESEND_API_KEY)
+  return resendClient
+}
 const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
 // ── Daily cron: find panels due and fire dispatch events ─────────────────────
@@ -79,7 +85,7 @@ export const panelDispatch = inngest.createFunction(
           batches.push(panel.recipient_emails.slice(i, i + 50))
         }
         for (const batch of batches) {
-          await resend.emails.send({
+          await getResend().emails.send({
             from:    `${brandName} <surveys@brandgauge.app>`,
             to:      batch,
             subject: `${brandName} — ${panel.name} (${new Date().toLocaleDateString('en-NG', { month: 'long', timeZone: 'Africa/Lagos' })})`,

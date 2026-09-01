@@ -3,7 +3,13 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
 import { Resend } from 'resend'
 
-const resend  = new Resend(process.env.RESEND_API_KEY)
+// Constructed lazily: the Resend SDK throws when the key is absent, and building
+// the app should not require a mail credential.
+let resendClient: Resend | null = null
+function getResend() {
+  resendClient ??= new Resend(process.env.RESEND_API_KEY)
+  return resendClient
+}
 const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
 function thirtyDaysAgo() {
@@ -110,7 +116,7 @@ Return JSON only:
 
       if (!adminEmails.length || !process.env.RESEND_API_KEY) continue
 
-      await resend.emails.send({
+      await getResend().emails.send({
         from:    'BrandGauge <reports@brandgauge.app>',
         to:      adminEmails,
         subject: `Monthly brand report — ${brand.name} — ${month}`,
@@ -205,7 +211,7 @@ export const weeklyDigestCron = inngest.createFunction(
 
       if (!emails.length || !process.env.RESEND_API_KEY) continue
 
-      await resend.emails.send({
+      await getResend().emails.send({
         from:    'BrandGauge <digest@brandgauge.app>',
         to:      emails,
         subject: `Your week in brand — ${brand.name}`,

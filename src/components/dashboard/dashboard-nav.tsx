@@ -56,7 +56,7 @@ const INTELLIGENCE: NavEntry[] = [
   { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: Clipboard   },
   { label: 'PR Tracking',        href: '/dashboard/pr',                 icon: FileSearch  },
   { label: 'YouTube',            href: '/dashboard/youtube',            icon: Video,      comingSoon: true },
-  { label: 'AI Visibility',      href: '/dashboard/ai-visibility',      icon: Eye,        comingSoon: true },
+  { label: 'AI Visibility',      href: '/dashboard/ai-visibility',      icon: Eye        },
 ]
 
 // Campaigns: one section, three channel groups separated by thin dividers.
