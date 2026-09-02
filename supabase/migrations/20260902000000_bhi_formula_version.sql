@@ -7,20 +7,23 @@
 -- rows were produced by different formulas and are not comparable.
 --
 -- Version 1 = legacy 3-component. Version 2 = 7-component (src/lib/bhi-inputs.ts,
--- BHI_FORMULA_VERSION). Existing rows are backfilled to 1 rather than deleted,
--- so the history stays intact and any chart can label or exclude the older
--- segment instead of silently drawing two metrics as one line.
+-- BHI_FORMULA_VERSION). Existing rows are kept rather than deleted, so the
+-- history stays intact and any chart can label or exclude the older segment
+-- instead of silently drawing two metrics as one line.
+--
+-- The default is deliberately 1, not 2. The new job always sets the column
+-- explicitly, so the default only ever applies to a write from code that does
+-- not set it, and the only such code is the old job. Migrations are applied
+-- before the deploy that uses them, so if the nightly job fires in that window
+-- it writes a legacy score, and the default must label it as one. A default of
+-- 2 would silently mark those rows as the new formula and corrupt exactly the
+-- provenance this column exists to protect.
 
 alter table brand_health_snapshots
-  add column if not exists formula_version smallint not null default 2;
-
--- Everything written before this migration came from the legacy formula.
-update brand_health_snapshots
-   set formula_version = 1
- where created_at < now();
+  add column if not exists formula_version smallint not null default 1;
 
 comment on column brand_health_snapshots.formula_version is
-  '1 = legacy 3-component BHI (sentiment/SOV/survey). 2 = 7-component BHI. Scores across versions are not comparable.';
+  '1 = legacy 3-component BHI (sentiment/SOV/survey), written before 2026-09-02. 2 = 7-component BHI. Scores are not comparable across versions.';
 
 create index if not exists idx_bhi_brand_date_version
   on brand_health_snapshots(brand_id, formula_version, snapshot_date desc);
