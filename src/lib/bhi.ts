@@ -1,6 +1,14 @@
-// BHI computation — two modes:
-// 1. computeBHI()      — 3-component dashboard widget (Sentiment, SOV, Survey)
-// 2. computeFullBHI()  — 7-component Brand Equity Tracker (Phase 2+)
+// BHI computation.
+//
+// computeFullBHI() is the only scoring function. It takes the seven components
+// assembled by loadBHIInputs() in src/lib/bhi-inputs.ts, which every surface
+// calls, so the Overview, Brand Equity, Ask AI and the nightly snapshot all
+// produce one number for a brand.
+//
+// A 3-component version (sentiment 40 / SOV 30 / survey 30) used to live here
+// and was still writing the stored history while the pages computed the
+// 7-component score live. It was removed on 2026-09-02. Snapshots it produced
+// are marked formula_version = 1 and are not comparable with later rows.
 
 export type BHIZone = 'at_risk' | 'building' | 'healthy' | 'leading'
 
@@ -18,54 +26,17 @@ export function getBHIZone(score: number): BHIZone {
   return 'leading'
 }
 
+/** Display shape for the three-tile gauge. Not a formula: the three values are
+ *  picked from the seven real components purely because they read well on a
+ *  small tile. The score, coverage and zone always come from computeFullBHI. */
 export interface BHIResult {
   score: number | null
-  coverage: number        // 0–100 — share of components on real data
+  coverage: number
   zone: BHIZone | null
   components: {
-    sentiment: number | null   // 0–100 from sentiment_daily.social_score
-    sov:       number | null   // 0–100 from sov_snapshots.social_sov
-    survey:    number | null   // 0–100 (avg NPS × 10) from survey_responses
-  }
-}
-
-export function computeBHI({
-  sentimentScore,
-  sovScore,
-  surveyScore,
-}: {
-  sentimentScore: number | null
-  sovScore:       number | null
-  surveyScore:    number | null
-}): BHIResult {
-  const available = [sentimentScore, sovScore, surveyScore].filter(v => v !== null).length
-  const coverage  = Math.round((available / 3) * 100)
-
-  if (available === 0) {
-    return { score: null, coverage: 0, zone: null, components: { sentiment: null, sov: null, survey: null } }
-  }
-
-  // Base weights when all three available: sentiment 40 %, SOV 30 %, survey 30 %.
-  // Weights are renormalised to whatever is actually present so a missing source
-  // doesn't drag the score to zero — it just reduces coverage.
-  const w = {
-    sentiment: sentimentScore !== null ? 40 : 0,
-    sov:       sovScore       !== null ? 30 : 0,
-    survey:    surveyScore    !== null ? 30 : 0,
-  }
-  const total = w.sentiment + w.sov + w.survey
-
-  const score = Number((
-    ((sentimentScore ?? 0) * w.sentiment +
-     (sovScore       ?? 0) * w.sov +
-     (surveyScore    ?? 0) * w.survey) / total
-  ).toFixed(1))
-
-  return {
-    score,
-    coverage,
-    zone: getBHIZone(score),
-    components: { sentiment: sentimentScore, sov: sovScore, survey: surveyScore },
+    sentiment: number | null
+    sov:       number | null
+    survey:    number | null
   }
 }
 
