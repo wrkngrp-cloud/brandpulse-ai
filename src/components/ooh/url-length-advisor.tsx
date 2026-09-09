@@ -1,6 +1,6 @@
 'use client'
 
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 interface UrlLengthAdvisorProps {
   url:        string
   formatType: string

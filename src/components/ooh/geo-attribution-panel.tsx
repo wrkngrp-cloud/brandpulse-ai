@@ -12,7 +12,7 @@ import { cn }         from '@/lib/utils'
 import { MapPin, Target, Zap, Globe, Smartphone, Monitor, ExternalLink, Plus, ChevronRight, Radio, CheckCircle2, Clock, Users } from 'lucide-react'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { toast } from 'sonner'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface GeoVisit {
   id:                    string

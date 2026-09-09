@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
 

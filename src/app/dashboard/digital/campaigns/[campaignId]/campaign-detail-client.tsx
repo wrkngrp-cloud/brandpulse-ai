@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 import {
   getBenchmarks,
   benchCTR, benchCPC, benchCPM, benchROAS, benchFreq, benchCVR, benchCPL, benchCPI,

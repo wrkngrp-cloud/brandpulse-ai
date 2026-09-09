@@ -15,7 +15,7 @@ import { TopicClusters } from './topic-clusters'
 import { SentimentHeatmap } from '@/components/dashboard/sentiment-heatmap'
 import { MentionsList } from './mentions-list'
 import { TourTrigger } from '@/components/tours/tour-trigger'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 const PLATFORM_LABEL: Record<string, string> = {
   twitter:   'X',

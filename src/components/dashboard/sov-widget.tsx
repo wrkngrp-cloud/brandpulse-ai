@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Plus, X } from 'lucide-react'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { toast } from 'sonner'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 export interface SovData {
   brand_mentions: number

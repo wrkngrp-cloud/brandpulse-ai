@@ -7,7 +7,7 @@ import { PrMentionsChart }      from './pr-mentions-chart'
 import { DateRangeFilter }      from '@/components/dashboard/date-range-filter'
 import { TriggerPrCrawlButton } from './trigger-pr-crawl-button'
 import { TourTrigger } from '@/components/tours/tour-trigger'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface PressMention {
   id:              string

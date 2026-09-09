@@ -2,7 +2,7 @@
 
 import { cn, formatNGN } from '@/lib/utils'
 import { CampaignAiSummary } from './campaign-ai-summary'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 const OBJECTIVE_META: Record<string, { label: string; color: string }> = {
   awareness:     { label: 'Brand Awareness',  color: 'bg-flare' },

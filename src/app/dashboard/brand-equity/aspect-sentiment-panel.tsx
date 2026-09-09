@@ -2,7 +2,7 @@
 
 import { MessageSquareText } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface AspectScore {
   aspect: string

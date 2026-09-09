@@ -58,8 +58,7 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
           </button>
           <Link href="/auth/login" className="hidden text-[13px] font-medium transition-opacity hover:opacity-70 sm:block" style={{ color: 'var(--lp-ink)' }}>Sign in</Link>
           <Link href="/auth/signup"
-            className="whitespace-nowrap rounded-sm px-4 py-2 text-[13px] font-bold text-tx-inv transition-transform border border-line"
-            style={{ background: 'var(--lp-clay)' }}>
+            className="whitespace-nowrap rounded-sm px-4 py-2 text-[13px] font-bold text-tx-inv transition-transform border border-line" style={{ background: 'var(--bg-ink)', color: 'var(--tx-inv)' }}>
             Start free
           </Link>
         </div>
@@ -329,7 +328,7 @@ function Industries() {
             <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
               className="rounded-sm border px-5 py-2.5 text-[13px] transition-colors duration-200 bg-press"
               style={active === i
-                ? { borderColor: 'var(--flare)', color: 'var(--bg-paper)', background: 'var(--flare)' }
+                ? { borderColor: 'var(--bg-ink)', color: 'var(--tx-inv)', background: 'var(--bg-ink)' }
                 : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
               {v.name}
             </button>
@@ -364,8 +363,8 @@ function FinalCta() {
         </motion.p>
         <motion.div {...rise} className="relative mt-10">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-sm px-8 py-4 text-[15px] font-bold text-tx-inv transition-transform border border-line"
-            style={{ background: 'var(--ember)' }}>
+            className="inline-flex items-center gap-2 rounded-sm px-8 py-4 text-[15px] font-bold border border-line"
+            style={{ background: 'var(--flare)', color: 'var(--bg-paper)' }}>
             Create your workspace <ArrowRight className="h-4 w-4" />
           </Link>
         </motion.div>

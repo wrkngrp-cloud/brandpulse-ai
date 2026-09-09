@@ -13,7 +13,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import { toast } from 'sonner'
 import { linkInfluencerToCampaign } from '@/app/dashboard/campaigns/[id]/link-influencer-action'
 import { PostTracker } from '@/components/influencers/post-tracker'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface Channel {
   id: string

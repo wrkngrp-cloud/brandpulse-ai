@@ -10,7 +10,7 @@ import { Eye, RefreshCw, Wand2, FlaskConical, Images, TrendingDown, CheckCircle2
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import type { FatiguedAsset } from './page'
 import { TourTrigger } from '@/components/tours/tour-trigger'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface Props {
   brandName:   string

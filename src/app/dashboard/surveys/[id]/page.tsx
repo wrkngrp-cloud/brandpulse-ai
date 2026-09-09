@@ -8,7 +8,7 @@ import { SurveyAiAnalysis } from './ai-analysis'
 import { SendSurvey }     from './send-survey'
 import { getTemplateLabel } from '@/lib/survey-templates'
 import type { SurveyQuestion } from '@/lib/survey-templates'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
 

@@ -3,7 +3,8 @@
 import type { BHIResult } from '@/lib/bhi'
 import { ZONE_META } from '@/lib/bhi'
 import { BrandGauge } from '@/components/brand/gauge'
-import { Meter, Readout } from '@brand/components'
+import { Readout } from '@brand/components'
+import { Meter } from '@/components/brand/crescendo'
 import { Sparkline } from '@brand/charts'
 
 interface Props {

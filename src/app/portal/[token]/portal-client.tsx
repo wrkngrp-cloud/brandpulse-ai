@@ -8,7 +8,7 @@ import {
 import { TrendingDown, Activity, Radio, DollarSign, Target, Award, CheckCircle2, ChevronRight, RefreshCw, Calendar, BarChart3, Eye, Newspaper } from 'lucide-react'
 import { TrendIcon as TrendingUp, MentionsIcon as MessageSquare, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn, formatNGN } from '@/lib/utils'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

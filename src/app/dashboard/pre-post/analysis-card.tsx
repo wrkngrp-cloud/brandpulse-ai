@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Camera, ChevronDown, ChevronUp } from 'lucide-react'
 import { AlertIcon as AlertTriangle, AskIcon as Sparkles } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface RiskFlag {
   title?: string

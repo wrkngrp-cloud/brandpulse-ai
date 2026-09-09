@@ -16,7 +16,7 @@ import Link                   from 'next/link'
 import type { PlaceDemographics } from '@/lib/ooh/places-demographics'
 import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
 import { TOKENS } from '@/lib/brand-tokens'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 const FORMAT_TYPES = [
   'Billboard', 'Unipole', 'Bridge Panel', 'Transit Shelter',

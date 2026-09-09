@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { PostTracker } from '@/components/influencers/post-tracker'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 // ── types ─────────────────────────────────────────────────────────────────────
 

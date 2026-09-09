@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { RefreshCw, CheckCircle2, SearchX } from 'lucide-react'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 type State =
   | { phase: 'idle' }

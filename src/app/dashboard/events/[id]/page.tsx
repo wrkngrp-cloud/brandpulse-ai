@@ -8,7 +8,7 @@ import { computeEventMetrics, fmtNGN, fmtPct } from '@/lib/events/roi'
 import { ReportPoller }        from '@/components/events/report-poller'
 import { DebriefPromptCard }   from '@/components/events/debrief-prompt-card'
 import { VisualMentions }      from '@/components/events/visual-mentions'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 

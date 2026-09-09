@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import type { RetentionRiskData, RetentionSignal } from '@/app/api/retention/risk/route'
 import { TourTrigger } from '@/components/tours/tour-trigger'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 const RISK_COLOR = {
   low:      'text-pos bg-shell border-line',

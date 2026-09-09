@@ -6,7 +6,7 @@ import { Loader2, Check, ExternalLink, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface PlanLimits {
   brand_count:  number

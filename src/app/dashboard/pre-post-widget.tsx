@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 
 type SupportedMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
 

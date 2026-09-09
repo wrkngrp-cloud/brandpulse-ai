@@ -1,6 +1,6 @@
 'use client'
 
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, BarChart, Bar, Cell, ReferenceLine,

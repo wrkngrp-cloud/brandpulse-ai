@@ -11,7 +11,7 @@
  */
 
 import type { CSSProperties } from 'react'
-import { Crescendo } from '@brand/components'
+import { Crescendo } from '@/components/brand/crescendo'
 import { BrandLockup } from '@/components/brand/logo'
 
 // ————— timing helpers —————
@@ -64,10 +64,10 @@ function Panel({ children, className = '' }: { children: React.ReactNode; classN
 function Tag({ children, tone = 'dim' }: { children: React.ReactNode; tone?: 'dim' | 'clay' | 'blue' | 'green' | 'red' | 'teal' }) {
   const tones: Record<string, CSSProperties> = {
     dim:   { color: 'var(--s-mut)', borderColor: 'var(--s-line)' },
-    clay:  { color: HERO, borderColor: 'var(--line)', background: 'var(--bg-shell)' },
-    blue:  { color: NEUTRAL, borderColor: 'var(--line)', background: 'var(--bg-shell)' },
+    clay:  { color: 'var(--tx-flare)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
+    blue:  { color: 'var(--tx-2)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
     green: { color: 'var(--pos)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
-    red:   { color: 'var(--flare)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
+    red:   { color: 'var(--tx-flare)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
     teal:  { color: 'var(--pos)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
   }
   return (
@@ -137,10 +137,10 @@ export function GaugeScene({ t }: { t: number }) {
           <circle cx={dotP.x} cy={dotP.y} r={7 * dotIn} fill="var(--pos)" style={{ filter: 'drop-shadow(0 0 6px rgba(34,197,94,0.4))' }} />
           <circle cx={dotP.x} cy={dotP.y} r={3.5 * dotIn} fill="var(--bg-paper)" />
           <text x={CX} y={CY - 14} textAnchor="middle" fontSize="48" fontWeight="700" letterSpacing="-2"
-            fontFamily="var(--font)" fill="var(--s-strong)">{score}</text>
+            fontFamily="var(--font-num)" fill="var(--s-strong)">{score}</text>
           <text x={CX} y={CY + 10} textAnchor="middle" fontSize="11" fill="var(--s-mut)">out of 100</text>
-          <text x={START.x - 2} y={START.y + 18} textAnchor="middle" fontSize="9" fill="var(--s-mut)">0</text>
-          <text x={END.x + 2} y={END.y + 18} textAnchor="middle" fontSize="9" fill="var(--s-mut)">100</text>
+          <text x={START.x - 2} y={START.y + 18} textAnchor="middle" fontSize="9" fontFamily="var(--font-num)" fill="var(--s-mut)">0</text>
+          <text x={END.x + 2} y={END.y + 18} textAnchor="middle" fontSize="9" fontFamily="var(--font-num)" fill="var(--s-mut)">100</text>
         </svg>
         <span className="inline-flex items-center gap-1.5 rounded-sm border px-3 py-1 text-xs font-semibold"
           style={{ color: 'var(--pos)', backgroundColor: 'var(--bg-shell)', borderColor: 'var(--bg-shell)', opacity: win(t, 0.5, 0.62) }}>
@@ -222,7 +222,7 @@ export function SentimentScene({ t }: { t: number }) {
           {line > 0.97 && <circle cx={280} cy={80 - 0.68 * 72} r="4" fill={HERO} />}
         </svg>
         <div className="flex gap-2" style={{ opacity: win(t, 0.55, 0.7) }}>
-          <Tag tone="green">68 positive</Tag><Tag>21 neutral</Tag><Tag tone="red">11 negative</Tag>
+          <Tag tone="green"><span className="bg-num">68</span>&nbsp;positive</Tag><Tag><span className="bg-num">21</span>&nbsp;neutral</Tag><Tag tone="red"><span className="bg-num">11</span>&nbsp;negative</Tag>
         </div>
         <p className="hidden text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.65, 0.8) }}>
           Pidgin, Yoruba, Igbo and Hausa classified correctly. No lost-in-translation scores.
@@ -320,16 +320,16 @@ export function SurveyScene({ t }: { t: number }) {
               style={{ opacity: p, transform: `translateX(${(1 - p) * -16}px)` }}>
               <p className="text-[11.5px] text-[var(--s-body)]">{r.text}</p>
               <Tag>{r.via}</Tag>
-              <Tag tone={r.score >= 9 ? 'green' : r.score >= 7 ? 'dim' : 'red'}>{r.score}</Tag>
+              <Tag tone={r.score >= 9 ? 'green' : r.score >= 7 ? 'dim' : 'red'}><span className="bg-num">{r.score}</span></Tag>
             </div>
           )
         })}
       </div>
       <div className="flex flex-1 flex-col items-center justify-center gap-3">
         <Label>Net Promoter Score</Label>
-        <span className="text-5xl font-extrabold text-[var(--s-strong)] @xl:text-6xl" style={{ fontFamily: 'var(--font)' }}>+{nps}</span>
+        <span className="text-5xl font-extrabold text-[var(--s-strong)] @xl:text-6xl bg-num" style={{ fontFamily: 'var(--font-num)' }}>+{nps}</span>
         <div className="flex gap-2" style={{ opacity: win(t, 0.7, 0.85) }}>
-          <Tag tone="green">61% promoters</Tag><Tag tone="red">3% detractors</Tag>
+          <Tag tone="green"><span className="bg-num">61%</span>&nbsp;promoters</Tag><Tag tone="red"><span className="bg-num">3%</span>&nbsp;detractors</Tag>
         </div>
         <p className="hidden max-w-[220px] text-center text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.78, 0.92) }}>
           Email, in-app and shareable-link surveys, with every reply scored as it lands.
@@ -381,7 +381,7 @@ export function OohScene({ t }: { t: number }) {
                   <div className="absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded-md border border-[var(--s-line)] bg-[var(--s-panel)] px-2 py-1"
                     style={{ opacity: easeOut(win(t, 0.5, 0.62)) }}>
                     <p className="text-[10px] font-bold text-[var(--s-strong)]">Lekki–Epe Expressway</p>
-                    <p className="bg-num text-[8.5px] text-[var(--s-mut)]">48-sheet, 3,412 visits</p>
+                    <p className="text-[8.5px] text-[var(--s-mut)]">48-sheet, <span className="bg-num">3,412</span> visits</p>
                   </div>
                 )}
               </div>
@@ -391,7 +391,7 @@ export function OohScene({ t }: { t: number }) {
         </div>
         <div className="hidden items-center gap-2 rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2.5 @xl:flex">
           <span className="h-2 w-2 rounded-full" style={{ background: HERO }} />
-          <span className="bg-num text-[11px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: HERO }}>▍</span></span>
+          <span className="bg-num text-[11px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: 'var(--tx-flare)' }}>▍</span></span>
         </div>
       </div>
       <div className="flex flex-1 flex-col justify-center gap-4">
@@ -435,8 +435,8 @@ export function AiScene({ t }: { t: number }) {
   return (
     <Panel className="flex h-full w-full flex-col gap-3 p-4 @xl:gap-4 @xl:p-6">
       <div className="flex items-center gap-2 rounded-xl border px-4 py-3" style={{ borderColor: 'var(--line)', background: 'var(--bg-shell)' }}>
-        <span className="text-[13px]" style={{ color: HERO }}>✦</span>
-        <span className="text-[12.5px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: HERO }}>▍</span></span>
+        <span className="text-[13px]" style={{ color: 'var(--tx-flare)' }}>✦</span>
+        <span className="text-[12.5px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: 'var(--tx-flare)' }}>▍</span></span>
       </div>
       <div className="flex flex-1 flex-col gap-2">
         {answers.map((a, i) => {
@@ -444,7 +444,7 @@ export function AiScene({ t }: { t: number }) {
           return (
             <div key={i} className="flex items-start gap-2.5 rounded-lg bg-[var(--s-chip)] px-3 py-2"
               style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
-              <span className="mt-0.5 bg-num text-[10px]" style={{ color: HERO }}>{String(i + 1).padStart(2, '0')}</span>
+              <span className="mt-0.5 bg-num text-[10px]" style={{ color: 'var(--tx-flare)' }}>{String(i + 1).padStart(2, '0')}</span>
               <p className="text-[11.5px] leading-relaxed text-[var(--s-body)]">{a}</p>
             </div>
           )
@@ -461,7 +461,7 @@ export function AiScene({ t }: { t: number }) {
             return (
               <div key={pl.name} className="rounded-lg border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2" style={{ opacity: p }}>
                 <p className="text-[9px] text-[var(--s-mut)]">{pl.name}</p>
-                <p className="text-lg font-extrabold text-[var(--s-strong)] bg-num" style={{ fontFamily: 'var(--font)' }}>{Math.round(pl.score * p)}</p>
+                <p className="text-lg font-extrabold text-[var(--s-strong)] bg-num" style={{ fontFamily: 'var(--font-num)' }}>{Math.round(pl.score * p)}</p>
               </div>
             )
           })}

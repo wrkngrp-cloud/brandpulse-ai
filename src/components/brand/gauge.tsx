@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Gauge as KitGauge } from '@brand/components'
 import { GEOM } from '@brand/engine.js'
+import { TOKENS } from '@/lib/brand-tokens'
 
 /**
  * The Brand Health Index, drawn by the brand engine.
@@ -22,6 +23,26 @@ import { GEOM } from '@brand/engine.js'
  */
 const SEEN = 'bg-gauge-seen'
 
+/**
+ * The engine draws into a string of SVG, so it needs resolved colours rather
+ * than a var(). On Ink the needle flips to Paper, which is what keeps it the
+ * extreme-contrast element and the thing the eye lands on.
+ */
+function useGround() {
+  const [dark, setDark] = useState(false)
+  useEffect(() => {
+    const root = document.documentElement
+    const read = () => setDark(root.dataset.mode === 'dark' || root.classList.contains('dark'))
+    read()
+    const mo = new MutationObserver(read)
+    mo.observe(root, { attributes: true, attributeFilter: ['data-mode', 'class'] })
+    return () => mo.disconnect()
+  }, [])
+  return dark
+    ? { ink: TOKENS.paper, needleColour: TOKENS.paper }
+    : { ink: TOKENS.ink, needleColour: TOKENS.char }
+}
+
 /** The bearing the needle points at for a reading, in the engine's own sweep. */
 function bearing(value: number): number {
   const [a0, a1] = GEOM.sweep as [number, number]
@@ -32,6 +53,7 @@ function bearing(value: number): number {
 export function BrandGauge({ value, size = 320, ticks }: { value: number; size?: number; ticks?: number }) {
   const host = useRef<HTMLDivElement>(null)
   const previous = useRef<number | null>(null)
+  const ground = useGround()
 
   useEffect(() => {
     const el = host.current
@@ -80,11 +102,11 @@ export function BrandGauge({ value, size = 320, ticks }: { value: number; size?:
         el.classList.add('bg-gauge-enter')
       }
     } catch { /* private mode: the final state is what is drawn */ }
-  }, [value, size, ticks])
+  }, [value, size, ticks, ground.ink, ground.needleColour])
 
   return (
     <div ref={host}>
-      <KitGauge value={value} size={size} ticks={ticks} />
+      <KitGauge value={value} size={size} ticks={ticks} ink={ground.ink} needleColour={ground.needleColour} />
     </div>
   )
 }
