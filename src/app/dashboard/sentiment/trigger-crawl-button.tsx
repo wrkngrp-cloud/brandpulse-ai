@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { RefreshCw, CheckCircle2, SearchX } from 'lucide-react'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
+import { Crescendo } from '@brand/components'
 
 type State =
   | { phase: 'idle' }
@@ -63,12 +64,7 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
           </span>
           <span>{state.progress}%</span>
         </div>
-        <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
-          <div
-            className="h-full bg-foreground rounded-sm transition-all duration-1000"
-            style={{ width: `${state.progress}%` }}
-          />
-        </div>
+        <Crescendo value={state.progress} height={6} />
       </div>
     )
   }

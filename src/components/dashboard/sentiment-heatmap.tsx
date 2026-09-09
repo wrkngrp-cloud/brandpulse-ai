@@ -301,7 +301,7 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
                 )}
               </>
             ) : (
-              <p className="text-[12px] text-tx-inv/30 italic">No crawl data</p>
+              <p className="text-[12px] text-tx-inv/30">No crawl data</p>
             )}
           </div>
         </div>

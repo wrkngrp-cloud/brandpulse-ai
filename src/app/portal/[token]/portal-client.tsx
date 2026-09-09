@@ -8,6 +8,7 @@ import {
 import { TrendingDown, Activity, Radio, DollarSign, Target, Award, CheckCircle2, ChevronRight, RefreshCw, Calendar, BarChart3, Eye, Newspaper } from 'lucide-react'
 import { TrendIcon as TrendingUp, MentionsIcon as MessageSquare, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn, formatNGN } from '@/lib/utils'
+import { Crescendo } from '@brand/components'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -566,12 +567,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                           <p className={cn('text-[11px] font-medium w-28 shrink-0 truncate', item.isBrand ? 'text-primary' : 'text-foreground')}>
                             {item.name}
                           </p>
-                          <div className="flex-1 bg-muted rounded-sm h-2 overflow-hidden">
-                            <div
-                              className={cn('h-full rounded-sm', item.isBrand ? 'bg-primary' : 'bg-muted-foreground/40')}
-                              style={{ width: `${(item.sov! / maxSov) * 100}%` }}
-                            />
-                          </div>
+                          <Crescendo value={(item.sov! / maxSov) * 100} height={8} />
                           <p className="text-[11px] font-semibold w-10 text-right shrink-0 bg-num">{item.sov!.toFixed(1)}%</p>
                         </div>
                       ))}

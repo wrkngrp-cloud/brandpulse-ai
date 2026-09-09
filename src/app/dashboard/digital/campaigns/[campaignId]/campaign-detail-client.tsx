@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { Crescendo } from '@brand/components'
 import {
   getBenchmarks,
   benchCTR, benchCPC, benchCPM, benchROAS, benchFreq, benchCVR, benchCPL, benchCPI,
@@ -179,7 +180,6 @@ function GoalBar({
     ? actual >= target.target_value
     : actual <= target.target_value
 
-  const color = onTrack ? 'bg-pos' : pct >= 70 ? 'bg-ember' : 'bg-flare'
 
   return (
     <div className="space-y-1">
@@ -189,9 +189,7 @@ function GoalBar({
           {onTrack ? 'On track' : 'Off track'}
         </span>
       </div>
-      <div className="h-2 bg-muted rounded-sm overflow-hidden">
-        <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
-      </div>
+      <Crescendo value={pct} height={8} />
       <div className="flex items-center justify-between text-[10px] text-muted-foreground">
         <span className="bg-num">Target: {isGte ? '≥' : '≤'} {target.target_value.toLocaleString()}</span>
         <span>Actual: {actual > 0 ? actual.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '—'}</span>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Camera, ChevronDown, ChevronUp } from 'lucide-react'
 import { AlertIcon as AlertTriangle, AskIcon as Sparkles } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'
+import { Crescendo } from '@brand/components'
 
 interface RiskFlag {
   title?: string
@@ -33,15 +34,8 @@ function scoreColor(score: number): string {
   return 'text-tx-flare'
 }
 
-function ScoreBar({ score, invert = false }: { score: number; invert?: boolean }) {
-  const good = invert ? score <= 25 : score >= 75
-  const mid  = invert ? score <= 50 : score >= 50
-  const col  = good ? 'bg-pos' : mid ? 'bg-ember' : 'bg-flare'
-  return (
-    <div className="h-1 bg-muted rounded-sm overflow-hidden w-16">
-      <div className={cn('h-full rounded-sm', col)} style={{ width: `${score}%` }} />
-    </div>
-  )
+function ScoreBar({ score }: { score: number }) {
+  return <Crescendo value={score} height={6} />
 }
 
 function VerdictBadge({ verdict }: { verdict: string }) {
@@ -102,7 +96,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
         ) : (
           <div className="flex items-center gap-1.5 text-muted-foreground/70">
             <Camera className="h-3.5 w-3.5 shrink-0" />
-            <span className="text-sm italic">Image/video analyzed</span>
+            <span className="text-sm">Image/video analyzed</span>
           </div>
         )}
       </div>
@@ -128,7 +122,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
                 {s.score ?? '—'}
               </span>
             </div>
-            <ScoreBar score={s.score ?? 0} invert={s.invert} />
+            <ScoreBar score={s.score ?? 0} />
           </div>
         ))}
       </div>

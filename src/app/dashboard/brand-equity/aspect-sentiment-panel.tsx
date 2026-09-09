@@ -2,6 +2,7 @@
 
 import { MessageSquareText } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Crescendo } from '@brand/components'
 
 interface AspectScore {
   aspect: string
@@ -87,12 +88,7 @@ export function AspectSentimentPanel({ aspects, platform }: Props) {
                     </span>
                   </div>
                 </div>
-                <div className="h-2 w-full rounded-sm bg-muted overflow-hidden">
-                  <div
-                    className={cn('h-full rounded-sm transition-all', styles.bar)}
-                    style={{ width: `${Math.max(0, Math.min(100, a.score))}%` }}
-                  />
-                </div>
+                <Crescendo value={Math.max(0, Math.min(100, a.score))} height={8} />
               </div>
             )
           })}

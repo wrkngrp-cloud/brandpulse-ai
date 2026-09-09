@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { Crescendo } from '@brand/components'
 
 type SupportedMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
 
@@ -61,18 +62,6 @@ function scoreColor(score: number): string {
   return 'text-tx-flare'
 }
 
-function scoreBarColor(score: number): string {
-  if (score >= 75) return 'bg-pos'
-  if (score >= 50) return 'bg-ember'
-  return 'bg-flare'
-}
-
-function riskBarColor(score: number): string {
-  if (score <= 20) return 'bg-pos'
-  if (score <= 50) return 'bg-ember'
-  return 'bg-flare'
-}
-
 function ScoreCard({ label, dim, isRisk = false }: {
   label: string
   dim: ScoreDim | { score: number; flags?: RiskFlag[] }
@@ -98,12 +87,7 @@ function ScoreCard({ label, dim, isRisk = false }: {
             <span className="text-muted-foreground font-normal">/100</span>
           </span>
         </div>
-        <div className="h-1.5 rounded-sm bg-muted overflow-hidden">
-          <div
-            className={cn('h-full rounded-sm transition-all duration-500', isRisk ? riskBarColor(score) : scoreBarColor(score))}
-            style={{ width: `${score}%` }}
-          />
-        </div>
+        <Crescendo value={score} height={6} />
       </button>
       {open && reasoning && (
         <p className="text-[11px] text-muted-foreground leading-relaxed pt-1 pl-0.5">{reasoning}</p>
@@ -465,7 +449,7 @@ export function PrePostWidget() {
                         {f.offending_text && (
                           <p className="text-tx-2 text-xs">
                             <span className="font-medium">Flagged: </span>
-                            <span className="italic">"{f.offending_text}"</span>
+                            <span className="">"{f.offending_text}"</span>
                           </p>
                         )}
                         <p className="text-tx-2 text-xs">{f.reason}</p>

@@ -7,6 +7,7 @@ import { PrMentionsChart }      from './pr-mentions-chart'
 import { DateRangeFilter }      from '@/components/dashboard/date-range-filter'
 import { TriggerPrCrawlButton } from './trigger-pr-crawl-button'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { Crescendo } from '@brand/components'
 
 interface PressMention {
   id:              string
@@ -329,12 +330,7 @@ export default async function PRTrackingPage({
                   </p>
                   <p className="text-3xl font-bold bg-num">{latestSov.press_sov?.toFixed(1)}%</p>
                 </div>
-                <div className="h-2.5 flex-1 min-w-[120px] rounded-sm bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-sm"
-                    style={{ width: `${latestSov.press_sov ?? 0}%` }}
-                  />
-                </div>
+                <Crescendo value={latestSov.press_sov ?? 0} height={10} />
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import type { RetentionRiskData, RetentionSignal } from '@/app/api/retention/risk/route'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { Crescendo } from '@brand/components'
 
 const RISK_COLOR = {
   low:      'text-pos bg-shell border-line',
@@ -127,9 +128,9 @@ export function RetentionClient() {
                 <p className="text-sm text-muted-foreground">No NPS data yet</p>
               ) : (
                 <div className="space-y-2">
-                  <NpsBar label="Promoters" count={data.nps_breakdown.promoters} total={data.nps_breakdown.total} color="bg-pos" />
-                  <NpsBar label="Passives"  count={data.nps_breakdown.passives}  total={data.nps_breakdown.total} color="bg-ember" />
-                  <NpsBar label="Detractors" count={data.nps_breakdown.detractors} total={data.nps_breakdown.total} color="bg-flare" />
+                  <NpsBar label="Promoters" count={data.nps_breakdown.promoters} total={data.nps_breakdown.total} />
+                  <NpsBar label="Passives"  count={data.nps_breakdown.passives}  total={data.nps_breakdown.total} />
+                  <NpsBar label="Detractors" count={data.nps_breakdown.detractors} total={data.nps_breakdown.total} />
                 </div>
               )}
             </div>
@@ -231,7 +232,7 @@ export function RetentionClient() {
                       {d.verbatim ? (
                         <p className="text-sm text-foreground line-clamp-2">"{d.verbatim}"</p>
                       ) : (
-                        <p className="text-sm text-muted-foreground italic">No verbatim provided</p>
+                        <p className="text-sm text-muted-foreground">No verbatim provided</p>
                       )}
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {new Date(d.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}
@@ -255,14 +256,12 @@ export function RetentionClient() {
   )
 }
 
-function NpsBar({ label, count, total, color }: { label: string; count: number; total: number; color: string }) {
+function NpsBar({ label, count, total }: { label: string; count: number; total: number }) {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0
   return (
     <div className="flex items-center gap-2 text-sm">
       <span className="w-20 text-muted-foreground text-xs">{label}</span>
-      <div className="flex-1 bg-muted rounded-sm h-2">
-        <div className={cn('h-2 rounded-sm', color)} style={{ width: `${pct}%` }} />
-      </div>
+      <Crescendo value={pct} height={8} />
       <span className="text-xs font-medium w-8 text-right">{pct}%</span>
     </div>
   )

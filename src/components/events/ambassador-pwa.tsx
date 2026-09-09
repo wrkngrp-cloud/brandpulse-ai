@@ -12,6 +12,7 @@ import {
   WifiOff, RefreshCw,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Crescendo } from '@brand/components'
 
 interface QueuedInteraction {
   clientUuid:       string
@@ -362,12 +363,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
             <div className="space-y-6 flex-1 flex flex-col">
               <div>
                 <p className="text-xs text-muted-foreground mb-1 bg-num">Question {surveyQ + 1} of {SURVEY_QUESTIONS.length}</p>
-                <div className="h-1 bg-muted rounded-sm overflow-hidden">
-                  <div
-                    className="h-full bg-foreground rounded-sm transition-all"
-                    style={{ width: `${((surveyQ + 1) / SURVEY_QUESTIONS.length) * 100}%` }}
-                  />
-                </div>
+                <Crescendo value={((surveyQ + 1) / SURVEY_QUESTIONS.length) * 100} height={6} />
               </div>
 
               <div className="flex-1 space-y-4">

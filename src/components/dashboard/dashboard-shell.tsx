@@ -15,6 +15,7 @@ import { MobileNav }          from './mobile-nav'
 import { CommandPalette }     from './command-palette'
 import { cn }                 from '@/lib/utils'
 import type { BrandOption }   from './brand-switcher'
+import { BrandLockup } from '@/components/brand/logo'
 
 const LS_KEY = 'bp-sidebar'
 
@@ -94,15 +95,7 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
           <div className="flex items-center gap-2.5 md:hidden">
             <MobileNav userName={userName} userEmail={userEmail} brandName={brandName} />
             <div className="flex items-center gap-2">
-              <div
-                className="h-6 w-6 rounded-lg grid place-items-center"
-                style={{ background: 'var(--flare)' }}
-              >
-                <svg viewBox="0 0 20 20" className="h-3 w-3" fill="none" aria-hidden>
-                  <polyline points="2,10 6,6 9.5,13 13.5,7.5 18,10" stroke="var(--bg-paper)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <span className="font-bold text-[14px] tracking-tight text-tx">BrandGauge</span>
+              <BrandLockup height={18} />
             </div>
           </div>
 

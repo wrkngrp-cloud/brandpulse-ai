@@ -2,6 +2,7 @@
 
 import { cn, formatNGN } from '@/lib/utils'
 import { CampaignAiSummary } from './campaign-ai-summary'
+import { Crescendo } from '@brand/components'
 
 const OBJECTIVE_META: Record<string, { label: string; color: string }> = {
   awareness:     { label: 'Brand Awareness',  color: 'bg-flare' },
@@ -178,12 +179,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
             <span className="bg-num">{fmtDateShort(start_date)}</span>
             <span className="bg-num">{end_date ? fmtDateShort(end_date) : 'Always On'}</span>
           </div>
-          <div className="h-3 bg-muted rounded-sm overflow-hidden">
-            <div
-              className="h-full bg-foreground rounded-sm transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+          <Crescendo value={progress} height={12} />
           <p className="text-xs text-muted-foreground text-right">{progress}% elapsed</p>
         </div>
 
@@ -223,12 +219,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
                       </div>
                     )}
                   </div>
-                  <div className="h-2 bg-muted rounded-sm overflow-hidden">
-                    <div
-                      className={cn('h-full rounded-sm transition-all duration-500', meta.color)}
-                      style={{ width: `${barPct}%`, opacity: 0.7 }}
-                    />
-                  </div>
+                  <Crescendo value={barPct} height={8} />
                 </div>
               )
             })}
@@ -265,12 +256,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
                 {totalAllocated > 0 && (
                   <>
                     {/* Allocation bar */}
-                    <div className="h-2 bg-muted rounded-sm overflow-hidden">
-                      <div
-                        className="h-full bg-foreground rounded-sm"
-                        style={{ width: `${pct(totalAllocated, Number(campaign.total_budget))}%` }}
-                      />
-                    </div>
+                    <Crescendo value={pct(totalAllocated, Number(campaign.total_budget))} height={8} />
                     <p className="text-xs text-muted-foreground">
                       {pct(totalAllocated, Number(campaign.total_budget))}% allocated across channels
                     </p>

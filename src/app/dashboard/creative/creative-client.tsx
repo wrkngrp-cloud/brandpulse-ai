@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { Crescendo } from '@brand/components'
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
 
@@ -69,27 +70,22 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
 
 const PLATFORMS = ['Instagram', 'Twitter', 'TikTok', 'Facebook']
 
-const SCORE_META: { key: keyof Omit<CreativeScore, 'summary'>; label: string; color: string }[] = [
-  { key: 'engagement',        label: 'Engagement',        color: 'bg-flare'   },
-  { key: 'cultural_resonance',label: 'Cultural Resonance',color: 'bg-neu' },
-  { key: 'tone',              label: 'Tone',              color: 'bg-pos'  },
-  { key: 'clarity',           label: 'Clarity',           color: 'bg-ember'  },
-  { key: 'risk',              label: 'Risk',              color: 'bg-flare'    },
+const SCORE_META: { key: keyof Omit<CreativeScore, 'summary'>; label: string }[] = [
+  { key: 'engagement',        label: 'Engagement' },
+  { key: 'cultural_resonance',label: 'Cultural Resonance' },
+  { key: 'tone',              label: 'Tone' },
+  { key: 'clarity',           label: 'Clarity' },
+  { key: 'risk',              label: 'Risk' },
 ]
 
-function ScoreBar({ score, color, label }: { score: number; color: string; label: string }) {
+function ScoreBar({ score, label }: { score: number; label: string }) {
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
         <span className="font-medium bg-num">{score}</span>
       </div>
-      <div className="h-1.5 w-full bg-muted rounded-sm overflow-hidden">
-        <div
-          className={cn('h-full rounded-sm transition-all', color)}
-          style={{ width: `${Math.min(score, 100)}%` }}
-        />
-      </div>
+      <Crescendo value={Math.min(score, 100)} height={6} />
     </div>
   )
 }
@@ -522,8 +518,8 @@ export function CreativeClient({
                         )}
                       </div>
                       <div className="space-y-3">
-                        {SCORE_META.map(({ key: sk, label: sl, color }) => (
-                          <ScoreBar key={sk} score={scores[sk]} label={sl} color={color} />
+                        {SCORE_META.map(({ key: sk, label: sl }) => (
+                          <ScoreBar key={sk} score={scores[sk]} label={sl} />
                         ))}
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed pt-1 border-t">

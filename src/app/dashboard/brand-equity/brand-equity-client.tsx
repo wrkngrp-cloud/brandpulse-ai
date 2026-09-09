@@ -305,7 +305,7 @@ export function BrandEquityClient({
                           )}
                         </>
                       ) : (
-                        <p className="text-xs text-muted-foreground italic">
+                        <p className="text-xs text-muted-foreground">
                           No source data available for this component yet.
                         </p>
                       )}

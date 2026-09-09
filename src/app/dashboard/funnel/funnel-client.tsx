@@ -358,7 +358,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-muted-foreground italic">No source data yet for this stage.</p>
+                    <p className="text-xs text-muted-foreground">No source data yet for this stage.</p>
                   )}
                 </div>
               )}

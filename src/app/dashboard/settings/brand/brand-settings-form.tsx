@@ -371,7 +371,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                 <p className="text-[11px] font-semibold text-muted-foreground mb-1.5">Signature phrases</p>
                 <div className="flex flex-wrap gap-1.5">
                   {data.brandVoice.signaturePhrases.map(p => (
-                    <span key={p} className="text-xs px-2 py-0.5 rounded-sm bg-primary/10 text-primary border border-primary/20 font-medium italic">{p}</span>
+                    <span key={p} className="text-xs px-2 py-0.5 rounded-sm bg-primary/10 text-primary border border-primary/20 font-medium">{p}</span>
                   ))}
                 </div>
               </div>

@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { PanelLeftClose, PanelLeft, Settings, LogOut, ChevronUp, ChevronsUpDown } from 'lucide-react'
+import { PanelLeftClose, PanelLeft, Settings, LogOut, ChevronsUpDown } from 'lucide-react'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
@@ -17,31 +16,7 @@ import { DashboardNav } from './dashboard-nav'
 import { BrandSwitcher } from './brand-switcher'
 import type { BrandOption } from './brand-switcher'
 import { cn } from '@/lib/utils'
-
-// ── Logo / pulse mark ─────────────────────────────────────────────────────
-
-function PulseMark({ size = 32 }: { size?: number }) {
-  return (
-    <motion.div
-      className="shrink-0 grid place-items-center rounded-xl"
-      style={{
-        height: size,
-        width:  size,
-        background: 'var(--flare)',
-      }}
-    >
-      <svg viewBox="0 0 20 20" fill="none" style={{ height: size * 0.46, width: size * 0.46 }} aria-hidden>
-        <polyline
-          points="2,10 6,6 9.5,13 13.5,7.5 18,10"
-          stroke="var(--bg-paper)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </motion.div>
-  )
-}
+import { BrandMark, BrandLockup } from '@/components/brand/logo'
 
 // ── Sidebar user block ─────────────────────────────────────────────────────
 
@@ -175,17 +150,16 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
 
       {/* ── Logo area ──────────────────────────────────────────── */}
       <div className="h-14 shrink-0 flex items-center gap-3 border-b border-sidebar-border/70 px-[18px]">
-        <PulseMark size={32} />
-
-        {/* Wordmark */}
+        {/* The mark as supplied. Duotone on the ink plane, and the lockup
+            only once the rail is wide enough to carry the wordmark. */}
+        <BrandMark size={28} ground="ink" className="shrink-0" />
         <span
           className={cn(
-            'font-bold text-[15px] tracking-tight whitespace-nowrap text-tx-inv',
             'transition-opacity duration-150',
             expanded ? 'opacity-100 delay-75' : 'opacity-0',
           )}
         >
-          BrandGauge
+          <BrandLockup height={16} ground="ink" />
         </span>
 
         {/* Collapse/expand toggle */}

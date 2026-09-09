@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { PostTracker } from '@/components/influencers/post-tracker'
+import { Crescendo } from '@brand/components'
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -123,13 +124,10 @@ function IqScore({ score }: { score: number | null }) {
   const color = score >= 70 ? 'text-pos dark:text-pos'
     : score >= 50 ? 'text-tx-2 dark:text-tx-2'
     : 'text-tx-flare dark:text-tx-flare'
-  const barColor = score >= 70 ? 'bg-pos' : score >= 50 ? 'bg-ember' : 'bg-flare'
   return (
     <div className="space-y-1">
       <span className={cn('text-2xl font-bold bg-num', color)}>{score}</span>
-      <div className="h-1.5 bg-muted rounded-sm overflow-hidden w-full">
-        <div className={cn('h-full rounded-sm', barColor)} style={{ width: `${score}%` }} />
-      </div>
+      <Crescendo value={score} height={6} />
     </div>
   )
 }
@@ -139,7 +137,6 @@ function RiskScore({ score }: { score: number | null }) {
   const color = score < 30 ? 'text-pos dark:text-pos'
     : score <= 60 ? 'text-tx-2 dark:text-tx-2'
     : 'text-tx-flare dark:text-tx-flare'
-  const barColor = score < 30 ? 'bg-pos' : score <= 60 ? 'bg-ember' : 'bg-flare'
   const label    = score < 30 ? 'Low risk' : score <= 60 ? 'Medium' : 'High risk'
   return (
     <div className="space-y-1">
@@ -147,9 +144,7 @@ function RiskScore({ score }: { score: number | null }) {
         <span className={cn('text-2xl font-bold bg-num', color)}>{score}</span>
         <span className="text-xs text-muted-foreground">{label}</span>
       </div>
-      <div className="h-1.5 bg-muted rounded-sm overflow-hidden w-full">
-        <div className={cn('h-full rounded-sm', barColor)} style={{ width: `${score}%` }} />
-      </div>
+      <Crescendo value={score} height={6} />
     </div>
   )
 }
@@ -553,7 +548,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
             <div className="border rounded-2xl p-4 bg-card space-y-3">
               <h2 className="text-xs font-semibold text-muted-foreground">Online Reputation</h2>
               {pd.online_reputation.summary && (
-                <p className="text-xs text-muted-foreground italic">{pd.online_reputation.summary}</p>
+                <p className="text-xs text-muted-foreground">{pd.online_reputation.summary}</p>
               )}
               {pd.online_reputation.positive_signals?.length > 0 && (
                 <div className="flex flex-wrap gap-1">

@@ -362,7 +362,7 @@ export function BoardPackClient({
                     {topCampaign ? `. Top campaign: ${topCampaign}.` : '.'}
                   </p>
                 ) : (
-                  <p className="text-[14px] text-tx-3 italic">No active campaigns found.</p>
+                  <p className="text-[14px] text-tx-3">No active campaigns found.</p>
                 )}
               </div>
 
@@ -387,7 +387,7 @@ export function BoardPackClient({
                 <p className="text-[11px] font-bold text-tx-3 mb-1">
                   AI Narrative
                 </p>
-                <p className="text-[13px] italic text-tx-3">
+                <p className="text-[13px] text-tx-3">
                   AI narrative generates automatically once you connect revenue data.
                 </p>
               </div>

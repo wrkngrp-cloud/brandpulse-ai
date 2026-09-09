@@ -10,6 +10,7 @@ import { Eye, RefreshCw, Wand2, FlaskConical, Images, TrendingDown, CheckCircle2
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import type { FatiguedAsset } from './page'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { Crescendo } from '@brand/components'
 
 interface Props {
   brandName:   string
@@ -31,17 +32,14 @@ function fmtPct(n: number | null | undefined) {
   return n == null ? '—' : `${n.toFixed(2)}%`
 }
 
-function FatigueBar({ score, level }: { score: number; level: FatiguedAsset['fatigue_level'] }) {
-  const color = level === 'critical' ? 'bg-flare' : level === 'watch' ? 'bg-ember' : 'bg-flare'
+function FatigueBar({ score }: { score: number }) {
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>Fatigue score</span>
         <span className="font-medium bg-num">{score}/100</span>
       </div>
-      <div className="h-1.5 rounded-sm bg-muted overflow-hidden">
-        <div className={cn('h-full rounded-sm transition-all', color)} style={{ width: `${score}%` }} />
-      </div>
+      <Crescendo value={score} height={6} />
     </div>
   )
 }
@@ -75,7 +73,7 @@ function AssetCard({ asset }: { asset: FatiguedAsset }) {
       </div>
 
       {/* Fatigue score */}
-      <FatigueBar score={asset.fatigue_score} level={asset.fatigue_level} />
+      <FatigueBar score={asset.fatigue_score} />
 
       {/* Signals */}
       <div className="space-y-1.5">

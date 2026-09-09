@@ -102,7 +102,7 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                       {site.campaign_name}
                     </Link>
                   ) : !site.campaign_id ? (
-                    <span className="text-xs text-muted-foreground/60 italic">Always On</span>
+                    <span className="text-xs text-muted-foreground/60">Always On</span>
                   ) : null}
                   {site.format_type && FORMAT_BADGE[site.format_type] ? (
                     <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium', FORMAT_BADGE[site.format_type].style)}>

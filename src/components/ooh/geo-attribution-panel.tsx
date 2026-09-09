@@ -12,6 +12,7 @@ import { cn }         from '@/lib/utils'
 import { MapPin, Target, Zap, Globe, Smartphone, Monitor, ExternalLink, Plus, ChevronRight, Radio, CheckCircle2, Clock, Users } from 'lucide-react'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { toast } from 'sonner'
+import { Crescendo } from '@brand/components'
 
 interface GeoVisit {
   id:                    string
@@ -190,12 +191,7 @@ export function GeoAttributionPanel({
                   <span className="truncate">{city}</span>
                   <span className="font-medium bg-num">{count}</span>
                 </div>
-                <div className="h-1.5 rounded-sm bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-sm bg-[var(--brand-primary,var(--ember))]"
-                    style={{ width: `${(count / byCity[0][1]) * 100}%` }}
-                  />
-                </div>
+                <Crescendo value={(count / byCity[0][1]) * 100} height={6} />
               </div>
             ))}
           </Card>
@@ -214,9 +210,7 @@ export function GeoAttributionPanel({
                     <span>{label}</span>
                     <span className="text-muted-foreground bg-num">{count} ({pct}%)</span>
                   </div>
-                  <div className="h-1.5 rounded-sm bg-muted overflow-hidden">
-                    <div className="h-full rounded-sm bg-flare" style={{ width: `${pct}%` }} />
-                  </div>
+                  <Crescendo value={pct} height={6} />
                 </div>
               )
             })}
@@ -379,7 +373,7 @@ export function GeoAttributionPanel({
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span>{aud.fence_radius_m}m fence</span>
                       {aud.estimated_reach && <span className="bg-num">~{aud.estimated_reach.toLocaleString()} reach</span>}
-                      {aud.creative_headline && <span className="italic truncate">"{aud.creative_headline}"</span>}
+                      {aud.creative_headline && <span className="truncate">"{aud.creative_headline}"</span>}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">

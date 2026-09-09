@@ -171,7 +171,7 @@ export function ApiKeysSection() {
           <p className="text-xs text-muted-foreground">Loading...</p>
         )}
         {!loading && keys.length === 0 && (
-          <p className="text-xs text-muted-foreground italic">No active keys. Generate one below.</p>
+          <p className="text-xs text-muted-foreground">No active keys. Generate one below.</p>
         )}
         {keys.map(k => (
           <div key={k.id} className="flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm">

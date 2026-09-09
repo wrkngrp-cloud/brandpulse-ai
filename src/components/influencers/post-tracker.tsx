@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { Crescendo } from '@brand/components'
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -162,16 +163,14 @@ function ScoreTile({ label, score, icon: Icon }: { label: string; score: number;
   )
 }
 
-function SentimentBar({ pct, color, label }: { pct: number; color: string; label: string }) {
+function SentimentBar({ pct, label }: { pct: number; label: string }) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
         <span className="font-semibold bg-num">{pct}%</span>
       </div>
-      <div className="h-2 bg-muted rounded-sm overflow-hidden">
-        <div className="h-full rounded-sm transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
-      </div>
+      <Crescendo value={pct} height={8} />
     </div>
   )
 }
@@ -240,9 +239,9 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
             {analysis.sentiment_analysis.brand_mention_sentiment} on brand mentions
           </span>
         </div>
-        <SentimentBar pct={analysis.sentiment_analysis.positive_pct} color="var(--pos)" label="Positive" />
-        <SentimentBar pct={analysis.sentiment_analysis.neutral_pct}  color="var(--tx-3)" label="Neutral"  />
-        <SentimentBar pct={analysis.sentiment_analysis.negative_pct} color="var(--flare)" label="Negative" />
+        <SentimentBar pct={analysis.sentiment_analysis.positive_pct} label="Positive" />
+        <SentimentBar pct={analysis.sentiment_analysis.neutral_pct} label="Neutral"  />
+        <SentimentBar pct={analysis.sentiment_analysis.negative_pct} label="Negative" />
         {analysis.sentiment_analysis.key_themes.length > 0 && (
           <div className="flex flex-wrap gap-1 pt-1">
             {analysis.sentiment_analysis.key_themes.map(t => (
@@ -358,7 +357,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
               ))}
             </div>
           )}
-          <p className="text-xs text-muted-foreground italic leading-relaxed border-t pt-3">
+          <p className="text-xs text-muted-foreground leading-relaxed border-t pt-3">
             {analysis.fit_verdict.rationale}
           </p>
         </div>

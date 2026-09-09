@@ -6,7 +6,8 @@ import { motion, useInView } from 'framer-motion'
 import { ArrowRight, Moon, Sun } from 'lucide-react'
 import { VideoHero } from './video-hero'
 import { HorizontalTour } from './horizontal-tour'
-import { AiScene, CompetitiveScene, GaugeMark, darkSceneVars, lightSceneVars } from './scenes'
+import { AiScene, CompetitiveScene, darkSceneVars, lightSceneVars } from './scenes'
+import { BrandLockup } from '@/components/brand/logo'
 
 const rise = {
   initial: { opacity: 0, y: 28 },
@@ -30,12 +31,9 @@ export const DARK = {
   '--lp-dot': 'var(--tick-1)',
 } as React.CSSProperties
 
-export function Wordmark({ className = 'text-xl' }: { className?: string }) {
-  return (
-    <span className={`font-extrabold tracking-tight ${className}`} style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
-      Brand<span style={{ color: 'var(--lp-clay)' }}>Gauge</span>
-    </span>
-  )
+/** The lockup as supplied. The wordmark is not set in type here. */
+export function Wordmark({ height = 22, dark = false }: { height?: number; dark?: boolean }) {
+  return <BrandLockup height={height} ground={dark ? 'ink' : 'paper'} />
 }
 
 export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
@@ -44,7 +42,6 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
       <div className="mx-4 mt-4 flex max-w-6xl items-center justify-between rounded-2xl border px-4 py-3 backdrop-blur-xl sm:mx-6 sm:px-5 lg:mx-auto"
         style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-glass)' }}>
         <Link href="/" className="flex items-center gap-2.5" style={{ color: 'var(--lp-ink)' }}>
-          <GaugeMark className="h-7 w-7" />
           <Wordmark />
         </Link>
         <nav className="hidden items-center gap-7 text-[11px] md:flex" style={{ color: 'var(--lp-mut)' }}>
@@ -414,8 +411,7 @@ export function Footer() {
     <footer className="border-t px-6 py-10" style={{ borderColor: 'var(--lp-line)' }}>
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
         <div className="flex items-center gap-2" style={{ color: 'var(--lp-ink)' }}>
-          <GaugeMark className="h-5 w-5" />
-          <Wordmark className="text-sm" />
+          <Wordmark height={16} />
         </div>
         <p className="text-[10px]" style={{ color: 'var(--lp-mut)' }}>
           Made for West African marketers

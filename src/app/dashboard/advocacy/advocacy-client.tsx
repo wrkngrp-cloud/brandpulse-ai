@@ -391,7 +391,7 @@ function PromoterCard({
 
           {/* Notes */}
           {promoter.notes && (
-            <p className="text-xs text-muted-foreground italic">"{promoter.notes}"</p>
+            <p className="text-xs text-muted-foreground">"{promoter.notes}"</p>
           )}
 
           {/* Referral codes table */}

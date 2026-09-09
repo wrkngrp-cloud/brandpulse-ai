@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Plus, X } from 'lucide-react'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { toast } from 'sonner'
+import { Crescendo } from '@brand/components'
 
 export interface SovData {
   brand_mentions: number
@@ -93,12 +94,7 @@ export function SovWidget({
                     <span className="bg-num font-semibold text-primary">{sovPct !== null ? `${sovPct.toFixed(1)}%` : '—'}</span>
                   </div>
                 </div>
-                <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-sm transition-all duration-500"
-                    style={{ width: `${sovPct ?? 0}%` }}
-                  />
-                </div>
+                <Crescendo value={sovPct ?? 0} height={6} />
               </div>
             )}
             {competitors.map(c => {

@@ -13,6 +13,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import { toast } from 'sonner'
 import { linkInfluencerToCampaign } from '@/app/dashboard/campaigns/[id]/link-influencer-action'
 import { PostTracker } from '@/components/influencers/post-tracker'
+import { Crescendo } from '@brand/components'
 
 interface Channel {
   id: string
@@ -755,9 +756,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               <span className="text-muted-foreground">{labels[type] ?? type}</span>
                               <span className="font-medium bg-num">{count.toLocaleString()} ({pct}%)</span>
                             </div>
-                            <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
-                              <div className="h-full bg-foreground rounded-sm" style={{ width: `${pct}%` }} />
-                            </div>
+                            <Crescendo value={pct} height={6} />
                           </div>
                         )
                       })}

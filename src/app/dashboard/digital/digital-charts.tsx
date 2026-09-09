@@ -1,5 +1,6 @@
 'use client'
 
+import { Crescendo } from '@brand/components'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, BarChart, Bar, Cell, ReferenceLine,
@@ -167,12 +168,7 @@ export function ConversionFunnelChart({ data, demo }: { data?: FunnelData; demo?
             </div>
             <span className="text-sm font-bold bg-num shrink-0">{fmtNum(step.value)}</span>
           </div>
-          <div className="h-5 bg-muted/50 rounded-sm overflow-hidden">
-            <div
-              className="h-full rounded-sm transition-all duration-700"
-              style={{ width: `${step.barPct}%`, backgroundColor: step.color, opacity: 0.82 }}
-            />
-          </div>
+          <Crescendo value={step.barPct} height={20} />
         </div>
       ))}
       <p className="text-[10px] text-muted-foreground text-right">

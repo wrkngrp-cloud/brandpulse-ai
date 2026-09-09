@@ -8,6 +8,7 @@ import { SurveyAiAnalysis } from './ai-analysis'
 import { SendSurvey }     from './send-survey'
 import { getTemplateLabel } from '@/lib/survey-templates'
 import type { SurveyQuestion } from '@/lib/survey-templates'
+import { Crescendo } from '@brand/components'
 
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
 
@@ -156,9 +157,7 @@ export default async function SurveyDetailPage({
                       <span className="text-muted-foreground truncate max-w-[70%]">{label}</span>
                       <span className="font-medium shrink-0 bg-num">{count} ({pct}%)</span>
                     </div>
-                    <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
-                      <div className="h-full bg-foreground rounded-sm" style={{ width: `${pct}%` }} />
-                    </div>
+                    <Crescendo value={pct} height={6} />
                   </div>
                 )
               })}

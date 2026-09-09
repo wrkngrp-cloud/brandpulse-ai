@@ -1,5 +1,6 @@
 'use client'
 
+import { Crescendo } from '@brand/components'
 interface UrlLengthAdvisorProps {
   url:        string
   formatType: string
@@ -51,12 +52,7 @@ export function UrlLengthAdvisor({ url, formatType }: UrlLengthAdvisorProps) {
         <span className="font-medium">{message}</span>
         <span className="shrink-0 bg-num">{len}/{limits.max}</span>
       </div>
-      <div className="h-1 rounded-sm bg-ink/10 dark:bg-card/10 overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all ${c.bar}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
+      <Crescendo value={pct} height={6} />
       <p className="opacity-70">{limits.note}</p>
     </div>
   )

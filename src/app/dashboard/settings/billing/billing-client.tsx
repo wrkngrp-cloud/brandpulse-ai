@@ -6,6 +6,7 @@ import { Loader2, Check, ExternalLink, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { Crescendo } from '@brand/components'
 
 interface PlanLimits {
   brand_count:  number
@@ -38,7 +39,6 @@ function fmtLimit(n: number) {
 
 function UsageBar({ used, limit, label }: { used: number; limit: number; label: string }) {
   const pct = limit === -1 ? 0 : Math.min(100, (used / limit) * 100)
-  const color = pct > 90 ? 'bg-flare' : pct > 70 ? 'bg-ember' : 'bg-pos'
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-[12px]">
@@ -46,9 +46,7 @@ function UsageBar({ used, limit, label }: { used: number; limit: number; label: 
         <span className="font-medium bg-num">{used.toLocaleString()} / {fmtLimit(limit)}</span>
       </div>
       {limit !== -1 && (
-        <div className="h-1.5 rounded-sm bg-muted/60 overflow-hidden">
-          <div className={cn('h-full rounded-sm transition-all', color)} style={{ width: `${pct}%` }} />
-        </div>
+        <Crescendo value={pct} height={6} />
       )}
     </div>
   )

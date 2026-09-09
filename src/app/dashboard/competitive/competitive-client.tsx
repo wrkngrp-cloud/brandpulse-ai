@@ -728,7 +728,7 @@ function SightingsTab({
                     </span>
                   )}
                   {s.lat != null && s.lng != null && (
-                    <span className="text-xs text-muted-foreground italic">Location logged</span>
+                    <span className="text-xs text-muted-foreground">Location logged</span>
                   )}
                 </div>
                 <span className="text-xs text-muted-foreground whitespace-nowrap">

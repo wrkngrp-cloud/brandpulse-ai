@@ -11,6 +11,8 @@
  */
 
 import type { CSSProperties } from 'react'
+import { Crescendo } from '@brand/components'
+import { BrandLockup } from '@/components/brand/logo'
 
 // ————— timing helpers —————
 export function clamp01(v: number) { return Math.min(1, Math.max(0, v)) }
@@ -406,9 +408,7 @@ export function OohScene({ t }: { t: number }) {
                 <span className="text-[11px] text-[var(--s-body)]">{row.label}</span>
                 <span className="bg-num text-[12px] font-bold text-[var(--s-strong)]">{row.value}</span>
               </div>
-              <div className="h-1.5 rounded-sm bg-[var(--s-track)]">
-                <div className="h-full rounded-sm" style={{ width: `${row.p * 100 * p}%`, background: row.clay ? HERO : NEUTRAL, opacity: row.clay ? 1 : 0.6 }} />
-              </div>
+              <Crescendo value={row.p * 100 * p} height={6} />
             </div>
           )
         })}
@@ -527,10 +527,7 @@ export function OutroScene({ t }: { t: number }) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-5" style={{ color: 'var(--s-strong)' }}>
       <div style={{ opacity: p1, transform: `scale(${0.92 + p1 * 0.08})` }} className="flex items-center gap-3">
-        <GaugeMark className="h-10 w-10" />
-        <span className="text-4xl font-extrabold tracking-tight text-[var(--s-strong)]" style={{ fontFamily: 'var(--font)' }}>
-          Brand<span style={{ color: HERO }}>Gauge</span>
-        </span>
+        <BrandLockup height={40} />
       </div>
       <p className="max-w-md text-center text-[15px] leading-relaxed text-[var(--s-mut)]" style={{ opacity: p2 }}>
         Brand intelligence that speaks your market&apos;s language.
@@ -542,14 +539,5 @@ export function OutroScene({ t }: { t: number }) {
   )
 }
 
-// ————— logo mark —————
-export function GaugeMark({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden>
-      <path d="M 8 30 A 16 16 0 1 1 32 30" fill="none" stroke="var(--s-track, rgba(20,24,43,0.2))" strokeWidth="4" strokeLinecap="round" />
-      <path d="M 8 30 A 16 16 0 0 1 20 4" fill="none" stroke={HERO} strokeWidth="4" strokeLinecap="round" />
-      <line x1="20" y1="24" x2="28" y2="13" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="20" cy="24" r="3" fill="currentColor" />
-    </svg>
-  )
-}
+// The mark is supplied in brand/logo and used as drawn. Nothing here
+// approximates it with an arc, a line and a circle.

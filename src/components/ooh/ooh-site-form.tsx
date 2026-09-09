@@ -16,6 +16,7 @@ import Link                   from 'next/link'
 import type { PlaceDemographics } from '@/lib/ooh/places-demographics'
 import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
 import { TOKENS } from '@/lib/brand-tokens'
+import { Crescendo } from '@brand/components'
 
 const FORMAT_TYPES = [
   'Billboard', 'Unipole', 'Bridge Panel', 'Transit Shelter',
@@ -607,12 +608,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                   </div>
                 )}
                 <div className="flex items-center gap-1.5">
-                  <div className="h-1.5 rounded-sm bg-muted overflow-hidden flex-1">
-                    <div
-                      className="h-full bg-primary/60 rounded-sm"
-                      style={{ width: `${Math.round(demographics.confidence * 100)}%` }}
-                    />
-                  </div>
+                  <Crescendo value={Math.round(demographics.confidence * 100)} height={6} />
                   <span className="text-xs text-muted-foreground shrink-0 bg-num">
                     {Math.round(demographics.confidence * 100)}% confidence
                   </span>

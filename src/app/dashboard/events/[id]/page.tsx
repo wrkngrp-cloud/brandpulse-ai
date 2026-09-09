@@ -8,6 +8,7 @@ import { computeEventMetrics, fmtNGN, fmtPct } from '@/lib/events/roi'
 import { ReportPoller }        from '@/components/events/report-poller'
 import { DebriefPromptCard }   from '@/components/events/debrief-prompt-card'
 import { VisualMentions }      from '@/components/events/visual-mentions'
+import { Crescendo } from '@brand/components'
 
 const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -289,12 +290,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                     <span className="text-sm bg-num font-semibold">{a.total}</span>
                   </div>
                   {/* Progress bar */}
-                  <div className="ml-7 h-1.5 rounded-sm bg-muted overflow-hidden">
-                    <div
-                      className="h-full rounded-sm bg-foreground/70 transition-all"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
+                  <Crescendo value={pct} height={6} />
                   {/* Sub-stats */}
                   <div className="ml-7 flex flex-wrap gap-x-4 gap-y-0.5 text-[11px] text-muted-foreground">
                     {a.leads > 0    && <span>{a.leads} lead{a.leads !== 1 ? 's' : ''}</span>}

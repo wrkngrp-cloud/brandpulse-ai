@@ -6,6 +6,7 @@ import { Menu, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { DashboardNav } from './dashboard-nav'
 import { cn } from '@/lib/utils'
+import { BrandLockup } from '@/components/brand/logo'
 
 interface MobileNavProps {
   userName?:  string
@@ -46,15 +47,7 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
         {/* Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border/70 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div
-              className="h-8 w-8 rounded-xl grid place-items-center shrink-0"
-              style={{ background: 'var(--flare)' }}
-            >
-              <svg viewBox="0 0 20 20" className="h-[14px] w-[14px]" fill="none" aria-hidden>
-                <polyline points="2,10 6,6 9.5,13 13.5,7.5 18,10" stroke="var(--bg-paper)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <span className="font-bold text-[15px] tracking-tight text-tx">BrandGauge</span>
+            <BrandLockup height={20} tone="duotone" ground="ink" />
           </div>
           <button
             onClick={() => setOpen(false)}

@@ -39,7 +39,7 @@ export function TrustPillarCard({ trust }: Props) {
             <span className={`text-xs ${cfg.color} opacity-80`}>{cfg.label}</span>
           </div>
         ) : (
-          <span className="text-sm text-muted-foreground italic">No data yet</span>
+          <span className="text-sm text-muted-foreground">No data yet</span>
         )}
       </div>
 
@@ -78,7 +78,7 @@ export function TrustPillarCard({ trust }: Props) {
         </p>
       )}
       {trust.grade === null && (
-        <p className="text-xs text-muted-foreground/60 border-t pt-3 italic">
+        <p className="text-xs text-muted-foreground/60 border-t pt-3">
           Connect your App Store IDs and ensure sentiment data is flowing to see your trust score.
         </p>
       )}

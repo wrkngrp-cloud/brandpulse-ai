@@ -911,7 +911,7 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
             </div>
           )}
           {pd.online_reputation.summary && (
-            <p className="text-xs text-muted-foreground italic">{pd.online_reputation.summary}</p>
+            <p className="text-xs text-muted-foreground">{pd.online_reputation.summary}</p>
           )}
         </div>
       )}
