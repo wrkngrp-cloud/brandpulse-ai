@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Award, Plus, Users, Star, RefreshCw, Loader2, X, Gift, Coins } from 'lucide-react'
+import { Award, Plus, Users, Star, RefreshCw, X, Gift, Coins } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -83,7 +84,7 @@ export function LoyaltyClient() {
         <div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="loyalty" autoStart />
           <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
         </div>
@@ -118,7 +119,7 @@ export function LoyaltyClient() {
 
       {loading && programs.length === 0 && (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loader2 className="h-6 w-6 text-muted-foreground" />
         </div>
       )}
 
@@ -395,7 +396,7 @@ function NewProgramForm({ onSave, onCancel }: { onSave: (d: Record<string, unkno
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Create
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -446,7 +447,7 @@ function AddMemberForm({ programs, onSave, onCancel }: { programs: LoyaltyProgra
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Add member
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -499,7 +500,7 @@ function AwardPointsForm({ memberId, memberName, onSave, onCancel }: { memberId:
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Confirm
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>

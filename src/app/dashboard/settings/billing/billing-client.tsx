@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2, Check, ExternalLink, Zap } from 'lucide-react'
+import { Check, ExternalLink, Zap } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -133,7 +134,7 @@ export function BillingClient({
 
         {currentPlan !== 'starter' && (
           <Button variant="outline" size="sm" onClick={openPortal} disabled={portalPending}>
-            {portalPending ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5 mr-1.5" />}
+            {portalPending ? <Loader2 className="h-3.5 w-3.5 mr-1.5" /> : <ExternalLink className="h-3.5 w-3.5 mr-1.5" />}
             Manage subscription
           </Button>
         )}
@@ -167,7 +168,7 @@ export function BillingClient({
                       disabled={!!upgrading}
                     >
                       {upgrading === plan
-                        ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Redirecting...</>
+                        ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Redirecting...</>
                         : <><Zap className="h-3.5 w-3.5 mr-1.5" />Upgrade to {display?.name}</>}
                     </Button>
                   ) : (

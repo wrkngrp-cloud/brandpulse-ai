@@ -76,7 +76,7 @@ function YesNoToggle({
               value === opt
                 ? opt
                   ? 'bg-pos border-line text-tx-inv'
-                  : 'bg-flare border-line-strong text-tx-inv'
+                  : 'bg-flare border-line-strong text-on-hot'
                 : 'bg-background border-border text-muted-foreground hover:border-primary/50',
             )}
           >

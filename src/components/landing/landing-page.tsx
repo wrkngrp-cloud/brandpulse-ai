@@ -154,8 +154,8 @@ function Hero() {
         </motion.p>
         <motion.div {...rise} transition={{ ...rise.transition, delay: 0.6 }} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Link href="/auth/signup"
-            className="group flex items-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-tx-inv transition-transform border border-line"
-            style={{ background: 'var(--lp-clay)' }}>
+            className="group flex items-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-on-hot border border-line bg-press"
+            style={{ background: 'var(--flare)' }}>
             Start free in beta
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
@@ -364,7 +364,7 @@ function FinalCta() {
         <motion.div {...rise} className="relative mt-10">
           <Link href="/auth/signup"
             className="inline-flex items-center gap-2 rounded-sm px-8 py-4 text-[15px] font-bold border border-line"
-            style={{ background: 'var(--flare)', color: 'var(--bg-paper)' }}>
+            style={{ background: 'var(--flare)', color: 'var(--on-hot)' }}>
             Create your workspace <ArrowRight className="h-4 w-4" />
           </Link>
         </motion.div>
@@ -403,100 +403,13 @@ export function Footer() {
  * backdrop animates with zero React re-renders. Returns whether the effect is live so
  * the caller can skip rendering the overlay entirely on touch / reduced-motion.
  */
-function useCursorBackdrop(ref: React.RefObject<HTMLElement | null>) {
-  const [active, setActive] = useState(false)
-  useEffect(() => {
-    const el = ref.current
-    if (!el || typeof window === 'undefined' || !window.matchMedia) return
-    const fine = window.matchMedia('(pointer: fine)')
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)')
-    if (!fine.matches || reduce.matches) return
-    const activateId = requestAnimationFrame(() => setActive(true))
-
-    const tgt = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
-    const cur = { x: tgt.x, y: tgt.y }
-    let raf = 0
-    let running = false
-    let lastMove = 0
-
-    const write = () => {
-      el.style.setProperty('--lp-x', cur.x.toFixed(1) + 'px')
-      el.style.setProperty('--lp-y', cur.y.toFixed(1) + 'px')
-      el.style.setProperty('--lp-px', (cur.x / window.innerWidth - 0.5).toFixed(4))
-      el.style.setProperty('--lp-py', (cur.y / window.innerHeight - 0.5).toFixed(4))
-    }
-    const tick = () => {
-      cur.x += (tgt.x - cur.x) * 0.14
-      cur.y += (tgt.y - cur.y) * 0.14
-      write()
-      const settled = Math.hypot(tgt.x - cur.x, tgt.y - cur.y) < 0.4
-      if (settled && performance.now() - lastMove > 250) { running = false; return }
-      raf = requestAnimationFrame(tick)
-    }
-    const run = () => { if (!running) { running = true; raf = requestAnimationFrame(tick) } }
-    const onMove = (e: PointerEvent) => {
-      tgt.x = e.clientX
-      tgt.y = e.clientY
-      lastMove = performance.now()
-      el.style.setProperty('--lp-glow', '1')
-      run()
-    }
-    const onLeave = () => el.style.setProperty('--lp-glow', '0')
-
-    write()
-    window.addEventListener('pointermove', onMove, { passive: true })
-    document.addEventListener('pointerleave', onLeave)
-    window.addEventListener('blur', onLeave)
-    return () => {
-      cancelAnimationFrame(activateId)
-      cancelAnimationFrame(raf)
-      window.removeEventListener('pointermove', onMove)
-      document.removeEventListener('pointerleave', onLeave)
-      window.removeEventListener('blur', onLeave)
-    }
-  }, [ref])
-  return active
-}
-
-/** Viewport-fixed layer that trails the cursor: a soft clay glow plus the Adire dot-grid
- *  lighting up in place through a radial mask that follows the pointer. Sits behind all
- *  content (main sets `isolation: isolate`). Movement is transform / mask only. */
-function CursorField() {
-  return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10"
-      style={{ opacity: 'var(--lp-glow, 0)', transition: 'opacity 0.5s ease' }}>
-      {/* clay glow blob, moved by transform (compositor-only) */}
-      <div className="absolute left-0 top-0 h-[620px] w-[620px] rounded-sm blur-[85px]"
-        style={{
-          transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
-          background: 'var(--bg-shell)',
-          willChange: 'transform',
-        }} />
-      {/* a defined ring right at the cursor, so the pointer itself reads as the source */}
-      <div className="absolute left-0 top-0 h-[70px] w-[70px] rounded-sm"
-        style={{
-          transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
-          border: '1px solid var(--lp-clay)',
-          opacity: 0.18,
-          willChange: 'transform',
-        }} />
-      {/* dot grid revealed in place around the pointer via a cursor-tracking radial mask */}
-      <div className="absolute inset-0"
-        style={{
-          backgroundImage: 'var(--lp-clay)',
-          backgroundSize: '26px 26px',
-          opacity: 0.5,
-          WebkitMaskImage: 'radial-gradient(260px circle at var(--lp-x, -999px) var(--lp-y, -999px), rgba(0,0,0,0.95), transparent 72%)',
-          maskImage: 'radial-gradient(260px circle at var(--lp-x, -999px) var(--lp-y, -999px), rgba(0,0,0,0.95), transparent 72%)',
-        }} />
-    </div>
-  )
-}
+// A layer that trails the cursor is decoration: it represents no value, no
+// state and no touch, so it does not ship. The dot field it lit is now a
+// static tick field behind the hero.
 
 export function LandingPage() {
   const [dark, setDark] = useState(false)
   const rootRef = useRef<HTMLElement>(null)
-  const cursorLive = useCursorBackdrop(rootRef)
   useEffect(() => {
     const id = requestAnimationFrame(() => {
       if (window.localStorage.getItem('bg-landing-theme') === 'dark') setDark(true)
@@ -515,7 +428,6 @@ export function LandingPage() {
       className="min-h-screen antialiased transition-colors duration-500"
       style={{ ...(dark ? DARK : LIGHT), ...(dark ? darkSceneVars : lightSceneVars), background: 'var(--lp-bg)', color: 'var(--lp-ink)', isolation: 'isolate' }}
     >
-      {cursorLive && <CursorField />}
       <Nav dark={dark} onToggle={toggle} />
       <Hero />
       <div id="tour" className="scroll-mt-20"><HorizontalTour /></div>

@@ -5,6 +5,7 @@ import {
   CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import { Activity } from 'lucide-react'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface Visit {
   visited_at: string
@@ -73,42 +74,44 @@ export function OohVisitChart({ visits }: OohVisitChartProps) {
       ) : (
         <>
           <div className="h-44">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
-                <defs>
-                  <linearGradient id="visitGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"   stopColor="hsl(var(--primary))" stopOpacity={0.25} />
-                    <stop offset="95%"  stopColor="hsl(var(--primary))" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                  tickLine={false} axisLine={false}
-                  interval="preserveStartEnd"
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                  tickLine={false} axisLine={false}
-                  allowDecimals={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    fontSize: 12,
-                    border: '1px solid hsl(var(--border))',
-                    background: 'hsl(var(--card))',
-                    borderRadius: 'var(--r-card)',
-                  }}
-                />
-                <Area
-                  type="monotone" dataKey="visits"
-                  stroke="hsl(var(--primary))" strokeWidth={2}
-                  fill="url(#visitGradient)"
-                  dot={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            <ChartState rows={chartData} height={220} empty="Share the site link to start counting visits.">
+                          <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
+                  <defs>
+                    <linearGradient id="visitGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"   stopColor="hsl(var(--primary))" stopOpacity={0.25} />
+                      <stop offset="95%"  stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tickLine={false} axisLine={false}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tickLine={false} axisLine={false}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      fontSize: 12,
+                      border: '1px solid hsl(var(--border))',
+                      background: 'hsl(var(--card))',
+                      borderRadius: 'var(--r-card)',
+                    }}
+                  />
+                  <Area
+                    type="monotone" dataKey="visits"
+                    stroke="hsl(var(--primary))" strokeWidth={2}
+                    fill="url(#visitGradient)"
+                    dot={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartState>
           </div>
 
           {/* Device breakdown */}

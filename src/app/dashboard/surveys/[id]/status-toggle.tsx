@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react'
 import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { updateSurveyStatus } from '../actions'
 
 export function StatusToggle({ surveyId, status }: { surveyId: string; status: string }) {
@@ -25,7 +25,7 @@ export function StatusToggle({ surveyId, status }: { surveyId: string; status: s
         )
       }
     >
-      {pending && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
+      {pending && <Loader2 className="h-3.5 w-3.5 mr-1.5" />}
       {status === 'draft' ? 'Go live' : 'Close survey'}
     </Button>
   )

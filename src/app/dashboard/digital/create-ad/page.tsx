@@ -15,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowLeft, ArrowRight, Check, Loader2, Megaphone, Upload, X, ImageIcon, Plus, Globe, Users, BarChart2, ShoppingCart, MousePointer, Smartphone } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Megaphone, Upload, X, ImageIcon, Plus, Globe, Users, BarChart2, ShoppingCart, MousePointer, Smartphone } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 // ── types ─────────────────────────────────────────────────────────────────────
@@ -332,7 +333,7 @@ function ImageUploadZone({
         onChange={e => handleFiles(e.target.files)}
       />
       {uploading
-        ? <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        ? <Loader2 className="h-6 w-6 text-muted-foreground" />
         : <Upload className="h-6 w-6 text-muted-foreground" />
       }
       <div className="text-center">
@@ -409,7 +410,7 @@ function VideoUploadZone({
         onChange={e => { if (e.target.files?.[0]) void uploadFile(e.target.files[0]) }}
       />
       {uploading
-        ? <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
+        ? <Loader2 className="h-7 w-7 text-muted-foreground" />
         : <Upload className="h-7 w-7 text-muted-foreground" />
       }
       <div className="text-center">
@@ -1834,7 +1835,7 @@ export default function CreateAdPage() {
         ) : (
           <Button onClick={() => void handleSubmit()} disabled={saving}>
             {saving ? (
-              <><Loader2 className="mr-1.5 h-4 w-4 animate-spin" />Saving…</>
+              <><Loader2 className="mr-1.5 h-4 w-4" />Saving…</>
             ) : (
               <><Check className="mr-1.5 h-4 w-4" />Save draft</>
             )}

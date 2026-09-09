@@ -7,7 +7,8 @@ import { Button }             from '@/components/ui/button'
 import { Input }              from '@/components/ui/input'
 import { Label }              from '@/components/ui/label'
 import { Textarea }           from '@/components/ui/textarea'
-import { Copy, RefreshCw, Link2, QrCode, MapPin, Loader2, Settings, Zap, Map, X, Users } from 'lucide-react'
+import { Copy, RefreshCw, Link2, QrCode, MapPin, Settings, Zap, Map, X, Users } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { FieldTip } from '@/components/ui/field-tip'
 import { estimateTraffic, inferSiteDemographics } from '@/app/dashboard/ooh/actions'
@@ -506,7 +507,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                 autoComplete="off"
               />
               {geocoding && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               )}
             </div>
 
@@ -577,7 +578,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Audience of Place</span>
-              {inferringDemogs && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground ml-auto" />}
+              {inferringDemogs && <Loader2 className="h-3.5 w-3.5 text-muted-foreground ml-auto" />}
             </div>
             {demographics && !inferringDemogs && (
               <div className="space-y-3">
@@ -840,7 +841,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
               disabled={estimating || !city}
               title="AI estimate based on format, LGA, address, and city"
             >
-              {estimating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+              {estimating ? <Loader2 className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
               {estimating ? 'Estimating…' : 'AI estimate'}
             </Button>
           </div>

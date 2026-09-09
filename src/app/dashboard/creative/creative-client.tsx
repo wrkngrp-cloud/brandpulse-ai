@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import { Palette, Zap, Eye, Target, Loader2, CheckCircle2, ImagePlus, Video, XCircle, Film } from 'lucide-react'
+import { Palette, Zap, Eye, Target, CheckCircle2, ImagePlus, Video, XCircle, Film } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -431,7 +432,7 @@ export function CreativeClient({
                     </div>
                   ) : extracting ? (
                     <div className="flex items-center justify-center gap-2 border border-dashed rounded-lg py-4 text-xs text-muted-foreground">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5" />
                       Extracting frame…
                     </div>
                   ) : (
@@ -474,7 +475,7 @@ export function CreativeClient({
             className="w-full"
           >
             {compareLoading
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Comparing creatives...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Comparing creatives...</>
               : <><Zap className="h-4 w-4 mr-2" /> Compare creatives</>
             }
           </Button>
@@ -586,7 +587,7 @@ export function CreativeClient({
             className="w-full"
           >
             {identityLoading
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Checking identity...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Checking identity...</>
               : <><Eye className="h-4 w-4 mr-2" /> Check identity consistency</>
             }
           </Button>
@@ -712,7 +713,7 @@ export function CreativeClient({
             className="w-full"
           >
             {competitorLoading
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analysing...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Analysing...</>
               : <><Target className="h-4 w-4 mr-2" /> Analyse competitor creative</>
             }
           </Button>
@@ -818,7 +819,7 @@ export function CreativeClient({
             </div>
           ) : videoExtracting ? (
             <div className="flex items-center justify-center gap-2 border border-dashed rounded-xl py-8 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4" />
               Extracting video frame…
             </div>
           ) : (
@@ -890,7 +891,7 @@ export function CreativeClient({
             className="w-full"
           >
             {videoLoading
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analysing video…</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Analysing video…</>
               : <><Film className="h-4 w-4 mr-2" /> Analyse video creative</>
             }
           </Button>

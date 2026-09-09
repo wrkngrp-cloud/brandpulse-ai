@@ -3,7 +3,8 @@
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn, toSentenceCase } from '@/lib/utils'
-import { Link2, X, Loader2, MapPin, CalendarDays, Check } from 'lucide-react'
+import { Link2, X, MapPin, CalendarDays, Check } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { linkOohSiteToCampaign, linkEventToCampaign } from '@/app/dashboard/campaigns/actions'
 
 interface OohSiteOption {
@@ -108,7 +109,7 @@ export function LinkOohSiteDialog({ campaignId, availableSites }: LinkOohDialogP
               <Button variant="outline" size="sm" onClick={() => setOpen(false)} className="flex-1">Cancel</Button>
               <Button size="sm" onClick={handleLink} disabled={!selected || pending || done} className="flex-1">
                 {done ? <><Check className="h-3.5 w-3.5 mr-1.5" /> Linked</> :
-                 pending ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Linking…</> :
+                 pending ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" /> Linking…</> :
                  'Link site'}
               </Button>
             </div>
@@ -199,7 +200,7 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
               <Button variant="outline" size="sm" onClick={() => setOpen(false)} className="flex-1">Cancel</Button>
               <Button size="sm" onClick={handleLink} disabled={!selected || pending || done} className="flex-1">
                 {done ? <><Check className="h-3.5 w-3.5 mr-1.5" /> Linked</> :
-                 pending ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Linking…</> :
+                 pending ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" /> Linking…</> :
                  'Link event'}
               </Button>
             </div>

@@ -1,4 +1,5 @@
 'use client'
+import { ChartState } from '@/components/brand/chart-states'
 
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -45,47 +46,49 @@ export function SovHistoryChart({ data, days }: { data: SovPoint[]; days?: numbe
           {rangeLabel} · {data.length} snapshots
         </p>
       </div>
-      <ResponsiveContainer width="100%" height={180}>
-        <AreaChart data={data} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
-          <defs>
-            <linearGradient id="sovGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.28} />
-              <stop offset="60%"  stopColor="var(--flare)" stopOpacity={0.06} />
-              <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
-          <XAxis
-            dataKey="date"
-            tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
-            tickLine={false}
-            axisLine={false}
-            interval="preserveStartEnd"
-            tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
-            fontFamily="var(--font)"
-          />
-          <YAxis
-            domain={[min, max]}
-            tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }}
-            tickLine={false}
-            axisLine={false}
-            tickCount={4}
-            tickFormatter={(v: number) => `${v.toFixed(0)}%`}
-            fontFamily="var(--font)"
-          />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }} />
-          <Area
-            type="monotone"
-            dataKey="sov_pct"
-            stroke="var(--flare)"
-            strokeWidth={2}
-            fill="url(#sovGrad)"
-            dot={false}
-            activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
-            connectNulls={false}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      <ChartState rows={data} height={180} empty="Add a competitor to see share of voice over time.">
+              <ResponsiveContainer width="100%" height={180}>
+          <AreaChart data={data} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
+            <defs>
+              <linearGradient id="sovGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.28} />
+                <stop offset="60%"  stopColor="var(--flare)" stopOpacity={0.06} />
+                <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
+            <XAxis
+              dataKey="date"
+              tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
+              tickLine={false}
+              axisLine={false}
+              interval="preserveStartEnd"
+              tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
+              fontFamily="var(--font)"
+            />
+            <YAxis
+              domain={[min, max]}
+              tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }}
+              tickLine={false}
+              axisLine={false}
+              tickCount={4}
+              tickFormatter={(v: number) => `${v.toFixed(0)}%`}
+              fontFamily="var(--font)"
+            />
+            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }} />
+            <Area
+              type="monotone"
+              dataKey="sov_pct"
+              stroke="var(--flare)"
+              strokeWidth={2}
+              fill="url(#sovGrad)"
+              dot={false}
+              activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+              connectNulls={false}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartState>
     </div>
   )
 }

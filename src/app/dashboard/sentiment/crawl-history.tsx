@@ -72,7 +72,7 @@ export function CrawlHistory() {
         <div className="mt-4 space-y-3">
           <div className="flex justify-end">
             <Button size="sm" variant="ghost" onClick={load} disabled={loading}>
-              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${loading ? '' : ''}`} />
               Refresh
             </Button>
           </div>

@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { X, Send, Loader2, ChevronDown, ArrowRight } from 'lucide-react'
+import { X, Send, ChevronDown, ArrowRight } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { MentionsIcon as MessageSquare } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -229,7 +230,7 @@ export function AiCommand() {
             {loading && (
               <div className="flex items-start">
                 <div className="bg-muted rounded-2xl rounded-bl-sm px-3 py-2 flex items-center gap-1.5">
-                  <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                  <Loader2 className="h-3 w-3 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Thinking...</span>
                 </div>
               </div>
@@ -257,7 +258,7 @@ export function AiCommand() {
               disabled={!input.trim() || loading}
               aria-label="Send message"
             >
-              {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+              {loading ? <Loader2 className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5" />}
             </Button>
           </div>
         </div>

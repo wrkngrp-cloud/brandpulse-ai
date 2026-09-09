@@ -2,7 +2,8 @@
 
 import { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { CheckCircle2, Loader2, ChevronLeft } from 'lucide-react'
+import { CheckCircle2, ChevronLeft } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 
 export interface SurveyQuestion {
   id:       string
@@ -219,7 +220,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
             )}
           >
             {submitting
-              ? <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+              ? <Loader2 className="h-4 w-4 mx-auto" />
               : isLast ? 'Submit' : 'Next'}
           </button>
         )}

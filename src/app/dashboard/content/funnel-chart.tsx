@@ -1,4 +1,5 @@
 'use client'
+import { ChartState } from '@/components/brand/chart-states'
 
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -56,37 +57,41 @@ export function FunnelChart({ data }: Props) {
         {/* Posts per stage */}
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground font-medium">Posts per funnel stage</p>
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={data} margin={{ top: 0, right: 0, left: -28, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
-              <XAxis dataKey="stage" tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="posts" radius={[4, 4, 0, 0]}>
-                {data.map(entry => (
-                  <Cell key={entry.stage} fill={STAGE_COLOURS[entry.stage] ?? 'var(--tx-3)'} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartState rows={data} height={140} empty="Connect a channel to see where people drop out of the funnel.">
+                      <ResponsiveContainer width="100%" height={140}>
+              <BarChart data={data} margin={{ top: 0, right: 0, left: -28, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
+                <XAxis dataKey="stage" tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="posts" radius={[4, 4, 0, 0]}>
+                  {data.map(entry => (
+                    <Cell key={entry.stage} fill={STAGE_COLOURS[entry.stage] ?? 'var(--tx-3)'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartState>
         </div>
 
         {/* Avg engagement per stage */}
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground font-medium">Avg engagement rate %</p>
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
-              <XAxis dataKey="stage" tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="avg_engagement" radius={[4, 4, 0, 0]}>
-                {data.map(entry => (
-                  <Cell key={entry.stage} fill={STAGE_COLOURS[entry.stage] ?? 'var(--tx-3)'} opacity={0.7} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartState rows={data} height={140} empty="Connect a channel to see where people drop out of the funnel.">
+                      <ResponsiveContainer width="100%" height={140}>
+              <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
+                <XAxis dataKey="stage" tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="avg_engagement" radius={[4, 4, 0, 0]}>
+                  {data.map(entry => (
+                    <Cell key={entry.stage} fill={STAGE_COLOURS[entry.stage] ?? 'var(--tx-3)'} opacity={0.7} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartState>
         </div>
       </div>
 

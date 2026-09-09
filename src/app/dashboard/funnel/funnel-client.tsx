@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Globe, Eye, Heart, Zap, Shield, Share2, ChevronDown, Loader2, ChevronRight, Info } from 'lucide-react'
+import { Globe, Eye, Heart, Zap, Shield, Share2, ChevronDown, ChevronRight, Info } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -199,7 +200,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
           disabled={isPending}
         >
           {isPending ? (
-            <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Analysing…</>
+            <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Analysing…</>
           ) : (
             <><Sparkles className="h-3.5 w-3.5 mr-1.5" />Diagnose with AI</>
           )}
@@ -274,7 +275,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                         className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                       >
                         {isLoading ? (
-                          <><Loader2 className="h-3 w-3 animate-spin" />Analysing…</>
+                          <><Loader2 className="h-3 w-3" />Analysing…</>
                         ) : (
                           <>
                             <Sparkles className="h-3 w-3" />
@@ -439,7 +440,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
               {/* Loading state for AI analysis */}
               {isAIOpen && isLoading && (
                 <div className="border-t border-dashed border-border bg-muted/20 px-5 py-6 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                  <Loader2 className="h-4 w-4 shrink-0" />
                   Fetching signals and generating analysis…
                 </div>
               )}

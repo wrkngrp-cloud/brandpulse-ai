@@ -5,11 +5,13 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine,
 } from 'recharts'
-import { Loader2, Users, TrendingDown, Minus } from 'lucide-react'
+import { Users, TrendingDown, Minus } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { ChartState } from '@/components/brand/chart-states'
 
 export interface WeeklyNps {
   weekLabel:   string   // "Jun 1"
@@ -196,7 +198,7 @@ export function NpsClient({
               className="rounded-xl"
             >
               {isPending ? (
-                <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Analysing…</>
+                <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Analysing…</>
               ) : (
                 <><Sparkles className="h-3.5 w-3.5 mr-1.5" />Diagnose with AI</>
               )}
@@ -205,87 +207,89 @@ export function NpsClient({
         </div>
 
         {chartData.length >= 2 ? (
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -24 }}>
-              <defs>
-                {/* Positive zone — green above 0 */}
-                <linearGradient id="npsGradPos" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="var(--pos)" stopOpacity={0.30} />
-                  <stop offset="50%"  stopColor="var(--pos)" stopOpacity={0.10} />
-                  <stop offset="100%" stopColor="var(--pos)" stopOpacity={0}    />
-                </linearGradient>
-                {/* Negative zone — red */}
-                <linearGradient id="npsGradNeg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0}    />
-                  <stop offset="100%" stopColor="var(--flare)" stopOpacity={0.22} />
-                </linearGradient>
-              </defs>
-
-              <CartesianGrid
-                strokeDasharray="0"
-                horizontal
-                vertical={false}
-                stroke="currentColor"
-                className="text-border opacity-35"
-              />
-
-              <XAxis
-                dataKey="weekLabel"
-                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                domain={[-100, 100]}
-                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
-                tickLine={false}
-                axisLine={false}
-                tickCount={5}
-              />
-
-              <Tooltip
-                content={<CUSTOM_TOOLTIP />}
-                cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }}
-              />
-
-              <ReferenceLine
-                y={0}
-                stroke="currentColor"
-                strokeDasharray="4 4"
-                strokeOpacity={0.25}
-              />
-              <ReferenceLine
-                y={50}
-                stroke="var(--pos)"
-                strokeDasharray="4 4"
-                strokeOpacity={0.20}
-                label={{ value: 'Excellent', position: 'insideTopRight', fontSize: 9, fill: 'var(--pos)', opacity: 0.5 }}
-              />
-
-              {benchmarkP50 != null && (
-                <ReferenceLine
-                  y={benchmarkP50}
-                  stroke="var(--ember)"
-                  strokeDasharray="6 3"
-                  strokeWidth={1.5}
-                  strokeOpacity={0.7}
-                  label={{ value: `Sector P50 (${Math.round(benchmarkP50)})`, position: 'insideTopRight', fontSize: 9, fill: 'var(--ember)', opacity: 0.85 }}
+          <ChartState rows={chartData} height={220} empty="Send a survey to see your first NPS reading.">
+                      <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -24 }}>
+                <defs>
+                  {/* Positive zone — green above 0 */}
+                  <linearGradient id="npsGradPos" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor="var(--pos)" stopOpacity={0.30} />
+                    <stop offset="50%"  stopColor="var(--pos)" stopOpacity={0.10} />
+                    <stop offset="100%" stopColor="var(--pos)" stopOpacity={0}    />
+                  </linearGradient>
+                  {/* Negative zone — red */}
+                  <linearGradient id="npsGradNeg" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0}    />
+                    <stop offset="100%" stopColor="var(--flare)" stopOpacity={0.22} />
+                  </linearGradient>
+                </defs>
+  
+                <CartesianGrid
+                  strokeDasharray="0"
+                  horizontal
+                  vertical={false}
+                  stroke="currentColor"
+                  className="text-border opacity-35"
                 />
-              )}
-
-              <Area
-                type="monotone"
-                dataKey="nps"
-                name="NPS"
-                stroke="var(--flare)"
-                strokeWidth={2.5}
-                fill="url(#npsGradPos)"
-                dot={false}
-                activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
-                connectNulls={false}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+  
+                <XAxis
+                  dataKey="weekLabel"
+                  tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  domain={[-100, 100]}
+                  tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
+                  tickLine={false}
+                  axisLine={false}
+                  tickCount={5}
+                />
+  
+                <Tooltip
+                  content={<CUSTOM_TOOLTIP />}
+                  cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }}
+                />
+  
+                <ReferenceLine
+                  y={0}
+                  stroke="currentColor"
+                  strokeDasharray="4 4"
+                  strokeOpacity={0.25}
+                />
+                <ReferenceLine
+                  y={50}
+                  stroke="var(--line-strong)"
+                  strokeDasharray="4 4"
+                  strokeOpacity={0.20}
+                  label={{ value: 'Excellent', position: 'insideTopRight', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.5 }}
+                />
+  
+                {benchmarkP50 != null && (
+                  <ReferenceLine
+                    y={benchmarkP50}
+                    stroke="var(--line-strong)"
+                    strokeDasharray="6 3"
+                    strokeWidth={1.5}
+                    strokeOpacity={0.7}
+                    label={{ value: `Sector P50 (${Math.round(benchmarkP50)})`, position: 'insideTopRight', fontSize: 9, fill: 'var(--ember)', opacity: 0.85 }}
+                  />
+                )}
+  
+                <Area
+                  type="monotone"
+                  dataKey="nps"
+                  name="NPS"
+                  stroke="var(--flare)"
+                  strokeWidth={2.5}
+                  fill="url(#npsGradPos)"
+                  dot={false}
+                  activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+                  connectNulls={false}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartState>
         ) : (
           <div className="h-48 flex items-center justify-center">
             <div className="text-center space-y-2">

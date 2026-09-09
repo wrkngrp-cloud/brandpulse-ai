@@ -9,6 +9,7 @@ import { TrendingDown, Activity, Radio, DollarSign, Target, Award, CheckCircle2,
 import { TrendIcon as TrendingUp, MentionsIcon as MessageSquare, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn, formatNGN } from '@/lib/utils'
 import { Crescendo } from '@/components/brand/crescendo'
+import { ChartState } from '@/components/brand/chart-states'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -235,7 +236,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <RangePicker value={range} onChange={fetchRange} loading={loading} />
-            {loading && <RefreshCw className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+            {loading && <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />}
           </div>
         </div>
       </header>
@@ -347,21 +348,23 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                 <DeltaBadge delta={bhiDelta} unit=" pts" />
                 <span className="text-[11px] text-muted-foreground ml-auto">BHI = sentiment + share-of-voice + reach blend</span>
               </div>
-              <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={bhiHistory.map(r => ({ date: r.snapshot_date, bhi: Number(r.bhi) }))}>
-                  <defs>
-                    <linearGradient id="bhiGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="var(--flare)" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="var(--flare)" stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
-                  <Area type="monotone" dataKey="bhi" stroke="var(--flare)" strokeWidth={2.5} fill="url(#bhiGrad)" dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
+              <ChartState rows={bhiHistory} height={220} empty="No reading for this period yet.">
+                              <ResponsiveContainer width="100%" height={220}>
+                  <AreaChart data={bhiHistory.map(r => ({ date: r.snapshot_date, bhi: Number(r.bhi) }))}>
+                    <defs>
+                      <linearGradient id="bhiGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor="var(--flare)" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="var(--flare)" stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
+                    <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                    <Area type="monotone" dataKey="bhi" stroke="var(--flare)" strokeWidth={2.5} fill="url(#bhiGrad)" dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartState>
             </div>
           </section>
         )}
@@ -371,18 +374,20 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
           <section>
             <SectionHeading icon={TrendingUp}>Sentiment Analysis</SectionHeading>
             <div className="rounded-2xl border bg-card p-5">
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={sentimentChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, '']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Line type="monotone" dataKey="score" name="Overall" stroke="var(--pos)" strokeWidth={2.5} dot={false} />
-                  <Line type="monotone" dataKey="pos"   name="Positive" stroke="var(--neu)" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
-                  <Line type="monotone" dataKey="neg"   name="Negative" stroke="var(--flare)" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
-                </LineChart>
-              </ResponsiveContainer>
+              <ChartState rows={sentimentChartData} height={220} empty="No reading for this period yet.">
+                              <ResponsiveContainer width="100%" height={220}>
+                  <LineChart data={sentimentChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
+                    <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, '']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Line type="monotone" dataKey="score" name="Overall" stroke="var(--tx)" strokeWidth={2.5} dot={false} />
+                    <Line type="monotone" dataKey="pos"   name="Positive" stroke="var(--chart-3)" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
+                    <Line type="monotone" dataKey="neg"   name="Negative" stroke="var(--flare)" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </ChartState>
             </div>
           </section>
         )}
@@ -392,21 +397,23 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
           <section>
             <SectionHeading icon={Radio}>Share of Voice Trend</SectionHeading>
             <div className="rounded-2xl border bg-card p-5">
-              <ResponsiveContainer width="100%" height={180}>
-                <AreaChart data={sovChartData}>
-                  <defs>
-                    <linearGradient id="sovGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="var(--neu)" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="var(--neu)" stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                  <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10 }} width={32} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [typeof v === 'number' ? `${v.toFixed(1)}%` : v, 'SOV']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
-                  <Area type="monotone" dataKey="sov" stroke="var(--neu)" strokeWidth={2.5} fill="url(#sovGrad)" dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
+              <ChartState rows={sovChartData} height={180} empty="No reading for this period yet.">
+                              <ResponsiveContainer width="100%" height={180}>
+                  <AreaChart data={sovChartData}>
+                    <defs>
+                      <linearGradient id="sovGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor="var(--neu)" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="var(--neu)" stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10 }} width={32} tickLine={false} axisLine={false} />
+                    <Tooltip formatter={(v) => [typeof v === 'number' ? `${v.toFixed(1)}%` : v, 'SOV']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                    <Area type="monotone" dataKey="sov" stroke="var(--chart-1)" strokeWidth={2.5} fill="url(#sovGrad)" dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartState>
             </div>
           </section>
         )}
@@ -487,15 +494,17 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             {npsWeeks.length > 1 && (
               <div className="rounded-2xl border bg-card p-5 mt-4">
                 <p className="text-[12px] font-medium mb-4 text-muted-foreground">NPS trend (weekly avg)</p>
-                <ResponsiveContainer width="100%" height={160}>
-                  <BarChart data={npsWeeks} barSize={24}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                    <XAxis dataKey="week" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                    <YAxis domain={[0, 10]} tick={{ fontSize: 10 }} width={24} tickLine={false} axisLine={false} />
-                    <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'NPS']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
-                    <Bar dataKey="score" fill="var(--pos)" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <ChartState rows={npsWeeks} height={160} empty="No reading for this period yet.">
+                                  <ResponsiveContainer width="100%" height={160}>
+                    <BarChart data={npsWeeks} barSize={24}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <XAxis dataKey="week" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                      <YAxis domain={[0, 10]} tick={{ fontSize: 10 }} width={24} tickLine={false} axisLine={false} />
+                      <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'NPS']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                      <Bar dataKey="score" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartState>
               </div>
             )}
           </section>

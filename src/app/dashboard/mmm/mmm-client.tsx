@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { Loader2, TrendingDown, Zap, RefreshCw } from 'lucide-react'
+import { TrendingDown, Zap, RefreshCw } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface MmmRun {
   id: string
@@ -134,7 +136,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
           </div>
           <Button onClick={runAnalysis} disabled={loading} size="sm">
             {loading
-              ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Analysing...</>
+              ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Analysing...</>
               : <><RefreshCw className="h-3.5 w-3.5 mr-1.5" />Run analysis</>}
           </Button>
         </div>
@@ -153,7 +155,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
             </p>
           </div>
           <Button onClick={runAnalysis} disabled={loading}>
-            {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+            {loading ? <Loader2 className="h-4 w-4 mr-2" /> : null}
             Run media mix analysis
           </Button>
         </div>
@@ -184,30 +186,32 @@ export function MmmClient({ brandName, lastRun }: Props) {
               {/* Pie chart */}
               <div className="rounded-2xl border bg-card p-5">
                 <p className="text-[13px] font-medium mb-4 eyebrow">Channel contribution</p>
-                <ResponsiveContainer width="100%" height={260}>
-                  <PieChart>
-                    <Pie
-                      data={chartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={70}
-                      outerRadius={110}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {chartData.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(v) => [`${v}%`, 'Contribution']}
-                      contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }}
-                    />
-                    <Legend
-                      formatter={(value) => <span style={{ fontSize: 12, color: 'var(--tx-3)' }}><span className="bg-num">{value}</span></span>}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <ChartState rows={chartData} loading={loading} height={260} empty="Run the media mix model to see where your spend is working.">
+                                  <ResponsiveContainer width="100%" height={260}>
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={70}
+                        outerRadius={110}
+                        paddingAngle={2}
+                        dataKey="value"
+                      >
+                        {chartData.map((entry, i) => (
+                          <Cell key={i} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(v) => [`${v}%`, 'Contribution']}
+                        contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }}
+                      />
+                      <Legend
+                        formatter={(value) => <span style={{ fontSize: 12, color: 'var(--tx-3)' }}><span className="bg-num">{value}</span></span>}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </ChartState>
               </div>
 
               {/* Channel table */}

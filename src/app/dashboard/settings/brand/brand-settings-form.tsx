@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
 import { FieldTip } from '@/components/ui/field-tip'
-import { Upload, X, Loader2, ImageIcon, ArrowRight } from 'lucide-react'
+import { Upload, X, ImageIcon, ArrowRight } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import Link from 'next/link'
 import {
@@ -162,7 +163,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                   className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-md border text-xs font-medium cursor-pointer transition-colors
                     ${logoLoading ? 'pointer-events-none opacity-50' : 'hover:bg-accent'}`}
                 >
-                  {logoLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+                  {logoLoading ? <Loader2 className="h-3.5 w-3.5" /> : <Upload className="h-3.5 w-3.5" />}
                   {logoUrl ? 'Replace logo' : 'Upload logo'}
                 </label>
                 <p className="text-[11px] text-muted-foreground">JPEG, PNG, WebP, SVG · max 5 MB</p>

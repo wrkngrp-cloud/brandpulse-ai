@@ -1,4 +1,5 @@
 'use client'
+import { ChartState } from '@/components/brand/chart-states'
 
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -24,20 +25,22 @@ function formatNum(val: number) {
 
 export function RadioReachChart() {
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <BarChart data={weeklyReach} margin={{ top: 8, right: 16, left: 0, bottom: 0 }} barGap={2}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} vertical={false} />
-        <XAxis dataKey="week" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-        <YAxis tickFormatter={formatNum} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={48} />
-        <Tooltip
-          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
-          formatter={(val) => [typeof val === 'number' ? formatNum(val) : val, '']}
-        />
-        <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-        <Bar dataKey="coolFm"  name="Cool FM"   fill="var(--neu)" radius={[3, 3, 0, 0]} />
-        <Bar dataKey="beatFm"  name="Beat FM"   fill="var(--pos)" radius={[3, 3, 0, 0]} />
-        <Bar dataKey="wazobia" name="Wazobia FM" fill="var(--ember)" radius={[3, 3, 0, 0]} />
-      </BarChart>
-    </ResponsiveContainer>
+    <ChartState rows={weeklyReach} height={260} empty="Add a radio buy to see weekly reach.">
+          <ResponsiveContainer width="100%" height={260}>
+        <BarChart data={weeklyReach} margin={{ top: 8, right: 16, left: 0, bottom: 0 }} barGap={2}>
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} vertical={false} />
+          <XAxis dataKey="week" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+          <YAxis tickFormatter={formatNum} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={48} />
+          <Tooltip
+            contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
+            formatter={(val) => [typeof val === 'number' ? formatNum(val) : val, '']}
+          />
+          <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+          <Bar dataKey="coolFm"  name="Cool FM"   fill="var(--chart-1)" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="beatFm"  name="Beat FM"   fill="var(--chart-2)" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="wazobia" name="Wazobia FM" fill="var(--chart-3)" radius={[3, 3, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartState>
   )
 }

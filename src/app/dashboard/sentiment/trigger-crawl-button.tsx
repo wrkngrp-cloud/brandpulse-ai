@@ -59,7 +59,7 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
       <div className="space-y-2 w-full max-w-xs">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <RefreshCw className="h-3 w-3 animate-spin" />
+            <RefreshCw className="h-3 w-3" />
             {label}
           </span>
           <span>{state.progress}%</span>

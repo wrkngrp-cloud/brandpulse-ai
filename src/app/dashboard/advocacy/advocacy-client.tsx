@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Users, Plus, Copy, Check, ExternalLink, Star, MousePointer, ShoppingCart, Activity, ChevronDown, ChevronRight, Loader2, X, Link2, RefreshCw, UserCheck, Pause, UserX } from 'lucide-react'
+import { Users, Plus, Copy, Check, ExternalLink, Star, MousePointer, ShoppingCart, Activity, ChevronDown, ChevronRight, X, Link2, RefreshCw, UserCheck, Pause, UserX } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -94,7 +95,7 @@ export function AdvocacyClient() {
         <div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="advocacy" autoStart />
           <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
         </div>
@@ -187,7 +188,7 @@ export function AdvocacyClient() {
           {/* List */}
           {loading && promoters.length === 0 && (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <Loader2 className="h-6 w-6 text-muted-foreground" />
             </div>
           )}
 
@@ -499,7 +500,7 @@ function GenerateCodeForm({ promoterId, onSaved, onCancel }: { promoterId: strin
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handleSave} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Generate code
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -548,7 +549,7 @@ function AddPromoterForm({ onSave, onCancel }: { onSave: (d: Record<string, unkn
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Add promoter
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>

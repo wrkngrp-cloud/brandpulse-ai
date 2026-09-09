@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
-import { Loader2, Plus, Trash2, CheckCircle2, Wand2, PenLine, Copy, RefreshCw, ChevronDown } from 'lucide-react'
+import { Plus, Trash2, CheckCircle2, Wand2, PenLine, Copy, RefreshCw, ChevronDown } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -243,7 +244,7 @@ export default function VoiceBuilderPage() {
               </Button>
               <Button onClick={build} disabled={building} size="sm">
                 {building
-                  ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Analysing...</>
+                  ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Analysing...</>
                   : <><Sparkles className="h-3.5 w-3.5 mr-1.5" />Build voice profile</>}
               </Button>
             </div>
@@ -370,7 +371,7 @@ export default function VoiceBuilderPage() {
             </div>
             <Button onClick={retune} disabled={retuning}>
               {retuning
-                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Retuning...</>
+                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Retuning...</>
                 : <><Wand2 className="h-3.5 w-3.5 mr-1.5" />Retune caption</>}
             </Button>
           </div>
@@ -462,7 +463,7 @@ export default function VoiceBuilderPage() {
             </div>
             <Button onClick={generate} disabled={generating}>
               {generating
-                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Generating...</>
+                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Generating...</>
                 : <><PenLine className="h-3.5 w-3.5 mr-1.5" />Generate captions</>}
             </Button>
           </div>

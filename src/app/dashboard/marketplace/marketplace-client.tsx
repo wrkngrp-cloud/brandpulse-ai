@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { ShoppingBag, Plus, Star, Package, TrendingDown, Minus, Loader2, X, RefreshCw, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react'
+import { ShoppingBag, Plus, Star, Package, TrendingDown, Minus, X, RefreshCw, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -73,7 +74,7 @@ export function MarketplaceClient() {
         <div className="flex gap-2">
           <TourTrigger module="marketplace" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
           <Button size="sm" onClick={() => setShowForm(true)}>
@@ -127,7 +128,7 @@ export function MarketplaceClient() {
 
       {loading && products.length === 0 && (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loader2 className="h-6 w-6 text-muted-foreground" />
         </div>
       )}
 
@@ -287,7 +288,7 @@ function AddProductForm({ onSave, onCancel }: { onSave: (d: Record<string, unkno
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Add product
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -351,7 +352,7 @@ function AddSnapshotForm({ onSave, onCancel }: { onSave: (d: Record<string, unkn
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Save snapshot
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>

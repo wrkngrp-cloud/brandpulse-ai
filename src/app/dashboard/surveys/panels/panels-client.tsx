@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Calendar, Mail, Phone, Play, Trash2, Loader2, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Plus, Calendar, Mail, Phone, Play, Trash2, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -196,7 +197,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
 
           <div className="flex gap-2">
             <Button size="sm" onClick={createPanel} disabled={saving}>
-              {saving ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : null}
+              {saving ? <Loader2 className="h-3.5 w-3.5 mr-1.5" /> : null}
               Create panel
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
@@ -255,7 +256,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                     disabled={dispatching === panel.id}
                   >
                     {dispatching === panel.id
-                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ? <Loader2 className="h-3.5 w-3.5" />
                       : <><Play className="h-3 w-3 mr-1" />Send now</>}
                   </Button>
                   <Button

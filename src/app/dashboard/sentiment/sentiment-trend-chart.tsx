@@ -1,4 +1,5 @@
 'use client'
+import { ChartState } from '@/components/brand/chart-states'
 
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -55,113 +56,115 @@ export function SentimentTrendChart({ data, weekly = false, benchmarkP50 }: Prop
   const dateKey = weekly ? 'weekLabel' : 'day'
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <AreaChart data={data} margin={{ top: 4, right: 8, left: -28, bottom: 0 }}>
-        <defs>
-          {/* Sentiment score — blue */}
-          <linearGradient id="sgScore" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.28} />
-            <stop offset="40%"  stopColor="var(--flare)" stopOpacity={0.10} />
-            <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
-          </linearGradient>
-          {/* Positive — green */}
-          <linearGradient id="sgPositive" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="var(--pos)" stopOpacity={0.22} />
-            <stop offset="100%" stopColor="var(--pos)" stopOpacity={0}    />
-          </linearGradient>
-          {/* Negative — red */}
-          <linearGradient id="sgNegative" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.22} />
-            <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
-          </linearGradient>
-        </defs>
-
-        <CartesianGrid
-          strokeDasharray="0"
-          horizontal
-          vertical={false}
-          stroke="currentColor"
-          className="text-border opacity-35"
-        />
-
-        <XAxis
-          dataKey={dateKey}
-          tickFormatter={shortDate}
-          interval={weekly ? 1 : Math.floor(data.length / 6)}
-          tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
-          axisLine={false}
-          tickLine={false}
-        />
-
-        <YAxis
-          domain={[0, 100]}
-          tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
-          tickLine={false}
-          axisLine={false}
-          tickCount={5}
-        />
-
-        <Tooltip
-          content={<CustomTooltip />}
-          cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }}
-        />
-
-        <ReferenceLine
-          y={50}
-          stroke="currentColor"
-          strokeDasharray="4 4"
-          strokeOpacity={0.20}
-        />
-
-        {benchmarkP50 != null && (
-          <ReferenceLine
-            y={benchmarkP50}
-            stroke="var(--ember)"
-            strokeDasharray="6 3"
-            strokeWidth={1.5}
-            strokeOpacity={0.7}
-            label={{ value: `Sector P50 (${Math.round(benchmarkP50)})`, position: 'insideTopRight', fontSize: 9, fill: 'var(--ember)', opacity: 0.85 }}
+    <ChartState rows={data} height={200} empty="Connect a social account to see sentiment over time.">
+          <ResponsiveContainer width="100%" height={200}>
+        <AreaChart data={data} margin={{ top: 4, right: 8, left: -28, bottom: 0 }}>
+          <defs>
+            {/* Sentiment score — blue */}
+            <linearGradient id="sgScore" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.28} />
+              <stop offset="40%"  stopColor="var(--flare)" stopOpacity={0.10} />
+              <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
+            </linearGradient>
+            {/* Positive — green */}
+            <linearGradient id="sgPositive" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="var(--pos)" stopOpacity={0.22} />
+              <stop offset="100%" stopColor="var(--pos)" stopOpacity={0}    />
+            </linearGradient>
+            {/* Negative — red */}
+            <linearGradient id="sgNegative" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.22} />
+              <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
+            </linearGradient>
+          </defs>
+  
+          <CartesianGrid
+            strokeDasharray="0"
+            horizontal
+            vertical={false}
+            stroke="currentColor"
+            className="text-border opacity-35"
           />
-        )}
-
-        {/* Negative % — dashed bottom layer */}
-        <Area
-          type="monotone"
-          dataKey="negative"
-          name="negative %"
-          stroke="var(--flare)"
-          strokeWidth={1.5}
-          strokeDasharray="5 3"
-          fill="url(#sgNegative)"
-          dot={false}
-          activeDot={{ r: 3.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
-        />
-
-        {/* Positive % */}
-        <Area
-          type="monotone"
-          dataKey="positive"
-          name="positive %"
-          stroke="var(--pos)"
-          strokeWidth={1.5}
-          strokeDasharray="5 3"
-          fill="url(#sgPositive)"
-          dot={false}
-          activeDot={{ r: 3.5, fill: 'var(--pos)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
-        />
-
-        {/* Sentiment score — primary, on top */}
-        <Area
-          type="monotone"
-          dataKey="score"
-          name="sentiment"
-          stroke="var(--flare)"
-          strokeWidth={2.5}
-          fill="url(#sgScore)"
-          dot={false}
-          activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
-        />
-      </AreaChart>
-    </ResponsiveContainer>
+  
+          <XAxis
+            dataKey={dateKey}
+            tickFormatter={shortDate}
+            interval={weekly ? 1 : Math.floor(data.length / 6)}
+            tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
+            axisLine={false}
+            tickLine={false}
+          />
+  
+          <YAxis
+            domain={[0, 100]}
+            tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
+            tickLine={false}
+            axisLine={false}
+            tickCount={5}
+          />
+  
+          <Tooltip
+            content={<CustomTooltip />}
+            cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }}
+          />
+  
+          <ReferenceLine
+            y={50}
+            stroke="currentColor"
+            strokeDasharray="4 4"
+            strokeOpacity={0.20}
+          />
+  
+          {benchmarkP50 != null && (
+            <ReferenceLine
+              y={benchmarkP50}
+              stroke="var(--line-strong)"
+              strokeDasharray="6 3"
+              strokeWidth={1.5}
+              strokeOpacity={0.7}
+              label={{ value: `Sector P50 (${Math.round(benchmarkP50)})`, position: 'insideTopRight', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.85 }}
+            />
+          )}
+  
+          {/* Negative % — dashed bottom layer */}
+          <Area
+            type="monotone"
+            dataKey="negative"
+            name="negative %"
+            stroke="var(--flare)"
+            strokeWidth={1.5}
+            strokeDasharray="5 3"
+            fill="url(#sgNegative)"
+            dot={false}
+            activeDot={{ r: 3.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+          />
+  
+          {/* Positive % */}
+          <Area
+            type="monotone"
+            dataKey="positive"
+            name="positive %"
+            stroke="var(--pos)"
+            strokeWidth={1.5}
+            strokeDasharray="5 3"
+            fill="url(#sgPositive)"
+            dot={false}
+            activeDot={{ r: 3.5, fill: 'var(--pos)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+          />
+  
+          {/* Sentiment score — primary, on top */}
+          <Area
+            type="monotone"
+            dataKey="score"
+            name="sentiment"
+            stroke="var(--flare)"
+            strokeWidth={2.5}
+            fill="url(#sgScore)"
+            dot={false}
+            activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </ChartState>
   )
 }

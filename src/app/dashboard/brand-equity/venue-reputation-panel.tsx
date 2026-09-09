@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Star, MapPin, RefreshCw, Loader2 } from 'lucide-react'
+import { Star, MapPin, RefreshCw } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -124,13 +125,13 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={handleAnalyseAspects} disabled={analysing}>
             {analysing
-              ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              ? <Loader2 className="h-3.5 w-3.5 mr-1.5" />
               : <Sparkles className="h-3.5 w-3.5 mr-1.5" />}
             Analyse aspects
           </Button>
           <Button size="sm" variant="outline" onClick={handleSync} disabled={syncing}>
             {syncing
-              ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              ? <Loader2 className="h-3.5 w-3.5 mr-1.5" />
               : <RefreshCw className="h-3.5 w-3.5 mr-1.5" />}
             Sync now
           </Button>

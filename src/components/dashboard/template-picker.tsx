@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Check, ArrowRight, Loader2 } from 'lucide-react'
+import { Check, ArrowRight } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { DASHBOARD_TEMPLATES } from '@/lib/widget-catalog'
@@ -76,7 +77,7 @@ export function TemplatePicker({ onSelect, defaultTemplateId }: Props) {
         <div className="p-6 pt-4 border-t shrink-0">
           <Button className="w-full" size="lg" onClick={confirm} disabled={isPending}>
             {isPending
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Setting up...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Setting up...</>
               : <>Get started <ArrowRight className="h-4 w-4 ml-2" /></>
             }
           </Button>

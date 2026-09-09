@@ -10,7 +10,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Check, Globe, ArrowRight, ArrowLeft, Loader2, X, Plus } from 'lucide-react'
+import { Check, Globe, ArrowRight, ArrowLeft, X, Plus } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
@@ -320,7 +321,7 @@ export default function OnboardingPage() {
         <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-sm px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
         <div className="w-full max-w-md text-center space-y-6">
           <div className="inline-flex h-12 w-12 rounded-full bg-foreground items-center justify-center">
-            <Loader2 className="h-6 w-6 text-background animate-spin" />
+            <Loader2 className="h-6 w-6 text-background" />
           </div>
           <div className="space-y-2">
             <StepBadge step={2} />
@@ -496,7 +497,7 @@ export default function OnboardingPage() {
             disabled={!data.brandName.trim() || !data.category || isPending}
           >
             {isPending
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving your profile...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Saving your profile...</>
               : <><Check className="h-4 w-4 mr-2" /> Save profile and open my dashboard</>
             }
           </Button>

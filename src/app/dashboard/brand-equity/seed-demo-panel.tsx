@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Database, Loader2 } from 'lucide-react'
+import { Database } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 
 export function SeedDemoPanel() {
@@ -60,7 +61,7 @@ export function SeedDemoPanel() {
           disabled={perceptionLoading}
           className="border-line dark:border-line text-tx-2 dark:text-tx-2 hover:bg-shell dark:hover:bg-shell/40"
         >
-          {perceptionLoading && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
+          {perceptionLoading && <Loader2 className="h-3.5 w-3.5 mr-1.5" />}
           Seed Perception Data
         </Button>
         <Button
@@ -70,7 +71,7 @@ export function SeedDemoPanel() {
           disabled={npsLoading}
           className="border-line dark:border-line text-tx-2 dark:text-tx-2 hover:bg-shell dark:hover:bg-shell/40"
         >
-          {npsLoading && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
+          {npsLoading && <Loader2 className="h-3.5 w-3.5 mr-1.5" />}
           Seed NPS Data
         </Button>
       </div>

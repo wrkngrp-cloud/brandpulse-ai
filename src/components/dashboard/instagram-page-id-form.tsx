@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { ExternalLink, Loader2 } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 
 export function InstagramPageIdForm({ pendingKey }: { pendingKey: string }) {
@@ -74,7 +75,7 @@ export function InstagramPageIdForm({ pendingKey }: { pendingKey: string }) {
             className="max-w-xs bg-card dark:bg-background"
           />
           <Button type="submit" disabled={loading || !pageId.trim()} size="sm">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Connect'}
+            {loading ? <Loader2 className="h-4 w-4" /> : 'Connect'}
           </Button>
         </form>
 

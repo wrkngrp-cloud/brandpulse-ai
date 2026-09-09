@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Loader2, MessageSquareQuote } from 'lucide-react'
+import { MessageSquareQuote } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -66,7 +67,7 @@ export function TopicClusters({ mentions }: Props) {
         {!clusters && (
           <Button size="sm" variant="outline" onClick={handleAnalyse} disabled={isPending}>
             {isPending ? (
-              <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Clustering…</>
+              <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Clustering…</>
             ) : (
               <><Sparkles className="h-3.5 w-3.5 mr-1.5" />Analyse topics</>
             )}

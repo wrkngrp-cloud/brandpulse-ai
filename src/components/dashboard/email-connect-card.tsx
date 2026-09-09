@@ -118,7 +118,7 @@ function ProviderCard({
             className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2 text-xs')}
           >
             {loading === 'sync'
-              ? <RefreshCw className="h-3 w-3 animate-spin" />
+              ? <RefreshCw className="h-3 w-3" />
               : <RefreshCw className="h-3 w-3" />
             }
             Sync now

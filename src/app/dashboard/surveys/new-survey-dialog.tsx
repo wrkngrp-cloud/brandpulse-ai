@@ -2,10 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  Zap, Activity, Globe, CalendarDays, BarChart2, ShoppingBag,
-  ArrowLeft, Loader2, Plus,
-} from 'lucide-react'
+import { Zap, Activity, Globe, CalendarDays, BarChart2, ShoppingBag, ArrowLeft, Plus } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Input }  from '@/components/ui/input'
 import { Label }  from '@/components/ui/label'
@@ -151,7 +149,7 @@ export function NewSurveyDialog() {
               </div>
               <Button type="submit" className="w-full" disabled={!name.trim() || pending}>
                 {pending
-                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  ? <Loader2 className="h-4 w-4" />
                   : 'Create survey'
                 }
               </Button>

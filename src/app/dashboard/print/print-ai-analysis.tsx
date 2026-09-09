@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { buttonVariants } from '@/components/ui/button'
@@ -69,7 +70,7 @@ export function PrintAiAnalysis({ days, brandName, hasData }: PrintAiAnalysisPro
         )}
       >
         {loading
-          ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ? <Loader2 className="h-3.5 w-3.5" />
           : <Sparkles className="h-3.5 w-3.5 text-tx-2" />
         }
         {loading ? 'Analysing…' : 'Analyse with AI'}

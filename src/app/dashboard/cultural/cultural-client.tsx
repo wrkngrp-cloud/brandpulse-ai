@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Flame, TrendingDown, Calendar, Loader2, ChevronRight, ChevronDown, Star, Globe } from 'lucide-react'
+import { Flame, TrendingDown, Calendar, ChevronRight, ChevronDown, Star, Globe } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AskIcon as Sparkles, AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -651,7 +652,7 @@ function TopPickCard({
         </div>
         {!ideas && (
           <Button size="sm" variant="outline" onClick={generate} disabled={loading} className="shrink-0 h-8 text-xs gap-1">
-            {loading ? <><Loader2 className="h-3 w-3 animate-spin" />Thinking</> : <><Sparkles className="h-3 w-3" />Get ideas</>}
+            {loading ? <><Loader2 className="h-3 w-3" />Thinking</> : <><Sparkles className="h-3 w-3" />Get ideas</>}
           </Button>
         )}
       </div>

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -75,7 +76,7 @@ export function SurveyAiAnalysis({ surveyId, responseCount }: { surveyId: string
         {!result && (
           <Button size="sm" variant="outline" onClick={generate} disabled={loading}>
             {loading
-              ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Analysing...</>
+              ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" /> Analysing...</>
               : <><Sparkles className="h-3.5 w-3.5 mr-1.5" /> Generate</>}
           </Button>
         )}
@@ -90,7 +91,7 @@ export function SurveyAiAnalysis({ surveyId, responseCount }: { surveyId: string
 
       {loading && !result && (
         <div className="py-6 text-center space-y-2">
-          <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+          <Loader2 className="h-6 w-6 mx-auto text-muted-foreground" />
           <p className="text-xs text-muted-foreground animate-pulse">Reading your survey data and generating insights...</p>
         </div>
       )}

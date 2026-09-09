@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { FlaskConical, Plus, Play, Pause, CheckSquare, RefreshCw, Loader2, X, Users, BarChart3, Trophy } from 'lucide-react'
+import { FlaskConical, Plus, Play, Pause, CheckSquare, RefreshCw, X, Users, BarChart3, Trophy } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -118,7 +119,7 @@ export function ExperimentsClient() {
         <div className="flex gap-2">
           <TourTrigger module="experiments" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
           <Button size="sm" onClick={() => setShowForm(true)}>
@@ -155,7 +156,7 @@ export function ExperimentsClient() {
 
       {loading && experiments.length === 0 && (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loader2 className="h-6 w-6 text-muted-foreground" />
         </div>
       )}
 
@@ -351,7 +352,7 @@ function NewExperimentForm({ onSave, onCancel }: { onSave: (d: Record<string, un
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Create experiment
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>

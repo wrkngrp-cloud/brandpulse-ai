@@ -68,6 +68,7 @@
   --color-flare:        var(--flare);
   --color-flare-press:  var(--flare-press);
   --color-flare-wash:   var(--flare-wash);
+  --color-on-hot:       var(--on-hot);
 
   --color-tick-1:       var(--tick-1);
   --color-tick-2:       var(--tick-2);
@@ -140,9 +141,10 @@
   --popover:            var(--bg-card);
   --popover-foreground: var(--tx);
 
-  /* Primary action — Flare, on a plane. Paper sits on top of it. */
+  /* Primary action — Flare, on a plane. Ink sits on top of it: ink on Flare
+     reads 5.3:1 where paper reads 3.3:1, and the audit's bar for UI is 4.5. */
   --primary:            var(--flare);
-  --primary-foreground: var(--bg-paper);
+  --primary-foreground: var(--on-hot);
 
   /* Secondary and muted surfaces — the shell */
   --secondary:            var(--bg-shell);
@@ -163,19 +165,21 @@
   /* Radius. Cards 4px. The scale in @theme derives the rest. */
   --radius: var(--r-card);
 
-  /* Charts. Ordered steps along the ramp, cold to hot, plus ash for the
-     neutral comparison series. The ramp grades; it never mixes. */
-  --chart-1: var(--flare);
-  --chart-2: var(--ember);
-  --chart-3: var(--danfo);
-  --chart-4: var(--char);
-  --chart-5: var(--neu);
+  /* Charts. Only the subject series carries heat; everything it is compared
+     against is neutral ink, stepping down so a four-series panel still reads
+     without a legend and without turning into a rainbow. A sequential scale
+     is a different thing and reads the ramp tokens directly. */
+  --chart-1: var(--flare);              /* the subject */
+  --chart-2: rgba(22,18,14,.55);        /* comparison, nearest */
+  --chart-3: rgba(22,18,14,.38);
+  --chart-4: rgba(22,18,14,.26);
+  --chart-5: rgba(22,18,14,.16);        /* comparison, furthest */
 
   /* Sidebar. The branded shell, and the one permanent ink plane. */
   --sidebar:                    var(--bg-ink);
   --sidebar-foreground:         var(--tx-inv-2);
   --sidebar-primary:            var(--flare);
-  --sidebar-primary-foreground: var(--bg-paper);
+  --sidebar-primary-foreground: var(--on-hot);
   --sidebar-accent:             var(--bg-ink-raised);
   --sidebar-accent-foreground:  var(--tx-inv);
   --sidebar-border:             var(--line-inv);
@@ -183,10 +187,17 @@
 }
 
 /* next-themes writes .dark and data-mode="dark" together. The tokens flip on
-   data-mode; this only keeps the sidebar readable, since it is ink in both. */
-.dark {
+   data-mode; this keeps the sidebar readable, since it is ink in both, and
+   inverts the neutral comparison series so they read on an ink ground. */
+.dark,
+[data-mode="dark"] {
   --sidebar-foreground: var(--tx-inv-2);
   --sidebar-accent-foreground: var(--tx-inv);
+
+  --chart-2: rgba(250,246,239,.55);
+  --chart-3: rgba(250,246,239,.38);
+  --chart-4: rgba(250,246,239,.26);
+  --chart-5: rgba(250,246,239,.16);
 }
 
 
@@ -248,6 +259,15 @@
     text-transform: uppercase;
     line-height: 1.45;
     color: var(--tx-3);
+  }
+
+  /* ── Work in progress. The atom, pulsing on the skeleton's own curve.
+     There is no spinner in this system and nothing rotates. ───────────── */
+  .bg-working {
+    animation: bg-pulse 1.25s var(--ease-snap) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bg-working { animation: none; opacity: .55 }
   }
 
   /* ── The tick rule. The one piece of decoration in the system, and it
@@ -343,7 +363,7 @@
      outline, and it does not glow. */
   .nav-pill-active {
     background: var(--flare);
-    color: var(--bg-paper);
+    color: var(--on-hot);
     box-shadow: none;
     border-radius: var(--r-control);
   }

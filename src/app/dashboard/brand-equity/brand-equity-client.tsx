@@ -11,6 +11,7 @@ import { BHIGauge } from '@/components/dashboard/bhi-gauge'
 import { cn, formatNGN } from '@/lib/utils'
 import { computeFullBHI, ZONE_META, type FullBHIComponents, type FullBHIResult, type BHIZone } from '@/lib/bhi'
 import { rangeLabelShort, rangeLabelLong } from '@/lib/range-label'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface PerceptionDimension {
   dimension: string
@@ -440,65 +441,67 @@ export function BrandEquityClient({
             <p className="text-sm font-semibold">Brand Health Trend</p>
             <p className="text-xs text-muted-foreground">{rlShort} history — hover data points for details</p>
           </div>
-          <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={sparkline} margin={{ top: 4, right: 8, left: -28, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
-                tickLine={false}
-                axisLine={false}
-                interval="preserveStartEnd"
-                tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
-                fontFamily="var(--font)"
-              />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }} tickLine={false} axisLine={false} tickCount={5} fontFamily="var(--font)" />
-              <ReferenceLine y={80} stroke="var(--pos)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Leading', fontSize: 9, fill: 'var(--pos)', opacity: 0.5 }} />
-              <ReferenceLine y={65} stroke="var(--pos)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Healthy', fontSize: 9, fill: 'var(--pos)', opacity: 0.5 }} />
-              <ReferenceLine y={40} stroke="var(--ember)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Building', fontSize: 9, fill: 'var(--ember)', opacity: 0.5 }} />
-              {benchmarks['bhi']?.p50 != null && (
-                <ReferenceLine
-                  y={benchmarks['bhi'].p50}
-                  stroke="var(--neu)"
-                  strokeDasharray="6 3"
-                  strokeWidth={1.5}
-                  strokeOpacity={0.65}
-                  label={{ value: `Sector P50 (${Math.round(benchmarks['bhi'].p50)})`, position: 'insideBottomRight', fontSize: 9, fill: 'var(--neu)', opacity: 0.8 }}
+          <ChartState rows={sparkline} height={180} empty="Connect a source to start the brand health trend.">
+                      <ResponsiveContainer width="100%" height={180}>
+              <LineChart data={sparkline} margin={{ top: 4, right: 8, left: -28, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
+                  tickLine={false}
+                  axisLine={false}
+                  interval="preserveStartEnd"
+                  tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
+                  fontFamily="var(--font)"
                 />
-              )}
-              <RechartTooltip
-                formatter={(v) => [typeof v === 'number' ? Math.round(v) : v, 'BHI Score']}
-                labelFormatter={(v) => typeof v === 'string' ? new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' }) : String(v)}
-                contentStyle={{
-                  background: 'var(--bg-ink)',
-                  border: 'var(--line)',
-                  borderRadius: 'var(--r-card)',
-                  fontSize: 12,
-                  color: 'var(--bg-card)',
-                }}
-                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em', marginBottom: 4 }}
-              />
-              {markers.map(m => (
-                <ReferenceLine
-                  key={`${m.marker_date}-${m.label}`}
-                  x={m.marker_date}
-                  stroke={MARKER_STROKE[m.marker_type] ?? MARKER_STROKE.other}
-                  strokeDasharray="3 3"
-                  label={{ value: '🚀', position: 'top', fontSize: 10 }}
+                <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }} tickLine={false} axisLine={false} tickCount={5} fontFamily="var(--font)" />
+                <ReferenceLine y={80} stroke="var(--line-strong)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Leading', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.5 }} />
+                <ReferenceLine y={65} stroke="var(--line-strong)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Healthy', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.5 }} />
+                <ReferenceLine y={40} stroke="var(--line-strong)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Building', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.5 }} />
+                {benchmarks['bhi']?.p50 != null && (
+                  <ReferenceLine
+                    y={benchmarks['bhi'].p50}
+                    stroke="var(--line-strong)"
+                    strokeDasharray="6 3"
+                    strokeWidth={1.5}
+                    strokeOpacity={0.65}
+                    label={{ value: `Sector P50 (${Math.round(benchmarks['bhi'].p50)})`, position: 'insideBottomRight', fontSize: 9, fill: 'var(--neu)', opacity: 0.8 }}
+                  />
+                )}
+                <RechartTooltip
+                  formatter={(v) => [typeof v === 'number' ? Math.round(v) : v, 'BHI Score']}
+                  labelFormatter={(v) => typeof v === 'string' ? new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' }) : String(v)}
+                  contentStyle={{
+                    background: 'var(--bg-ink)',
+                    border: 'var(--line)',
+                    borderRadius: 'var(--r-card)',
+                    fontSize: 12,
+                    color: 'var(--bg-card)',
+                  }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em', marginBottom: 4 }}
                 />
-              ))}
-              <Line
-                type="monotone"
-                dataKey="score"
-                name="BHI"
-                stroke="var(--flare)"
-                strokeWidth={2.5}
-                dot={false}
-                activeDot={{ r: 5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
-                connectNulls={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+                {markers.map(m => (
+                  <ReferenceLine
+                    key={`${m.marker_date}-${m.label}`}
+                    x={m.marker_date}
+                    stroke={MARKER_STROKE[m.marker_type] ?? MARKER_STROKE.other}
+                    strokeDasharray="3 3"
+                    label={{ value: '🚀', position: 'top', fontSize: 10 }}
+                  />
+                ))}
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  name="BHI"
+                  stroke="var(--flare)"
+                  strokeWidth={2.5}
+                  dot={false}
+                  activeDot={{ r: 5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+                  connectNulls={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartState>
           <div className="flex items-center gap-4 flex-wrap">
             {[
               { label: 'Leading', color: 'var(--pos)', range: '80–100' },
@@ -618,37 +621,39 @@ export function BrandEquityClient({
         </div>
 
         {hasPerceptionData ? (
-          <ResponsiveContainer width="100%" height={280}>
-            <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
-              <PolarGrid className="stroke-border" />
-              <PolarAngleAxis
-                dataKey="dimension"
-                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-              />
-              <Radar
-                name={brandName}
-                dataKey="score"
-                stroke="var(--flare)"
-                fill="var(--flare)"
-                fillOpacity={0.18}
-                strokeWidth={2}
-              />
-              <RechartTooltip
-                formatter={(v, _name, props) => [
-                  `${Number(v).toFixed(0)}/100`,
-                  (props.payload as { fullLabel?: string })?.fullLabel ?? String(_name),
-                ]}
-                contentStyle={{
-                  background: 'var(--bg-ink)',
-                  border: 'var(--line)',
-                  borderRadius: 'var(--r-card)',
-                  fontSize: 12,
-                  color: 'var(--bg-card)',
-                }}
-                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
-              />
-            </RadarChart>
-          </ResponsiveContainer>
+          <ChartState rows={radarData} height={280} empty="Connect a source to start the brand health trend.">
+                      <ResponsiveContainer width="100%" height={280}>
+              <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+                <PolarGrid className="stroke-border" />
+                <PolarAngleAxis
+                  dataKey="dimension"
+                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                />
+                <Radar
+                  name={brandName}
+                  dataKey="score"
+                  stroke="var(--flare)"
+                  fill="var(--flare)"
+                  fillOpacity={0.18}
+                  strokeWidth={2}
+                />
+                <RechartTooltip
+                  formatter={(v, _name, props) => [
+                    `${Number(v).toFixed(0)}/100`,
+                    (props.payload as { fullLabel?: string })?.fullLabel ?? String(_name),
+                  ]}
+                  contentStyle={{
+                    background: 'var(--bg-ink)',
+                    border: 'var(--line)',
+                    borderRadius: 'var(--r-card)',
+                    fontSize: 12,
+                    color: 'var(--bg-card)',
+                  }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
+                />
+              </RadarChart>
+            </ResponsiveContainer>
+          </ChartState>
         ) : (
           <div className="h-48 flex items-center justify-center border rounded-lg border-dashed">
             <div className="text-center space-y-1.5">

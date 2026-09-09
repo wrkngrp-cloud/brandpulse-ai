@@ -46,7 +46,7 @@ export function CampaignAiSummary({ campaignId, initialSummary }: CampaignAiSumm
           onClick={analyse}
           disabled={pending}
         >
-          <RefreshCw className={`h-3 w-3 ${pending ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-3 w-3 ${pending ? '' : ''}`} />
           {pending ? 'Analysing…' : summary ? 'Re-analyse' : 'Analyse campaign'}
         </Button>
       </div>

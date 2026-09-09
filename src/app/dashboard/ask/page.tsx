@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Send, Loader2, Plus, FileText, Filter, ArrowRight } from 'lucide-react'
+import { Send, Plus, FileText, Filter, ArrowRight } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles, MentionsIcon as MessageSquare, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -317,7 +318,7 @@ function AskPageContent() {
               <div className="flex-1 overflow-y-auto min-h-0 space-y-6 pr-1">
                 {histLoading && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4" />
                     Loading conversation...
                   </div>
                 )}
@@ -404,7 +405,7 @@ function AskPageContent() {
                       <Sparkles className="h-3.5 w-3.5 text-background" />
                     </div>
                     <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-2">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                      <Loader2 className="h-3.5 w-3.5 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">Thinking...</span>
                     </div>
                   </div>
@@ -433,7 +434,7 @@ function AskPageContent() {
                     disabled={!input.trim() || loading}
                     aria-label="Send message"
                   >
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    {loading ? <Loader2 className="h-4 w-4" /> : <Send className="h-4 w-4" />}
                   </Button>
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-2">
@@ -471,7 +472,7 @@ export default function AskPage() {
   return (
     <Suspense fallback={
       <div className="flex h-[calc(100vh-7rem)] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <Loader2 className="h-6 w-6 text-muted-foreground" />
       </div>
     }>
       <AskPageContent />

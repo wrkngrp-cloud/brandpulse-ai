@@ -1,6 +1,7 @@
 import { createClient }        from '@/lib/supabase/server'
 import { redirect }            from 'next/navigation'
-import { CheckCircle2, Clock, Loader2 } from 'lucide-react'
+import { CheckCircle2, Clock } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { GeoLiftStartForm }    from './geo-lift-start-form'
 import { getActiveBrand }      from '@/lib/active-brand'
@@ -43,7 +44,7 @@ const STATUS_STYLE: Record<string, string> = {
 }
 
 function StatusIcon({ status }: { status: string }) {
-  if (status === 'running')           return <Loader2 className="h-3.5 w-3.5 animate-spin" />
+  if (status === 'running')           return <Loader2 className="h-3.5 w-3.5" />
   if (status === 'complete')          return <CheckCircle2 className="h-3.5 w-3.5" />
   if (status === 'insufficient_data') return <AlertCircle className="h-3.5 w-3.5" />
   return <Clock className="h-3.5 w-3.5" />

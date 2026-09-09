@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition }  from 'react'
-import { X, ChevronDown, Loader2, CheckCircle2, Plus } from 'lucide-react'
+import { X, ChevronDown, CheckCircle2, Plus } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button }   from '@/components/ui/button'
 import { Input }    from '@/components/ui/input'
 import { Label }    from '@/components/ui/label'
@@ -121,7 +122,7 @@ export function MetricEntryDrawer({ industry, onClose, onSaved }: Props) {
         <div className="p-4 border-t">
           <Button className="w-full" onClick={saveAll} disabled={isPending || Object.keys(values).length === 0}>
             {isPending
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Saving...</>
               : 'Save all'
             }
           </Button>

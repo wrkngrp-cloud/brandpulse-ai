@@ -144,7 +144,7 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
               'gap-1.5 text-xs'
             )}
           >
-            <RefreshCw className={cn('h-3.5 w-3.5', loading === 'sync' && 'animate-spin')} />
+            <RefreshCw className={cn('h-3.5 w-3.5', loading === 'sync' && '')} />
             {loading === 'sync' ? 'Queuing...' : 'Sync now'}
           </button>
         </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { ChartState } from '@/components/brand/chart-states'
 
 const PLUTCHIK: Record<string, { color: string; label: string }> = {
   joy:          { color: 'var(--danfo)', label: 'Joy'          },
@@ -46,24 +47,26 @@ export function EmotionWheel({ distribution }: Props) {
 
   return (
     <div className="space-y-3">
-      <ResponsiveContainer width="100%" height={180}>
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={50}
-            outerRadius={80}
-            paddingAngle={2}
-            dataKey="value"
-          >
-            {data.map((entry, i) => (
-              <Cell key={i} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip content={<CustomTooltip />} />
-        </PieChart>
-      </ResponsiveContainer>
+      <ChartState rows={data} height={180} empty="Connect a social account to read how people feel.">
+              <ResponsiveContainer width="100%" height={180}>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              innerRadius={50}
+              outerRadius={80}
+              paddingAngle={2}
+              dataKey="value"
+            >
+              {data.map((entry, i) => (
+                <Cell key={i} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+          </PieChart>
+        </ResponsiveContainer>
+      </ChartState>
 
       {/* Legend */}
       <div className="flex flex-wrap gap-x-3 gap-y-1.5 justify-center">

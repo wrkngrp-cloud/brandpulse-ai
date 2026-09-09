@@ -16,6 +16,9 @@
   --danfo:         #FFC12E;   /* a tint of Ember. Crescendo tails, lightest step on Ink. */
   --ember:         #FF9E1B;   /* the middle. Secondary planes, mid-scale data. */
   --flare:         #FF3D14;   /* the hero, and the head of every crescendo. */
+  --on-hot:        #16120E;   /* type on a Flare, Ember or Danfo plane. Ink reads
+                                 5.3:1 on Flare where Paper reads 3.3:1, so a hot
+                                 plane carries ink, not paper. */
   --flare-press:   #D62E0B;   /* :active, pressed */
   --flare-wash:    #FFE9E3;   /* tinted surface, selected row */
 
@@ -31,12 +34,27 @@
   --neu:           #8C877E;   /* neutral — ash */
   --neg:           #FF3D14;   /* negative / alert — flare */
 
-  /* ---- Text ---- */
+  /* ---- Text ----
+     The steps below Ink are Ink lightened toward Paper: shades of the ground,
+     not new hues. They are set where the ship audit's contrast bars land.
+
+       --tx    17.3:1 on Paper
+       --tx-2   9.5:1 on Paper, 8.7:1 on Shell
+       --tx-3   8.0:1 on Paper, 7.4:1 on Shell
+
+     All three clear the 7:1 body bar on every ground in the system, so the
+     hierarchy is carried by size and weight rather than by fading type out
+     until it stops being readable.
+
+     Ash (#8C877E) is no longer a text colour: at 3.3:1 it could not pass
+     either bar on any ground in this system. It keeps its other two jobs
+     as --neu, where it is a mark rather than type: neutral polarity and
+     unlit ticks. */
   --tx:            #16120E;
-  --tx-2:          #5B554D;
-  --tx-3:          #8C877E;   /* Ash */
+  --tx-2:          #44403B;
+  --tx-3:          #4F4B46;
   --tx-inv:        #FAF6EF;
-  --tx-inv-2:      #A9A299;
+  --tx-inv-2:      #A9A299;   /* 7.4:1 on Ink */
   --tx-flare:      #5A1E0C;   /* Char. Flare as text on light — never #FF3D14 */
 
   /* ---- Line. Hairlines only. Instruments are drawn, not shadowed. ---- */
@@ -95,8 +113,8 @@
   --bg-shell:      #221D18;
   --bg-card:       #221D18;
   --tx:            #FAF6EF;
-  --tx-2:          #A9A299;
-  --tx-3:          #6F6A62;
+  --tx-2:          #CCC8C2;   /* 11.2:1 on Ink, 10.0:1 on the raised card */
+  --tx-3:          #C1BDB7;   /* 10.0:1 on Ink, 8.9:1 on the raised card */
   --tx-flare:      #FFC12E;
   --pos:           #FAF6EF;
   --line:          rgba(250,246,239,.13);

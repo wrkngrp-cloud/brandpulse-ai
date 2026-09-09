@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Plus, Trash2, Loader2, Building } from 'lucide-react'
+import { Plus, Trash2, Building } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Input }  from '@/components/ui/input'
 import { toast }  from 'sonner'
@@ -75,7 +76,7 @@ export function CompetitorsClient({ initialCompetitors }: Props) {
           disabled={isPending || !newName.trim()}
         >
           {isPending && !deletingId
-            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ? <Loader2 className="h-3.5 w-3.5" />
             : <><Plus className="h-3.5 w-3.5 mr-1" />Add</>
           }
         </Button>
@@ -113,7 +114,7 @@ export function CompetitorsClient({ initialCompetitors }: Props) {
                 aria-label={`Remove ${c.name}`}
               >
                 {deletingId === c.id
-                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  ? <Loader2 className="h-4 w-4" />
                   : <Trash2 className="h-4 w-4" />
                 }
               </button>

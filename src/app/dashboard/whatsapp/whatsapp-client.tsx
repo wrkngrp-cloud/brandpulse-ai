@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Users, Send, BarChart2, CheckCircle2, Plus, Loader2, ChevronRight, Clock, CheckCheck } from 'lucide-react'
+import { Users, Send, BarChart2, CheckCircle2, Plus, ChevronRight, Clock, CheckCheck } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { MentionsIcon as MessageCircle, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -201,7 +202,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
               <div key={c.id} className="p-4 flex items-start gap-4">
                 <div className="h-8 w-8 rounded-lg bg-shell dark:bg-shell/30 flex items-center justify-center shrink-0 mt-0.5">
                   {c.status === 'sending'
-                    ? <Loader2 className="h-3.5 w-3.5 text-pos animate-spin" />
+                    ? <Loader2 className="h-3.5 w-3.5 text-pos" />
                     : c.status === 'sent'
                     ? <CheckCheck className="h-3.5 w-3.5 text-pos" />
                     : c.status === 'failed'
@@ -280,7 +281,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
               <Label>Message template</Label>
               {loadingTemplates ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading approved templates…
+                  <Loader2 className="h-3.5 w-3.5" /> Loading approved templates…
                 </div>
               ) : templates.length === 0 ? (
                 <div className="rounded-lg border bg-shell dark:bg-shell/20 p-3 text-xs text-tx-2 dark:text-tx-2">
@@ -329,7 +330,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
               onClick={handleSend}
               disabled={sending || !form.name || !form.template_name || !form.consented}
             >
-              {sending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Queuing…</> : 'Send campaign'}
+              {sending ? <><Loader2 className="h-4 w-4 mr-2" /> Queuing…</> : 'Send campaign'}
             </Button>
           </div>
         </SheetContent>

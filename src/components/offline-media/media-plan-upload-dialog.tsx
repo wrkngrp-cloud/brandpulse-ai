@@ -10,7 +10,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
+import { Upload, FileSpreadsheet, CheckCircle2, XCircle } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
@@ -168,7 +169,7 @@ export function MediaPlanUploadDialog({
           {/* Uploading state */}
           {uploadState === 'uploading' && (
             <div className="flex flex-col items-center gap-3 py-6">
-              <Loader2 className="h-10 w-10 text-primary animate-spin" />
+              <Loader2 className="h-10 w-10 text-primary" />
               <p className="text-sm font-medium">Importing {fileName}…</p>
               <p className="text-xs text-muted-foreground">Matching stations and validating rows</p>
             </div>

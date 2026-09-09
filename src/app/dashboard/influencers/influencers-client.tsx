@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Users, Star, Loader2, Plus, X, Globe, ChevronDown, Eye, Megaphone, Filter } from 'lucide-react'
+import { Users, Star, Plus, X, Globe, ChevronDown, Eye, Megaphone, Filter } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn, formatNGN } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -601,7 +602,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
                 disabled={analysing}
                 className="w-full"
               >
-                {analysing && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+                {analysing && <Loader2 className="h-4 w-4 mr-1.5" />}
                 {analysing ? 'Analysing...' : 'Analyse Profile'}
               </Button>
 
@@ -627,7 +628,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
                   disabled={submitting}
                   onClick={handleSave}
                 >
-                  {submitting && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+                  {submitting && <Loader2 className="h-4 w-4 mr-1.5" />}
                   {submitting ? 'Saving...' : 'Save Influencer'}
                 </Button>
               </div>
@@ -1103,7 +1104,7 @@ function InfluencerCard({
               onClick={() => onScore(inf.id)}
             >
               {scoringId === inf.id ? (
-                <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Scoring...</>
+                <><Loader2 className="h-3 w-3 mr-1" /> Scoring...</>
               ) : (
                 'Score with AI'
               )}
@@ -1118,7 +1119,7 @@ function InfluencerCard({
                 title="Re-analyse full profile and brand fit"
               >
                 {reanalysingId === inf.id ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <Loader2 className="h-3 w-3" />
                 ) : (
                   'Re-analyse'
                 )}

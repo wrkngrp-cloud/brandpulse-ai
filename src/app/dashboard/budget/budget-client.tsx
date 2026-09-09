@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { DollarSign, Plus, RefreshCw, Loader2, X, ChevronDown, ChevronRight, CheckCircle } from 'lucide-react'
+import { DollarSign, Plus, RefreshCw, X, ChevronDown, ChevronRight, CheckCircle } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -75,7 +76,7 @@ export function BudgetClient() {
         <div className="flex gap-2">
           <TourTrigger module="budget" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
           <Button size="sm" onClick={() => setShowNewPlan(true)}>
@@ -109,7 +110,7 @@ export function BudgetClient() {
 
       {loading && plans.length === 0 && (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loader2 className="h-6 w-6 text-muted-foreground" />
         </div>
       )}
 
@@ -381,7 +382,7 @@ function NewPlanForm({ onSave, onCancel }: { onSave: (d: Record<string, unknown>
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Create plan
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -426,7 +427,7 @@ function AddLineItemForm({ planId, onSave, onCancel }: { planId: string; onSave:
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Add
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -472,7 +473,7 @@ function AddActualForm({ lineItemId, onSave, onCancel }: { lineItemId: string; o
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Log spend
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>

@@ -5,7 +5,8 @@ import { useRouter }       from 'next/navigation'
 import { useState, useTransition, useRef } from 'react'
 import { cn, formatPlatformLabel } from '@/lib/utils'
 import { buttonVariants, Button } from '@/components/ui/button'
-import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, Users, Eye, Percent, RefreshCw, Upload, X, Loader2, ImageIcon, ShoppingCart } from 'lucide-react'
+import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, Users, Eye, Percent, RefreshCw, Upload, X, ImageIcon, ShoppingCart } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AskIcon as Sparkles } from '@/components/brand/icon'
 import { CampaignOverview } from './campaign-overview'
 import { LinkOohSiteDialog, LinkEventDialog } from './link-existing-dialog'
@@ -14,6 +15,7 @@ import { toast } from 'sonner'
 import { linkInfluencerToCampaign } from '@/app/dashboard/campaigns/[id]/link-influencer-action'
 import { PostTracker } from '@/components/influencers/post-tracker'
 import { Crescendo } from '@/components/brand/crescendo'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface Channel {
   id: string
@@ -407,7 +409,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
           disabled={analysing}
         >
           {analysing
-            ? <><RefreshCw className="h-3 w-3 animate-spin" /> Analysing…</>
+            ? <><RefreshCw className="h-3 w-3" /> Analysing…</>
             : <><Sparkles className="h-3 w-3" /> {headerSummary ? 'Re-analyse' : 'AI Analysis'}</>
           }
         </Button>
@@ -696,36 +698,38 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               {weeklyChartData.length > 1 && (
                 <div>
                   <p className="text-xs text-muted-foreground mb-2">Impressions by week</p>
-                  <ResponsiveContainer width="100%" height={180}>
-                    <BarChart data={weeklyChartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                      <XAxis
-                        dataKey="week"
-                        tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis
-                        tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
-                        axisLine={false}
-                        tickLine={false}
-                        width={36}
-                        tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          background: 'var(--bg-ink)',
-                          border: 'var(--line)',
-                          borderRadius: 'var(--r-card)',
-                          fontSize: 12,
-                          color: 'var(--bg-card)',
-                        }}
-                        labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10.5, textTransform: '', letterSpacing: '0.10em', marginBottom: 4 }}
-                        formatter={(value) => [Number(value).toLocaleString(), 'Impressions']}
-                        cursor={{ fill: 'currentColor', opacity: 0.05 }}
-                      />
-                      <Bar dataKey="impressions" fill="var(--flare)" radius={[4, 4, 0, 0]} opacity={0.85} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <ChartState rows={weeklyChartData} height={180} empty="Link a channel to this campaign to see weekly performance.">
+                                      <ResponsiveContainer width="100%" height={180}>
+                      <BarChart data={weeklyChartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                        <XAxis
+                          dataKey="week"
+                          tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
+                          axisLine={false}
+                          tickLine={false}
+                          width={36}
+                          tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            background: 'var(--bg-ink)',
+                            border: 'var(--line)',
+                            borderRadius: 'var(--r-card)',
+                            fontSize: 12,
+                            color: 'var(--bg-card)',
+                          }}
+                          labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10.5, textTransform: '', letterSpacing: '0.10em', marginBottom: 4 }}
+                          formatter={(value) => [Number(value).toLocaleString(), 'Impressions']}
+                          cursor={{ fill: 'currentColor', opacity: 0.05 }}
+                        />
+                        <Bar dataKey="impressions" fill="var(--flare)" radius={[4, 4, 0, 0]} opacity={0.85} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartState>
                 </div>
               )}
             </div>
@@ -1250,7 +1254,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 bg-press"
                         >
                           {loading
-                            ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />Uploading…</>
+                            ? <><Loader2 className="h-3.5 w-3.5" />Uploading…</>
                             : <><Upload className="h-3.5 w-3.5" />Add creative</>}
                         </button>
                       </div>

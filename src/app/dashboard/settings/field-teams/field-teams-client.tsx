@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { toast }    from 'sonner'
-import { Copy, Plus, Loader2, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Copy, Plus, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 
 interface FsoTeam {
   id:         string
@@ -104,7 +105,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
               disabled={creating || !name.trim()}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 bg-press"
             >
-              {creating && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {creating && <Loader2 className="h-3.5 w-3.5" />}
               Create team
             </button>
             <button

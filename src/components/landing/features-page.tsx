@@ -132,8 +132,8 @@ export function FeaturesPage() {
         </motion.h2>
         <motion.div {...rise} className="mt-8">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-bold text-tx-inv transition-transform border border-line"
-            style={{ background: 'var(--lp-clay)' }}>
+            className="inline-flex items-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-bold text-on-hot border border-line bg-press"
+            style={{ background: 'var(--flare)' }}>
             Start free in beta <ArrowRight className="h-4 w-4" />
           </Link>
         </motion.div>

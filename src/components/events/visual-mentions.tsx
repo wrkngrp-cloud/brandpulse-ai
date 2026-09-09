@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Camera, ExternalLink, CheckCircle2, XCircle, Loader2, RefreshCw } from 'lucide-react'
+import { Camera, ExternalLink, CheckCircle2, XCircle, RefreshCw } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 
 interface VisualMention {
   id:                string
@@ -165,7 +166,7 @@ export function VisualMentions({ eventId, initialData, hasIgConnection, hasHasht
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-press"
         >
           {scanning
-            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ? <Loader2 className="h-3.5 w-3.5" />
             : mentions.length > 0
               ? <RefreshCw className="h-3.5 w-3.5" />
               : <Camera className="h-3.5 w-3.5" />}

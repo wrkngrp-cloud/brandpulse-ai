@@ -40,7 +40,7 @@ export function VideoHero() {
       />
       {/* sound toggle */}
       <button onClick={toggleSound}
-        className="absolute bottom-4 right-4 flex items-center gap-2 rounded-sm border border-line-inv bg-ink/45 px-3.5 py-2 text-[11px] font-medium text-tx-inv backdrop-blur transition-opacity hover:bg-ink/65 bg-press"
+        className="absolute bottom-4 right-4 flex items-center gap-2 rounded-sm border border-line-inv bg-ink px-3.5 py-2 text-[11px] font-medium text-tx-inv transition-colors hover:bg-ink-raised bg-press"
         aria-label={muted ? 'Unmute video' : 'Mute video'}>
         {muted ? (
           <>

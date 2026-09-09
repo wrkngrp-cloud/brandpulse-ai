@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Zap, X, ChevronDown, Send, Loader2, Copy, Check, ImagePlus, Video, XCircle } from 'lucide-react'
+import { Zap, X, ChevronDown, Send, Copy, Check, ImagePlus, Video, XCircle } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -350,7 +351,7 @@ export function PrePostWidget() {
                   </div>
                 ) : extracting ? (
                   <div className="w-full flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4" />
                     Extracting video frame...
                   </div>
                 ) : (
@@ -407,7 +408,7 @@ export function PrePostWidget() {
                   disabled={(!content.trim() && !image) || !platform || !funnel || loading}
                 >
                   {loading
-                    ? <><Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> Analysing...</>
+                    ? <><Loader2 className="h-3.5 w-3.5 mr-2" /> Analysing...</>
                     : <><Send className="h-3.5 w-3.5 mr-2" /> {image ? (image.isVideo ? 'Analyse video + copy' : 'Analyse image + copy') : 'Analyse content'}</>
                   }
                 </Button>

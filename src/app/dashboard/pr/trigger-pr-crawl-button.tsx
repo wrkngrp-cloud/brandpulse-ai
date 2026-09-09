@@ -30,7 +30,7 @@ export function TriggerPrCrawlButton() {
   if (phase === 'running') {
     return (
       <Button size="sm" variant="outline" disabled>
-        <RefreshCw className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+        <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
         Starting crawl…
       </Button>
     )

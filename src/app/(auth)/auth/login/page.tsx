@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button'
 import { cn } from '@/lib/utils'
-import { Loader2, ArrowRight, BarChart2, Globe2, Users2, Zap } from 'lucide-react'
+import { ArrowRight, BarChart2, Globe2, Users2, Zap } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 
 // ── Demo accounts ──────────────────────────────────────────────────────────────
 
@@ -233,7 +234,7 @@ function LoginContent() {
               )}
 
               <Button className="w-full" type="submit" form="email-login-form" disabled={pending}>
-                {pending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                {pending ? <Loader2 className="h-4 w-4 mr-2" /> : null}
                 {pending ? 'Signing in...' : 'Sign in'}
               </Button>
             </form>

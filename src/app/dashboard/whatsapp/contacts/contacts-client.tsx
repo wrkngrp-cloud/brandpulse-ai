@@ -2,7 +2,8 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Upload, Users, UserCheck, UserX, Loader2, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Upload, Users, UserCheck, UserX, CheckCircle2 } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -91,7 +92,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
         >
           {uploading ? (
             <div className="flex flex-col items-center gap-2">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <Loader2 className="h-6 w-6 text-primary" />
               <p className="text-sm text-muted-foreground">Importing…</p>
             </div>
           ) : imported ? (

@@ -69,7 +69,7 @@ export function RetentionClient() {
         <div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="retention" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
         </div>

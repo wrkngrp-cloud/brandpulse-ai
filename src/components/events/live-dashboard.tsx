@@ -9,6 +9,7 @@ import { Button }       from '@/components/ui/button'
 import { Badge }        from '@/components/ui/badge'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { Radio, Square, Users, Target, Handshake, Gift, Camera } from 'lucide-react'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface Interaction {
   id:               string
@@ -156,24 +157,26 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
       {hourlyData.length > 0 && (
         <div className="border rounded-xl p-5 bg-card space-y-3">
           <p className="text-sm font-medium">Interactions per hour</p>
-          <ResponsiveContainer width="100%" height={100}>
-            <BarChart data={hourlyData} margin={{ top: 0, right: 0, bottom: 0, left: -30 }}>
-              <XAxis dataKey="hour" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip
-                contentStyle={{
-                  background: 'var(--bg-ink)',
-                  border: 'var(--line)',
-                  borderRadius: 'var(--r-card)',
-                  fontSize: 12,
-                  color: 'var(--bg-card)',
-                }}
-                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
-                cursor={{ fill: 'currentColor', opacity: 0.05 }}
-              />
-              <Bar dataKey="count" fill="var(--flare)" radius={[4,4,0,0]} opacity={0.85} />
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartState rows={hourlyData} height={100} empty="Interactions appear here as ambassadors capture them.">
+                      <ResponsiveContainer width="100%" height={100}>
+              <BarChart data={hourlyData} margin={{ top: 0, right: 0, bottom: 0, left: -30 }}>
+                <XAxis dataKey="hour" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{
+                    background: 'var(--bg-ink)',
+                    border: 'var(--line)',
+                    borderRadius: 'var(--r-card)',
+                    fontSize: 12,
+                    color: 'var(--bg-card)',
+                  }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
+                  cursor={{ fill: 'currentColor', opacity: 0.05 }}
+                />
+                <Bar dataKey="count" fill="var(--flare)" radius={[4,4,0,0]} opacity={0.85} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartState>
         </div>
       )}
 

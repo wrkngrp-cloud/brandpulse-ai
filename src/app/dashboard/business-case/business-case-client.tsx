@@ -14,6 +14,7 @@ import {
   type CommercialMetricId,
 } from '@/lib/commercial-metrics'
 import type { BrandType } from '@/lib/bhi'
+import { ChartState } from '@/components/brand/chart-states'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -292,21 +293,23 @@ export function BusinessCaseClient({
         <section>
           <SectionHead icon={Award}>Brand Health Index — 90-day Trend</SectionHead>
           <div className="rounded-2xl border bg-card p-5">
-            <ResponsiveContainer width="100%" height={200}>
-              <AreaChart data={bhiTrend}>
-                <defs>
-                  <linearGradient id="bhiGradBC" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="var(--flare)" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="var(--flare)" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
-                <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
-                <Area type="monotone" dataKey="bhi" stroke="var(--flare)" strokeWidth={2.5} fill="url(#bhiGradBC)" dot={false} />
-              </AreaChart>
-            </ResponsiveContainer>
+            <ChartState rows={bhiTrend} height={200} empty="Connect a source to build the commercial case.">
+                          <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={bhiTrend}>
+                  <defs>
+                    <linearGradient id="bhiGradBC" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="var(--flare)" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="var(--flare)" stopOpacity={0.02} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
+                  <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                  <Area type="monotone" dataKey="bhi" stroke="var(--flare)" strokeWidth={2.5} fill="url(#bhiGradBC)" dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartState>
           </div>
         </section>
       )}
@@ -331,18 +334,20 @@ export function BusinessCaseClient({
               </div>
             </div>
             <div className="p-5">
-              <ResponsiveContainer width="100%" height={channelRows.length * 44 + 20}>
-                <BarChart data={channelRows} layout="vertical" margin={{ left: 8 }}>
-                  <XAxis type="number" hide />
-                  <YAxis type="category" dataKey="channel" tick={{ fontSize: 12 }} width={80} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [fmtNGN(Number(v)), 'Spend']} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
-                  <Bar dataKey="spend" radius={[0, 6, 6, 0]} barSize={22}>
-                    {channelRows.map((r) => (
-                      <Cell key={r.channel} fill={r.bcg.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              <ChartState rows={channelRows} height={220} empty="Connect a source to build the commercial case.">
+                              <ResponsiveContainer width="100%" height={channelRows.length * 44 + 20}>
+                  <BarChart data={channelRows} layout="vertical" margin={{ left: 8 }}>
+                    <XAxis type="number" hide />
+                    <YAxis type="category" dataKey="channel" tick={{ fontSize: 12 }} width={80} tickLine={false} axisLine={false} />
+                    <Tooltip formatter={(v) => [fmtNGN(Number(v)), 'Spend']} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                    <Bar dataKey="spend" radius={[0, 6, 6, 0]} barSize={22}>
+                      {channelRows.map((r) => (
+                        <Cell key={r.channel} fill={r.bcg.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartState>
               {/* BCG legend */}
               <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
                 <p className="text-[11px] text-muted-foreground font-medium w-full">Channel portfolio classification (BCG lens):</p>

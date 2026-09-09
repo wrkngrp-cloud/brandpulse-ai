@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Star, Globe, CheckCircle, XCircle, Loader2, ExternalLink, Users, BarChart2, Activity, Calendar, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Star, Globe, CheckCircle, XCircle, ExternalLink, Users, BarChart2, Activity, Calendar, RefreshCw } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -280,7 +281,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           disabled={scoring}
           className="shrink-0 gap-1.5"
         >
-          {scoring ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+          {scoring ? <Loader2 className="h-3.5 w-3.5" /> : <RefreshCw className="h-3.5 w-3.5" />}
           {scoring ? 'Scoring…' : 'Score with AI'}
         </Button>
       </div>
@@ -343,7 +344,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
                 disabled={reanalysing}
                 className="gap-1.5"
               >
-                {reanalysing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                {reanalysing ? <Loader2 className="h-3.5 w-3.5" /> : <RefreshCw className="h-3.5 w-3.5" />}
                 {reanalysing ? 'Analysing…' : 'Run brand fit analysis'}
               </Button>
             </div>
@@ -360,7 +361,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
                     disabled={reanalysing}
                     className="h-7 px-2 gap-1 text-xs text-muted-foreground"
                   >
-                    {reanalysing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+                    {reanalysing ? <Loader2 className="h-3 w-3" /> : <RefreshCw className="h-3 w-3" />}
                     {reanalysing ? 'Re-analysing…' : 'Re-analyse'}
                   </Button>
                   <span className="text-xs text-muted-foreground">Score</span>

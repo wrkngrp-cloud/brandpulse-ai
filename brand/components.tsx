@@ -117,13 +117,14 @@ export function StatusPill({ state = 'live', children }:
   { state?: 'live' | 'paused' | 'error'; children?: ReactNode }) {
   const tick = { live: 'var(--flare)', paused: 'var(--neu)', error: 'var(--flare)' }[state];
   const bg = state === 'error' ? 'var(--flare)' : 'var(--bg-shell)';
-  const fg = state === 'error' ? 'var(--bg-paper)' : 'var(--tx-2)';
+  // A hot plane carries ink: paper on Flare is 3.3:1, ink is 5.3:1.
+  const fg = state === 'error' ? 'var(--on-hot)' : 'var(--tx-2)';
   return (
     <span className="bg-label" style={{
       display: 'inline-flex', alignItems: 'center', gap: 'var(--s-2)',
       background: bg, color: fg, padding: '4px 11px', borderRadius: 'var(--r-pill)'
     }}>
-      <i style={{ width: 6, height: 11, borderRadius: 2, background: state === 'error' ? 'var(--bg-paper)' : tick }} />
+      <i style={{ width: 6, height: 11, borderRadius: 2, background: state === 'error' ? 'var(--on-hot)' : tick }} />
       {children || state}
     </span>
   );

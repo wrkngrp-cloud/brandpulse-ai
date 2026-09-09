@@ -287,7 +287,7 @@ export function BoardPackClient({
 
               {/* Header */}
               <div className="flex items-start gap-4 border-b border-line pb-5">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-flare text-lg font-bold text-tx-inv select-none">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-flare text-lg font-bold text-on-hot select-none">
                   {initials(brand.name)}
                 </div>
                 <div className="flex-1">
@@ -425,7 +425,7 @@ export function BoardPackClient({
             <button
               type="button"
               onClick={handleDownload}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-flare px-5 py-2.5 text-[13px] font-semibold text-tx-inv transition-colors hover:bg-flare active:bg-flare border border-line bg-press"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-flare px-5 py-2.5 text-[13px] font-semibold text-on-hot transition-colors hover:bg-flare active:bg-flare border border-line bg-press"
             >
               <Download className="h-4 w-4 shrink-0" />
               Download PDF

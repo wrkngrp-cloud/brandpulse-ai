@@ -6,6 +6,7 @@ import {
 } from 'recharts'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { ChartState } from '@/components/brand/chart-states'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -116,90 +117,93 @@ export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day
       </div>
 
       {/* Chart */}
-      <ResponsiveContainer width="100%" height={height}>
-        <AreaChart data={data} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
-          <defs>
-            {/* Blue gradient — BHI */}
-            <linearGradient id="gradBHI" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.30} />
-              <stop offset="40%"  stopColor="var(--flare)" stopOpacity={0.12} />
-              <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
-            </linearGradient>
-            {/* Green gradient — Sentiment */}
-            <linearGradient id="gradSentiment" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="var(--pos)" stopOpacity={0.28} />
-              <stop offset="40%"  stopColor="var(--pos)" stopOpacity={0.10} />
-              <stop offset="100%" stopColor="var(--pos)" stopOpacity={0}    />
-            </linearGradient>
-          </defs>
-
-          <CartesianGrid
-            strokeDasharray="0"
-            horizontal={true}
-            vertical={false}
-            stroke="currentColor"
-            className="text-border opacity-40"
-          />
-
-          <XAxis
-            dataKey="date"
-            tick={<DateTick />}
-            tickLine={false}
-            axisLine={false}
-            interval="preserveStartEnd"
-          />
-
-          <YAxis
-            domain={[0, 100]}
-            tick={{ fontSize: 10, fill: 'currentColor', className: 'opacity-35' }}
-            tickLine={false}
-            axisLine={false}
-            tickCount={5}
-            fontFamily="var(--font)"
-          />
-
-          {/* 50% reference line — neutral threshold */}
-          <ReferenceLine
-            y={50}
-            stroke="currentColor"
-            strokeDasharray="4 4"
-            strokeOpacity={0.20}
-          />
-
-          <Tooltip
-            content={<CustomTooltip />}
-            cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }}
-          />
-
-          {hasSentiment && (
-            <Area
-              type="monotone"
-              dataKey="sentiment"
-              name="Sentiment"
-              stroke="var(--pos)"
-              strokeWidth={2}
-              fill="url(#gradSentiment)"
-              dot={false}
-              activeDot={{ r: 4, fill: 'var(--pos)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
-              connectNulls={false}
+      <ChartState rows={data} height={220} empty="Connect a source to start the trend.">
+              <ResponsiveContainer width="100%" height={height}>
+          <AreaChart data={data} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
+            <defs>
+              {/* Blue gradient — BHI */}
+              <linearGradient id="gradBHI" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.30} />
+                <stop offset="40%"  stopColor="var(--flare)" stopOpacity={0.12} />
+                <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
+              </linearGradient>
+              {/* Green gradient — Sentiment */}
+              <linearGradient id="gradSentiment" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="var(--pos)" stopOpacity={0.28} />
+                <stop offset="40%"  stopColor="var(--pos)" stopOpacity={0.10} />
+                <stop offset="100%" stopColor="var(--pos)" stopOpacity={0}    />
+              </linearGradient>
+            </defs>
+  
+            <CartesianGrid
+              strokeDasharray="0"
+              horizontal={true}
+              vertical={false}
+              stroke="currentColor"
+              className="text-border opacity-40"
             />
-          )}
-
-          {hasBHI && (
-            <Area
-              type="monotone"
-              dataKey="bhi"
-              name="Brand Health"
-              stroke="var(--flare)"
-              strokeWidth={2.5}
-              fill="url(#gradBHI)"
-              dot={false}
-              activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
-              connectNulls={false}
+  
+            <XAxis
+              dataKey="date"
+              tick={<DateTick />}
+              tickLine={false}
+              axisLine={false}
+              interval="preserveStartEnd"
             />
-          )}
-        </AreaChart>
-      </ResponsiveContainer>
+  
+            <YAxis
+              domain={[0, 100]}
+              tick={{ fontSize: 10, fill: 'currentColor', className: 'opacity-35' }}
+              tickLine={false}
+              axisLine={false}
+              tickCount={5}
+              fontFamily="var(--font)"
+            />
+  
+            {/* 50% reference line — neutral threshold */}
+            <ReferenceLine
+              y={50}
+              stroke="currentColor"
+              strokeDasharray="4 4"
+              strokeOpacity={0.20}
+            />
+  
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }}
+            />
+  
+            {hasSentiment && (
+              <Area
+                type="monotone"
+                dataKey="sentiment"
+                name="Sentiment"
+                stroke="var(--chart-2)"
+                strokeWidth={2}
+                strokeDasharray="4 3"
+                fill="url(#gradSentiment)"
+                dot={false}
+                activeDot={{ r: 4, fill: 'var(--chart-2)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+                connectNulls={false}
+              />
+            )}
+  
+            {hasBHI && (
+              <Area
+                type="monotone"
+                dataKey="bhi"
+                name="Brand Health"
+                stroke="var(--flare)"
+                strokeWidth={2.5}
+                fill="url(#gradBHI)"
+                dot={false}
+                activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+                connectNulls={false}
+              />
+            )}
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartState>
     </motion.div>
   )
 }

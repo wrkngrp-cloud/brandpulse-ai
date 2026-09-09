@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Mail, Send, CheckCircle2, Loader2 } from 'lucide-react'
+import { Mail, Send, CheckCircle2 } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
@@ -72,7 +73,7 @@ export function SendSurvey({ surveyId, surveyName: _surveyName, shareUrl: _share
           disabled={isPending || !emails.trim()}
         >
           {isPending
-            ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Sending...</>
+            ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Sending...</>
             : <><Send className="h-3.5 w-3.5 mr-1.5" />Send emails</>}
         </Button>
       </div>

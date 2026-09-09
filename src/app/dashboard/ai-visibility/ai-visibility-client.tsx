@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { Bot, Loader2, RefreshCw, CheckCircle2, XCircle, MinusCircle, Trophy } from 'lucide-react'
+import { Bot, RefreshCw, CheckCircle2, XCircle, MinusCircle, Trophy } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { VisibilityScore, VisibilityCheck } from './page'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface Props {
   brandName: string
@@ -24,10 +26,12 @@ const PLATFORM_LABELS: Record<string, string> = {
   perplexity: 'Perplexity',
 }
 
+// These are data series, not logos. Only the brand's own overall reading
+// carries heat; the platforms it is compared across are neutral ink.
 const PLATFORM_COLORS: Record<string, string> = {
-  chatgpt:    '#10a37f',
-  gemini:     '#4285f4',
-  perplexity: '#5436da',
+  chatgpt:    'var(--chart-2)',
+  gemini:     'var(--chart-3)',
+  perplexity: 'var(--chart-4)',
 }
 
 function ScoreRing({ score, size = 80 }: { score: number; size?: number }) {
@@ -132,7 +136,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
         </div>
         <Button onClick={runCheck} disabled={running || noKeys} size="sm" className="shrink-0">
           {running
-            ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Running...</>
+            ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Running...</>
             : <><RefreshCw className="h-3.5 w-3.5 mr-1.5" />Run check now</>}
         </Button>
       </div>
@@ -190,7 +194,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
           </div>
           {!noKeys && (
             <Button onClick={runCheck} disabled={running}>
-              {running ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Running...</> : 'Run first check'}
+              {running ? <><Loader2 className="h-4 w-4 mr-2" />Running...</> : 'Run first check'}
             </Button>
           )}
         </div>
@@ -200,24 +204,26 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
       {chartData.length > 1 && (
         <div className="border rounded-2xl p-5 bg-card space-y-4">
           <p className="text-[11px] font-bold text-muted-foreground">12-week trend</p>
-          <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border/40" />
-              <XAxis dataKey="week" tick={{ fontSize: 11 }} tickLine={false} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickLine={false} />
-              <Tooltip
-                contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)', border: '1px solid hsl(var(--border))' }}
-                formatter={(value, name) => [
-                  String(value ?? 0) + '/100',
-                  PLATFORM_LABELS[String(name)] ?? String(name),
-                ]}
-              />
-              <Line type="monotone" dataKey="score"      stroke="var(--neu)" strokeWidth={2.5} dot={false} name="Overall" />
-              <Line type="monotone" dataKey="chatgpt"    stroke={PLATFORM_COLORS.chatgpt}    strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="chatgpt" />
-              <Line type="monotone" dataKey="gemini"     stroke={PLATFORM_COLORS.gemini}     strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="gemini" />
-              <Line type="monotone" dataKey="perplexity" stroke={PLATFORM_COLORS.perplexity} strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="perplexity" />
-            </LineChart>
-          </ResponsiveContainer>
+          <ChartState rows={chartData} loading={running && chartData.length === 0} height={180} empty="Run a visibility check to see how AI assistants describe your brand.">
+                      <ResponsiveContainer width="100%" height={180}>
+              <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border/40" />
+                <XAxis dataKey="week" tick={{ fontSize: 11 }} tickLine={false} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)', border: '1px solid hsl(var(--border))' }}
+                  formatter={(value, name) => [
+                    String(value ?? 0) + '/100',
+                    PLATFORM_LABELS[String(name)] ?? String(name),
+                  ]}
+                />
+                <Line type="monotone" dataKey="score"      stroke="var(--chart-1)" strokeWidth={2.5} dot={false} name="Overall" />
+                <Line type="monotone" dataKey="chatgpt"    stroke={PLATFORM_COLORS.chatgpt}    strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="chatgpt" />
+                <Line type="monotone" dataKey="gemini"     stroke={PLATFORM_COLORS.gemini}     strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="gemini" />
+                <Line type="monotone" dataKey="perplexity" stroke={PLATFORM_COLORS.perplexity} strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="perplexity" />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartState>
         </div>
       )}
 

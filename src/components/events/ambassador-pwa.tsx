@@ -6,11 +6,8 @@ import { Button }   from '@/components/ui/button'
 import { Input }    from '@/components/ui/input'
 import { Label }    from '@/components/ui/label'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import {
-  Users, Target, Handshake, UserCheck, Gift, FlaskConical,
-  Trophy, Camera, ClipboardList, Trophy as Leaderboard, Loader2,
-  WifiOff, RefreshCw,
-} from 'lucide-react'
+import { Users, Target, Handshake, UserCheck, Gift, FlaskConical, Trophy, Camera, ClipboardList, Trophy as Leaderboard, WifiOff, RefreshCw } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { cn } from '@/lib/utils'
 import { Crescendo } from '@/components/brand/crescendo'
 
@@ -387,7 +384,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
               </div>
 
               <Button className="w-full" onClick={handleSurveyNext} disabled={surveyPending || !surveyAnswers[SURVEY_QUESTIONS[surveyQ].key]}>
-                {surveyPending ? <Loader2 className="h-4 w-4 animate-spin" /> : surveyQ < SURVEY_QUESTIONS.length - 1 ? 'Next' : 'Submit survey'}
+                {surveyPending ? <Loader2 className="h-4 w-4" /> : surveyQ < SURVEY_QUESTIONS.length - 1 ? 'Next' : 'Submit survey'}
               </Button>
             </div>
           )}
@@ -399,7 +396,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
         <div className="flex-1 p-4 safe-bottom space-y-3">
           {lbLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <Loader2 className="h-6 w-6 text-muted-foreground" />
             </div>
           ) : leaderboard.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-12">No data yet.</p>

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Database, RefreshCw, Loader2, Users, Star, Minus, ThumbsDown, ShieldCheck, Activity, Mail, Phone, Calendar } from 'lucide-react'
+import { Database, RefreshCw, Users, Star, Minus, ThumbsDown, ShieldCheck, Activity, Mail, Phone, Calendar } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { SearchIcon as Search } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -111,7 +112,7 @@ export function CdpClient() {
           <TourTrigger module="cdp" autoStart />
           <Button onClick={handleSync} disabled={syncing} size="sm">
             {syncing
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Syncing...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" />Syncing...</>
               : <><RefreshCw className="h-4 w-4 mr-2" />Sync data</>}
           </Button>
         </div>
@@ -164,7 +165,7 @@ export function CdpClient() {
             Click "Sync data" to merge customer records from your surveys, WhatsApp contacts, and app reviews.
           </p>
           <Button className="mt-4" size="sm" onClick={handleSync} disabled={syncing}>
-            {syncing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+            {syncing ? <Loader2 className="h-4 w-4 mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
             Sync now
           </Button>
         </div>

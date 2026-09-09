@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Trophy, TrendingDown, MapPin, Plus, Loader2, RefreshCw, ChevronDown, ChevronUp, Lightbulb, Eye, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Trophy, TrendingDown, MapPin, Plus, RefreshCw, ChevronDown, ChevronUp, Lightbulb, Eye, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -25,7 +26,7 @@ function TriggerCompetitiveCrawlButton() {
   if (phase === 'running') {
     return (
       <Button size="sm" variant="outline" disabled>
-        <RefreshCw className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Starting…
+        <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Starting…
       </Button>
     )
   }
@@ -303,7 +304,7 @@ function BriefingTab({
 
           <Button onClick={generate} disabled={loading} className="w-full">
             {loading
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating briefing...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Generating briefing...</>
               : <><Trophy className="h-4 w-4 mr-2" /> Generate this week&apos;s briefing</>}
           </Button>
 
@@ -331,7 +332,7 @@ function BriefingTab({
             </div>
             <Button size="sm" variant="outline" onClick={generate} disabled={loading}>
               {loading
-                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ? <Loader2 className="h-3.5 w-3.5" />
                 : <><RefreshCw className="h-3.5 w-3.5 mr-1" /> Regenerate</>}
             </Button>
           </div>
@@ -694,7 +695,7 @@ function SightingsTab({
               Cancel
             </Button>
             <Button type="submit" size="sm" disabled={saving}>
-              {saving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Saving...</> : 'Save sighting'}
+              {saving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" /> Saving...</> : 'Save sighting'}
             </Button>
           </div>
         </form>

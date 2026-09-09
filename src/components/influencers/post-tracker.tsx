@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Loader2, Plus, X, ExternalLink, ChevronDown, ChevronUp, BarChart2, Users, Shield, CheckCircle, XCircle, Lightbulb, RefreshCw } from 'lucide-react'
+import { Plus, X, ExternalLink, ChevronDown, ChevronUp, BarChart2, Users, Shield, CheckCircle, XCircle, Lightbulb, RefreshCw } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -125,8 +126,8 @@ function verdictConfig(v: string): { label: string; cls: string } {
 function recommendConfig(r: string): { label: string; cls: string } {
   const m: Record<string, { label: string; cls: string }> = {
     renew:       { label: 'Renew',       cls: 'bg-pos text-tx-inv' },
-    consider:    { label: 'Consider',    cls: 'bg-ember text-tx-inv' },
-    discontinue: { label: 'Discontinue', cls: 'bg-flare text-tx-inv' },
+    consider:    { label: 'Consider',    cls: 'bg-ember text-on-hot' },
+    discontinue: { label: 'Discontinue', cls: 'bg-flare text-on-hot' },
   }
   return m[r] ?? { label: r, cls: 'bg-muted text-foreground' }
 }
@@ -562,7 +563,7 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
             className="text-sm h-8 pr-8"
           />
           {fetching && (
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground absolute right-2.5 top-1/2 -translate-y-1/2" />
+            <Loader2 className="h-3.5 w-3.5 text-muted-foreground absolute right-2.5 top-1/2 -translate-y-1/2" />
           )}
         </div>
         <p className="text-[10px] text-muted-foreground">Instagram, TikTok, X, YouTube, or Facebook — caption auto-fetches for TikTok, YouTube, and X</p>
@@ -614,7 +615,7 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
         </Button>
         <Button type="button" size="sm" onClick={handleSubmit} disabled={submitting} className="text-xs h-7">
           {submitting ? (
-            <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Analysing&hellip;</>
+            <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Analysing&hellip;</>
           ) : (
             'Analyse Post'
           )}
@@ -709,7 +710,7 @@ export function PostTracker({ influencerId, campaignId, influencerHandle, influe
       {/* Posts list */}
       {loading ? (
         <div className="flex items-center justify-center py-4">
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          <Loader2 className="h-4 w-4 text-muted-foreground" />
         </div>
       ) : posts.length === 0 && !showForm ? (
         <div className="border border-dashed rounded-xl p-5 text-center space-y-2">

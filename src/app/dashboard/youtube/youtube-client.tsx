@@ -352,7 +352,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                 </Link>
                 <Button size="sm" variant="outline" onClick={handleRunMonitor} disabled={running}>
                   {running
-                    ? <><RefreshCw className="h-3.5 w-3.5 mr-1.5 animate-spin" />Running…</>
+                    ? <><RefreshCw className="h-3.5 w-3.5 mr-1.5" />Running…</>
                     : <><RefreshCw className="h-3.5 w-3.5 mr-1.5" />Run monitor</>
                   }
                 </Button>

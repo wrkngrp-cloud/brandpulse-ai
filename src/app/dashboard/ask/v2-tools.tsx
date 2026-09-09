@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Filter, Loader2, CheckCircle2, Send, Printer, Copy, ArrowRight } from 'lucide-react'
+import { FileText, Filter, CheckCircle2, Send, Printer, Copy, ArrowRight } from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -366,7 +367,7 @@ export function BusinessCaseTab() {
 
           <Button onClick={generate} disabled={loading || !initiative.trim()} className="gap-2">
             {loading
-              ? <><Loader2 className="h-4 w-4 animate-spin" />Generating business case...</>
+              ? <><Loader2 className="h-4 w-4" />Generating business case...</>
               : <><Send className="h-4 w-4" />Generate Business Case</>
             }
           </Button>
@@ -715,7 +716,7 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
 
         <Button onClick={generate} disabled={loading} size="lg" className="gap-2">
           {loading
-            ? <><Loader2 className="h-4 w-4 animate-spin" />Generating report...</>
+            ? <><Loader2 className="h-4 w-4" />Generating report...</>
             : <><Sparkles className="h-4 w-4" />Generate Monthly Report</>
           }
         </Button>
