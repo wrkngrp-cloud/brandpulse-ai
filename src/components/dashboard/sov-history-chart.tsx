@@ -18,10 +18,10 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-tx-inv/40 mb-1.5">
+      <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-1.5">
         {label ? new Date(label).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'Africa/Lagos' }) : ''}
       </p>
-      <p className="text-[15px] font-bold tabular-nums" style={{ color: 'var(--flare)' }}>
+      <p className="text-[15px] font-bold bg-num" style={{ color: 'var(--flare)' }}>
         {payload[0].value.toFixed(1)}%
       </p>
       <p className="text-[10px] text-tx-inv/40 mt-0.5">Share of Voice</p>
@@ -41,7 +41,7 @@ export function SovHistoryChart({ data, days }: { data: SovPoint[]; days?: numbe
     <div className="border rounded-xl p-5 bg-card space-y-3">
       <div>
         <p className="text-sm font-semibold">SOV Over Time</p>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground bg-num">
           {rangeLabel} · {data.length} snapshots
         </p>
       </div>

@@ -304,7 +304,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
               {platformEntries.map(([p, s]) => (
                 <span key={p} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border bg-muted/40 text-muted-foreground">
                   {PLATFORM_LABEL[p] ?? p}
-                  <span className="font-bold text-foreground">{Math.round(s.score)}</span>
+                  <span className="font-bold text-foreground bg-num">{Math.round(s.score)}</span>
                 </span>
               ))}
             </div>
@@ -389,7 +389,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
                     <div key={label} className="space-y-0.5">
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span className="capitalize">{label}</span>
-                        <span>{Math.round(pct)}%</span>
+                        <span className="bg-num">{Math.round(pct)}%</span>
                       </div>
                       <div className="h-1 bg-muted rounded-full overflow-hidden">
                         <div className={`h-full rounded-full ${SENTIMENT_BAR[label]}`} style={{ width: `${pct}%` }} />
@@ -439,7 +439,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
               <div key={a.type} className="flex items-center gap-1.5">
                 <span className={`h-2 w-2 rounded-full ${AUDIENCE_BAR[a.type] ?? 'bg-muted-foreground/40'}`} />
                 <span className="text-xs font-medium">{AUDIENCE_LABEL[a.type] ?? a.type}</span>
-                <span className="text-xs text-muted-foreground tabular-nums">{Math.round(a.pct)}%</span>
+                <span className="text-xs text-muted-foreground bg-num">{Math.round(a.pct)}%</span>
               </div>
             ))}
           </div>

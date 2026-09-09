@@ -115,7 +115,7 @@ export function ProfileForm({ name, email }: { name: string; email: string }) {
 
           <div className="space-y-2 py-2">
             <Label htmlFor="deleteConfirm" className="text-sm">
-              Type <span className="font-mono font-semibold">DELETE</span> to confirm
+              Type <span className="bg-num font-semibold">DELETE</span> to confirm
             </Label>
             <Input
               id="deleteConfirm"

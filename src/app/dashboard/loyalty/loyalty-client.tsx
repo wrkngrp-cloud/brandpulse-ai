@@ -226,8 +226,8 @@ export function LoyaltyClient() {
                           </span>
                         ) : <span className="text-muted-foreground text-xs">—</span>}
                       </td>
-                      <td className="px-4 py-3 font-semibold">{m.points_balance.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{m.lifetime_points.toLocaleString()}</td>
+                      <td className="px-4 py-3 font-semibold bg-num">{m.points_balance.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-muted-foreground bg-num">{m.lifetime_points.toLocaleString()}</td>
                       <td className="px-4 py-3">
                         <Badge variant={m.status === 'active' ? 'default' : 'secondary'} className="text-xs capitalize">{m.status}</Badge>
                       </td>
@@ -302,8 +302,8 @@ export function LoyaltyClient() {
                       </span>
                     )}
                     <div className="text-right shrink-0">
-                      <p className="font-bold">{m.lifetime_points.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground">{m.points_balance.toLocaleString()} balance</p>
+                      <p className="font-bold bg-num">{m.lifetime_points.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground bg-num">{m.points_balance.toLocaleString()} balance</p>
                     </div>
                   </div>
                 ))}
@@ -321,7 +321,7 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">{icon} {label}</div>
-      <p className="text-xl font-bold">{value}</p>
+      <p className="text-xl font-bold"><span className="bg-num">{value}</span></p>
     </div>
   )
 }
@@ -347,7 +347,7 @@ function ProgramCard({ program }: { program: LoyaltyProgram }) {
           {program.tiers
             .sort((a, b) => a.sort_order - b.sort_order)
             .map(t => (
-              <div key={t.id} className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-tx-inv" style={{ backgroundColor: t.color }}>
+              <div key={t.id} className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-tx-inv bg-num" style={{ backgroundColor: t.color }}>
                 {t.name} · {t.min_points.toLocaleString()}+ pts
               </div>
             ))}

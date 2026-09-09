@@ -148,7 +148,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
               </p>
             </div>
           </div>
-          <div className="font-mono text-xs bg-shell dark:bg-shell/40 rounded-lg p-3 space-y-1 text-tx-2 dark:text-tx-2">
+          <div className="bg-num text-xs bg-shell dark:bg-shell/40 rounded-lg p-3 space-y-1 text-tx-2 dark:text-tx-2">
             <p>OPENAI_API_KEY=          ← ChatGPT (GPT-4o mini)</p>
             <p>GOOGLE_AI_API_KEY=       ← Gemini 2.0 Flash</p>
             <p>PERPLEXITY_API_KEY=      ← Perplexity Sonar</p>
@@ -162,7 +162,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
           {/* Overall score */}
           <div className="border rounded-2xl p-6 bg-card flex flex-col items-center justify-center gap-2 sm:col-span-1">
             <ScoreRing score={latest.visibility_score} size={80} />
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">AI Visibility Score</p>
+            <p className="text-[11px] font-semibold text-muted-foreground text-center">AI Visibility Score</p>
             <p className="text-[11px] text-muted-foreground">
               Week of {new Date(latest.week_of).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', timeZone: 'Africa/Lagos' })}
             </p>
@@ -198,7 +198,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
       {/* Trend chart */}
       {chartData.length > 1 && (
         <div className="border rounded-2xl p-5 bg-card space-y-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">12-week trend</p>
+          <p className="text-[11px] font-bold text-muted-foreground">12-week trend</p>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border/40" />
@@ -250,7 +250,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
       {/* Check log */}
       {checks.length > 0 && (
         <section>
-          <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">
+          <h2 className="text-[11px] font-bold text-muted-foreground mb-3">
             Question-by-question breakdown
           </h2>
           <div className="border rounded-2xl bg-card overflow-hidden divide-y">

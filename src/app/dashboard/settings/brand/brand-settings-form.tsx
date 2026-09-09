@@ -174,7 +174,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
               {colors.map(color => (
                 <div key={color} className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-full border">
                   <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
-                  <span className="font-mono">{color}</span>
+                  <span className="bg-num">{color}</span>
                   <button
                     type="button"
                     onClick={() => setColors(prev => prev.filter(c => c !== color))}
@@ -191,7 +191,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                 onChange={e => setColorInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addColor())}
                 placeholder="var(--flare)"
-                className="font-mono text-xs h-8"
+                className="bg-num text-xs h-8"
               />
               <Button type="button" size="sm" variant="outline" className="h-8 text-xs shrink-0" onClick={addColor}>
                 Add
@@ -221,12 +221,12 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
               value={data.googlePlaceId ?? ''}
               onChange={e => patch('googlePlaceId', e.target.value)}
               placeholder="ChIJ..."
-              className="max-w-sm font-mono text-xs"
+              className="max-w-sm bg-num text-xs"
             />
           </div>
           {(data.brandType === 'b2b_saas' || data.brandType === 'marketplace') && (
             <div className="space-y-4 pt-2 border-t">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Review Platforms</p>
+              <p className="text-xs font-medium text-muted-foreground">Review Platforms</p>
               <div className="space-y-2">
                 <Label htmlFor="g2Slug">G2 Product Slug</Label>
                 <p className="text-xs text-muted-foreground">
@@ -237,7 +237,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                   value={data.g2Slug ?? ''}
                   onChange={e => patch('g2Slug', e.target.value)}
                   placeholder="your-product-name"
-                  className="max-w-sm font-mono text-xs"
+                  className="max-w-sm bg-num text-xs"
                 />
               </div>
               <div className="space-y-2">
@@ -250,7 +250,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                   value={data.capterraSlug ?? ''}
                   onChange={e => patch('capterraSlug', e.target.value)}
                   placeholder="your-product-slug"
-                  className="max-w-sm font-mono text-xs"
+                  className="max-w-sm bg-num text-xs"
                 />
               </div>
             </div>
@@ -258,19 +258,19 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
 
           {(['fintech', 'b2b_saas', 'marketplace'] as const).includes(data.brandType as 'fintech') && (
             <div className="space-y-4 pt-2 border-t">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Developer Ecosystem</p>
+              <p className="text-xs font-medium text-muted-foreground">Developer Ecosystem</p>
               <div className="space-y-2">
                 <Label htmlFor="githubRepo">GitHub Repository</Label>
                 <p className="text-xs text-muted-foreground">owner/repo format, e.g. paystack/paystack-php</p>
-                <Input id="githubRepo" value={data.githubRepo ?? ''} onChange={e => patch('githubRepo', e.target.value)} placeholder="org/repo" className="max-w-sm font-mono text-xs" />
+                <Input id="githubRepo" value={data.githubRepo ?? ''} onChange={e => patch('githubRepo', e.target.value)} placeholder="org/repo" className="max-w-sm bg-num text-xs" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="npmPackageName">npm Package</Label>
-                <Input id="npmPackageName" value={data.npmPackageName ?? ''} onChange={e => patch('npmPackageName', e.target.value)} placeholder="@scope/package or package-name" className="max-w-sm font-mono text-xs" />
+                <Input id="npmPackageName" value={data.npmPackageName ?? ''} onChange={e => patch('npmPackageName', e.target.value)} placeholder="@scope/package or package-name" className="max-w-sm bg-num text-xs" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="stackoverflowTag">Stack Overflow Tag</Label>
-                <Input id="stackoverflowTag" value={data.stackoverflowTag ?? ''} onChange={e => patch('stackoverflowTag', e.target.value)} placeholder="paystack" className="max-w-sm font-mono text-xs" />
+                <Input id="stackoverflowTag" value={data.stackoverflowTag ?? ''} onChange={e => patch('stackoverflowTag', e.target.value)} placeholder="paystack" className="max-w-sm bg-num text-xs" />
               </div>
             </div>
           )}
@@ -343,13 +343,13 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
           <div className="space-y-4">
             {data.brandVoice.tone && (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Tone</p>
+                <p className="text-[11px] font-semibold text-muted-foreground mb-1">Tone</p>
                 <p className="text-sm">{data.brandVoice.tone}</p>
               </div>
             )}
             {data.brandVoice.adjectives.length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Voice adjectives</p>
+                <p className="text-[11px] font-semibold text-muted-foreground mb-1.5">Voice adjectives</p>
                 <div className="flex flex-wrap gap-1.5">
                   {data.brandVoice.adjectives.map(a => (
                     <span key={a} className="text-xs px-2 py-0.5 rounded-full bg-muted border border-border font-medium">{a}</span>
@@ -359,7 +359,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
             )}
             {data.brandVoice.signaturePhrases.length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Signature phrases</p>
+                <p className="text-[11px] font-semibold text-muted-foreground mb-1.5">Signature phrases</p>
                 <div className="flex flex-wrap gap-1.5">
                   {data.brandVoice.signaturePhrases.map(p => (
                     <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium italic">{p}</span>

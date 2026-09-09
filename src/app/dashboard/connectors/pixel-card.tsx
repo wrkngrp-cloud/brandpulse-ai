@@ -52,7 +52,7 @@ export function PixelCard() {
           {/* Web snippet */}
           <div>
             <p className="text-[12px] font-semibold mb-2">1. Add this snippet to your website {"<head>"}</p>
-            <div className="rounded-xl bg-ink text-tx-inv-2 p-4 text-[11.5px] font-mono leading-relaxed relative">
+            <div className="rounded-xl bg-ink text-tx-inv-2 p-4 text-[11.5px] bg-num leading-relaxed relative">
               <pre className="whitespace-pre-wrap break-all">{snippet}</pre>
               <button
                 onClick={() => copy(snippet, 'snippet')}
@@ -67,7 +67,7 @@ export function PixelCard() {
           {/* Track events */}
           <div>
             <p className="text-[12px] font-semibold mb-2">2. Track custom events (optional)</p>
-            <div className="rounded-xl bg-ink text-tx-inv-2 p-4 text-[11.5px] font-mono leading-relaxed">
+            <div className="rounded-xl bg-ink text-tx-inv-2 p-4 text-[11.5px] bg-num leading-relaxed">
               <pre>{`// Track a purchase
 window.__bp.track('purchase', 4500, { product: 'Jara Combo' });
 
@@ -89,7 +89,7 @@ window.__bp.track('cta_click', 1, { label: 'Order Now' });`}</pre>
                 { label: 'Flutter', cmd: 'flutter pub add brandgauge_sdk' },
               ].map(({ label, cmd }) => (
                 <div key={label} className="rounded-lg bg-muted px-3 py-2 flex items-center gap-2">
-                  <code className="text-[11.5px] font-mono text-foreground">{cmd}</code>
+                  <code className="text-[11.5px] bg-num text-foreground">{cmd}</code>
                   <button onClick={() => copy(cmd, label)} className="text-muted-foreground hover:text-foreground">
                     {copied === label ? <Check className="h-3 w-3 text-pos" /> : <Copy className="h-3 w-3" />}
                   </button>

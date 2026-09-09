@@ -141,14 +141,14 @@ export function ConversionFunnelChart({ data, demo }: { data?: FunnelData; demo?
       value:  d.clicks,
       barPct: logBarPct(d.clicks, d.impressions),
       color:  'var(--neu)',
-      rate:   `↓ ${ctr.toFixed(2)}% CTR`,
+      rate:   `− ${ctr.toFixed(2)}% CTR`,
     },
     {
       label:  'Conversions',
       value:  d.conversions,
       barPct: logBarPct(d.conversions, d.impressions),
       color:  'var(--pos)',
-      rate:   `↓ ${cvr.toFixed(2)}% CVR`,
+      rate:   `− ${cvr.toFixed(2)}% CVR`,
     },
   ]
 
@@ -165,7 +165,7 @@ export function ConversionFunnelChart({ data, demo }: { data?: FunnelData; demo?
                 </span>
               )}
             </div>
-            <span className="text-sm font-bold tabular-nums shrink-0">{fmtNum(step.value)}</span>
+            <span className="text-sm font-bold bg-num shrink-0">{fmtNum(step.value)}</span>
           </div>
           <div className="h-5 bg-muted/50 rounded-full overflow-hidden">
             <div

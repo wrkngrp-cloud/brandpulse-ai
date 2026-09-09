@@ -91,7 +91,7 @@ export function NewSurveyDialog() {
                       <div className="space-y-0.5 min-w-0">
                         <p className="text-sm font-semibold group-hover:text-foreground">{tmpl.label}</p>
                         <div className="flex items-center gap-2">
-                          <span className="text-[11px] text-muted-foreground">
+                          <span className="text-[11px] text-muted-foreground bg-num">
                             {tmpl.questionCount}Q
                           </span>
                           <span className="text-[11px] text-muted-foreground/50">·</span>
@@ -126,7 +126,7 @@ export function NewSurveyDialog() {
                 Change template
               </button>
               <span className="text-muted-foreground/40">·</span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground bg-num">
                 {selectedTemplate.label} — {selectedTemplate.questionCount}Q, {selectedTemplate.timeEstimate}
               </span>
             </div>

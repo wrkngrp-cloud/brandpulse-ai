@@ -72,7 +72,7 @@ function MetricChip({ icon: Icon, label, value }: { icon: React.ElementType; lab
       <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
         <Icon className="h-3 w-3" /> {label}
       </div>
-      <p className="text-[13px] font-semibold">{value}</p>
+      <p className="text-[13px] font-semibold"><span className="bg-num">{value}</span></p>
     </div>
   )
 }
@@ -169,8 +169,8 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="rounded-2xl border bg-card p-4">
               <Icon className={cn('h-4 w-4 mb-1.5', color)} />
-              <p className="text-[10.5px] text-muted-foreground font-medium uppercase tracking-wider">{label}</p>
-              <p className={cn('text-[20px] font-bold leading-tight', color)}>{value}</p>
+              <p className="text-[10.5px] text-muted-foreground font-medium">{label}</p>
+              <p className={cn('text-[20px] font-bold leading-tight', color)}><span className="bg-num">{value}</span></p>
             </div>
           ))}
         </div>
@@ -245,15 +245,15 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
           {/* Live ROI preview */}
           {n(form.fee) > 0 && (
             <div className="rounded-xl bg-muted/40 border px-4 py-3 space-y-1">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">EMV Preview</p>
+              <p className="text-[11px] font-bold text-muted-foreground">EMV Preview</p>
               <div className="flex flex-wrap gap-4">
                 <div>
                   <p className="text-[10.5px] text-muted-foreground">Estimated Media Value</p>
-                  <p className="text-[16px] font-bold">{fmtNGN(previewEmv)}</p>
+                  <p className="text-[16px] font-bold bg-num">{fmtNGN(previewEmv)}</p>
                 </div>
                 <div>
                   <p className="text-[10.5px] text-muted-foreground">Fee</p>
-                  <p className="text-[16px] font-bold">{fmtNGN(n(form.fee))}</p>
+                  <p className="text-[16px] font-bold bg-num">{fmtNGN(n(form.fee))}</p>
                 </div>
                 <div>
                   <p className="text-[10.5px] text-muted-foreground">ROI</p>
@@ -303,7 +303,7 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
                     <p className="text-[13.5px] font-semibold truncate">{c.name}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       {c.creator_handle && <span className="text-[11.5px] text-muted-foreground">{c.creator_handle}</span>}
-                      {c.platform && <span className="text-[10px] font-bold uppercase text-muted-foreground/60 bg-muted rounded px-1.5 py-0.5">{c.platform}</span>}
+                      {c.platform && <span className="text-[10px] font-bold text-muted-foreground/60 bg-muted rounded px-1.5 py-0.5">{c.platform}</span>}
                     </div>
                   </div>
                   <RoiPill roi={roi} />
@@ -321,15 +321,15 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
                     </div>
 
                     <div className="rounded-xl bg-background border p-4 space-y-3">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">ROI Breakdown</p>
+                      <p className="text-[11px] font-bold text-muted-foreground">ROI Breakdown</p>
                       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">Earned Media Value</p>
-                          <p className="text-[16px] font-bold text-pos">{fmtNGN(c.emv)}</p>
+                          <p className="text-[16px] font-bold text-pos bg-num">{fmtNGN(c.emv)}</p>
                         </div>
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">Fee Paid</p>
-                          <p className="text-[16px] font-bold">{fmtNGN(c.fee)}</p>
+                          <p className="text-[16px] font-bold bg-num">{fmtNGN(c.fee)}</p>
                         </div>
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">ROI</p>
@@ -337,25 +337,25 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
                         </div>
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">Eng. rate</p>
-                          <p className="text-[16px] font-bold">{er.toFixed(2)}%</p>
+                          <p className="text-[16px] font-bold bg-num">{er.toFixed(2)}%</p>
                         </div>
                       </div>
                       {c.engagements > 0 && (
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2 border-t">
                           <div>
                             <p className="text-[10.5px] text-muted-foreground">Cost per engagement</p>
-                            <p className="text-[14px] font-semibold">₦{cpe.toFixed(0)}</p>
+                            <p className="text-[14px] font-semibold bg-num">₦{cpe.toFixed(0)}</p>
                           </div>
                           {c.attributed_clicks > 0 && (
                             <div>
                               <p className="text-[10.5px] text-muted-foreground">Cost per click</p>
-                              <p className="text-[14px] font-semibold">₦{(c.fee / c.attributed_clicks).toFixed(0)}</p>
+                              <p className="text-[14px] font-semibold bg-num">₦{(c.fee / c.attributed_clicks).toFixed(0)}</p>
                             </div>
                           )}
                           {c.attributed_conversions > 0 && (
                             <div>
                               <p className="text-[10.5px] text-muted-foreground">Cost per conversion</p>
-                              <p className="text-[14px] font-semibold">₦{(c.fee / c.attributed_conversions).toFixed(0)}</p>
+                              <p className="text-[14px] font-semibold bg-num">₦{(c.fee / c.attributed_conversions).toFixed(0)}</p>
                             </div>
                           )}
                         </div>

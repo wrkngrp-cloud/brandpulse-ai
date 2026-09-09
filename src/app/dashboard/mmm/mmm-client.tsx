@@ -203,7 +203,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
                       contentStyle={{ fontSize: 12, borderRadius: 8 }}
                     />
                     <Legend
-                      formatter={(value) => <span style={{ fontSize: 12, color: 'var(--tx-3)' }}>{value}</span>}
+                      formatter={(value) => <span style={{ fontSize: 12, color: 'var(--tx-3)' }}><span className="bg-num">{value}</span></span>}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -217,9 +217,9 @@ export function MmmClient({ brandName, lastRun }: Props) {
                     <div key={ch.ch} className="flex items-center gap-3">
                       <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: ch.color }} />
                       <span className="text-[13px] flex-1">{ch.name}</span>
-                      <span className="text-[13px] font-semibold tabular-nums w-12 text-right">{ch.value}%</span>
+                      <span className="text-[13px] font-semibold bg-num w-12 text-right">{ch.value}%</span>
                       {spend[ch.ch] > 0 && (
-                        <span className="text-[11px] text-muted-foreground w-16 text-right">{fmtNGN(spend[ch.ch])}</span>
+                        <span className="text-[11px] text-muted-foreground w-16 text-right bg-num">{fmtNGN(spend[ch.ch])}</span>
                       )}
                       {roi[ch.ch] !== undefined && (
                         <span className={cn(
@@ -234,7 +234,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
                   {totalSpend > 0 && (
                     <div className="pt-2 border-t border-border/40 flex justify-between">
                       <span className="text-[12px] text-muted-foreground">Total tracked spend</span>
-                      <span className="text-[12px] font-semibold">{fmtNGN(totalSpend)}</span>
+                      <span className="text-[12px] font-semibold bg-num">{fmtNGN(totalSpend)}</span>
                     </div>
                   )}
                 </div>
@@ -274,7 +274,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
               <p className="text-[13px] font-medium eyebrow">Recommendations</p>
               {result.recommendations.map((r, i) => (
                 <div key={i} className="flex gap-3 py-3 border-b border-border/40 last:border-0">
-                  <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/60 w-14 shrink-0 pt-0.5 capitalize">{r.channel}</span>
+                  <span className="text-[11px] font-bold text-muted-foreground/60 w-14 shrink-0 pt-0.5 capitalize">{r.channel}</span>
                   <div>
                     <p className="text-[13px] font-medium">{r.action}</p>
                     <p className="text-[12px] text-muted-foreground mt-0.5 leading-relaxed">{r.rationale}</p>

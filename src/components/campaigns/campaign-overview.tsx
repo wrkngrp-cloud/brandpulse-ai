@@ -126,7 +126,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
           { label: 'Total budget',   value: fmtMoney(campaign.total_budget, campaign.currency) },
         ].map(m => (
           <div key={m.label} className="border rounded-xl p-4 bg-card space-y-1">
-            <p className="text-lg font-semibold tabular-nums leading-tight">{m.value}</p>
+            <p className="text-lg font-semibold bg-num leading-tight">{m.value}</p>
             <p className="text-xs text-muted-foreground">{m.label}</p>
           </div>
         ))}
@@ -165,7 +165,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium">Campaign timeline</p>
           {daysTotal !== null && daysElapsed !== null && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground bg-num">
               Day {Math.min(daysElapsed, daysTotal)} of {daysTotal}
               {end_date ? '' : ' (Always On)'}
             </p>
@@ -175,8 +175,8 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
         {/* Overall timeline bar */}
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{fmtDateShort(start_date)}</span>
-            <span>{end_date ? fmtDateShort(end_date) : 'Always On'}</span>
+            <span className="bg-num">{fmtDateShort(start_date)}</span>
+            <span className="bg-num">{end_date ? fmtDateShort(end_date) : 'Always On'}</span>
           </div>
           <div className="h-3 bg-muted rounded-full overflow-hidden">
             <div
@@ -190,7 +190,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
         {/* Per-channel Gantt rows */}
         {channels.length > 0 && (
           <div className="space-y-2 pt-1">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Channels</p>
+            <p className="text-xs font-medium text-muted-foreground">Channels</p>
             {channels.map(ch => {
               const meta    = CHANNEL_META[ch.channel] ?? { label: ch.channel, color: 'bg-muted-foreground' }
               const linked  = ch.objectives ?? []
@@ -203,7 +203,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
                       <span className={cn('h-2 w-2 rounded-full shrink-0', meta.color)} />
                       <span className="font-medium">{meta.label}</span>
                       {ch.budget_allocation && (
-                        <span className="text-muted-foreground">
+                        <span className="text-muted-foreground bg-num">
                           {fmtMoney(ch.budget_allocation, campaign.currency)}
                         </span>
                       )}
@@ -260,7 +260,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
               <>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Total budget</span>
-                  <span className="font-medium">{fmtMoney(campaign.total_budget, campaign.currency)}</span>
+                  <span className="font-medium bg-num">{fmtMoney(campaign.total_budget, campaign.currency)}</span>
                 </div>
                 {totalAllocated > 0 && (
                   <>
@@ -288,7 +288,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
                     <span className={cn('h-2 w-2 rounded-full', meta?.color ?? 'bg-muted-foreground')} />
                     <span>{meta?.label ?? ch.channel}</span>
                   </div>
-                  <span>{fmtMoney(ch.budget_allocation, campaign.currency)}</span>
+                  <span className="bg-num">{fmtMoney(ch.budget_allocation, campaign.currency)}</span>
                 </div>
               )
             })}
@@ -306,7 +306,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
             {totalOohSpend > 0 && (
               <div className="flex justify-between text-sm text-muted-foreground border-t pt-2">
                 <span>OOH monthly spend (entered)</span>
-                <span>{fmtMoney(totalOohSpend, campaign.currency)}</span>
+                <span className="bg-num">{fmtMoney(totalOohSpend, campaign.currency)}</span>
               </div>
             )}
           </div>
@@ -371,7 +371,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
                 <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize shrink-0', PLATFORM_BADGE[inf.platform] ?? 'bg-muted text-muted-foreground')}>
                   {inf.platform === 'tiktok' ? 'TikTok' : inf.platform === 'youtube' ? 'YouTube' : inf.platform.charAt(0).toUpperCase() + inf.platform.slice(1)}
                 </span>
-                <span className="text-xs tabular-nums shrink-0 text-muted-foreground">{formatFollowers(inf.followers)}</span>
+                <span className="text-xs bg-num shrink-0 text-muted-foreground">{formatFollowers(inf.followers)}</span>
                 {inf.cultural_iq !== null && (
                   <span className={cn(
                     'text-xs px-1.5 py-0.5 rounded-full font-semibold shrink-0',

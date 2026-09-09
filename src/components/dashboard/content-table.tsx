@@ -77,7 +77,7 @@ function PlatformIcon({ platform }: { platform: string }) {
 function ScoreBadge({ score }: { score: number | null }) {
   if (score === null) return <span className="text-xs text-muted-foreground">—</span>
   const colour = score >= 70 ? 'text-pos' : score >= 40 ? 'text-tx-2' : 'text-tx-flare'
-  return <span className={`text-sm font-semibold ${colour}`}>{score.toFixed(0)}</span>
+  return <span className={`text-sm font-semibold bg-num ${colour}`}>{score.toFixed(0)}</span>
 }
 
 export function ContentTable({
@@ -142,7 +142,7 @@ export function ContentTable({
       ),
       accessorKey: 'reach',
       cell: ({ row }) => (
-        <span className="text-sm tabular-nums">{row.original.reach.toLocaleString()}</span>
+        <span className="text-sm bg-num">{row.original.reach.toLocaleString()}</span>
       ),
       size: 90,
     },
@@ -156,7 +156,7 @@ export function ContentTable({
       ),
       accessorKey: 'engagement_rate',
       cell: ({ row }) => (
-        <span className="text-sm tabular-nums">
+        <span className="text-sm bg-num">
           {row.original.engagement_rate !== null
             ? `${Number(row.original.engagement_rate).toFixed(2)}%`
             : '—'}

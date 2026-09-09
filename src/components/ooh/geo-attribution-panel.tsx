@@ -163,7 +163,7 @@ export function GeoAttributionPanel({
           { label: 'Unique cities',    value: byCity.length.toString() },
         ].map(s => (
           <Card key={s.label} className="p-4 text-center">
-            <div className="text-2xl font-bold tabular-nums">{s.value}</div>
+            <div className="text-2xl font-bold bg-num">{s.value}</div>
             <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
           </Card>
         ))}
@@ -191,7 +191,7 @@ export function GeoAttributionPanel({
               <div key={city} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="truncate">{city}</span>
-                  <span className="font-medium tabular-nums">{count}</span>
+                  <span className="font-medium bg-num">{count}</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                   <div
@@ -215,7 +215,7 @@ export function GeoAttributionPanel({
                 <div key={method} className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span>{label}</span>
-                    <span className="text-muted-foreground tabular-nums">{count} ({pct}%)</span>
+                    <span className="text-muted-foreground bg-num">{count} ({pct}%)</span>
                   </div>
                   <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                     <div className="h-full rounded-full bg-flare" style={{ width: `${pct}%` }} />
@@ -226,7 +226,7 @@ export function GeoAttributionPanel({
             {geoVisits.length > 0 && (
               <p className="text-xs text-muted-foreground pt-1">
                 Avg attribution confidence: {' '}
-                <span className={cn('font-medium', CONFIDENCE_COLOR(avgConf))}>
+                <span className={cn('font-medium bg-num', CONFIDENCE_COLOR(avgConf))}>
                   {(avgConf * 100).toFixed(0)}%
                 </span>
               </p>
@@ -255,7 +255,7 @@ export function GeoAttributionPanel({
                     </Badge>
                   )}
                 </div>
-                <span className="text-xs text-muted-foreground shrink-0">{fmtDate(v.visited_at)}</span>
+                <span className="text-xs text-muted-foreground shrink-0 bg-num">{fmtDate(v.visited_at)}</span>
               </div>
             ))}
           </div>
@@ -381,7 +381,7 @@ export function GeoAttributionPanel({
                     </div>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span>{aud.fence_radius_m}m fence</span>
-                      {aud.estimated_reach && <span>~{aud.estimated_reach.toLocaleString()} reach</span>}
+                      {aud.estimated_reach && <span className="bg-num">~{aud.estimated_reach.toLocaleString()} reach</span>}
                       {aud.creative_headline && <span className="italic truncate">"{aud.creative_headline}"</span>}
                     </div>
                   </div>

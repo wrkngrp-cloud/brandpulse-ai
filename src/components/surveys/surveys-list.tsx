@@ -106,7 +106,7 @@ function SurveyRow({ survey, appUrl }: { survey: Survey; appUrl: string }) {
           </p>
         </div>
         <div className="flex items-center gap-3 ml-4 shrink-0">
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground bg-num">
             {survey.responseCount} {survey.responseCount === 1 ? 'response' : 'responses'}
           </span>
           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[survey.status] ?? ''}`}>

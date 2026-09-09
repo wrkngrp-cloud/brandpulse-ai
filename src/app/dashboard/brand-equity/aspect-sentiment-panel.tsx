@@ -81,8 +81,8 @@ export function AspectSentimentPanel({ aspects, platform }: Props) {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-sm font-semibold tabular-nums">{a.score}</span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
+                    <span className="text-sm font-semibold bg-num">{a.score}</span>
+                    <span className="text-xs text-muted-foreground bg-num">
                       {a.mention_count} {a.mention_count === 1 ? 'mention' : 'mentions'}
                     </span>
                   </div>

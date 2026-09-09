@@ -56,7 +56,7 @@ export function WhatsAppConnectCard({ configured, contactCount, campaignCount }:
 
       {!configured && (
         <div className="rounded-lg bg-shell dark:bg-shell/20 border border-line dark:border-line px-3 py-2.5 text-[11.5px] text-tx-2 dark:text-tx-2 leading-relaxed">
-          Add <code className="font-mono">WHATSAPP_PHONE_NUMBER_ID</code>, <code className="font-mono">WHATSAPP_BUSINESS_ACCOUNT_ID</code>, and <code className="font-mono">WHATSAPP_ACCESS_TOKEN</code> to your environment variables to activate.
+          Add <code className="bg-num">WHATSAPP_PHONE_NUMBER_ID</code>, <code className="bg-num">WHATSAPP_BUSINESS_ACCOUNT_ID</code>, and <code className="bg-num">WHATSAPP_ACCESS_TOKEN</code> to your environment variables to activate.
         </div>
       )}
     </div>

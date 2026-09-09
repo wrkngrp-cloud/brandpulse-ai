@@ -26,7 +26,7 @@ export default function DashboardError({
           {error.message || 'An unexpected error occurred while loading this page.'}
         </p>
         {error.digest && (
-          <p className="text-[10px] font-mono text-muted-foreground/50 mt-2">ref: {error.digest}</p>
+          <p className="text-[10px] bg-num text-muted-foreground/50 mt-2">ref: {error.digest}</p>
         )}
       </div>
       <div className="flex gap-2">

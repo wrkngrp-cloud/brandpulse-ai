@@ -36,7 +36,7 @@ function FatigueBar({ score, level }: { score: number; level: FatiguedAsset['fat
     <div className="space-y-1">
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>Fatigue score</span>
-        <span className="font-medium">{score}/100</span>
+        <span className="font-medium bg-num">{score}/100</span>
       </div>
       <div className="h-1.5 rounded-full bg-muted overflow-hidden">
         <div className={cn('h-full rounded-full transition-all', color)} style={{ width: `${score}%` }} />
@@ -89,22 +89,22 @@ function AssetCard({ asset }: { asset: FatiguedAsset }) {
       {/* Quick stats */}
       <div className="grid grid-cols-3 gap-3 pt-1">
         <div className="text-center">
-          <div className="text-sm font-semibold tabular-nums">{fmtPct(p.ctr)}</div>
+          <div className="text-sm font-semibold bg-num">{fmtPct(p.ctr)}</div>
           <div className="text-xs text-muted-foreground">CTR</div>
         </div>
         <div className="text-center">
-          <div className="text-sm font-semibold tabular-nums">{p.frequency != null ? `${(p.frequency as number).toFixed(1)}×` : '—'}</div>
+          <div className="text-sm font-semibold bg-num">{p.frequency != null ? `${(p.frequency as number).toFixed(1)}×` : '—'}</div>
           <div className="text-xs text-muted-foreground">Frequency</div>
         </div>
         <div className="text-center">
-          <div className="text-sm font-semibold tabular-nums">{daysRunning}d</div>
+          <div className="text-sm font-semibold bg-num">{daysRunning}d</div>
           <div className="text-xs text-muted-foreground">Running</div>
         </div>
       </div>
 
       {/* Actions */}
       <div className="space-y-2 pt-1">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Fix with Creative Lab</p>
+        <p className="text-xs font-medium text-muted-foreground">Fix with Creative Lab</p>
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm" variant="outline" className="h-8 text-xs gap-1.5"
@@ -162,7 +162,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
           { label: 'Healthy',      count: healthy,         color: 'text-pos', bg: 'bg-shell dark:bg-shell/10'},
         ].map(t => (
           <div key={t.label} className={cn('rounded-lg p-4 text-center', t.bg)}>
-            <div className={cn('text-3xl font-bold tabular-nums', t.color)}>{t.count}</div>
+            <div className={cn('text-3xl font-bold bg-num', t.color)}>{t.count}</div>
             <div className="text-xs text-muted-foreground mt-0.5">{t.label}</div>
           </div>
         ))}
@@ -178,7 +178,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
         <div className="space-y-8">
           {critical.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-tx-flare uppercase tracking-wide flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-tx-flare flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" /> Critical — Pause or Replace Now
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -189,7 +189,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
 
           {watch.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-tx-2 uppercase tracking-wide flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-tx-2 flex items-center gap-2">
                 <Eye className="h-4 w-4" /> Watch — Plan Refresh This Week
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -200,7 +200,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
 
           {refresh.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-tx-flare uppercase tracking-wide flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-tx-flare flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" /> Refresh Soon — Schedule Within 2 Weeks
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">

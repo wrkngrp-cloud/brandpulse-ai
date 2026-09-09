@@ -64,7 +64,7 @@ export function OohSiteMapClient({
           <MapPin className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">Location</span>
         </div>
-        <span className="text-xs text-muted-foreground font-mono">
+        <span className="text-xs text-muted-foreground bg-num">
           {lat.toFixed(5)}, {lng.toFixed(5)}
         </span>
       </div>
@@ -105,7 +105,7 @@ export function OohSiteMapClient({
                 {address     && <span>{address}<br /></span>}
                 {locationLine && <span style={{ color: 'var(--tx-2)' }}>{locationLine}<br /></span>}
                 {campaignLine && <span style={{ color: 'var(--tx-2)', fontSize: '11px' }}>Campaign: {campaignLine}<br /></span>}
-                <span style={{ fontSize: '11px', color: 'var(--tx-2)', marginTop: '2px', display: 'block' }}>
+                <span style={{ fontSize: '11px', color: 'var(--tx-2)', marginTop: '2px', display: 'block' }} className="bg-num">
                   {lat.toFixed(5)}, {lng.toFixed(5)}
                 </span>
               </div>

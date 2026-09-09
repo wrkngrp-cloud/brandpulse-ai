@@ -187,10 +187,10 @@ export default async function TVPage({
             ].map(m => (
               <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{m.label}</span>
+                  <span className="text-xs text-muted-foreground font-medium">{m.label}</span>
                   <m.icon className={`h-4 w-4 ${m.color}`} />
                 </div>
-                <p className="text-2xl font-bold tracking-tight">{m.value}</p>
+                <p className="text-2xl font-bold tracking-tight"><span className="bg-num">{m.value}</span></p>
                 <p className="text-xs text-muted-foreground">{m.sub}</p>
               </Card>
             ))}
@@ -207,7 +207,7 @@ export default async function TVPage({
                 <thead>
                   <tr className="border-b border-border/50">
                     {['Channel', 'Programme', 'Date', 'Daypart', 'Dur.', 'Planned', 'Aired', 'GRP', 'Net Cost', 'Status'].map(h => (
-                      <th key={h} className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</th>
+                      <th key={h} className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -221,8 +221,8 @@ export default async function TVPage({
                       <td className="py-2.5 pr-4 text-muted-foreground">{s.duration_sec}s</td>
                       <td className="py-2.5 pr-4">{s.spots_planned}</td>
                       <td className="py-2.5 pr-4 text-muted-foreground">{s.spots_aired ?? '–'}</td>
-                      <td className="py-2.5 pr-4 text-muted-foreground">{s.grp_planned ? Number(s.grp_planned).toFixed(1) : '–'}</td>
-                      <td className="py-2.5 pr-4 font-medium">{s.net_cost ? formatNGN(Number(s.net_cost)) : '–'}</td>
+                      <td className="py-2.5 pr-4 text-muted-foreground bg-num">{s.grp_planned ? Number(s.grp_planned).toFixed(1) : '–'}</td>
+                      <td className="py-2.5 pr-4 font-medium bg-num">{s.net_cost ? formatNGN(Number(s.net_cost)) : '–'}</td>
                       <td className="py-2.5">
                         <Badge variant={STATUS_VARIANT[s.status] ?? 'secondary'} className="text-[10px] capitalize">
                           {s.status.replace('_', ' ')}

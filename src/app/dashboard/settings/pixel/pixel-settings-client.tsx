@@ -182,7 +182,7 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
           <Badge variant="secondary" className="text-xs">Active</Badge>
         </div>
         <div className="flex items-center gap-3">
-          <code className="flex-1 font-mono text-sm bg-muted px-3 py-2 rounded-lg border">
+          <code className="flex-1 bg-num text-sm bg-muted px-3 py-2 rounded-lg border">
             {pixelId}
           </code>
           <CopyButton text={pixelId} label="Pixel ID" />
@@ -198,7 +198,7 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
           </div>
           <CopyButton text={snippet} label="Snippet" />
         </div>
-        <pre className="bg-muted rounded-lg p-4 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border">
+        <pre className="bg-muted rounded-lg p-4 text-xs bg-num overflow-x-auto whitespace-pre-wrap break-all border">
           {snippet}
         </pre>
       </div>
@@ -213,11 +213,11 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
           <CopyButton text={leadSnippet} label="Lead snippet" />
         </div>
         <p className="text-sm text-muted-foreground">
-          Fire a <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">lead</code> event
+          Fire a <code className="bg-num text-xs bg-muted px-1 py-0.5 rounded">lead</code> event
           from your contact form&apos;s submit handler. These events power the MQL and
           Cost Per Lead numbers on your Board Pack and Business Case.
         </p>
-        <pre className="bg-muted rounded-lg p-4 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border">
+        <pre className="bg-muted rounded-lg p-4 text-xs bg-num overflow-x-auto whitespace-pre-wrap break-all border">
           {leadSnippet}
         </pre>
       </div>
@@ -230,7 +230,7 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
         </div>
         <p className="text-sm text-muted-foreground">
           If your product is a mobile app, growth usually starts with a signup, not a website form.
-          Fire a <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">signup</code> event
+          Fire a <code className="bg-num text-xs bg-muted px-1 py-0.5 rounded">signup</code> event
           from your app&apos;s registration-complete handler and BrandGauge will count real
           new customers from it instead of estimating them from payments alone. This is what
           powers CAC and new customers on Board Pack and Business Case for app-based brands.
@@ -241,7 +241,7 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
             <p className="text-xs font-semibold text-muted-foreground">React Native</p>
             <CopyButton text={signupSnippetRN} label="React Native snippet" />
           </div>
-          <pre className="bg-muted rounded-lg p-4 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border">
+          <pre className="bg-muted rounded-lg p-4 text-xs bg-num overflow-x-auto whitespace-pre-wrap break-all border">
             {signupSnippetRN}
           </pre>
         </div>
@@ -251,7 +251,7 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
             <p className="text-xs font-semibold text-muted-foreground">Flutter</p>
             <CopyButton text={signupSnippetFlutter} label="Flutter snippet" />
           </div>
-          <pre className="bg-muted rounded-lg p-4 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all border">
+          <pre className="bg-muted rounded-lg p-4 text-xs bg-num overflow-x-auto whitespace-pre-wrap break-all border">
             {signupSnippetFlutter}
           </pre>
         </div>
@@ -267,7 +267,7 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
           <li>Copy the snippet above using the Copy button.</li>
           <li>
             Paste it before the closing{' '}
-            <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">&lt;/head&gt;</code>{' '}
+            <code className="bg-num text-xs bg-muted px-1 py-0.5 rounded">&lt;/head&gt;</code>{' '}
             tag on every page of your website.
           </li>
           <li>
@@ -278,7 +278,7 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
         </ol>
         <p className="text-xs text-muted-foreground border-t pt-3">
           Track custom events anywhere on your site:{' '}
-          <code className="font-mono bg-muted px-1 py-0.5 rounded">
+          <code className="bg-num bg-muted px-1 py-0.5 rounded">
             {`window.__bp.track('purchase', 5000, { product: 'Pro Plan' })`}
           </code>
         </p>
@@ -323,11 +323,11 @@ export function PixelSettingsClient({ pixelId: initialPixelId, recentEvents: ini
                 {events.map((ev) => (
                   <tr key={ev.id} className="border-b last:border-0 hover:bg-muted/40 transition-colors">
                     <td className="py-2 pr-4">
-                      <code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">
+                      <code className="bg-num text-xs bg-muted px-1.5 py-0.5 rounded">
                         {ev.event_type}
                       </code>
                     </td>
-                    <td className="py-2 pr-4 text-xs text-muted-foreground">
+                    <td className="py-2 pr-4 text-xs text-muted-foreground bg-num">
                       {ev.value != null ? ev.value.toLocaleString() : '—'}
                     </td>
                     <td className="py-2 pr-4 max-w-[180px]">

@@ -220,19 +220,19 @@ export function EcommerceImportClient({ campaigns }: Props) {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="bg-card/60 dark:bg-background/40 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold tabular-nums text-pos dark:text-pos">
+              <p className="text-2xl font-bold bg-num text-pos dark:text-pos">
                 {result.imported.toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">Imported</p>
             </div>
             <div className="bg-card/60 dark:bg-background/40 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold tabular-nums text-muted-foreground">
+              <p className="text-2xl font-bold bg-num text-muted-foreground">
                 {result.skipped.toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">Skipped</p>
             </div>
             <div className="bg-card/60 dark:bg-background/40 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold tabular-nums text-tx-2 dark:text-tx-2">
+              <p className="text-2xl font-bold bg-num text-tx-2 dark:text-tx-2">
                 {result.errors.length}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">Errors</p>
@@ -241,7 +241,7 @@ export function EcommerceImportClient({ campaigns }: Props) {
 
           {result.errors.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Row errors</p>
+              <p className="text-xs font-semibold text-muted-foreground">Row errors</p>
               <ul className="space-y-1 max-h-40 overflow-y-auto">
                 {result.errors.map((e, i) => (
                   <li key={i} className="text-xs text-destructive">{e}</li>

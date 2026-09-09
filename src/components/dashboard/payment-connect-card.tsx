@@ -79,7 +79,7 @@ function PaymentProviderCard({
       <div className="space-y-1.5">
         <p className="text-xs font-medium">Webhook URL</p>
         <div className="flex items-center gap-2">
-          <code className="flex-1 rounded-md bg-muted/50 border border-input px-3 py-1.5 text-[11px] font-mono truncate">
+          <code className="flex-1 rounded-md bg-muted/50 border border-input px-3 py-1.5 text-[11px] bg-num truncate">
             {webhookUrl}
           </code>
           <button

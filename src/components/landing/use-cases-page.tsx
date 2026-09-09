@@ -99,7 +99,7 @@ export function UseCasesPage() {
   return (
     <MarketingShell>
       <section className="mx-auto max-w-6xl px-6 pb-8 pt-36 sm:pt-44">
-        <motion.p {...rise} className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>
+        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>
           Use cases
         </motion.p>
         <motion.h1 {...rise} className="mt-4 max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
@@ -144,9 +144,9 @@ export function UseCasesPage() {
             </div>
             <div className="mt-8 flex flex-wrap gap-2 border-t pt-6" style={{ borderColor: 'var(--lp-line)' }}>
               {ind.modules.map(m => (
-                <span key={m} className="flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em]"
+                <span key={m} className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px]"
                   style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-mut)', background: 'var(--lp-chip)' }}>
-                  <Check className="h-3 w-3" style={{ color: 'var(--lp-clay)' }} /> {m}
+                  <Check className="h-3 w-3" style={{ color: 'var(--tx-flare)' }} /> {m}
                 </span>
               ))}
             </div>

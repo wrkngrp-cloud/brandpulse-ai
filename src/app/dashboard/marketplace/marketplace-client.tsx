@@ -173,7 +173,7 @@ function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">{icon} {label}</div>
-      <p className="text-xl font-bold">{value}</p>
+      <p className="text-xl font-bold"><span className="bg-num">{value}</span></p>
     </div>
   )
 }
@@ -217,8 +217,8 @@ function ProductRow({
           <p className="text-xs text-muted-foreground mt-0.5">{productSummary(product)}</p>
         </button>
         <div className="flex items-center gap-4 shrink-0 text-sm">
-          {snap?.price    != null && <span className="font-semibold">{formatNGN(snap.price)}</span>}
-          {snap?.rating   != null && <span className="text-tx-2 font-medium">★ {snap.rating.toFixed(1)}</span>}
+          {snap?.price    != null && <span className="font-semibold bg-num">{formatNGN(snap.price)}</span>}
+          {snap?.rating   != null && <span className="text-tx-2 font-medium bg-num">★ {snap.rating.toFixed(1)}</span>}
           {snap?.in_stock === false && <Badge variant="destructive" className="text-xs">Out of stock</Badge>}
           {snap?.shelf_position != null && <span className="text-muted-foreground text-xs">#{snap.shelf_position}</span>}
           {product.product_url && (

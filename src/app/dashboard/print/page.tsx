@@ -191,10 +191,10 @@ export default async function PrintPage({
             ].map(m => (
               <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{m.label}</span>
+                  <span className="text-xs text-muted-foreground font-medium">{m.label}</span>
                   <m.icon className={`h-4 w-4 ${m.color}`} />
                 </div>
-                <p className="text-2xl font-bold tracking-tight">{m.value}</p>
+                <p className="text-2xl font-bold tracking-tight"><span className="bg-num">{m.value}</span></p>
                 <p className="text-xs text-muted-foreground">{m.sub}</p>
               </Card>
             ))}
@@ -211,7 +211,7 @@ export default async function PrintPage({
                 <thead>
                   <tr className="border-b border-border/50">
                     {['Publication', 'Date', 'Position', 'Size', 'Colour', 'Insertions', 'Net Cost', 'QR Link', 'Scans', 'Status'].map(h => (
-                      <th key={h} className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</th>
+                      <th key={h} className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -226,7 +226,7 @@ export default async function PrintPage({
                         <td className="py-2.5 pr-4 text-muted-foreground whitespace-nowrap">{SIZE_LABEL[p.size] ?? p.size}</td>
                         <td className="py-2.5 pr-4 text-muted-foreground whitespace-nowrap">{p.colour === 'full_colour' ? 'Colour' : 'B&W'}</td>
                         <td className="py-2.5 pr-4">{p.insertions}</td>
-                        <td className="py-2.5 pr-4 font-medium">{p.net_cost ? formatNGN(Number(p.net_cost)) : '–'}</td>
+                        <td className="py-2.5 pr-4 font-medium bg-num">{p.net_cost ? formatNGN(Number(p.net_cost)) : '–'}</td>
                         <td className="py-2.5 pr-4">
                           {qrUrl ? (
                             <a
@@ -245,7 +245,7 @@ export default async function PrintPage({
                         </td>
                         <td className="py-2.5 pr-4 font-medium">
                           {p.qr_scan_count > 0 ? (
-                            <span className="text-pos">{p.qr_scan_count.toLocaleString()}</span>
+                            <span className="text-pos bg-num">{p.qr_scan_count.toLocaleString()}</span>
                           ) : (
                             <span className="text-muted-foreground">0</span>
                           )}

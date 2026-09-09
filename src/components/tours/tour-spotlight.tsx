@@ -268,7 +268,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
         onClick={(e) => e.stopPropagation()}
       >
         {/* Step counter */}
-        <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wider select-none">
+        <p className="text-[11px] font-semibold text-muted-foreground/60 select-none bg-num">
           {current + 1} of {steps.length}
         </p>
 

@@ -379,7 +379,7 @@ export default function MethodologyPage() {
             <div className="divide-y">
               {section.body.map((block, i) => (
                 <div key={i} className="px-5 py-4 space-y-1.5">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{block.heading}</p>
+                  <p className="text-xs font-semibold text-muted-foreground">{block.heading}</p>
                   <p className="text-sm leading-relaxed text-foreground/90">{block.text}</p>
                 </div>
               ))}
@@ -463,7 +463,7 @@ export default function MethodologyPage() {
 
       {/* Footer note */}
       <div className="border rounded-xl p-5 space-y-2 bg-muted/20">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">A note on AI usage</p>
+        <p className="text-xs font-semibold text-muted-foreground">A note on AI usage</p>
         <p className="text-sm text-muted-foreground leading-relaxed">
           BrandGauge uses three tiers of AI depending on task complexity. Cultural tasks — sentiment classification, Pre-Post scoring, cultural resonance — use our fastest model, calibrated specifically for Nigerian linguistic patterns. Structural analysis tasks — creative comparison, influencer scoring, funnel diagnosis, competitive briefings — use our mid-tier model. Board-grade outputs — business cases, strategic recommendations requiring deep synthesis — use our most capable model.
         </p>

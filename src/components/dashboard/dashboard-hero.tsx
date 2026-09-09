@@ -134,7 +134,7 @@ function WidgetPanel({ currentIds, onUpdate, onClose }: {
         <div className="flex-1 overflow-y-auto p-3 space-y-4">
           {categories.map(cat => (
             <div key={cat.label}>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">{cat.label}</p>
+              <p className="text-[11px] font-semibold text-muted-foreground mb-2">{cat.label}</p>
               <div className="space-y-1">
                 {cat.ids.map(id => {
                   const w = WIDGET_BY_ID[id]
@@ -169,7 +169,7 @@ function WidgetPanel({ currentIds, onUpdate, onClose }: {
 function KpiTile({ label, value, sub, href }: { label: string; value: string | null; sub?: string; href?: string }) {
   const content = (
     <div className="border rounded-xl p-4 bg-card space-y-1 hover:border-foreground/30 transition-colors cursor-pointer">
-      <p className={cn('text-xl font-bold tabular-nums', !value && 'text-muted-foreground/40')}>
+      <p className={cn('text-xl font-bold bg-num', !value && 'text-muted-foreground/40')}>
         {value ?? 'N/A'}
       </p>
       <p className="text-xs text-muted-foreground font-medium">{label}</p>
@@ -310,7 +310,7 @@ export function DashboardHero({
           <div className="flex items-center gap-2">
             <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Your dashboard</span>
-            <span className="text-xs text-muted-foreground">{widgetIds.length} widgets</span>
+            <span className="text-xs text-muted-foreground bg-num">{widgetIds.length} widgets</span>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" className="h-7 text-xs gap-1.5" onClick={() => setShowMetrics(true)}>

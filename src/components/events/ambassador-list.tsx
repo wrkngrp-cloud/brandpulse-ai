@@ -64,7 +64,7 @@ export function AmbassadorList({ eventId, ambassadors, appUrl }: Props) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium">{list.length} ambassador{list.length !== 1 ? 's' : ''}</p>
+        <p className="text-sm font-medium bg-num">{list.length} ambassador{list.length !== 1 ? 's' : ''}</p>
         <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
           <Plus className="h-4 w-4 mr-1.5" />
           Add
@@ -129,7 +129,7 @@ export function AmbassadorList({ eventId, ambassadors, appUrl }: Props) {
                 </Button>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground font-mono break-all">{url}</p>
+            <p className="text-xs text-muted-foreground bg-num break-all">{url}</p>
           </div>
         )
       })}

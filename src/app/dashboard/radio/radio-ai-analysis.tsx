@@ -20,7 +20,7 @@ function renderAnalysis(text: string) {
     const body = rest.join('\n').trim()
     return (
       <div key={i} className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{heading.trim()}</p>
+        <p className="text-xs font-semibold text-muted-foreground">{heading.trim()}</p>
         <p className="text-sm leading-relaxed">{body}</p>
       </div>
     )

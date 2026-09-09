@@ -508,7 +508,7 @@ function CRSGauge({ score, drift }: { score: number | null; drift: number | null
         <div className="absolute flex flex-col items-center">
           {score !== null ? (
             <>
-              <span className={cn('text-4xl font-bold tabular-nums', crsColor(score))}>{Math.round(score)}</span>
+              <span className={cn('text-4xl font-bold bg-num', crsColor(score))}>{Math.round(score)}</span>
               <span className="text-xs text-muted-foreground mt-0.5">/ 100</span>
             </>
           ) : (
@@ -534,7 +534,7 @@ function EmotionBar({ value }: { value: number | null }) {
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <span className="text-sm text-muted-foreground">Audience emotional positivity</span>
-        <span className="text-sm font-semibold tabular-nums">{value !== null ? `${Math.round(value)}%` : '—'}</span>
+        <span className="text-sm font-semibold bg-num">{value !== null ? `${Math.round(value)}%` : '—'}</span>
       </div>
       <div className="h-2.5 bg-muted rounded-full overflow-hidden">
         <div className={cn('h-full rounded-full transition-all duration-700',
@@ -575,7 +575,7 @@ function CalendarRow({
         <p className="text-xs text-muted-foreground mt-0.5 leading-snug line-clamp-2">{moment.brandRelevance}</p>
       </div>
       <div className="shrink-0 text-right pt-0.5">
-        <span className={cn('text-xs font-semibold tabular-nums px-2 py-0.5 rounded-full',
+        <span className={cn('text-xs font-semibold bg-num px-2 py-0.5 rounded-full',
           daysAway <= 14 ? 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
           : daysAway <= 30 ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
           : 'bg-muted text-muted-foreground'
@@ -828,7 +828,7 @@ export function CulturalClient({
 
         {crsOpen && analyses.length > 0 && (
           <div className="border-t pt-4 mt-2 space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Breakdown — last 30 days</p>
+            <p className="text-xs font-semibold text-muted-foreground">Breakdown — last 30 days</p>
             {analyses.map(a => {
               const date = new Date(a.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
               const preview = a.content_text ? a.content_text.slice(0, 80) + (a.content_text.length > 80 ? '…' : '') : null
@@ -836,18 +836,18 @@ export function CulturalClient({
                 <div key={a.id} className="rounded-lg border bg-muted/30 px-3 py-2.5 space-y-1.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      {a.platform && <span className="text-[10px] font-medium bg-background border rounded px-1.5 py-0.5">{formatPlatformLabel(a.platform)}</span>}
+                      {a.platform && <span className="text-[10px] font-medium bg-background border rounded px-1.5 py-0.5 bg-num">{formatPlatformLabel(a.platform)}</span>}
                       {a.funnel_goal && <span className="text-[10px] text-muted-foreground capitalize">{a.funnel_goal}</span>}
                     </div>
                     <span className="text-[10px] text-muted-foreground shrink-0">{date}</span>
                   </div>
                   {preview && <p className="text-xs text-muted-foreground leading-snug">{preview}</p>}
                   <div className="flex flex-wrap items-center gap-3 pt-0.5">
-                    <span className={cn('text-xs font-semibold tabular-nums', crsColor(a.cultural_score))}>Cultural {Math.round(a.cultural_score)}</span>
-                    {a.engagement_score != null && <span className="text-xs text-muted-foreground tabular-nums">Eng {Math.round(a.engagement_score)}</span>}
-                    {a.tone_score != null && <span className="text-xs text-muted-foreground tabular-nums">Tone {Math.round(a.tone_score)}</span>}
+                    <span className={cn('text-xs font-semibold bg-num', crsColor(a.cultural_score))}>Cultural {Math.round(a.cultural_score)}</span>
+                    {a.engagement_score != null && <span className="text-xs text-muted-foreground bg-num">Eng {Math.round(a.engagement_score)}</span>}
+                    {a.tone_score != null && <span className="text-xs text-muted-foreground bg-num">Tone {Math.round(a.tone_score)}</span>}
                     {a.risk_score != null && (
-                      <span className={cn('text-xs tabular-nums', a.risk_score > 50 ? 'text-tx-flare' : a.risk_score > 20 ? 'text-tx-2' : 'text-muted-foreground')}>
+                      <span className={cn('text-xs bg-num', a.risk_score > 50 ? 'text-tx-flare' : a.risk_score > 20 ? 'text-tx-2' : 'text-muted-foreground')}>
                         Risk {Math.round(a.risk_score)}
                       </span>
                     )}

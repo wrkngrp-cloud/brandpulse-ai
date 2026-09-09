@@ -92,7 +92,7 @@ export function TopicClusters({ mentions }: Props) {
                     {c.sentiment}
                   </span>
                   <span className="text-xs text-muted-foreground">·</span>
-                  <span className="text-xs text-muted-foreground">{c.count} mentions</span>
+                  <span className="text-xs text-muted-foreground bg-num"><span className="bg-num">{c.count}</span> mentions</span>
                 </div>
               </div>
 

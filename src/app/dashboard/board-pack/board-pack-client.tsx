@@ -119,7 +119,7 @@ function CommercialTile({ id, metric }: {
   if (metric.value == null) {
     return (
       <div className="flex flex-col justify-between gap-1 rounded-xl border border-dashed border-line bg-shell px-4 py-3 print:border-line">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-tx-3">{def.label}</span>
+        <span className="text-[10px] font-semibold text-tx-3">{def.label}</span>
         <span className="text-[11px] leading-snug text-tx-3">{metric.unavailableReason}</span>
       </div>
     )
@@ -130,11 +130,11 @@ function CommercialTile({ id, metric }: {
 
   return (
     <div className="flex flex-col gap-1 rounded-xl border border-line bg-card px-4 py-3 shadow-sm print:border-line print:shadow-none">
-      <span className="text-[10px] font-semibold uppercase tracking-widest text-tx-3">{def.label}</span>
-      <span className="text-xl font-bold text-tx leading-none tabular-nums">{def.fmt(metric.value)}</span>
+      <span className="text-[10px] font-semibold text-tx-3">{def.label}</span>
+      <span className="text-xl font-bold text-tx leading-none bg-num">{def.fmt(metric.value)}</span>
       {delta != null ? (
         <span className={cn(
-          'flex items-center gap-1 text-[11px] font-semibold tabular-nums',
+          'flex items-center gap-1 text-[11px] font-semibold bg-num',
           improved ? 'text-pos' : 'text-tx-flare',
         )}>
           {delta > 0
@@ -161,8 +161,8 @@ function MetricTile({
 }) {
   return (
     <div className="flex flex-col items-center gap-1 rounded-xl border border-line bg-card px-4 py-3 text-center shadow-sm print:border-line print:shadow-none">
-      <span className="text-[10px] font-semibold uppercase tracking-widest text-tx-3">{label}</span>
-      <span className="text-2xl font-bold text-tx leading-none tabular-nums">
+      <span className="text-[10px] font-semibold text-tx-3">{label}</span>
+      <span className="text-2xl font-bold text-tx leading-none bg-num">
         {value}
         {unit && <span className="ml-0.5 text-sm font-medium text-tx-3">{unit}</span>}
       </span>
@@ -335,7 +335,7 @@ export function BoardPackClient({
 
               {/* Commercial Performance — the CFO-facing numbers */}
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-tx-3 mb-2">
+                <p className="text-[11px] font-bold text-tx-3 mb-2">
                   Commercial Performance
                 </p>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -347,7 +347,7 @@ export function BoardPackClient({
 
               {/* Campaign summary */}
               <div className="rounded-xl bg-shell px-5 py-4 print:bg-shell">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-tx-3 mb-1">
+                <p className="text-[11px] font-bold text-tx-3 mb-1">
                   Campaigns
                 </p>
                 {allCampaignCount > 0 ? (
@@ -368,7 +368,7 @@ export function BoardPackClient({
               {/* Events section */}
               {recentEventCount > 0 && (
                 <div className="rounded-xl bg-shell px-5 py-4 print:bg-shell">
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-tx-3 mb-1">
+                  <p className="text-[11px] font-bold text-tx-3 mb-1">
                     Events (last 90 days)
                   </p>
                   <p className="text-[14px] text-tx leading-relaxed">
@@ -383,7 +383,7 @@ export function BoardPackClient({
 
               {/* AI narrative placeholder */}
               <div className="rounded-xl border border-dashed border-line bg-shell px-5 py-4">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-tx-3 mb-1">
+                <p className="text-[11px] font-bold text-tx-3 mb-1">
                   AI Narrative
                 </p>
                 <p className="text-[13px] italic text-tx-3">

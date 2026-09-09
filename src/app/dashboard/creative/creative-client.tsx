@@ -84,7 +84,7 @@ function ScoreBar({ score, color, label }: { score: number; color: string; label
     <div className="space-y-1">
       <div className="flex justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
-        <span className="font-medium tabular-nums">{score}</span>
+        <span className="font-medium bg-num">{score}</span>
       </div>
       <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
         <div
@@ -101,7 +101,7 @@ function Gauge({ score }: { score: number }) {
   const color = pct >= 70 ? 'text-pos' : pct >= 40 ? 'text-tx-2' : 'text-tx-flare'
   return (
     <div className="flex flex-col items-center gap-1 py-4">
-      <span className={cn('text-5xl font-bold tabular-nums', color)}>{score}</span>
+      <span className={cn('text-5xl font-bold bg-num', color)}>{score}</span>
       <span className="text-sm text-muted-foreground">Consistency score / 100</span>
     </div>
   )
@@ -429,7 +429,7 @@ export function CreativeClient({
                       <img src={media.previewUrl} alt="Creative visual" className="w-full max-h-36 object-cover" />
                       <div className="absolute top-1.5 left-1.5 flex items-center gap-1">
                         {media.isVideo && <Film className="h-3 w-3 text-tx-inv" />}
-                        <span className="text-[9px] bg-ink/60 text-tx-inv px-1.5 py-0.5 rounded font-mono">{media.isVideo ? 'VIDEO FRAME' : 'IMAGE'}</span>
+                        <span className="text-[9px] bg-ink/60 text-tx-inv px-1.5 py-0.5 rounded bg-num">{media.isVideo ? 'VIDEO FRAME' : 'IMAGE'}</span>
                       </div>
                       <button onClick={() => setMedia(null)} className="absolute top-1.5 right-1.5 bg-ink/60 rounded-full p-0.5">
                         <XCircle className="h-3.5 w-3.5 text-tx-inv" />
@@ -518,7 +518,7 @@ export function CreativeClient({
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold">Creative {label}</span>
                         {isWinner && (
-                          <span className="text-[10px] font-bold bg-shell text-pos px-2 py-0.5 rounded-full uppercase tracking-wide">
+                          <span className="text-[10px] font-bold bg-shell text-pos px-2 py-0.5 rounded-full">
                             Winner
                           </span>
                         )}
@@ -734,11 +734,11 @@ export function CreativeClient({
                 </div>
                 <div className="border rounded-xl p-3 text-center space-y-1">
                   <p className="text-xs text-muted-foreground">Cultural fit</p>
-                  <p className="text-sm font-semibold tabular-nums">{competitorResult.cultural_fit}/100</p>
+                  <p className="text-sm font-semibold bg-num">{competitorResult.cultural_fit}/100</p>
                 </div>
                 <div className="border rounded-xl p-3 text-center space-y-1">
                   <p className="text-xs text-muted-foreground">Est. engagement</p>
-                  <p className="text-sm font-semibold tabular-nums">{competitorResult.engagement_potential}/100</p>
+                  <p className="text-sm font-semibold bg-num">{competitorResult.engagement_potential}/100</p>
                 </div>
               </div>
 
@@ -814,7 +814,7 @@ export function CreativeClient({
               <img src={videoMedia.previewUrl} alt="Video frame" className="w-full max-h-56 object-cover" />
               <div className="absolute top-2 left-2 flex items-center gap-1.5">
                 {videoMedia.isVideo && <Film className="h-3.5 w-3.5 text-tx-inv" />}
-                <span className="text-[10px] bg-ink/60 text-tx-inv px-2 py-0.5 rounded font-mono">
+                <span className="text-[10px] bg-ink/60 text-tx-inv px-2 py-0.5 rounded bg-num">
                   {videoMedia.isVideo ? 'VIDEO (first frame)' : 'IMAGE'}
                 </span>
               </div>
@@ -913,7 +913,7 @@ export function CreativeClient({
                 ].map(m => (
                   <div key={m.label} className="border rounded-xl p-3 text-center space-y-1">
                     <p className="text-xs text-muted-foreground">{m.label}</p>
-                    <p className={cn('text-2xl font-bold tabular-nums', m.color)}>{m.score}</p>
+                    <p className={cn('text-2xl font-bold bg-num', m.color)}>{m.score}</p>
                     <p className="text-[10px] text-muted-foreground">/100</p>
                   </div>
                 ))}
@@ -922,7 +922,7 @@ export function CreativeClient({
               {/* Overall */}
               <div className="border rounded-xl p-4 bg-muted/30 flex items-center justify-between gap-3">
                 <span className="text-sm font-medium">Overall score</span>
-                <span className={cn('text-3xl font-bold tabular-nums', videoResult.overall >= 70 ? 'text-pos' : videoResult.overall >= 50 ? 'text-tx-2' : 'text-tx-flare')}>
+                <span className={cn('text-3xl font-bold bg-num', videoResult.overall >= 70 ? 'text-pos' : videoResult.overall >= 50 ? 'text-tx-2' : 'text-tx-flare')}>
                   {videoResult.overall}<span className="text-base text-muted-foreground font-normal">/100</span>
                 </span>
               </div>
@@ -935,21 +935,21 @@ export function CreativeClient({
                 { label: 'CTA notes',          note: videoResult.cta_notes        },
               ].map(({ label, note }) => (
                 <div key={label} className="border rounded-xl p-4 space-y-1.5">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+                  <p className="text-xs font-semibold text-muted-foreground">{label}</p>
                   <p className="text-sm leading-relaxed">{note}</p>
                 </div>
               ))}
 
               {/* Top recommendation */}
               <div className="border-l-4 border-line pl-4 py-1">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">Top recommendation</p>
+                <p className="text-xs font-semibold text-muted-foreground mb-1">Top recommendation</p>
                 <p className="text-sm leading-relaxed font-medium">{videoResult.top_recommendation}</p>
               </div>
 
               {/* Improvements */}
               {videoResult.improvements.length > 0 && (
                 <div className="border rounded-xl p-4 space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Improvements</p>
+                  <p className="text-xs font-semibold text-muted-foreground">Improvements</p>
                   <ul className="space-y-2">
                     {videoResult.improvements.map((imp, i) => (
                       <li key={i} className="flex gap-2.5 text-sm leading-relaxed">
@@ -981,7 +981,7 @@ export function CreativeClient({
                   </span>
                   <span className="text-muted-foreground truncate">{analysisSummary(a)}</span>
                 </div>
-                <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
+                <span className="text-xs text-muted-foreground shrink-0 bg-num">
                   {new Date(a.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', timeZone: 'Africa/Lagos' })}
                 </span>
               </li>

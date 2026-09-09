@@ -263,12 +263,12 @@ export function AdvocacyClient() {
                       .sort((a, b) => b.clicks - a.clicks)
                       .map(c => (
                         <tr key={c.id} className="hover:bg-muted/20">
-                          <td className="px-4 py-2 font-mono text-xs font-bold">{c.code}</td>
+                          <td className="px-4 py-2 bg-num text-xs font-bold">{c.code}</td>
                           <td className="px-4 py-2 text-muted-foreground">{c.promoter.name}</td>
                           <td className="px-4 py-2">{c.clicks}</td>
                           <td className="px-4 py-2">{c.unique_clicks}</td>
                           <td className="px-4 py-2">{c.conversions}</td>
-                          <td className="px-4 py-2">{formatNGN(c.attributed_revenue)}</td>
+                          <td className="px-4 py-2 bg-num">{formatNGN(c.attributed_revenue)}</td>
                           <td className="px-4 py-2">
                             <Badge variant={c.is_active ? 'default' : 'secondary'} className="text-xs">
                               {c.is_active ? 'Active' : 'Paused'}
@@ -304,7 +304,7 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
       <div className="flex items-center gap-2 text-muted-foreground text-xs mb-2">
         {icon} {label}
       </div>
-      <p className="text-2xl font-bold">{value}</p>
+      <p className="text-2xl font-bold"><span className="bg-num">{value}</span></p>
     </div>
   )
 }
@@ -354,7 +354,7 @@ function PromoterCard({
         </div>
         <div className="text-right shrink-0">
           <p className="text-sm font-semibold">{promoter.referral_codes.reduce((s, c) => s + c.clicks, 0)} clicks</p>
-          <p className="text-xs text-muted-foreground">{promoter.referral_codes.length} code{promoter.referral_codes.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-muted-foreground bg-num">{promoter.referral_codes.length} code{promoter.referral_codes.length !== 1 ? 's' : ''}</p>
         </div>
       </button>
 
@@ -438,12 +438,12 @@ function ReferralCodeRow({ code }: { code: ReferralCode }) {
 
   return (
     <tr className={cn('hover:bg-muted/20', !code.is_active && 'opacity-50')}>
-      <td className="px-3 py-2 font-mono font-bold">{code.code}</td>
+      <td className="px-3 py-2 bg-num font-bold">{code.code}</td>
       <td className="px-3 py-2 text-muted-foreground">{code.label ?? '—'}</td>
       <td className="px-3 py-2">{code.clicks}</td>
       <td className="px-3 py-2">{code.unique_clicks}</td>
       <td className="px-3 py-2">{code.conversions}</td>
-      <td className="px-3 py-2">{formatNGN(code.attributed_revenue)}</td>
+      <td className="px-3 py-2 bg-num">{formatNGN(code.attributed_revenue)}</td>
       <td className="px-3 py-2">
         <div className="flex items-center gap-1">
           <button onClick={copyLink} className="p-1 hover:bg-muted rounded" title="Copy referral link">
@@ -574,7 +574,7 @@ function CandidateRow({
   return (
     <div className="bg-card/60 rounded-lg border border-line px-3 py-2">
       <div className="flex items-center gap-2 text-xs">
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-shell font-bold text-pos text-[11px]">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-shell font-bold text-pos text-[11px] bg-num">
           {candidate.score}
         </span>
         <span className="flex-1 text-muted-foreground line-clamp-1">

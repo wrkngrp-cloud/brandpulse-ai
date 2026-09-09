@@ -88,7 +88,7 @@ export function ReportPoller({ eventId }: { eventId: string }) {
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>Progress</span>
-          <span>{Math.round(progress)}%</span>
+          <span className="bg-num">{Math.round(progress)}%</span>
         </div>
         <div className="h-2 bg-muted rounded-full overflow-hidden">
           <div

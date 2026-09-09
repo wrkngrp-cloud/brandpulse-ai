@@ -148,7 +148,7 @@ export function BudgetClient() {
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <p className="font-semibold">{formatNGN(plan.total_budget)}</p>
+                <p className="font-semibold bg-num">{formatNGN(plan.total_budget)}</p>
                 <p className="text-xs text-muted-foreground">
                   {formatNGN(plan.line_items?.reduce((s, li) => s + li.actual_amount, 0) ?? 0)} spent
                 </p>
@@ -185,9 +185,9 @@ export function BudgetClient() {
                                 </span>
                               </td>
                               <td className="px-3 py-2 font-medium">{li.label}</td>
-                              <td className="px-3 py-2">{formatNGN(li.planned_amount)}</td>
-                              <td className="px-3 py-2">{formatNGN(li.actual_amount)}</td>
-                              <td className={cn('px-3 py-2 font-medium', isOver ? 'text-tx-flare' : variance < 0 ? 'text-pos' : 'text-muted-foreground')}>
+                              <td className="px-3 py-2 bg-num">{formatNGN(li.planned_amount)}</td>
+                              <td className="px-3 py-2 bg-num">{formatNGN(li.actual_amount)}</td>
+                              <td className={cn('px-3 py-2 font-medium bg-num', isOver ? 'text-tx-flare' : variance < 0 ? 'text-pos' : 'text-muted-foreground')}>
                                 {variance !== 0 ? (isOver ? '+' : '') + formatNGN(variance) : '—'}
                               </td>
                               <td className="px-3 py-2 w-28">
@@ -198,7 +198,7 @@ export function BudgetClient() {
                                       style={{ width: `${Math.min(100, pacingPct)}%` }}
                                     />
                                   </div>
-                                  <span className="text-xs text-muted-foreground w-8 shrink-0">{Math.round(pacingPct)}%</span>
+                                  <span className="text-xs text-muted-foreground w-8 shrink-0 bg-num">{Math.round(pacingPct)}%</span>
                                 </div>
                               </td>
                               <td className="px-3 py-2">
@@ -281,9 +281,9 @@ function ActivePlanSummary({ plan }: { plan: BudgetPlan }) {
         <span className="font-semibold text-sm">Active plan: {plan.name}</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <div><p className="text-xs text-muted-foreground">Total budget</p><p className="font-bold">{formatNGN(plan.total_budget)}</p></div>
-        <div><p className="text-xs text-muted-foreground">Spent</p><p className="font-bold">{formatNGN(totalActual)}</p></div>
-        <div><p className="text-xs text-muted-foreground">Remaining</p><p className="font-bold">{formatNGN(remaining)}</p></div>
+        <div><p className="text-xs text-muted-foreground">Total budget</p><p className="font-bold bg-num">{formatNGN(plan.total_budget)}</p></div>
+        <div><p className="text-xs text-muted-foreground">Spent</p><p className="font-bold bg-num">{formatNGN(totalActual)}</p></div>
+        <div><p className="text-xs text-muted-foreground">Remaining</p><p className="font-bold bg-num">{formatNGN(remaining)}</p></div>
         <div>
           <p className="text-xs text-muted-foreground">Pace</p>
           <div className="flex items-center gap-1">
@@ -300,8 +300,8 @@ function ActivePlanSummary({ plan }: { plan: BudgetPlan }) {
       </div>
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Spend ({Math.round(pacingPct)}%)</span>
-          <span>Time ({Math.round(timePct)}%)</span>
+          <span className="bg-num">Spend ({Math.round(pacingPct)}%)</span>
+          <span className="bg-num">Time ({Math.round(timePct)}%)</span>
         </div>
         <div className="relative bg-muted rounded-full h-2">
           <div className="absolute h-2 rounded-full bg-primary" style={{ width: `${Math.min(100, pacingPct)}%` }} />
@@ -335,8 +335,8 @@ function SpendProgress({ plan }: { plan: BudgetPlan }) {
                 style={{ width: `${pct}%` }}
               />
             </div>
-            <span className="text-xs text-muted-foreground w-10 text-right">{Math.round(pct)}%</span>
-            <span className="text-xs font-medium w-24 text-right">{formatNGN(actual)}</span>
+            <span className="text-xs text-muted-foreground w-10 text-right bg-num">{Math.round(pct)}%</span>
+            <span className="text-xs font-medium w-24 text-right bg-num">{formatNGN(actual)}</span>
           </div>
         )
       })}

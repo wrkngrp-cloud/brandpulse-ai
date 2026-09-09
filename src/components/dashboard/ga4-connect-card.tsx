@@ -113,7 +113,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
           <div className="rounded-lg bg-muted/50 px-3 py-2 text-xs space-y-1">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Property</span>
-              <span className="font-mono">{connection.property_name ?? connection.property_id}</span>
+              <span className="bg-num">{connection.property_name ?? connection.property_id}</span>
             </div>
             {connection.last_synced_at && (
               <div className="flex justify-between">

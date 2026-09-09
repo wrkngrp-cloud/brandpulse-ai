@@ -99,7 +99,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
               Live
             </span>
           )}
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-muted-foreground bg-num">
             {interactions.length} interactions logged
           </span>
         </div>
@@ -145,7 +145,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
               <div className={`h-7 w-7 rounded-md ${meta.color} bg-opacity-15 flex items-center justify-center`}>
                 <Icon className={`h-4 w-4 ${meta.color.replace('bg-', 'text-')}`} />
               </div>
-              <p className="text-2xl font-semibold tabular-nums">{counts[type] ?? 0}</p>
+              <p className="text-2xl font-semibold bg-num">{counts[type] ?? 0}</p>
               <p className="text-xs text-muted-foreground">{meta.label}</p>
             </div>
           )
@@ -168,7 +168,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
                   fontSize: 12,
                   color: 'var(--bg-card)',
                 }}
-                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
                 cursor={{ fill: 'currentColor', opacity: 0.05 }}
               />
               <Bar dataKey="count" fill="var(--flare)" radius={[4,4,0,0]} opacity={0.85} />
@@ -188,7 +188,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-medium truncate">{a.name}</p>
-                    <p className="text-sm tabular-nums shrink-0">{a.total}</p>
+                    <p className="text-sm bg-num shrink-0">{a.total}</p>
                   </div>
                   <p className="text-xs text-muted-foreground">{a.leads} leads</p>
                 </div>

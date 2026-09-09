@@ -114,9 +114,9 @@ export function OohVisitChart({ visits }: OohVisitChartProps) {
           {/* Device breakdown */}
           <div className="flex items-center gap-5 text-xs text-muted-foreground pt-1 border-t">
             <span>Device mix: </span>
-            {devices.mobile  > 0 && <span><strong className="text-foreground">{Math.round(devices.mobile  / total * 100)}%</strong> mobile</span>}
-            {devices.desktop > 0 && <span><strong className="text-foreground">{Math.round(devices.desktop / total * 100)}%</strong> desktop</span>}
-            {devices.tablet  > 0 && <span><strong className="text-foreground">{Math.round(devices.tablet  / total * 100)}%</strong> tablet</span>}
+            {devices.mobile  > 0 && <span><strong className="text-foreground bg-num">{Math.round(devices.mobile  / total * 100)}%</strong> mobile</span>}
+            {devices.desktop > 0 && <span><strong className="text-foreground bg-num">{Math.round(devices.desktop / total * 100)}%</strong> desktop</span>}
+            {devices.tablet  > 0 && <span><strong className="text-foreground bg-num">{Math.round(devices.tablet  / total * 100)}%</strong> tablet</span>}
           </div>
         </>
       )}

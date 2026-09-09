@@ -49,7 +49,7 @@ export function UrlLengthAdvisor({ url, formatType }: UrlLengthAdvisorProps) {
     <div className={`rounded-md px-3 py-2 text-xs ${c.bg} ${c.text} space-y-1.5`}>
       <div className="flex items-center justify-between gap-2">
         <span className="font-medium">{message}</span>
-        <span className="shrink-0 font-mono tabular-nums">{len}/{limits.max}</span>
+        <span className="shrink-0 bg-num">{len}/{limits.max}</span>
       </div>
       <div className="h-1 rounded-full bg-ink/10 dark:bg-card/10 overflow-hidden">
         <div

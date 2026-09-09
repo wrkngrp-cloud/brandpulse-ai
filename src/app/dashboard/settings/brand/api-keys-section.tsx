@@ -175,7 +175,7 @@ export function ApiKeysSection() {
         )}
         {keys.map(k => (
           <div key={k.id} className="flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm">
-            <code className="flex-1 font-mono text-xs text-muted-foreground">{k.key_prefix}</code>
+            <code className="flex-1 bg-num text-xs text-muted-foreground">{k.key_prefix}</code>
             <span className="text-xs text-muted-foreground/70 shrink-0">{k.name}</span>
             <span className="text-xs text-muted-foreground/50 shrink-0">
               {k.last_used_at
@@ -200,7 +200,7 @@ export function ApiKeysSection() {
             Copy this key now — it will not be shown again.
           </p>
           <div className="flex items-center gap-2 rounded-md bg-background border px-3 py-2">
-            <code className="flex-1 font-mono text-xs break-all select-all">{revealed.key}</code>
+            <code className="flex-1 bg-num text-xs break-all select-all">{revealed.key}</code>
             <CopyButton text={revealed.key} />
           </div>
           <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setRevealed(null)}>
@@ -241,9 +241,9 @@ export function ApiKeysSection() {
         {showDocs && (
           <div className="mt-3 space-y-2">
             <p className="text-xs text-muted-foreground">
-              POST to <code className="font-mono bg-muted px-1 rounded">https://your-domain.com/api/first-party/[type]</code> with your key in the Authorization header.
+              POST to <code className="bg-num bg-muted px-1 rounded">https://your-domain.com/api/first-party/[type]</code> with your key in the Authorization header.
             </p>
-            <div className="rounded-md bg-muted p-2 font-mono text-xs text-muted-foreground overflow-x-auto">
+            <div className="rounded-md bg-muted p-2 bg-num text-xs text-muted-foreground overflow-x-auto">
               Authorization: Bearer bp_live_...
             </div>
 
@@ -266,7 +266,7 @@ export function ApiKeysSection() {
                       <p className="text-xs text-muted-foreground">POST /api/first-party/{doc.type}</p>
                       <CopyButton text={doc.example} />
                     </div>
-                    <pre className="text-[11px] font-mono bg-background rounded-md p-2 overflow-x-auto max-h-52 border">
+                    <pre className="text-[11px] bg-num bg-background rounded-md p-2 overflow-x-auto max-h-52 border">
                       {doc.example}
                     </pre>
                   </div>

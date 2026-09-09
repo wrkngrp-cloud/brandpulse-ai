@@ -119,9 +119,9 @@ export default async function SurveyDetailPage({
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div className="border rounded-xl p-4 space-y-1">
           <p className="text-xs text-muted-foreground">Total responses</p>
-          <p className="text-2xl font-bold">{allResponses.length}</p>
+          <p className="text-2xl font-bold bg-num">{allResponses.length}</p>
           {allResponses.length !== okResponses.length && (
-            <p className="text-xs text-muted-foreground">{okResponses.length} quality</p>
+            <p className="text-xs text-muted-foreground bg-num">{okResponses.length} quality</p>
           )}
         </div>
         {npsQuestion && (
@@ -154,7 +154,7 @@ export default async function SurveyDetailPage({
                   <div key={label} className="space-y-1">
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground truncate max-w-[70%]">{label}</span>
-                      <span className="font-medium shrink-0">{count} ({pct}%)</span>
+                      <span className="font-medium shrink-0 bg-num">{count} ({pct}%)</span>
                     </div>
                     <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                       <div className="h-full bg-foreground rounded-full" style={{ width: `${pct}%` }} />
@@ -169,7 +169,7 @@ export default async function SurveyDetailPage({
       {/* Response feed — shows all questions generically */}
       {allResponses.length > 0 && (
         <div className="space-y-3">
-          <p className="text-sm font-medium">Responses ({allResponses.length})</p>
+          <p className="text-sm font-medium bg-num">Responses ({allResponses.length})</p>
           <div className="space-y-3">
             {allResponses.slice(0, 50).map(r => {
               const ans = r.answers as Record<string, unknown>
@@ -193,7 +193,7 @@ export default async function SurveyDetailPage({
                           <span className="text-muted-foreground shrink-0 w-24 truncate" title={q.text.replace('{brand}', 'brand')}>
                             {q.text.replace('{brand}', 'brand').slice(0, 30)}{q.text.length > 30 ? '…' : ''}
                           </span>
-                          <span className="font-medium">{fmtAnswer(val)}</span>
+                          <span className="font-medium bg-num">{fmtAnswer(val)}</span>
                         </div>
                       )
                     })}

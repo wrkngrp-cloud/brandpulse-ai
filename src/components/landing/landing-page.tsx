@@ -47,7 +47,7 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
           <GaugeMark className="h-7 w-7" />
           <Wordmark />
         </Link>
-        <nav className="hidden items-center gap-7 font-mono text-[11px] uppercase tracking-[0.18em] md:flex" style={{ color: 'var(--lp-mut)' }}>
+        <nav className="hidden items-center gap-7 text-[11px] md:flex" style={{ color: 'var(--lp-mut)' }}>
           <a href="/#tour" className="transition-opacity hover:opacity-60">Product</a>
           <Link href="/features" className="transition-opacity hover:opacity-60">Features</Link>
           <Link href="/use-cases" className="transition-opacity hover:opacity-60">Industries</Link>
@@ -162,8 +162,8 @@ function Hero() {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6 text-center">
-        <motion.p {...rise} className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>
-          Brand intelligence · Lagos to Accra
+        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>
+          Brand intelligence built in Lagos, for West Africa
         </motion.p>
         <h1 className="mx-auto mt-5 max-w-4xl text-5xl font-black leading-[1.02] tracking-[-0.03em] sm:text-7xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
@@ -202,11 +202,11 @@ function Hero() {
 
         {/* connector marquee */}
         <div className="relative mt-16 overflow-hidden" style={{ maskImage: 'linear-gradient(90deg, transparent, black 12%, black 88%, transparent)' }}>
-          <div className="flex w-max animate-[lp-marquee_26s_linear_infinite] gap-10 font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--lp-mut)' }}>
+          <div className="flex w-max animate-[lp-marquee_26s_linear_infinite] gap-10 text-[10px]" style={{ color: 'var(--lp-mut)' }}>
             {[...Array(2)].flatMap((_, k) =>
               ['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
                 <span key={`${k}-${c}`} className="flex items-center gap-10">
-                  <span>{c}</span><span style={{ color: 'var(--lp-clay)' }}>·</span>
+                  <span>{c}</span><span style={{ color: 'var(--tx-3)' }}>·</span>
                 </span>
               )),
             )}
@@ -246,7 +246,7 @@ function Differentiators() {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
-        <motion.p {...rise} className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>Why BrandGauge</motion.p>
+        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Why BrandGauge</motion.p>
         <motion.h2 {...rise} className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Built for here. Not adapted for here.
@@ -259,7 +259,7 @@ function Differentiators() {
               {/* clay corner sweep on hover */}
               <div className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
                 style={{ background: 'var(--bg-shell)' }} />
-              <span className="font-mono text-[11px]" style={{ color: 'var(--lp-clay)' }}>{d.n}</span>
+              <span className="bg-num text-[11px]" style={{ color: 'var(--tx-flare)' }}>{d.n}</span>
               <h3 className="mt-3 text-[17px] font-bold leading-snug" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{d.title}</h3>
               <p className="mt-2.5 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{d.body}</p>
             </motion.div>
@@ -277,7 +277,7 @@ function Differentiators() {
             { v: 5,  s: '',  label: 'offline channels measured' },
           ].map(st => (
             <div key={st.label} className="relative">
-              <p className="text-4xl font-black tabular-nums" style={{ fontFamily: 'var(--font)', color: 'var(--lp-clay)' }}>
+              <p className="text-4xl font-black bg-num" style={{ fontFamily: 'var(--font-num)', color: 'var(--tx-flare)' }}>
                 <CountUp to={st.v} suffix={st.s} />
               </p>
               <p className="mt-1 text-[12px]" style={{ color: 'var(--lp-mut)' }}>{st.label}</p>
@@ -311,7 +311,7 @@ function DeepDives() {
           <motion.div key={s.kicker} {...rise}
             className={`flex flex-col gap-10 lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
             <div className="lg:w-[38%]">
-              <p className="font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--lp-clay)' }}>{s.kicker}</p>
+              <p className="text-[10px]" style={{ color: 'var(--tx-flare)' }}>{s.kicker}</p>
               <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{s.title}</h3>
               <p className="mt-4 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{s.body}</p>
             </div>
@@ -364,13 +364,13 @@ function Industries() {
             <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
               className="rounded-full border px-5 py-2.5 text-[13px] transition-all duration-200"
               style={active === i
-                ? { borderColor: 'var(--lp-clay)', color: 'var(--lp-clay)', background: 'var(--bg-shell)', transform: 'translateY(-2px)' }
+                ? { borderColor: 'var(--flare)', color: 'var(--bg-paper)', background: 'var(--flare)' }
                 : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
               {v.name}
             </button>
           ))}
         </motion.div>
-        <p className="mx-auto mt-6 h-6 max-w-md font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: 'var(--lp-mut)' }}>
+        <p className="mx-auto mt-6 h-6 max-w-md text-[11px]" style={{ color: 'var(--lp-mut)' }}>
           {list[active].hint}
         </p>
       </div>
@@ -417,7 +417,7 @@ export function Footer() {
           <GaugeMark className="h-5 w-5" />
           <Wordmark className="text-sm" />
         </div>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: 'var(--lp-mut)' }}>
+        <p className="text-[10px]" style={{ color: 'var(--lp-mut)' }}>
           Made for West African marketers
         </p>
         <div className="flex gap-6 text-[12px]" style={{ color: 'var(--lp-mut)' }}>

@@ -125,7 +125,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
               Add your WhatsApp Business API credentials to start sending. All sends come from your BrandGauge-verified number.
             </p>
           </div>
-          <div className="text-left bg-muted/40 rounded-lg p-4 text-xs font-mono space-y-1 max-w-sm mx-auto">
+          <div className="text-left bg-muted/40 rounded-lg p-4 text-xs bg-num space-y-1 max-w-sm mx-auto">
             <p>WHATSAPP_PHONE_NUMBER_ID=</p>
             <p>WHATSAPP_BUSINESS_ACCOUNT_ID=</p>
             <p>WHATSAPP_ACCESS_TOKEN=</p>
@@ -164,7 +164,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="border rounded-xl p-4 bg-card space-y-1">
             <Icon className="h-4 w-4 text-muted-foreground" />
-            <p className="text-xl font-bold tracking-tight">{value}</p>
+            <p className="text-xl font-bold tracking-tight"><span className="bg-num">{value}</span></p>
             <p className="text-[11px] text-muted-foreground">{label}</p>
           </div>
         ))}
@@ -189,7 +189,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
 
       {/* Campaign history */}
       <section>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Campaign history</h2>
+        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Campaign history</h2>
 
         {campaigns.length === 0 ? (
           <div className="border rounded-xl p-8 bg-card text-center text-sm text-muted-foreground">
@@ -215,17 +215,17 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
                     {statusBadge(c.status)}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                    Template: <span className="font-mono">{c.template_name}</span>
+                    Template: <span className="bg-num">{c.template_name}</span>
                   </p>
                   {c.status === 'sent' && c.sent > 0 && (
                     <div className="flex items-center gap-3 mt-1.5 text-[11px] text-muted-foreground">
-                      <span>{c.sent.toLocaleString()} sent</span>
+                      <span className="bg-num">{c.sent.toLocaleString()} sent</span>
                       <span>·</span>
                       <span className="text-pos dark:text-pos">
                         {pct(c.delivered, c.sent)} delivered
                       </span>
                       <span>·</span>
-                      <span className="text-tx-flare dark:text-tx-2">
+                      <span className="text-tx-flare dark:text-tx-2 bg-num">
                         {pct(c.read_count, c.sent)} read
                       </span>
                       {c.failed > 0 && (
@@ -296,7 +296,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
                   <SelectContent>
                     {templates.map(t => (
                       <SelectItem key={t.name} value={t.name}>
-                        <span className="font-mono text-xs">{t.name}</span>
+                        <span className="bg-num text-xs">{t.name}</span>
                         <span className="ml-2 text-muted-foreground text-xs">{t.category}</span>
                       </SelectItem>
                     ))}

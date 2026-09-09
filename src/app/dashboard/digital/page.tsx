@@ -133,7 +133,7 @@ function MetricRow({ label, value, bench }: {
     <div className="flex items-center justify-between gap-3">
       <span className="text-xs text-muted-foreground">{label}</span>
       <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold tabular-nums">{value}</span>
+        <span className="text-sm font-semibold bg-num">{value}</span>
         {bench && (
           <span className={`text-[10px] font-medium leading-none ${bench.cls}`}>{bench.label}</span>
         )}
@@ -564,7 +564,7 @@ export default async function DigitalPage({
             <strong>Facebook Login → Settings</strong> and add this exact URL to{' '}
             <strong>Valid OAuth Redirect URIs</strong>:
           </p>
-          <code className="block text-xs bg-shell dark:bg-shell/40 px-3 py-1.5 rounded font-mono">
+          <code className="block text-xs bg-shell dark:bg-shell/40 px-3 py-1.5 rounded bg-num">
             {process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'}/api/ads/meta/callback
           </code>
           <p className="text-xs text-tx-2 dark:text-tx-2">
@@ -639,12 +639,12 @@ export default async function DigitalPage({
           {kpis.map(m => (
             <Card key={m.label} className="border rounded-xl p-4 bg-card space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">
+                <span className="text-[10px] text-muted-foreground font-semibold">
                   {m.label}
                 </span>
                 <m.icon className={`h-3.5 w-3.5 ${m.color}`} />
               </div>
-              <p className="text-xl font-bold tracking-tight">{m.value}</p>
+              <p className="text-xl font-bold tracking-tight"><span className="bg-num">{m.value}</span></p>
               <p className="text-[10px] text-muted-foreground">{m.sub}</p>
             </Card>
           ))}
@@ -671,7 +671,7 @@ export default async function DigitalPage({
                     {['Campaign', 'Platform', 'Objective', 'Spend', 'ROAS', 'CPA', 'CTR', 'Conversions', ''].map(h => (
                       <th
                         key={h}
-                        className="text-left py-3 px-4 text-[11px] font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap"
+                        className="text-left py-3 px-4 text-[11px] font-semibold text-muted-foreground whitespace-nowrap"
                       >
                         {h}
                       </th>
@@ -695,10 +695,10 @@ export default async function DigitalPage({
                       <td className="py-3 px-4 whitespace-nowrap text-xs text-muted-foreground">
                         {objectiveLabel(c.objective)}
                       </td>
-                      <td className="py-3 px-4 font-medium whitespace-nowrap">{fmtNGN(c.spend)}</td>
+                      <td className="py-3 px-4 font-medium whitespace-nowrap bg-num">{fmtNGN(c.spend)}</td>
                       <td className="py-3 px-4 whitespace-nowrap">
                         {c.avgRoas > 0 ? (
-                          <span className={benchROAS(c.avgRoas, bench).cls}>{c.avgRoas.toFixed(1)}x</span>
+                          <span className={cn('bg-num', benchROAS(c.avgRoas, bench).cls)}>{c.avgRoas.toFixed(1)}x</span>
                         ) : '—'}
                       </td>
                       <td className="py-3 px-4 text-muted-foreground whitespace-nowrap">
@@ -706,7 +706,7 @@ export default async function DigitalPage({
                       </td>
                       <td className="py-3 px-4 whitespace-nowrap">
                         {c.avgCtr > 0 ? (
-                          <span className={benchCTR(c.avgCtr, bench).cls}>{fmtPct(c.avgCtr)}</span>
+                          <span className={cn('bg-num', benchCTR(c.avgCtr, bench).cls)}>{fmtPct(c.avgCtr)}</span>
                         ) : '—'}
                       </td>
                       <td className="py-3 px-4 whitespace-nowrap">{c.conversions > 0 ? fmtNum(c.conversions) : '—'}</td>
@@ -747,7 +747,7 @@ export default async function DigitalPage({
             <Card key={pillar.name} className="border rounded-xl p-5 bg-card space-y-4">
               <div className="flex items-center gap-2">
                 <div className={`h-2 w-2 rounded-full shrink-0 ${pillar.dotColor}`} />
-                <span className={`text-[10px] font-bold uppercase tracking-widest ${pillar.textColor}`}>
+                <span className={`text-[10px] font-medium ${pillar.textColor}`}>
                   {pillar.name}
                 </span>
               </div>
@@ -809,7 +809,7 @@ export default async function DigitalPage({
                   {['Platform', 'Spend', 'ROAS', 'CPA', 'CTR', 'CVR', 'Conversions'].map(h => (
                     <th
                       key={h}
-                      className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap"
+                      className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground whitespace-nowrap"
                     >
                       {h}
                     </th>
@@ -820,21 +820,21 @@ export default async function DigitalPage({
                 {platformSummaries.map(p => (
                   <tr key={p.platform} className="border-b border-border/30 last:border-0">
                     <td className="py-3 pr-4 font-medium whitespace-nowrap">{platformLabel(p.platform)}</td>
-                    <td className="py-3 pr-4 font-medium">{fmtNGN(p.spend)}</td>
+                    <td className="py-3 pr-4 font-medium bg-num">{fmtNGN(p.spend)}</td>
                     <td className="py-3 pr-4">
                       {p.avgRoas > 0 ? (
-                        <span className={benchROAS(p.avgRoas, bench).cls}>{p.avgRoas.toFixed(1)}x</span>
+                        <span className={cn('bg-num', benchROAS(p.avgRoas, bench).cls)}>{p.avgRoas.toFixed(1)}x</span>
                       ) : '—'}
                     </td>
                     <td className="py-3 pr-4 text-muted-foreground">
                       {p.avgCpa > 0 ? fmtNGN(p.avgCpa) : '—'}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={benchCTR(p.avgCtr, bench).cls}>{fmtPct(p.avgCtr)}</span>
+                      <span className={cn('bg-num', benchCTR(p.avgCtr, bench).cls)}>{fmtPct(p.avgCtr)}</span>
                     </td>
                     <td className="py-3 pr-4">
                       {p.cvr > 0 ? (
-                        <span className={benchCVR(p.cvr, bench).cls}>{p.cvr.toFixed(2)}%</span>
+                        <span className={cn('bg-num', benchCVR(p.cvr, bench).cls)}>{p.cvr.toFixed(2)}%</span>
                       ) : '—'}
                     </td>
                     <td className="py-3">{p.conversions}</td>

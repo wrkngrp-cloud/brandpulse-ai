@@ -371,7 +371,7 @@ function BriefingTab({
                   { key: 'threat_of_substitutes',    label: 'Threat of Substitutes' },
                 ] as const).map(({ key, label }) => (
                   <div key={key} className="rounded-lg border bg-muted/20 px-4 py-3">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">{label}</p>
+                    <p className="text-[11px] font-bold text-muted-foreground mb-1">{label}</p>
                     <p className="text-sm leading-relaxed">{result.porter_forces![key]}</p>
                   </div>
                 ))}
@@ -500,7 +500,7 @@ function EsovLeagueTab({
                   <td className="px-4 py-3 font-medium">
                     <div className="flex items-center gap-2">
                       {entry.isOurBrand && (
-                        <span className="text-[10px] px-1.5 py-0.5 bg-foreground text-background rounded-full font-bold tracking-wide">
+                        <span className="text-[10px] px-1.5 py-0.5 bg-foreground text-background rounded-full font-bold">
                           YOU
                         </span>
                       )}

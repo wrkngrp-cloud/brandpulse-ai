@@ -197,7 +197,7 @@ function CulturalIQBadge({ score }: { score: number | null }) {
   const color = score >= 70 ? 'text-pos bg-shell'
     : score >= 50 ? 'text-tx-2 bg-shell'
     : 'text-tx-flare bg-flare-wash'
-  return <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold', color)}>{score}</span>
+  return <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold bg-num', color)}>{score}</span>
 }
 
 function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; campaignId: string }) {
@@ -227,7 +227,7 @@ function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; 
       <div className="grid grid-cols-2 gap-2">
         <div className="bg-muted/40 rounded-lg p-2 space-y-0.5">
           <p className="text-xs text-muted-foreground">Followers</p>
-          <p className="text-sm font-semibold tabular-nums">{formatFollowers(inf.followers)}</p>
+          <p className="text-sm font-semibold bg-num">{formatFollowers(inf.followers)}</p>
         </div>
         <div className="bg-muted/40 rounded-lg p-2 space-y-0.5">
           <p className="text-xs text-muted-foreground">Cultural IQ</p>
@@ -488,7 +488,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                   <Icon className="h-3.5 w-3.5" />
                   {label}
                 </div>
-                <p className="text-2xl font-bold tabular-nums">{value}</p>
+                <p className="text-2xl font-bold bg-num">{value}</p>
                 <p className="text-xs text-muted-foreground">{sub}</p>
               </div>
             ))}
@@ -502,7 +502,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
             </div>
             {attributedRevenue > 0 ? (
               <>
-                <p className="text-2xl font-bold tabular-nums">
+                <p className="text-2xl font-bold bg-num">
                   {attributedRevenue >= 1_000_000
                     ? `₦${(attributedRevenue / 1_000_000).toFixed(1)}M`
                     : `₦${attributedRevenue.toLocaleString('en-NG')}`}
@@ -511,7 +511,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               </>
             ) : (
               <>
-                <p className="text-2xl font-bold tabular-nums">—</p>
+                <p className="text-2xl font-bold bg-num">—</p>
                 <p className="text-xs text-muted-foreground">
                   Link a sales import to track revenue ·{' '}
                   <Link href="/dashboard/connectors/ecommerce" className="underline hover:text-foreground transition-colors">
@@ -531,7 +531,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <Percent className="h-3.5 w-3.5" />
                     Cost per OOH visit
                   </div>
-                  <p className="text-xl font-bold tabular-nums">{fmtMoney(cpv, campaign.currency)}</p>
+                  <p className="text-xl font-bold bg-num">{fmtMoney(cpv, campaign.currency)}</p>
                   <p className="text-xs text-muted-foreground">OOH spend ÷ vanity-link visits</p>
                 </div>
               )}
@@ -541,7 +541,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <TrendingUp className="h-3.5 w-3.5" />
                     Total engaged
                   </div>
-                  <p className="text-xl font-bold tabular-nums">{totalEngaged.toLocaleString()}</p>
+                  <p className="text-xl font-bold bg-num">{totalEngaged.toLocaleString()}</p>
                   <p className="text-xs text-muted-foreground">leads + customers + engaged across events</p>
                 </div>
               )}
@@ -582,13 +582,13 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                             <td className="py-2 pr-4 text-muted-foreground">
                               {[site.lga, site.city, site.state].filter(Boolean).join(', ') || '—'}
                             </td>
-                            <td className="py-2 pr-4 text-right tabular-nums">
+                            <td className="py-2 pr-4 text-right bg-num">
                               {site.visits != null ? site.visits.toLocaleString() : '—'}
                             </td>
-                            <td className="py-2 pr-4 text-right tabular-nums font-medium">
+                            <td className="py-2 pr-4 text-right bg-num font-medium">
                               {logVisits.toLocaleString()}
                             </td>
-                            <td className="py-2 text-right tabular-nums text-muted-foreground">
+                            <td className="py-2 text-right bg-num text-muted-foreground">
                               {fmtMoney(site.monthly_cost, site.currency ?? 'NGN')}/mo
                             </td>
                           </tr>
@@ -599,10 +599,10 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <tfoot>
                       <tr className="border-t">
                         <td colSpan={3} className="pt-2 text-muted-foreground font-medium">Total</td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">
+                        <td className="pt-2 text-right bg-num font-semibold">
                           {totalOohVisits.toLocaleString()}
                         </td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">
+                        <td className="pt-2 text-right bg-num font-semibold">
                           {fmtMoney(totalOohSpend, campaign.currency)}/mo
                         </td>
                       </tr>
@@ -640,13 +640,13 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.date_start)}
                             </span>
                           </td>
-                          <td className="py-2 pr-4 text-right tabular-nums font-medium">
+                          <td className="py-2 pr-4 text-right bg-num font-medium">
                             {leads > 0 ? leads.toLocaleString() : <span className="text-muted-foreground">—</span>}
                           </td>
-                          <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">
+                          <td className="py-2 pr-4 text-right bg-num text-muted-foreground">
                             {ev.expected_attendance != null ? ev.expected_attendance.toLocaleString() : '—'}
                           </td>
-                          <td className="py-2 text-right tabular-nums">
+                          <td className="py-2 text-right bg-num">
                             <span className="text-muted-foreground">—</span>
                           </td>
                         </tr>
@@ -657,9 +657,9 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <tfoot>
                       <tr className="border-t">
                         <td className="pt-2 text-muted-foreground font-medium">Total</td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">{totalLeads.toLocaleString()}</td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">{totalEventAttendance > 0 ? totalEventAttendance.toLocaleString() : '—'}</td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">—</td>
+                        <td className="pt-2 text-right bg-num font-semibold">{totalLeads.toLocaleString()}</td>
+                        <td className="pt-2 text-right bg-num font-semibold">{totalEventAttendance > 0 ? totalEventAttendance.toLocaleString() : '—'}</td>
+                        <td className="pt-2 text-right bg-num font-semibold">—</td>
                       </tr>
                     </tfoot>
                   )}
@@ -673,7 +673,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
             <div className="border rounded-xl p-5 bg-card space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">Social performance</p>
-                <span className="text-xs text-muted-foreground">{socialPosts.length} post{socialPosts.length !== 1 ? 's' : ''}</span>
+                <span className="text-xs text-muted-foreground bg-num">{socialPosts.length} post{socialPosts.length !== 1 ? 's' : ''}</span>
               </div>
 
               {/* Social KPI row */}
@@ -685,7 +685,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                 ].map(({ label, value }) => (
                   <div key={label} className="bg-muted/40 rounded-lg p-3 space-y-0.5">
                     <p className="text-xs text-muted-foreground">{label}</p>
-                    <p className="text-lg font-bold tabular-nums">{value}</p>
+                    <p className="text-lg font-bold bg-num">{value}</p>
                   </div>
                 ))}
               </div>
@@ -717,7 +717,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           fontSize: 12,
                           color: 'var(--bg-card)',
                         }}
-                        labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
+                        labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10.5, textTransform: '', letterSpacing: '0.10em', marginBottom: 4 }}
                         formatter={(value) => [Number(value).toLocaleString(), 'Impressions']}
                         cursor={{ fill: 'currentColor', opacity: 0.05 }}
                       />
@@ -752,7 +752,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           <div key={type} className="space-y-1">
                             <div className="flex justify-between text-xs">
                               <span className="text-muted-foreground">{labels[type] ?? type}</span>
-                              <span className="font-medium">{count.toLocaleString()} ({pct}%)</span>
+                              <span className="font-medium bg-num">{count.toLocaleString()} ({pct}%)</span>
                             </div>
                             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                               <div className="h-full bg-foreground rounded-full" style={{ width: `${pct}%` }} />
@@ -834,7 +834,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="text-sm font-semibold tabular-nums">{(site.visits ?? 0).toLocaleString()}</p>
+                    <p className="text-sm font-semibold bg-num">{(site.visits ?? 0).toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">visits</p>
                   </div>
                   <Link href={`/dashboard/ooh/${site.id}`} className="shrink-0 text-muted-foreground hover:text-foreground">
@@ -909,7 +909,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                       <div className="shrink-0 text-right space-y-0.5">
                         {ev.expected_attendance != null && (
                           <>
-                            <p className="text-sm tabular-nums">{ev.expected_attendance.toLocaleString()}</p>
+                            <p className="text-sm bg-num">{ev.expected_attendance.toLocaleString()}</p>
                             <p className="text-xs text-muted-foreground">est. attendance</p>
                           </>
                         )}
@@ -937,19 +937,19 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <p className="text-sm font-semibold">BTL activations</p>
                     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
-                        <p className="text-lg font-bold tabular-nums">{btlEvents.length}</p>
+                        <p className="text-lg font-bold bg-num">{btlEvents.length}</p>
                         <p className="text-xs text-muted-foreground">Activations</p>
                       </div>
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
-                        <p className="text-lg font-bold tabular-nums">{btlTotalAttendance > 0 ? btlTotalAttendance.toLocaleString() : '—'}</p>
+                        <p className="text-lg font-bold bg-num">{btlTotalAttendance > 0 ? btlTotalAttendance.toLocaleString() : '—'}</p>
                         <p className="text-xs text-muted-foreground">Est. attendance</p>
                       </div>
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
-                        <p className="text-lg font-bold tabular-nums">{btlTotalLeads.toLocaleString()}</p>
+                        <p className="text-lg font-bold bg-num">{btlTotalLeads.toLocaleString()}</p>
                         <p className="text-xs text-muted-foreground">Total leads</p>
                       </div>
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
-                        <p className="text-lg font-bold tabular-nums">{btlBlendedCpl != null ? fmtMoney(btlBlendedCpl, campaign.currency) : '—'}</p>
+                        <p className="text-lg font-bold bg-num">{btlBlendedCpl != null ? fmtMoney(btlBlendedCpl, campaign.currency) : '—'}</p>
                         <p className="text-xs text-muted-foreground">Blended CPL</p>
                       </div>
                     </div>
@@ -978,7 +978,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                                   {(ev.activation_type ?? '').replace(/_/g, ' ')}
                                 </td>
                                 <td className="py-2 pr-4 text-muted-foreground">{ev.city}</td>
-                                <td className="py-2 pr-4 text-muted-foreground">{fmtDate(ev.date_start)}</td>
+                                <td className="py-2 pr-4 text-muted-foreground bg-num">{fmtDate(ev.date_start)}</td>
                                 <td className="py-2 text-right">
                                   {evLeads > 0 ? evLeads : '—'}
                                 </td>
@@ -1062,7 +1062,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{inf.name}</p>
-                        <p className="text-xs text-muted-foreground">@{inf.handle} · {formatPlatformLabel(inf.platform)} · {formatFollowers(inf.followers)}</p>
+                        <p className="text-xs text-muted-foreground bg-num">@{inf.handle} · {formatPlatformLabel(inf.platform)} · {formatFollowers(inf.followers)}</p>
                       </div>
                       <CulturalIQBadge score={inf.cultural_iq} />
                     </label>
@@ -1113,7 +1113,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
             <div className="space-y-2">
               <div className="flex justify-between text-sm border-b pb-3">
                 <span className="text-muted-foreground">Total campaign budget</span>
-                <span className="font-semibold">{fmtMoney(campaign.total_budget, campaign.currency)}</span>
+                <span className="font-semibold bg-num">{fmtMoney(campaign.total_budget, campaign.currency)}</span>
               </div>
 
               {channelAlloc.length > 0 && channelAlloc.map(ch => {
@@ -1145,7 +1145,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               {totalAllocated > 0 && (
                 <div className="flex justify-between text-sm border-t pt-3">
                   <span className="text-muted-foreground">Total allocated</span>
-                  <span className="font-semibold">{fmtMoney(totalAllocated, campaign.currency)}</span>
+                  <span className="font-semibold bg-num">{fmtMoney(totalAllocated, campaign.currency)}</span>
                 </div>
               )}
 
@@ -1199,7 +1199,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               }
                             </td>
                           ))}
-                          <td className="text-right py-2 pl-4 tabular-nums">
+                          <td className="text-right py-2 pl-4 bg-num">
                             {ch.budget_allocation ? fmtMoney(ch.budget_allocation, campaign.currency) : <span className="text-muted-foreground">—</span>}
                           </td>
                         </tr>
@@ -1240,7 +1240,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           <span className={cn('h-2 w-2 rounded-full shrink-0', meta?.color ?? 'bg-muted-foreground')} />
                           <span className="font-medium">{meta?.label ?? ch.channel}</span>
                           {urls.length > 0 && (
-                            <span className="text-xs text-muted-foreground">· {urls.length} asset{urls.length !== 1 ? 's' : ''}</span>
+                            <span className="text-xs text-muted-foreground bg-num">· {urls.length} asset{urls.length !== 1 ? 's' : ''}</span>
                           )}
                         </div>
                         <button
@@ -1294,12 +1294,12 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                 {oohSites.map(site => (
                   <div key={site.id} className="flex justify-between text-sm">
                     <span className="truncate mr-4">{site.site_name}</span>
-                    <span className="shrink-0 text-muted-foreground">{fmtMoney(site.monthly_cost, site.currency ?? 'NGN')}/mo</span>
+                    <span className="shrink-0 text-muted-foreground bg-num">{fmtMoney(site.monthly_cost, site.currency ?? 'NGN')}/mo</span>
                   </div>
                 ))}
                 <div className="border-t pt-2 flex justify-between text-sm font-medium">
                   <span>Total OOH monthly</span>
-                  <span>{fmtMoney(totalOohSpend, campaign.currency)}</span>
+                  <span className="bg-num">{fmtMoney(totalOohSpend, campaign.currency)}</span>
                 </div>
               </div>
             </div>

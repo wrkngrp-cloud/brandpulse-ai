@@ -225,9 +225,9 @@ export function VisualMentions({ eventId, initialData, hasIgConnection, hasHasht
       {notVisible.length > 0 && visible.length > 0 && (
         <details className="group">
           <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors list-none flex items-center gap-1 select-none">
-            <span className="group-open:hidden">▶</span>
-            <span className="hidden group-open:inline">▼</span>
-            {notVisible.length} photo{notVisible.length !== 1 ? 's' : ''} — brand not detected
+            <span className="group-open:hidden">+</span>
+            <span className="hidden group-open:inline">−</span>
+            <span className="bg-num">{notVisible.length}</span> photo{notVisible.length !== 1 ? 's' : ''} — brand not detected
           </summary>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
             {notVisible.map(m => <MentionCard key={m.id} m={m} />)}

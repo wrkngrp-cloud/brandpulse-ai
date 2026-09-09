@@ -400,7 +400,7 @@ export function OverviewClient({
           {sentiment !== null ? (
             <div className="flex items-start gap-6">
               <div className="shrink-0">
-                <div className={cn('metric text-[58px] leading-none tabular-nums',
+                <div className={cn('metric text-[58px] leading-none bg-num',
                   sentiment.social_score >= 60 ? 'text-pos'
                   : sentiment.social_score <= 40 ? 'text-tx-flare'
                   : 'text-tx-2'
@@ -426,7 +426,7 @@ export function OverviewClient({
                   <div key={row.label} className="space-y-1.5">
                     <div className="flex justify-between items-center">
                       <span className="text-[12px] text-muted-foreground/65">{row.label}</span>
-                      <span className={cn('text-[12px] font-semibold tabular-nums', row.text)}>
+                      <span className={cn('text-[12px] font-semibold bg-num', row.text)}>
                         {Math.round(row.pct)}%
                       </span>
                     </div>
@@ -440,7 +440,7 @@ export function OverviewClient({
                     </div>
                   </div>
                 ))}
-                <p className="text-[10px] text-muted-foreground/38 pt-0.5 tracking-wide uppercase">
+                <p className="text-[10px] text-muted-foreground/38 pt-0.5 bg-num">
                   {fmtDate(sentiment.day)}
                 </p>
               </div>
@@ -603,7 +603,7 @@ export function OverviewClient({
                   className="group rounded-xl border border-border/40 bg-muted/15 px-3.5 py-3.5 space-y-2.5 hover:bg-muted/30 hover:border-border/70 transition-all duration-200 cursor-default"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-foreground/8 text-foreground/50 shrink-0 uppercase tracking-[0.12em]">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-foreground/8 text-foreground/50 shrink-0">
                       {PLATFORM_LABEL[m.platform] ?? m.platform}
                     </span>
                     <span className="text-[11px] text-muted-foreground/65 truncate font-medium">

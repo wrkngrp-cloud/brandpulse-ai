@@ -29,7 +29,7 @@ function InsightRow({ label, text }: { label: string; text: string }) {
         className="w-full flex items-center justify-between text-left"
         onClick={() => setOpen(o => !o)}
       >
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="text-xs font-semibold text-muted-foreground">{label}</span>
         {open ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
       </button>
       {open && <p className="text-sm leading-relaxed mt-1.5">{text}</p>}
@@ -110,7 +110,7 @@ export function SurveyAiAnalysis({ surveyId, responseCount }: { surveyId: string
           {/* Recommendations */}
           {result.recommendations?.length > 0 && (
             <div className="pt-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Recommendations</p>
+              <p className="text-xs font-semibold text-muted-foreground mb-2">Recommendations</p>
               <ul className="space-y-2">
                 {result.recommendations.map((rec, i) => (
                   <li key={i} className="flex gap-2.5 text-sm">

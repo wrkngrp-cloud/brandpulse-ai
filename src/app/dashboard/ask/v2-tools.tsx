@@ -93,7 +93,7 @@ function printHtml(title: string, body: string) {
   *{box-sizing:border-box}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:760px;margin:40px auto;padding:0 24px;color:${TOKENS.tx};line-height:1.65;font-size:13px}
   h1{font-size:1.35rem;font-weight:700;margin:0 0 .5rem}
-  h2{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:${TOKENS.tx3};margin:1.75rem 0 .5rem}
+  h2{font-size:.65rem;font-weight:700;color:${TOKENS.tx3};margin:1.75rem 0 .5rem}
   p{margin:.4rem 0}
   ul{padding-left:1.4rem;margin:.4rem 0}
   li{margin-bottom:.35rem}
@@ -103,11 +103,11 @@ function printHtml(title: string, body: string) {
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:.5rem 0}
   .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin:.5rem 0}
   .card{padding:.65rem .85rem;border:1px solid ${TOKENS.line};border-radius:4px}
-  .label{font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:${TOKENS.tx3};display:block;margin-bottom:.2rem}
+  .label{font-size:.75rem;color:${TOKENS.tx3};display:block;margin-bottom:.2rem}
   .wins{background:${TOKENS.shell};border:1px solid ${TOKENS.line};border-radius:4px;padding:.65rem .85rem}
   .concerns{background:${TOKENS.shell};border:1px solid ${TOKENS.line};border-radius:4px;padding:.65rem .85rem}
   table{width:100%;border-collapse:collapse;margin:.5rem 0}
-  th{text-align:left;font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:${TOKENS.tx3};border-bottom:1px solid ${TOKENS.line};padding:.4rem .5rem}
+  th{text-align:left;font-size:.75rem;color:${TOKENS.tx3};border-bottom:1px solid ${TOKENS.line};padding:.4rem .5rem}
   td{padding:.45rem .5rem;border-bottom:1px solid ${TOKENS.line};vertical-align:top}
   @media print{body{margin:16px}button{display:none}}
 </style>
@@ -133,7 +133,7 @@ async function copyText(text: string) {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">{children}</p>
+    <p className="text-[10px] font-bold text-muted-foreground mb-2">{children}</p>
   )
 }
 
@@ -417,7 +417,7 @@ export function BusinessCaseTab() {
           )}>
             <CheckCircle2 className={cn('h-5 w-5 shrink-0 mt-0.5', verdictIsGo ? 'text-pos' : 'text-tx-2')} />
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Recommendation</p>
+              <p className="text-[10px] font-bold text-muted-foreground mb-1">Recommendation</p>
               <p className="text-sm font-semibold">{result.recommendation}</p>
             </div>
           </div>
@@ -435,14 +435,14 @@ export function BusinessCaseTab() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {result.ansoff_quadrant && (
                   <div className="rounded-xl border bg-card px-4 py-3 space-y-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Ansoff Quadrant</p>
+                    <p className="text-[10px] font-semibold text-muted-foreground">Ansoff Quadrant</p>
                     <p className="text-sm font-semibold">{result.ansoff_quadrant}</p>
                     {result.ansoff_implication && <p className="text-xs text-muted-foreground leading-relaxed">{result.ansoff_implication}</p>}
                   </div>
                 )}
                 {result.esov_signal && (
                   <div className="rounded-xl border bg-card px-4 py-3 space-y-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">ESOV Signal</p>
+                    <p className="text-[10px] font-semibold text-muted-foreground">ESOV Signal</p>
                     <p className="text-xs text-muted-foreground leading-relaxed">{result.esov_signal}</p>
                   </div>
                 )}
@@ -462,8 +462,8 @@ export function BusinessCaseTab() {
                   { label: 'MER Impact',              value: result.financial_return.mer_impact },
                 ].filter(f => f.value).map(f => (
                   <div key={f.label} className="rounded-xl border bg-card px-4 py-3 space-y-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{f.label}</p>
-                    <p className="text-xs leading-relaxed">{f.value}</p>
+                    <p className="text-[10px] font-semibold text-muted-foreground">{f.label}</p>
+                    <p className="text-xs leading-relaxed"><span className="bg-num">{f.value}</span></p>
                   </div>
                 ))}
               </div>
@@ -481,8 +481,8 @@ export function BusinessCaseTab() {
                   { label: 'Bear Case',  value: result.scenario_analysis.bear, color: 'border-line bg-shell/40' },
                 ].filter(s => s.value).map(s => (
                   <div key={s.label} className={cn('rounded-xl border px-4 py-3 space-y-1', s.color)}>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{s.label}</p>
-                    <p className="text-xs leading-relaxed">{s.value}</p>
+                    <p className="text-[10px] font-semibold text-muted-foreground">{s.label}</p>
+                    <p className="text-xs leading-relaxed"><span className="bg-num">{s.value}</span></p>
                   </div>
                 ))}
               </div>
@@ -532,8 +532,8 @@ export function BusinessCaseTab() {
                   { label: 'Proprietary Assets',  value: result.aaker_equity_outcomes.proprietary_assets },
                 ].filter(f => f.value).map(f => (
                   <div key={f.label} className="rounded-xl border bg-card px-4 py-3 space-y-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{f.label}</p>
-                    <p className="text-xs leading-relaxed">{f.value}</p>
+                    <p className="text-[10px] font-semibold text-muted-foreground">{f.label}</p>
+                    <p className="text-xs leading-relaxed"><span className="bg-num">{f.value}</span></p>
                   </div>
                 ))}
               </div>
@@ -549,7 +549,7 @@ export function BusinessCaseTab() {
                   <thead>
                     <tr className="border-b border-border/50 bg-muted/30">
                       {['Metric', 'Target', 'Timeline'].map(h => (
-                        <th key={h} className="text-left px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{h}</th>
+                        <th key={h} className="text-left px-4 py-2.5 text-[10px] font-bold text-muted-foreground">{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -646,11 +646,11 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
     if (!result) return
     const html = `
       <h1>Monthly Brand Report — ${result.month}</h1>
-      <p><strong>${result.headline_score}</strong></p>
+      <p><strong className="bg-num">${result.headline_score}</strong></p>
       <h2>Executive Summary</h2><p>${result.executive_summary}</p>
       <div class="grid2">
-        <div class="wins"><strong style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--pos)">Key Wins</strong><ul>${(result.key_wins ?? []).map(w => `<li>${w}</li>`).join('')}</ul></div>
-        <div class="concerns"><strong style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--char)">Key Concerns</strong><ul>${(result.key_concerns ?? []).map(c => `<li>${c}</li>`).join('')}</ul></div>
+        <div class="wins"><strong style="font-size:.7rem;text-transform:;letter-spacing:.05em;color:var(--pos)">Key Wins</strong><ul>${(result.key_wins ?? []).map(w => `<li>${w}</li>`).join('')}</ul></div>
+        <div class="concerns"><strong style="font-size:.7rem;text-transform:;letter-spacing:.05em;color:var(--char)">Key Concerns</strong><ul>${(result.key_concerns ?? []).map(c => `<li>${c}</li>`).join('')}</ul></div>
       </div>
       <h2>Sentiment Narrative</h2><p>${result.sentiment_narrative}</p>
       <h2>Content Performance</h2><p>${result.content_performance}</p>
@@ -740,7 +740,7 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
       <div className="shrink-0 px-6 py-3 border-b bg-background flex items-center justify-between gap-3">
         <div>
           <p className="text-xs text-muted-foreground">{result.month}</p>
-          <p className="text-sm font-semibold">{result.headline_score}</p>
+          <p className="text-sm font-semibold bg-num">{result.headline_score}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <DataQualityBadge quality={result.data_quality} />
@@ -764,7 +764,7 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
           {/* Wins / concerns */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="rounded-xl bg-shell border border-line px-4 py-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-pos mb-2.5">Key Wins</p>
+              <p className="text-xs font-bold text-pos mb-2.5">Key Wins</p>
               <ul className="space-y-2">
                 {(result.key_wins ?? []).map((w, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-pos">
@@ -775,7 +775,7 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
               </ul>
             </div>
             <div className="rounded-xl bg-shell border border-line px-4 py-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-tx-2 mb-2.5">Key Concerns</p>
+              <p className="text-xs font-bold text-tx-2 mb-2.5">Key Concerns</p>
               <ul className="space-y-2">
                 {(result.key_concerns ?? []).map((c, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-tx-2">

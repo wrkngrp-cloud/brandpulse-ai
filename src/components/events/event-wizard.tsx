@@ -468,7 +468,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                 </div>
               </div>
               {(parseFloat(data.spend_breakdown.agency) || parseFloat(data.spend_breakdown.materials) || parseFloat(data.spend_breakdown.sampling) || parseFloat(data.spend_breakdown.logistics)) ? (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground bg-num">
                   Total spend: ₦{(
                     (parseFloat(data.spend_breakdown.agency)    || 0) +
                     (parseFloat(data.spend_breakdown.materials) || 0) +

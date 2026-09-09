@@ -151,30 +151,30 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           <h2 className="text-sm font-semibold">BTL performance</h2>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="border rounded-xl p-4 bg-muted/30 space-y-1">
-              <p className="text-lg font-semibold tabular-nums">{fmtNGNLocal(costPerContact)}</p>
+              <p className="text-lg font-semibold bg-num">{fmtNGNLocal(costPerContact)}</p>
               <p className="text-xs text-muted-foreground">Cost per person reached</p>
             </div>
             <div className="border rounded-xl p-4 bg-muted/30 space-y-1">
-              <p className="text-lg font-semibold tabular-nums">{fmtNGNLocal(costPerLead)}</p>
+              <p className="text-lg font-semibold bg-num">{fmtNGNLocal(costPerLead)}</p>
               <p className="text-xs text-muted-foreground">Cost per lead</p>
             </div>
             {sampleConvRate != null && (
               <div className="border rounded-xl p-4 bg-muted/30 space-y-1">
-                <p className="text-lg font-semibold tabular-nums">{sampleConvRate.toFixed(1)}%</p>
+                <p className="text-lg font-semibold bg-num">{sampleConvRate.toFixed(1)}%</p>
                 <p className="text-xs text-muted-foreground">Sample conversion rate</p>
               </div>
             )}
             <div className="border rounded-xl p-4 bg-muted/30 space-y-1">
-              <p className="text-lg font-semibold tabular-nums">{fmtNGNLocal(totalBtlSpend)}</p>
+              <p className="text-lg font-semibold bg-num">{fmtNGNLocal(totalBtlSpend)}</p>
               <p className="text-xs text-muted-foreground">Total BTL spend</p>
             </div>
           </div>
           {spendBd && (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs text-muted-foreground pt-2 border-t">
-              {spendBd.agency    != null && <span>Agency: {fmtNGNLocal(spendBd.agency)}</span>}
-              {spendBd.materials != null && <span>Materials: {fmtNGNLocal(spendBd.materials)}</span>}
-              {spendBd.sampling  != null && <span>Sampling: {fmtNGNLocal(spendBd.sampling)}</span>}
-              {spendBd.logistics != null && <span>Logistics: {fmtNGNLocal(spendBd.logistics)}</span>}
+              {spendBd.agency    != null && <span className="bg-num">Agency: {fmtNGNLocal(spendBd.agency)}</span>}
+              {spendBd.materials != null && <span className="bg-num">Materials: {fmtNGNLocal(spendBd.materials)}</span>}
+              {spendBd.sampling  != null && <span className="bg-num">Sampling: {fmtNGNLocal(spendBd.sampling)}</span>}
+              {spendBd.logistics != null && <span className="bg-num">Logistics: {fmtNGNLocal(spendBd.logistics)}</span>}
             </div>
           )}
         </div>
@@ -204,7 +204,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                   : 'N/A'                                                                   },
             ].map(m => (
               <div key={m.label} className="border rounded-xl p-4 bg-card space-y-1">
-                <p className="text-lg font-semibold tabular-nums">{m.value}</p>
+                <p className="text-lg font-semibold bg-num">{m.value}</p>
                 <p className="text-xs text-muted-foreground">{m.label}</p>
               </div>
             ))}
@@ -268,7 +268,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           <div className="flex items-center gap-2">
             <Trophy className="h-4 w-4 text-tx-2" />
             <h2 className="text-sm font-semibold">Ambassador leaderboard</h2>
-            <span className="text-xs text-muted-foreground ml-auto">
+            <span className="text-xs text-muted-foreground ml-auto bg-num">
               {(interactions ?? []).length} total interactions
             </span>
           </div>
@@ -286,7 +286,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                       {rank + 1}
                     </span>
                     <span className="text-sm font-medium flex-1 truncate">{a.name}</span>
-                    <span className="text-sm tabular-nums font-semibold">{a.total}</span>
+                    <span className="text-sm bg-num font-semibold">{a.total}</span>
                   </div>
                   {/* Progress bar */}
                   <div className="ml-7 h-1.5 rounded-full bg-muted overflow-hidden">

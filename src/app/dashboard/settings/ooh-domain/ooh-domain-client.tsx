@@ -103,7 +103,7 @@ export function OohDomainClient({ brandName, currentDomain, appUrl, appHost }: O
             </div>
           </div>
           <div className="bg-muted/50 border rounded-lg px-3 py-2.5 flex items-center justify-between gap-3">
-            <span className="text-xs font-mono break-all">{brandgaugeUrl}</span>
+            <span className="text-xs bg-num break-all">{brandgaugeUrl}</span>
             <Button type="button" variant="ghost" size="sm" className="h-7 px-2 shrink-0 text-xs" onClick={() => copy(brandgaugeUrl)}>
               <Copy className="h-3 w-3 mr-1" /> Copy
             </Button>
@@ -192,19 +192,19 @@ export function OohDomainClient({ brandName, currentDomain, appUrl, appHost }: O
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Cloudflare Redirect Rule</p>
+            <p className="text-xs font-medium text-muted-foreground">Cloudflare Redirect Rule</p>
             <CodeBlock
               code={`# In Cloudflare: Rules → Redirect Rules → Create Rule\n# Match: URI Path starts with /morelife (replace with your slug)\n# Action: Dynamic Redirect\n# Expression: concat("https://go.${brandSlug}.com", http.request.uri.path)`}
               onCopy={copy}
             />
 
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mt-4">Nginx</p>
+            <p className="text-xs font-medium text-muted-foreground mt-4">Nginx</p>
             <CodeBlock
               code={`# In your nginx.conf server block:\nlocation /morelife {\n  return 301 https://go.${brandSlug}.com$request_uri;\n}`}
               onCopy={copy}
             />
 
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mt-4">Next.js redirects (next.config.js)</p>
+            <p className="text-xs font-medium text-muted-foreground mt-4">Next.js redirects (next.config.js)</p>
             <CodeBlock
               code={`// next.config.js\nmodule.exports = {\n  async redirects() {\n    return [\n      {\n        source: '/morelife',\n        destination: 'https://go.${brandSlug}.com/morelife',\n        permanent: true,\n      },\n    ]\n  },\n}`}
               onCopy={copy}
@@ -254,7 +254,7 @@ function TierCard({
         </span>
       </div>
       <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
-      <p className="text-xs font-mono text-muted-foreground/70 truncate">{example}</p>
+      <p className="text-xs bg-num text-muted-foreground/70 truncate">{example}</p>
     </button>
   )
 }
@@ -277,9 +277,9 @@ function DnsInstructions({ domain, appHost, onCopy }: { domain: string; appHost:
           </thead>
           <tbody>
             <tr>
-              <td className="py-1.5 pr-4 font-mono">CNAME</td>
-              <td className="py-1.5 pr-4 font-mono">{domain.split('.')[0]}</td>
-              <td className="py-1.5 font-mono flex items-center gap-1.5">
+              <td className="py-1.5 pr-4 bg-num">CNAME</td>
+              <td className="py-1.5 pr-4 bg-num">{domain.split('.')[0]}</td>
+              <td className="py-1.5 bg-num flex items-center gap-1.5">
                 cname.vercel-dns.com
                 <button onClick={() => onCopy('cname.vercel-dns.com')} className="hover:text-foreground transition-colors">
                   <Copy className="h-3 w-3" />
@@ -312,7 +312,7 @@ function Step({ number, title, description }: { number: number; title: string; d
 
 function CodeBlock({ code, onCopy }: { code: string; onCopy: (t: string) => void }) {
   return (
-    <div className="relative rounded-lg bg-muted border text-xs font-mono">
+    <div className="relative rounded-lg bg-muted border text-xs bg-num">
       <button
         type="button"
         onClick={() => onCopy(code)}

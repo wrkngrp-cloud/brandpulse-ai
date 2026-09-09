@@ -109,10 +109,10 @@ function KpiCard({ icon: Icon, iconColor, label, value, delta, unit = '', sub }:
     <div className="rounded-2xl border bg-card p-5 flex flex-col gap-2">
       <div className="flex items-center gap-2">
         <Icon className={cn('h-4 w-4', iconColor)} />
-        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="text-[11px] font-bold text-muted-foreground">{label}</p>
       </div>
       <div className="flex items-end justify-between gap-2">
-        <p className="text-[28px] font-bold leading-none tracking-tight">{value}</p>
+        <p className="text-[28px] font-bold leading-none tracking-tight"><span className="bg-num">{value}</span></p>
         {delta !== undefined && <DeltaBadge delta={delta} unit={unit} />}
       </div>
       {sub && <p className="text-[11px] text-muted-foreground">{sub}</p>}
@@ -124,7 +124,7 @@ function SectionHeading({ icon: Icon, children }: { icon: React.ElementType; chi
   return (
     <div className="flex items-center gap-2.5 mb-4">
       <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-      <h2 className="text-[13px] font-bold uppercase tracking-wider text-muted-foreground">{children}</h2>
+      <h2 className="text-[13px] font-bold text-muted-foreground">{children}</h2>
       <div className="flex-1 h-px bg-border/60" />
     </div>
   )
@@ -341,7 +341,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               <div className="flex items-center gap-3 mb-4 flex-wrap">
                 {latestBhi != null && zone && (
                   <div className="flex items-center gap-2">
-                    <span className={cn('text-[26px] font-bold', zone.color)}>{latestBhi.toFixed(1)}</span>
+                    <span className={cn('text-[26px] font-bold bg-num', zone.color)}>{latestBhi.toFixed(1)}</span>
                     <span className="text-[12px] text-muted-foreground">/ 100</span>
                     <span className={cn('text-[12px] font-semibold ml-1', zone.color)}>{zone.label}</span>
                   </div>
@@ -422,7 +422,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                 <div className="flex gap-6">
                   <div>
                     <p className="text-[11px] text-muted-foreground">Total budget</p>
-                    <p className="text-[16px] font-bold">{fmtNGN(totalBudget)}</p>
+                    <p className="text-[16px] font-bold bg-num">{fmtNGN(totalBudget)}</p>
                   </div>
                   <div>
                     <p className="text-[11px] text-muted-foreground">Active campaigns</p>
@@ -449,7 +449,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                             <span className="font-medium truncate max-w-[160px]">{c.name}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-right font-medium">{c.total_budget != null ? fmtNGN(c.total_budget) : '—'}</td>
+                        <td className="px-4 py-3 text-right font-medium bg-num">{c.total_budget != null ? fmtNGN(c.total_budget) : '—'}</td>
                         <td className="px-4 py-3 text-muted-foreground">{c.start_date ?? '—'}</td>
                         <td className="px-5 py-3 capitalize text-muted-foreground">{c.status}</td>
                       </tr>
@@ -467,19 +467,19 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             <SectionHeading icon={Award}>Net Promoter Score</SectionHeading>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="rounded-2xl border bg-card p-5 text-center">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Avg NPS</p>
+                <p className="text-[11px] font-bold text-muted-foreground mb-2">Avg NPS</p>
                 <p className={cn('text-[42px] font-bold leading-none', (avgNps ?? 0) >= 7 ? 'text-pos' : (avgNps ?? 0) >= 5 ? 'text-tx-2' : 'text-tx-flare')}>
                   {avgNps != null ? avgNps.toFixed(1) : '—'}
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-1">out of 10</p>
               </div>
               <div className="rounded-2xl border bg-card p-5 text-center">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Responses</p>
-                <p className="text-[42px] font-bold leading-none">{npsResponses.length}</p>
+                <p className="text-[11px] font-bold text-muted-foreground mb-2">Responses</p>
+                <p className="text-[42px] font-bold leading-none bg-num">{npsResponses.length}</p>
                 <p className="text-[11px] text-muted-foreground mt-1">survey replies</p>
               </div>
               <div className="rounded-2xl border bg-card p-5 text-center">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Promoters</p>
+                <p className="text-[11px] font-bold text-muted-foreground mb-2">Promoters</p>
                 <p className="text-[42px] font-bold leading-none text-pos">
                   {Math.round((npsResponses.filter(r => r.score >= 9).length / npsResponses.length) * 100)}%
                 </p>
@@ -545,7 +545,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                         )}
                       >
                         <p className={cn(
-                          'text-[11px] font-bold uppercase tracking-wider mb-1 truncate',
+                          'text-[11px] font-bold mb-1 truncate',
                           item.isBrand ? 'text-primary' : 'text-muted-foreground'
                         )}>
                           {item.name}
@@ -563,7 +563,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                   {/* SOV comparison bar chart when real data exists */}
                   {allWithSov.length > 1 && maxSov > 0 && (
                     <div className="space-y-2.5 pt-2 border-t">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">SOV Comparison</p>
+                      <p className="text-[11px] font-bold text-muted-foreground">SOV Comparison</p>
                       {allItems.filter(i => i.sov != null).map(item => (
                         <div key={item.name} className="flex items-center gap-3">
                           <p className={cn('text-[11px] font-medium w-28 shrink-0 truncate', item.isBrand ? 'text-primary' : 'text-foreground')}>
@@ -575,7 +575,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                               style={{ width: `${(item.sov! / maxSov) * 100}%` }}
                             />
                           </div>
-                          <p className="text-[11px] font-semibold w-10 text-right shrink-0">{item.sov!.toFixed(1)}%</p>
+                          <p className="text-[11px] font-semibold w-10 text-right shrink-0 bg-num">{item.sov!.toFixed(1)}%</p>
                         </div>
                       ))}
                     </div>
@@ -601,7 +601,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               {competitorSightings.length > 0 && (
                 <div className="rounded-2xl border bg-card overflow-hidden">
                   <div className="px-5 py-3.5 border-b bg-muted/30">
-                    <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Field Intelligence</p>
+                    <p className="text-[12px] font-bold text-muted-foreground">Field Intelligence</p>
                   </div>
                   <ul className="divide-y">
                     {competitorSightings.map(s => (
@@ -616,7 +616,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                           <div className="flex items-center gap-2 flex-wrap mb-0.5">
                             <span className="text-[13px] font-semibold">{s.competitor_name ?? 'Unknown competitor'}</span>
                             {s.sighting_type && (
-                              <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded uppercase font-semibold text-muted-foreground">
+                              <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded font-semibold text-muted-foreground">
                                 {s.sighting_type}
                               </span>
                             )}
@@ -641,7 +641,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                   <div className="px-5 py-3.5 border-b bg-muted/30">
                     <div className="flex items-center gap-1.5">
                       <Newspaper className="h-3.5 w-3.5 text-muted-foreground" />
-                      <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Recent Competitor Coverage</p>
+                      <p className="text-[12px] font-bold text-muted-foreground">Recent Competitor Coverage</p>
                     </div>
                   </div>
                   <ul className="divide-y">
@@ -680,7 +680,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               <div className="rounded-2xl border bg-shell/70 dark:bg-shell/20 border-line dark:border-line p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <CheckCircle2 className="h-4 w-4 text-pos" />
-                  <p className="text-[12px] font-bold text-pos dark:text-pos uppercase tracking-wider">Key Wins</p>
+                  <p className="text-[12px] font-bold text-pos dark:text-pos">Key Wins</p>
                 </div>
                 <ul className="space-y-2">
                   {winsAndConcerns.wins.map((w, i) => (
@@ -696,7 +696,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               <div className="rounded-2xl border bg-flare-wash/70 dark:bg-shell/20 border-line-strong dark:border-line-strong p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <AlertCircle className="h-4 w-4 text-tx-flare" />
-                  <p className="text-[12px] font-bold text-tx-flare dark:text-tx-flare uppercase tracking-wider">Watch Items</p>
+                  <p className="text-[12px] font-bold text-tx-flare dark:text-tx-flare">Watch Items</p>
                 </div>
                 <ul className="space-y-2">
                   {winsAndConcerns.concerns.map((c, i) => (
@@ -712,7 +712,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               <div className="rounded-2xl border bg-flare-wash/70 dark:bg-shell/20 border-line-strong dark:border-line-strong p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Target className="h-4 w-4 text-tx-flare" />
-                  <p className="text-[12px] font-bold text-tx-flare dark:text-tx-2 uppercase tracking-wider">Next Priorities</p>
+                  <p className="text-[12px] font-bold text-tx-flare dark:text-tx-2">Next Priorities</p>
                 </div>
                 <ul className="space-y-2">
                   {winsAndConcerns.priorities.map((p, i) => (
@@ -735,23 +735,23 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               {/* KPI summary table */}
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
                 <div className="rounded-xl bg-muted/40 p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">BHI</p>
-                  <p className="text-3xl font-bold">{latestBhi != null ? latestBhi.toFixed(1) : '—'}</p>
+                  <p className="text-[11px] font-bold text-muted-foreground mb-1">BHI</p>
+                  <p className="text-3xl font-bold bg-num">{latestBhi != null ? latestBhi.toFixed(1) : '—'}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Brand Health</p>
                 </div>
                 <div className="rounded-xl bg-muted/40 p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">SOV</p>
+                  <p className="text-[11px] font-bold text-muted-foreground mb-1">SOV</p>
                   <p className="text-3xl font-bold">{latestSov ? `${Number(latestSov.social_sov).toFixed(1)}%` : '—'}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Share of Voice</p>
                 </div>
                 <div className="rounded-xl bg-muted/40 p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">NPS</p>
-                  <p className="text-3xl font-bold">{avgNps != null ? avgNps.toFixed(1) : '—'}</p>
+                  <p className="text-[11px] font-bold text-muted-foreground mb-1">NPS</p>
+                  <p className="text-3xl font-bold bg-num">{avgNps != null ? avgNps.toFixed(1) : '—'}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Avg score</p>
                 </div>
                 <div className="rounded-xl bg-muted/40 p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Campaigns</p>
-                  <p className="text-3xl font-bold">{campaigns.length}</p>
+                  <p className="text-[11px] font-bold text-muted-foreground mb-1">Campaigns</p>
+                  <p className="text-3xl font-bold bg-num">{campaigns.length}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Active</p>
                 </div>
               </div>
@@ -760,7 +760,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               {winsAndConcerns && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t">
                   <div>
-                    <p className="text-xs font-bold text-pos uppercase tracking-wider mb-2">Key wins</p>
+                    <p className="text-xs font-bold text-pos mb-2">Key wins</p>
                     <ul className="space-y-1.5">
                       {winsAndConcerns.wins.slice(0, 3).map((w, i) => (
                         <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
@@ -770,7 +770,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-tx-flare uppercase tracking-wider mb-2">Watch items</p>
+                    <p className="text-xs font-bold text-tx-flare mb-2">Watch items</p>
                     <ul className="space-y-1.5">
                       {winsAndConcerns.concerns.slice(0, 3).map((c, i) => (
                         <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
@@ -780,7 +780,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-tx-flare uppercase tracking-wider mb-2">Next priorities</p>
+                    <p className="text-xs font-bold text-tx-flare mb-2">Next priorities</p>
                     <ul className="space-y-1.5">
                       {winsAndConcerns.priorities.slice(0, 3).map((p, i) => (
                         <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">

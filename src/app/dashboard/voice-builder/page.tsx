@@ -261,7 +261,7 @@ export default function VoiceBuilderPage() {
                 </div>
               </div>
               <div className="p-5">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Voice adjectives</p>
+                <p className="text-[11px] font-bold text-muted-foreground mb-3">Voice adjectives</p>
                 <div className="flex flex-wrap gap-2">
                   {voiceResult.adjectives.map(a => (
                     <Badge key={a} variant="secondary" className="text-[12px] px-2.5 py-1">{a}</Badge>
@@ -269,12 +269,12 @@ export default function VoiceBuilderPage() {
                 </div>
               </div>
               <div className="p-5">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Tone</p>
+                <p className="text-[11px] font-bold text-muted-foreground mb-2">Tone</p>
                 <p className="text-[13.5px] leading-relaxed">{voiceResult.tone}</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border/50">
                 <div className="p-5">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-pos dark:text-pos mb-3">Dos</p>
+                  <p className="text-[11px] font-bold text-pos dark:text-pos mb-3">Dos</p>
                   <ul className="space-y-1.5">
                     {voiceResult.dos.map((d, i) => (
                       <li key={i} className="text-[13px] flex gap-2"><span className="text-pos shrink-0">✓</span>{d}</li>
@@ -282,7 +282,7 @@ export default function VoiceBuilderPage() {
                   </ul>
                 </div>
                 <div className="p-5">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-tx-flare mb-3">Don&apos;ts</p>
+                  <p className="text-[11px] font-bold text-tx-flare mb-3">Don&apos;ts</p>
                   <ul className="space-y-1.5">
                     {voiceResult.donts.map((d, i) => (
                       <li key={i} className="text-[13px] flex gap-2"><span className="text-tx-flare shrink-0">✗</span>{d}</li>
@@ -292,7 +292,7 @@ export default function VoiceBuilderPage() {
               </div>
               {voiceResult.signaturePhrases?.length > 0 && (
                 <div className="p-5">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Signature phrases</p>
+                  <p className="text-[11px] font-bold text-muted-foreground mb-3">Signature phrases</p>
                   <div className="flex flex-wrap gap-2">
                     {voiceResult.signaturePhrases.map((p, i) => (
                       <span key={i} className="px-3 py-1.5 rounded-full bg-muted text-[12.5px] italic">&ldquo;{p}&rdquo;</span>
@@ -304,7 +304,7 @@ export default function VoiceBuilderPage() {
                 <div className="p-5">
                   <button
                     onClick={() => setShowPrism(p => !p)}
-                    className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-2 text-[12px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Kapferer Brand Identity Prism
                     <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', showPrism && 'rotate-180')} />
@@ -320,7 +320,7 @@ export default function VoiceBuilderPage() {
                         { key: 'self_image',  label: 'Self-Image',  desc: 'How users feel' },
                       ] as const).map(({ key, label, desc }) => (
                         <div key={key} className="rounded-xl border bg-muted/20 p-3.5 space-y-1">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-primary">{label}</p>
+                          <p className="text-[10px] font-bold text-primary">{label}</p>
                           <p className="text-[10px] text-muted-foreground">{desc}</p>
                           <p className="text-[12.5px] leading-snug">{voiceResult.kapferer_prism![key]}</p>
                         </div>
@@ -385,7 +385,7 @@ export default function VoiceBuilderPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] text-muted-foreground">Voice match</span>
                     <span className={cn(
-                      'text-[12px] font-bold tabular-nums',
+                      'text-[12px] font-bold bg-num',
                       retuneResult.voice_match_score >= 80 ? 'text-pos' : 'text-tx-2',
                     )}>
                       {retuneResult.voice_match_score}%
@@ -403,7 +403,7 @@ export default function VoiceBuilderPage() {
                 </button>
               </div>
               <div className="p-5">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">What changed</p>
+                <p className="text-[11px] font-bold text-muted-foreground mb-3">What changed</p>
                 <ul className="space-y-1.5">
                   {retuneResult.changes.map((c, i) => (
                     <li key={i} className="text-[12.5px] flex gap-2 text-muted-foreground">
@@ -472,7 +472,7 @@ export default function VoiceBuilderPage() {
           {genResults.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-[13px] font-semibold">{genResults.length} caption variations</p>
+                <p className="text-[13px] font-semibold bg-num">{genResults.length} caption variations</p>
                 <Button variant="outline" size="sm" onClick={generate} disabled={generating}>
                   <RefreshCw className="h-3.5 w-3.5 mr-1.5" />Regenerate
                 </Button>

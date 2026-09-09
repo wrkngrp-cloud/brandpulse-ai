@@ -127,7 +127,7 @@ export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId, tota
               : latestCorr >= 0 ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
               : 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
             }`}>
-              <strong>r = {latestCorr.toFixed(2)}</strong>
+              <strong className="bg-num">r = {latestCorr.toFixed(2)}</strong>
               {latestInterp && <span className="ml-1">{latestInterp}</span>}
             </div>
           )}
@@ -147,7 +147,7 @@ export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId, tota
                     fontSize: 11,
                     color: 'var(--bg-card)',
                   }}
-                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
                   cursor={{ fill: 'currentColor', opacity: 0.05 }}
                 />
                 <Legend wrapperStyle={{ fontSize: 11 }} />

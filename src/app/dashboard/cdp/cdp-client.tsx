@@ -211,7 +211,7 @@ function KpiChip({ icon, label, value }: { icon: React.ReactNode; label: string;
     <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-card text-xs">
       {icon}
       <span className="text-muted-foreground">{label}:</span>
-      <span className="font-semibold">{value.toLocaleString()}</span>
+      <span className="font-semibold bg-num">{value.toLocaleString()}</span>
     </div>
   )
 }
@@ -306,8 +306,8 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
       {/* Spend */}
       {profile.total_spend > 0 && (
         <div className="flex items-center justify-between text-xs border-t pt-2 mt-1">
-          <span className="text-muted-foreground">{profile.total_orders} orders</span>
-          <span className="font-semibold">{formatNGN(profile.total_spend)}</span>
+          <span className="text-muted-foreground"><span className="bg-num">{profile.total_orders}</span> orders</span>
+          <span className="font-semibold bg-num">{formatNGN(profile.total_spend)}</span>
         </div>
       )}
     </div>

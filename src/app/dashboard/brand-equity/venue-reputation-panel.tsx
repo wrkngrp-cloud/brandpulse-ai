@@ -145,14 +145,14 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
           <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
             <div>
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold tabular-nums">{rating.toFixed(1)}</span>
+                <span className="text-4xl font-bold bg-num">{rating.toFixed(1)}</span>
                 <span className="text-sm text-muted-foreground">/ 5</span>
               </div>
               <div className="mt-1.5"><Stars rating={rating} /></div>
             </div>
 
             <div>
-              <p className="text-2xl font-semibold tabular-nums">
+              <p className="text-2xl font-semibold bg-num">
                 {count != null ? count.toLocaleString('en-NG') : '—'}
               </p>
               <p className="text-xs text-muted-foreground">total reviews</p>
@@ -160,7 +160,7 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
 
             <div>
               <p className={cn(
-                'text-2xl font-semibold tabular-nums flex items-center gap-1',
+                'text-2xl font-semibold bg-num flex items-center gap-1',
                 velocity && velocity > 0 ? 'text-pos' : 'text-muted-foreground',
               )}>
                 {velocity && velocity > 0 && <TrendingUp className="h-4 w-4" />}
@@ -172,7 +172,7 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
 
           {reviews.length > 0 && (
             <div className="space-y-2.5 border-t pt-4">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <p className="text-[11px] font-semibold text-muted-foreground">
                 Recent reviews
               </p>
               {reviews.map((r, i) => (

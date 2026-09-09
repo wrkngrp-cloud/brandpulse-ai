@@ -43,7 +43,7 @@ function UsageBar({ used, limit, label }: { used: number; limit: number; label: 
     <div className="space-y-1">
       <div className="flex justify-between text-[12px]">
         <span className="text-muted-foreground">{label}</span>
-        <span className="font-medium">{used.toLocaleString()} / {fmtLimit(limit)}</span>
+        <span className="font-medium bg-num">{used.toLocaleString()} / {fmtLimit(limit)}</span>
       </div>
       {limit !== -1 && (
         <div className="h-1.5 rounded-full bg-muted/60 overflow-hidden">
@@ -110,12 +110,12 @@ export function BillingClient({
       <div className="rounded-2xl border bg-card p-5 space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[12px] text-muted-foreground uppercase tracking-wider font-semibold mb-1">Current plan</p>
+            <p className="text-[12px] text-muted-foreground font-semibold mb-1">Current plan</p>
             <p className="text-2xl font-bold capitalize">{planDisplay[currentPlan]?.name ?? currentPlan}</p>
             <p className={cn('text-[12.5px] font-medium mt-0.5 capitalize', statusColor)}>{subscriptionStatus}</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold">{fmtNGN(planDisplay[currentPlan]?.priceNGN ?? 0)}</p>
+            <p className="text-2xl font-bold bg-num">{fmtNGN(planDisplay[currentPlan]?.priceNGN ?? 0)}</p>
             {trialEndsAt && subscriptionStatus === 'trialing' && (
               <p className="text-[12px] text-muted-foreground">Trial ends {new Date(trialEndsAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', timeZone: 'Africa/Lagos' })}</p>
             )}
@@ -160,7 +160,7 @@ export function BillingClient({
                   </div>
                   {isCurrent && <Badge variant="secondary" className="text-[11px]">Current</Badge>}
                 </div>
-                <p className="text-xl font-bold">{fmtNGN(display?.priceNGN ?? 0)}</p>
+                <p className="text-xl font-bold bg-num">{fmtNGN(display?.priceNGN ?? 0)}</p>
                 {!isCurrent ? (
                   PLAN_ORDER.indexOf(plan) > PLAN_ORDER.indexOf(currentPlan) ? (
                     <Button

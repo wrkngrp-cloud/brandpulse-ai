@@ -120,7 +120,7 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
               </div>
 
               <div className="shrink-0 text-right">
-                <p className="text-sm font-semibold tabular-nums">{site.visits.toLocaleString()}</p>
+                <p className="text-sm font-semibold bg-num">{site.visits.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">visits</p>
               </div>
 

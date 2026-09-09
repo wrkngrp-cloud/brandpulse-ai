@@ -32,14 +32,14 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[148px]">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-tx-inv/40 mb-2">{label}</p>
+      <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-2">{label}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center justify-between gap-4 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
             <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: p.color ?? 'var(--flare)' }} />
             <span className="text-[11.5px] text-tx-inv/55 capitalize">{p.name.replace(/_/g, ' ')}</span>
           </div>
-          <span className="text-[13px] font-semibold tabular-nums text-tx-inv">
+          <span className="text-[13px] font-semibold bg-num text-tx-inv">
             {typeof p.value === 'number' ? (p.name === 'avg_engagement' ? `${p.value.toFixed(2)}%` : p.value.toLocaleString()) : p.value}
           </span>
         </div>

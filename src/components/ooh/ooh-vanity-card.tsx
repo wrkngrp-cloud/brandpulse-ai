@@ -28,7 +28,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
       <div className="flex items-center gap-2">
         <Link2 className="h-4 w-4 text-muted-foreground" />
         <h3 className="text-sm font-semibold">Attribution Links</h3>
-        <span className="ml-auto text-xs text-muted-foreground tabular-nums">
+        <span className="ml-auto text-xs text-muted-foreground bg-num">
           {totalVisits.toLocaleString()} tracked visits
         </span>
       </div>
@@ -41,7 +41,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
             Short link — print on billboard
           </div>
           <div className="rounded-lg bg-primary/5 border border-primary/20 px-3 py-2.5 flex items-center justify-between gap-3">
-            <p className="text-sm font-mono font-semibold break-all flex-1 text-foreground">{shortLink}</p>
+            <p className="text-sm bg-num font-semibold break-all flex-1 text-foreground">{shortLink}</p>
             <Button
               type="button" variant="ghost" size="sm"
               className="h-7 px-2 shrink-0"
@@ -62,7 +62,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
             </div>
           )}
           <div className="rounded-lg bg-muted/50 border px-3 py-2.5 flex items-center justify-between gap-3">
-            <p className="text-sm font-mono break-all flex-1">{vanityLink}</p>
+            <p className="text-sm bg-num break-all flex-1">{vanityLink}</p>
             <Button
               type="button" variant="ghost" size="sm"
               className="h-7 px-2 shrink-0"
@@ -92,7 +92,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
               </div>
               <div className="space-y-2 text-xs text-muted-foreground">
                 <p>Right-click the QR code to save as image.</p>
-                <p className="font-mono break-all">{qrLink}</p>
+                <p className="bg-num break-all">{qrLink}</p>
                 <Button
                   type="button" variant="outline" size="sm"
                   className="h-7 px-2 text-xs"

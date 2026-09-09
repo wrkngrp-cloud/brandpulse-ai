@@ -92,7 +92,7 @@ function ScoreCard({ label, dim, isRisk = false }: {
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-medium text-foreground">{label}</span>
-          <span className={cn('text-xs font-semibold tabular-nums', isRisk ? (score <= 20 ? 'text-pos' : score <= 50 ? 'text-tx-2' : 'text-tx-flare') : scoreColor(score))}>
+          <span className={cn('text-xs font-semibold bg-num', isRisk ? (score <= 20 ? 'text-pos' : score <= 50 ? 'text-tx-2' : 'text-tx-flare') : scoreColor(score))}>
             {score}
             <span className="text-muted-foreground font-normal">/100</span>
           </span>
@@ -348,7 +348,7 @@ export function PrePostWidget() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={image.previewUrl} alt="Visual to analyse" className="w-full max-h-48 object-cover" />
                     <div className="absolute top-2 right-2 flex items-center gap-1.5">
-                      <span className="text-[10px] bg-background/80 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-full border font-mono">
+                      <span className="text-[10px] bg-background/80 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-full border bg-num">
                         {image.isVideo ? 'VIDEO' : image.mediaType.split('/')[1].toUpperCase()} · {image.sizeKb}KB
                       </span>
                       <button
@@ -443,7 +443,7 @@ export function PrePostWidget() {
 
                 {/* Score cards */}
                 <div className="space-y-3">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Scores — tap any bar to see reasoning</p>
+                  <p className="text-xs font-medium text-muted-foreground">Scores — tap any bar to see reasoning</p>
                   <ScoreCard label="Predicted Engagement" dim={result.engagement} />
                   <ScoreCard label="Cultural Resonance"   dim={result.cultural} />
                   <ScoreCard label="Tone Match"           dim={result.tone} />
@@ -454,7 +454,7 @@ export function PrePostWidget() {
                 {/* Risk flags */}
                 {result.risk.flags?.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+                    <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                       <AlertTriangle className="h-3.5 w-3.5 text-tx-2" />
                       Cultural Risk Flags
                     </p>
@@ -481,7 +481,7 @@ export function PrePostWidget() {
                 {/* Improvements */}
                 {result.improvements?.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Improvements</p>
+                    <p className="text-xs font-medium text-muted-foreground">Improvements</p>
                     <ul className="space-y-1.5">
                       {result.improvements.map((imp, i) => (
                         <li key={i} className="flex gap-2 text-sm">
@@ -497,7 +497,7 @@ export function PrePostWidget() {
                 {result.suggested_rewrite && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Suggested Rewrite</p>
+                      <p className="text-xs font-medium text-muted-foreground">Suggested Rewrite</p>
                       <button
                         onClick={copyRewrite}
                         className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"

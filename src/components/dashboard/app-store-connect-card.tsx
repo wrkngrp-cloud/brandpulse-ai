@@ -104,13 +104,13 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
             {config.apple_app_id && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Apple App ID</span>
-                <span className="font-mono">{config.apple_app_id}</span>
+                <span className="bg-num">{config.apple_app_id}</span>
               </div>
             )}
             {config.google_pkg_name && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Android package</span>
-                <span className="font-mono">{config.google_pkg_name}</span>
+                <span className="bg-num">{config.google_pkg_name}</span>
               </div>
             )}
             {config.avg_rating !== null && (
@@ -125,7 +125,7 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
             {config.review_count > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Reviews collected</span>
-                <span>{config.review_count}</span>
+                <span className="bg-num">{config.review_count}</span>
               </div>
             )}
             {config.google_pkg_name && (

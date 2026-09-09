@@ -85,7 +85,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap min-w-0">
           {a.verdict && <VerdictBadge verdict={a.verdict} />}
-          <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium">{formatPlatformLabel(a.platform)}</span>
+          <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium bg-num">{formatPlatformLabel(a.platform)}</span>
           {a.funnel_goal    && <span className="text-xs text-muted-foreground capitalize">{a.funnel_goal}</span>}
           {a.target_segment && <span className="text-xs text-muted-foreground">· {a.target_segment}</span>}
         </div>
@@ -119,7 +119,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground">{s.label}</span>
               <span className={cn(
-                'text-xs font-semibold tabular-nums',
+                'text-xs font-semibold bg-num',
                 s.invert
                   ? (s.score ?? 0) <= 25 ? 'text-pos' : (s.score ?? 0) <= 50 ? 'text-tx-2' : 'text-tx-flare'
                   : scoreColor(s.score ?? 0),
@@ -141,7 +141,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
               <p key={i}>{f.title}</p>
             ))}
             {riskFlags.length > 2 && (
-              <p className="text-tx-2 dark:text-tx-2">+{riskFlags.length - 2} more</p>
+              <p className="text-tx-2 dark:text-tx-2 bg-num">+{riskFlags.length - 2} more</p>
             )}
           </div>
         </div>

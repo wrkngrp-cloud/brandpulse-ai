@@ -83,7 +83,7 @@ function AssetCard({
         {/* Overlay badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {asset.fit_for_ads && (
-            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-primary text-primary-foreground rounded px-1.5 py-0.5">
+            <span className="flex items-center gap-1 text-[10px] font-bold bg-primary text-primary-foreground rounded px-1.5 py-0.5">
               <Zap className="h-2.5 w-2.5" />Ads-ready
             </span>
           )}
@@ -118,7 +118,7 @@ function AssetCard({
         {/* Platform + format */}
         <div className="flex flex-wrap gap-1">
           {asset.platform && (
-            <span className="text-[10px] bg-muted rounded px-1.5 py-0.5 text-muted-foreground">{formatPlatformLabel(asset.platform)}</span>
+            <span className="text-[10px] bg-muted rounded px-1.5 py-0.5 text-muted-foreground bg-num">{formatPlatformLabel(asset.platform)}</span>
           )}
           {asset.format && (
             <span className="text-[10px] bg-muted rounded px-1.5 py-0.5 text-muted-foreground">{asset.format === 'ooh' ? 'OOH' : toSentenceCase(asset.format)}</span>
@@ -181,7 +181,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
               {asset.status}
             </span>
             {asset.fit_for_ads && (
-              <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide text-primary">
+              <span className="flex items-center gap-1 text-[11px] font-bold text-primary">
                 <Zap className="h-3 w-3" />Approved for ads
               </span>
             )}
@@ -190,7 +190,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
           {/* Description */}
           {asset.description && (
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Description</p>
+              <p className="text-[11px] font-bold text-muted-foreground mb-2">Description</p>
               <p className="text-[13px] leading-relaxed text-muted-foreground">{asset.description}</p>
             </div>
           )}
@@ -198,42 +198,42 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
           {/* Performance */}
           {Object.keys(perf).length > 0 && (
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Performance</p>
+              <p className="text-[11px] font-bold text-muted-foreground mb-3">Performance</p>
               <div className="grid grid-cols-3 gap-2">
                 {perf.impressions && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">Impressions</p>
-                    <p className="text-[13px] font-semibold tabular-nums">{fmtNum(perf.impressions)}</p>
+                    <p className="text-[13px] font-semibold bg-num">{fmtNum(perf.impressions)}</p>
                   </div>
                 )}
                 {perf.clicks && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">Clicks</p>
-                    <p className="text-[13px] font-semibold tabular-nums">{fmtNum(perf.clicks)}</p>
+                    <p className="text-[13px] font-semibold bg-num">{fmtNum(perf.clicks)}</p>
                   </div>
                 )}
                 {perf.ctr && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">CTR</p>
-                    <p className="text-[13px] font-semibold tabular-nums">{perf.ctr.toFixed(2)}%</p>
+                    <p className="text-[13px] font-semibold bg-num">{perf.ctr.toFixed(2)}%</p>
                   </div>
                 )}
                 {perf.conversions && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">Conversions</p>
-                    <p className="text-[13px] font-semibold tabular-nums">{fmtNum(perf.conversions)}</p>
+                    <p className="text-[13px] font-semibold bg-num">{fmtNum(perf.conversions)}</p>
                   </div>
                 )}
                 {perf.spend && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">Spend</p>
-                    <p className="text-[13px] font-semibold tabular-nums">₦{fmtNum(perf.spend)}</p>
+                    <p className="text-[13px] font-semibold bg-num">₦{fmtNum(perf.spend)}</p>
                   </div>
                 )}
                 {perf.roas && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">ROAS</p>
-                    <p className="text-[13px] font-semibold tabular-nums">{perf.roas.toFixed(1)}x</p>
+                    <p className="text-[13px] font-semibold bg-num">{perf.roas.toFixed(1)}x</p>
                   </div>
                 )}
               </div>
@@ -243,7 +243,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
           {/* Replication elements */}
           {asset.replication_elements?.length > 0 && (
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">
+              <p className="text-[11px] font-bold text-muted-foreground mb-3">
                 What made it work — replicate these
               </p>
               <ul className="space-y-2">
@@ -260,7 +260,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
           {/* Notes */}
           {asset.notes && (
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Notes</p>
+              <p className="text-[11px] font-bold text-muted-foreground mb-2">Notes</p>
               <p className="text-[12.5px] text-muted-foreground leading-relaxed">{asset.notes}</p>
             </div>
           )}
@@ -268,7 +268,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
           {/* Tags */}
           {asset.tags?.length > 0 && (
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Tags</p>
+              <p className="text-[11px] font-bold text-muted-foreground mb-2">Tags</p>
               <div className="flex flex-wrap gap-1.5">
                 {asset.tags.map(t => (
                   <span key={t} className="text-[11px] bg-muted rounded-full px-2.5 py-1 text-muted-foreground">{t}</span>

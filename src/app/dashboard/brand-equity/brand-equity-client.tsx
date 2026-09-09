@@ -211,14 +211,14 @@ export function BrandEquityClient({
                     </div>
                     <div className="w-12 text-right shrink-0">
                       {available ? (
-                        <span className="text-sm font-semibold tabular-nums">{Math.round(score as number)}</span>
+                        <span className="text-sm font-semibold bg-num">{Math.round(score as number)}</span>
                       ) : meta.phase ? (
                         <span className="text-[10px] text-muted-foreground/40 bg-muted rounded px-1">{meta.phase}</span>
                       ) : (
                         <span className="text-xs text-muted-foreground/40">—</span>
                       )}
                       {pctile && (
-                        <p className={cn('text-[9px] font-semibold uppercase tracking-wide leading-none mt-0.5', pctileColor)}>{pctile}</p>
+                        <p className={cn('text-[9px] font-semibold leading-none mt-0.5', pctileColor)}>{pctile}</p>
                       )}
                     </div>
                     <div className="w-20 shrink-0 hidden sm:flex items-center justify-between gap-1">
@@ -237,7 +237,7 @@ export function BrandEquityClient({
                   {/* Breakdown panel */}
                   {isOpen && (
                     <div className="ml-1 mr-1 mb-2 border border-border rounded-lg bg-muted p-3 space-y-2.5">
-                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <p className="text-[10px] font-semibold text-muted-foreground">
                         Contributing data sources
                       </p>
                       {breakdown && breakdown.sources.length > 0 ? (
@@ -250,15 +250,15 @@ export function BrandEquityClient({
                                   <div className="flex items-center gap-2 min-w-0">
                                     <span className="text-[11px] text-foreground/80 font-medium truncate">{source.label}</span>
                                     {source.rawDisplay && (
-                                      <span className="text-[10px] text-muted-foreground/60 tabular-nums shrink-0">{source.rawDisplay}</span>
+                                      <span className="text-[10px] text-muted-foreground/60 bg-num shrink-0">{source.rawDisplay}</span>
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2 shrink-0">
-                                    <span className="text-[10px] text-muted-foreground/50 tabular-nums">
+                                    <span className="text-[10px] text-muted-foreground/50 bg-num">
                                       {source.weight > 0 ? `${source.weight}% wt` : 'no data'}
                                     </span>
                                     <span className={cn(
-                                      'text-[11px] font-bold tabular-nums w-10 text-right',
+                                      'text-[11px] font-bold bg-num w-10 text-right',
                                       source.score !== null
                                         ? source.score >= 70 ? 'text-pos'
                                           : source.score >= 45 ? 'text-tx-2'
@@ -345,7 +345,7 @@ export function BrandEquityClient({
                     <span className="h-2 w-2 rounded-full" style={{ backgroundColor: meta.color }} />
                     <span className="text-xs font-semibold" style={{ color: meta.color }}>{meta.label}</span>
                   </div>
-                  <span className="text-[10px] font-mono text-muted-foreground/50 tabular-nums">{range}</span>
+                  <span className="text-[10px] bg-num text-muted-foreground/50 bg-num">{range}</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
                 {bhi.zone === zone && (
@@ -389,13 +389,13 @@ export function BrandEquityClient({
                 <div key={key} className="rounded-lg border border-border/60 p-3 space-y-2">
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-medium">{label}</p>
-                    {pctile && <span className={cn('text-[10px] font-bold uppercase tracking-wide', colour)}>{pctile}</span>}
+                    {pctile && <span className={cn('text-[10px] font-bold', colour)}>{pctile}</span>}
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-lg font-bold tabular-nums">
+                    <span className="text-lg font-bold bg-num">
                       {value != null ? `${Math.round(value)}${suffix}` : '—'}
                     </span>
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-[10px] text-muted-foreground bg-num">
                       median {Math.round(b.p50)}{suffix}
                     </span>
                   </div>
@@ -421,10 +421,10 @@ export function BrandEquityClient({
                     })()}
                   </div>
                   <div className="flex justify-between text-[10px] text-muted-foreground/50">
-                    <span>P25: {Math.round(b.p25)}</span>
-                    <span>P50: {Math.round(b.p50)}</span>
-                    <span>P75: {Math.round(b.p75)}</span>
-                    <span>Top: {Math.round(b.top_decile)}</span>
+                    <span className="bg-num">P25: {Math.round(b.p25)}</span>
+                    <span className="bg-num">P50: {Math.round(b.p50)}</span>
+                    <span className="bg-num">P75: {Math.round(b.p75)}</span>
+                    <span className="bg-num">Top: {Math.round(b.top_decile)}</span>
                   </div>
                 </div>
               )
@@ -476,7 +476,7 @@ export function BrandEquityClient({
                   fontSize: 12,
                   color: 'var(--bg-card)',
                 }}
-                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
+                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em', marginBottom: 4 }}
               />
               {markers.map(m => (
                 <ReferenceLine
@@ -559,7 +559,7 @@ export function BrandEquityClient({
 
         {/* Budget simulator */}
         <div className="border rounded-lg p-4 space-y-3 bg-muted/20">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Budget-to-ESOV Simulator</p>
+          <p className="text-xs font-semibold text-muted-foreground">Budget-to-ESOV Simulator</p>
           <div className="flex items-center gap-3 flex-wrap">
             <p className="text-sm text-muted-foreground">Target ESOV:</p>
             <div className="flex items-center gap-1">
@@ -581,7 +581,7 @@ export function BrandEquityClient({
                 <span className="font-semibold">{marketShare + targetEsov}% SOV</span>
                 {' '}(ESOV +{targetEsov}%), estimated additional media investment needed:
               </p>
-              <p className="text-2xl font-bold">{formatNGN(estimatedAdditionalSpend)}</p>
+              <p className="text-2xl font-bold bg-num">{formatNGN(estimatedAdditionalSpend)}</p>
               <p className="text-xs text-muted-foreground">
                 Estimated time to impact: {targetEsov <= 5 ? '3–6 months' : targetEsov <= 15 ? '6–9 months' : '9–12 months'} at sustained spend.
                 Based on current social EMV as spend proxy — accuracy improves when digital ad accounts are connected.
@@ -645,7 +645,7 @@ export function BrandEquityClient({
                   fontSize: 12,
                   color: 'var(--bg-card)',
                 }}
-                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
               />
             </RadarChart>
           </ResponsiveContainer>

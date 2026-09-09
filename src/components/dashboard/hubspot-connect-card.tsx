@@ -102,7 +102,7 @@ export function HubSpotConnectCard({ connection: initialConnection }: HubSpotCon
             {connection.portal_id && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Portal</span>
-                <span className="font-mono">{connection.portal_id}</span>
+                <span className="bg-num">{connection.portal_id}</span>
               </div>
             )}
             <div className="flex justify-between">

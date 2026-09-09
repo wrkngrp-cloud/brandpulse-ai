@@ -68,14 +68,14 @@ export function SpendJustification({
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div className="bg-muted/40 rounded-lg p-3">
           <p className="text-xs text-muted-foreground">Total campaign spend</p>
-          <p className="text-base font-semibold mt-0.5 tabular-nums">
+          <p className="text-base font-semibold mt-0.5 bg-num">
             {currency} {metrics.totalCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </p>
           <p className="text-xs text-muted-foreground">{metrics.campaignDays} days</p>
         </div>
         <div className="bg-muted/40 rounded-lg p-3">
           <p className="text-xs text-muted-foreground">OOH effective CPM</p>
-          <p className="text-base font-semibold mt-0.5 tabular-nums">
+          <p className="text-base font-semibold mt-0.5 bg-num">
             {metrics.oohCpm != null
               ? `${currency} ${metrics.oohCpm.toFixed(2)}`
               : '—'}
@@ -84,7 +84,7 @@ export function SpendJustification({
         </div>
         <div className="bg-muted/40 rounded-lg p-3">
           <p className="text-xs text-muted-foreground">Cost per tracked visit</p>
-          <p className="text-base font-semibold mt-0.5 tabular-nums">
+          <p className="text-base font-semibold mt-0.5 bg-num">
             {metrics.costPerVisit != null
               ? `${currency} ${metrics.costPerVisit.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
               : '—'}
@@ -125,7 +125,7 @@ export function SpendJustification({
                     fontSize: 11,
                     color: 'var(--bg-card)',
                   }}
-                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
                   cursor={{ fill: 'currentColor', opacity: 0.05 }}
                 />
                 <Bar dataKey="cpm" radius={[0, 4, 4, 0]}>

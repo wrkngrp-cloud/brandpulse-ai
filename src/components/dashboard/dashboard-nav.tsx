@@ -121,7 +121,7 @@ const REPORTS: NavEntry[] = [
 function SectionLabel({ children, expanded }: { children: React.ReactNode; expanded: boolean }) {
   if (expanded) {
     return (
-      <p className="px-3 pt-5 pb-1.5 text-[9.5px] font-bold uppercase tracking-[0.13em] text-sidebar-foreground/35 select-none whitespace-nowrap">
+      <p className="px-3 pt-5 pb-1.5 text-[9.5px] font-bold text-sidebar-foreground/35 select-none whitespace-nowrap">
         {children}
       </p>
     )
@@ -136,7 +136,7 @@ function InSectionDivider({ expanded }: { expanded: boolean }) {
 
 function ComingSoonBadge() {
   return (
-    <span className="text-[9px] font-bold uppercase tracking-wide bg-primary/15 text-primary rounded px-1 py-0.5 leading-none shrink-0">
+    <span className="text-[9px] font-bold bg-primary/15 text-primary rounded px-1 py-0.5 leading-none shrink-0">
       Soon
     </span>
   )
@@ -282,7 +282,7 @@ function CollapsibleSection({
                 <SubIcon className="h-3.5 w-3.5 shrink-0 opacity-70" />
                 <span className="flex-1">{l}</span>
                 {badge && (
-                  <span className="text-[9px] font-bold uppercase tracking-wide bg-primary/15 text-primary rounded px-1 py-0.5 leading-none">{badge}</span>
+                  <span className="text-[9px] font-bold bg-primary/15 text-primary rounded px-1 py-0.5 leading-none">{badge}</span>
                 )}
               </Link>
             )

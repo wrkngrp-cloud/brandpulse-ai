@@ -89,7 +89,7 @@ function SentimentBadge({ score }: { score: number | null }) {
     ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
     : 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', cls)}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium bg-num', cls)}>
       {label} ({score})
     </span>
   )
@@ -344,7 +344,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                 <div>
                   <p className="text-sm font-medium">YouTube monitoring active</p>
                   {lastSyncedAt && (
-                    <p className="text-xs text-muted-foreground">Last sync: {fmtDate(lastSyncedAt)}</p>
+                    <p className="text-xs text-muted-foreground bg-num">Last sync: {fmtDate(lastSyncedAt)}</p>
                   )}
                 </div>
               </div>
@@ -428,7 +428,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                           {m.comment_count.toLocaleString()}
                         </span>
                         {m.published_at && (
-                          <span>{fmtDate(m.published_at)}</span>
+                          <span className="bg-num">{fmtDate(m.published_at)}</span>
                         )}
                         <SentimentBadge score={m.sentiment_score} />
                       </div>
@@ -438,14 +438,14 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                   {/* Comment snippets */}
                   {m.comment_sample && m.comment_sample.length > 0 && (
                     <div className="border-t pt-3 space-y-2">
-                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <p className="text-[11px] font-semibold text-muted-foreground">
                         Top comments
                       </p>
                       {m.comment_sample.slice(0, 3).map((c, i) => (
                         <p key={i} className="text-xs text-muted-foreground line-clamp-2 pl-2 border-l-2 border-border">
                           {c.text}
                           {c.like_count > 0 && (
-                            <span className="ml-2 text-muted-foreground/60">· {c.like_count} likes</span>
+                            <span className="ml-2 text-muted-foreground/60 bg-num">· {c.like_count} likes</span>
                           )}
                         </p>
                       ))}
@@ -462,7 +462,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
       {tab === 'deals' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground bg-num">
               {localDeals.length} deal{localDeals.length !== 1 ? 's' : ''} logged
             </p>
             <AddDealDialog
@@ -501,9 +501,9 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                         )}
                       </div>
                       <div className="text-right shrink-0 space-y-0.5">
-                        <p className="text-sm font-semibold">{fmtNGN(deal.fee_ngn)}</p>
+                        <p className="text-sm font-semibold bg-num">{fmtNGN(deal.fee_ngn)}</p>
                         {deal.deal_date && (
-                          <p className="text-xs text-muted-foreground">{fmtDate(deal.deal_date)}</p>
+                          <p className="text-xs text-muted-foreground bg-num">{fmtDate(deal.deal_date)}</p>
                         )}
                       </div>
                     </div>
@@ -521,7 +521,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                         </a>
                       )}
                       {deal.promo_code && (
-                        <span className="bg-muted px-2 py-0.5 rounded font-mono">{deal.promo_code}</span>
+                        <span className="bg-muted px-2 py-0.5 rounded bg-num">{deal.promo_code}</span>
                       )}
                       {deal.view_guarantee && (
                         <span className="flex items-center gap-1">

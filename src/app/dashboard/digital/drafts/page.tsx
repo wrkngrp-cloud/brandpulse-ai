@@ -175,10 +175,10 @@ export default function DraftsPage() {
 
               <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
                 {draft.budget_daily && (
-                  <span>{fmtNGN(draft.budget_daily)}/day</span>
+                  <span className="bg-num">{fmtNGN(draft.budget_daily)}/day</span>
                 )}
                 {draft.budget_total && (
-                  <span>{fmtNGN(draft.budget_total)} total</span>
+                  <span className="bg-num"><span className="bg-num">{fmtNGN(draft.budget_total)}</span> total</span>
                 )}
                 {draft.start_date && (
                   <span className="flex items-center gap-1">
@@ -186,7 +186,7 @@ export default function DraftsPage() {
                     Starts {fmtDate(draft.start_date)}
                   </span>
                 )}
-                <span className="ml-auto">Saved {fmtDate(draft.created_at)}</span>
+                <span className="ml-auto bg-num">Saved {fmtDate(draft.created_at)}</span>
               </div>
 
               <div className="flex items-center gap-2 pt-1 border-t border-border/50">

@@ -197,7 +197,7 @@ function CulturalIQBadge({ score }: { score: number | null }) {
     ? 'text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2'
     : 'text-tx-flare bg-flare-wash dark:bg-shell/30 dark:text-tx-flare'
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold', color)}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold bg-num', color)}>
       {score}
     </span>
   )
@@ -221,7 +221,7 @@ function BrandFitScore({ score }: { score: number }) {
     ? 'text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2'
     : 'text-tx-flare bg-flare-wash dark:bg-shell/30 dark:text-tx-flare'
   return (
-    <span className={cn('text-sm font-bold px-2.5 py-1 rounded-lg', color)}>
+    <span className={cn('text-sm font-bold px-2.5 py-1 rounded-lg bg-num', color)}>
       {score}/100
     </span>
   )
@@ -520,14 +520,14 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
                 <Users className="h-4 w-4" />
                 <span className="text-xs font-medium">Total</span>
               </div>
-              <p className="text-2xl font-bold">{total}</p>
+              <p className="text-2xl font-bold bg-num">{total}</p>
             </div>
             <div className="border rounded-xl p-4 bg-card space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <TrendingUp className="h-4 w-4" />
                 <span className="text-xs font-medium">Active</span>
               </div>
-              <p className="text-2xl font-bold">{activeCount}</p>
+              <p className="text-2xl font-bold bg-num">{activeCount}</p>
             </div>
             <div className="border rounded-xl p-4 bg-card space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -541,7 +541,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
                 <AlertCircle className="h-4 w-4" />
                 <span className="text-xs font-medium">High risk</span>
               </div>
-              <p className="text-2xl font-bold">{highRiskCount}</p>
+              <p className="text-2xl font-bold bg-num">{highRiskCount}</p>
             </div>
           </div>
 
@@ -742,7 +742,7 @@ function CampaignsTab({
             <Users className="h-4 w-4" />
             <span className="text-xs font-medium">Linked Influencers</span>
           </div>
-          <p className="text-xl font-bold">{totalLinked}</p>
+          <p className="text-xl font-bold"><span className="bg-num">{totalLinked}</span></p>
         </div>
         <div className="border rounded-xl p-4 bg-card space-y-1">
           <div className="flex items-center gap-2 text-muted-foreground">
@@ -804,7 +804,7 @@ function CampaignsTab({
                 <div className="grid grid-cols-2 gap-3 pt-1 border-t">
                   <div className="space-y-0.5">
                     <p className="text-xs text-muted-foreground">Followers</p>
-                    <p className="text-sm font-semibold">{inf.followers !== null ? formatCount(inf.followers) : '—'}</p>
+                    <p className="text-sm font-semibold bg-num">{inf.followers !== null ? formatCount(inf.followers) : '—'}</p>
                   </div>
                   <div className="space-y-0.5">
                     <p className="text-xs text-muted-foreground">Cultural IQ</p>
@@ -843,7 +843,7 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
             {ef.tiktok > 0 && <FollowerChip platform="TikTok" count={ef.tiktok} />}
             {ef.twitter > 0 && <FollowerChip platform="Twitter" count={ef.twitter} />}
             {ef.youtube > 0 && <FollowerChip platform="YouTube" count={ef.youtube} />}
-            <span className="text-xs font-semibold text-foreground self-center">
+            <span className="text-xs font-semibold text-foreground self-center bg-num">
               Total: {formatFollowers(ef.total)}
             </span>
           </div>
@@ -884,7 +884,7 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
       {pd?.engagement_rate_estimate != null && (
         <div className="text-xs">
           <span className="text-muted-foreground">Engagement rate: </span>
-          <span className="font-semibold">{(pd.engagement_rate_estimate * 100).toFixed(1)}%</span>
+          <span className="font-semibold bg-num">{(pd.engagement_rate_estimate * 100).toFixed(1)}%</span>
         </div>
       )}
 
@@ -928,7 +928,7 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <span className="text-muted-foreground">Audience overlap: <span className="text-foreground font-medium">{bf.audience_overlap}%</span></span>
-            <span className="text-muted-foreground col-span-2">Alignment: <span className="text-foreground">{bf.value_alignment}</span></span>
+            <span className="text-muted-foreground col-span-2">Alignment: <span className="text-foreground"><span className="bg-num">{bf.value_alignment}</span></span></span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Recommendation:</span>
@@ -959,7 +959,7 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
 
 function FollowerChip({ platform, count }: { platform: string; count: number }) {
   return (
-    <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium">
+    <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium bg-num">
       {platform}: {formatFollowers(count)}
     </span>
   )
@@ -1073,12 +1073,12 @@ function InfluencerCard({
         <div className="flex flex-row sm:flex-col items-start sm:items-end gap-3 sm:gap-2 shrink-0 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
             {totalFollowers != null && (
-              <span className="text-xs text-muted-foreground font-medium">
+              <span className="text-xs text-muted-foreground font-medium bg-num">
                 {formatFollowers(totalFollowers)} followers
               </span>
             )}
             {engagementRate != null && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground bg-num">
                 {(engagementRate * 100).toFixed(1)}% eng.
               </span>
             )}
@@ -1167,7 +1167,7 @@ function InfluencerCard({
                   ))}
                 {availableCampaigns.some(c => c.status === 'completed') && (
                   <>
-                    <div className="px-2 py-1 text-[10px] text-muted-foreground uppercase tracking-wide mt-1">Completed</div>
+                    <div className="px-2 py-1 text-[10px] text-muted-foreground mt-1">Completed</div>
                     {availableCampaigns
                       .filter(c => c.status === 'completed')
                       .map(c => (

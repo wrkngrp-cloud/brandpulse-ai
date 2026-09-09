@@ -94,7 +94,7 @@ export function GoogleAdsConnectCard({ account: initialAccount }: Props) {
                 <p className="text-xs text-muted-foreground">
                   {account.account_name ?? 'Connected'}
                   {account.ad_account_id && (
-                    <span className="text-muted-foreground/50 ml-1">· {account.ad_account_id}</span>
+                    <span className="text-muted-foreground/50 ml-1 bg-num">· {account.ad_account_id}</span>
                   )}
                 </p>
               </div>

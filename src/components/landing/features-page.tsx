@@ -51,7 +51,7 @@ const FEATURES: Feature[] = [
   {
     n: '05', title: 'Surveys and NPS',
     body: 'Ask your customers directly, by email, in-app or a shareable link. Replies score live as they land. NPS waves track movement over time. Consent is built in from the first question.',
-    chips: ['Email · in-app · link', 'Live NPS scoring', 'Opt-in, NDPR-aware'],
+    chips: ['Email, in-app and link', 'Live NPS scoring', 'Opt-in, NDPR-aware'],
   },
   {
     n: '06', title: 'Competitive intelligence',
@@ -84,7 +84,7 @@ export function FeaturesPage() {
   return (
     <MarketingShell>
       <section className="mx-auto max-w-6xl px-6 pb-10 pt-36 sm:pt-44">
-        <motion.p {...rise} className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>
+        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>
           Features
         </motion.p>
         <motion.h1 {...rise} className="mt-4 max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
@@ -103,7 +103,7 @@ export function FeaturesPage() {
           <motion.div key={f.n} {...rise}
             className={`flex flex-col gap-8 lg:items-center ${f.Scene ? (i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row') : ''}`}>
             <div className={f.Scene ? 'lg:w-[38%]' : 'max-w-2xl'}>
-              <span className="font-mono text-[11px]" style={{ color: 'var(--lp-clay)' }}>{f.n}</span>
+              <span className="bg-num text-[11px]" style={{ color: 'var(--tx-flare)' }}>{f.n}</span>
               <h2 className="mt-2 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl"
                 style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
                 {f.title}
@@ -111,7 +111,7 @@ export function FeaturesPage() {
               <p className="mt-3 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{f.body}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {f.chips.map(c => (
-                  <span key={c} className="rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em]"
+                  <span key={c} className="rounded-full border px-3 py-1 text-[10px]"
                     style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-mut)', background: 'var(--lp-chip)' }}>
                     {c}
                   </span>

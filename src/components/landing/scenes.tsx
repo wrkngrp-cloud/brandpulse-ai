@@ -70,14 +70,14 @@ function Tag({ children, tone = 'dim' }: { children: React.ReactNode; tone?: 'di
     teal:  { color: 'var(--pos)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
   }
   return (
-    <span className="inline-flex items-center whitespace-nowrap rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em]" style={tones[tone]}>
+    <span className="inline-flex items-center whitespace-nowrap rounded-full border px-2 py-0.5 text-[9px]" style={tones[tone]}>
       {children}
     </span>
   )
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--s-mut)]">{children}</p>
+  return <p className="text-[9px] text-[var(--s-mut)]">{children}</p>
 }
 
 // ————— Scene 1: Brand Health Index — faithful to src/components/dashboard/bhi-gauge.tsx —————
@@ -153,7 +153,7 @@ export function GaugeScene({ t }: { t: number }) {
             return (
               <div key={c.label} className="space-y-0.5 rounded-lg border border-[var(--s-line)] bg-[var(--s-chip)] py-2.5"
                 style={{ opacity: p, transform: `translateY(${(1 - p) * 8}px)` }}>
-                <p className="text-sm font-semibold tabular-nums text-[var(--s-strong)]">{Math.round(c.value * p)}</p>
+                <p className="text-sm font-semibold bg-num text-[var(--s-strong)]">{Math.round(c.value * p)}</p>
                 <p className="text-[10px] text-[var(--s-mut)]">{c.label}</p>
               </div>
             )
@@ -214,7 +214,7 @@ export function SentimentScene({ t }: { t: number }) {
         })}
       </div>
       <div className="flex flex-1 flex-col justify-center gap-3">
-        <Label>Social score · 30 days</Label>
+        <Label>Social score over 30 days</Label>
         <svg viewBox="0 0 280 88" className="w-full">
           <path d={path} fill="none" stroke={HERO} strokeWidth="2.5" strokeLinecap="round"
             strokeDasharray={400} strokeDashoffset={400 * (1 - line)} />
@@ -240,15 +240,15 @@ export function FunnelScene({ t }: { t: number }) {
     { label: 'Advocate', v: 0.14, n: '18k'  },
   ]
   const tiles = [
-    { label: 'CAC',  value: '₦412',  delta: '▼ 9%'  },
-    { label: 'ROI',  value: '3.8x',  delta: '▲ 0.4' },
-    { label: 'MQLs', value: '1,204', delta: '▲ 22%' },
+    { label: 'CAC',  value: '₦412',  delta: '− 9%'  },
+    { label: 'ROI',  value: '3.8x',  delta: '+ 0.4' },
+    { label: 'MQLs', value: '1,204', delta: '+ 22%' },
   ]
   const srcs = ['Meta Ads', 'GA4', 'Paystack', 'Pixel']
   return (
     <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:gap-5 @xl:p-6">
       <div className="flex flex-col gap-2 @xl:flex-row @xl:items-center @xl:justify-between">
-        <Label>Funnel · live connector data</Label>
+        <Label>Funnel, from live connector data</Label>
         <div className="flex flex-wrap gap-1.5">
           {srcs.map((s, i) => (
             <span key={s} style={{ opacity: win(t, 0.05 + i * 0.06, 0.15 + i * 0.06) }}><Tag tone="blue">{s}</Tag></span>
@@ -260,13 +260,13 @@ export function FunnelScene({ t }: { t: number }) {
           const p = easeOut(win(t, 0.12 + i * 0.1, 0.42 + i * 0.1))
           return (
             <div key={s.label} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
-              <span className="font-mono text-[11px] text-[var(--s-body)]" style={{ opacity: p }}>{s.n}</span>
+              <span className="bg-num text-[11px] text-[var(--s-body)]" style={{ opacity: p }}>{s.n}</span>
               <div className="w-full rounded-t-lg" style={{
                 height: `${8 + s.v * 80 * p}%`,
                 background: `var(--bg-shell)`,
                 opacity: 0.9,
               }} />
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--s-mut)]">{s.label}</span>
+              <span className="text-[9px] text-[var(--s-mut)]">{s.label}</span>
             </div>
           )
         })}
@@ -279,8 +279,8 @@ export function FunnelScene({ t }: { t: number }) {
               style={{ opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
               <Label>{m.label}</Label>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-xl font-extrabold text-[var(--s-strong)]" style={{ fontFamily: 'var(--font)' }}>{m.value}</span>
-                <span className="font-mono text-[10px] text-pos">{m.delta}</span>
+                <span className="text-xl font-extrabold text-[var(--s-strong)]" style={{ fontFamily: 'var(--font)' }}><span className="bg-num">{m.value}</span></span>
+                <span className="bg-num text-[10px] text-pos">{m.delta}</span>
               </div>
             </div>
           )
@@ -302,7 +302,7 @@ export function SurveyScene({ t }: { t: number }) {
     <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:flex-row @xl:gap-6 @xl:p-6">
       <div className="flex w-full flex-col gap-2.5 @xl:w-1/2">
         <div className="flex items-center justify-between">
-          <Label>NPS survey · wave 4</Label>
+          <Label>NPS survey, wave 4</Label>
           <Tag tone="green">Opt-in only</Tag>
         </div>
         <div className="flex gap-1.5" style={{ opacity: easeOut(win(t, 0.03, 0.14)) }}>
@@ -358,7 +358,7 @@ export function OohScene({ t }: { t: number }) {
     <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:flex-row @xl:gap-6 @xl:p-6">
       <div className="flex w-full flex-col justify-center gap-3 @xl:w-[55%]">
         <div className="flex items-center justify-between">
-          <Label>OOH sites · Lagos</Label>
+          <Label>OOH sites in Lagos</Label>
           <Tag tone="clay">5 live</Tag>
         </div>
         <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[var(--s-line)]"
@@ -380,7 +380,7 @@ export function OohScene({ t }: { t: number }) {
                   <div className="absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded-md border border-[var(--s-line)] bg-[var(--s-panel)] px-2 py-1"
                     style={{ opacity: easeOut(win(t, 0.5, 0.62)), boxShadow: 'var(--s-shadow)' }}>
                     <p className="text-[10px] font-bold text-[var(--s-strong)]">Lekki–Epe Expressway</p>
-                    <p className="font-mono text-[8.5px] text-[var(--s-mut)]">48-sheet · 3,412 visits</p>
+                    <p className="bg-num text-[8.5px] text-[var(--s-mut)]">48-sheet, 3,412 visits</p>
                   </div>
                 )}
               </div>
@@ -390,7 +390,7 @@ export function OohScene({ t }: { t: number }) {
         </div>
         <div className="hidden items-center gap-2 rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2.5 @xl:flex">
           <span className="h-2 w-2 rounded-full" style={{ background: HERO }} />
-          <span className="font-mono text-[11px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: HERO }}>▍</span></span>
+          <span className="bg-num text-[11px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: HERO }}>▍</span></span>
         </div>
       </div>
       <div className="flex flex-1 flex-col justify-center gap-4">
@@ -405,7 +405,7 @@ export function OohScene({ t }: { t: number }) {
             <div key={row.label} style={{ opacity: p }}>
               <div className="mb-1.5 flex justify-between">
                 <span className="text-[11px] text-[var(--s-body)]">{row.label}</span>
-                <span className="font-mono text-[12px] font-bold text-[var(--s-strong)]">{row.value}</span>
+                <span className="bg-num text-[12px] font-bold text-[var(--s-strong)]">{row.value}</span>
               </div>
               <div className="h-1.5 rounded-full bg-[var(--s-track)]">
                 <div className="h-full rounded-full" style={{ width: `${row.p * 100 * p}%`, background: row.clay ? HERO : NEUTRAL, opacity: row.clay ? 1 : 0.6 }} />
@@ -445,7 +445,7 @@ export function AiScene({ t }: { t: number }) {
           return (
             <div key={i} className="flex items-start gap-2.5 rounded-lg bg-[var(--s-chip)] px-3 py-2"
               style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
-              <span className="mt-0.5 font-mono text-[10px]" style={{ color: HERO }}>{String(i + 1).padStart(2, '0')}</span>
+              <span className="mt-0.5 bg-num text-[10px]" style={{ color: HERO }}>{String(i + 1).padStart(2, '0')}</span>
               <p className="text-[11.5px] leading-relaxed text-[var(--s-body)]">{a}</p>
             </div>
           )
@@ -461,8 +461,8 @@ export function AiScene({ t }: { t: number }) {
             const p = easeOut(win(t, 0.68 + i * 0.08, 0.82 + i * 0.08))
             return (
               <div key={pl.name} className="rounded-lg border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2" style={{ opacity: p }}>
-                <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--s-mut)]">{pl.name}</p>
-                <p className="text-lg font-extrabold text-[var(--s-strong)]" style={{ fontFamily: 'var(--font)' }}>{Math.round(pl.score * p)}</p>
+                <p className="text-[9px] text-[var(--s-mut)]">{pl.name}</p>
+                <p className="text-lg font-extrabold text-[var(--s-strong)] bg-num" style={{ fontFamily: 'var(--font)' }}>{Math.round(pl.score * p)}</p>
               </div>
             )
           })}

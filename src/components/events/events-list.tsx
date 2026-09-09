@@ -150,7 +150,7 @@ function EventRow({ ev }: { ev: Event }) {
           {ev.expected_attendance != null && (
             <div className="text-right shrink-0 pr-8">
               <p className="text-xs text-muted-foreground">Est. Attendance</p>
-              <p className="text-sm font-medium">{ev.expected_attendance.toLocaleString()}</p>
+              <p className="text-sm font-medium bg-num">{ev.expected_attendance.toLocaleString()}</p>
             </div>
           )}
         </div>

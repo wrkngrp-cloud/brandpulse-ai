@@ -41,7 +41,7 @@ const CONFIDENCE_META: Record<string, { label: string; class: string }> = {
 
 function StepBadge({ step, label }: { step: number; label?: string }) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70">
+    <p className="text-[11px] font-semibold text-muted-foreground/70">
       Brand setup · Step {step} of 3{label ? ` · ${label}` : ''}
     </p>
   )

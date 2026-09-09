@@ -97,7 +97,7 @@ function StatCard({
 
   return (
     <div className="rounded-xl border border-border bg-card p-4 space-y-1">
-      <p className={cn('text-2xl font-bold tabular-nums', color)}>
+      <p className={cn('text-2xl font-bold bg-num', color)}>
         {value}{suffix}
       </p>
       <p className="text-xs text-muted-foreground font-medium">{label}</p>
@@ -173,8 +173,8 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
                     <tr key={i} className="hover:bg-muted/20 transition-colors">
                       <td className="px-4 py-2.5 font-medium">{row.state}</td>
                       <td className="px-4 py-2.5 text-muted-foreground">{row.lga ?? '—'}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{row.total}</td>
-                      <td className={cn('px-4 py-2.5 text-right tabular-nums font-semibold', availColor(row.pct))}>
+                      <td className="px-4 py-2.5 text-right bg-num text-muted-foreground">{row.total}</td>
+                      <td className={cn('px-4 py-2.5 text-right bg-num font-semibold', availColor(row.pct))}>
                         {row.pct}%
                       </td>
                     </tr>
@@ -211,8 +211,8 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className={cn('text-sm font-bold tabular-nums', availColor(avail))}>{avail}%</p>
-                      <p className="text-[10px] text-muted-foreground">{r.outletStats.total} outlets</p>
+                      <p className={cn('text-sm font-bold bg-num', availColor(avail))}>{avail}%</p>
+                      <p className="text-[10px] text-muted-foreground bg-num"><span className="bg-num">{r.outletStats.total}</span> outlets</p>
                     </div>
                   </div>
                   {r.notes && (

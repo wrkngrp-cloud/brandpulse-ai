@@ -262,7 +262,7 @@ export function BHIGauge({ bhi, sparkline = [], trendLabel = '30-day' }: Props) 
             variants={{ hidden: { opacity: 0, y: 6 }, visible: { opacity: 1, y: 0 } }}
             className="rounded-lg border bg-muted/40 py-2.5 space-y-0.5 card-hover cursor-default"
           >
-            <p className="text-sm font-semibold tabular-nums">
+            <p className="text-sm font-semibold bg-num">
               {c.value !== null
                 ? Math.round(c.value)
                 : <span className="text-muted-foreground/30">—</span>}

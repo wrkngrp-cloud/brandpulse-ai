@@ -270,9 +270,9 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
             <div className="flex items-center gap-1.5 justify-end">
               {!isOnline && <WifiOff className="h-3 w-3 text-tx-flare" />}
               {queue.length > 0 && (
-                <span className="text-xs bg-ember text-tx rounded-full px-1.5 font-medium">{queue.length} pending</span>
+                <span className="text-xs bg-ember text-tx rounded-full px-1.5 font-medium bg-num">{queue.length} pending</span>
               )}
-              <span className="text-sm font-bold tabular-nums">{totalMine}</span>
+              <span className="text-sm font-bold bg-num">{totalMine}</span>
             </div>
           </div>
         </div>
@@ -315,7 +315,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
                 </div>
                 <span className="text-sm font-medium text-center leading-tight">{label}</span>
                 {counts[type] ? (
-                  <span className="absolute top-2 right-2 text-xs font-bold tabular-nums bg-foreground text-background rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute top-2 right-2 text-xs font-bold bg-num bg-foreground text-background rounded-full h-5 w-5 flex items-center justify-center">
                     {counts[type]}
                   </span>
                 ) : null}
@@ -361,7 +361,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
           ) : (
             <div className="space-y-6 flex-1 flex flex-col">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Question {surveyQ + 1} of {SURVEY_QUESTIONS.length}</p>
+                <p className="text-xs text-muted-foreground mb-1 bg-num">Question {surveyQ + 1} of {SURVEY_QUESTIONS.length}</p>
                 <div className="h-1 bg-muted rounded-full overflow-hidden">
                   <div
                     className="h-full bg-foreground rounded-full transition-all"
@@ -416,7 +416,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
                   entry.id === myId && 'border-foreground bg-foreground text-background',
                 )}
               >
-                <span className={cn('text-lg font-bold tabular-nums w-6 text-center', entry.id === myId ? 'text-background' : 'text-muted-foreground')}>
+                <span className={cn('text-lg font-bold bg-num w-6 text-center', entry.id === myId ? 'text-background' : 'text-muted-foreground')}>
                   {rank + 1}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -427,7 +427,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
                     {entry.leads} leads · {entry.engaged} engaged
                   </p>
                 </div>
-                <span className="text-xl font-bold tabular-nums">{entry.total}</span>
+                <span className="text-xl font-bold bg-num">{entry.total}</span>
               </div>
             ))
           )}

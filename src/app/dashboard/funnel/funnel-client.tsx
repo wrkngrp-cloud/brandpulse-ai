@@ -237,7 +237,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       </div>
                       <div className="text-right shrink-0">
                         {score != null ? (
-                          <span className={cn('text-2xl font-bold tabular-nums', scoreColor(score))}>
+                          <span className={cn('text-2xl font-bold bg-num', scoreColor(score))}>
                             {score}
                           </span>
                         ) : (
@@ -313,7 +313,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
               {/* Data points breakdown panel */}
               {isDataOpen && (
                 <div className="border-t border-border bg-muted px-5 py-4 space-y-3">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  <p className="text-[10px] font-semibold text-muted-foreground">
                     Data points &amp; weightings
                   </p>
                   {breakdown.length > 0 ? (
@@ -324,7 +324,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                             <div className="flex items-center gap-2 min-w-0">
                               <span className="text-xs font-medium text-foreground/80 truncate">{item.label}</span>
                               {item.rawDisplay && (
-                                <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{item.rawDisplay}</span>
+                                <span className="text-[10px] text-muted-foreground bg-num shrink-0">{item.rawDisplay}</span>
                               )}
                             </div>
                             <div className="flex items-center gap-3 shrink-0">
@@ -332,7 +332,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                                 {item.weight > 0 ? `${item.weight}% weight` : 'no data'}
                               </span>
                               <span
-                                className="text-xs font-bold tabular-nums w-12 text-right"
+                                className="text-xs font-bold bg-num w-12 text-right"
                                 style={{ color: scoreBarColor(item.score) }}
                               >
                                 {item.score !== null ? `${item.score}/100` : '—'}
@@ -370,7 +370,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                 <div className="border-t border-dashed border-border bg-muted/20 px-5 py-4 space-y-4">
                   {/* Channels */}
                   <div className="space-y-2">
-                    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    <p className="text-[11px] font-semibold text-muted-foreground">
                       Channels informing this stage
                     </p>
                     <div className="flex flex-wrap gap-1.5">
@@ -388,7 +388,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                   {/* Initiatives */}
                   {analysis.initiatives.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <p className="text-[11px] font-semibold text-muted-foreground">
                         Initiatives powering it
                       </p>
                       <div className="flex flex-wrap gap-1.5">
@@ -410,7 +410,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       <div className="h-4 w-4 rounded-full bg-foreground flex items-center justify-center shrink-0">
                         <Sparkles className="h-2.5 w-2.5 text-background" />
                       </div>
-                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <p className="text-[11px] font-semibold text-muted-foreground">
                         Why this score
                       </p>
                     </div>
@@ -420,7 +420,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                   {/* Top actions */}
                   {analysis.topActions.length > 0 && (
                     <div className="space-y-2 pt-1 border-t border-border/50">
-                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <p className="text-[11px] font-semibold text-muted-foreground">
                         Top actions to improve this stage
                       </p>
                       <ol className="space-y-2">
@@ -452,7 +452,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                   <ChevronDown className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
                   {drop.pct != null ? (
                     <>
-                      <span className={cn('text-xs font-semibold tabular-nums', drop.colorClass)}>
+                      <span className={cn('text-xs font-semibold bg-num', drop.colorClass)}>
                         {drop.pct}% {drop.isLift ? 'lift' : 'drop-off'}
                       </span>
                       {drop.urgent && (
@@ -496,7 +496,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
           <p className="text-sm leading-relaxed">{diagnosis.diagnosis}</p>
 
           <div className="space-y-2">
-            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            <p className="text-[11px] font-semibold text-muted-foreground">
               Recommended actions
             </p>
             <ul className="space-y-2">

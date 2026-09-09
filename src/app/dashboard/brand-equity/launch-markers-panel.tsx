@@ -244,11 +244,11 @@ export function LaunchMarkersPanel() {
                 key={m.id}
                 className="flex items-center gap-3 rounded-lg border border-border/60 px-3 py-2 group"
               >
-                <span className="text-xs text-muted-foreground tabular-nums w-24 shrink-0">
+                <span className="text-xs text-muted-foreground bg-num w-24 shrink-0">
                   {formatDate(m.marker_date)}
                 </span>
                 <span className={cn(
-                  'text-[10px] font-semibold uppercase tracking-wide rounded px-1.5 py-0.5 border shrink-0',
+                  'text-[10px] font-semibold rounded px-1.5 py-0.5 border shrink-0',
                   TYPE_BADGE[m.marker_type] ?? TYPE_BADGE.other,
                 )}>
                   {TYPE_LABEL[m.marker_type] ?? m.marker_type}
@@ -257,7 +257,7 @@ export function LaunchMarkersPanel() {
                   {m.label}
                 </span>
                 <span className={cn(
-                  'hidden sm:inline text-xs font-semibold tabular-nums shrink-0',
+                  'hidden sm:inline text-xs font-semibold bg-num shrink-0',
                   delta == null ? 'text-muted-foreground/50'
                     : delta > 0 ? 'text-pos'
                     : delta < 0 ? 'text-tx-flare'

@@ -248,10 +248,10 @@ export function ExperimentsClient() {
                                     {v.is_control && <Badge variant="outline" className="text-[10px] py-0">Control</Badge>}
                                   </div>
                                 </td>
-                                <td className="px-3 py-2">{v.impressions.toLocaleString()}</td>
-                                <td className="px-3 py-2">{v.conversions.toLocaleString()}</td>
-                                <td className="px-3 py-2 font-medium">{convRate.toFixed(2)}%</td>
-                                <td className="px-3 py-2">₦{v.revenue.toLocaleString()}</td>
+                                <td className="px-3 py-2 bg-num">{v.impressions.toLocaleString()}</td>
+                                <td className="px-3 py-2 bg-num">{v.conversions.toLocaleString()}</td>
+                                <td className="px-3 py-2 font-medium bg-num">{convRate.toFixed(2)}%</td>
+                                <td className="px-3 py-2 bg-num">₦{v.revenue.toLocaleString()}</td>
                                 <td className="px-3 py-2">
                                   {sig ? (
                                     <span className={cn('font-medium', sig.liftPct > 0 ? 'text-pos' : 'text-tx-flare')}>
@@ -287,7 +287,7 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">{icon} {label}</div>
-      <p className="text-xl font-bold">{value}</p>
+      <p className="text-xl font-bold"><span className="bg-num">{value}</span></p>
     </div>
   )
 }

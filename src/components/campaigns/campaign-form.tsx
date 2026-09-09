@@ -176,7 +176,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="currency">Currency</Label>
-              <Input id="currency" name="currency" defaultValue="NGN" maxLength={3} className="uppercase" />
+              <Input id="currency" name="currency" defaultValue="NGN" maxLength={3} className="" />
             </div>
           </div>
 
@@ -282,7 +282,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
           {selectedChannels.length > 0 && totalAllocated > 0 && (
             <div className="border rounded-xl p-3 bg-muted/30 text-sm flex justify-between">
               <span className="text-muted-foreground">Total allocated</span>
-              <span className="font-medium tabular-nums">{formatNGN(totalAllocated)}</span>
+              <span className="font-medium bg-num">{formatNGN(totalAllocated)}</span>
             </div>
           )}
 

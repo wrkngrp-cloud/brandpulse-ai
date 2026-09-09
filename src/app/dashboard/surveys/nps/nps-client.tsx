@@ -61,13 +61,13 @@ const CUSTOM_TOOLTIP = ({ active, payload, label }: {
   const isPositive = val >= 0
   return (
     <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[148px]">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-tx-inv/40 mb-2">{label}</p>
+      <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-2">{label}</p>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-1.5">
           <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: isPositive ? 'var(--pos)' : 'var(--flare)' }} />
           <span className="text-[11.5px] text-tx-inv/55">NPS Score</span>
         </div>
-        <span className={cn('text-[13px] font-semibold tabular-nums', isPositive ? 'text-pos' : 'text-tx-flare')}>
+        <span className={cn('text-[13px] font-semibold bg-num', isPositive ? 'text-pos' : 'text-tx-flare')}>
           {isPositive ? '+' : ''}{Math.round(val)}
         </span>
       </div>
@@ -148,7 +148,7 @@ export function NpsClient({
           ) : (
             <p className="metric text-[38px] text-muted-foreground/40 mt-1">—</p>
           )}
-          <p className="text-xs text-muted-foreground mt-1">{totalResponses} total responses</p>
+          <p className="text-xs text-muted-foreground mt-1"><span className="bg-num">{totalResponses}</span> total responses</p>
         </div>
 
         {/* Promoters */}
@@ -332,7 +332,7 @@ export function NpsClient({
                   <p className={cn('metric text-[26px]', color)}>
                     {c.nps != null ? `${c.nps >= 0 ? '+' : ''}${c.nps}` : '—'}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-1 bg-num">
                     {c.total} response{c.total === 1 ? '' : 's'}
                   </p>
                 </div>

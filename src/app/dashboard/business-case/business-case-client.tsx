@@ -82,9 +82,9 @@ function KpiTile({ icon: Icon, iconColor, label, value, delta, sub }: {
     <div className="rounded-2xl border bg-card p-5">
       <div className="flex items-center gap-2 mb-2">
         <Icon className={cn('h-4 w-4', iconColor)} />
-        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="text-[11px] font-bold text-muted-foreground">{label}</p>
       </div>
-      <p className="text-[28px] font-bold leading-none tracking-tight">{value}</p>
+      <p className="text-[28px] font-bold leading-none tracking-tight"><span className="bg-num">{value}</span></p>
       {delta != null && (
         <p className={cn('text-[12px] font-semibold mt-1 flex items-center gap-0.5', delta >= 0 ? 'text-pos' : 'text-tx-flare')}>
           {delta >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
@@ -100,7 +100,7 @@ function SectionHead({ icon: Icon, children }: { icon: React.ElementType; childr
   return (
     <div className="flex items-center gap-2.5 mb-5">
       <Icon className="h-4.5 w-4.5 text-muted-foreground shrink-0" />
-      <h2 className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground">{children}</h2>
+      <h2 className="text-[12px] font-bold text-muted-foreground">{children}</h2>
       <div className="flex-1 h-px bg-border/60" />
     </div>
   )
@@ -142,7 +142,7 @@ function CommercialKpiTile({ id, metric }: { id: CommercialMetricId; metric: Com
       <div className="rounded-2xl border border-dashed bg-muted/20 p-5">
         <div className="flex items-center gap-2 mb-2">
           <def.icon className={cn('h-4 w-4', def.iconColor)} />
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{def.label}</p>
+          <p className="text-[11px] font-bold text-muted-foreground">{def.label}</p>
         </div>
         <p className="text-[12px] text-muted-foreground leading-relaxed">{metric.unavailableReason}</p>
       </div>
@@ -156,9 +156,9 @@ function CommercialKpiTile({ id, metric }: { id: CommercialMetricId; metric: Com
     <div className="rounded-2xl border bg-card p-5">
       <div className="flex items-center gap-2 mb-2">
         <def.icon className={cn('h-4 w-4', def.iconColor)} />
-        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{def.label}</p>
+        <p className="text-[11px] font-bold text-muted-foreground">{def.label}</p>
       </div>
-      <p className="text-[28px] font-bold leading-none tracking-tight">{def.fmt(metric.value)}</p>
+      <p className="text-[28px] font-bold leading-none tracking-tight bg-num">{def.fmt(metric.value)}</p>
       {delta != null ? (
         <p className={cn('text-[12px] font-semibold mt-1 flex items-center gap-0.5', improved ? 'text-pos' : 'text-tx-flare')}>
           {delta > 0
@@ -281,7 +281,7 @@ export function BusinessCaseClient({
               ].map(({ label, value, note }) => (
                 <div key={label} className="rounded-xl bg-background/60 p-3 text-center">
                   <p className="text-[11px] text-muted-foreground">{label}</p>
-                  <p className="text-[20px] font-bold">{value}</p>
+                  <p className="text-[20px] font-bold"><span className="bg-num">{value}</span></p>
                   <p className="text-[10px] text-muted-foreground">{note}</p>
                 </div>
               ))}
@@ -322,11 +322,11 @@ export function BusinessCaseClient({
             <div className="px-5 py-4 border-b flex gap-6 flex-wrap">
               <div>
                 <p className="text-[11px] text-muted-foreground">Total budget</p>
-                <p className="text-[16px] font-bold">{fmtNGN(totalBudget)}</p>
+                <p className="text-[16px] font-bold bg-num">{fmtNGN(totalBudget)}</p>
               </div>
               <div>
                 <p className="text-[11px] text-muted-foreground">Deployed</p>
-                <p className="text-[16px] font-bold">{fmtNGN(totalSpend)}</p>
+                <p className="text-[16px] font-bold bg-num">{fmtNGN(totalSpend)}</p>
               </div>
               <div>
                 <p className="text-[11px] text-muted-foreground">Utilisation</p>
@@ -386,7 +386,7 @@ export function BusinessCaseClient({
 
       {/* Methodology note */}
       <div className="rounded-xl border bg-muted/20 p-5">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Methodology</p>
+        <p className="text-[11px] font-bold text-muted-foreground mb-2">Methodology</p>
         <p className="text-[12px] text-muted-foreground leading-relaxed">
           Brand Health Index uses a 40/30/30 sentiment/SOV/survey weighting. ESOV (your share of voice minus your market share) consistently predicts market share growth in 12–18 month windows across FMCG and QSR categories when positive. Channel portfolio classification: Stars (high growth/high investment), Cash Cows (established/efficient), Question Marks (unproven/potential), Dogs (low efficiency).
           Business case generated by BrandGauge using board-grade analysis.

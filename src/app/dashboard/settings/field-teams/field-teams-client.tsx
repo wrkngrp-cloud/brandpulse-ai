@@ -78,7 +78,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
         <div className="border rounded-xl p-4 space-y-3 bg-card">
           <p className="text-sm font-semibold">New field team</p>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Team name</label>
+            <label className="text-xs font-medium text-muted-foreground">Team name</label>
             <input
               type="text"
               placeholder="e.g. Lagos North FSOs"
@@ -89,7 +89,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notes (optional)</label>
+            <label className="text-xs font-medium text-muted-foreground">Notes (optional)</label>
             <input
               type="text"
               placeholder="e.g. Covers Ikeja, Oshodi, Mushin"
@@ -138,7 +138,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold truncate">{team.name}</p>
-                <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${team.active ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos' : 'bg-muted text-muted-foreground'}`}>
+                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${team.active ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos' : 'bg-muted text-muted-foreground'}`}>
                   {team.active ? 'Active' : 'Inactive'}
                 </span>
               </div>
@@ -163,7 +163,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
           </div>
 
           <div className="flex items-center gap-3 pt-1 border-t border-border/50">
-            <code className="text-xs text-muted-foreground font-mono">/fso/{maskToken(team.token)}</code>
+            <code className="text-xs text-muted-foreground bg-num">/fso/{maskToken(team.token)}</code>
             <button
               onClick={() => copyLink(team.token)}
               className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"

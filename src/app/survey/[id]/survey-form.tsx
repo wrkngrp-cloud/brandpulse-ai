@@ -77,7 +77,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
   return (
     <div className="w-full max-w-md space-y-8 px-4 sm:px-0">
       {/* Brand */}
-      <p className="text-center text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+      <p className="text-center text-xs font-semibold text-muted-foreground">
         {brandName}
       </p>
 
@@ -97,7 +97,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
       </div>
 
       {/* Step counter */}
-      <p className="text-xs text-muted-foreground text-right -mt-4">
+      <p className="text-xs text-muted-foreground text-right -mt-4 bg-num">
         {step + 1} / {questions.length}
       </p>
 

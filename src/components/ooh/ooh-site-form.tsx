@@ -463,7 +463,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         <div className="flex items-center gap-2 text-muted-foreground">
           <Link2 className="h-3.5 w-3.5 shrink-0" />
           {customDomain
-            ? <span>Links use your custom domain: <strong className="text-foreground font-mono">{customDomain}</strong></span>
+            ? <span>Links use your custom domain: <strong className="text-foreground bg-num">{customDomain}</strong></span>
             : <span>Links use the BrandGauge platform domain. Want to use your own?</span>}
         </div>
         <Link
@@ -612,7 +612,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                       style={{ width: `${Math.round(demographics.confidence * 100)}%` }}
                     />
                   </div>
-                  <span className="text-xs text-muted-foreground shrink-0">
+                  <span className="text-xs text-muted-foreground shrink-0 bg-num">
                     {Math.round(demographics.confidence * 100)}% confidence
                   </span>
                 </div>
@@ -673,7 +673,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         {/* Keke Fleet: fleet size + routes */}
         {isKeke && (
           <div className="space-y-4 rounded-lg border border-orange-200 bg-orange-50/40 dark:border-orange-900/40 dark:bg-orange-950/10 p-4">
-            <p className="text-xs font-semibold text-orange-700 dark:text-orange-400 uppercase tracking-wider">Keke Fleet Details</p>
+            <p className="text-xs font-semibold text-orange-700 dark:text-orange-400">Keke Fleet Details</p>
             <div className="space-y-1.5">
               <Label htmlFor="fleet_size">Number of keke units <FieldTip tip="How many tricycles carry your branding. Total impressions are multiplied by units × daily routes covered." /></Label>
               <Input
@@ -700,7 +700,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         {/* Wall Painting: dimensions + classification */}
         {isMural && (
           <div className="space-y-4 rounded-lg border border-green-200 bg-green-50/40 dark:border-green-900/40 dark:bg-green-950/10 p-4">
-            <p className="text-xs font-semibold text-green-700 dark:text-green-400 uppercase tracking-wider">Wall Painting Details</p>
+            <p className="text-xs font-semibold text-green-700 dark:text-green-400">Wall Painting Details</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="surface_width_m">Width (metres) <FieldTip tip="Used to calculate surface area and estimate impressions (width × height × 150/day). Ask your vendor for the exact dimensions." /></Label>
@@ -745,7 +745,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         {/* Branded Vehicle: fleet size + vehicle type + routes */}
         {isVehicle && (
           <div className="space-y-4 rounded-lg border border-blue-200 bg-blue-50/40 dark:border-blue-900/40 dark:bg-blue-950/10 p-4">
-            <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Branded Vehicle Details</p>
+            <p className="text-xs font-semibold text-blue-700 dark:text-blue-400">Branded Vehicle Details</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="fleet_size_v">Number of vehicles <FieldTip tip="Impressions are calculated as vehicles × 2,000 unique views per vehicle per day across all routes." /></Label>
@@ -933,7 +933,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
               placeholder="k3d9x"
               value={shortCode}
               onChange={e => setShortCode(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10))}
-              className="flex-1 font-mono"
+              className="flex-1 bg-num"
               maxLength={10}
             />
             <Button type="button" variant="outline" size="icon" onClick={regenerateShortCode} title="Regenerate">
@@ -976,7 +976,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                     <Copy className="h-3 w-3 mr-1" /> Copy
                   </Button>
                 </div>
-                <p className="text-sm font-mono font-semibold break-all text-foreground">{shortLink}</p>
+                <p className="text-sm bg-num font-semibold break-all text-foreground">{shortLink}</p>
                 {formatType && (
                   <UrlLengthAdvisor url={shortLink} formatType={formatType} />
                 )}
@@ -987,14 +987,14 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             {vanityLink && (
               <div className={`space-y-1 ${shortLink ? 'pt-2 border-t' : ''}`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                  <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                     <Link2 className="h-3 w-3" /> Vanity link — QR codes &amp; digital
                   </span>
                   <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => copyLink(vanityLink)}>
                     <Copy className="h-3 w-3 mr-1" /> Copy
                   </Button>
                 </div>
-                <p className="text-xs font-mono break-all text-foreground">{vanityLink}</p>
+                <p className="text-xs bg-num break-all text-foreground">{vanityLink}</p>
               </div>
             )}
 
@@ -1002,12 +1002,12 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             {utmLink && (
               <div className="space-y-1 pt-2 border-t">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Full UTM destination</span>
+                  <span className="text-xs font-medium text-muted-foreground">Full UTM destination</span>
                   <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => copyLink(utmLink)}>
                     <Copy className="h-3 w-3 mr-1" /> Copy
                   </Button>
                 </div>
-                <p className="text-xs font-mono break-all text-muted-foreground">{utmLink}</p>
+                <p className="text-xs bg-num break-all text-muted-foreground">{utmLink}</p>
               </div>
             )}
           </div>

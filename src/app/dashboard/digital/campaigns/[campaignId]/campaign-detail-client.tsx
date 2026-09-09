@@ -192,7 +192,7 @@ function GoalBar({
         <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
       </div>
       <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-        <span>Target: {isGte ? '≥' : '≤'} {target.target_value.toLocaleString()}</span>
+        <span className="bg-num">Target: {isGte ? '≥' : '≤'} {target.target_value.toLocaleString()}</span>
         <span>Actual: {actual > 0 ? actual.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '—'}</span>
       </div>
     </div>
@@ -409,10 +409,10 @@ export function CampaignDetailClient({
           const b = getBench(metric, raw)
           return (
             <Card key={metric} className="border rounded-xl p-4 space-y-1">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <p className="text-[10px] font-semibold text-muted-foreground">
                 {METRIC_FRIENDLY[metric] ?? metric}
               </p>
-              <p className="text-xl font-bold tabular-nums">{value}</p>
+              <p className="text-xl font-bold bg-num">{value}</p>
               {b && <p className={`text-[10px] font-medium ${b.cls}`}>{b.label}</p>}
             </Card>
           )
@@ -429,7 +429,7 @@ export function CampaignDetailClient({
       <Card className="border rounded-xl p-5 space-y-3">
         <div>
           <h2 className="text-sm font-semibold">Daily Spend</h2>
-          <p className="text-xs text-muted-foreground">Total: {fmtNGN(agg.totalSpend)}</p>
+          <p className="text-xs text-muted-foreground bg-num">Total: {fmtNGN(agg.totalSpend)}</p>
         </div>
         <div className="flex items-end gap-0.5 h-20">
           {sparkDates.map(d => {
@@ -468,7 +468,7 @@ export function CampaignDetailClient({
           ].map(([label, value]) => (
             <div key={label} className="flex items-center justify-between gap-2">
               <span className="text-xs text-muted-foreground">{label}</span>
-              <span className="text-xs font-semibold tabular-nums">{value}</span>
+              <span className="text-xs font-semibold bg-num">{value}</span>
             </div>
           ))}
         </div>

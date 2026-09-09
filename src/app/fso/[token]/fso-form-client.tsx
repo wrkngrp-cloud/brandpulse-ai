@@ -272,7 +272,7 @@ export function FsoFormClient({
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-4 pt-safe-top pb-3">
         <div className="flex items-center justify-between pt-3">
           <div>
-            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{brandName}</p>
+            <p className="text-xs text-muted-foreground font-medium">{brandName}</p>
             <p className="text-sm font-semibold leading-tight">{teamName} Field Report</p>
           </div>
           <div className="flex gap-1 items-center">
@@ -433,7 +433,7 @@ export function FsoFormClient({
                       >
                         −
                       </button>
-                      <span className="text-xl font-bold w-8 text-center">{outlet.facings_count}</span>
+                      <span className="text-xl font-bold w-8 text-center bg-num">{outlet.facings_count}</span>
                       <button
                         type="button"
                         onClick={() => updateOutlet({ facings_count: Math.min(20, outlet.facings_count + 1) })}
@@ -550,7 +550,7 @@ export function FsoFormClient({
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-muted/40 p-4 space-y-1">
-                <p className="text-2xl font-bold">{stats.total}</p>
+                <p className="text-2xl font-bold bg-num">{stats.total}</p>
                 <p className="text-xs text-muted-foreground">Outlets visited</p>
               </div>
               <div className={cn(
@@ -581,7 +581,7 @@ export function FsoFormClient({
 
             {/* Outlet list */}
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Outlets logged</p>
+              <p className="text-xs font-semibold text-muted-foreground">Outlets logged</p>
               {outlets.map((o, i) => (
                 <div key={i} className="flex items-center gap-3 rounded-xl border border-border p-3">
                   <Package className={cn(

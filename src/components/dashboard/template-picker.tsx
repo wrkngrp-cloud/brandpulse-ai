@@ -66,7 +66,7 @@ export function TemplatePicker({ onSelect, defaultTemplateId }: Props) {
                   </span>
                 ))}
                 {t.widgetIds.length > 5 && (
-                  <span className="text-[10px] text-muted-foreground px-1">+{t.widgetIds.length - 5} more</span>
+                  <span className="text-[10px] text-muted-foreground px-1 bg-num">+{t.widgetIds.length - 5} more</span>
                 )}
               </div>
             </button>

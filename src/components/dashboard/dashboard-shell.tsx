@@ -120,7 +120,7 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
             >
               <Search className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
               <span className="text-[13px] text-muted-foreground/50 flex-1 text-left">Search or ask anything…</span>
-              <kbd className="text-[10px] font-mono bg-background/70 border border-border rounded-md px-1.5 py-0.5 text-muted-foreground/50 leading-none shrink-0">
+              <kbd className="text-[10px] bg-num bg-background/70 border border-border rounded-md px-1.5 py-0.5 text-muted-foreground/50 leading-none shrink-0">
                 ⌘K
               </kbd>
             </button>

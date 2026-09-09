@@ -47,7 +47,7 @@ export function SeedDemoPanel() {
       <div className="flex items-center gap-2">
         <Database className="h-4 w-4 text-tx-2 shrink-0" />
         <p className="text-sm font-semibold text-tx-2 dark:text-tx-2">Developer Tools</p>
-        <span className="text-[10px] bg-shell/80 dark:bg-shell/60 text-tx-2 dark:text-tx-2 rounded px-1.5 py-0.5 font-mono">DEV ONLY</span>
+        <span className="text-[10px] bg-shell/80 dark:bg-shell/60 text-tx-2 dark:text-tx-2 rounded px-1.5 py-0.5 bg-num">DEV ONLY</span>
       </div>
       <p className="text-xs text-tx-2/70 dark:text-tx-2/70">
         Seed demo data into the database to test charts and scores. These buttons are hidden in production.

@@ -721,7 +721,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
           {cards.map((card, idx) => (
             <div key={idx} className="border rounded-xl p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Card {idx + 1}</span>
+                <span className="text-xs font-semibold text-muted-foreground">Card {idx + 1}</span>
                 {cards.length > 2 && (
                   <button type="button" onClick={() => removeCard(idx)} className="text-muted-foreground hover:text-destructive transition-colors">
                     <X className="h-3.5 w-3.5" />
@@ -813,7 +813,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
                   maxLength={30}
                   className="h-8 text-sm"
                 />
-                <span className="text-xs text-muted-foreground w-6 tabular-nums shrink-0">{h.length}/30</span>
+                <span className="text-xs text-muted-foreground w-6 bg-num shrink-0">{h.length}/30</span>
               </div>
             ))}
           </div>
@@ -838,7 +838,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
                   maxLength={90}
                   className="h-8 text-sm"
                 />
-                <span className="text-xs text-muted-foreground w-6 tabular-nums shrink-0">{d.length}/90</span>
+                <span className="text-xs text-muted-foreground w-6 bg-num shrink-0">{d.length}/90</span>
               </div>
             ))}
           </div>
@@ -987,7 +987,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
                 maxLength={150}
                 className="text-sm resize-none"
               />
-              <p className="text-xs text-muted-foreground text-right tabular-nums">{state.body.length}/150</p>
+              <p className="text-xs text-muted-foreground text-right bg-num">{state.body.length}/150</p>
             </div>
             <div className="space-y-1.5">
               <Label>Display name / Brand name</Label>
@@ -1064,7 +1064,7 @@ function AdCopyFields({
           maxLength={headlineMax}
           className="text-sm"
         />
-        <p className="text-xs text-muted-foreground text-right tabular-nums">{state.headline.length}/{headlineMax}</p>
+        <p className="text-xs text-muted-foreground text-right bg-num">{state.headline.length}/{headlineMax}</p>
       </div>
 
       {showLongHeadline && (
@@ -1164,7 +1164,7 @@ function StepAudience({ state, setState }: { state: WizardState; setState: React
             </button>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground">{aud.locations.length} location{aud.locations.length !== 1 ? 's' : ''} selected</p>
+        <p className="text-xs text-muted-foreground bg-num">{aud.locations.length} location{aud.locations.length !== 1 ? 's' : ''} selected</p>
       </div>
 
       {/* Age + gender */}
@@ -1610,7 +1610,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div className="border rounded-xl overflow-hidden">
       <div className="bg-muted/40 px-4 py-2 border-b">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
+        <p className="text-xs font-semibold text-muted-foreground">{title}</p>
       </div>
       <div className="px-4 py-3 space-y-1.5">{children}</div>
     </div>
@@ -1621,7 +1621,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-4">
       <span className="w-28 shrink-0 text-xs font-medium text-muted-foreground pt-0.5">{label}</span>
-      <span className="text-sm flex-1 break-all">{value}</span>
+      <span className="text-sm flex-1 break-all"><span className="bg-num">{value}</span></span>
     </div>
   )
 }

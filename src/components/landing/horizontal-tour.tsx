@@ -7,31 +7,31 @@ import { FunnelScene, GaugeScene, OohScene, SentimentScene, SurveyScene, clamp01
 const PANELS = [
   {
     Comp: GaugeScene,
-    kicker: '01 · Brand Health Index',
+    kicker: 'Brand Health Index',
     title: 'One score your CEO can ask about',
     body: 'Five signals, one number, weighted for your industry. This is the exact gauge from the live dashboard.',
   },
   {
     Comp: SentimentScene,
-    kicker: '02 · Cultural sentiment',
+    kicker: 'Cultural sentiment',
     title: 'Sentiment with street sense',
     body: 'Pidgin, Yoruba, Igbo and Hausa classified the way a Lagos marketer would read them.',
   },
   {
     Comp: FunnelScene,
-    kicker: '03 · Commercial proof',
+    kicker: 'Commercial proof',
     title: 'Marketing you can defend in money',
     body: 'CAC, ROI and funnel movement from Meta Ads, GA4, Paystack and your site pixel.',
   },
   {
     Comp: SurveyScene,
-    kicker: '04 · Surveys & NPS',
+    kicker: 'Surveys and NPS',
     title: 'Ask, and score every reply live',
     body: 'NPS waves by email, in-app and shareable link, opt-in and NDPR-aware, scored as replies land.',
   },
   {
     Comp: OohScene,
-    kicker: '05 · Offline attribution',
+    kicker: 'Offline attribution',
     title: 'From billboard to bank alert',
     body: 'Vanity links, geo attribution and AI media-plan analysis for OOH, radio, TV and print.',
   },
@@ -56,7 +56,7 @@ export function HorizontalTour() {
       <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
         {/* header */}
         <div className="mx-auto mb-8 w-full max-w-6xl px-6">
-          <p className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>The product, not a mockup</p>
+          <p className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>The product, not a mockup</p>
           <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
             <h2 className="max-w-xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
               Scroll sideways through the dashboard.
@@ -93,7 +93,7 @@ export function HorizontalTour() {
                   >
                     <div className="mb-4 flex items-end justify-between gap-6">
                       <div>
-                        <p className="font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--lp-clay)' }}>{panel.kicker}</p>
+                        <p className="text-[10px]" style={{ color: 'var(--tx-flare)' }}>{panel.kicker}</p>
                         <h3 className="mt-1.5 text-xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{panel.title}</h3>
                       </div>
                       <p className="hidden max-w-[260px] text-[12px] leading-relaxed sm:block" style={{ color: 'var(--lp-mut)' }}>{panel.body}</p>
@@ -108,7 +108,7 @@ export function HorizontalTour() {
           </div>
         </div>
 
-        <p className="mt-8 text-center font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--lp-mut)' }}>
+        <p className="mt-8 text-center text-[10px]" style={{ color: 'var(--lp-mut)' }}>
           Keep scrolling — the dashboard keeps moving
         </p>
       </div>

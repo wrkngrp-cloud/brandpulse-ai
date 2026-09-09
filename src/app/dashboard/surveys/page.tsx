@@ -135,7 +135,7 @@ async function PerceptionAuditSection() {
                       />
                     )}
                   </div>
-                  <span className={`text-sm font-semibold tabular-nums w-8 text-right shrink-0 ${dim.avg != null ? dimScoreColor(dim.avg) : 'text-muted-foreground/40'}`}>
+                  <span className={`text-sm font-semibold bg-num w-8 text-right shrink-0 ${dim.avg != null ? dimScoreColor(dim.avg) : 'text-muted-foreground/40'}`}>
                     {dim.avg != null ? dim.avg.toFixed(1) : '—'}
                   </span>
                 </div>

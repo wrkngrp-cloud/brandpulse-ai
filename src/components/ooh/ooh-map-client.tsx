@@ -123,7 +123,7 @@ export function OohMapClient({ sites, onMapReady }: OohMapClientProps) {
                   Campaign: {fmtDate(popupSite.campaign_start)}{popupSite.campaign_end ? ` – ${fmtDate(popupSite.campaign_end)}` : ''}<br />
                 </span>
               )}
-              <span style={{ color: getRoiColor(popupSite.visits), fontWeight: 600, marginTop: '4px', display: 'block' }}>
+              <span style={{ color: getRoiColor(popupSite.visits), fontWeight: 600, marginTop: '4px', display: 'block' }} className="bg-num">
                 {popupSite.visits.toLocaleString()} tracked visits
               </span>
             </div>

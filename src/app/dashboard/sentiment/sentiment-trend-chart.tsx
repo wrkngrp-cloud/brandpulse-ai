@@ -31,7 +31,7 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[155px]">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-tx-inv/40 mb-2">
+      <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-2">
         {shortDate(label ?? '')}
       </p>
       {payload.map(p => (
@@ -40,7 +40,7 @@ function CustomTooltip({ active, payload, label }: {
             <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: p.color }} />
             <span className="text-[11.5px] text-tx-inv/55 capitalize">{p.name}</span>
           </div>
-          <span className="text-[13px] font-semibold tabular-nums" style={{ color: p.color }}>
+          <span className="text-[13px] font-semibold bg-num" style={{ color: p.color }}>
             {Math.round(p.value)}
           </span>
         </div>

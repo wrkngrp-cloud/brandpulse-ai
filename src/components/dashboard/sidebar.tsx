@@ -236,7 +236,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
           {expanded && (
             <>
               <span className="text-[13px] font-semibold whitespace-nowrap">Ask AI</span>
-              <kbd className="ml-auto text-[9.5px] font-mono bg-background/50 border border-current/20 rounded px-1.5 py-0.5 opacity-60 leading-none">
+              <kbd className="ml-auto text-[9.5px] bg-num bg-background/50 border border-current/20 rounded px-1.5 py-0.5 opacity-60 leading-none">
                 ⌘K
               </kbd>
             </>

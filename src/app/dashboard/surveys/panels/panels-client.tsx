@@ -189,7 +189,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                 onChange={e => setPhonesRaw(e.target.value)}
                 rows={3}
                 placeholder="+2348012345678&#10;+2349098765432"
-                className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-background focus:outline-none resize-none font-mono"
+                className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-background focus:outline-none resize-none bg-num"
               />
             </div>
           </div>
@@ -222,7 +222,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                   <div className="flex items-center gap-2 mb-0.5">
                     <p className="text-[14px] font-semibold truncate">{panel.name}</p>
                     <span className={cn(
-                      'text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wide',
+                      'text-[10px] font-bold px-1.5 py-0.5 rounded-md',
                       panel.active
                         ? 'bg-pos/10 text-pos dark:text-pos'
                         : 'bg-muted text-muted-foreground'
@@ -274,28 +274,28 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                   <Calendar className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">Next run</p>
-                    <p className="text-[12px] font-medium">{fmtDate(panel.next_run_at)}</p>
+                    <p className="text-[12px] font-medium bg-num">{fmtDate(panel.next_run_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">Last run</p>
-                    <p className="text-[12px] font-medium">{fmtDate(panel.last_run_at)}</p>
+                    <p className="text-[12px] font-medium bg-num">{fmtDate(panel.last_run_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">Emails</p>
-                    <p className="text-[12px] font-medium">{panel.recipient_emails?.length ?? 0}</p>
+                    <p className="text-[12px] font-medium bg-num">{panel.recipient_emails?.length ?? 0}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">WhatsApp</p>
-                    <p className="text-[12px] font-medium">{panel.recipient_phones?.length ?? 0}</p>
+                    <p className="text-[12px] font-medium bg-num">{panel.recipient_phones?.length ?? 0}</p>
                   </div>
                 </div>
               </div>

@@ -78,19 +78,19 @@ function StudyCard({ study }: { study: GeoLiftStudy }) {
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
             <p className="text-xs text-muted-foreground">Search Lift</p>
-            <p className={`text-lg font-bold tabular-nums ${(study.lift_pct ?? 0) > 0 ? 'text-pos dark:text-pos' : 'text-tx-flare'}`}>
+            <p className={`text-lg font-bold bg-num ${(study.lift_pct ?? 0) > 0 ? 'text-pos dark:text-pos' : 'text-tx-flare'}`}>
               {study.lift_pct !== null ? `${study.lift_pct > 0 ? '+' : ''}${study.lift_pct.toFixed(1)}%` : '—'}
             </p>
           </div>
           <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
             <p className="text-xs text-muted-foreground">Correlation</p>
-            <p className="text-lg font-bold tabular-nums">
+            <p className="text-lg font-bold bg-num">
               {study.correlation !== null ? study.correlation.toFixed(2) : '—'}
             </p>
           </div>
           <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
             <p className="text-xs text-muted-foreground">Confidence</p>
-            <p className="text-lg font-bold tabular-nums">
+            <p className="text-lg font-bold bg-num">
               {study.confidence !== null ? `${study.confidence.toFixed(0)}%` : '—'}
             </p>
           </div>
@@ -123,7 +123,7 @@ function StudyCard({ study }: { study: GeoLiftStudy }) {
             </div>
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span>{study.weekly_data.length} weeks of data</span>
+            <span className="bg-num">{study.weekly_data.length} weeks of data</span>
             <span className="flex items-center gap-1">
               <span className="inline-block w-2 h-2 rounded-sm bg-primary/70" />{study.treatment_city}
             </span>

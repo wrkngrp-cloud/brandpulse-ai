@@ -102,7 +102,7 @@ export function CompetitorsClient({ initialCompetitors }: Props) {
                 i < competitors.length - 1 && 'border-b',
               )}
             >
-              <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center shrink-0 text-xs font-semibold text-muted-foreground uppercase">
+              <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center shrink-0 text-xs font-semibold text-muted-foreground">
                 {c.name.charAt(0)}
               </div>
               <span className="flex-1 text-sm font-medium">{c.name}</span>

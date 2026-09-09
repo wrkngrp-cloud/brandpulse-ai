@@ -99,7 +99,7 @@ function DisputeMenu({
         <ChevronDown className="h-2.5 w-2.5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
-        <p className="px-2 py-1.5 text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
+        <p className="px-2 py-1.5 text-[10px] text-muted-foreground font-medium">
           Correct label to
         </p>
         <DropdownMenuSeparator />

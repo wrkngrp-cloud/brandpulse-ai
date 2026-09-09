@@ -35,7 +35,7 @@ export function TrustPillarCard({ trust }: Props) {
         {trust.score != null && cfg ? (
           <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${cfg.bg}`}>
             <Icon className={`w-4 h-4 ${cfg.color}`} />
-            <span className={`text-sm font-semibold ${cfg.color}`}>{trust.score}/100</span>
+            <span className={`text-sm font-semibold bg-num ${cfg.color}`}>{trust.score}/100</span>
             <span className={`text-xs ${cfg.color} opacity-80`}>{cfg.label}</span>
           </div>
         ) : (

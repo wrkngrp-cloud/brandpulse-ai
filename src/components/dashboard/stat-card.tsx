@@ -184,7 +184,7 @@ export function StatCard({
       )}
 
       {/* Label */}
-      <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.11em] text-muted-foreground/50 select-none leading-none">
+      <p className="mt-2 text-[11px] font-semibold text-muted-foreground/50 select-none leading-none">
         {label}
       </p>
 

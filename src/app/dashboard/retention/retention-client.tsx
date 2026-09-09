@@ -13,10 +13,10 @@ import type { RetentionRiskData, RetentionSignal } from '@/app/api/retention/ris
 import { TourTrigger } from '@/components/tours/tour-trigger'
 
 const RISK_COLOR = {
-  low:      'text-pos  bg-shell  border-line',
+  low:      'text-pos bg-shell border-line',
   medium:   'text-tx-2 bg-shell border-line',
   high:     'text-tx-2 bg-shell border-line',
-  critical: 'text-tx-flare   bg-flare-wash    border-line-strong',
+  critical: 'text-tx-flare bg-flare-wash border-line-strong',
 } as const
 
 const RISK_LABEL = {
@@ -98,7 +98,7 @@ export function RetentionClient() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Risk score gauge */}
             <div className={cn('rounded-xl border p-5 flex flex-col items-center justify-center gap-3', RISK_COLOR[data.overall_risk])}>
-              <p className="text-[11px] font-semibold uppercase tracking-widest opacity-60">Risk Score</p>
+              <p className="text-[11px] font-semibold opacity-60">Risk Score</p>
               <div className="relative w-[88px] h-[88px]">
                 <svg width="88" height="88" viewBox="0 0 88 88" className="absolute inset-0">
                   <circle cx="44" cy="44" r="36" fill="none" strokeWidth="8" className="stroke-current opacity-20" />
@@ -111,7 +111,7 @@ export function RetentionClient() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[28px] font-bold leading-none">{data.risk_score}</span>
+                  <span className="text-[28px] font-bold leading-none bg-num">{data.risk_score}</span>
                   <span className="text-[10px] opacity-50 mt-0.5">out of 100</span>
                 </div>
               </div>
@@ -227,7 +227,7 @@ export function RetentionClient() {
               <div className="divide-y">
                 {data.detractors.map((d) => (
                   <div key={d.id} className="px-5 py-3 flex items-start gap-3">
-                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-flare-wash text-xs font-bold text-tx-flare">
+                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-flare-wash text-xs font-bold text-tx-flare bg-num">
                       {d.score}
                     </span>
                     <div className="min-w-0">
@@ -275,7 +275,7 @@ function SentimentStat({ label, value }: { label: string; value: number | null }
   return (
     <div className="flex justify-between text-sm">
       <span className="text-muted-foreground">{label}</span>
-      <span className="font-semibold">{value !== null ? value.toFixed(1) : '—'}</span>
+      <span className="font-semibold bg-num">{value !== null ? value.toFixed(1) : '—'}</span>
     </div>
   )
 }
@@ -302,9 +302,9 @@ function SignalRow({ signal }: { signal: RetentionSignal }) {
       </div>
       {signal.value !== undefined && (
         <div className="text-right shrink-0">
-          <p className="text-sm font-bold">{signal.value.toFixed(1)}</p>
+          <p className="text-sm font-bold bg-num">{signal.value.toFixed(1)}</p>
           {signal.benchmark !== undefined && (
-            <p className="text-xs text-muted-foreground">vs {signal.benchmark.toFixed(1)}</p>
+            <p className="text-xs text-muted-foreground bg-num">vs {signal.benchmark.toFixed(1)}</p>
           )}
         </div>
       )}

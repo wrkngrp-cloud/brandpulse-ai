@@ -152,9 +152,9 @@ function ScoreTile({ label, score, icon: Icon }: { label: string; score: number;
     <div className="bg-muted/40 rounded-xl p-3 space-y-1.5">
       <div className="flex items-center gap-1.5">
         <Icon className="h-3 w-3 text-muted-foreground" />
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="text-[10px] font-semibold text-muted-foreground">{label}</span>
       </div>
-      <p className={cn('text-xl font-bold tabular-nums', scoreColor(score))}>{score}</p>
+      <p className={cn('text-xl font-bold bg-num', scoreColor(score))}>{score}</p>
       <div className="h-1.5 bg-muted rounded-full overflow-hidden">
         <div
           className={cn('h-full rounded-full transition-all', score >= 75 ? 'bg-pos' : score >= 55 ? 'bg-ember' : 'bg-flare')}
@@ -170,7 +170,7 @@ function SentimentBar({ pct, color, label }: { pct: number; color: string; label
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
-        <span className="font-semibold tabular-nums">{pct}%</span>
+        <span className="font-semibold bg-num">{pct}%</span>
       </div>
       <div className="h-2 bg-muted rounded-full overflow-hidden">
         <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
@@ -192,7 +192,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
       {/* Overall score + recommendation */}
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-baseline gap-1">
-          <span className={cn('text-4xl font-bold tabular-nums', scoreColor(analysis.fit_verdict.score))}>
+          <span className={cn('text-4xl font-bold bg-num', scoreColor(analysis.fit_verdict.score))}>
             {analysis.fit_verdict.score}
           </span>
           <span className="text-base text-muted-foreground font-medium">/100</span>
@@ -255,7 +255,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
         )}
         {analysis.sentiment_analysis.conversion_signals.length > 0 && (
           <div className="space-y-1 pt-1">
-            <p className="text-[10px] font-semibold text-pos dark:text-pos uppercase tracking-wide">Conversion signals</p>
+            <p className="text-[10px] font-semibold text-pos dark:text-pos">Conversion signals</p>
             {analysis.sentiment_analysis.conversion_signals.map(s => (
               <p key={s} className="text-xs text-muted-foreground flex gap-1.5"><CheckCircle className="h-3 w-3 text-pos mt-0.5 shrink-0" />{s}</p>
             ))}
@@ -263,7 +263,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
         )}
         {analysis.sentiment_analysis.concern_signals.length > 0 && (
           <div className="space-y-1 pt-1">
-            <p className="text-[10px] font-semibold text-tx-flare uppercase tracking-wide">Concerns</p>
+            <p className="text-[10px] font-semibold text-tx-flare">Concerns</p>
             {analysis.sentiment_analysis.concern_signals.map(s => (
               <p key={s} className="text-xs text-muted-foreground flex gap-1.5"><AlertCircle className="h-3 w-3 text-tx-flare mt-0.5 shrink-0" />{s}</p>
             ))}
@@ -275,7 +275,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
       <div className="border rounded-xl p-3 space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold">Brand Association</span>
-          <span className={cn('text-sm font-bold tabular-nums', scoreColor(analysis.brand_association.score))}>
+          <span className={cn('text-sm font-bold bg-num', scoreColor(analysis.brand_association.score))}>
             {analysis.brand_association.score}/100
           </span>
         </div>
@@ -298,7 +298,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
 
       {/* Executive summary */}
       <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Summary</p>
+        <p className="text-xs font-semibold text-muted-foreground">Summary</p>
         <p className="text-xs leading-relaxed">{analysis.executive_summary}</p>
       </div>
 
@@ -312,7 +312,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
           <ol className="space-y-1.5">
             {analysis.action_items.map((a, i) => (
               <li key={i} className="flex gap-2 text-xs">
-                <span className="text-[10px] font-bold text-muted-foreground tabular-nums mt-0.5 w-3.5 shrink-0">{i + 1}.</span>
+                <span className="text-[10px] font-bold text-muted-foreground bg-num mt-0.5 w-3.5 shrink-0">{i + 1}.</span>
                 <span className="text-muted-foreground">{a}</span>
               </li>
             ))}
@@ -333,7 +333,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
         <div className="space-y-3 pt-1">
           {analysis.fit_verdict.strengths.length > 0 && (
             <div className="space-y-1">
-              <p className="text-[10px] font-semibold text-pos dark:text-pos uppercase tracking-wide">Strengths</p>
+              <p className="text-[10px] font-semibold text-pos dark:text-pos">Strengths</p>
               {analysis.fit_verdict.strengths.map(s => (
                 <p key={s} className="text-xs text-muted-foreground flex gap-1.5">
                   <CheckCircle className="h-3 w-3 text-pos mt-0.5 shrink-0" />{s}
@@ -343,7 +343,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
           )}
           {analysis.fit_verdict.weaknesses.length > 0 && (
             <div className="space-y-1">
-              <p className="text-[10px] font-semibold text-tx-2 uppercase tracking-wide">Weaknesses</p>
+              <p className="text-[10px] font-semibold text-tx-2">Weaknesses</p>
               {analysis.fit_verdict.weaknesses.map(w => (
                 <p key={w} className="text-xs text-muted-foreground flex gap-1.5">
                   <AlertCircle className="h-3 w-3 text-tx-2 mt-0.5 shrink-0" />{w}
@@ -353,7 +353,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
           )}
           {analysis.fit_verdict.risks.length > 0 && (
             <div className="space-y-1">
-              <p className="text-[10px] font-semibold text-tx-flare uppercase tracking-wide">Risks</p>
+              <p className="text-[10px] font-semibold text-tx-flare">Risks</p>
               {analysis.fit_verdict.risks.map(r => (
                 <p key={r} className="text-xs text-muted-foreground flex gap-1.5">
                   <XCircle className="h-3 w-3 text-tx-flare mt-0.5 shrink-0" />{r}
@@ -407,7 +407,7 @@ function PostCard({ post }: { post: InfluencerPost }) {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {post.overall_score != null && (
-            <span className={cn('text-sm font-bold tabular-nums', scoreColor(post.overall_score))}>
+            <span className={cn('text-sm font-bold bg-num', scoreColor(post.overall_score))}>
               {post.overall_score}
             </span>
           )}
@@ -439,7 +439,7 @@ function PostCard({ post }: { post: InfluencerPost }) {
 function MetricChip({ label, value }: { label: string; value: string }) {
   return (
     <div className="text-[10px] text-muted-foreground">
-      <span className="font-semibold text-foreground">{value}</span> {label}
+      <span className="font-semibold text-foreground"><span className="bg-num">{value}</span></span> {label}
     </div>
   )
 }
@@ -665,11 +665,11 @@ export function PostTracker({ influencerId, campaignId, influencerHandle, influe
       {/* Header */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          <span className="text-xs font-semibold text-muted-foreground">
             Post Performance
           </span>
           {posts.length > 0 && (
-            <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full font-medium">
+            <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full font-medium bg-num">
               {posts.length} post{posts.length !== 1 ? 's' : ''}
             </span>
           )}
