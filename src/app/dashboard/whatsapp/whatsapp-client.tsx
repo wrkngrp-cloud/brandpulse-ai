@@ -53,7 +53,7 @@ function statusBadge(status: string) {
     failed:    { label: 'Failed',    className: 'bg-flare-wash text-tx-flare dark:bg-shell/40 dark:text-tx-flare' },
   }
   const { label, className } = map[status] ?? { label: status, className: 'bg-muted text-muted-foreground' }
-  return <span className={cn('text-[10px] font-semibold px-2 py-0.5 rounded-full', className)}>{label}</span>
+  return <span className={cn('text-[10px] font-semibold px-2 py-0.5 rounded-sm', className)}>{label}</span>
 }
 
 export function WhatsAppClient({ brandName, configured, stats, campaigns }: Props) {

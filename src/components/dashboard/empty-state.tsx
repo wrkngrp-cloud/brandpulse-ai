@@ -81,7 +81,7 @@ export function EmptyState({
                 : 'border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50',
             )
             const style = a.primary
-              ? { background: 'var(--char)', boxShadow: '0 4px 14px -4px rgba(212,96,42,0.5)' }
+              ? { background: 'var(--char)' }
               : undefined
 
             if (a.href) {

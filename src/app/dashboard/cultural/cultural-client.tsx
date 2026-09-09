@@ -517,7 +517,7 @@ function CRSGauge({ score, drift }: { score: number | null; drift: number | null
         </div>
       </div>
       {drift !== null && (
-        <div className={cn('inline-flex items-center gap-1 text-sm font-medium px-2.5 py-1 rounded-full',
+        <div className={cn('inline-flex items-center gap-1 text-sm font-medium px-2.5 py-1 rounded-sm',
           drift >= 0 ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos'
                      : 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
         )}>
@@ -536,8 +536,8 @@ function EmotionBar({ value }: { value: number | null }) {
         <span className="text-sm text-muted-foreground">Audience emotional positivity</span>
         <span className="text-sm font-semibold bg-num">{value !== null ? `${Math.round(value)}%` : '—'}</span>
       </div>
-      <div className="h-2.5 bg-muted rounded-full overflow-hidden">
-        <div className={cn('h-full rounded-full transition-all duration-700',
+      <div className="h-2.5 bg-muted rounded-sm overflow-hidden">
+        <div className={cn('h-full rounded-sm transition-all duration-700',
           value === null ? 'w-0' : value >= 60 ? 'bg-pos' : value >= 40 ? 'bg-ember' : 'bg-flare'
         )} style={{ width: value !== null ? `${Math.min(100, value)}%` : '0%' }} />
       </div>
@@ -565,17 +565,17 @@ function CalendarRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
           <p className="text-sm font-medium">{moment.name}</p>
-          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', TYPE_BADGE[moment.type])}>
+          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', TYPE_BADGE[moment.type])}>
             {moment.type}
           </span>
-          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', FIT_BADGE[fit])}>
+          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', FIT_BADGE[fit])}>
             {fit}
           </span>
         </div>
         <p className="text-xs text-muted-foreground mt-0.5 leading-snug line-clamp-2">{moment.brandRelevance}</p>
       </div>
       <div className="shrink-0 text-right pt-0.5">
-        <span className={cn('text-xs font-semibold bg-num px-2 py-0.5 rounded-full',
+        <span className={cn('text-xs font-semibold bg-num px-2 py-0.5 rounded-sm',
           daysAway <= 14 ? 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
           : daysAway <= 30 ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
           : 'bg-muted text-muted-foreground'
@@ -636,10 +636,10 @@ function TopPickCard({
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
             <p className="text-sm font-semibold">{moment.name}</p>
-            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', TYPE_BADGE[moment.type])}>
+            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', TYPE_BADGE[moment.type])}>
               {moment.type}
             </span>
-            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', FIT_BADGE[fit])}>
+            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', FIT_BADGE[fit])}>
               {fit}
             </span>
           </div>
@@ -673,7 +673,7 @@ function TopPickCard({
                 <p className="text-sm font-medium">{idea.title}</p>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className="text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">{idea.channel}</span>
-                  <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', EFFORT_BADGE[idea.effort] ?? 'bg-muted text-muted-foreground')}>
+                  <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', EFFORT_BADGE[idea.effort] ?? 'bg-muted text-muted-foreground')}>
                     {idea.effort}
                   </span>
                 </div>

@@ -26,14 +26,6 @@ function PulseMark({ size = 32 }: { size?: number }) {
   return (
     <motion.div
       className="shrink-0 grid place-items-center rounded-xl"
-      animate={{
-        boxShadow: [
-          '0 4px 14px -4px rgba(43,89,255,0.50)',
-          '0 4px 22px -2px rgba(43,89,255,0.78)',
-          '0 4px 14px -4px rgba(43,89,255,0.50)',
-        ],
-      }}
-      transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
       style={{
         height: size,
         width:  size,
@@ -176,7 +168,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
         'bg-sidebar border-r border-sidebar-border',
         'overflow-hidden transition-[width] duration-200 ease-out',
         /* subtle shadow when expanded as overlay (collapsed mode) */
-        !pinned && hovering && 'shadow-[4px_0_24px_-4px_rgba(0,0,0,0.12)] dark:shadow-[4px_0_24px_-4px_rgba(0,0,0,0.40)]',
+        !pinned && hovering && 'border-r border-line-inv',
       )}
       style={{ width: expanded ? '256px' : '72px' }}
       onMouseEnter={() => !pinned && setHovering(true)}

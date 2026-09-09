@@ -157,7 +157,7 @@ function DataQualityBadge({ quality }: { quality: 'High' | 'Medium' | 'Low' }) {
     Low:    'bg-flare-wash text-tx-flare border-line-strong',
   }
   return (
-    <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border', styles[quality])}>
+    <span className={cn('inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium border', styles[quality])}>
       {quality} data quality
     </span>
   )
@@ -715,7 +715,7 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
             {errorCta && (
               <Link
                 href={errorCta.href}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-tx-2 border border-line rounded-full px-3 py-1.5 hover:bg-shell transition-colors ml-6"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-tx-2 border border-line rounded-sm px-3 py-1.5 hover:bg-shell transition-colors ml-6"
               >
                 {errorCta.label}
                 <ArrowRight className="h-3 w-3" />

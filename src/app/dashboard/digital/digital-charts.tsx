@@ -78,7 +78,7 @@ export function DigitalSpendChart({ data, demo }: SpendChartProps) {
         <YAxis yAxisId="spend" tickFormatter={fmtNGN} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={56} />
         <YAxis yAxisId="impr" orientation="right" tickFormatter={fmtImpr} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={52} />
         <Tooltip
-          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
           formatter={(val, name) =>
             name === 'spend'
               ? [typeof val === 'number' ? fmtNGN(val) : val, 'Spend']
@@ -167,9 +167,9 @@ export function ConversionFunnelChart({ data, demo }: { data?: FunnelData; demo?
             </div>
             <span className="text-sm font-bold bg-num shrink-0">{fmtNum(step.value)}</span>
           </div>
-          <div className="h-5 bg-muted/50 rounded-full overflow-hidden">
+          <div className="h-5 bg-muted/50 rounded-sm overflow-hidden">
             <div
-              className="h-full rounded-full transition-all duration-700"
+              className="h-full rounded-sm transition-all duration-700"
               style={{ width: `${step.barPct}%`, backgroundColor: step.color, opacity: 0.82 }}
             />
           </div>
@@ -227,7 +227,7 @@ export function FrequencyBarChart({ data, demo }: FreqProps) {
           <XAxis dataKey="platform" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
           <YAxis domain={[0, domainMax]} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={24} />
           <Tooltip
-            contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+            contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
             formatter={(val) => [typeof val === 'number' ? val.toFixed(2) : String(val), 'Avg Frequency']}
           />
           <ReferenceLine y={7} stroke="var(--flare)" strokeDasharray="4 2" />

@@ -87,7 +87,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
           <div
             key={i}
             className={cn(
-              'h-1 flex-1 rounded-full transition-colors duration-300',
+              'h-1 flex-1 rounded-sm transition-colors duration-300',
               i < step  ? 'bg-foreground'
             : i === step ? 'bg-foreground/60'
             : 'bg-muted'

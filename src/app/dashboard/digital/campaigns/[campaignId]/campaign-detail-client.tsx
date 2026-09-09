@@ -188,7 +188,7 @@ function GoalBar({
           {onTrack ? 'On track' : 'Off track'}
         </span>
       </div>
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
+      <div className="h-2 bg-muted rounded-sm overflow-hidden">
         <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
       </div>
       <div className="flex items-center justify-between text-[10px] text-muted-foreground">

@@ -46,8 +46,8 @@ function UsageBar({ used, limit, label }: { used: number; limit: number; label: 
         <span className="font-medium bg-num">{used.toLocaleString()} / {fmtLimit(limit)}</span>
       </div>
       {limit !== -1 && (
-        <div className="h-1.5 rounded-full bg-muted/60 overflow-hidden">
-          <div className={cn('h-full rounded-full transition-all', color)} style={{ width: `${pct}%` }} />
+        <div className="h-1.5 rounded-sm bg-muted/60 overflow-hidden">
+          <div className={cn('h-full rounded-sm transition-all', color)} style={{ width: `${pct}%` }} />
         </div>
       )}
     </div>

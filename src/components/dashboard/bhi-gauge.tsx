@@ -233,7 +233,7 @@ export function BHIGauge({ bhi, sparkline = [], trendLabel = '30-day' }: Props) 
         transition={{ delay: 0.6, duration: 0.4 }}
       >
         <span
-          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full border"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-sm border"
           style={{
             color:            zone?.color ?? 'var(--tx-3)',
             backgroundColor:  zone ? `${zone.color}15` : 'transparent',

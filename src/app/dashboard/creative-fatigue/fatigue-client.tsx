@@ -38,8 +38,8 @@ function FatigueBar({ score, level }: { score: number; level: FatiguedAsset['fat
         <span>Fatigue score</span>
         <span className="font-medium bg-num">{score}/100</span>
       </div>
-      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-        <div className={cn('h-full rounded-full transition-all', color)} style={{ width: `${score}%` }} />
+      <div className="h-1.5 rounded-sm bg-muted overflow-hidden">
+        <div className={cn('h-full rounded-sm transition-all', color)} style={{ width: `${score}%` }} />
       </div>
     </div>
   )
@@ -58,7 +58,7 @@ function AssetCard({ asset }: { asset: FatiguedAsset }) {
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={cn('inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full', meta.color)}>
+            <span className={cn('inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-sm', meta.color)}>
               <LevelIcon className="h-3 w-3" />
               {meta.label}
             </span>

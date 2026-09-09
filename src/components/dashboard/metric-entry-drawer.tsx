@@ -63,7 +63,7 @@ export function MetricEntryDrawer({ industry, onClose, onSaved }: Props) {
       <div className="fixed inset-0 z-[9990] bg-foreground/20 backdrop-blur-[2px]" onClick={onClose} />
       <div
         ref={drawerRef}
-        className="fixed inset-y-0 right-0 z-[9991] w-full max-w-sm bg-card border-l shadow-2xl flex flex-col"
+        className="fixed inset-y-0 right-0 z-[9991] w-full max-w-sm bg-card border-l flex flex-col"
       >
         <div className="flex items-center justify-between px-5 py-4 border-b">
           <div>

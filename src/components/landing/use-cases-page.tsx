@@ -114,7 +114,7 @@ export function UseCasesPage() {
         <motion.div {...rise} className="mt-8 flex flex-wrap gap-2.5">
           {INDUSTRIES.map(ind => (
             <a key={ind.id} href={`#${ind.id}`}
-              className="rounded-full border px-4 py-2 text-[12px] transition-colors hover:border-[var(--lp-clay)]"
+              className="rounded-sm border px-4 py-2 text-[12px] transition-colors hover:border-[var(--lp-clay)]"
               style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
               {ind.name}
             </a>
@@ -126,7 +126,7 @@ export function UseCasesPage() {
         {INDUSTRIES.map(ind => (
           <motion.div key={ind.id} id={ind.id} {...rise}
             className="scroll-mt-28 rounded-2xl border p-7 sm:p-10"
-            style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', boxShadow: '0 1px 2px rgba(20,24,43,0.04)' }}>
+            style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
             <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl"
               style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
               {ind.name}
@@ -144,7 +144,7 @@ export function UseCasesPage() {
             </div>
             <div className="mt-8 flex flex-wrap gap-2 border-t pt-6" style={{ borderColor: 'var(--lp-line)' }}>
               {ind.modules.map(m => (
-                <span key={m} className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px]"
+                <span key={m} className="flex items-center gap-1.5 rounded-sm border px-3 py-1 text-[10px]"
                   style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-mut)', background: 'var(--lp-chip)' }}>
                   <Check className="h-3 w-3" style={{ color: 'var(--tx-flare)' }} /> {m}
                 </span>
@@ -164,7 +164,7 @@ export function UseCasesPage() {
         </motion.p>
         <motion.div {...rise} className="mt-8">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-bold text-tx-inv shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
+            className="inline-flex items-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-bold text-tx-inv transition-transform hover:scale-[1.03] border border-line"
             style={{ background: 'var(--lp-clay)' }}>
             Start free in beta <ArrowRight className="h-4 w-4" />
           </Link>

@@ -62,9 +62,9 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
           </span>
           <span>{state.progress}%</span>
         </div>
-        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
           <div
-            className="h-full bg-foreground rounded-full transition-all duration-1000"
+            className="h-full bg-foreground rounded-sm transition-all duration-1000"
             style={{ width: `${state.progress}%` }}
           />
         </div>

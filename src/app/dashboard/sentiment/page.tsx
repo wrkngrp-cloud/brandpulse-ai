@@ -302,7 +302,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
           {platformEntries.length > 0 && (
             <div className="flex flex-wrap gap-1 pt-0.5">
               {platformEntries.map(([p, s]) => (
-                <span key={p} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border bg-muted/40 text-muted-foreground">
+                <span key={p} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-[10px] font-semibold border bg-muted/40 text-muted-foreground">
                   {PLATFORM_LABEL[p] ?? p}
                   <span className="font-bold text-foreground bg-num">{Math.round(s.score)}</span>
                 </span>
@@ -349,7 +349,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
                 { label: 'Negative', color: 'var(--flare)' },
               ].map(l => (
                 <div key={l.label} className="hidden sm:flex items-center gap-1.5">
-                  <span className="h-[3px] w-4 rounded-full" style={{ background: l.color }} />
+                  <span className="h-[3px] w-4 rounded-sm" style={{ background: l.color }} />
                   <span className="text-[11px] text-muted-foreground/55 font-medium">{l.label}</span>
                 </div>
               ))}
@@ -391,7 +391,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
                         <span className="capitalize">{label}</span>
                         <span className="bg-num">{Math.round(pct)}%</span>
                       </div>
-                      <div className="h-1 bg-muted rounded-full overflow-hidden">
+                      <div className="h-1 bg-muted rounded-sm overflow-hidden">
                         <div className={`h-full rounded-full ${SENTIMENT_BAR[label]}`} style={{ width: `${pct}%` }} />
                       </div>
                     </div>
@@ -423,7 +423,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
             </p>
           </div>
           {/* Stacked bar */}
-          <div className="h-2.5 w-full rounded-full overflow-hidden flex bg-muted">
+          <div className="h-2.5 w-full rounded-sm overflow-hidden flex bg-muted">
             {audienceEntries.map(a => (
               <div
                 key={a.type}

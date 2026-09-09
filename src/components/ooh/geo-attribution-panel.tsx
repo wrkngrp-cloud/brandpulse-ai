@@ -193,9 +193,9 @@ export function GeoAttributionPanel({
                   <span className="truncate">{city}</span>
                   <span className="font-medium bg-num">{count}</span>
                 </div>
-                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                <div className="h-1.5 rounded-sm bg-muted overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-[var(--brand-primary,var(--ember))]"
+                    className="h-full rounded-sm bg-[var(--brand-primary,var(--ember))]"
                     style={{ width: `${(count / byCity[0][1]) * 100}%` }}
                   />
                 </div>
@@ -217,8 +217,8 @@ export function GeoAttributionPanel({
                     <span>{label}</span>
                     <span className="text-muted-foreground bg-num">{count} ({pct}%)</span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                    <div className="h-full rounded-full bg-flare" style={{ width: `${pct}%` }} />
+                  <div className="h-1.5 rounded-sm bg-muted overflow-hidden">
+                    <div className="h-full rounded-sm bg-flare" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               )
@@ -373,7 +373,7 @@ export function GeoAttributionPanel({
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-sm truncate">{aud.audience_name}</span>
-                      <span className={cn('inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium', meta.color)}>
+                      <span className={cn('inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-sm font-medium', meta.color)}>
                         <StatusIcon className="h-3 w-3" />
                         {meta.label}
                       </span>

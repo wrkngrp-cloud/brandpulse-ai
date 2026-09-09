@@ -164,7 +164,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
                 contentStyle={{
                   background: 'var(--bg-ink)',
                   border: 'var(--line)',
-                  borderRadius: 12,
+                  borderRadius: 'var(--r-card)',
                   fontSize: 12,
                   color: 'var(--bg-card)',
                 }}

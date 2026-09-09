@@ -36,13 +36,13 @@ function CustomTooltip({ active, payload, label }: {
     : ''
 
   return (
-    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[150px]">
+    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5 min-w-[150px]">
       <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-2">{date}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center justify-between gap-4 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
             <span
-              className="h-1.5 w-3 rounded-full shrink-0"
+              className="h-1.5 w-3 rounded-sm shrink-0"
               style={{ background: p.color }}
             />
             <span className="text-[11.5px] text-tx-inv/60 capitalize">{p.name}</span>
@@ -78,7 +78,7 @@ function Legend({ items }: { items: { label: string; color: string }[] }) {
     <div className="flex items-center gap-5">
       {items.map(item => (
         <div key={item.label} className="flex items-center gap-1.5">
-          <span className="h-[3px] w-4 rounded-full" style={{ background: item.color }} />
+          <span className="h-[3px] w-4 rounded-sm" style={{ background: item.color }} />
           <span className="text-[11px] text-muted-foreground/60 font-medium">{item.label}</span>
         </div>
       ))}

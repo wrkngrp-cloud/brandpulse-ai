@@ -17,7 +17,7 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5">
+    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5">
       <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-1.5">
         {label ? new Date(label).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'Africa/Lagos' }) : ''}
       </p>

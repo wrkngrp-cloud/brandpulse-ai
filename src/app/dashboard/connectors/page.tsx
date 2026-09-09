@@ -133,7 +133,7 @@ export default async function ConnectorsPage() {
           </p>
           <div className="flex flex-wrap gap-2">
             {suggestedConns.map(key => (
-              <span key={key} className="text-xs border rounded-full px-3 py-1 bg-muted/40 text-muted-foreground font-medium">
+              <span key={key} className="text-xs border rounded-sm px-3 py-1 bg-muted/40 text-muted-foreground font-medium">
                 {CONNECTOR_LABEL[key] ?? key}
               </span>
             ))}

@@ -37,8 +37,8 @@ function ScoreBar({ score, invert = false }: { score: number; invert?: boolean }
   const mid  = invert ? score <= 50 : score >= 50
   const col  = good ? 'bg-pos' : mid ? 'bg-ember' : 'bg-flare'
   return (
-    <div className="h-1 bg-muted rounded-full overflow-hidden w-16">
-      <div className={cn('h-full rounded-full', col)} style={{ width: `${score}%` }} />
+    <div className="h-1 bg-muted rounded-sm overflow-hidden w-16">
+      <div className={cn('h-full rounded-sm', col)} style={{ width: `${score}%` }} />
     </div>
   )
 }
@@ -46,28 +46,28 @@ function ScoreBar({ score, invert = false }: { score: number; invert?: boolean }
 function VerdictBadge({ verdict }: { verdict: string }) {
   if (verdict === 'Publish') {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-shell text-pos dark:bg-shell/40 dark:text-pos border border-line dark:border-line">
+      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-sm bg-shell text-pos dark:bg-shell/40 dark:text-pos border border-line dark:border-line">
         Ready to Publish
       </span>
     )
   }
   if (verdict === 'Revise') {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-shell text-tx-2 dark:bg-shell/40 dark:text-tx-2 border border-line dark:border-line">
+      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-sm bg-shell text-tx-2 dark:bg-shell/40 dark:text-tx-2 border border-line dark:border-line">
         Needs Revision
       </span>
     )
   }
   if (verdict === 'Hold') {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-flare-wash text-tx-flare dark:bg-shell/40 dark:text-tx-flare border border-line-strong dark:border-line-strong">
+      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-sm bg-flare-wash text-tx-flare dark:bg-shell/40 dark:text-tx-flare border border-line-strong dark:border-line-strong">
         On Hold
       </span>
     )
   }
   // Fallback: render raw verdict text as a neutral badge
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
+    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-sm bg-muted text-muted-foreground border border-border">
       {verdict}
     </span>
   )

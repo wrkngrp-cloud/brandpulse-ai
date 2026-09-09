@@ -26,7 +26,7 @@ export function WhatsAppConnectCard({ configured, contactCount, campaignCount }:
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold">WhatsApp Business</p>
               {configured && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-pos dark:text-pos bg-shell dark:bg-shell/40 rounded-full px-2 py-0.5">
+                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-pos dark:text-pos bg-shell dark:bg-shell/40 rounded-sm px-2 py-0.5">
                   <CheckCircle2 className="h-2.5 w-2.5" /> Active
                 </span>
               )}

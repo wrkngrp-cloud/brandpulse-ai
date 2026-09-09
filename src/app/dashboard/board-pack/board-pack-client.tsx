@@ -129,7 +129,7 @@ function CommercialTile({ id, metric }: {
   const improved = delta != null ? (def.goodWhenDown ? delta < 0 : delta > 0) : null
 
   return (
-    <div className="flex flex-col gap-1 rounded-xl border border-line bg-card px-4 py-3 shadow-sm print:border-line print:shadow-none">
+    <div className="flex flex-col gap-1 rounded-xl border border-line bg-card px-4 py-3 print:border-line">
       <span className="text-[10px] font-semibold text-tx-3">{def.label}</span>
       <span className="text-xl font-bold text-tx leading-none bg-num">{def.fmt(metric.value)}</span>
       {delta != null ? (
@@ -160,7 +160,7 @@ function MetricTile({
   trend: number | null
 }) {
   return (
-    <div className="flex flex-col items-center gap-1 rounded-xl border border-line bg-card px-4 py-3 text-center shadow-sm print:border-line print:shadow-none">
+    <div className="flex flex-col items-center gap-1 rounded-xl border border-line bg-card px-4 py-3 text-center print:border-line">
       <span className="text-[10px] font-semibold text-tx-3">{label}</span>
       <span className="text-2xl font-bold text-tx leading-none bg-num">
         {value}
@@ -280,7 +280,7 @@ export function BoardPackClient({
           <div
             data-tour="boardpack-main"
             id="board-pack-preview"
-            className="rounded-2xl border border-line bg-card shadow-sm print:rounded-none print:border-0 print:shadow-none"
+            className="rounded-2xl border border-line bg-card print:rounded-none print:border-0"
           >
             <div className="p-8 space-y-6">
 
@@ -406,7 +406,7 @@ export function BoardPackClient({
 
             <a
               href={`mailto:?subject=${subject}&body=${body}`}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-card px-4 py-2.5 text-[13px] font-medium text-tx-2 shadow-sm transition-colors hover:bg-shell active:bg-shell"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-card px-4 py-2.5 text-[13px] font-medium text-tx-2 transition-colors hover:bg-shell active:bg-shell"
             >
               <Mail className="h-4 w-4 shrink-0 opacity-70" />
               Share via Email
@@ -415,7 +415,7 @@ export function BoardPackClient({
             <button
               type="button"
               onClick={handleCopyLink}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-card px-4 py-2.5 text-[13px] font-medium text-tx-2 shadow-sm transition-colors hover:bg-shell active:bg-shell"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-card px-4 py-2.5 text-[13px] font-medium text-tx-2 transition-colors hover:bg-shell active:bg-shell"
             >
               <Link2 className="h-4 w-4 shrink-0 opacity-70" />
               Copy link
@@ -424,7 +424,7 @@ export function BoardPackClient({
             <button
               type="button"
               onClick={handleDownload}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-flare px-5 py-2.5 text-[13px] font-semibold text-tx-inv shadow-sm transition-colors hover:bg-flare active:bg-flare"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-flare px-5 py-2.5 text-[13px] font-semibold text-tx-inv transition-colors hover:bg-flare active:bg-flare border border-line"
             >
               <Download className="h-4 w-4 shrink-0" />
               Download PDF

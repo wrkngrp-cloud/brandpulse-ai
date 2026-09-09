@@ -257,7 +257,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
                                     type="button"
                                     onClick={() => toggleChannelObjective(ch.value, o.value)}
                                     className={cn(
-                                      'text-xs px-2.5 py-1 rounded-full border transition-colors',
+                                      'text-xs px-2.5 py-1 rounded-sm border transition-colors',
                                       linked
                                         ? 'bg-foreground text-background border-foreground'
                                         : 'border-muted-foreground/40 text-muted-foreground hover:border-foreground hover:text-foreground',

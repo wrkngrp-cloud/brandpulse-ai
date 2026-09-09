@@ -31,7 +31,7 @@ export function TVGRPChart() {
         <XAxis dataKey="week" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={36} />
         <Tooltip
-          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
         />
         <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
         <Line type="monotone" dataKey="nta"      name="NTA"          stroke="var(--neu)" strokeWidth={2} dot={{ r: 3 }} />
@@ -50,7 +50,7 @@ export function TVDaypartChart() {
         <XAxis dataKey="part" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={36} />
         <Tooltip
-          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
         />
         <Bar dataKey="grp" name="GRP" fill="var(--neu)" radius={[4, 4, 0, 0]} />
       </BarChart>

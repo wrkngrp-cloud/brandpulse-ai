@@ -38,7 +38,7 @@ export function DateRangeFilter({
           className={cn(
             'text-[11px] font-medium px-2.5 py-1 rounded-md transition-all',
             currentDays === p.days
-              ? 'bg-background text-foreground shadow-sm'
+              ? 'bg-background text-foreground border border-line'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >

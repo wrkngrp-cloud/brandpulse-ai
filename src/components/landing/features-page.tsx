@@ -111,7 +111,7 @@ export function FeaturesPage() {
               <p className="mt-3 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{f.body}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {f.chips.map(c => (
-                  <span key={c} className="rounded-full border px-3 py-1 text-[10px]"
+                  <span key={c} className="rounded-sm border px-3 py-1 text-[10px]"
                     style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-mut)', background: 'var(--lp-chip)' }}>
                     {c}
                   </span>
@@ -134,7 +134,7 @@ export function FeaturesPage() {
         </motion.h2>
         <motion.div {...rise} className="mt-8">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-bold text-tx-inv shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
+            className="inline-flex items-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-bold text-tx-inv transition-transform hover:scale-[1.03] border border-line"
             style={{ background: 'var(--lp-clay)' }}>
             Start free in beta <ArrowRight className="h-4 w-4" />
           </Link>

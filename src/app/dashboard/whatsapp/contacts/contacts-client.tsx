@@ -132,7 +132,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
                   <p className={cn('bg-num text-xs', c.name ? 'text-muted-foreground' : 'text-foreground')}>{c.phone_e164}</p>
                 </div>
                 <span className={cn(
-                  'text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0',
+                  'text-[10px] font-medium px-2 py-0.5 rounded-sm shrink-0',
                   c.whatsapp_opted_in
                     ? 'bg-shell text-pos dark:bg-shell/40 dark:text-pos'
                     : 'bg-muted text-muted-foreground'

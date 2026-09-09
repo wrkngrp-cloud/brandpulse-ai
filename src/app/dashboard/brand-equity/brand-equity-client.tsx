@@ -198,9 +198,9 @@ export function BrandEquityClient({
                       <p className="text-[10px] text-muted-foreground/60">{meta.weight}% weight</p>
                     </div>
                     <div className="flex-1">
-                      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
                         <div
-                          className="h-full rounded-full transition-all duration-700"
+                          className="h-full rounded-sm transition-all duration-700"
                           style={{
                             width: available ? `${score}%` : '0%',
                             backgroundColor: available ? (zone?.color ?? 'var(--tx-3)') : undefined,
@@ -270,16 +270,16 @@ export function BrandEquityClient({
                                   </div>
                                 </div>
                                 {/* Weight + score bar */}
-                                <div className="relative h-1 bg-muted rounded-full overflow-hidden">
+                                <div className="relative h-1 bg-muted rounded-sm overflow-hidden">
                                   {/* Weight indicator (total bar width shows relative weight) */}
                                   <div
-                                    className="absolute inset-y-0 left-0 rounded-full bg-muted-foreground/15"
+                                    className="absolute inset-y-0 left-0 rounded-sm bg-muted-foreground/15"
                                     style={{ width: `${source.weight}%` }}
                                   />
                                   {/* Score fill within the weight area */}
                                   {source.score !== null && source.weight > 0 && (
                                     <div
-                                      className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                                      className="absolute inset-y-0 left-0 rounded-sm transition-all duration-700"
                                       style={{
                                         width: `${(source.weight / 100) * source.score}%`,
                                         backgroundColor: source.score >= 70 ? 'var(--pos)'
@@ -400,7 +400,7 @@ export function BrandEquityClient({
                     </span>
                   </div>
                   {/* Percentile bar */}
-                  <div className="relative h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="relative h-1.5 bg-muted rounded-sm overflow-hidden">
                     {/* p25 marker */}
                     <div className="absolute top-0 bottom-0 w-px bg-border/60" style={{ left: '25%' }} />
                     {/* median marker */}
@@ -414,7 +414,7 @@ export function BrandEquityClient({
                       const pos   = Math.min(100, Math.max(0, ((value - min) / range) * 100))
                       return (
                         <div
-                          className="absolute top-1/2 -translate-y-1/2 h-3 w-3 rounded-full border-2 border-background shadow"
+                          className="absolute top-1/2 -translate-y-1/2 h-3 w-3 rounded-full border-2 border-background"
                           style={{ left: `${pos}%`, transform: `translateX(-50%) translateY(-50%)`, backgroundColor: 'var(--flare)' }}
                         />
                       )
@@ -472,7 +472,7 @@ export function BrandEquityClient({
                 contentStyle={{
                   background: 'var(--bg-ink)',
                   border: 'var(--line)',
-                  borderRadius: 12,
+                  borderRadius: 'var(--r-card)',
                   fontSize: 12,
                   color: 'var(--bg-card)',
                 }}
@@ -507,7 +507,7 @@ export function BrandEquityClient({
               { label: 'At Risk', color: 'var(--flare)', range: '0–39' },
             ].map(z => (
               <div key={z.label} className="flex items-center gap-1.5">
-                <span className="h-[2px] w-4 rounded-full" style={{ background: z.color, opacity: 0.5 }} />
+                <span className="h-[2px] w-4 rounded-sm" style={{ background: z.color, opacity: 0.5 }} />
                 <span className="text-[10px] text-muted-foreground">{z.label} ({z.range})</span>
               </div>
             ))}
@@ -641,7 +641,7 @@ export function BrandEquityClient({
                 contentStyle={{
                   background: 'var(--bg-ink)',
                   border: 'var(--line)',
-                  borderRadius: 12,
+                  borderRadius: 'var(--r-card)',
                   fontSize: 12,
                   color: 'var(--bg-card)',
                 }}

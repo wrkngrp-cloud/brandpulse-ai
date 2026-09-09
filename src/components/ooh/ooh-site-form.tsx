@@ -509,7 +509,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             </div>
 
             {showSuggestions && suggestions.length > 0 && (
-              <ul className="absolute z-50 mt-1 w-full rounded-lg border bg-popover shadow-lg overflow-hidden">
+              <ul className="absolute z-50 mt-1 w-full rounded-lg border bg-popover overflow-hidden">
                 {suggestions.map((f, i) => {
                   const label = f.properties.full_address ?? f.properties.place_formatted ?? f.properties.name ?? ''
                   return (
@@ -580,16 +580,16 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             {demographics && !inferringDemogs && (
               <div className="space-y-3">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-semibold">
+                  <span className="text-xs px-2.5 py-1 rounded-sm bg-primary/10 text-primary font-semibold">
                     {demographics.primary_audience}
                   </span>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium capitalize">
+                  <span className="text-xs px-2.5 py-1 rounded-sm bg-muted text-muted-foreground font-medium capitalize">
                     {demographics.income_tier.replace('_', ' ')} income
                   </span>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium">
+                  <span className="text-xs px-2.5 py-1 rounded-sm bg-muted text-muted-foreground font-medium">
                     {demographics.age_skew}
                   </span>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium capitalize">
+                  <span className="text-xs px-2.5 py-1 rounded-sm bg-muted text-muted-foreground font-medium capitalize">
                     {demographics.gender_split.replace('_', ' ')}
                   </span>
                 </div>
@@ -606,9 +606,9 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                   </div>
                 )}
                 <div className="flex items-center gap-1.5">
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden flex-1">
+                  <div className="h-1.5 rounded-sm bg-muted overflow-hidden flex-1">
                     <div
-                      className="h-full bg-primary/60 rounded-full"
+                      className="h-full bg-primary/60 rounded-sm"
                       style={{ width: `${Math.round(demographics.confidence * 100)}%` }}
                     />
                   </div>

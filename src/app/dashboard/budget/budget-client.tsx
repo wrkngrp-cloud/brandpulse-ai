@@ -192,9 +192,9 @@ export function BudgetClient() {
                               </td>
                               <td className="px-3 py-2 w-28">
                                 <div className="flex items-center gap-1.5">
-                                  <div className="flex-1 bg-muted rounded-full h-1.5">
+                                  <div className="flex-1 bg-muted rounded-sm h-1.5">
                                     <div
-                                      className={cn('h-1.5 rounded-full', pacingPct > 110 ? 'bg-flare' : pacingPct > 90 ? 'bg-ember' : 'bg-pos')}
+                                      className={cn('h-1.5 rounded-sm', pacingPct > 110 ? 'bg-flare' : pacingPct > 90 ? 'bg-ember' : 'bg-pos')}
                                       style={{ width: `${Math.min(100, pacingPct)}%` }}
                                     />
                                   </div>
@@ -303,8 +303,8 @@ function ActivePlanSummary({ plan }: { plan: BudgetPlan }) {
           <span className="bg-num">Spend ({Math.round(pacingPct)}%)</span>
           <span className="bg-num">Time ({Math.round(timePct)}%)</span>
         </div>
-        <div className="relative bg-muted rounded-full h-2">
-          <div className="absolute h-2 rounded-full bg-primary" style={{ width: `${Math.min(100, pacingPct)}%` }} />
+        <div className="relative bg-muted rounded-sm h-2">
+          <div className="absolute h-2 rounded-sm bg-primary" style={{ width: `${Math.min(100, pacingPct)}%` }} />
           <div className="absolute h-2 w-0.5 bg-foreground/30" style={{ left: `${Math.min(100, timePct)}%` }} />
         </div>
       </div>
@@ -329,9 +329,9 @@ function SpendProgress({ plan }: { plan: BudgetPlan }) {
             <span className={cn('px-1.5 py-0.5 rounded text-[11px] font-medium capitalize w-20 text-center shrink-0', CHANNEL_COLOR[ch] ?? 'bg-muted')}>
               {ch}
             </span>
-            <div className="flex-1 bg-muted rounded-full h-2">
+            <div className="flex-1 bg-muted rounded-sm h-2">
               <div
-                className={cn('h-2 rounded-full', pct > 110 ? 'bg-flare' : pct > 90 ? 'bg-ember' : 'bg-primary')}
+                className={cn('h-2 rounded-sm', pct > 110 ? 'bg-flare' : pct > 90 ? 'bg-ember' : 'bg-primary')}
                 style={{ width: `${pct}%` }}
               />
             </div>

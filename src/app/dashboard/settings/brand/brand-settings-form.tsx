@@ -172,7 +172,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
             </p>
             <div className="flex flex-wrap gap-2 mb-2">
               {colors.map(color => (
-                <div key={color} className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-full border">
+                <div key={color} className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-sm border">
                   <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
                   <span className="bg-num">{color}</span>
                   <button
@@ -352,7 +352,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                 <p className="text-[11px] font-semibold text-muted-foreground mb-1.5">Voice adjectives</p>
                 <div className="flex flex-wrap gap-1.5">
                   {data.brandVoice.adjectives.map(a => (
-                    <span key={a} className="text-xs px-2 py-0.5 rounded-full bg-muted border border-border font-medium">{a}</span>
+                    <span key={a} className="text-xs px-2 py-0.5 rounded-sm bg-muted border border-border font-medium">{a}</span>
                   ))}
                 </div>
               </div>
@@ -362,7 +362,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                 <p className="text-[11px] font-semibold text-muted-foreground mb-1.5">Signature phrases</p>
                 <div className="flex flex-wrap gap-1.5">
                   {data.brandVoice.signaturePhrases.map(p => (
-                    <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium italic">{p}</span>
+                    <span key={p} className="text-xs px-2 py-0.5 rounded-sm bg-primary/10 text-primary border border-primary/20 font-medium italic">{p}</span>
                   ))}
                 </div>
               </div>

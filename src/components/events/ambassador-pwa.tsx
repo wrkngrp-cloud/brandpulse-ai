@@ -270,7 +270,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
             <div className="flex items-center gap-1.5 justify-end">
               {!isOnline && <WifiOff className="h-3 w-3 text-tx-flare" />}
               {queue.length > 0 && (
-                <span className="text-xs bg-ember text-tx rounded-full px-1.5 font-medium bg-num">{queue.length} pending</span>
+                <span className="text-xs bg-ember text-tx rounded-sm px-1.5 font-medium bg-num">{queue.length} pending</span>
               )}
               <span className="text-sm font-bold bg-num">{totalMine}</span>
             </div>
@@ -362,9 +362,9 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
             <div className="space-y-6 flex-1 flex flex-col">
               <div>
                 <p className="text-xs text-muted-foreground mb-1 bg-num">Question {surveyQ + 1} of {SURVEY_QUESTIONS.length}</p>
-                <div className="h-1 bg-muted rounded-full overflow-hidden">
+                <div className="h-1 bg-muted rounded-sm overflow-hidden">
                   <div
-                    className="h-full bg-foreground rounded-full transition-all"
+                    className="h-full bg-foreground rounded-sm transition-all"
                     style={{ width: `${((surveyQ + 1) / SURVEY_QUESTIONS.length) * 100}%` }}
                   />
                 </div>

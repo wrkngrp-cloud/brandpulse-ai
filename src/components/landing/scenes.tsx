@@ -53,7 +53,6 @@ function Panel({ children, className = '' }: { children: React.ReactNode; classN
   return (
     <div
       className={`rounded-2xl border border-[var(--s-line)] bg-[var(--s-panel)] ${className}`}
-      style={{ boxShadow: 'var(--s-shadow)' }}
     >
       {children}
     </div>
@@ -70,7 +69,7 @@ function Tag({ children, tone = 'dim' }: { children: React.ReactNode; tone?: 'di
     teal:  { color: 'var(--pos)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
   }
   return (
-    <span className="inline-flex items-center whitespace-nowrap rounded-full border px-2 py-0.5 text-[9px]" style={tones[tone]}>
+    <span className="inline-flex items-center whitespace-nowrap rounded-sm border px-2 py-0.5 text-[9px]" style={tones[tone]}>
       {children}
     </span>
   )
@@ -141,7 +140,7 @@ export function GaugeScene({ t }: { t: number }) {
           <text x={START.x - 2} y={START.y + 18} textAnchor="middle" fontSize="9" fill="var(--s-mut)">0</text>
           <text x={END.x + 2} y={END.y + 18} textAnchor="middle" fontSize="9" fill="var(--s-mut)">100</text>
         </svg>
-        <span className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold"
+        <span className="inline-flex items-center gap-1.5 rounded-sm border px-3 py-1 text-xs font-semibold"
           style={{ color: 'var(--pos)', backgroundColor: 'var(--bg-shell)', borderColor: 'var(--bg-shell)', opacity: win(t, 0.5, 0.62) }}>
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--pos)]" /> Healthy
         </span>
@@ -316,7 +315,7 @@ export function SurveyScene({ t }: { t: number }) {
           const p = easeOut(win(t, 0.22 + i * 0.14, 0.36 + i * 0.14))
           return (
             <div key={i} className="flex items-center gap-2 self-start rounded-xl border border-[var(--s-line)] bg-[var(--s-panel)] px-3 py-2 @xl:mr-10"
-              style={{ opacity: p, transform: `translateX(${(1 - p) * -16}px)`, boxShadow: '0 1px 3px rgba(20,24,43,0.05)' }}>
+              style={{ opacity: p, transform: `translateX(${(1 - p) * -16}px)` }}>
               <p className="text-[11.5px] text-[var(--s-body)]">{r.text}</p>
               <Tag>{r.via}</Tag>
               <Tag tone={r.score >= 9 ? 'green' : r.score >= 7 ? 'dim' : 'red'}>{r.score}</Tag>
@@ -378,7 +377,7 @@ export function OohScene({ t }: { t: number }) {
                 </svg>
                 {s.hero && (
                   <div className="absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded-md border border-[var(--s-line)] bg-[var(--s-panel)] px-2 py-1"
-                    style={{ opacity: easeOut(win(t, 0.5, 0.62)), boxShadow: 'var(--s-shadow)' }}>
+                    style={{ opacity: easeOut(win(t, 0.5, 0.62)) }}>
                     <p className="text-[10px] font-bold text-[var(--s-strong)]">Lekki–Epe Expressway</p>
                     <p className="bg-num text-[8.5px] text-[var(--s-mut)]">48-sheet, 3,412 visits</p>
                   </div>
@@ -407,8 +406,8 @@ export function OohScene({ t }: { t: number }) {
                 <span className="text-[11px] text-[var(--s-body)]">{row.label}</span>
                 <span className="bg-num text-[12px] font-bold text-[var(--s-strong)]">{row.value}</span>
               </div>
-              <div className="h-1.5 rounded-full bg-[var(--s-track)]">
-                <div className="h-full rounded-full" style={{ width: `${row.p * 100 * p}%`, background: row.clay ? HERO : NEUTRAL, opacity: row.clay ? 1 : 0.6 }} />
+              <div className="h-1.5 rounded-sm bg-[var(--s-track)]">
+                <div className="h-full rounded-sm" style={{ width: `${row.p * 100 * p}%`, background: row.clay ? HERO : NEUTRAL, opacity: row.clay ? 1 : 0.6 }} />
               </div>
             </div>
           )
@@ -537,7 +536,7 @@ export function OutroScene({ t }: { t: number }) {
         Brand intelligence that speaks your market&apos;s language.
       </p>
       <div style={{ opacity: p2 }}>
-        <span className="rounded-full px-5 py-2.5 text-[13px] font-bold text-tx-inv" style={{ background: HERO }}>Start free at brandgauge.app</span>
+        <span className="rounded-sm px-5 py-2.5 text-[13px] font-bold text-tx-inv" style={{ background: HERO }}>Start free at brandgauge.app</span>
       </div>
     </div>
   )

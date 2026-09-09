@@ -71,7 +71,7 @@ export function LinkOohSiteDialog({ campaignId, availableSites }: LinkOohDialogP
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40">
-          <div className="bg-background border rounded-2xl shadow-xl w-full max-w-md space-y-4 p-5">
+          <div className="bg-background border rounded-2xl w-full max-w-md space-y-4 p-5">
             <div className="flex items-center justify-between">
               <p className="font-semibold text-sm">Link an OOH site to this campaign</p>
               <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
@@ -157,7 +157,7 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40">
-          <div className="bg-background border rounded-2xl shadow-xl w-full max-w-md space-y-4 p-5">
+          <div className="bg-background border rounded-2xl w-full max-w-md space-y-4 p-5">
             <div className="flex items-center justify-between">
               <p className="font-semibold text-sm">Link an event to this campaign</p>
               <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
@@ -181,7 +181,7 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium truncate">{ev.name}</p>
-                      <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0 capitalize', STATUS_COLOURS[ev.status] ?? 'bg-muted text-muted-foreground')}>
+                      <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium shrink-0 capitalize', STATUS_COLOURS[ev.status] ?? 'bg-muted text-muted-foreground')}>
                         {ev.status}
                       </span>
                     </div>

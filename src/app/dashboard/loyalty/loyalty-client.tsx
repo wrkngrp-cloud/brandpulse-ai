@@ -219,7 +219,7 @@ export function LoyaltyClient() {
                       <td className="px-4 py-3">
                         {m.tier ? (
                           <span
-                            className="px-2 py-0.5 rounded-full text-xs font-medium text-tx-inv"
+                            className="px-2 py-0.5 rounded-sm text-xs font-medium text-tx-inv"
                             style={{ backgroundColor: m.tier.color }}
                           >
                             {m.tier.name}
@@ -297,7 +297,7 @@ export function LoyaltyClient() {
                       <p className="text-xs text-muted-foreground">{m.email ?? m.phone ?? '—'}</p>
                     </div>
                     {m.tier && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium text-tx-inv" style={{ backgroundColor: m.tier.color }}>
+                      <span className="px-2 py-0.5 rounded-sm text-xs font-medium text-tx-inv" style={{ backgroundColor: m.tier.color }}>
                         {m.tier.name}
                       </span>
                     )}

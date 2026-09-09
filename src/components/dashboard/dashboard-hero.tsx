@@ -123,7 +123,7 @@ function WidgetPanel({ currentIds, onUpdate, onClose }: {
 
   return (
     <div className="fixed inset-0 z-[9985] bg-foreground/20 backdrop-blur-[2px]" onClick={onClose}>
-      <div className="absolute right-0 top-0 bottom-0 w-full max-w-xs bg-card border-l shadow-2xl flex flex-col"
+      <div className="absolute right-0 top-0 bottom-0 w-full max-w-xs bg-card border-l flex flex-col"
         onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <span className="text-sm font-semibold">Manage widgets</span>
@@ -290,7 +290,7 @@ export function DashboardHero({
               key={p}
               type="button"
               onClick={() => handlePromptClick(p)}
-              className="shrink-0 text-xs border rounded-full px-3 py-1.5 bg-card hover:bg-muted hover:border-foreground/30 transition-colors text-muted-foreground hover:text-foreground truncate max-w-[200px]"
+              className="shrink-0 text-xs border rounded-sm px-3 py-1.5 bg-card hover:bg-muted hover:border-foreground/30 transition-colors text-muted-foreground hover:text-foreground truncate max-w-[200px]"
             >
               {p}
             </button>

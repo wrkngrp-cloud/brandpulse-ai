@@ -121,7 +121,7 @@ export function SpendJustification({
                   contentStyle={{
                     background: 'var(--bg-ink)',
                     border: 'var(--line)',
-                    borderRadius: 12,
+                    borderRadius: 'var(--r-card)',
                     fontSize: 11,
                     color: 'var(--bg-card)',
                   }}

@@ -56,7 +56,7 @@ export function AspectSentimentPanel({ aspects, platform }: Props) {
             <p className="text-xs text-muted-foreground">What people praise and complain about</p>
           </div>
         </div>
-        <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+        <span className="text-[11px] font-medium px-2 py-0.5 rounded-sm bg-muted text-muted-foreground">
           {PLATFORM_LABELS[platform] ?? platform}
         </span>
       </div>
@@ -76,7 +76,7 @@ export function AspectSentimentPanel({ aspects, platform }: Props) {
                     <span className="text-sm font-medium truncate">
                       {ASPECT_LABELS[a.aspect] ?? a.aspect}
                     </span>
-                    <span className={cn('text-[11px] font-medium px-1.5 py-0.5 rounded-full shrink-0', styles.badge)}>
+                    <span className={cn('text-[11px] font-medium px-1.5 py-0.5 rounded-sm shrink-0', styles.badge)}>
                       {styles.label}
                     </span>
                   </div>
@@ -87,9 +87,9 @@ export function AspectSentimentPanel({ aspects, platform }: Props) {
                     </span>
                   </div>
                 </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                <div className="h-2 w-full rounded-sm bg-muted overflow-hidden">
                   <div
-                    className={cn('h-full rounded-full transition-all', styles.bar)}
+                    className={cn('h-full rounded-sm transition-all', styles.bar)}
                     style={{ width: `${Math.max(0, Math.min(100, a.score))}%` }}
                   />
                 </div>

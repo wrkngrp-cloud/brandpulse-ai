@@ -306,7 +306,7 @@ export function BusinessCaseClient({
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                 <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
-                <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 10 }} />
+                <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                 <Area type="monotone" dataKey="bhi" stroke="var(--flare)" strokeWidth={2.5} fill="url(#bhiGradBC)" dot={false} />
               </AreaChart>
             </ResponsiveContainer>
@@ -338,7 +338,7 @@ export function BusinessCaseClient({
                 <BarChart data={channelRows} layout="vertical" margin={{ left: 8 }}>
                   <XAxis type="number" hide />
                   <YAxis type="category" dataKey="channel" tick={{ fontSize: 12 }} width={80} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [fmtNGN(Number(v)), 'Spend']} contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+                  <Tooltip formatter={(v) => [fmtNGN(Number(v)), 'Spend']} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                   <Bar dataKey="spend" radius={[0, 6, 6, 0]} barSize={22}>
                     {channelRows.map((r) => (
                       <Cell key={r.channel} fill={r.bcg.color} />

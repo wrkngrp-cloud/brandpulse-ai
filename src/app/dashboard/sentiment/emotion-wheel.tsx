@@ -24,7 +24,7 @@ function CustomTooltip({ active, payload }: {
   if (!active || !payload?.length) return null
   const { name, value, payload: p } = payload[0]
   return (
-    <div className="bg-card border rounded-lg shadow px-3 py-1.5 text-xs">
+    <div className="bg-card border rounded-lg px-3 py-1.5 text-xs">
       <span className="font-semibold capitalize" style={{ color: p.color }}>{name}</span>
       <span className="text-muted-foreground ml-2">{value} mention{value !== 1 ? 's' : ''}</span>
     </div>

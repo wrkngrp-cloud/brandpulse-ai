@@ -227,7 +227,7 @@ export function OverviewClient({
             <Link
               href="/dashboard/campaigns/new"
               className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-tx-inv rounded-xl px-4 py-2 transition-all hover:opacity-90 active:scale-[0.98]"
-              style={{ background: 'var(--char)', boxShadow: '0 4px 14px -4px oklch(0.585 0.163 37 / 0.55)' }}
+              style={{ background: 'var(--char)' }}
             >
               <Plus className="h-3.5 w-3.5" />
               Campaign
@@ -430,7 +430,7 @@ export function OverviewClient({
                         {Math.round(row.pct)}%
                       </span>
                     </div>
-                    <div className="h-[3px] bg-muted/40 rounded-full overflow-hidden">
+                    <div className="h-[3px] bg-muted/40 rounded-sm overflow-hidden">
                       <motion.div
                         className={cn('h-full', row.bar)}
                         initial={{ width: 0 }}
@@ -473,9 +473,9 @@ export function OverviewClient({
                   Social share of voice{sovDate ? ` · ${fmtDate(sovDate)}` : ''}
                 </p>
               </div>
-              <div className="h-[3px] bg-muted/40 rounded-full overflow-hidden mt-4">
+              <div className="h-[3px] bg-muted/40 rounded-sm overflow-hidden mt-4">
                 <motion.div
-                  className="h-full rounded-full"
+                  className="h-full rounded-sm"
                   style={{ background: 'var(--flare)' }}
                   initial={{ width: 0 }}
                   animate={{ width: `${Math.min(sovScore, 100)}%` }}

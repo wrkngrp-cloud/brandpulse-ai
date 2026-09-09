@@ -86,9 +86,9 @@ function ScoreBar({ score, color, label }: { score: number; color: string; label
         <span className="text-muted-foreground">{label}</span>
         <span className="font-medium bg-num">{score}</span>
       </div>
-      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+      <div className="h-1.5 w-full bg-muted rounded-sm overflow-hidden">
         <div
-          className={cn('h-full rounded-full transition-all', color)}
+          className={cn('h-full rounded-sm transition-all', color)}
           style={{ width: `${Math.min(score, 100)}%` }}
         />
       </div>
@@ -389,7 +389,7 @@ export function CreativeClient({
                 key={p}
                 onClick={() => setPlatform(p)}
                 className={cn(
-                  'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
+                  'px-3 py-1.5 rounded-sm text-xs font-medium border transition-colors',
                   platform === p
                     ? 'bg-foreground text-background border-foreground'
                     : 'text-muted-foreground border-border hover:border-foreground/40',
@@ -431,7 +431,7 @@ export function CreativeClient({
                         {media.isVideo && <Film className="h-3 w-3 text-tx-inv" />}
                         <span className="text-[9px] bg-ink/60 text-tx-inv px-1.5 py-0.5 rounded bg-num">{media.isVideo ? 'VIDEO FRAME' : 'IMAGE'}</span>
                       </div>
-                      <button onClick={() => setMedia(null)} className="absolute top-1.5 right-1.5 bg-ink/60 rounded-full p-0.5">
+                      <button onClick={() => setMedia(null)} className="absolute top-1.5 right-1.5 bg-ink/60 rounded-sm p-0.5">
                         <XCircle className="h-3.5 w-3.5 text-tx-inv" />
                       </button>
                     </div>
@@ -518,7 +518,7 @@ export function CreativeClient({
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold">Creative {label}</span>
                         {isWinner && (
-                          <span className="text-[10px] font-bold bg-shell text-pos px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-bold bg-shell text-pos px-2 py-0.5 rounded-sm">
                             Winner
                           </span>
                         )}
@@ -555,7 +555,7 @@ export function CreativeClient({
               <div className="flex flex-wrap gap-1.5 pt-1">
                 <span className="text-xs text-muted-foreground">Brand values:</span>
                 {brandValues.map(v => (
-                  <span key={v} className="text-xs bg-muted px-2 py-0.5 rounded-full">
+                  <span key={v} className="text-xs bg-muted px-2 py-0.5 rounded-sm">
                     {v}
                   </span>
                 ))}
@@ -818,7 +818,7 @@ export function CreativeClient({
                   {videoMedia.isVideo ? 'VIDEO (first frame)' : 'IMAGE'}
                 </span>
               </div>
-              <button onClick={() => setVideoMedia(null)} className="absolute top-2 right-2 bg-ink/60 rounded-full p-1">
+              <button onClick={() => setVideoMedia(null)} className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1">
                 <XCircle className="h-4 w-4 text-tx-inv" />
               </button>
             </div>

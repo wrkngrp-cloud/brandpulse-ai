@@ -388,7 +388,7 @@ function AskPageContent() {
                             <Link
                               key={a.href + a.label}
                               href={a.href}
-                              className="inline-flex items-center gap-1.5 text-xs font-medium border rounded-full px-3 py-1.5 hover:bg-muted transition-colors"
+                              className="inline-flex items-center gap-1.5 text-xs font-medium border rounded-sm px-3 py-1.5 hover:bg-muted transition-colors"
                             >
                               {a.label}
                               <ArrowRight className="h-3 w-3" />

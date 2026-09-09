@@ -200,7 +200,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
                     </Pie>
                     <Tooltip
                       formatter={(v) => [`${v}%`, 'Contribution']}
-                      contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                      contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }}
                     />
                     <Legend
                       formatter={(value) => <span style={{ fontSize: 12, color: 'var(--tx-3)' }}><span className="bg-num">{value}</span></span>}

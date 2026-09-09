@@ -89,7 +89,7 @@ export function CampaignsList({ campaigns }: CampaignsListProps) {
                 <span className="text-sm font-medium truncate">
                   {c.name}
                 </span>
-                <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', STATUS_STYLES[c.status] ?? STATUS_STYLES.draft)}>
+                <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium', STATUS_STYLES[c.status] ?? STATUS_STYLES.draft)}>
                   {c.status.charAt(0).toUpperCase() + c.status.slice(1)}
                 </span>
                 {c.objective && (

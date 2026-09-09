@@ -86,7 +86,7 @@ function DemoTile({
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-1.5">
             <span className="text-[13px] font-semibold">{demo.brand}</span>
-            <span className="text-[11px] text-muted-foreground border rounded-full px-1.5 py-0.5 leading-none">{demo.industry}</span>
+            <span className="text-[11px] text-muted-foreground border rounded-sm px-1.5 py-0.5 leading-none">{demo.industry}</span>
           </div>
           <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{demo.tagline}</p>
         </div>

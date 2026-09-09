@@ -83,7 +83,7 @@ function toneBadge(tone: string | null) {
     negative: 'bg-flare-wash text-tx-flare dark:bg-shell/40 dark:text-tx-flare',
   }
   return (
-    <span className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded-full capitalize', map[tone as keyof typeof map])}>
+    <span className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded-sm capitalize', map[tone as keyof typeof map])}>
       {tone}
     </span>
   )
@@ -205,7 +205,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
               <XAxis dataKey="week" tick={{ fontSize: 11 }} tickLine={false} />
               <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickLine={false} />
               <Tooltip
-                contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid hsl(var(--border))' }}
+                contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)', border: '1px solid hsl(var(--border))' }}
                 formatter={(value, name) => [
                   String(value ?? 0) + '/100',
                   PLATFORM_LABELS[String(name)] ?? String(name),
@@ -260,7 +260,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-full text-tx-inv shrink-0"
+                      className="text-[10px] font-bold px-2 py-0.5 rounded-sm text-tx-inv shrink-0"
                       style={{ backgroundColor: PLATFORM_COLORS[c.platform] ?? 'var(--tx-3)' }}
                     >
                       {PLATFORM_LABELS[c.platform] ?? c.platform}

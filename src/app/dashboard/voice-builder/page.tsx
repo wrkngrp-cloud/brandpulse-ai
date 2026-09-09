@@ -295,7 +295,7 @@ export default function VoiceBuilderPage() {
                   <p className="text-[11px] font-bold text-muted-foreground mb-3">Signature phrases</p>
                   <div className="flex flex-wrap gap-2">
                     {voiceResult.signaturePhrases.map((p, i) => (
-                      <span key={i} className="px-3 py-1.5 rounded-full bg-muted text-[12.5px] italic">&ldquo;{p}&rdquo;</span>
+                      <span key={i} className="px-3 py-1.5 rounded-sm bg-muted text-[12.5px] italic">&ldquo;{p}&rdquo;</span>
                     ))}
                   </div>
                 </div>

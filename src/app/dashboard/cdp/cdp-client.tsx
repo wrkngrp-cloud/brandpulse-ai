@@ -146,7 +146,7 @@ export function CdpClient() {
               key={v}
               onClick={() => { setNpsFilter(v); setPage(1); load(search, v, 1) }}
               className={cn(
-                'px-3 py-1.5 rounded-full border text-xs font-medium transition-colors capitalize',
+                'px-3 py-1.5 rounded-sm border text-xs font-medium transition-colors capitalize',
                 npsFilter === v
                   ? 'bg-foreground text-background border-foreground'
                   : 'hover:bg-muted border-border'
@@ -208,7 +208,7 @@ export function CdpClient() {
 
 function KpiChip({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-card text-xs">
+    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm border bg-card text-xs">
       {icon}
       <span className="text-muted-foreground">{label}:</span>
       <span className="font-semibold bg-num">{value.toLocaleString()}</span>
@@ -227,7 +227,7 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
     .map(([k]) => SOURCE_LABEL[k] ?? k)
 
   return (
-    <div className={cn('rounded-xl border p-4 space-y-3 hover:shadow-sm transition-shadow', riskColor)}>
+    <div className={cn('rounded-xl border p-4 space-y-3 transition-shadow', riskColor)}>
       {/* Identity */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">

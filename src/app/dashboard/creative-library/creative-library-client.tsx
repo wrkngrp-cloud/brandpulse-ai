@@ -159,7 +159,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-ink/40" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-background border-l shadow-2xl overflow-y-auto flex flex-col">
+      <div className="relative w-full max-w-md bg-background border-l overflow-y-auto flex flex-col">
         {/* Header */}
         <div className="p-5 border-b flex items-start gap-3">
           <span className={cn('h-8 w-8 rounded-lg flex items-center justify-center shrink-0', ASSET_COLOR[asset.asset_type])}>
@@ -177,7 +177,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
         <div className="flex-1 divide-y divide-border/40">
           {/* Status + ads-ready */}
           <div className="p-5 flex items-center gap-3">
-            <span className={cn('text-[11px] font-medium capitalize rounded-full px-2.5 py-1', STATUS_BADGE[asset.status])}>
+            <span className={cn('text-[11px] font-medium capitalize rounded-sm px-2.5 py-1', STATUS_BADGE[asset.status])}>
               {asset.status}
             </span>
             {asset.fit_for_ads && (
@@ -271,7 +271,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
               <p className="text-[11px] font-bold text-muted-foreground mb-2">Tags</p>
               <div className="flex flex-wrap gap-1.5">
                 {asset.tags.map(t => (
-                  <span key={t} className="text-[11px] bg-muted rounded-full px-2.5 py-1 text-muted-foreground">{t}</span>
+                  <span key={t} className="text-[11px] bg-muted rounded-sm px-2.5 py-1 text-muted-foreground">{t}</span>
                 ))}
               </div>
             </div>

@@ -197,7 +197,7 @@ function CulturalIQBadge({ score }: { score: number | null }) {
   const color = score >= 70 ? 'text-pos bg-shell'
     : score >= 50 ? 'text-tx-2 bg-shell'
     : 'text-tx-flare bg-flare-wash'
-  return <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold bg-num', color)}>{score}</span>
+  return <span className={cn('text-xs px-2 py-0.5 rounded-sm font-semibold bg-num', color)}>{score}</span>
 }
 
 function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; campaignId: string }) {
@@ -210,14 +210,14 @@ function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; 
           <p className="text-xs text-muted-foreground truncate">@{inf.handle}</p>
         </div>
         <span className={cn(
-          'text-xs px-2 py-0.5 rounded-full font-medium shrink-0 capitalize',
+          'text-xs px-2 py-0.5 rounded-sm font-medium shrink-0 capitalize',
           INF_STATUS_STYLES[inf.status] ?? 'bg-muted text-muted-foreground',
         )}>
           {inf.status}
         </span>
       </div>
       <div className="flex items-center gap-2 flex-wrap">
-        <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', PLATFORM_COLORS[inf.platform] ?? 'bg-muted text-muted-foreground')}>
+        <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium capitalize', PLATFORM_COLORS[inf.platform] ?? 'bg-muted text-muted-foreground')}>
           {formatPlatformLabel(inf.platform)}
         </span>
         {inf.category && (
@@ -381,7 +381,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
       {/* Status + objectives pills + AI Analyse button */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', STATUS_STYLES[campaign.status] ?? STATUS_STYLES.draft)}>
+          <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium', STATUS_STYLES[campaign.status] ?? STATUS_STYLES.draft)}>
             {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
           </span>
           {objectives.map(obj => (
@@ -713,7 +713,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                         contentStyle={{
                           background: 'var(--bg-ink)',
                           border: 'var(--line)',
-                          borderRadius: 12,
+                          borderRadius: 'var(--r-card)',
                           fontSize: 12,
                           color: 'var(--bg-card)',
                         }}
@@ -754,8 +754,8 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               <span className="text-muted-foreground">{labels[type] ?? type}</span>
                               <span className="font-medium bg-num">{count.toLocaleString()} ({pct}%)</span>
                             </div>
-                            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                              <div className="h-full bg-foreground rounded-full" style={{ width: `${pct}%` }} />
+                            <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
+                              <div className="h-full bg-foreground rounded-sm" style={{ width: `${pct}%` }} />
                             </div>
                           </div>
                         )
@@ -897,7 +897,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           <Link href={`/dashboard/events/${ev.id}`} className="text-sm font-medium hover:underline truncate">
                             {ev.name}
                           </Link>
-                          <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0', EVENT_STATUS[ev.status] ?? 'bg-muted text-muted-foreground')}>
+                          <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium shrink-0', EVENT_STATUS[ev.status] ?? 'bg-muted text-muted-foreground')}>
                             {ev.status.charAt(0).toUpperCase() + ev.status.slice(1)}
                           </span>
                         </div>
@@ -1037,7 +1037,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
           {/* Link influencer dialog */}
           {linkingOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" onClick={() => setLinkingOpen(false)}>
-              <div className="bg-background border rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
+              <div className="bg-background border rounded-2xl w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between">
                   <p className="font-semibold">Link influencer to campaign</p>
                   <button onClick={() => setLinkingOpen(false)} className="text-muted-foreground hover:text-foreground">

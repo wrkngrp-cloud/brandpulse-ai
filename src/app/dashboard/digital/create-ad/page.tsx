@@ -305,7 +305,7 @@ function ImageUploadZone({
           <button
             type="button"
             onClick={onRemove}
-            className="absolute top-2 right-2 bg-ink/60 rounded-full p-1 hover:bg-ink/80 transition-colors"
+            className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1 hover:bg-ink/80 transition-colors"
           >
             <X className="h-3.5 w-3.5 text-tx-inv" />
           </button>
@@ -389,7 +389,7 @@ function VideoUploadZone({
           <button
             type="button"
             onClick={onRemove}
-            className="absolute top-2 right-2 bg-ink/60 rounded-full p-1 hover:bg-ink/80 transition-colors"
+            className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1 hover:bg-ink/80 transition-colors"
           >
             <X className="h-3.5 w-3.5 text-tx-inv" />
           </button>
@@ -461,7 +461,7 @@ function TagInput({
           {tags.map(t => (
             <span
               key={t}
-              className="inline-flex items-center gap-1 text-xs bg-muted px-2 py-0.5 rounded-full"
+              className="inline-flex items-center gap-1 text-xs bg-muted px-2 py-0.5 rounded-sm"
             >
               {t}
               <button
@@ -1154,7 +1154,7 @@ function StepAudience({ state, setState }: { state: WizardState; setState: React
               type="button"
               onClick={() => toggleLocation(loc)}
               className={cn(
-                'text-xs px-2.5 py-1 rounded-full border transition-colors',
+                'text-xs px-2.5 py-1 rounded-sm border transition-colors',
                 aud.locations.includes(loc)
                   ? 'border-primary bg-primary/10 text-primary font-medium'
                   : 'border-border text-muted-foreground hover:border-primary/40',

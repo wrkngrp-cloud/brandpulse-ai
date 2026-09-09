@@ -243,8 +243,10 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
               left:         box.left,
               width:        box.width,
               height:       box.height,
-              borderRadius: 14,
-              boxShadow:    '0 0 0 3px var(--ember), 0 0 24px 4px rgba(232,118,62,0.35), 0 0 0 9999px rgba(0,0,0,0.6)',
+              borderRadius: 'var(--r-card)',
+              /* The spotlight is a ring and a scrim, not a glow: 2px Flare at
+                 2px offset, which is the focus ring this system uses. */
+              boxShadow:    '0 0 0 2px var(--bg-paper), 0 0 0 4px var(--flare), 0 0 0 9999px rgba(22,18,14,.72)',
               zIndex:       9992,
               pointerEvents: 'none',
             }}
@@ -261,7 +263,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
         exit={{ opacity: 0, scale: 0.94 }}
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
         style={{ ...cardStyle, width: cardWidth(), zIndex: 9995 }}
-        className="bg-background border border-border rounded-xl shadow-xl p-5 space-y-3"
+        className="bg-background border border-border rounded-xl p-5 space-y-3"
         role="dialog"
         aria-modal="true"
         aria-label={step.title}

@@ -98,7 +98,7 @@ export function OohVisitChart({ visits }: OohVisitChartProps) {
                     fontSize: 12,
                     border: '1px solid hsl(var(--border))',
                     background: 'hsl(var(--card))',
-                    borderRadius: '8px',
+                    borderRadius: 'var(--r-card)',
                   }}
                 />
                 <Area

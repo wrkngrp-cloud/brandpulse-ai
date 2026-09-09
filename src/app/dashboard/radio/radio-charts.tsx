@@ -30,7 +30,7 @@ export function RadioReachChart() {
         <XAxis dataKey="week" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
         <YAxis tickFormatter={formatNum} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={48} />
         <Tooltip
-          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
           formatter={(val) => [typeof val === 'number' ? formatNum(val) : val, '']}
         />
         <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />

@@ -247,9 +247,9 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                     </div>
 
                     {/* Progress bar */}
-                    <div className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                    <div className="mt-2 h-1.5 w-full rounded-sm bg-muted overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-foreground transition-all duration-700"
+                        className="h-full rounded-sm bg-foreground transition-all duration-700"
                         style={{ width: score != null ? `${score}%` : '0%' }}
                       />
                     </div>
@@ -340,14 +340,14 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                             </div>
                           </div>
                           {/* Two-layer bar: weight track + score fill */}
-                          <div className="relative h-1.5 bg-muted-foreground/10 rounded-full overflow-hidden">
+                          <div className="relative h-1.5 bg-muted-foreground/10 rounded-sm overflow-hidden">
                             <div
-                              className="absolute inset-y-0 left-0 rounded-full bg-muted-foreground/20"
+                              className="absolute inset-y-0 left-0 rounded-sm bg-muted-foreground/20"
                               style={{ width: `${item.weight}%` }}
                             />
                             {item.score !== null && item.weight > 0 && (
                               <div
-                                className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                                className="absolute inset-y-0 left-0 rounded-sm transition-all duration-700"
                                 style={{
                                   width: `${(item.weight / 100) * item.score}%`,
                                   backgroundColor: scoreBarColor(item.score),
@@ -377,7 +377,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       {analysis.channels.map(ch => (
                         <span
                           key={ch}
-                          className="text-xs px-2 py-0.5 rounded-full bg-foreground/8 border border-border font-medium"
+                          className="text-xs px-2 py-0.5 rounded-sm bg-foreground/8 border border-border font-medium"
                         >
                           {ch}
                         </span>
@@ -395,7 +395,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                         {analysis.initiatives.map(init => (
                           <span
                             key={init}
-                            className="text-xs px-2 py-0.5 rounded-full bg-flare/10 text-tx-flare dark:text-tx-2 border border-line-strong dark:border-line-strong"
+                            className="text-xs px-2 py-0.5 rounded-sm bg-flare/10 text-tx-flare dark:text-tx-2 border border-line-strong dark:border-line-strong"
                           >
                             {init}
                           </span>

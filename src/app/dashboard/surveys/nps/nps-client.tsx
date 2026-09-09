@@ -60,11 +60,11 @@ const CUSTOM_TOOLTIP = ({ active, payload, label }: {
   const val = payload[0].value
   const isPositive = val >= 0
   return (
-    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[148px]">
+    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5 min-w-[148px]">
       <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-2">{label}</p>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-1.5">
-          <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: isPositive ? 'var(--pos)' : 'var(--flare)' }} />
+          <span className="h-[3px] w-3 rounded-sm shrink-0" style={{ background: isPositive ? 'var(--pos)' : 'var(--flare)' }} />
           <span className="text-[11.5px] text-tx-inv/55">NPS Score</span>
         </div>
         <span className={cn('text-[13px] font-semibold bg-num', isPositive ? 'text-pos' : 'text-tx-flare')}>
@@ -301,10 +301,10 @@ export function NpsClient({
 
       {/* Score guide */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-muted-foreground px-1">
-        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-pos inline-block" />50+ Excellent</span>
-        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-flare inline-block" />30–49 Good</span>
-        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-ember inline-block" />0–29 Needs work</span>
-        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-flare inline-block" />Below 0 Critical</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-sm bg-pos inline-block" />50+ Excellent</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-sm bg-flare inline-block" />30–49 Good</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-sm bg-ember inline-block" />0–29 Needs work</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-sm bg-flare inline-block" />Below 0 Critical</span>
         <span className="ml-auto opacity-50">NPS = % Promoters − % Detractors</span>
       </div>
 
@@ -347,7 +347,7 @@ export function NpsClient({
         <div className="border rounded-2xl p-5 bg-card card-shadow space-y-5">
           <div className="flex items-start gap-3">
             <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: 'var(--char)', boxShadow: '0 4px 12px -4px rgba(212,96,42,0.5)' }}>
+              style={{ background: 'var(--char)' }}>
               <Sparkles className="h-4 w-4 text-tx-inv" />
             </div>
             <div>

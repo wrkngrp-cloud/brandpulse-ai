@@ -121,7 +121,7 @@ export function AiCommand() {
         <button
           data-tour="ask-ai"
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-foreground text-background shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+          className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-foreground text-background flex items-center justify-center hover:scale-105 transition-transform border border-line"
           aria-label="Open BrandGauge"
         >
           <MessageSquare className="h-5 w-5" />
@@ -130,7 +130,7 @@ export function AiCommand() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col w-[360px] sm:w-[420px] h-[540px] rounded-2xl border bg-background shadow-2xl overflow-hidden">
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col w-[360px] sm:w-[420px] h-[540px] rounded-2xl border bg-background overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
             <div className="flex items-center gap-2">
@@ -212,7 +212,7 @@ export function AiCommand() {
                           <Link
                             key={a.href + a.label}
                             href={a.href}
-                            className="inline-flex items-center gap-1 text-[11px] font-medium border rounded-full px-2.5 py-1 hover:bg-muted transition-colors"
+                            className="inline-flex items-center gap-1 text-[11px] font-medium border rounded-sm px-2.5 py-1 hover:bg-muted transition-colors"
                           >
                             {a.label}
                             <ArrowRight className="h-3 w-3" />

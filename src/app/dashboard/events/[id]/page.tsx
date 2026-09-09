@@ -289,9 +289,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                     <span className="text-sm bg-num font-semibold">{a.total}</span>
                   </div>
                   {/* Progress bar */}
-                  <div className="ml-7 h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div className="ml-7 h-1.5 rounded-sm bg-muted overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-foreground/70 transition-all"
+                      className="h-full rounded-sm bg-foreground/70 transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>

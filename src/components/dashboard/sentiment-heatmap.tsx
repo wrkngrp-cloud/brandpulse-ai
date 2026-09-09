@@ -282,7 +282,7 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
           className="fixed z-50 pointer-events-none"
           style={{ left: tooltip.x, top: tooltip.y - 8, transform: 'translate(-50%, -100%)' }}
         >
-          <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[170px]">
+          <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5 min-w-[170px]">
             <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-1.5 bg-num">
               {fmt(tooltip.date)}
             </p>

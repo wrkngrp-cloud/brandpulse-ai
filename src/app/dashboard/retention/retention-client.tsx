@@ -263,8 +263,8 @@ function NpsBar({ label, count, total, color }: { label: string; count: number; 
   return (
     <div className="flex items-center gap-2 text-sm">
       <span className="w-20 text-muted-foreground text-xs">{label}</span>
-      <div className="flex-1 bg-muted rounded-full h-2">
-        <div className={cn('h-2 rounded-full', color)} style={{ width: `${pct}%` }} />
+      <div className="flex-1 bg-muted rounded-sm h-2">
+        <div className={cn('h-2 rounded-sm', color)} style={{ width: `${pct}%` }} />
       </div>
       <span className="text-xs font-medium w-8 text-right">{pct}%</span>
     </div>

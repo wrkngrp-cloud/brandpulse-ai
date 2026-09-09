@@ -249,7 +249,7 @@ function TierCard({
         <div className="flex items-center gap-1.5 text-sm font-medium">
           {icon} {title}
         </div>
-        <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', badgeStyles[badgeColor])}>
+        <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium', badgeStyles[badgeColor])}>
           {badge}
         </span>
       </div>

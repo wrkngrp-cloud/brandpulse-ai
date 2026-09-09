@@ -65,7 +65,7 @@ export function HorizontalTour() {
             <div className="flex items-center gap-2 pb-1.5">
               {PANELS.map((panel, i) => {
                 const on = Math.round(slide) === i
-                return <span key={panel.kicker} className="h-1.5 rounded-full transition-all duration-300"
+                return <span key={panel.kicker} className="h-1.5 rounded-sm transition-all duration-300"
                   style={{ width: on ? 28 : 10, background: on ? 'var(--lp-clay)' : 'var(--lp-line)' }} />
               })}
             </div>

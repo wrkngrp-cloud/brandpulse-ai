@@ -165,7 +165,7 @@ function StatusBadge({ status }: { status: string }) {
     rejected: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
   }
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
       {status}
     </span>
   )
@@ -181,7 +181,7 @@ function RecommendationBadge({ recommendation }: { recommendation: string | unde
   const config = map[recommendation]
   if (!config) return null
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', config.className)}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium', config.className)}>
       {config.label}
     </span>
   )
@@ -197,7 +197,7 @@ function CulturalIQBadge({ score }: { score: number | null }) {
     ? 'text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2'
     : 'text-tx-flare bg-flare-wash dark:bg-shell/30 dark:text-tx-flare'
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold bg-num', color)}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-sm font-semibold bg-num', color)}>
       {score}
     </span>
   )
@@ -206,12 +206,12 @@ function CulturalIQBadge({ score }: { score: number | null }) {
 function RiskBadge({ score }: { score: number | null }) {
   if (score === null) return <span className="text-xs text-muted-foreground">—</span>
   if (score < 30) {
-    return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-shell text-pos dark:bg-shell/30 dark:text-pos">Low risk</span>
+    return <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-pos dark:bg-shell/30 dark:text-pos">Low risk</span>
   }
   if (score <= 60) {
-    return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">Medium</span>
+    return <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">Medium</span>
   }
-  return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">High risk</span>
+  return <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">High risk</span>
 }
 
 function BrandFitScore({ score }: { score: number }) {
@@ -895,21 +895,21 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
           {pd.online_reputation.positive_signals?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {pd.online_reputation.positive_signals.map(s => (
-                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-shell text-pos dark:bg-shell/30 dark:text-pos">{s}</span>
+                <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-shell text-pos dark:bg-shell/30 dark:text-pos">{s}</span>
               ))}
             </div>
           )}
           {pd.online_reputation.negative_signals?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {pd.online_reputation.negative_signals.map(s => (
-                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">{s}</span>
+                <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">{s}</span>
               ))}
             </div>
           )}
           {pd.online_reputation.controversy_flags?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {pd.online_reputation.controversy_flags.map(s => (
-                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{s}</span>
+                <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{s}</span>
               ))}
             </div>
           )}
@@ -940,14 +940,14 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
           {bf.positive_indicators?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {bf.positive_indicators.map(p => (
-                <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-shell text-pos dark:bg-shell/30 dark:text-pos">{p}</span>
+                <span key={p} className="text-xs px-2 py-0.5 rounded-sm bg-shell text-pos dark:bg-shell/30 dark:text-pos">{p}</span>
               ))}
             </div>
           )}
           {bf.risk_factors?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {bf.risk_factors.map(r => (
-                <span key={r} className="text-xs px-2 py-0.5 rounded-full bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{r}</span>
+                <span key={r} className="text-xs px-2 py-0.5 rounded-sm bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{r}</span>
               ))}
             </div>
           )}
@@ -1011,18 +1011,18 @@ function InfluencerCard({
               <RecommendationBadge recommendation={brandFit.recommendation} />
             )}
             {inf.campaign_id && availableCampaigns.length === 0 && (
-              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">
+              <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">
                 In campaign
               </span>
             )}
             {inf.campaign_id && availableCampaigns.length > 0 && (() => {
               const linkedCampaign = availableCampaigns.find(c => c.id === inf.campaign_id)
               return linkedCampaign ? (
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2 truncate max-w-[180px]">
+                <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2 truncate max-w-[180px]">
                   {linkedCampaign.name}
                 </span>
               ) : (
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">
+                <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">
                   In campaign
                 </span>
               )

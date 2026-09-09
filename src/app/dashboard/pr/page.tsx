@@ -211,7 +211,7 @@ export default async function PRTrackingPage({
                 </div>
               ))}
             </div>
-            <div className="h-2 rounded-full overflow-hidden flex">
+            <div className="h-2 rounded-sm overflow-hidden flex">
               {sentCounts.positive > 0 && (
                 <div className="bg-pos" style={{ width: `${(sentCounts.positive / total) * 100}%` }} />
               )}
@@ -328,9 +328,9 @@ export default async function PRTrackingPage({
                   </p>
                   <p className="text-3xl font-bold bg-num">{latestSov.press_sov?.toFixed(1)}%</p>
                 </div>
-                <div className="h-2.5 flex-1 min-w-[120px] rounded-full bg-muted overflow-hidden">
+                <div className="h-2.5 flex-1 min-w-[120px] rounded-sm bg-muted overflow-hidden">
                   <div
-                    className="h-full bg-primary rounded-full"
+                    className="h-full bg-primary rounded-sm"
                     style={{ width: `${latestSov.press_sov ?? 0}%` }}
                   />
                 </div>

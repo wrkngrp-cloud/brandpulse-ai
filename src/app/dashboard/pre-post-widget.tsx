@@ -97,9 +97,9 @@ function ScoreCard({ label, dim, isRisk = false }: {
             <span className="text-muted-foreground font-normal">/100</span>
           </span>
         </div>
-        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+        <div className="h-1.5 rounded-sm bg-muted overflow-hidden">
           <div
-            className={cn('h-full rounded-full transition-all duration-500', isRisk ? riskBarColor(score) : scoreBarColor(score))}
+            className={cn('h-full rounded-sm transition-all duration-500', isRisk ? riskBarColor(score) : scoreBarColor(score))}
             style={{ width: `${score}%` }}
           />
         </div>
@@ -279,7 +279,7 @@ export function PrePostWidget() {
   const trigger = (
     <button
       onClick={() => { setOpen(true); setMinimised(false) }}
-      className="h-12 w-12 rounded-full bg-foreground text-background shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center"
+      className="h-12 w-12 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center border border-line"
       title="Pre-Post Analysis (⌘⇧P)"
     >
       <Zap className="h-5 w-5" />
@@ -295,7 +295,7 @@ export function PrePostWidget() {
       {minimised ? (
         <button
           onClick={() => setMinimised(false)}
-          className="flex items-center gap-2 bg-foreground text-background text-xs font-medium px-4 py-2 rounded-full shadow-lg hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 bg-foreground text-background text-xs font-medium px-4 py-2 rounded-sm hover:opacity-90 transition-opacity border border-line"
         >
           <Zap className="h-3.5 w-3.5" />
           Pre-Post
@@ -303,7 +303,7 @@ export function PrePostWidget() {
       ) : (
         <div
           className={cn(
-            'w-[92vw] sm:w-[480px] bg-background border rounded-2xl shadow-2xl flex flex-col',
+            'w-[92vw] sm:w-[480px] bg-background border rounded-2xl flex flex-col',
             'max-h-[80vh] overflow-hidden'
           )}
         >
@@ -348,19 +348,19 @@ export function PrePostWidget() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={image.previewUrl} alt="Visual to analyse" className="w-full max-h-48 object-cover" />
                     <div className="absolute top-2 right-2 flex items-center gap-1.5">
-                      <span className="text-[10px] bg-background/80 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-full border bg-num">
+                      <span className="text-[10px] bg-background/80 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-sm border bg-num">
                         {image.isVideo ? 'VIDEO' : image.mediaType.split('/')[1].toUpperCase()} · {image.sizeKb}KB
                       </span>
                       <button
                         onClick={() => { setImage(null); setImageError(null) }}
-                        className="bg-background/80 backdrop-blur-sm rounded-full p-0.5 hover:bg-flare-wash transition-colors"
+                        className="bg-background/80 backdrop-blur-sm rounded-sm p-0.5 hover:bg-flare-wash transition-colors"
                         title="Remove"
                       >
                         <XCircle className="h-4 w-4 text-tx-flare" />
                       </button>
                     </div>
                     <div className="absolute bottom-2 left-2">
-                      <span className="text-[10px] bg-foreground text-background px-2 py-0.5 rounded-full font-medium">Visual attached</span>
+                      <span className="text-[10px] bg-foreground text-background px-2 py-0.5 rounded-sm font-medium">Visual attached</span>
                     </div>
                   </div>
                 ) : extracting ? (
@@ -528,7 +528,7 @@ export function PrePostWidget() {
       {minimised && (
         <button
           onClick={() => { setOpen(true); setMinimised(false) }}
-          className="h-12 w-12 rounded-full bg-foreground text-background shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center"
+          className="h-12 w-12 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center border border-line"
           title="Pre-Post Analysis"
         >
           <Zap className="h-5 w-5" />

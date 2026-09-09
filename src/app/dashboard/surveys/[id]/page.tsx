@@ -156,8 +156,8 @@ export default async function SurveyDetailPage({
                       <span className="text-muted-foreground truncate max-w-[70%]">{label}</span>
                       <span className="font-medium shrink-0 bg-num">{count} ({pct}%)</span>
                     </div>
-                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div className="h-full bg-foreground rounded-full" style={{ width: `${pct}%` }} />
+                    <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
+                      <div className="h-full bg-foreground rounded-sm" style={{ width: `${pct}%` }} />
                     </div>
                   </div>
                 )

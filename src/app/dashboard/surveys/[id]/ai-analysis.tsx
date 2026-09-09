@@ -79,7 +79,7 @@ export function SurveyAiAnalysis({ surveyId, responseCount }: { surveyId: string
           </Button>
         )}
         {result && (
-          <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', CONFIDENCE_COLOUR[result.confidence])}>
+          <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium', CONFIDENCE_COLOUR[result.confidence])}>
             {result.confidence} confidence
           </span>
         )}

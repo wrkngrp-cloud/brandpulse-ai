@@ -73,7 +73,7 @@ export function ConnectChecklist({ items, serverDismissed }: {
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <span className="text-[11px] font-semibold bg-num text-muted-foreground rounded-full border border-border px-2.5 py-1">
+          <span className="text-[11px] font-semibold bg-num text-muted-foreground rounded-sm border border-border px-2.5 py-1">
             {doneCount} of {items.length} done
           </span>
           <button

@@ -89,7 +89,7 @@ function SentimentBadge({ score }: { score: number | null }) {
     ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
     : 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium bg-num', cls)}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium bg-num', cls)}>
       {label} ({score})
     </span>
   )
@@ -548,10 +548,10 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                           </span>
                         </div>
                         {deal.actual_views != null && (
-                          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                          <div className="h-1.5 w-full rounded-sm bg-muted overflow-hidden">
                             <div
                               className={cn(
-                                'h-full rounded-full transition-all',
+                                'h-full rounded-sm transition-all',
                                 (delivPct ?? 0) >= 100 ? 'bg-pos'
                                   : (delivPct ?? 0) >= 70 ? 'bg-ember'
                                   : 'bg-flare',

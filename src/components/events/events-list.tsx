@@ -127,7 +127,7 @@ function EventRow({ ev }: { ev: Event }) {
               <Badge variant={badge.variant} className="text-xs shrink-0">{badge.label}</Badge>
               {activationType && (
                 <span className={cn(
-                  'text-xs px-2 py-0.5 rounded-full font-medium shrink-0',
+                  'text-xs px-2 py-0.5 rounded-sm font-medium shrink-0',
                   activationBadgeClass(activationType),
                 )}>
                   {ACTIVATION_LABELS[activationType] ?? activationType}

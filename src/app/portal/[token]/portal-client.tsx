@@ -145,7 +145,7 @@ function RangePicker({ value, onChange, loading }: { value: Range; onChange: (r:
           className={cn(
             'px-3 py-1 text-[12px] font-semibold rounded-md transition-all',
             value === o.v
-              ? 'bg-background shadow-sm text-foreground'
+              ? 'bg-background text-foreground border border-line'
               : 'text-muted-foreground hover:text-foreground'
           )}
         >
@@ -360,7 +360,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 10 }} />
+                  <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                   <Area type="monotone" dataKey="bhi" stroke="var(--flare)" strokeWidth={2.5} fill="url(#bhiGrad)" dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -378,7 +378,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, '']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 10 }} />
+                  <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, '']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
                   <Line type="monotone" dataKey="score" name="Overall" stroke="var(--pos)" strokeWidth={2.5} dot={false} />
                   <Line type="monotone" dataKey="pos"   name="Positive" stroke="var(--neu)" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
@@ -405,7 +405,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                   <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10 }} width={32} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [typeof v === 'number' ? `${v.toFixed(1)}%` : v, 'SOV']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 10 }} />
+                  <Tooltip formatter={(v) => [typeof v === 'number' ? `${v.toFixed(1)}%` : v, 'SOV']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                   <Area type="monotone" dataKey="sov" stroke="var(--neu)" strokeWidth={2.5} fill="url(#sovGrad)" dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -494,7 +494,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                     <XAxis dataKey="week" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                     <YAxis domain={[0, 10]} tick={{ fontSize: 10 }} width={24} tickLine={false} axisLine={false} />
-                    <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'NPS']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 10 }} />
+                    <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'NPS']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                     <Bar dataKey="score" fill="var(--pos)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -569,9 +569,9 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                           <p className={cn('text-[11px] font-medium w-28 shrink-0 truncate', item.isBrand ? 'text-primary' : 'text-foreground')}>
                             {item.name}
                           </p>
-                          <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
+                          <div className="flex-1 bg-muted rounded-sm h-2 overflow-hidden">
                             <div
-                              className={cn('h-full rounded-full', item.isBrand ? 'bg-primary' : 'bg-muted-foreground/40')}
+                              className={cn('h-full rounded-sm', item.isBrand ? 'bg-primary' : 'bg-muted-foreground/40')}
                               style={{ width: `${(item.sov! / maxSov) * 100}%` }}
                             />
                           </div>

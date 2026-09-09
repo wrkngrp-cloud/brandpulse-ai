@@ -56,7 +56,7 @@ export function TrustPillarCard({ trust }: Props) {
                   {dim.display && <span className="ml-1.5 opacity-70">{dim.display}</span>}
                 </span>
               </div>
-              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all ${
                     dim.score == null   ? 'w-0' :

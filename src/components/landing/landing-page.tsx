@@ -61,7 +61,7 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
           </button>
           <Link href="/auth/login" className="hidden text-[13px] font-medium transition-opacity hover:opacity-70 sm:block" style={{ color: 'var(--lp-ink)' }}>Sign in</Link>
           <Link href="/auth/signup"
-            className="whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-bold text-tx-inv shadow-[0_8px_28px_rgba(212,96,42,0.35)] transition-transform hover:scale-[1.04]"
+            className="whitespace-nowrap rounded-sm px-4 py-2 text-[13px] font-bold text-tx-inv transition-transform hover:scale-[1.04] border border-line"
             style={{ background: 'var(--lp-clay)' }}>
             Start free
           </Link>
@@ -155,9 +155,9 @@ function Hero() {
         }} />
         <div className="absolute -left-24 top-40 opacity-70"><div className="lp-par lp-par-b"><CircleMotif /></div></div>
         <div className="absolute -right-16 top-[560px] opacity-50"><div className="lp-par lp-par-a"><CircleMotif size={220} /></div></div>
-        <div className="absolute left-1/2 top-[-180px] h-[420px] w-[820px] -translate-x-1/2 rounded-full blur-[130px]"
+        <div className="absolute left-1/2 top-[-180px] h-[420px] w-[820px] -translate-x-1/2 rounded-sm blur-[130px]"
           style={{ background: 'var(--bg-shell)' }} />
-        <div className="absolute left-1/2 top-[380px] h-[380px] w-[700px] -translate-x-1/2 rounded-full blur-[130px]"
+        <div className="absolute left-1/2 top-[380px] h-[380px] w-[700px] -translate-x-1/2 rounded-sm blur-[130px]"
           style={{ background: 'var(--bg-shell)' }} />
       </div>
 
@@ -184,12 +184,12 @@ function Hero() {
         </motion.p>
         <motion.div {...rise} transition={{ ...rise.transition, delay: 0.6 }} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Link href="/auth/signup"
-            className="group flex items-center gap-2 rounded-full px-6 py-3.5 text-[14px] font-bold text-tx-inv shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
+            className="group flex items-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-tx-inv transition-transform hover:scale-[1.03] border border-line"
             style={{ background: 'var(--lp-clay)' }}>
             Start free in beta
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
-          <a href="#demo" className="rounded-full border px-6 py-3.5 text-[14px] font-medium transition-colors"
+          <a href="#demo" className="rounded-sm border px-6 py-3.5 text-[14px] font-medium transition-colors"
             style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)' }}>
             Watch the demo
           </a>
@@ -239,9 +239,9 @@ function Differentiators() {
         }} />
         <div className="absolute -left-20 -top-16 opacity-40"><div className="lp-par lp-par-a"><CircleMotif size={200} /></div></div>
         <div className="absolute -bottom-32 -right-24"><div className="lp-par lp-par-b"><GaugeArcMotif size={560} opacity={0.24} /></div></div>
-        <div className="absolute right-0 top-0 h-[360px] w-[560px] rounded-full blur-[130px]"
+        <div className="absolute right-0 top-0 h-[360px] w-[560px] rounded-sm blur-[130px]"
           style={{ background: 'var(--bg-shell)' }} />
-        <div className="absolute -bottom-40 left-0 h-[340px] w-[600px] rounded-full blur-[130px]"
+        <div className="absolute -bottom-40 left-0 h-[340px] w-[600px] rounded-sm blur-[130px]"
           style={{ background: 'var(--bg-shell)' }} />
       </div>
 
@@ -255,7 +255,7 @@ function Differentiators() {
           {DIFFS.map((d, i) => (
             <motion.div key={d.n} {...rise} transition={{ ...rise.transition, delay: i * 0.05 }}
               className="group relative overflow-hidden rounded-2xl border p-7 transition-all duration-300 hover:-translate-y-1.5"
-              style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', boxShadow: '0 1px 2px rgba(20,24,43,0.04)' }}>
+              style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
               {/* clay corner sweep on hover */}
               <div className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
                 style={{ background: 'var(--bg-shell)' }} />
@@ -295,9 +295,9 @@ function DeepDives() {
       {/* patterned backdrop: diagonal wash pair + a faint circle motif cropped at the edge */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-32 top-1/4 opacity-30"><div className="lp-par lp-par-b"><CircleMotif size={380} /></div></div>
-        <div className="absolute -right-20 top-0 h-[360px] w-[520px] rounded-full blur-[140px]"
+        <div className="absolute -right-20 top-0 h-[360px] w-[520px] rounded-sm blur-[140px]"
           style={{ background: 'var(--bg-shell)' }} />
-        <div className="absolute -left-10 bottom-0 h-[320px] w-[480px] rounded-full blur-[140px]"
+        <div className="absolute -left-10 bottom-0 h-[320px] w-[480px] rounded-sm blur-[140px]"
           style={{ background: 'var(--bg-shell)' }} />
       </div>
 
@@ -347,7 +347,7 @@ function Industries() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <div className="lp-par lp-par-a"><GaugeArcMotif size={620} opacity={0.22} /></div>
         </div>
-        <div className="absolute left-1/2 top-0 h-[300px] w-[560px] -translate-x-1/2 rounded-full blur-[130px]"
+        <div className="absolute left-1/2 top-0 h-[300px] w-[560px] -translate-x-1/2 rounded-sm blur-[130px]"
           style={{ background: 'var(--bg-shell)' }} />
       </div>
 
@@ -362,7 +362,7 @@ function Industries() {
         <motion.div {...rise} className="mt-10 flex flex-wrap justify-center gap-3">
           {list.map((v, i) => (
             <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
-              className="rounded-full border px-5 py-2.5 text-[13px] transition-all duration-200"
+              className="rounded-sm border px-5 py-2.5 text-[13px] transition-all duration-200"
               style={active === i
                 ? { borderColor: 'var(--flare)', color: 'var(--bg-paper)', background: 'var(--flare)' }
                 : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
@@ -399,7 +399,7 @@ function FinalCta() {
         </motion.p>
         <motion.div {...rise} className="relative mt-10">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-bold text-tx-inv shadow-[0_0_60px_rgba(224,106,50,0.45)] transition-transform hover:scale-[1.04]"
+            className="inline-flex items-center gap-2 rounded-sm px-8 py-4 text-[15px] font-bold text-tx-inv transition-transform hover:scale-[1.04] border border-line"
             style={{ background: 'var(--ember)' }}>
             Create your workspace <ArrowRight className="h-4 w-4" />
           </Link>
@@ -503,14 +503,14 @@ function CursorField() {
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10"
       style={{ opacity: 'var(--lp-glow, 0)', transition: 'opacity 0.5s ease' }}>
       {/* clay glow blob, moved by transform (compositor-only) */}
-      <div className="absolute left-0 top-0 h-[620px] w-[620px] rounded-full blur-[85px]"
+      <div className="absolute left-0 top-0 h-[620px] w-[620px] rounded-sm blur-[85px]"
         style={{
           transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
           background: 'var(--bg-shell)',
           willChange: 'transform',
         }} />
       {/* a defined ring right at the cursor, so the pointer itself reads as the source */}
-      <div className="absolute left-0 top-0 h-[70px] w-[70px] rounded-full"
+      <div className="absolute left-0 top-0 h-[70px] w-[70px] rounded-sm"
         style={{
           transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
           border: '1px solid var(--lp-clay)',

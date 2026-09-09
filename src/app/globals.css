@@ -211,6 +211,12 @@
   a {
     color: var(--tx-flare);
   }
+  /* The one shadow this system keeps: a 2px Flare ring at 2px offset, on
+     every interactive element. Everything else is drawn with a hairline. */
+  :focus-visible {
+    outline: 2px solid var(--flare);
+    outline-offset: 2px;
+  }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font);
     font-weight: 700;

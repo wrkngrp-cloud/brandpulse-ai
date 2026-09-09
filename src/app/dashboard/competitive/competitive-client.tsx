@@ -251,7 +251,7 @@ function BriefingTab({
       {errorCta && (
         <Link
           href={errorCta.href}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-tx-2 border border-line rounded-full px-3 py-1.5 hover:bg-shell transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-tx-2 border border-line rounded-sm px-3 py-1.5 hover:bg-shell transition-colors"
         >
           {errorCta.label}
           <ArrowRight className="h-3 w-3" />
@@ -322,7 +322,7 @@ function BriefingTab({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-1">
               <h2 className="text-base font-semibold">{result.title}</h2>
-              <span className={cn('inline-flex text-xs px-2 py-0.5 rounded-full font-medium', CONFIDENCE_STYLE[result.confidence])}>
+              <span className={cn('inline-flex text-xs px-2 py-0.5 rounded-sm font-medium', CONFIDENCE_STYLE[result.confidence])}>
                 {result.confidence} confidence
               </span>
               {lastBriefing && !loading && (
@@ -356,7 +356,7 @@ function BriefingTab({
             <Section title="Competitive Forces" icon={AlertCircle} defaultOpen>
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold border', {
+                  <span className={cn('text-xs px-2 py-0.5 rounded-sm font-semibold border', {
                     'bg-flare-wash text-tx-flare border-line-strong':    result.porter_forces.overall_intensity === 'High',
                     'bg-shell text-tx-2 border-line': result.porter_forces.overall_intensity === 'Medium',
                     'bg-shell text-pos border-line':  result.porter_forces.overall_intensity === 'Low',
@@ -403,7 +403,7 @@ function BriefingTab({
                   <div key={i} className="border rounded-xl p-4 space-y-2">
                     <div className="flex items-start justify-between gap-3">
                       <p className="text-sm font-medium leading-snug">{rec.action}</p>
-                      <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium shrink-0', PRIORITY_STYLE[rec.priority])}>
+                      <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium shrink-0', PRIORITY_STYLE[rec.priority])}>
                         {rec.priority}
                       </span>
                     </div>
@@ -500,7 +500,7 @@ function EsovLeagueTab({
                   <td className="px-4 py-3 font-medium">
                     <div className="flex items-center gap-2">
                       {entry.isOurBrand && (
-                        <span className="text-[10px] px-1.5 py-0.5 bg-foreground text-background rounded-full font-bold">
+                        <span className="text-[10px] px-1.5 py-0.5 bg-foreground text-background rounded-sm font-bold">
                           YOU
                         </span>
                       )}
@@ -716,10 +716,10 @@ function SightingsTab({
             <div key={s.id} className="border rounded-xl p-4 bg-card space-y-2">
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-foreground text-background">
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-foreground text-background">
                     {s.competitor_name}
                   </span>
-                  <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium',
+                  <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium',
                     SIGHTING_TYPE_STYLE[s.sighting_type] ?? 'bg-muted text-muted-foreground')}>
                     {s.sighting_type}
                   </span>
@@ -792,7 +792,7 @@ function ScorecardTab({
             <tr className="border-b bg-muted/30">
               <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-40">Metric</th>
               <th className="text-center px-4 py-3 text-xs font-medium">
-                <span className="text-[10px] px-1.5 py-0.5 bg-foreground text-background rounded-full font-bold mr-1">YOU</span>
+                <span className="text-[10px] px-1.5 py-0.5 bg-foreground text-background rounded-sm font-bold mr-1">YOU</span>
                 {brandName}
               </th>
               {competitors.map(c => (

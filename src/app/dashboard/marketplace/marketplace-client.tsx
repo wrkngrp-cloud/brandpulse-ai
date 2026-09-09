@@ -103,7 +103,7 @@ export function MarketplaceClient() {
             key={f}
             onClick={() => setFilter(f)}
             className={cn(
-              'px-3 py-1.5 rounded-full border text-xs font-medium capitalize transition-colors',
+              'px-3 py-1.5 rounded-sm border text-xs font-medium capitalize transition-colors',
               filter === f ? 'bg-foreground text-background border-foreground' : 'hover:bg-muted border-border'
             )}
           >

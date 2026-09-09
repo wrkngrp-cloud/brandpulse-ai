@@ -48,7 +48,7 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
           <div className="flex items-center gap-2.5">
             <div
               className="h-8 w-8 rounded-xl grid place-items-center shrink-0"
-              style={{ background: 'var(--flare)', boxShadow: '0 4px 14px -4px oklch(0.485 0.25 258 / 0.55)' }}
+              style={{ background: 'var(--flare)' }}
             >
               <svg viewBox="0 0 20 20" className="h-[14px] w-[14px]" fill="none" aria-hidden>
                 <polyline points="2,10 6,6 9.5,13 13.5,7.5 18,10" stroke="var(--bg-paper)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />

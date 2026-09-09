@@ -35,7 +35,7 @@ export function PrMentionsChart({ data }: Props) {
           contentStyle={{
             fontSize: 12,
             border: '1px solid hsl(var(--border))',
-            borderRadius: 8,
+            borderRadius: 'var(--r-card)',
             background: 'hsl(var(--card))',
           }}
           labelStyle={{ fontWeight: 600 }}

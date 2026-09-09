@@ -57,9 +57,9 @@ export function SovWidget({
             {sovPct !== null ? `${sovPct.toFixed(1)}%` : '—'}
           </span>
         </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
+        <div className="h-2 bg-muted rounded-sm overflow-hidden">
           <div
-            className="h-full bg-primary rounded-full transition-all duration-500"
+            className="h-full bg-primary rounded-sm transition-all duration-500"
             style={{ width: sovPct !== null ? `${sovPct}%` : '0%' }}
           />
         </div>
@@ -92,9 +92,9 @@ export function SovWidget({
                     <span className="bg-num font-semibold text-primary">{sovPct !== null ? `${sovPct.toFixed(1)}%` : '—'}</span>
                   </div>
                 </div>
-                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
                   <div
-                    className="h-full bg-primary rounded-full transition-all duration-500"
+                    className="h-full bg-primary rounded-sm transition-all duration-500"
                     style={{ width: `${sovPct ?? 0}%` }}
                   />
                 </div>
@@ -126,9 +126,9 @@ export function SovWidget({
                       </Button>
                     </div>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
                     <div
-                      className="h-full bg-muted-foreground/40 rounded-full transition-all duration-500"
+                      className="h-full bg-muted-foreground/40 rounded-sm transition-all duration-500"
                       style={{ width: count > 0 ? `${pct}%` : '0%' }}
                     />
                   </div>

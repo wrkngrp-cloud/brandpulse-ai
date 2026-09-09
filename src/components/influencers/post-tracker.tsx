@@ -155,9 +155,9 @@ function ScoreTile({ label, score, icon: Icon }: { label: string; score: number;
         <span className="text-[10px] font-semibold text-muted-foreground">{label}</span>
       </div>
       <p className={cn('text-xl font-bold bg-num', scoreColor(score))}>{score}</p>
-      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+      <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
         <div
-          className={cn('h-full rounded-full transition-all', score >= 75 ? 'bg-pos' : score >= 55 ? 'bg-ember' : 'bg-flare')}
+          className={cn('h-full rounded-sm transition-all', score >= 75 ? 'bg-pos' : score >= 55 ? 'bg-ember' : 'bg-flare')}
           style={{ width: `${score}%` }}
         />
       </div>
@@ -172,8 +172,8 @@ function SentimentBar({ pct, color, label }: { pct: number; color: string; label
         <span className="text-muted-foreground">{label}</span>
         <span className="font-semibold bg-num">{pct}%</span>
       </div>
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
-        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
+      <div className="h-2 bg-muted rounded-sm overflow-hidden">
+        <div className="h-full rounded-sm transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
     </div>
   )
@@ -198,8 +198,8 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
           <span className="text-base text-muted-foreground font-medium">/100</span>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={cn('text-xs px-2.5 py-1 rounded-full font-semibold', verdict.cls)}>{verdict.label}</span>
-          <span className={cn('text-xs px-2.5 py-1 rounded-full font-semibold', rec.cls)}>{rec.label}</span>
+          <span className={cn('text-xs px-2.5 py-1 rounded-sm font-semibold', verdict.cls)}>{verdict.label}</span>
+          <span className={cn('text-xs px-2.5 py-1 rounded-sm font-semibold', rec.cls)}>{rec.label}</span>
         </div>
       </div>
 
@@ -249,7 +249,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
         {analysis.sentiment_analysis.key_themes.length > 0 && (
           <div className="flex flex-wrap gap-1 pt-1">
             {analysis.sentiment_analysis.key_themes.map(t => (
-              <span key={t} className="text-[10px] bg-muted px-2 py-0.5 rounded-full">{t}</span>
+              <span key={t} className="text-[10px] bg-muted px-2 py-0.5 rounded-sm">{t}</span>
             ))}
           </div>
         )}
@@ -280,10 +280,10 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
           </span>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <span className="text-[10px] bg-muted px-2 py-0.5 rounded-full capitalize">
+          <span className="text-[10px] bg-muted px-2 py-0.5 rounded-sm capitalize">
             {analysis.brand_association.community_receptivity} receptivity
           </span>
-          <span className="text-[10px] bg-muted px-2 py-0.5 rounded-full capitalize">
+          <span className="text-[10px] bg-muted px-2 py-0.5 rounded-sm capitalize">
             {analysis.brand_association.naturalness} integration
           </span>
         </div>
@@ -388,10 +388,10 @@ function PostCard({ post }: { post: InfluencerPost }) {
               {platformLabel(post.platform)} {post.post_type ? postTypeLabel(post.post_type) : ''}
             </span>
             {verdict && (
-              <span className={cn('text-[10px] px-2 py-0.5 rounded-full font-semibold', verdict.cls)}>{verdict.label}</span>
+              <span className={cn('text-[10px] px-2 py-0.5 rounded-sm font-semibold', verdict.cls)}>{verdict.label}</span>
             )}
             {!post.analysis && (
-              <span className="text-[10px] text-tx-2 bg-shell dark:bg-shell/20 px-2 py-0.5 rounded-full">Analysis pending</span>
+              <span className="text-[10px] text-tx-2 bg-shell dark:bg-shell/20 px-2 py-0.5 rounded-sm">Analysis pending</span>
             )}
           </div>
           <a
@@ -669,7 +669,7 @@ export function PostTracker({ influencerId, campaignId, influencerHandle, influe
             Post Performance
           </span>
           {posts.length > 0 && (
-            <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full font-medium bg-num">
+            <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-sm font-medium bg-num">
               {posts.length} post{posts.length !== 1 ? 's' : ''}
             </span>
           )}

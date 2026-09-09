@@ -130,8 +130,8 @@ function IqScore({ score }: { score: number | null }) {
   return (
     <div className="space-y-1">
       <span className={cn('text-2xl font-bold bg-num', color)}>{score}</span>
-      <div className="h-1.5 bg-muted rounded-full overflow-hidden w-full">
-        <div className={cn('h-full rounded-full', barColor)} style={{ width: `${score}%` }} />
+      <div className="h-1.5 bg-muted rounded-sm overflow-hidden w-full">
+        <div className={cn('h-full rounded-sm', barColor)} style={{ width: `${score}%` }} />
       </div>
     </div>
   )
@@ -150,8 +150,8 @@ function RiskScore({ score }: { score: number | null }) {
         <span className={cn('text-2xl font-bold bg-num', color)}>{score}</span>
         <span className="text-xs text-muted-foreground">{label}</span>
       </div>
-      <div className="h-1.5 bg-muted rounded-full overflow-hidden w-full">
-        <div className={cn('h-full rounded-full', barColor)} style={{ width: `${score}%` }} />
+      <div className="h-1.5 bg-muted rounded-sm overflow-hidden w-full">
+        <div className={cn('h-full rounded-sm', barColor)} style={{ width: `${score}%` }} />
       </div>
     </div>
   )
@@ -165,7 +165,7 @@ function StatusBadge({ status }: { status: string }) {
     rejected: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
   }
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
       {status}
     </span>
   )
@@ -180,7 +180,7 @@ function RecommendationBadge({ rec }: { rec: string }) {
   const labels: Record<string, string> = {
     strong_fit: 'Strong fit', potential_fit: 'Potential fit', poor_fit: 'Poor fit',
   }
-  return <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', map[rec] ?? 'bg-muted text-muted-foreground')}>{labels[rec] ?? rec}</span>
+  return <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium', map[rec] ?? 'bg-muted text-muted-foreground')}>{labels[rec] ?? rec}</span>
 }
 
 // ── main component ────────────────────────────────────────────────────────────
@@ -380,9 +380,9 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
                 </div>
               </div>
 
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div className="h-2 bg-muted rounded-sm overflow-hidden">
                 <div
-                  className={cn('h-full rounded-full', bf.score >= 70 ? 'bg-pos' : bf.score >= 40 ? 'bg-ember' : 'bg-flare')}
+                  className={cn('h-full rounded-sm', bf.score >= 70 ? 'bg-pos' : bf.score >= 40 ? 'bg-ember' : 'bg-flare')}
                   style={{ width: `${bf.score}%` }}
                 />
               </div>
@@ -561,21 +561,21 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
               {pd.online_reputation.positive_signals?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {pd.online_reputation.positive_signals.map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-shell text-pos dark:bg-shell/30 dark:text-pos">{s}</span>
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-shell text-pos dark:bg-shell/30 dark:text-pos">{s}</span>
                   ))}
                 </div>
               )}
               {pd.online_reputation.negative_signals?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {pd.online_reputation.negative_signals.map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">{s}</span>
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">{s}</span>
                   ))}
                 </div>
               )}
               {pd.online_reputation.controversy_flags?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {pd.online_reputation.controversy_flags.map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{s}</span>
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{s}</span>
                   ))}
                 </div>
               )}

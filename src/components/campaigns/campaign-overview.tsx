@@ -149,7 +149,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
               return (
                 <span
                   key={obj}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-muted"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-sm bg-muted"
                 >
                   <span className={cn('h-2 w-2 rounded-full', meta.color)} />
                   {meta.label}
@@ -178,9 +178,9 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
             <span className="bg-num">{fmtDateShort(start_date)}</span>
             <span className="bg-num">{end_date ? fmtDateShort(end_date) : 'Always On'}</span>
           </div>
-          <div className="h-3 bg-muted rounded-full overflow-hidden">
+          <div className="h-3 bg-muted rounded-sm overflow-hidden">
             <div
-              className="h-full bg-foreground rounded-full transition-all duration-500"
+              className="h-full bg-foreground rounded-sm transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -223,9 +223,9 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
                       </div>
                     )}
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-2 bg-muted rounded-sm overflow-hidden">
                     <div
-                      className={cn('h-full rounded-full transition-all duration-500', meta.color)}
+                      className={cn('h-full rounded-sm transition-all duration-500', meta.color)}
                       style={{ width: `${barPct}%`, opacity: 0.7 }}
                     />
                   </div>
@@ -265,9 +265,9 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
                 {totalAllocated > 0 && (
                   <>
                     {/* Allocation bar */}
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-2 bg-muted rounded-sm overflow-hidden">
                       <div
-                        className="h-full bg-foreground rounded-full"
+                        className="h-full bg-foreground rounded-sm"
                         style={{ width: `${pct(totalAllocated, Number(campaign.total_budget))}%` }}
                       />
                     </div>
@@ -368,13 +368,13 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
                   <p className="text-sm font-medium truncate">{inf.name}</p>
                   <p className="text-xs text-muted-foreground truncate">@{inf.handle}</p>
                 </div>
-                <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize shrink-0', PLATFORM_BADGE[inf.platform] ?? 'bg-muted text-muted-foreground')}>
+                <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium capitalize shrink-0', PLATFORM_BADGE[inf.platform] ?? 'bg-muted text-muted-foreground')}>
                   {inf.platform === 'tiktok' ? 'TikTok' : inf.platform === 'youtube' ? 'YouTube' : inf.platform.charAt(0).toUpperCase() + inf.platform.slice(1)}
                 </span>
                 <span className="text-xs bg-num shrink-0 text-muted-foreground">{formatFollowers(inf.followers)}</span>
                 {inf.cultural_iq !== null && (
                   <span className={cn(
-                    'text-xs px-1.5 py-0.5 rounded-full font-semibold shrink-0',
+                    'text-xs px-1.5 py-0.5 rounded-sm font-semibold shrink-0',
                     inf.cultural_iq >= 70 ? 'text-pos bg-shell'
                     : inf.cultural_iq >= 50 ? 'text-tx-2 bg-shell'
                     : 'text-tx-flare bg-flare-wash',

@@ -143,7 +143,7 @@ export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId, tota
                   contentStyle={{
                     background: 'var(--bg-ink)',
                     border: 'var(--line)',
-                    borderRadius: 12,
+                    borderRadius: 'var(--r-card)',
                     fontSize: 11,
                     color: 'var(--bg-card)',
                   }}

@@ -106,7 +106,7 @@ async function PerceptionAuditSection() {
           <BarChart2 className="h-4 w-4 text-muted-foreground" />
           <h2 className="text-base font-semibold">Perception Audit</h2>
           {totalResponses > 0 && (
-            <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+            <span className="text-xs bg-muted px-2 py-0.5 rounded-sm text-muted-foreground">
               {totalResponses} {totalResponses === 1 ? 'response' : 'responses'}
             </span>
           )}
@@ -127,7 +127,7 @@ async function PerceptionAuditSection() {
               {dimensionScores.map(dim => (
                 <div key={dim.key} className="flex items-center gap-3 px-4 sm:px-5 py-3">
                   <p className="text-xs sm:text-sm w-24 sm:w-36 shrink-0">{dim.label}</p>
-                  <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="flex-1 h-1.5 bg-muted rounded-sm overflow-hidden">
                     {dim.avg != null && (
                       <div
                         className={`h-full rounded-full ${dimBarColor(dim.avg)}`}

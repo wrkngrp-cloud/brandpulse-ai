@@ -90,7 +90,7 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                   <Link href={`/dashboard/ooh/${site.id}`} className="text-sm font-medium hover:underline truncate">
                     {site.site_name}
                   </Link>
-                  <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', STATUS_STYLES[status])}>
+                  <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium', STATUS_STYLES[status])}>
                     {STATUS_LABELS[status]}
                   </span>
                   {site.campaign_id && site.campaign_name ? (
@@ -105,7 +105,7 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                     <span className="text-xs text-muted-foreground/60 italic">Always On</span>
                   ) : null}
                   {site.format_type && FORMAT_BADGE[site.format_type] ? (
-                    <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', FORMAT_BADGE[site.format_type].style)}>
+                    <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium', FORMAT_BADGE[site.format_type].style)}>
                       {FORMAT_BADGE[site.format_type].label}
                     </span>
                   ) : site.format_type ? (
