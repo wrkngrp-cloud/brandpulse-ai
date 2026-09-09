@@ -1,11 +1,19 @@
+/* BrandGauge v3.4 brand system. These come first, in this order, before
+   anything else. Every colour, type, space and motion value lives in them. */
+@import "../../brand/fonts.css";
+@import "../../public/fonts/plex.css";  /* IBM Plex Mono, the fall-through in --font-num */
+@import "../../brand/tokens.css";
+@import "../../brand/gradients.css";
+@import "../../brand/motion.css";
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
-/* ── Font: Satoshi (all weights 300–900) ─────────────────────────────────── */
-/* Loaded via fontshare CDN in layout.tsx head                                */
+/* ── Type: Nohemi for everything, Disket Mono for numerals ─────────────── */
+/* Both self-hosted from /public/fonts via brand/fonts.css                  */
 
 @theme inline {
   --color-background:            var(--background);
@@ -78,10 +86,12 @@
    Canvas: pure white  |  Chrome: navy  |  Signal: blue  |  Brand: clay
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Font family — Satoshi for everything; weight does the hierarchy work */
-  --font-sans:    'Satoshi', system-ui, -apple-system, sans-serif;
-  --font-display: 'Satoshi', system-ui, -apple-system, sans-serif;
-  --font-mono:    var(--font-mono, 'Geist Mono', monospace);
+  /* Type. Nohemi for everything, Disket Mono for numerals only.
+     Both stacks are defined in brand/tokens.css; these only alias them so the
+     existing font-sans / font-mono / font-display utilities resolve to them. */
+  --font-sans:    var(--font);
+  --font-display: var(--font);
+  --font-mono:    var(--font-num);
 
   /* Content backgrounds — WHITE is the canvas */
   --background:         #FFFFFF;
@@ -220,6 +230,34 @@
    UTILITIES
    ───────────────────────────────────────────────────────────────────────────── */
 @layer utilities {
+
+  /* ── The two classes brand/components.tsx expects ──────────────────────── */
+  /* .bg-num — every number in the app. Disket Mono, tabular so digits do not
+     jitter as data updates. .bg-label — the ONLY place capitals are allowed:
+     Disket 700 at .20em tracking. Nohemi is never set in caps. */
+  .bg-num {
+    font-family: var(--font-num);
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+    font-weight: 400;
+  }
+  .bg-label {
+    font-family: var(--font-num);
+    font-weight: 700;
+    font-size: var(--t-micro);
+    letter-spacing: .20em;
+    text-transform: uppercase;
+    line-height: 1.45;
+    color: var(--tx-3);
+  }
+
+  /* ── The tick rule. The one piece of decoration in the system. ─────────── */
+  .rule-tick {
+    height: 16px;
+    background-image: repeating-linear-gradient(
+      to right, var(--tick-1) 0 7px, transparent 7px 22px);
+    border-radius: 0;
+  }
 
   /* ── Typography ─────────────────────────────────────────────────────────── */
 

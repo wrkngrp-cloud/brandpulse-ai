@@ -1,0 +1,122 @@
+/* BrandGauge Design Tokens — v3.2
+   Direction A · Signal. Light ground is default. Dark is a mode, not a theme.
+   Every value below is load-bearing. Do not add colours to this file. */
+
+:root {
+  /* ---- Ground. Carries ~75% of every surface. ---- */
+  --bg-paper:      #FAF6EF;   /* default page */
+  --bg-shell:      #F1ECE2;   /* wells, table stripes, inset panels */
+  --bg-card:       #FFFFFF;   /* raised card on paper */
+  --bg-ink:        #16120E;   /* dark mode page, film, OOH, merch */
+  --bg-ink-raised: #221D18;   /* raised card on ink */
+
+  /* ---- The ramp. A fire, read cold to hot. Char > Danfo > Ember > Flare. ---- */
+  --char:          #5A1E0C;   /* a true shade of Flare. Needle, text on light (12:1),
+                                 pressed states, deep fields, the cold end. */
+  --danfo:         #FFC12E;   /* a tint of Ember. Crescendo tails, lightest step on Ink. */
+  --ember:         #FF9E1B;   /* the middle. Secondary planes, mid-scale data. */
+  --flare:         #FF3D14;   /* the hero, and the head of every crescendo. */
+  --flare-press:   #D62E0B;   /* :active, pressed */
+  --flare-wash:    #FFE9E3;   /* tinted surface, selected row */
+
+  /* ---- Tick scale. Single-hue. Mirrors the logo's faint-to-solid ticks. ---- */
+  --tick-1:        rgba(255,61,20,.16);
+  --tick-2:        rgba(255,61,20,.32);
+  --tick-3:        rgba(255,61,20,.52);
+  --tick-4:        rgba(255,61,20,.76);
+  --tick-5:        rgba(255,61,20,1);
+
+  /* ---- Polarity. There is no green in this system. Deviation runs hot. ---- */
+  --pos:           #16120E;   /* nominal / positive — solid ink */
+  --neu:           #8C877E;   /* neutral — ash */
+  --neg:           #FF3D14;   /* negative / alert — flare */
+
+  /* ---- Text ---- */
+  --tx:            #16120E;
+  --tx-2:          #5B554D;
+  --tx-3:          #8C877E;   /* Ash */
+  --tx-inv:        #FAF6EF;
+  --tx-inv-2:      #A9A299;
+  --tx-flare:      #5A1E0C;   /* Char. Flare as text on light — never #FF3D14 */
+
+  /* ---- Line. Hairlines only. Instruments are drawn, not shadowed. ---- */
+  --line:          rgba(22,18,14,.13);
+  --line-strong:   rgba(22,18,14,.30);
+  --line-inv:      rgba(250,246,239,.15);
+
+  /* ---- Radius. Derived from the mark: 24% of the short side. ---- */
+  --r-tick:        2.5px;     /* on a 7px tick */
+  --r-control:     3px;
+  --r-card:        4px;
+  --r-pill:        999px;     /* status pills only */
+
+  /* ---- Type ---- */
+  --font:          'Nohemi', system-ui, -apple-system, sans-serif;
+  /* Numerals only. Disket has no Naira sign, no triangles and no Yoruba
+     dotted vowels — the stack falls through to IBM Plex Mono for those.
+     Never edit the font to add them; the licence forbids it. */
+  --font-num:      'Disket Mono', 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --t-display:     clamp(46px, 8vw, 96px);
+  --t-h1:          clamp(34px, 5vw, 56px);
+  --t-h2:          clamp(26px, 3.2vw, 38px);
+  --t-h3:          21px;
+  --t-body:        17px;
+  --t-small:       14px;
+  --t-micro:       12px;
+  --t-readout:     clamp(38px, 6vw, 72px);
+
+  --lh-tight:      .94;
+  --lh-head:       1.06;
+  --lh-body:       1.55;
+  --ls-display:    -.035em;
+  --ls-head:       -.02em;
+  --ls-body:       0;
+
+  /* ---- Space. 4px base, ruler rhythm. ---- */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+  --s-9: 96px; --s-10: 130px;
+
+  --grid-max:      1260px;
+  --grid-gutter:   24px;
+  --grid-cols:     12;
+
+  /* ---- Motion. The needle settles. Nothing bounces. ---- */
+  --ease-settle:   cubic-bezier(.16,.84,.28,1);
+  --ease-snap:     cubic-bezier(.4,0,.2,1);
+  --d-tick:        90ms;      /* one tick lighting */
+  --d-needle:      620ms;     /* needle travel + settle */
+  --d-ui:          180ms;
+}
+
+[data-mode="dark"] {
+  --bg-paper:      #16120E;
+  --bg-shell:      #221D18;
+  --bg-card:       #221D18;
+  --tx:            #FAF6EF;
+  --tx-2:          #A9A299;
+  --tx-3:          #6F6A62;
+  --tx-flare:      #FFC12E;
+  --pos:           #FAF6EF;
+  --line:          rgba(250,246,239,.13);
+  --line-strong:   rgba(250,246,239,.28);
+  --flare-wash:    #3A1409;
+  --char:          #FFC12E;   /* Char inverts to Danfo on Ink */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --d-tick: 0ms; --d-needle: 0ms; --d-ui: 0ms; }
+}
+
+/* ---- Gradients. Two kinds only: quantised (made of atoms) or atmospheric
+   (a soft wash on a dark ground). See gradients.css for the full set. ---- */
+:root{
+  --grad-hearth:radial-gradient(120% 100% at 12% 40%,#4A1A0A 0%,#2A150C 42%,#16120E 100%);
+  --grad-forge:radial-gradient(90% 120% at 50% 108%,#FF3D14 0%,#7A2A0C 34%,#2A150C 68%,#16120E 100%);
+  --grad-dawn:radial-gradient(80% 90% at 50% 100%,rgba(255,193,46,.14) 0%,rgba(255,158,27,.06) 45%,transparent 78%);
+  --grad-scrim:linear-gradient(180deg,rgba(22,18,14,0) 0%,rgba(22,18,14,.62) 58%,rgba(22,18,14,.94) 100%);
+  --grain-opacity:.035;
+  --ease-glide:cubic-bezier(.32,.72,0,1);
+  --d-press:110ms; --d-climb:900ms; --d-panel:420ms; --stagger:40ms;
+}

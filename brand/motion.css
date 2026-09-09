@@ -1,0 +1,88 @@
+/* BrandGauge motion — v3.5
+ *
+ * One law: THE NEEDLE SETTLES, NOTHING BOUNCES.
+ *
+ * Motion in this brand is an instrument responding, never an interface showing
+ * off. If an animation does not represent a value changing, a state changing,
+ * or a touch being registered, it does not ship.
+ *
+ * Only transform and opacity are animated. Never top/left/width/height.
+ */
+:root{
+  --ease-settle:cubic-bezier(.16,.84,.28,1);  /* needle travel, value change */
+  --ease-snap:cubic-bezier(.4,0,.2,1);        /* UI state, press, toggle */
+  --ease-glide:cubic-bezier(.32,.72,0,1);     /* panels, sheets, overlays */
+
+  --d-tick:90ms;      /* one tick lighting */
+  --d-ui:180ms;       /* hover, toggle, chip */
+  --d-press:110ms;    /* tactile feedback */
+  --d-needle:620ms;   /* needle travel and settle */
+  --d-climb:900ms;    /* a crescendo filling, capped */
+  --d-panel:420ms;    /* sheet, drawer, modal */
+  --stagger:40ms;     /* per tick, per row, per card */
+}
+
+/* ---- 1. Value change. The signature motion. ---------------------------- */
+/* When a reading updates, ticks re-light in sequence and the needle travels
+   to the new angle. This is the only motion that fires without a user action,
+   and only when the underlying number actually changed. */
+.bg-needle{transition:transform var(--d-needle) var(--ease-settle);transform-box:fill-box}
+.bg-tick{transition:fill var(--d-tick) var(--ease-snap),
+                    fill-opacity var(--d-tick) var(--ease-snap),
+                    transform var(--d-tick) var(--ease-snap);
+         transition-delay:calc(var(--i,0) * var(--stagger))}
+
+/* First paint only, once per session. Never on scroll. */
+@keyframes bg-light{from{fill-opacity:0;transform:scale(.7)}to{fill-opacity:1;transform:scale(1)}}
+.bg-gauge-enter .bg-tick{animation:bg-light var(--d-tick) var(--ease-snap) both;
+                         animation-delay:calc(var(--i,0) * var(--stagger))}
+@keyframes bg-settle{0%{transform:rotate(var(--from,-40deg))}
+                     72%{transform:rotate(calc(var(--to,0deg) + 3deg))}
+                     100%{transform:rotate(var(--to,0deg))}}
+.bg-gauge-enter .bg-needle{animation:bg-settle var(--d-needle) var(--ease-settle) both}
+
+/* ---- 2. Tactile feedback. Everything pressable. ------------------------ */
+.bg-press{transition:transform var(--d-press) var(--ease-snap),
+                     background-color var(--d-ui) var(--ease-snap)}
+.bg-press:active{transform:translateY(1px) scale(.985)}
+
+/* ---- 3. Reveal. One per section, IntersectionObserver driven. ---------- */
+/* Add .is-in when the section enters. Never a scroll listener, never per-frame
+   state, never on more than one group per section. */
+.bg-reveal>*{opacity:0;transform:translateY(14px);
+             transition:opacity 520ms var(--ease-glide), transform 520ms var(--ease-glide);
+             transition-delay:calc(var(--i,0) * var(--stagger))}
+.bg-reveal.is-in>*{opacity:1;transform:none}
+
+/* ---- 4. Loading. A crescendo filling, not a spinner. ------------------- */
+/* The skeleton is the shape of the thing that is coming, which is the whole
+   point: the layout does not jump when the data lands. */
+@keyframes bg-pulse{0%,100%{opacity:.16}50%{opacity:.42}}
+.bg-skeleton .bg-tick{animation:bg-pulse 1.25s var(--ease-snap) infinite;
+                      animation-delay:calc(var(--i,0) * 60ms)}
+.bg-skeleton-block{background:var(--bg-shell);border-radius:var(--r-card);
+  animation:bg-pulse 1.25s var(--ease-snap) infinite}
+
+/* ---- 5. Panels. ------------------------------------------------------- */
+.bg-panel{transition:transform var(--d-panel) var(--ease-glide),
+                     opacity var(--d-panel) var(--ease-glide)}
+.bg-panel[data-state="closed"]{transform:translateY(8px);opacity:0;pointer-events:none}
+
+/* ---- 6. Reduced motion. Non-negotiable. ------------------------------- */
+@media (prefers-reduced-motion:reduce){
+  :root{--d-tick:0ms;--d-ui:0ms;--d-press:0ms;--d-needle:0ms;--d-climb:0ms;--d-panel:0ms;--stagger:0ms}
+  .bg-gauge-enter .bg-tick,.bg-gauge-enter .bg-needle,
+  .bg-skeleton .bg-tick,.bg-skeleton-block{animation:none}
+  .bg-reveal>*{opacity:1;transform:none}
+  .bg-skeleton .bg-tick{opacity:.3}
+}
+
+/* BANNED. Each of these has been tried and each one cheapens the product:
+   - parallax, scroll hijacking, smooth-scroll inertia libraries
+   - marquee or infinite logo strips
+   - numbers counting up on scroll (the reading is not a slot machine)
+   - hover lift on cards (translateY on hover). Cards do not float here.
+   - fade-and-slide-up on every element. One reveal group per section, max.
+   - window.addEventListener('scroll'). Use IntersectionObserver or
+     animation-timeline: view(). This is a hard ban, not a preference.
+   - any animation on top/left/width/height                                */

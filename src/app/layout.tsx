@@ -1,12 +1,8 @@
 import type { Metadata } from 'next'
-import { Geist_Mono } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
+import { IconSprite } from '@/components/brand/icon-sprite'
 import './globals.css'
-
-// Satoshi (body + display, weights 300–900) — loaded via fontshare CDN
-// Geist Mono for code/tabular data only
-const geistMono = Geist_Mono({ variable: '--font-mono', subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'BrandGauge',
@@ -15,24 +11,36 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <head>
-        {/* Satoshi — fontshare CDN, weights 300/400/500/700/900 */}
-        <link rel="preconnect" href="https://api.fontshare.com" />
+        {/* Nohemi and Disket Mono are self-hosted from /public/fonts.
+            Preloaded so the first paint is never a substituted face. */}
         <link
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap"
-          rel="stylesheet"
+          rel="preload"
+          href="/fonts/Nohemi-400.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/DisketMono-400.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
         />
         <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.css" />
       </head>
       <body className="min-h-full flex flex-col">
-        <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
+        {/* brand/icons.svg, mounted once so <use href="#bg-gauge" /> resolves everywhere */}
+        <IconSprite />
+        <ThemeProvider
+          attribute={['class', 'data-mode']}
+          defaultTheme="light"
+          disableTransitionOnChange
+        >
           {children}
-          <Toaster richColors position="top-right" />
+          <Toaster position="top-right" />
         </ThemeProvider>
       </body>
     </html>
