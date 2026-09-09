@@ -129,7 +129,7 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                 {hasCoords && onLocateSite && (
                   <button
                     onClick={() => onLocateSite(site.lat!, site.lng!, site.id)}
-                    className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-muted transition-colors"
+                    className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-muted transition-colors bg-press"
                     title="Locate on map"
                   >
                     <Crosshair className="h-3.5 w-3.5 text-muted-foreground" />

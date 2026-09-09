@@ -141,7 +141,7 @@ function RangePicker({ value, onChange, loading }: { value: Range; onChange: (r:
           key={o.v}
           onClick={() => !loading && onChange(o.v)}
           className={cn(
-            'px-3 py-1 text-[12px] font-semibold rounded-md transition-all',
+            'px-3 py-1 text-[12px] font-semibold rounded-md transition-colors',
             value === o.v
               ? 'bg-background text-foreground border border-line'
               : 'text-muted-foreground hover:text-foreground'

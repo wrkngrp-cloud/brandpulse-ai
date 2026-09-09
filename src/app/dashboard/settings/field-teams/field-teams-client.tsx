@@ -102,14 +102,14 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
             <button
               onClick={createTeam}
               disabled={creating || !name.trim()}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 bg-press"
             >
               {creating && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               Create team
             </button>
             <button
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors bg-press"
             >
               Cancel
             </button>
@@ -118,7 +118,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
       ) : (
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors bg-press"
         >
           <Plus className="h-4 w-4" />
           Create team
@@ -152,7 +152,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
             <button
               onClick={() => toggleActive(team)}
               disabled={toggling === team.id}
-              className="shrink-0 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+              className="shrink-0 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 bg-press"
               title={team.active ? 'Deactivate' : 'Activate'}
             >
               {team.active
@@ -166,7 +166,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
             <code className="text-xs text-muted-foreground bg-num">/fso/{maskToken(team.token)}</code>
             <button
               onClick={() => copyLink(team.token)}
-              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
+              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors bg-press"
             >
               <Copy className="h-3.5 w-3.5" />
               Copy link

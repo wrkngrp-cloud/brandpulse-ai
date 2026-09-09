@@ -191,7 +191,7 @@ export function BrandEquityClient({
                   {/* Row header — clickable */}
                   <button
                     onClick={() => setExpandedKey(isOpen ? null : meta.key)}
-                    className="w-full flex items-center gap-3 py-1.5 px-1 rounded-lg hover:bg-muted/40 transition-colors group text-left"
+                    className="w-full flex items-center gap-3 py-1.5 px-1 rounded-lg hover:bg-muted/40 transition-colors group text-left bg-press"
                   >
                     <div className="w-24 shrink-0">
                       <p className="text-xs font-medium truncate">{meta.label}</p>
@@ -200,7 +200,7 @@ export function BrandEquityClient({
                     <div className="flex-1">
                       <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
                         <div
-                          className="h-full rounded-sm transition-all duration-700"
+                          className="h-full rounded-sm transition-colors duration-700"
                           style={{
                             width: available ? `${score}%` : '0%',
                             backgroundColor: available ? (zone?.color ?? 'var(--tx-3)') : undefined,
@@ -279,7 +279,7 @@ export function BrandEquityClient({
                                   {/* Score fill within the weight area */}
                                   {source.score !== null && source.weight > 0 && (
                                     <div
-                                      className="absolute inset-y-0 left-0 rounded-sm transition-all duration-700"
+                                      className="absolute inset-y-0 left-0 rounded-sm transition-colors duration-700"
                                       style={{
                                         width: `${(source.weight / 100) * source.score}%`,
                                         backgroundColor: source.score >= 70 ? 'var(--pos)'

@@ -155,7 +155,7 @@ function ScoreTile({ label, score, icon: Icon }: { label: string; score: number;
       <p className={cn('text-xl font-bold bg-num', scoreColor(score))}>{score}</p>
       <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
         <div
-          className={cn('h-full rounded-sm transition-all', score >= 75 ? 'bg-pos' : score >= 55 ? 'bg-ember' : 'bg-flare')}
+          className={cn('h-full rounded-sm transition-colors', score >= 75 ? 'bg-pos' : score >= 55 ? 'bg-ember' : 'bg-flare')}
           style={{ width: `${score}%` }}
         />
       </div>
@@ -319,7 +319,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
       {/* Strengths / Weaknesses / Risks — collapsible */}
       <button
         onClick={() => setShowDetail(v => !v)}
-        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
       >
         {showDetail ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
         {showDetail ? 'Hide' : 'Show'} strengths, weaknesses & risks
@@ -376,7 +376,7 @@ function PostCard({ post }: { post: InfluencerPost }) {
     <div className="border rounded-xl overflow-hidden">
       <button
         onClick={() => setExpanded(v => !v)}
-        className="w-full flex items-start justify-between gap-3 p-3 hover:bg-muted/30 transition-colors text-left"
+        className="w-full flex items-start justify-between gap-3 p-3 hover:bg-muted/30 transition-colors text-left bg-press"
       >
         <div className="space-y-0.5 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -673,7 +673,7 @@ export function PostTracker({ influencerId, campaignId, influencerHandle, influe
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => void fetchPosts()}
-            className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
+            className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded bg-press"
             title="Refresh"
           >
             <RefreshCw className="h-3 w-3" />
@@ -686,7 +686,7 @@ export function PostTracker({ influencerId, campaignId, influencerHandle, influe
           {showForm && (
             <button
               onClick={() => setShowForm(false)}
-              className="text-muted-foreground hover:text-foreground p-1 rounded"
+              className="text-muted-foreground hover:text-foreground p-1 rounded bg-press"
             >
               <X className="h-3.5 w-3.5" />
             </button>

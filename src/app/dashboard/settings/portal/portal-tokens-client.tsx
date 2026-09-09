@@ -136,7 +136,7 @@ export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit,
                   type="button"
                   onClick={() => toggleSection(opt.value)}
                   className={cn(
-                    'px-3 py-1.5 rounded-sm text-[12px] font-medium border transition-all',
+                    'px-3 py-1.5 rounded-sm text-[12px] font-medium border transition-colors',
                     sections.includes(opt.value)
                       ? 'bg-foreground text-background border-foreground'
                       : 'border-border text-muted-foreground hover:border-foreground/40'

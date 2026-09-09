@@ -425,7 +425,7 @@ export function CreativeClient({
                         {media.isVideo && <Film className="h-3 w-3 text-tx-inv" />}
                         <span className="text-[9px] bg-ink/60 text-tx-inv px-1.5 py-0.5 rounded bg-num">{media.isVideo ? 'VIDEO FRAME' : 'IMAGE'}</span>
                       </div>
-                      <button onClick={() => setMedia(null)} className="absolute top-1.5 right-1.5 bg-ink/60 rounded-sm p-0.5">
+                      <button onClick={() => setMedia(null)} className="absolute top-1.5 right-1.5 bg-ink/60 rounded-sm p-0.5 bg-press">
                         <XCircle className="h-3.5 w-3.5 text-tx-inv" />
                       </button>
                     </div>
@@ -437,13 +437,13 @@ export function CreativeClient({
                   ) : (
                     <div className="flex gap-2">
                       <button onClick={() => imgRef.current?.click()}
-                        className="flex-1 flex items-center justify-center gap-1.5 border border-dashed rounded-lg py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 border border-dashed rounded-lg py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
                       >
                         <ImagePlus className="h-3.5 w-3.5" />
                         Image
                       </button>
                       <button onClick={() => vidRef.current?.click()}
-                        className="flex-1 flex items-center justify-center gap-1.5 border border-dashed rounded-lg py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 border border-dashed rounded-lg py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
                       >
                         <Video className="h-3.5 w-3.5" />
                         Video
@@ -812,7 +812,7 @@ export function CreativeClient({
                   {videoMedia.isVideo ? 'VIDEO (first frame)' : 'IMAGE'}
                 </span>
               </div>
-              <button onClick={() => setVideoMedia(null)} className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1">
+              <button onClick={() => setVideoMedia(null)} className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1 bg-press">
                 <XCircle className="h-4 w-4 text-tx-inv" />
               </button>
             </div>
@@ -824,13 +824,13 @@ export function CreativeClient({
           ) : (
             <div className="flex gap-3">
               <button onClick={() => videoImgRef.current?.click()}
-                className="flex-1 flex flex-col items-center justify-center gap-2 border border-dashed rounded-xl py-6 text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                className="flex-1 flex flex-col items-center justify-center gap-2 border border-dashed rounded-xl py-6 text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
               >
                 <ImagePlus className="h-5 w-5" />
                 Upload image
               </button>
               <button onClick={() => videoVidRef.current?.click()}
-                className="flex-1 flex flex-col items-center justify-center gap-2 border border-dashed rounded-xl py-6 text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                className="flex-1 flex flex-col items-center justify-center gap-2 border border-dashed rounded-xl py-6 text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
               >
                 <Video className="h-5 w-5" />
                 Upload video

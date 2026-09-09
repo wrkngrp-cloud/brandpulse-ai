@@ -222,7 +222,7 @@ export function OverviewClient({
             </Link>
             <Link
               href="/dashboard/campaigns/new"
-              className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-tx-inv rounded-xl px-4 py-2 transition-all hover:opacity-90 active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-tx-inv rounded-xl px-4 py-2 transition-colors hover:opacity-90 active:scale-[0.98]"
               style={{ background: 'var(--char)' }}
             >
               <Plus className="h-3.5 w-3.5" />
@@ -268,7 +268,7 @@ export function OverviewClient({
           <Link
             key={label}
             href={href}
-            className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 hover:bg-muted/40 hover:border-border transition-all card-hover"
+            className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 hover:bg-muted/40 hover:border-border transition-colors card-hover"
           >
             <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center shrink-0">
               <Icon className="h-3.5 w-3.5 text-muted-foreground/70" />
@@ -547,7 +547,7 @@ export function OverviewClient({
               <p className="text-[12.5px] text-muted-foreground">No active campaigns. Create your first one.</p>
               <Link
                 href="/dashboard/campaigns/new"
-                className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-tx-inv rounded-xl px-4 py-2 transition-all hover:opacity-90"
+                className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-tx-inv rounded-xl px-4 py-2 transition-colors hover:opacity-90"
                 style={{ background: 'var(--char)' }}
               >
                 <Plus className="h-3.5 w-3.5" /> New campaign
@@ -596,7 +596,7 @@ export function OverviewClient({
               {recentMentions.map(m => (
                 <div
                   key={m.id}
-                  className="group rounded-xl border border-border/40 bg-muted/15 px-3.5 py-3.5 space-y-2.5 hover:bg-muted/30 hover:border-border/70 transition-all duration-200 cursor-default"
+                  className="group rounded-xl border border-border/40 bg-muted/15 px-3.5 py-3.5 space-y-2.5 hover:bg-muted/30 hover:border-border/70 transition-colors duration-200 cursor-default"
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-foreground/8 text-foreground/50 shrink-0">

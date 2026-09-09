@@ -269,7 +269,7 @@ export function LaunchMarkersPanel() {
                 </span>
                 <button
                   onClick={() => handleDelete(m.id, m.label)}
-                  className="text-muted-foreground/40 hover:text-tx-flare transition-colors shrink-0 opacity-0 group-hover:opacity-100"
+                  className="text-muted-foreground/40 hover:text-tx-flare transition-colors shrink-0 opacity-0 group-hover:opacity-100 bg-press"
                   aria-label="Delete marker"
                 >
                   <Trash2 className="h-3.5 w-3.5" />

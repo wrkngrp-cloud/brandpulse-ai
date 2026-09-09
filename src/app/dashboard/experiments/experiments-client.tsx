@@ -173,11 +173,11 @@ export function ExperimentsClient() {
         {experiments.map(exp => (
           <div key={exp.id} className="rounded-xl border bg-card overflow-hidden">
             <div className="flex items-start gap-3 px-4 py-3">
-              <button onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)} className="mt-0.5 shrink-0">
+              <button onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)} className="mt-0.5 shrink-0 bg-press">
                 {TYPE_ICON[exp.experiment_type] ?? TYPE_ICON.other}
               </button>
               <div className="flex-1 min-w-0">
-                <button onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)} className="text-left">
+                <button onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)} className="text-left bg-press">
                   <p className="font-semibold text-sm">{exp.name}</p>
                   <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{exp.hypothesis}</p>
                 </button>
@@ -315,7 +315,7 @@ function NewExperimentForm({ onSave, onCancel }: { onSave: (d: Record<string, un
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">New experiment</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>

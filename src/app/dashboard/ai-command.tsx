@@ -122,7 +122,7 @@ export function AiCommand() {
         <button
           data-tour="ask-ai"
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-foreground text-background flex items-center justify-center hover:scale-105 transition-transform border border-line"
+          className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-foreground text-background flex items-center justify-center transition-transform border border-line bg-press"
           aria-label="Open BrandGauge"
         >
           <MessageSquare className="h-5 w-5" />
@@ -160,7 +160,7 @@ export function AiCommand() {
                     <button
                       key={s}
                       onClick={() => send(s)}
-                      className="w-full text-left text-xs px-3 py-2 rounded-lg border hover:bg-muted transition-colors text-muted-foreground"
+                      className="w-full text-left text-xs px-3 py-2 rounded-lg border hover:bg-muted transition-colors text-muted-foreground bg-press"
                     >
                       {s}
                     </button>

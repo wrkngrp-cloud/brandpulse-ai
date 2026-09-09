@@ -131,7 +131,7 @@ export function ProfileForm({ name, email }: { name: string; email: string }) {
 
           <DialogFooter>
             <DialogClose
-              render={<button type="button" />}
+              render={<button type="button" className="bg-press" />}
               className="inline-flex items-center justify-center h-9 px-4 rounded-md border border-input bg-background text-sm font-medium hover:bg-accent transition-colors"
             >
               Cancel

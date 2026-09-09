@@ -84,7 +84,7 @@ export function PrintAiAnalysis({ days, brandName, hasData }: PrintAiAnalysisPro
             </div>
             <button
               onClick={() => setCollapsed(c => !c)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors bg-press"
             >
               {collapsed
                 ? <ChevronDown className="h-4 w-4" />

@@ -102,7 +102,7 @@ function CopyButton({ text }: { text: string }) {
     setTimeout(() => setCopied(false), 2000)
   }
   return (
-    <button type="button" onClick={handleCopy} className="text-muted-foreground hover:text-foreground transition-colors">
+    <button type="button" onClick={handleCopy} className="text-muted-foreground hover:text-foreground transition-colors bg-press">
       {copied ? <Check className="w-3.5 h-3.5 text-pos" /> : <Copy className="w-3.5 h-3.5" />}
     </button>
   )
@@ -185,7 +185,7 @@ export function ApiKeysSection() {
             <button
               type="button"
               onClick={() => void handleRevoke(k.id)}
-              className="text-muted-foreground hover:text-destructive transition-colors ml-1"
+              className="text-muted-foreground hover:text-destructive transition-colors ml-1 bg-press"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -232,7 +232,7 @@ export function ApiKeysSection() {
         <button
           type="button"
           onClick={() => setShowDocs(v => !v)}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
         >
           {showDocs ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
           How to send your data
@@ -252,7 +252,7 @@ export function ApiKeysSection() {
                 <button
                   type="button"
                   onClick={() => setOpenDoc(v => v === doc.type ? null : doc.type)}
-                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium hover:bg-accent transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium hover:bg-accent transition-colors bg-press"
                 >
                   <span>{doc.label}</span>
                   <div className="flex items-center gap-2">

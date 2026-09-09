@@ -50,7 +50,7 @@ export function TagInput({ label, placeholder, values, onChange, hint }: {
           {values.map(v => (
             <Badge key={v} variant="secondary" className="gap-1 pr-1 text-xs">
               {v}
-              <button type="button" onClick={() => onChange(values.filter(x => x !== v))} className="hover:text-destructive ml-0.5">
+              <button type="button" onClick={() => onChange(values.filter(x => x !== v))} className="hover:text-destructive ml-0.5 bg-press">
                 <X className="h-3 w-3" />
               </button>
             </Badge>

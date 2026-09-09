@@ -302,7 +302,7 @@ function ImageUploadZone({
           <button
             type="button"
             onClick={onRemove}
-            className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1 hover:bg-ink/80 transition-colors"
+            className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1 hover:bg-ink/80 transition-colors bg-press"
           >
             <X className="h-3.5 w-3.5 text-tx-inv" />
           </button>
@@ -386,7 +386,7 @@ function VideoUploadZone({
           <button
             type="button"
             onClick={onRemove}
-            className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1 hover:bg-ink/80 transition-colors"
+            className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1 hover:bg-ink/80 transition-colors bg-press"
           >
             <X className="h-3.5 w-3.5 text-tx-inv" />
           </button>
@@ -399,7 +399,7 @@ function VideoUploadZone({
     <button
       type="button"
       onClick={() => inputRef.current?.click()}
-      className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 py-10 px-4 transition-colors cursor-pointer hover:border-primary/50 hover:bg-muted/30 w-full"
+      className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 py-10 px-4 transition-colors cursor-pointer hover:border-primary/50 hover:bg-muted/30 w-full bg-press"
     >
       <input
         ref={inputRef}
@@ -464,7 +464,7 @@ function TagInput({
               <button
                 type="button"
                 onClick={() => onRemove(t)}
-                className="text-muted-foreground hover:text-foreground ml-0.5"
+                className="text-muted-foreground hover:text-foreground ml-0.5 bg-press"
               >
                 <X className="h-2.5 w-2.5" />
               </button>
@@ -720,7 +720,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-muted-foreground">Card {idx + 1}</span>
                 {cards.length > 2 && (
-                  <button type="button" onClick={() => removeCard(idx)} className="text-muted-foreground hover:text-destructive transition-colors">
+                  <button type="button" onClick={() => removeCard(idx)} className="text-muted-foreground hover:text-destructive transition-colors bg-press">
                     <X className="h-3.5 w-3.5" />
                   </button>
                 )}

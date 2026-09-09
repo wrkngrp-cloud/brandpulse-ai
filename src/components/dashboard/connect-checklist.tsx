@@ -81,7 +81,7 @@ export function ConnectChecklist({ items, serverDismissed }: {
             type="button"
             onClick={dismiss}
             aria-label="Hide this checklist"
-            className="text-muted-foreground/50 hover:text-foreground transition-colors"
+            className="text-muted-foreground/50 hover:text-foreground transition-colors bg-press"
           >
             <X className="h-4 w-4" />
           </button>

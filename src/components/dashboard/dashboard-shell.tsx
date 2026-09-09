@@ -107,7 +107,7 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
           {/* Center search trigger (desktop) */}
           <div className="hidden md:flex flex-1 max-w-[340px] mx-4">
             <button
-              className="search-trigger w-full flex items-center gap-2 h-9 rounded-xl px-3 cursor-pointer"
+              className="search-trigger w-full flex items-center gap-2 h-9 rounded-xl px-3 cursor-pointer bg-press"
               aria-label="Search"
               onClick={() => document.dispatchEvent(new CustomEvent('bp:open-command', { detail: '' }))}
             >

@@ -61,7 +61,7 @@ export function SovWidget({
         </div>
         <div className="h-2 bg-muted rounded-sm overflow-hidden">
           <div
-            className="h-full bg-primary rounded-sm transition-all duration-500"
+            className="h-full bg-primary rounded-sm transition-colors duration-500"
             style={{ width: sovPct !== null ? `${sovPct}%` : '0%' }}
           />
         </div>
@@ -125,7 +125,7 @@ export function SovWidget({
                   </div>
                   <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
                     <div
-                      className="h-full bg-muted-foreground/40 rounded-sm transition-all duration-500"
+                      className="h-full bg-muted-foreground/40 rounded-sm transition-colors duration-500"
                       style={{ width: count > 0 ? `${pct}%` : '0%' }}
                     />
                   </div>

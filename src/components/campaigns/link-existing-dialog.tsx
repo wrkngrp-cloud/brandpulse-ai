@@ -63,7 +63,7 @@ export function LinkOohSiteDialog({ campaignId, availableSites }: LinkOohDialogP
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border rounded-lg px-2.5 py-1.5 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border rounded-lg px-2.5 py-1.5 transition-colors bg-press"
       >
         <Link2 className="h-3.5 w-3.5" />
         Link existing site
@@ -74,7 +74,7 @@ export function LinkOohSiteDialog({ campaignId, availableSites }: LinkOohDialogP
           <div className="bg-background border rounded-2xl w-full max-w-md space-y-4 p-5">
             <div className="flex items-center justify-between">
               <p className="font-semibold text-sm">Link an OOH site to this campaign</p>
-              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground bg-press">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -149,7 +149,7 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border rounded-lg px-2.5 py-1.5 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border rounded-lg px-2.5 py-1.5 transition-colors bg-press"
       >
         <Link2 className="h-3.5 w-3.5" />
         Link existing event
@@ -160,7 +160,7 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
           <div className="bg-background border rounded-2xl w-full max-w-md space-y-4 p-5">
             <div className="flex items-center justify-between">
               <p className="font-semibold text-sm">Link an event to this campaign</p>
-              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground bg-press">
                 <X className="h-4 w-4" />
               </button>
             </div>

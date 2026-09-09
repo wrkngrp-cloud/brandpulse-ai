@@ -264,7 +264,7 @@ export function PrePostWidget() {
   const trigger = (
     <button
       onClick={() => { setOpen(true); setMinimised(false) }}
-      className="h-12 w-12 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center border border-line"
+      className="h-12 w-12 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center border border-line bg-press"
       title="Pre-Post Analysis (⌘⇧P)"
     >
       <Zap className="h-5 w-5" />
@@ -280,7 +280,7 @@ export function PrePostWidget() {
       {minimised ? (
         <button
           onClick={() => setMinimised(false)}
-          className="flex items-center gap-2 bg-foreground text-background text-xs font-medium px-4 py-2 rounded-sm hover:opacity-90 transition-opacity border border-line"
+          className="flex items-center gap-2 bg-foreground text-background text-xs font-medium px-4 py-2 rounded-sm hover:opacity-90 transition-opacity border border-line bg-press"
         >
           <Zap className="h-3.5 w-3.5" />
           Pre-Post
@@ -300,10 +300,10 @@ export function PrePostWidget() {
               <kbd className="hidden sm:inline-flex items-center text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">⌘⇧P</kbd>
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={() => setMinimised(true)} className="p-1 hover:bg-muted rounded transition-colors" title="Minimise">
+              <button onClick={() => setMinimised(true)} className="p-1 hover:bg-muted rounded transition-colors bg-press" title="Minimise">
                 <ChevronDown className="h-4 w-4" />
               </button>
-              <button onClick={() => { setOpen(false); reset() }} className="p-1 hover:bg-muted rounded transition-colors" title="Close">
+              <button onClick={() => { setOpen(false); reset() }} className="p-1 hover:bg-muted rounded transition-colors bg-press" title="Close">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -338,7 +338,7 @@ export function PrePostWidget() {
                       </span>
                       <button
                         onClick={() => { setImage(null); setImageError(null) }}
-                        className="bg-background/80 backdrop-blur-sm rounded-sm p-0.5 hover:bg-flare-wash transition-colors"
+                        className="bg-background/80 backdrop-blur-sm rounded-sm p-0.5 hover:bg-flare-wash transition-colors bg-press"
                         title="Remove"
                       >
                         <XCircle className="h-4 w-4 text-tx-flare" />
@@ -357,14 +357,14 @@ export function PrePostWidget() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => imageInputRef.current?.click()}
-                      className="flex-1 flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
                     >
                       <ImagePlus className="h-4 w-4" />
                       Add image
                     </button>
                     <button
                       onClick={() => videoInputRef.current?.click()}
-                      className="flex-1 flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
                     >
                       <Video className="h-4 w-4" />
                       Add video
@@ -485,7 +485,7 @@ export function PrePostWidget() {
                       <p className="text-xs font-medium text-muted-foreground">Suggested Rewrite</p>
                       <button
                         onClick={copyRewrite}
-                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                       >
                         {copiedRewrite
                           ? <><Check className="h-3 w-3 text-pos" /> Copied</>
@@ -513,7 +513,7 @@ export function PrePostWidget() {
       {minimised && (
         <button
           onClick={() => { setOpen(true); setMinimised(false) }}
-          className="h-12 w-12 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center border border-line"
+          className="h-12 w-12 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center border border-line bg-press"
           title="Pre-Post Analysis"
         >
           <Zap className="h-5 w-5" />

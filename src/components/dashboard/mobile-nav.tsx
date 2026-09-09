@@ -51,7 +51,7 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
           </div>
           <button
             onClick={() => setOpen(false)}
-            className="p-1.5 rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer bg-press"
             aria-label="Close navigation"
           >
             <X className="h-4 w-4" />
@@ -94,7 +94,7 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
       {/* Hamburger button — stays inside the header */}
       <button
         onClick={() => setOpen(true)}
-        className="md:hidden p-2 -ml-1 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
+        className="md:hidden p-2 -ml-1 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer bg-press"
         aria-label="Open navigation"
         aria-expanded={open}
       >

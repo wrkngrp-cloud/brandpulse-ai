@@ -548,7 +548,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                           <div className="h-1.5 w-full rounded-sm bg-muted overflow-hidden">
                             <div
                               className={cn(
-                                'h-full rounded-sm transition-all',
+                                'h-full rounded-sm transition-colors',
                                 (delivPct ?? 0) >= 100 ? 'bg-pos'
                                   : (delivPct ?? 0) >= 70 ? 'bg-ember'
                                   : 'bg-flare',

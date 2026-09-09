@@ -137,7 +137,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                     type="button"
                     onClick={handleLogoRemove}
                     disabled={logoLoading}
-                    className="absolute top-1 right-1 h-5 w-5 rounded-full bg-background/80 hover:bg-background border flex items-center justify-center"
+                    className="absolute top-1 right-1 h-5 w-5 rounded-full bg-background/80 hover:bg-background border flex items-center justify-center bg-press"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -184,7 +184,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                   <button
                     type="button"
                     onClick={() => setColors(prev => prev.filter(c => c !== color))}
-                    className="text-muted-foreground hover:text-foreground ml-0.5"
+                    className="text-muted-foreground hover:text-foreground ml-0.5 bg-press"
                   >
                     <X className="h-3 w-3" />
                   </button>

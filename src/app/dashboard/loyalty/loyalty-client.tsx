@@ -232,7 +232,7 @@ export function LoyaltyClient() {
                       <td className="px-4 py-3">
                         <button
                           onClick={() => setAwardFor(awardFor === m.id ? null : m.id)}
-                          className="text-xs text-primary hover:underline"
+                          className="text-xs text-primary hover:underline bg-press"
                         >
                           Award pts
                         </button>
@@ -373,7 +373,7 @@ function NewProgramForm({ onSave, onCancel }: { onSave: (d: Record<string, unkno
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">New loyalty program</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -422,7 +422,7 @@ function AddMemberForm({ programs, onSave, onCancel }: { programs: LoyaltyProgra
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">Add member</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -479,7 +479,7 @@ function AwardPointsForm({ memberId, memberName, onSave, onCancel }: { memberId:
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">Award / adjust points for {memberName}</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>

@@ -247,7 +247,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                     {/* Progress bar */}
                     <div className="mt-2 h-1.5 w-full rounded-sm bg-muted overflow-hidden">
                       <div
-                        className="h-full rounded-sm bg-foreground transition-all duration-700"
+                        className="h-full rounded-sm bg-foreground transition-colors duration-700"
                         style={{ width: score != null ? `${score}%` : '0%' }}
                       />
                     </div>
@@ -257,7 +257,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       <button
                         type="button"
                         onClick={() => toggleData(stage.key)}
-                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                       >
                         <span>{source}</span>
                         <span className="opacity-60">
@@ -271,7 +271,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                         type="button"
                         onClick={() => handleStageAI(stage.key, score)}
                         disabled={isLoading && loadingStage !== stage.key}
-                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                       >
                         {isLoading ? (
                           <><Loader2 className="h-3 w-3 animate-spin" />Analysing…</>
@@ -345,7 +345,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                             />
                             {item.score !== null && item.weight > 0 && (
                               <div
-                                className="absolute inset-y-0 left-0 rounded-sm transition-all duration-700"
+                                className="absolute inset-y-0 left-0 rounded-sm transition-colors duration-700"
                                 style={{
                                   width: `${(item.weight / 100) * item.score}%`,
                                   backgroundColor: scoreBarColor(item.score),

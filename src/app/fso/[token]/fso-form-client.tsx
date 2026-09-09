@@ -72,7 +72,7 @@ function YesNoToggle({
             type="button"
             onClick={() => onChange(opt)}
             className={cn(
-              'h-12 rounded-xl text-sm font-semibold border-2 transition-all duration-150',
+              'h-12 rounded-xl text-sm font-semibold border-2 transition-colors duration-150',
               value === opt
                 ? opt
                   ? 'bg-pos border-line text-tx-inv'
@@ -106,7 +106,7 @@ function RadioGroup({
             type="button"
             onClick={() => onChange(opt.value)}
             className={cn(
-              'px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all duration-150',
+              'px-4 py-2 rounded-xl text-sm font-medium border-2 transition-colors duration-150',
               value === opt.value
                 ? 'bg-primary border-primary text-primary-foreground'
                 : 'bg-background border-border text-muted-foreground hover:border-primary/50',
@@ -123,7 +123,7 @@ function RadioGroup({
 function StepDot({ active, done }: { active: boolean; done: boolean }) {
   return (
     <span className={cn(
-      'h-2 w-2 rounded-full transition-all duration-200',
+      'h-2 w-2 rounded-full transition-colors duration-200',
       done ? 'bg-primary' : active ? 'bg-primary/70 scale-125' : 'bg-muted-foreground/30',
     )} />
   )
@@ -257,7 +257,7 @@ export function FsoFormClient({
         </div>
         <button
           onClick={resetForNewRoute}
-          className="mt-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
+          className="mt-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold bg-press"
         >
           Submit another route
         </button>
@@ -373,7 +373,7 @@ export function FsoFormClient({
                       type="button"
                       onClick={() => setCurrentOutlet(i)}
                       className={cn(
-                        'h-6 w-6 rounded-full text-[10px] font-bold transition-all',
+                        'h-6 w-6 rounded-full text-[10px] font-bold transition-colors',
                         i === currentOutlet
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted text-muted-foreground',
@@ -430,7 +430,7 @@ export function FsoFormClient({
                       <button
                         type="button"
                         onClick={() => updateOutlet({ facings_count: Math.max(1, outlet.facings_count - 1) })}
-                        className="h-10 w-10 rounded-xl border border-border text-lg font-bold text-muted-foreground hover:border-primary/50 hover:text-foreground transition-colors"
+                        className="h-10 w-10 rounded-xl border border-border text-lg font-bold text-muted-foreground hover:border-primary/50 hover:text-foreground transition-colors bg-press"
                       >
                         −
                       </button>
@@ -438,7 +438,7 @@ export function FsoFormClient({
                       <button
                         type="button"
                         onClick={() => updateOutlet({ facings_count: Math.min(20, outlet.facings_count + 1) })}
-                        className="h-10 w-10 rounded-xl border border-border text-lg font-bold text-muted-foreground hover:border-primary/50 hover:text-foreground transition-colors"
+                        className="h-10 w-10 rounded-xl border border-border text-lg font-bold text-muted-foreground hover:border-primary/50 hover:text-foreground transition-colors bg-press"
                       >
                         +
                       </button>
@@ -633,7 +633,7 @@ export function FsoFormClient({
             type="button"
             disabled={!fsoName.trim()}
             onClick={() => setStep(2)}
-            className="w-full h-13 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+            className="w-full h-13 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-opacity bg-press"
           >
             Start route report
             <ChevronRight className="h-4 w-4" />
@@ -645,7 +645,7 @@ export function FsoFormClient({
             <button
               type="button"
               onClick={saveAndAddAnother}
-              className="w-full h-12 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold transition-opacity"
+              className="w-full h-12 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold transition-opacity bg-press"
             >
               <Plus className="h-4 w-4" />
               Save outlet + add another
@@ -653,7 +653,7 @@ export function FsoFormClient({
             <button
               type="button"
               onClick={finishRoute}
-              className="w-full h-12 flex items-center justify-center gap-2 rounded-xl border-2 border-border text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
+              className="w-full h-12 flex items-center justify-center gap-2 rounded-xl border-2 border-border text-sm font-medium text-foreground hover:bg-muted/50 transition-colors bg-press"
             >
               Done with route
               <ChevronRight className="h-4 w-4" />
@@ -661,7 +661,7 @@ export function FsoFormClient({
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="w-full h-9 flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="w-full h-9 flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
               Back to identity
@@ -675,7 +675,7 @@ export function FsoFormClient({
               type="button"
               onClick={handleSubmit}
               disabled={submitting}
-              className="w-full h-13 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-60 transition-opacity"
+              className="w-full h-13 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-60 transition-opacity bg-press"
             >
               {submitting ? 'Submitting...' : 'Submit report'}
               {!submitting && <Check className="h-4 w-4" />}
@@ -683,7 +683,7 @@ export function FsoFormClient({
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="w-full h-9 flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="w-full h-9 flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
               Back to outlets

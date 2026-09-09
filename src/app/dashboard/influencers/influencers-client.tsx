@@ -1178,7 +1178,7 @@ function InfluencerCard({
           {inf.campaign_id && (
             <button
               onClick={() => setShowTracker(v => !v)}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors h-7 px-2 rounded border border-transparent hover:border-border"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors h-7 px-2 rounded border border-transparent hover:border-border bg-press"
             >
               {showTracker ? 'Hide posts' : 'Track posts'}
             </button>

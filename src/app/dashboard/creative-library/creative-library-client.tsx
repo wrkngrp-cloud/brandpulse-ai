@@ -58,7 +58,7 @@ function AssetCard({
   return (
     <div
       className={cn(
-        'group relative rounded-2xl border bg-card transition-all duration-150 overflow-hidden',
+        'group relative rounded-2xl border bg-card transition-colors duration-150 overflow-hidden',
         selected ? 'ring-2 ring-primary border-primary' : 'hover:border-primary/30',
       )}
     >
@@ -168,7 +168,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
               {asset.asset_type} · {asset.platform ?? 'No platform'} · {asset.format ?? 'No format'}
             </p>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl leading-none shrink-0">×</button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl leading-none shrink-0 bg-press">×</button>
         </div>
 
         <div className="flex-1 divide-y divide-border/40">
@@ -394,7 +394,7 @@ export function CreativeLibraryClient({ brandId, brandName, assets }: Props) {
                 <Zap className="h-3.5 w-3.5 mr-1.5" />Create Ad Set ({adReadySelected.length})
               </Button>
             )}
-            <button onClick={() => setSelected(new Set())} className="text-[12px] text-muted-foreground hover:text-foreground">
+            <button onClick={() => setSelected(new Set())} className="text-[12px] text-muted-foreground hover:text-foreground bg-press">
               Clear
             </button>
           </div>

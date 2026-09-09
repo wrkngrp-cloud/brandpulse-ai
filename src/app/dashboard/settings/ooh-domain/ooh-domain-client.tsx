@@ -240,7 +240,7 @@ function TierCard({
       type="button"
       onClick={onClick}
       className={cn(
-        'text-left border rounded-xl p-4 space-y-2 transition-all',
+        'text-left border rounded-xl p-4 space-y-2 transition-colors',
         active
           ? 'border-primary bg-primary/5 ring-1 ring-primary'
           : 'hover:border-muted-foreground/30 hover:bg-muted/30'
@@ -282,7 +282,7 @@ function DnsInstructions({ domain, appHost, onCopy }: { domain: string; appHost:
               <td className="py-1.5 pr-4 bg-num">{domain.split('.')[0]}</td>
               <td className="py-1.5 bg-num flex items-center gap-1.5">
                 cname.vercel-dns.com
-                <button onClick={() => onCopy('cname.vercel-dns.com')} className="hover:text-foreground transition-colors">
+                <button onClick={() => onCopy('cname.vercel-dns.com')} className="hover:text-foreground transition-colors bg-press">
                   <Copy className="h-3 w-3" />
                 </button>
               </td>
@@ -317,7 +317,7 @@ function CodeBlock({ code, onCopy }: { code: string; onCopy: (t: string) => void
       <button
         type="button"
         onClick={() => onCopy(code)}
-        className="absolute top-2 right-2 p-1 rounded hover:bg-background transition-colors text-muted-foreground hover:text-foreground"
+        className="absolute top-2 right-2 p-1 rounded hover:bg-background transition-colors text-muted-foreground hover:text-foreground bg-press"
         title="Copy"
       >
         <Copy className="h-3.5 w-3.5" />

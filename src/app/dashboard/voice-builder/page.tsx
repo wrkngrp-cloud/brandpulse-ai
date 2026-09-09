@@ -230,7 +230,7 @@ export default function VoiceBuilderPage() {
                   <button
                     type="button"
                     onClick={() => removeSample(i)}
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 rounded-md hover:bg-muted flex items-center justify-center"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 rounded-md hover:bg-muted flex items-center justify-center bg-press"
                   >
                     <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
                   </button>
@@ -302,7 +302,7 @@ export default function VoiceBuilderPage() {
                 <div className="p-5">
                   <button
                     onClick={() => setShowPrism(p => !p)}
-                    className="flex items-center gap-2 text-[12px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-2 text-[12px] font-semibold text-muted-foreground hover:text-foreground transition-colors bg-press"
                   >
                     Kapferer Brand Identity Prism
                     <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', showPrism && 'rotate-180')} />
@@ -395,7 +395,7 @@ export default function VoiceBuilderPage() {
                 </div>
                 <button
                   onClick={() => { navigator.clipboard.writeText(retuneResult.retuned); toast.success('Copied') }}
-                  className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                 >
                   <Copy className="h-3 w-3" />Copy
                 </button>
@@ -481,7 +481,7 @@ export default function VoiceBuilderPage() {
                     <Badge variant="secondary" className="text-[11px]">{c.angle}</Badge>
                     <button
                       onClick={() => { navigator.clipboard.writeText(c.caption); toast.success('Copied') }}
-                      className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+                      className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                     >
                       <Copy className="h-3 w-3" />Copy
                     </button>

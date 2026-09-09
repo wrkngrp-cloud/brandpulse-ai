@@ -166,7 +166,7 @@ export default function DraftsPage() {
                 </div>
                 <button
                   onClick={() => deleteDraft(draft.id)}
-                  className="shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-tx-flare hover:bg-flare-wash dark:hover:bg-shell/30 transition-colors"
+                  className="shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-tx-flare hover:bg-flare-wash dark:hover:bg-shell/30 transition-colors bg-press"
                   title="Delete draft"
                 >
                   <Trash2 className="h-4 w-4" />

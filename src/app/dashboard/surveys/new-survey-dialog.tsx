@@ -65,7 +65,7 @@ export function NewSurveyDialog() {
         New survey
       </DialogTrigger>
 
-      <DialogContent className={cn('transition-all', step === 'pick' ? 'sm:max-w-2xl' : 'sm:max-w-sm')}>
+      <DialogContent className={cn('transition-colors', step === 'pick' ? 'sm:max-w-2xl' : 'sm:max-w-sm')}>
         {step === 'pick' && (
           <>
             <DialogHeader>
@@ -82,7 +82,7 @@ export function NewSurveyDialog() {
                   <button
                     key={tmpl.id}
                     onClick={() => handleSelect(tmpl.id)}
-                    className="text-left border rounded-xl p-4 hover:border-foreground hover:bg-muted/30 transition-all group"
+                    className="text-left border rounded-xl p-4 hover:border-foreground hover:bg-muted/30 transition-colors group bg-press"
                   >
                     <div className="flex items-start gap-3">
                       <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
@@ -120,7 +120,7 @@ export function NewSurveyDialog() {
             <div className="flex items-center gap-2 -mt-1">
               <button
                 onClick={handleBack}
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Change template

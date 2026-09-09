@@ -72,7 +72,7 @@ export function MetricEntryDrawer({ industry, onClose, onSaved }: Props) {
               {today.toLocaleString('en-NG', { month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}
             </p>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors bg-press">
             <X className="h-4 w-4" />
           </button>
         </div>

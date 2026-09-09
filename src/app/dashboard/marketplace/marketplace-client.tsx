@@ -201,7 +201,7 @@ function ProductRow({
     <div className="rounded-xl border bg-card overflow-hidden">
       <div className="flex items-center gap-3 px-4 py-3">
         {showSnap ? <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />}
-        <button onClick={onToggleSnap} className="flex-1 text-left min-w-0">
+        <button onClick={onToggleSnap} className="flex-1 text-left min-w-0 bg-press">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium text-sm">{product.product_name}</span>
             <Badge variant="outline" className={cn('text-xs capitalize', PLATFORM_COLOR[product.platform] ?? '')}>
@@ -255,7 +255,7 @@ function AddProductForm({ onSave, onCancel }: { onSave: (d: Record<string, unkno
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">Add product</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>

@@ -241,7 +241,7 @@ function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; 
       <div className="border-t pt-2">
         <button
           onClick={() => setShowTracker(v => !v)}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
         >
           {showTracker ? 'Hide post tracker' : 'Track posts for this influencer'}
         </button>
@@ -1040,7 +1040,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               <div className="bg-background border rounded-2xl w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between">
                   <p className="font-semibold">Link influencer to campaign</p>
-                  <button onClick={() => setLinkingOpen(false)} className="text-muted-foreground hover:text-foreground">
+                  <button onClick={() => setLinkingOpen(false)} className="text-muted-foreground hover:text-foreground bg-press">
                     <span className="sr-only">Close</span>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                   </button>
@@ -1247,7 +1247,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           type="button"
                           onClick={() => triggerCreativeUpload(ch.id)}
                           disabled={loading || uploadingChannel !== null}
-                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 bg-press"
                         >
                           {loading
                             ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />Uploading…</>
@@ -1263,7 +1263,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               <button
                                 type="button"
                                 onClick={() => handleCreativeDelete(ch.id, url)}
-                                className="absolute inset-0 bg-ink/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                                className="absolute inset-0 bg-ink/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity bg-press"
                               >
                                 <X className="h-4 w-4 text-tx-inv" />
                               </button>

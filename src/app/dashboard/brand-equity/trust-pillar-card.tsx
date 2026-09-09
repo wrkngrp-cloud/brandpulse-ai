@@ -58,7 +58,7 @@ export function TrustPillarCard({ trust }: Props) {
               </div>
               <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all ${
+                  className={`h-full rounded-full transition-colors ${
                     dim.score == null   ? 'w-0' :
                     dim.score >= 80     ? 'bg-pos' :
                     dim.score >= 60     ? 'bg-flare' :

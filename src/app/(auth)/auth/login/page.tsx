@@ -77,7 +77,7 @@ function DemoTile({
       type="button"
       onClick={() => onSelect(demo)}
       className={cn(
-        'w-full text-left rounded-xl border p-3 transition-all hover:border-foreground/40 hover:bg-muted/30',
+        'w-full text-left rounded-xl border p-3 transition-colors hover:border-foreground/40 hover:bg-muted/30',
         active && 'border-foreground/60 bg-muted/40 ring-1 ring-foreground/10',
       )}
     >

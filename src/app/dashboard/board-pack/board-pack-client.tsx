@@ -416,7 +416,7 @@ export function BoardPackClient({
             <button
               type="button"
               onClick={handleCopyLink}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-card px-4 py-2.5 text-[13px] font-medium text-tx-2 transition-colors hover:bg-shell active:bg-shell"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-card px-4 py-2.5 text-[13px] font-medium text-tx-2 transition-colors hover:bg-shell active:bg-shell bg-press"
             >
               <Link2 className="h-4 w-4 shrink-0 opacity-70" />
               Copy link
@@ -425,7 +425,7 @@ export function BoardPackClient({
             <button
               type="button"
               onClick={handleDownload}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-flare px-5 py-2.5 text-[13px] font-semibold text-tx-inv transition-colors hover:bg-flare active:bg-flare border border-line"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-flare px-5 py-2.5 text-[13px] font-semibold text-tx-inv transition-colors hover:bg-flare active:bg-flare border border-line bg-press"
             >
               <Download className="h-4 w-4 shrink-0" />
               Download PDF

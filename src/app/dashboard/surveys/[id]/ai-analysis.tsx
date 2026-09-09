@@ -27,7 +27,7 @@ function InsightRow({ label, text }: { label: string; text: string }) {
   return (
     <div className="border-b last:border-0 py-3">
       <button
-        className="w-full flex items-center justify-between text-left"
+        className="w-full flex items-center justify-between text-left bg-press"
         onClick={() => setOpen(o => !o)}
       >
         <span className="text-xs font-semibold text-muted-foreground">{label}</span>
@@ -126,7 +126,7 @@ export function SurveyAiAnalysis({ surveyId, responseCount }: { surveyId: string
           )}
 
           <div className="pt-2 flex justify-end">
-            <button onClick={() => setResult(null)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={() => setResult(null)} className="text-xs text-muted-foreground hover:text-foreground transition-colors bg-press">
               Regenerate
             </button>
           </div>

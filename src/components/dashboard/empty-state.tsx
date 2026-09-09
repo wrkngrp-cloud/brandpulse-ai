@@ -75,7 +75,7 @@ export function EmptyState({
         <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
           {actions.map(a => {
             const cls = cn(
-              'inline-flex items-center h-8 rounded-xl px-4 text-[12.5px] font-semibold transition-all duration-150 active:scale-[0.98]',
+              'inline-flex items-center h-8 rounded-xl px-4 text-[12.5px] font-semibold transition-colors duration-150 active:scale-[0.98]',
               a.primary
                 ? 'text-tx-inv hover:opacity-90'
                 : 'border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50',

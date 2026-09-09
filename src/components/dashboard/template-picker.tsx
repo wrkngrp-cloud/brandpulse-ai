@@ -45,7 +45,7 @@ export function TemplatePicker({ onSelect, defaultTemplateId }: Props) {
               type="button"
               onClick={() => setSelected(t.id)}
               className={cn(
-                'relative text-left rounded-xl border p-4 transition-all hover:border-foreground/40',
+                'relative text-left rounded-xl border p-4 transition-colors hover:border-foreground/40',
                 selected === t.id
                   ? 'border-foreground ring-2 ring-foreground/10 bg-muted/40'
                   : 'border-border bg-background hover:bg-muted/20',

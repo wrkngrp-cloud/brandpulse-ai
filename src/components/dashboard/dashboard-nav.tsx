@@ -188,7 +188,7 @@ function NavItem({
         />
       )}
       <Icon className={cn(
-        'shrink-0 transition-all duration-150',
+        'shrink-0 transition-colors duration-150',
         expanded ? 'h-[15px] w-[15px]' : 'h-[16px] w-[16px]',
         active ? 'opacity-100' : 'opacity-65 group-hover:opacity-100',
       )} />

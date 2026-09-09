@@ -139,7 +139,9 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
       className={cn(
         'fixed inset-y-0 left-0 z-40 hidden md:flex flex-col',
         'bg-sidebar border-r border-sidebar-border',
-        'overflow-hidden transition-[width] duration-200 ease-out',
+        /* No animation touches width in this system: the rail changes
+           width outright and the state reads through colour instead. */
+        'overflow-hidden',
         /* subtle shadow when expanded as overlay (collapsed mode) */
         !pinned && hovering && 'border-r border-line-inv',
       )}
@@ -168,7 +170,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
           className={cn(
             'ml-auto h-7 w-7 shrink-0 grid place-items-center rounded-lg cursor-pointer',
             'text-sidebar-foreground/35 hover:text-sidebar-foreground hover:bg-sidebar-accent',
-            'transition-all duration-150',
+            'transition-colors duration-150',
             expanded ? 'opacity-100 delay-75' : 'opacity-0 pointer-events-none',
           )}
           aria-label={pinned ? 'Collapse sidebar' : 'Pin sidebar'}
@@ -190,7 +192,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
         <Link
           href="/dashboard/ask"
           className={cn(
-            'ask-ai-btn flex items-center gap-2.5 rounded-xl transition-all duration-150',
+            'ask-ai-btn flex items-center gap-2.5 rounded-xl transition-colors duration-150',
             'overflow-hidden',
             expanded ? 'h-10 px-3' : 'h-10 justify-center px-0',
             isAskActive && 'ring-1 ring-primary/30',

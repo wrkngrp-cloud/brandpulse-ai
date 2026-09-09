@@ -109,7 +109,7 @@ export function CompetitorsClient({ initialCompetitors }: Props) {
               <button
                 onClick={() => handleDelete(c)}
                 disabled={isPending}
-                className="text-muted-foreground hover:text-destructive transition-colors disabled:opacity-40"
+                className="text-muted-foreground hover:text-destructive transition-colors disabled:opacity-40 bg-press"
                 aria-label={`Remove ${c.name}`}
               >
                 {deletingId === c.id

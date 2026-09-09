@@ -6,10 +6,8 @@ import { ArrowRight } from 'lucide-react'
 import { MarketingShell } from './marketing-shell'
 import { FunnelScene, GaugeScene, OohScene, SentimentScene } from './scenes'
 
+// One reveal group per section. See landing-page.tsx.
 const rise = {
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-60px' },
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
 }
 
@@ -134,7 +132,7 @@ export function FeaturesPage() {
         </motion.h2>
         <motion.div {...rise} className="mt-8">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-bold text-tx-inv transition-transform hover:scale-[1.03] border border-line"
+            className="inline-flex items-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-bold text-tx-inv transition-transform border border-line"
             style={{ background: 'var(--lp-clay)' }}>
             Start free in beta <ArrowRight className="h-4 w-4" />
           </Link>

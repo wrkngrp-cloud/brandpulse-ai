@@ -500,7 +500,7 @@ function CRSGauge({ score, drift }: { score: number | null; drift: number | null
           {score !== null && (
             <circle cx="68" cy="68" r={radius} fill="none" strokeWidth="10" strokeLinecap="round"
               strokeDasharray={circumference} strokeDashoffset={dashOffset}
-              className={cn('transition-all duration-700', crsRingColor(score))} />
+              className={cn('transition-colors duration-700', crsRingColor(score))} />
           )}
         </svg>
         <div className="absolute flex flex-col items-center">
@@ -535,7 +535,7 @@ function EmotionBar({ value }: { value: number | null }) {
         <span className="text-sm font-semibold bg-num">{value !== null ? `${Math.round(value)}%` : '—'}</span>
       </div>
       <div className="h-2.5 bg-muted rounded-sm overflow-hidden">
-        <div className={cn('h-full rounded-sm transition-all duration-700',
+        <div className={cn('h-full rounded-sm transition-colors duration-700',
           value === null ? 'w-0' : value >= 60 ? 'bg-pos' : value >= 40 ? 'bg-ember' : 'bg-flare'
         )} style={{ width: value !== null ? `${Math.min(100, value)}%` : '0%' }} />
       </div>
@@ -679,7 +679,7 @@ function TopPickCard({
               <p className="text-xs text-muted-foreground leading-snug">{idea.description}</p>
             </div>
           ))}
-          <button onClick={() => setIdeas(null)} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 pt-1">
+          <button onClick={() => setIdeas(null)} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 pt-1 bg-press">
             Regenerate
           </button>
         </div>
@@ -921,7 +921,7 @@ export function CulturalClient({
             {calendarList.length > 12 && (
               <button
                 onClick={() => setShowAllCalendar(o => !o)}
-                className="w-full text-center text-xs text-muted-foreground hover:text-foreground mt-2 py-1.5 border rounded-lg transition-colors hover:bg-muted/30"
+                className="w-full text-center text-xs text-muted-foreground hover:text-foreground mt-2 py-1.5 border rounded-lg transition-colors hover:bg-muted/30 bg-press"
               >
                 {showAllCalendar ? 'Show less' : `Show all ${calendarList.length} moments`}
               </button>

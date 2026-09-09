@@ -192,7 +192,7 @@ export default function OnboardingPage() {
                   type="button"
                   onClick={() => patch('industry', id)}
                   className={cn(
-                    'relative text-left rounded-xl border p-4 transition-all duration-150 bg-card hover:border-foreground/40',
+                    'relative text-left rounded-xl border p-4 transition-colors duration-150 bg-card hover:border-foreground/40',
                     selected && 'border-foreground ring-2 ring-foreground/10 bg-card',
                     !selected && 'border-border',
                   )}
@@ -293,7 +293,7 @@ export default function OnboardingPage() {
             <button
               type="button"
               onClick={() => setScreen('industry')}
-              className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors pt-1"
+              className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors pt-1 bg-press"
             >
               <ArrowLeft className="h-3 w-3 inline mr-1" />
               Change industry
@@ -325,7 +325,7 @@ export default function OnboardingPage() {
           <div className="space-y-2">
             <StepBadge step={2} />
             <h2 className="text-lg font-semibold">Drafting a profile for {brandName}</h2>
-            <p className="text-sm text-muted-foreground transition-all duration-500 min-h-[20px]">
+            <p className="text-sm text-muted-foreground transition-colors duration-500 min-h-[20px]">
               {LOADING_MESSAGES[msgIdx]}
             </p>
             <p className="text-xs text-muted-foreground/70">
@@ -340,7 +340,7 @@ export default function OnboardingPage() {
           <button
             type="button"
             onClick={() => setScreen('identify')}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
           >
             ← Cancel and go back
           </button>
@@ -462,7 +462,7 @@ export default function OnboardingPage() {
                   <button
                     type="button"
                     onClick={() => patch('targetSegments', data.targetSegments.filter((_, j) => j !== i))}
-                    className="text-muted-foreground hover:text-destructive transition-colors"
+                    className="text-muted-foreground hover:text-destructive transition-colors bg-press"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>

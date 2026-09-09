@@ -129,7 +129,7 @@ export function BudgetClient() {
             {/* Plan header */}
             <button
               onClick={() => setExpandedId(expandedId === plan.id ? null : plan.id)}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/20 text-left"
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/20 text-left bg-press"
             >
               {expandedId === plan.id ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
               <div className="flex-1 min-w-0">
@@ -201,7 +201,7 @@ export function BudgetClient() {
                               <td className="px-3 py-2">
                                 <button
                                   onClick={() => setAddActualFor(addActualFor === li.id ? null : li.id)}
-                                  className="text-xs text-primary hover:underline"
+                                  className="text-xs text-primary hover:underline bg-press"
                                 >
                                   + Actual
                                 </button>
@@ -359,7 +359,7 @@ function NewPlanForm({ onSave, onCancel }: { onSave: (d: Record<string, unknown>
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">New budget plan</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>

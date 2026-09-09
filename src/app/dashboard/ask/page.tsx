@@ -333,7 +333,7 @@ function AskPageContent() {
                         <button
                           key={s}
                           onClick={() => send(s)}
-                          className="text-left text-sm px-4 py-3 rounded-xl border hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                          className="text-left text-sm px-4 py-3 rounded-xl border hover:bg-muted transition-colors text-muted-foreground hover:text-foreground bg-press"
                         >
                           {s}
                         </button>

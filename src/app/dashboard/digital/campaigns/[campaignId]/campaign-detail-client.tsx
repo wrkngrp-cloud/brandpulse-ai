@@ -504,7 +504,7 @@ export function CampaignDetailClient({
                     <span className="text-[10px] text-muted-foreground capitalize">{t.period} target</span>
                     <button
                       onClick={() => removeTarget(t.id, t.metric)}
-                      className="text-[10px] text-muted-foreground hover:text-tx-flare flex items-center gap-1 transition-colors"
+                      className="text-[10px] text-muted-foreground hover:text-tx-flare flex items-center gap-1 transition-colors bg-press"
                     >
                       <Trash2 className="h-3 w-3" /> Remove
                     </button>

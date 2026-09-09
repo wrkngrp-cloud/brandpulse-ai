@@ -40,7 +40,7 @@ function TriggerCompetitiveCrawlButton() {
     return (
       <span className="text-xs text-tx-flare flex items-center gap-1">
         <AlertCircle className="h-3.5 w-3.5" /> Failed to start crawl.
-        <button onClick={trigger} className="underline">Retry</button>
+        <button onClick={trigger} className="underline bg-press">Retry</button>
       </span>
     )
   }
@@ -169,7 +169,7 @@ function Section({ title, icon: Icon, children, defaultOpen = true }: {
     <div className="border rounded-xl bg-card overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors bg-press"
       >
         <div className="flex items-center gap-2">
           <Icon className="h-4 w-4 text-muted-foreground" />

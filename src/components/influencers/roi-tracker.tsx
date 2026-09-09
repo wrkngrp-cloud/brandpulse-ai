@@ -293,7 +293,7 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
             return (
               <div key={c.id} className="rounded-2xl border bg-card overflow-hidden">
                 <button
-                  className="w-full flex items-center gap-3 px-5 py-4 text-left"
+                  className="w-full flex items-center gap-3 px-5 py-4 text-left bg-press"
                   onClick={() => setExpanded(isOpen ? null : c.id)}
                 >
                   <div className="flex-1 min-w-0">

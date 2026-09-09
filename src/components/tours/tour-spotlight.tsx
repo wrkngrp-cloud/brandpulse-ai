@@ -168,14 +168,22 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
     const mutationObserver = new MutationObserver(() => sync())
     mutationObserver.observe(el, { attributes: true, attributeFilter: ['style', 'class'] })
 
+    // A scroll listener is a hard ban in this system, so the box follows the
+    // target through an IntersectionObserver instead. Thresholds every 1%
+    // make it fire repeatedly as the element travels the viewport, which is
+    // what keeps the ring on the target during the smooth scrollIntoView
+    // above, with no per-frame work and nothing running once it settles.
+    const thresholds = Array.from({ length: 101 }, (_, i) => i / 100)
+    const travelObserver = new IntersectionObserver(() => sync(), { threshold: thresholds })
+    travelObserver.observe(el)
+
     sync()
 
-    window.addEventListener('scroll', sync, { passive: true })
     window.addEventListener('resize', sync)
     return () => {
       resizeObserver.disconnect()
       mutationObserver.disconnect()
-      window.removeEventListener('scroll', sync)
+      travelObserver.disconnect()
       window.removeEventListener('resize', sync)
     }
   }, [current, step])
@@ -289,7 +297,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
           {steps.map((_, i) => (
             <div
               key={i}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
+              className={`h-1.5 rounded-full transition-colors duration-300 ${
                 i === current
                   ? 'w-4 bg-foreground'
                   : 'w-1.5 bg-muted-foreground/25'

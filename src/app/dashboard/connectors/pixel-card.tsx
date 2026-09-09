@@ -39,7 +39,7 @@ export function PixelCard() {
         </div>
         <button
           onClick={() => setOpen(o => !o)}
-          className="flex items-center gap-1.5 text-[12px] font-medium text-primary hover:underline shrink-0"
+          className="flex items-center gap-1.5 text-[12px] font-medium text-primary hover:underline shrink-0 bg-press"
         >
           {open ? 'Collapse' : 'Setup'}
           <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} />
@@ -56,7 +56,7 @@ export function PixelCard() {
               <pre className="whitespace-pre-wrap break-all">{snippet}</pre>
               <button
                 onClick={() => copy(snippet, 'snippet')}
-                className="absolute top-3 right-3 flex items-center gap-1 text-[10px] bg-card/10 hover:bg-card/20 rounded px-2 py-1"
+                className="absolute top-3 right-3 flex items-center gap-1 text-[10px] bg-card/10 hover:bg-card/20 rounded px-2 py-1 bg-press"
               >
                 {copied === 'snippet' ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                 {copied === 'snippet' ? 'Copied' : 'Copy'}
@@ -90,7 +90,7 @@ window.__bp.track('cta_click', 1, { label: 'Order Now' });`}</pre>
               ].map(({ label, cmd }) => (
                 <div key={label} className="rounded-lg bg-muted px-3 py-2 flex items-center gap-2">
                   <code className="text-[11.5px] bg-num text-foreground">{cmd}</code>
-                  <button onClick={() => copy(cmd, label)} className="text-muted-foreground hover:text-foreground">
+                  <button onClick={() => copy(cmd, label)} className="text-muted-foreground hover:text-foreground bg-press">
                     {copied === label ? <Check className="h-3 w-3 text-pos" /> : <Copy className="h-3 w-3" />}
                   </button>
                 </div>

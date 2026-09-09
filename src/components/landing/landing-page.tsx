@@ -2,17 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ArrowRight, Moon, Sun } from 'lucide-react'
 import { VideoHero } from './video-hero'
 import { HorizontalTour } from './horizontal-tour'
 import { AiScene, CompetitiveScene, darkSceneVars, lightSceneVars } from './scenes'
 import { BrandLockup } from '@/components/brand/logo'
 
+// Fade-and-slide-up on every element is banned: one reveal group per section,
+// maximum, and it is the section's own .bg-reveal group in motion.css. What is
+// left here is the shared easing, so the call sites keep reading the same.
 const rise = {
-  initial: { opacity: 0, y: 28 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-80px' },
   transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
 }
 
@@ -52,13 +52,13 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
         </nav>
         <div className="flex items-center gap-2.5">
           <button onClick={onToggle} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="flex h-9 w-9 items-center justify-center rounded-full border transition-transform hover:rotate-12"
+            className="flex h-9 w-9 items-center justify-center rounded-full border transition-transform hover:rotate-12 bg-press"
             style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)' }}>
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
           <Link href="/auth/login" className="hidden text-[13px] font-medium transition-opacity hover:opacity-70 sm:block" style={{ color: 'var(--lp-ink)' }}>Sign in</Link>
           <Link href="/auth/signup"
-            className="whitespace-nowrap rounded-sm px-4 py-2 text-[13px] font-bold text-tx-inv transition-transform hover:scale-[1.04] border border-line"
+            className="whitespace-nowrap rounded-sm px-4 py-2 text-[13px] font-bold text-tx-inv transition-transform border border-line"
             style={{ background: 'var(--lp-clay)' }}>
             Start free
           </Link>
@@ -69,21 +69,9 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
 }
 
 /** Mouse-follow tilt wrapper: the "hold the product in your hand" delighter. */
+/** The demo sits flat. Nothing in this brand tilts toward the cursor. */
 function Tilt({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [tf, setTf] = useState('rotateX(0deg) rotateY(0deg)')
-  function onMove(e: React.MouseEvent) {
-    const r = ref.current?.getBoundingClientRect()
-    if (!r) return
-    const x = (e.clientX - r.left) / r.width - 0.5
-    const y = (e.clientY - r.top) / r.height - 0.5
-    setTf(`rotateX(${(-y * 4).toFixed(2)}deg) rotateY(${(x * 6).toFixed(2)}deg)`)
-  }
-  return (
-    <div ref={ref} style={{ perspective: '1400px' }} onMouseMove={onMove} onMouseLeave={() => setTf('rotateX(0deg) rotateY(0deg)')}>
-      <div className="transition-transform duration-300 ease-out will-change-transform" style={{ transform: tf }}>{children}</div>
-    </div>
-  )
+  return <div>{children}</div>
 }
 
 /** Adire-inspired concentric circle motif, kept faint. */
@@ -120,23 +108,9 @@ function GaugeArcMotif({ className = '', size = 520, color = 'var(--lp-clay)', o
   )
 }
 
-function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-40px' })
-  const [v, setV] = useState(0)
-  useEffect(() => {
-    if (!inView) return
-    const t0 = performance.now()
-    let raf = 0
-    const loop = (now: number) => {
-      const p = Math.min(1, (now - t0) / 1200)
-      setV(Math.round(to * (1 - Math.pow(1 - p, 3))))
-      if (p < 1) raf = requestAnimationFrame(loop)
-    }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
-  }, [inView, to])
-  return <span ref={ref}>{v}{suffix}</span>
+/** A reading is printed, not counted up to. The reading is not a slot machine. */
+function Reading({ to, suffix = '' }: { to: number; suffix?: string }) {
+  return <span>{to}{suffix}</span>
 }
 
 function Hero() {
@@ -150,8 +124,8 @@ function Hero() {
           backgroundSize: '26px 26px',
           maskImage: 'radial-gradient(75% 55% at 50% 32%, black, transparent)',
         }} />
-        <div className="absolute -left-24 top-40 opacity-70"><div className="lp-par lp-par-b"><CircleMotif /></div></div>
-        <div className="absolute -right-16 top-[560px] opacity-50"><div className="lp-par lp-par-a"><CircleMotif size={220} /></div></div>
+        <div className="absolute -left-24 top-40 opacity-70"><div><CircleMotif /></div></div>
+        <div className="absolute -right-16 top-[560px] opacity-50"><div><CircleMotif size={220} /></div></div>
         <div className="absolute left-1/2 top-[-180px] h-[420px] w-[820px] -translate-x-1/2 rounded-sm blur-[130px]"
           style={{ background: 'var(--bg-shell)' }} />
         <div className="absolute left-1/2 top-[380px] h-[380px] w-[700px] -translate-x-1/2 rounded-sm blur-[130px]"
@@ -181,7 +155,7 @@ function Hero() {
         </motion.p>
         <motion.div {...rise} transition={{ ...rise.transition, delay: 0.6 }} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Link href="/auth/signup"
-            className="group flex items-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-tx-inv transition-transform hover:scale-[1.03] border border-line"
+            className="group flex items-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-tx-inv transition-transform border border-line"
             style={{ background: 'var(--lp-clay)' }}>
             Start free in beta
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -196,21 +170,15 @@ function Hero() {
         <motion.div id="demo" {...rise} transition={{ ...rise.transition, delay: 0.72 }} className="relative mx-auto mt-16 max-w-4xl scroll-mt-28">
           <Tilt><VideoHero /></Tilt>
         </motion.div>
-
-        {/* connector marquee */}
-        <div className="relative mt-16 overflow-hidden" style={{ maskImage: 'linear-gradient(90deg, transparent, black 12%, black 88%, transparent)' }}>
-          <div className="flex w-max animate-[lp-marquee_26s_linear_infinite] gap-10 text-[10px]" style={{ color: 'var(--lp-mut)' }}>
-            {[...Array(2)].flatMap((_, k) =>
-              ['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
-                <span key={`${k}-${c}`} className="flex items-center gap-10">
-                  <span>{c}</span><span style={{ color: 'var(--tx-3)' }}>·</span>
-                </span>
-              )),
-            )}
+        {/* The connectors, listed. Nothing here loops. */}
+        <div className="relative mt-16">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px]" style={{ color: 'var(--lp-mut)' }}>
+            {['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
+              <span key={c}>{c}</span>
+            ))}
           </div>
         </div>
       </div>
-      <style>{`@keyframes lp-marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }`}</style>
     </section>
   )
 }
@@ -234,8 +202,8 @@ function Differentiators() {
           backgroundSize: '26px 26px',
           maskImage: 'radial-gradient(65% 70% at 50% 0%, black, transparent)',
         }} />
-        <div className="absolute -left-20 -top-16 opacity-40"><div className="lp-par lp-par-a"><CircleMotif size={200} /></div></div>
-        <div className="absolute -bottom-32 -right-24"><div className="lp-par lp-par-b"><GaugeArcMotif size={560} opacity={0.24} /></div></div>
+        <div className="absolute -left-20 -top-16 opacity-40"><div><CircleMotif size={200} /></div></div>
+        <div className="absolute -bottom-32 -right-24"><div><GaugeArcMotif size={560} opacity={0.24} /></div></div>
         <div className="absolute right-0 top-0 h-[360px] w-[560px] rounded-sm blur-[130px]"
           style={{ background: 'var(--bg-shell)' }} />
         <div className="absolute -bottom-40 left-0 h-[340px] w-[600px] rounded-sm blur-[130px]"
@@ -251,7 +219,7 @@ function Differentiators() {
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {DIFFS.map((d, i) => (
             <motion.div key={d.n} {...rise} transition={{ ...rise.transition, delay: i * 0.05 }}
-              className="group relative overflow-hidden rounded-2xl border p-7 transition-all duration-300 hover:-translate-y-1.5"
+              className="group relative overflow-hidden rounded-2xl border p-7 transition-colors duration-300"
               style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
               {/* clay corner sweep on hover */}
               <div className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
@@ -266,7 +234,7 @@ function Differentiators() {
         {/* stats band */}
         <motion.div {...rise} className="relative mt-16 grid grid-cols-2 gap-4 rounded-2xl border p-8 text-center sm:grid-cols-4"
           style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-chip)' }}>
-          <div className="pointer-events-none absolute -bottom-16 -right-10"><div className="lp-par lp-par-c"><GaugeArcMotif size={220} opacity={0.3} /></div></div>
+          <div className="pointer-events-none absolute -bottom-16 -right-10"><div><GaugeArcMotif size={220} opacity={0.3} /></div></div>
           {[
             { v: 4,  s: '',  label: 'languages read natively' },
             { v: 7,  s: '',  label: 'industry playbooks' },
@@ -275,7 +243,7 @@ function Differentiators() {
           ].map(st => (
             <div key={st.label} className="relative">
               <p className="text-4xl font-black bg-num" style={{ fontFamily: 'var(--font-num)', color: 'var(--tx-flare)' }}>
-                <CountUp to={st.v} suffix={st.s} />
+                <Reading to={st.v} suffix={st.s} />
               </p>
               <p className="mt-1 text-[12px]" style={{ color: 'var(--lp-mut)' }}>{st.label}</p>
             </div>
@@ -291,7 +259,7 @@ function DeepDives() {
     <section className="relative overflow-hidden py-16">
       {/* patterned backdrop: diagonal wash pair + a faint circle motif cropped at the edge */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 top-1/4 opacity-30"><div className="lp-par lp-par-b"><CircleMotif size={380} /></div></div>
+        <div className="absolute -left-32 top-1/4 opacity-30"><div><CircleMotif size={380} /></div></div>
         <div className="absolute -right-20 top-0 h-[360px] w-[520px] rounded-sm blur-[140px]"
           style={{ background: 'var(--bg-shell)' }} />
         <div className="absolute -left-10 bottom-0 h-[320px] w-[480px] rounded-sm blur-[140px]"
@@ -342,7 +310,7 @@ function Industries() {
           maskImage: 'radial-gradient(60% 65% at 50% 50%, black, transparent)',
         }} />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="lp-par lp-par-a"><GaugeArcMotif size={620} opacity={0.22} /></div>
+          <div><GaugeArcMotif size={620} opacity={0.22} /></div>
         </div>
         <div className="absolute left-1/2 top-0 h-[300px] w-[560px] -translate-x-1/2 rounded-sm blur-[130px]"
           style={{ background: 'var(--bg-shell)' }} />
@@ -359,7 +327,7 @@ function Industries() {
         <motion.div {...rise} className="mt-10 flex flex-wrap justify-center gap-3">
           {list.map((v, i) => (
             <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
-              className="rounded-sm border px-5 py-2.5 text-[13px] transition-all duration-200"
+              className="rounded-sm border px-5 py-2.5 text-[13px] transition-colors duration-200 bg-press"
               style={active === i
                 ? { borderColor: 'var(--flare)', color: 'var(--bg-paper)', background: 'var(--flare)' }
                 : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
@@ -385,7 +353,7 @@ function FinalCta() {
           maskImage: 'radial-gradient(70% 80% at 50% 50%, black, transparent)',
         }} />
         <div className="pointer-events-none absolute -right-16 -top-16">
-          <div className="lp-par lp-par-c"><GaugeArcMotif size={300} color="var(--bg-shell)" opacity={0.2} /></div>
+          <div><GaugeArcMotif size={300} color="var(--bg-shell)" opacity={0.2} /></div>
         </div>
         <motion.h2 {...rise} className="relative mx-auto max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
@@ -396,7 +364,7 @@ function FinalCta() {
         </motion.p>
         <motion.div {...rise} className="relative mt-10">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-sm px-8 py-4 text-[15px] font-bold text-tx-inv transition-transform hover:scale-[1.04] border border-line"
+            className="inline-flex items-center gap-2 rounded-sm px-8 py-4 text-[15px] font-bold text-tx-inv transition-transform border border-line"
             style={{ background: 'var(--ember)' }}>
             Create your workspace <ArrowRight className="h-4 w-4" />
           </Link>
@@ -548,14 +516,6 @@ export function LandingPage() {
       className="min-h-screen antialiased transition-colors duration-500"
       style={{ ...(dark ? DARK : LIGHT), ...(dark ? darkSceneVars : lightSceneVars), background: 'var(--lp-bg)', color: 'var(--lp-ink)', isolation: 'isolate' }}
     >
-      {/* parallax drift for the Adire motifs, keyed off the eased cursor custom properties.
-          Vars default to 0, so touch / reduced-motion renders these perfectly static. */}
-      <style>{`
-        .lp-par { will-change: transform }
-        .lp-par-a { transform: translate3d(calc(var(--lp-px,0) * 22px), calc(var(--lp-py,0) * 22px), 0) }
-        .lp-par-b { transform: translate3d(calc(var(--lp-px,0) * -30px), calc(var(--lp-py,0) * -30px), 0) }
-        .lp-par-c { transform: translate3d(calc(var(--lp-px,0) * 16px), calc(var(--lp-py,0) * -18px), 0) }
-      `}</style>
       {cursorLive && <CursorField />}
       <Nav dark={dark} onToggle={toggle} />
       <Hero />

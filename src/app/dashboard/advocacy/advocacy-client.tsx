@@ -329,7 +329,7 @@ function PromoterCard({
       {/* Row */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/20 transition-colors"
+        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/20 transition-colors bg-press"
       >
         {expanded ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
         <div className="flex-1 min-w-0">
@@ -442,7 +442,7 @@ function ReferralCodeRow({ code }: { code: ReferralCode }) {
       <td className="px-3 py-2 bg-num">{formatNGN(code.attributed_revenue)}</td>
       <td className="px-3 py-2">
         <div className="flex items-center gap-1">
-          <button onClick={copyLink} className="p-1 hover:bg-muted rounded" title="Copy referral link">
+          <button onClick={copyLink} className="p-1 hover:bg-muted rounded bg-press" title="Copy referral link">
             {copied ? <Check className="h-3 w-3 text-pos" /> : <Copy className="h-3 w-3" />}
           </button>
           <a href={code.destination_url} target="_blank" rel="noreferrer" className="p-1 hover:bg-muted rounded">
@@ -485,7 +485,7 @@ function GenerateCodeForm({ promoterId, onSaved, onCancel }: { promoterId: strin
     <div className="rounded-lg border bg-card p-4 space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium">Generate referral code</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
@@ -526,7 +526,7 @@ function AddPromoterForm({ onSave, onCancel }: { onSave: (d: Record<string, unkn
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">Add promoter</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -580,7 +580,7 @@ function CandidateRow({
         {!open && (
           <button
             onClick={() => setOpen(true)}
-            className="text-pos font-medium hover:underline"
+            className="text-pos font-medium hover:underline bg-press"
           >
             Activate
           </button>
@@ -602,11 +602,11 @@ function CandidateRow({
           />
           <button
             onClick={() => { if (!name.trim()) return; onActivate(name, email); setOpen(false) }}
-            className="bg-pos text-tx-inv text-xs px-3 py-1 rounded"
+            className="bg-pos text-tx-inv text-xs px-3 py-1 rounded bg-press"
           >
             Save
           </button>
-          <button onClick={() => setOpen(false)} className="text-xs text-muted-foreground">Cancel</button>
+          <button onClick={() => setOpen(false)} className="text-xs text-muted-foreground bg-press">Cancel</button>
         </div>
       )}
     </div>

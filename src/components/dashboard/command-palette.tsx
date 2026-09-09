@@ -103,7 +103,7 @@ export function CommandPalette() {
             {query.trim() && (
               <button
                 onClick={() => go(askAiHref)}
-                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                className="inline-flex items-center gap-2 text-sm text-primary hover:underline bg-press"
               >
                 <Sparkles className="h-3.5 w-3.5" />
                 Ask AI: &ldquo;{query.trim()}&rdquo;

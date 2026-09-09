@@ -147,7 +147,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
         <div className="border-t pt-3 space-y-2">
           <button
             onClick={() => setRewriteOpen(o => !o)}
-            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors bg-press"
           >
             <Sparkles className="h-3.5 w-3.5" />
             AI Suggested Rewrite

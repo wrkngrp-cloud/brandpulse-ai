@@ -440,7 +440,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           </p>
           <button
             type="button"
-            className="shrink-0 text-amber-700 dark:text-amber-400 underline"
+            className="shrink-0 text-amber-700 dark:text-amber-400 underline bg-press"
             onClick={async () => {
               const { discardDraft } = await import('@/app/dashboard/ooh/actions')
               if (draft.id) await discardDraft(draft.id)
@@ -519,7 +519,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                       <button
                         type="button"
                         onMouseDown={e => { e.preventDefault(); selectSuggestion(f) }}
-                        className="w-full text-left px-3 py-2.5 text-xs hover:bg-accent transition-colors flex items-start gap-2"
+                        className="w-full text-left px-3 py-2.5 text-xs hover:bg-accent transition-colors flex items-start gap-2 bg-press"
                       >
                         <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground" />
                         <span className="leading-snug">{label}</span>

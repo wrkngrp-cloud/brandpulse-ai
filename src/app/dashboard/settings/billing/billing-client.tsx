@@ -148,7 +148,7 @@ export function BillingClient({
             const isCurrent = plan === currentPlan
             return (
               <div key={plan} className={cn(
-                'rounded-2xl border p-5 space-y-3 transition-all',
+                'rounded-2xl border p-5 space-y-3 transition-colors',
                 isCurrent ? 'border-foreground bg-card' : 'border-border bg-card hover:border-border/80'
               )}>
                 <div className="flex items-start justify-between">

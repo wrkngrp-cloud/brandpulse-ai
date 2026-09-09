@@ -78,7 +78,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
         <div>
           <button
             onClick={() => setShowQr(v => !v)}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
           >
             <QrCode className="h-3.5 w-3.5" />
             {showQr ? 'Hide QR code' : 'Show QR code'}

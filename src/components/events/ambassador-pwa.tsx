@@ -305,7 +305,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
                 onClick={() => handleTap(type)}
                 disabled={pending}
                 className={cn(
-                  'relative rounded-2xl p-5 flex flex-col items-center gap-3 transition-all active:scale-95 select-none',
+                  'relative rounded-2xl p-5 flex flex-col items-center gap-3 transition-colors active:scale-95 select-none',
                   'border-2',
                   lastTap === type ? 'border-foreground scale-95' : 'border-transparent',
                   'bg-card hover:bg-muted',
@@ -327,7 +327,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
           {queue.length > 0 && isOnline && (
             <button
               onClick={flushQueue}
-              className="mt-4 w-full flex items-center justify-center gap-2 text-xs text-muted-foreground py-2 border rounded-xl"
+              className="mt-4 w-full flex items-center justify-center gap-2 text-xs text-muted-foreground py-2 border rounded-xl bg-press"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Sync {queue.length} pending interaction{queue.length !== 1 ? 's' : ''}

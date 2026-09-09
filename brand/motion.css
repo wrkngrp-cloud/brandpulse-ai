@@ -39,6 +39,8 @@
 @keyframes bg-settle{0%{transform:rotate(var(--from,-40deg))}
                      72%{transform:rotate(calc(var(--to,0deg) + 3deg))}
                      100%{transform:rotate(var(--to,0deg))}}
+/* The needle group is a wrapper around the drawn needle, so rotating it never
+   overwrites the engine's own transform. Its rest state is zero. */
 .bg-gauge-enter .bg-needle{animation:bg-settle var(--d-needle) var(--ease-settle) both}
 
 /* ---- 2. Tactile feedback. Everything pressable. ------------------------ */

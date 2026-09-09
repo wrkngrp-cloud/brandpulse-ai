@@ -378,7 +378,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                   <button
                     type="button"
                     onClick={() => set('creative_url', '')}
-                    className="absolute top-2 right-2 h-6 w-6 rounded-full bg-background/80 border flex items-center justify-center hover:bg-background transition-colors"
+                    className="absolute top-2 right-2 h-6 w-6 rounded-full bg-background/80 border flex items-center justify-center hover:bg-background transition-colors bg-press"
                     aria-label="Remove creative"
                   >
                     <X className="h-3.5 w-3.5" />
