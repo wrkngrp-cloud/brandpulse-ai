@@ -224,7 +224,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                     <span className={cn(
                       'text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wide',
                       panel.active
-                        ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                        ? 'bg-pos/10 text-pos dark:text-pos'
                         : 'bg-muted text-muted-foreground'
                     )}>
                       {panel.active ? 'active' : 'paused'}
@@ -244,7 +244,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                     title={panel.active ? 'Pause panel' : 'Resume panel'}
                   >
                     {panel.active
-                      ? <ToggleRight className="h-4 w-4 text-green-500" />
+                      ? <ToggleRight className="h-4 w-4 text-pos" />
                       : <ToggleLeft className="h-4 w-4 text-muted-foreground" />}
                   </Button>
                   <Button
@@ -261,7 +261,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500"
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-tx-flare"
                     onClick={() => deletePanel(panel.id)}
                   >
                     <Trash2 className="h-3.5 w-3.5" />

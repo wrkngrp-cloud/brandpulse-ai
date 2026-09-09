@@ -6,7 +6,7 @@ import { motion, useInView } from 'framer-motion'
 import { ArrowRight, Moon, Sun } from 'lucide-react'
 import { VideoHero } from './video-hero'
 import { HorizontalTour } from './horizontal-tour'
-import { AiScene, CLAY, CompetitiveScene, GaugeMark, darkSceneVars, lightSceneVars } from './scenes'
+import { AiScene, CompetitiveScene, GaugeMark, darkSceneVars, lightSceneVars } from './scenes'
 
 const rise = {
   initial: { opacity: 0, y: 28 },
@@ -17,22 +17,22 @@ const rise = {
 
 // ————— theme palettes —————
 export const LIGHT = {
-  '--lp-bg': '#FBF9F5', '--lp-ink': '#14182B', '--lp-mut': 'rgba(20,24,43,0.55)',
-  '--lp-line': 'rgba(20,24,43,0.10)', '--lp-card': '#FFFFFF', '--lp-glass': 'rgba(255,255,255,0.75)',
-  '--lp-chip': 'rgba(20,24,43,0.04)', '--lp-clay': CLAY, '--lp-band': '#14182B', '--lp-band-ink': '#F4EDE4',
-  '--lp-dot': 'rgba(20,24,43,0.10)',
+  '--lp-bg': 'var(--bg-paper)', '--lp-ink': 'var(--bg-ink)', '--lp-mut': 'var(--tx-3)',
+  '--lp-line': 'var(--line)', '--lp-card': 'var(--bg-card)', '--lp-glass': 'var(--bg-card)',
+  '--lp-chip': 'var(--bg-shell)', '--lp-clay': 'var(--flare)', '--lp-band': 'var(--bg-ink)', '--lp-band-ink': 'var(--bg-shell)',
+  '--lp-dot': 'var(--tick-1)',
 } as React.CSSProperties
 
 export const DARK = {
-  '--lp-bg': '#080C1A', '--lp-ink': '#F4EDE4', '--lp-mut': 'rgba(244,237,228,0.52)',
-  '--lp-line': 'rgba(255,255,255,0.10)', '--lp-card': '#0E1430', '--lp-glass': 'rgba(11,16,34,0.75)',
-  '--lp-chip': 'rgba(255,255,255,0.04)', '--lp-clay': '#E06A32', '--lp-band': '#0E1430', '--lp-band-ink': '#F4EDE4',
-  '--lp-dot': 'rgba(255,255,255,0.10)',
+  '--lp-bg': 'var(--bg-ink)', '--lp-ink': 'var(--bg-shell)', '--lp-mut': 'var(--tx-3)',
+  '--lp-line': 'var(--line)', '--lp-card': 'var(--bg-ink)', '--lp-glass': 'var(--bg-ink-raised)',
+  '--lp-chip': 'var(--bg-shell)', '--lp-clay': 'var(--flare)', '--lp-band': 'var(--bg-ink)', '--lp-band-ink': 'var(--bg-shell)',
+  '--lp-dot': 'var(--tick-1)',
 } as React.CSSProperties
 
 export function Wordmark({ className = 'text-xl' }: { className?: string }) {
   return (
-    <span className={`font-extrabold tracking-tight ${className}`} style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+    <span className={`font-extrabold tracking-tight ${className}`} style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
       Brand<span style={{ color: 'var(--lp-clay)' }}>Gauge</span>
     </span>
   )
@@ -61,7 +61,7 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
           </button>
           <Link href="/auth/login" className="hidden text-[13px] font-medium transition-opacity hover:opacity-70 sm:block" style={{ color: 'var(--lp-ink)' }}>Sign in</Link>
           <Link href="/auth/signup"
-            className="whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-bold text-white shadow-[0_8px_28px_rgba(212,96,42,0.35)] transition-transform hover:scale-[1.04]"
+            className="whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-bold text-tx-inv shadow-[0_8px_28px_rgba(212,96,42,0.35)] transition-transform hover:scale-[1.04]"
             style={{ background: 'var(--lp-clay)' }}>
             Start free
           </Link>
@@ -156,9 +156,9 @@ function Hero() {
         <div className="absolute -left-24 top-40 opacity-70"><div className="lp-par lp-par-b"><CircleMotif /></div></div>
         <div className="absolute -right-16 top-[560px] opacity-50"><div className="lp-par lp-par-a"><CircleMotif size={220} /></div></div>
         <div className="absolute left-1/2 top-[-180px] h-[420px] w-[820px] -translate-x-1/2 rounded-full blur-[130px]"
-          style={{ background: 'rgba(43,89,255,0.10)' }} />
+          style={{ background: 'var(--bg-shell)' }} />
         <div className="absolute left-1/2 top-[380px] h-[380px] w-[700px] -translate-x-1/2 rounded-full blur-[130px]"
-          style={{ background: 'rgba(212,96,42,0.10)' }} />
+          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6 text-center">
@@ -166,7 +166,7 @@ function Hero() {
           Brand intelligence · Lagos to Accra
         </motion.p>
         <h1 className="mx-auto mt-5 max-w-4xl text-5xl font-black leading-[1.02] tracking-[-0.03em] sm:text-7xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           {words.map((w, i) => (
             <motion.span key={i} className="inline-block whitespace-pre"
               initial={{ opacity: 0, y: 34, rotate: 2 }}
@@ -184,7 +184,7 @@ function Hero() {
         </motion.p>
         <motion.div {...rise} transition={{ ...rise.transition, delay: 0.6 }} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Link href="/auth/signup"
-            className="group flex items-center gap-2 rounded-full px-6 py-3.5 text-[14px] font-bold text-white shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
+            className="group flex items-center gap-2 rounded-full px-6 py-3.5 text-[14px] font-bold text-tx-inv shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
             style={{ background: 'var(--lp-clay)' }}>
             Start free in beta
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -240,15 +240,15 @@ function Differentiators() {
         <div className="absolute -left-20 -top-16 opacity-40"><div className="lp-par lp-par-a"><CircleMotif size={200} /></div></div>
         <div className="absolute -bottom-32 -right-24"><div className="lp-par lp-par-b"><GaugeArcMotif size={560} opacity={0.24} /></div></div>
         <div className="absolute right-0 top-0 h-[360px] w-[560px] rounded-full blur-[130px]"
-          style={{ background: 'rgba(43,89,255,0.08)' }} />
+          style={{ background: 'var(--bg-shell)' }} />
         <div className="absolute -bottom-40 left-0 h-[340px] w-[600px] rounded-full blur-[130px]"
-          style={{ background: 'rgba(212,96,42,0.09)' }} />
+          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
         <motion.p {...rise} className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>Why BrandGauge</motion.p>
         <motion.h2 {...rise} className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Built for here. Not adapted for here.
         </motion.h2>
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -258,9 +258,9 @@ function Differentiators() {
               style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', boxShadow: '0 1px 2px rgba(20,24,43,0.04)' }}>
               {/* clay corner sweep on hover */}
               <div className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                style={{ background: 'rgba(212,96,42,0.22)' }} />
+                style={{ background: 'var(--bg-shell)' }} />
               <span className="font-mono text-[11px]" style={{ color: 'var(--lp-clay)' }}>{d.n}</span>
-              <h3 className="mt-3 text-[17px] font-bold leading-snug" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>{d.title}</h3>
+              <h3 className="mt-3 text-[17px] font-bold leading-snug" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{d.title}</h3>
               <p className="mt-2.5 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{d.body}</p>
             </motion.div>
           ))}
@@ -277,7 +277,7 @@ function Differentiators() {
             { v: 5,  s: '',  label: 'offline channels measured' },
           ].map(st => (
             <div key={st.label} className="relative">
-              <p className="text-4xl font-black tabular-nums" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-clay)' }}>
+              <p className="text-4xl font-black tabular-nums" style={{ fontFamily: 'var(--font)', color: 'var(--lp-clay)' }}>
                 <CountUp to={st.v} suffix={st.s} />
               </p>
               <p className="mt-1 text-[12px]" style={{ color: 'var(--lp-mut)' }}>{st.label}</p>
@@ -296,9 +296,9 @@ function DeepDives() {
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-32 top-1/4 opacity-30"><div className="lp-par lp-par-b"><CircleMotif size={380} /></div></div>
         <div className="absolute -right-20 top-0 h-[360px] w-[520px] rounded-full blur-[140px]"
-          style={{ background: 'rgba(212,96,42,0.07)' }} />
+          style={{ background: 'var(--bg-shell)' }} />
         <div className="absolute -left-10 bottom-0 h-[320px] w-[480px] rounded-full blur-[140px]"
-          style={{ background: 'rgba(43,89,255,0.08)' }} />
+          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
       <div className="relative mx-auto max-w-6xl space-y-24 px-6">
@@ -312,7 +312,7 @@ function DeepDives() {
             className={`flex flex-col gap-10 lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
             <div className="lg:w-[38%]">
               <p className="font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--lp-clay)' }}>{s.kicker}</p>
-              <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>{s.title}</h3>
+              <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{s.title}</h3>
               <p className="mt-4 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{s.body}</p>
             </div>
             <div className="@container h-[430px] flex-1 sm:h-[360px]"><s.Comp t={1} /></div>
@@ -348,11 +348,11 @@ function Industries() {
           <div className="lp-par lp-par-a"><GaugeArcMotif size={620} opacity={0.22} /></div>
         </div>
         <div className="absolute left-1/2 top-0 h-[300px] w-[560px] -translate-x-1/2 rounded-full blur-[130px]"
-          style={{ background: 'rgba(212,96,42,0.07)' }} />
+          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
-        <motion.h2 {...rise} className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+        <motion.h2 {...rise} className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           One gauge. Seven industries.
         </motion.h2>
         <motion.p {...rise} className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
@@ -364,7 +364,7 @@ function Industries() {
             <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
               className="rounded-full border px-5 py-2.5 text-[13px] transition-all duration-200"
               style={active === i
-                ? { borderColor: 'var(--lp-clay)', color: 'var(--lp-clay)', background: 'rgba(212,96,42,0.08)', transform: 'translateY(-2px)' }
+                ? { borderColor: 'var(--lp-clay)', color: 'var(--lp-clay)', background: 'var(--bg-shell)', transform: 'translateY(-2px)' }
                 : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
               {v.name}
             </button>
@@ -384,25 +384,23 @@ function FinalCta() {
       <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl px-6 py-24 text-center"
         style={{ background: 'var(--lp-band)' }}>
         <div className="pointer-events-none absolute inset-0" style={{
-          backgroundImage: 'radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px)', backgroundSize: '22px 22px',
+          backgroundImage: 'radial-gradient(var(--tick-1) 1px, transparent 1px)', backgroundSize: '22px 22px',
           maskImage: 'radial-gradient(70% 80% at 50% 50%, black, transparent)',
         }} />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[320px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px]"
-          style={{ background: 'rgba(224,106,50,0.20)' }} />
         <div className="pointer-events-none absolute -right-16 -top-16">
-          <div className="lp-par lp-par-c"><GaugeArcMotif size={300} color="#F4EDE4" opacity={0.2} /></div>
+          <div className="lp-par lp-par-c"><GaugeArcMotif size={300} color="var(--bg-shell)" opacity={0.2} /></div>
         </div>
         <motion.h2 {...rise} className="relative mx-auto max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-band-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
           Your brand already has a reputation. Start measuring it.
         </motion.h2>
-        <motion.p {...rise} className="relative mx-auto mt-6 max-w-xl text-[15px]" style={{ color: 'rgba(244,237,228,0.6)' }}>
+        <motion.p {...rise} className="relative mx-auto mt-6 max-w-xl text-[15px]" style={{ color: 'var(--tx-inv-2)' }}>
           Free while in beta. Connect a social account and see your first Brand Health Index in minutes.
         </motion.p>
         <motion.div {...rise} className="relative mt-10">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-bold text-white shadow-[0_0_60px_rgba(224,106,50,0.45)] transition-transform hover:scale-[1.04]"
-            style={{ background: '#E06A32' }}>
+            className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-bold text-tx-inv shadow-[0_0_60px_rgba(224,106,50,0.45)] transition-transform hover:scale-[1.04]"
+            style={{ background: 'var(--ember)' }}>
             Create your workspace <ArrowRight className="h-4 w-4" />
           </Link>
         </motion.div>
@@ -508,7 +506,7 @@ function CursorField() {
       <div className="absolute left-0 top-0 h-[620px] w-[620px] rounded-full blur-[85px]"
         style={{
           transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
-          background: 'radial-gradient(circle, rgba(212,96,42,0.20), rgba(43,89,255,0.08) 45%, transparent 72%)',
+          background: 'var(--bg-shell)',
           willChange: 'transform',
         }} />
       {/* a defined ring right at the cursor, so the pointer itself reads as the source */}
@@ -522,7 +520,7 @@ function CursorField() {
       {/* dot grid revealed in place around the pointer via a cursor-tracking radial mask */}
       <div className="absolute inset-0"
         style={{
-          backgroundImage: 'radial-gradient(var(--lp-clay) 1.6px, transparent 1.6px)',
+          backgroundImage: 'var(--lp-clay)',
           backgroundSize: '26px 26px',
           opacity: 0.5,
           WebkitMaskImage: 'radial-gradient(260px circle at var(--lp-x, -999px) var(--lp-y, -999px), rgba(0,0,0,0.95), transparent 72%)',

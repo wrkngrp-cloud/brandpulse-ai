@@ -41,11 +41,11 @@ const TONE_SURFACE: Record<Tone, string> = {
 }
 
 const STROKE: Record<Tone, string> = {
-  blue:   '#4F79FF',
-  green:  '#22c55e',
-  amber:  '#f59e0b',
-  clay:   '#D4602A',
-  violet: '#7C3AED',
+  blue:   'var(--flare)',
+  green:  'var(--pos)',
+  amber:  'var(--ember)',
+  clay:   'var(--char)',
+  violet: 'var(--neu)',
 }
 
 // ── Smooth bezier sparkline ────────────────────────────────────────────────
@@ -150,7 +150,7 @@ export function StatCard({
     >
       {/* Header row */}
       <div className="flex items-start justify-between mb-3.5">
-        <div className={cn('h-10 w-10 rounded-xl grid place-items-center shrink-0 text-white', TONE_BOX[tone])}>
+        <div className={cn('h-10 w-10 rounded-xl grid place-items-center shrink-0 text-tx-inv', TONE_BOX[tone])}>
           <Icon className="h-[17px] w-[17px]" />
         </div>
 

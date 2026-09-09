@@ -36,9 +36,9 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_STYLE: Record<string, string> = {
   pending:           'bg-muted text-muted-foreground',
-  running:           'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  complete:          'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  insufficient_data: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+  running:           'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
+  complete:          'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  insufficient_data: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
 }
 
 function StatusIcon({ status }: { status: string }) {
@@ -78,7 +78,7 @@ function StudyCard({ study }: { study: GeoLiftStudy }) {
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
             <p className="text-xs text-muted-foreground">Search Lift</p>
-            <p className={`text-lg font-bold tabular-nums ${(study.lift_pct ?? 0) > 0 ? 'text-green-700 dark:text-green-400' : 'text-red-600'}`}>
+            <p className={`text-lg font-bold tabular-nums ${(study.lift_pct ?? 0) > 0 ? 'text-pos dark:text-pos' : 'text-tx-flare'}`}>
               {study.lift_pct !== null ? `${study.lift_pct > 0 ? '+' : ''}${study.lift_pct.toFixed(1)}%` : '—'}
             </p>
           </div>
@@ -141,7 +141,7 @@ function StudyCard({ study }: { study: GeoLiftStudy }) {
       )}
 
       {study.status === 'insufficient_data' && (
-        <p className="text-xs text-amber-700 dark:text-amber-400">
+        <p className="text-xs text-tx-2 dark:text-tx-2">
           Not enough weekly data points to calculate lift with confidence. Try extending the study period or choosing a broader keyword.
         </p>
       )}

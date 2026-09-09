@@ -17,9 +17,9 @@ const PLATFORM_LABEL: Record<string, string> = {
 }
 
 const LABEL_COLOR: Record<string, string> = {
-  positive: 'text-green-600',
-  negative: 'text-red-500',
-  mixed:    'text-amber-500',
+  positive: 'text-pos',
+  negative: 'text-tx-flare',
+  mixed:    'text-tx-2',
   neutral:  'text-muted-foreground',
 }
 
@@ -66,7 +66,7 @@ function DisputeMenu({
 
   if (done || mention.disputed) {
     return (
-      <span className="flex items-center gap-1 text-[10px] text-green-600 font-medium">
+      <span className="flex items-center gap-1 text-[10px] text-pos font-medium">
         <CheckCircle className="h-3 w-3" /> Corrected
       </span>
     )
@@ -162,7 +162,7 @@ export function MentionsList({ initialMentions }: { initialMentions: Mention[] }
                   </span>
                 )}
                 {m.disputed && (
-                  <span className="text-xs font-semibold capitalize text-amber-600 dark:text-amber-400">
+                  <span className="text-xs font-semibold capitalize text-tx-2 dark:text-tx-2">
                     disputed
                   </span>
                 )}

@@ -176,14 +176,14 @@ function NavItem({
         'relative flex items-center gap-3 h-[38px] rounded-xl transition-colors duration-150 group',
         expanded ? 'px-3' : 'px-0 justify-center',
         active
-          ? 'nav-pill-active text-white'
+          ? 'nav-pill-active text-tx-inv'
           : 'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent',
       )}
     >
       {active && (
         <motion.span
           layoutId="nav-rail"
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-white/80"
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-card/80"
           transition={{ type: 'spring', stiffness: 500, damping: 40 }}
         />
       )}

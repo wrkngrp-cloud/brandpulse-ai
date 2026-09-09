@@ -21,9 +21,9 @@ function fmtNGNLocal(n: number | null | undefined): string {
 }
 
 const RANK_COLOURS = [
-  'bg-amber-400/15 text-amber-600 dark:text-amber-400',   // 1st — gold
+  'bg-ember/15 text-tx-2 dark:text-tx-2',   // 1st — gold
   'bg-muted text-muted-foreground',                        // 2nd — silver
-  'bg-orange-400/15 text-orange-600 dark:text-orange-400', // 3rd — bronze
+  'bg-ember/15 text-tx-2 dark:text-tx-2', // 3rd — bronze
 ]
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -118,7 +118,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
               <span className="text-muted-foreground/40">·</span>
               <Link
                 href={`/dashboard/campaigns/${(event.campaigns as { id: string; name: string }).id}?tab=events`}
-                className="inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                className="inline-flex items-center gap-1 text-sm text-tx-flare dark:text-tx-2 hover:underline"
               >
                 <Megaphone className="h-3.5 w-3.5" />
                 {(event.campaigns as { id: string; name: string }).name}
@@ -218,7 +218,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                 {metrics.leads_vs_target != null && (
                   <div className="flex justify-between text-sm">
                     <span>Leads</span>
-                    <span className={metrics.leads_vs_target >= 100 ? 'text-green-600 font-medium' : 'text-orange-500 font-medium'}>
+                    <span className={metrics.leads_vs_target >= 100 ? 'text-pos font-medium' : 'text-tx-2 font-medium'}>
                       {metrics.leads_vs_target.toFixed(0)}% of target
                     </span>
                   </div>
@@ -226,7 +226,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                 {metrics.customers_vs_target != null && (
                   <div className="flex justify-between text-sm">
                     <span>Customers</span>
-                    <span className={metrics.customers_vs_target >= 100 ? 'text-green-600 font-medium' : 'text-orange-500 font-medium'}>
+                    <span className={metrics.customers_vs_target >= 100 ? 'text-pos font-medium' : 'text-tx-2 font-medium'}>
                       {metrics.customers_vs_target.toFixed(0)}% of target
                     </span>
                   </div>
@@ -266,7 +266,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       {ambLeaderboard.length > 0 && ambLeaderboard.some(a => a.total > 0) && (
         <div className="border rounded-xl p-5 bg-card space-y-4">
           <div className="flex items-center gap-2">
-            <Trophy className="h-4 w-4 text-amber-500" />
+            <Trophy className="h-4 w-4 text-tx-2" />
             <h2 className="text-sm font-semibold">Ambassador leaderboard</h2>
             <span className="text-xs text-muted-foreground ml-auto">
               {(interactions ?? []).length} total interactions

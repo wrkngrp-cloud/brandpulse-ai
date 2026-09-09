@@ -254,7 +254,7 @@ export default function VoiceBuilderPage() {
           {voiceResult && (
             <div className="rounded-2xl border bg-card divide-y divide-border/50">
               <div className="p-5 flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                <CheckCircle2 className="h-5 w-5 text-pos shrink-0 mt-0.5" />
                 <div>
                   <p className="text-[14px] font-semibold">Voice profile extracted</p>
                   <p className="text-[12.5px] text-muted-foreground mt-0.5">{voiceResult.confidenceNote}</p>
@@ -274,18 +274,18 @@ export default function VoiceBuilderPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border/50">
                 <div className="p-5">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-green-600 dark:text-green-400 mb-3">Dos</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-pos dark:text-pos mb-3">Dos</p>
                   <ul className="space-y-1.5">
                     {voiceResult.dos.map((d, i) => (
-                      <li key={i} className="text-[13px] flex gap-2"><span className="text-green-500 shrink-0">✓</span>{d}</li>
+                      <li key={i} className="text-[13px] flex gap-2"><span className="text-pos shrink-0">✓</span>{d}</li>
                     ))}
                   </ul>
                 </div>
                 <div className="p-5">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-red-500 mb-3">Don&apos;ts</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-tx-flare mb-3">Don&apos;ts</p>
                   <ul className="space-y-1.5">
                     {voiceResult.donts.map((d, i) => (
-                      <li key={i} className="text-[13px] flex gap-2"><span className="text-red-400 shrink-0">✗</span>{d}</li>
+                      <li key={i} className="text-[13px] flex gap-2"><span className="text-tx-flare shrink-0">✗</span>{d}</li>
                     ))}
                   </ul>
                 </div>
@@ -386,7 +386,7 @@ export default function VoiceBuilderPage() {
                     <span className="text-[11px] text-muted-foreground">Voice match</span>
                     <span className={cn(
                       'text-[12px] font-bold tabular-nums',
-                      retuneResult.voice_match_score >= 80 ? 'text-green-500' : 'text-amber-500',
+                      retuneResult.voice_match_score >= 80 ? 'text-pos' : 'text-tx-2',
                     )}>
                       {retuneResult.voice_match_score}%
                     </span>

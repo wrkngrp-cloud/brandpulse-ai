@@ -51,9 +51,9 @@ function fmtNGN(n: number) {
 }
 
 function roiColor(roi: number) {
-  if (roi >= 100) return 'text-emerald-600'
-  if (roi >= 0)   return 'text-teal-600'
-  return               'text-red-600'
+  if (roi >= 100) return 'text-pos'
+  if (roi >= 0)   return 'text-pos'
+  return               'text-tx-flare'
 }
 
 function RoiPill({ roi }: { roi: number }) {
@@ -162,10 +162,10 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
       {campaigns.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { label: 'Total EMV',     value: fmtNGN(totalEmv),          icon: TrendingUp,       color: 'text-emerald-600' },
-            { label: 'Total Fee Paid', value: fmtNGN(totalFee),         icon: DollarSign,       color: 'text-amber-600' },
-            { label: 'Blended ROI',   value: `${totalRoi.toFixed(0)}%`, icon: totalRoi >= 0 ? TrendingUp : TrendingDown, color: totalRoi >= 0 ? 'text-emerald-600' : 'text-red-600' },
-            { label: 'Avg Eng. Rate', value: `${avgEr.toFixed(1)}%`,    icon: Heart,            color: 'text-pink-600' },
+            { label: 'Total EMV',     value: fmtNGN(totalEmv),          icon: TrendingUp,       color: 'text-pos' },
+            { label: 'Total Fee Paid', value: fmtNGN(totalFee),         icon: DollarSign,       color: 'text-tx-2' },
+            { label: 'Blended ROI',   value: `${totalRoi.toFixed(0)}%`, icon: totalRoi >= 0 ? TrendingUp : TrendingDown, color: totalRoi >= 0 ? 'text-pos' : 'text-tx-flare' },
+            { label: 'Avg Eng. Rate', value: `${avgEr.toFixed(1)}%`,    icon: Heart,            color: 'text-tx-2' },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="rounded-2xl border bg-card p-4">
               <Icon className={cn('h-4 w-4 mb-1.5', color)} />
@@ -325,7 +325,7 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
                       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">Earned Media Value</p>
-                          <p className="text-[16px] font-bold text-emerald-600">{fmtNGN(c.emv)}</p>
+                          <p className="text-[16px] font-bold text-pos">{fmtNGN(c.emv)}</p>
                         </div>
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">Fee Paid</p>

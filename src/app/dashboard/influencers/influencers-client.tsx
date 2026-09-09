@@ -160,9 +160,9 @@ function PlatformIcon({ platform }: { platform: string }) {
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     prospect: 'bg-muted text-muted-foreground',
-    active:   'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    paused:   'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+    active:   'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+    paused:   'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+    rejected: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
   }
   return (
     <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
@@ -174,9 +174,9 @@ function StatusBadge({ status }: { status: string }) {
 function RecommendationBadge({ recommendation }: { recommendation: string | undefined }) {
   if (!recommendation) return null
   const map: Record<string, { label: string; className: string }> = {
-    strong_fit:    { label: 'Strong fit',    className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
-    potential_fit: { label: 'Potential fit', className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' },
-    poor_fit:      { label: 'Poor fit',      className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' },
+    strong_fit:    { label: 'Strong fit',    className: 'bg-shell text-pos dark:bg-shell/30 dark:text-pos' },
+    potential_fit: { label: 'Potential fit', className: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2' },
+    poor_fit:      { label: 'Poor fit',      className: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare' },
   }
   const config = map[recommendation]
   if (!config) return null
@@ -192,10 +192,10 @@ function CulturalIQBadge({ score }: { score: number | null }) {
     return <span className="text-xs text-muted-foreground">Not scored</span>
   }
   const color = score >= 70
-    ? 'text-green-700 bg-green-100 dark:bg-green-900/30 dark:text-green-400'
+    ? 'text-pos bg-shell dark:bg-shell/30 dark:text-pos'
     : score >= 50
-    ? 'text-amber-700 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400'
-    : 'text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-400'
+    ? 'text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2'
+    : 'text-tx-flare bg-flare-wash dark:bg-shell/30 dark:text-tx-flare'
   return (
     <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold', color)}>
       {score}
@@ -206,20 +206,20 @@ function CulturalIQBadge({ score }: { score: number | null }) {
 function RiskBadge({ score }: { score: number | null }) {
   if (score === null) return <span className="text-xs text-muted-foreground">—</span>
   if (score < 30) {
-    return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Low risk</span>
+    return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-shell text-pos dark:bg-shell/30 dark:text-pos">Low risk</span>
   }
   if (score <= 60) {
-    return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Medium</span>
+    return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">Medium</span>
   }
-  return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">High risk</span>
+  return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">High risk</span>
 }
 
 function BrandFitScore({ score }: { score: number }) {
   const color = score >= 70
-    ? 'text-green-700 bg-green-100 dark:bg-green-900/30 dark:text-green-400'
+    ? 'text-pos bg-shell dark:bg-shell/30 dark:text-pos'
     : score >= 40
-    ? 'text-amber-700 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400'
-    : 'text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-400'
+    ? 'text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2'
+    : 'text-tx-flare bg-flare-wash dark:bg-shell/30 dark:text-tx-flare'
   return (
     <span className={cn('text-sm font-bold px-2.5 py-1 rounded-lg', color)}>
       {score}/100
@@ -895,21 +895,21 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
           {pd.online_reputation.positive_signals?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {pd.online_reputation.positive_signals.map(s => (
-                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">{s}</span>
+                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-shell text-pos dark:bg-shell/30 dark:text-pos">{s}</span>
               ))}
             </div>
           )}
           {pd.online_reputation.negative_signals?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {pd.online_reputation.negative_signals.map(s => (
-                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">{s}</span>
+                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">{s}</span>
               ))}
             </div>
           )}
           {pd.online_reputation.controversy_flags?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {pd.online_reputation.controversy_flags.map(s => (
-                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">{s}</span>
+                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{s}</span>
               ))}
             </div>
           )}
@@ -940,14 +940,14 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
           {bf.positive_indicators?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {bf.positive_indicators.map(p => (
-                <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">{p}</span>
+                <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-shell text-pos dark:bg-shell/30 dark:text-pos">{p}</span>
               ))}
             </div>
           )}
           {bf.risk_factors?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {bf.risk_factors.map(r => (
-                <span key={r} className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">{r}</span>
+                <span key={r} className="text-xs px-2 py-0.5 rounded-full bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{r}</span>
               ))}
             </div>
           )}
@@ -1011,18 +1011,18 @@ function InfluencerCard({
               <RecommendationBadge recommendation={brandFit.recommendation} />
             )}
             {inf.campaign_id && availableCampaigns.length === 0 && (
-              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400">
+              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">
                 In campaign
               </span>
             )}
             {inf.campaign_id && availableCampaigns.length > 0 && (() => {
               const linkedCampaign = availableCampaigns.find(c => c.id === inf.campaign_id)
               return linkedCampaign ? (
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400 truncate max-w-[180px]">
+                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2 truncate max-w-[180px]">
                   {linkedCampaign.name}
                 </span>
               ) : (
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400">
+                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">
                   In campaign
                 </span>
               )
@@ -1063,7 +1063,7 @@ function InfluencerCard({
           {riskFactors.length > 0 && (
             <div className="flex flex-wrap gap-1 pt-0.5">
               {riskFactors.slice(0, 2).map(r => (
-                <span key={r} className="text-xs px-1.5 py-0.5 rounded bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400">{r}</span>
+                <span key={r} className="text-xs px-1.5 py-0.5 rounded bg-flare-wash text-tx-flare dark:bg-shell/20 dark:text-tx-flare">{r}</span>
               ))}
             </div>
           )}

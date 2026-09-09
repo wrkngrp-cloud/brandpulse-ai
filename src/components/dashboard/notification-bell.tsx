@@ -24,7 +24,7 @@ export function NotificationBell({
       {hasUnread && (
         <span
           className="absolute top-[7px] right-[7px] h-[7px] w-[7px] rounded-full ring-[1.5px] ring-background"
-          style={{ background: 'oklch(0.585 0.163 37)' }}
+          style={{ background: 'var(--bg-shell)' }}
         />
       )}
     </button>

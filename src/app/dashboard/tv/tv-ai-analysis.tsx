@@ -69,7 +69,7 @@ export function TvAiAnalysis({ days, brandName, hasData }: TvAiAnalysisProps) {
       >
         {loading
           ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          : <Sparkles className="h-3.5 w-3.5 text-blue-500" />
+          : <Sparkles className="h-3.5 w-3.5 text-tx-2" />
         }
         {loading ? 'Analysing…' : 'Analyse with AI'}
       </button>
@@ -78,7 +78,7 @@ export function TvAiAnalysis({ days, brandName, hasData }: TvAiAnalysisProps) {
         <Card className="border rounded-xl p-5 bg-card space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-blue-500" />
+              <Sparkles className="h-4 w-4 text-tx-2" />
               <span className="text-sm font-semibold">AI TV Analysis</span>
             </div>
             <button

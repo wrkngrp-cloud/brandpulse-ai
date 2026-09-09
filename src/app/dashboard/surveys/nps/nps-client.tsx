@@ -60,14 +60,14 @@ const CUSTOM_TOOLTIP = ({ active, payload, label }: {
   const val = payload[0].value
   const isPositive = val >= 0
   return (
-    <div className="bg-[#14182B] border border-white/10 rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[148px]">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-white/40 mb-2">{label}</p>
+    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[148px]">
+      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-tx-inv/40 mb-2">{label}</p>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-1.5">
-          <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: isPositive ? '#22c55e' : '#f87171' }} />
-          <span className="text-[11.5px] text-white/55">NPS Score</span>
+          <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: isPositive ? 'var(--pos)' : 'var(--flare)' }} />
+          <span className="text-[11.5px] text-tx-inv/55">NPS Score</span>
         </div>
-        <span className={cn('text-[13px] font-semibold tabular-nums', isPositive ? 'text-green-400' : 'text-red-400')}>
+        <span className={cn('text-[13px] font-semibold tabular-nums', isPositive ? 'text-pos' : 'text-tx-flare')}>
           {isPositive ? '+' : ''}{Math.round(val)}
         </span>
       </div>
@@ -116,16 +116,16 @@ export function NpsClient({
     Minus
 
   const trendColor =
-    trendDirection === 'rising'  ? 'text-green-600'  :
-    trendDirection === 'falling' ? 'text-red-500'     :
+    trendDirection === 'rising'  ? 'text-pos'  :
+    trendDirection === 'falling' ? 'text-tx-flare'     :
     'text-muted-foreground'
 
   const npsColor =
     currentNps == null ? 'text-muted-foreground'  :
-    currentNps >= 50   ? 'text-green-600'          :
+    currentNps >= 50   ? 'text-pos'          :
     currentNps >= 30   ? 'text-foreground'         :
-    currentNps >= 0    ? 'text-amber-500'          :
-    'text-red-500'
+    currentNps >= 0    ? 'text-tx-2'          :
+    'text-tx-flare'
 
   const chartData = weeklyData.filter(w => w.nps != null)
 
@@ -154,7 +154,7 @@ export function NpsClient({
         {/* Promoters */}
         <div className="border rounded-2xl p-5 bg-card card-shadow">
           <p className="eyebrow mb-2">Promoters</p>
-          <p className="metric text-[28px] text-green-500 mt-1">
+          <p className="metric text-[28px] text-pos mt-1">
             {totalResponses > 0 ? Math.round(totalPromoters / totalResponses * 100) : 0}%
           </p>
           <p className="text-xs text-muted-foreground mt-1">{totalPromoters} people · 9–10</p>
@@ -172,7 +172,7 @@ export function NpsClient({
         {/* Detractors */}
         <div className="border rounded-2xl p-5 bg-card card-shadow">
           <p className="eyebrow mb-2">Detractors</p>
-          <p className="metric text-[28px] text-red-500 mt-1">
+          <p className="metric text-[28px] text-tx-flare mt-1">
             {totalResponses > 0 ? Math.round(totalDetractors / totalResponses * 100) : 0}%
           </p>
           <p className="text-xs text-muted-foreground mt-1">{totalDetractors} people · 0–6</p>
@@ -209,14 +209,14 @@ export function NpsClient({
               <defs>
                 {/* Positive zone — green above 0 */}
                 <linearGradient id="npsGradPos" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#22c55e" stopOpacity={0.30} />
-                  <stop offset="50%"  stopColor="#22c55e" stopOpacity={0.10} />
-                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0}    />
+                  <stop offset="0%"   stopColor="var(--pos)" stopOpacity={0.30} />
+                  <stop offset="50%"  stopColor="var(--pos)" stopOpacity={0.10} />
+                  <stop offset="100%" stopColor="var(--pos)" stopOpacity={0}    />
                 </linearGradient>
                 {/* Negative zone — red */}
                 <linearGradient id="npsGradNeg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#f87171" stopOpacity={0}    />
-                  <stop offset="100%" stopColor="#f87171" stopOpacity={0.22} />
+                  <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0}    />
+                  <stop offset="100%" stopColor="var(--flare)" stopOpacity={0.22} />
                 </linearGradient>
               </defs>
 
@@ -230,13 +230,13 @@ export function NpsClient({
 
               <XAxis
                 dataKey="weekLabel"
-                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
+                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
                 domain={[-100, 100]}
-                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
+                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
                 tickLine={false}
                 axisLine={false}
                 tickCount={5}
@@ -255,20 +255,20 @@ export function NpsClient({
               />
               <ReferenceLine
                 y={50}
-                stroke="#22c55e"
+                stroke="var(--pos)"
                 strokeDasharray="4 4"
                 strokeOpacity={0.20}
-                label={{ value: 'Excellent', position: 'insideTopRight', fontSize: 9, fill: '#22c55e', opacity: 0.5 }}
+                label={{ value: 'Excellent', position: 'insideTopRight', fontSize: 9, fill: 'var(--pos)', opacity: 0.5 }}
               />
 
               {benchmarkP50 != null && (
                 <ReferenceLine
                   y={benchmarkP50}
-                  stroke="#f59e0b"
+                  stroke="var(--ember)"
                   strokeDasharray="6 3"
                   strokeWidth={1.5}
                   strokeOpacity={0.7}
-                  label={{ value: `Sector P50 (${Math.round(benchmarkP50)})`, position: 'insideTopRight', fontSize: 9, fill: '#f59e0b', opacity: 0.85 }}
+                  label={{ value: `Sector P50 (${Math.round(benchmarkP50)})`, position: 'insideTopRight', fontSize: 9, fill: 'var(--ember)', opacity: 0.85 }}
                 />
               )}
 
@@ -276,11 +276,11 @@ export function NpsClient({
                 type="monotone"
                 dataKey="nps"
                 name="NPS"
-                stroke="#2B59FF"
+                stroke="var(--flare)"
                 strokeWidth={2.5}
                 fill="url(#npsGradPos)"
                 dot={false}
-                activeDot={{ r: 4.5, fill: '#2B59FF', strokeWidth: 2, stroke: '#fff' }}
+                activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
                 connectNulls={false}
               />
             </AreaChart>
@@ -301,10 +301,10 @@ export function NpsClient({
 
       {/* Score guide */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-muted-foreground px-1">
-        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-green-500 inline-block" />50+ Excellent</span>
-        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-blue-500 inline-block" />30–49 Good</span>
-        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-amber-500 inline-block" />0–29 Needs work</span>
-        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-red-500 inline-block" />Below 0 Critical</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-pos inline-block" />50+ Excellent</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-flare inline-block" />30–49 Good</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-ember inline-block" />0–29 Needs work</span>
+        <span className="flex items-center gap-1.5"><span className="h-1.5 w-3 rounded-full bg-flare inline-block" />Below 0 Critical</span>
         <span className="ml-auto opacity-50">NPS = % Promoters − % Detractors</span>
       </div>
 
@@ -322,10 +322,10 @@ export function NpsClient({
             {cohorts.map(c => {
               const color =
                 c.nps == null  ? 'text-muted-foreground/40' :
-                c.nps >= 50    ? 'text-green-600'  :
+                c.nps >= 50    ? 'text-pos'  :
                 c.nps >= 30    ? 'text-foreground'  :
-                c.nps >= 0     ? 'text-amber-500'   :
-                'text-red-500'
+                c.nps >= 0     ? 'text-tx-2'   :
+                'text-tx-flare'
               return (
                 <div key={c.role} className="border rounded-xl p-4">
                   <p className="eyebrow mb-1.5">{c.label}</p>
@@ -347,8 +347,8 @@ export function NpsClient({
         <div className="border rounded-2xl p-5 bg-card card-shadow space-y-5">
           <div className="flex items-start gap-3">
             <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: 'linear-gradient(135deg, #E8763E 0%, #D4602A 100%)', boxShadow: '0 4px 12px -4px rgba(212,96,42,0.5)' }}>
-              <Sparkles className="h-4 w-4 text-white" />
+              style={{ background: 'var(--char)', boxShadow: '0 4px 12px -4px rgba(212,96,42,0.5)' }}>
+              <Sparkles className="h-4 w-4 text-tx-inv" />
             </div>
             <div>
               <p className="text-sm font-semibold tracking-tight">NPS diagnosis</p>
@@ -372,8 +372,8 @@ export function NpsClient({
             <ul className="space-y-2">
               {diagnosis.recommendations.map((rec, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm">
-                  <span className="shrink-0 h-5 w-5 rounded-full text-[11px] flex items-center justify-center font-semibold text-white mt-0.5"
-                    style={{ background: 'linear-gradient(135deg, #E8763E 0%, #D4602A 100%)' }}>
+                  <span className="shrink-0 h-5 w-5 rounded-full text-[11px] flex items-center justify-center font-semibold text-tx-inv mt-0.5"
+                    style={{ background: 'var(--char)' }}>
                     {i + 1}
                   </span>
                   <span className="leading-relaxed">{rec}</span>

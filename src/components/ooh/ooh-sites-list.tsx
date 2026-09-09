@@ -47,8 +47,8 @@ function campaignStatus(start: string | null | undefined, end: string | null | u
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  live:       'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300',
-  upcoming:   'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300',
+  live:       'bg-shell text-pos dark:bg-shell/50 dark:text-pos',
+  upcoming:   'bg-flare-wash text-tx-flare dark:bg-shell/50 dark:text-tx-2',
   ended:      'bg-muted text-muted-foreground',
   'no-dates': 'bg-muted text-muted-foreground',
 }
@@ -58,9 +58,9 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const FORMAT_BADGE: Record<string, { label: string; style: string }> = {
-  'Keke Fleet':      { label: 'Keke Fleet',      style: 'bg-orange-100 text-orange-800 dark:bg-orange-950/50 dark:text-orange-300' },
-  'Wall Painting':   { label: 'Wall Painting',   style: 'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300' },
-  'Branded Vehicle': { label: 'Branded Vehicle', style: 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300' },
+  'Keke Fleet':      { label: 'Keke Fleet',      style: 'bg-shell text-tx-2 dark:bg-shell/50 dark:text-tx-2' },
+  'Wall Painting':   { label: 'Wall Painting',   style: 'bg-shell text-pos dark:bg-shell/50 dark:text-pos' },
+  'Branded Vehicle': { label: 'Branded Vehicle', style: 'bg-flare-wash text-tx-flare dark:bg-shell/50 dark:text-tx-2' },
 }
 
 export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps) {
@@ -96,7 +96,7 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                   {site.campaign_id && site.campaign_name ? (
                     <Link
                       href={`/dashboard/campaigns/${site.campaign_id}`}
-                      className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                      className="inline-flex items-center gap-1 text-xs text-tx-flare dark:text-tx-2 hover:underline"
                     >
                       <Megaphone className="h-3 w-3" />
                       {site.campaign_name}

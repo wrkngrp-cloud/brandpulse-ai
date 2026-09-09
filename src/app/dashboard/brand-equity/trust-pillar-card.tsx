@@ -8,10 +8,10 @@ interface Props {
 }
 
 const GRADE_CONFIG = {
-  excellent: { icon: ShieldCheck, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/30', label: 'Excellent' },
-  good:      { icon: Shield,      color: 'text-blue-500',    bg: 'bg-blue-50 dark:bg-blue-950/30',       label: 'Good' },
-  fair:      { icon: ShieldAlert, color: 'text-amber-500',   bg: 'bg-amber-50 dark:bg-amber-950/30',     label: 'Fair' },
-  poor:      { icon: ShieldX,     color: 'text-red-500',     bg: 'bg-red-50 dark:bg-red-950/30',         label: 'Needs attention' },
+  excellent: { icon: ShieldCheck, color: 'text-pos', bg: 'bg-shell dark:bg-shell/30', label: 'Excellent' },
+  good:      { icon: Shield,      color: 'text-tx-2',    bg: 'bg-flare-wash dark:bg-shell/30',       label: 'Good' },
+  fair:      { icon: ShieldAlert, color: 'text-tx-2',   bg: 'bg-shell dark:bg-shell/30',     label: 'Fair' },
+  poor:      { icon: ShieldX,     color: 'text-tx-flare',     bg: 'bg-flare-wash dark:bg-shell/30',         label: 'Needs attention' },
 } as const
 
 const DIMENSION_LABELS: Record<keyof TrustScore['breakdown'], string> = {
@@ -60,9 +60,9 @@ export function TrustPillarCard({ trust }: Props) {
                 <div
                   className={`h-full rounded-full transition-all ${
                     dim.score == null   ? 'w-0' :
-                    dim.score >= 80     ? 'bg-emerald-500' :
-                    dim.score >= 60     ? 'bg-blue-500' :
-                    dim.score >= 40     ? 'bg-amber-500' : 'bg-red-500'
+                    dim.score >= 80     ? 'bg-pos' :
+                    dim.score >= 60     ? 'bg-flare' :
+                    dim.score >= 40     ? 'bg-ember' : 'bg-flare'
                   }`}
                   style={{ width: dim.score != null ? `${dim.score}%` : '0%' }}
                 />
@@ -73,7 +73,7 @@ export function TrustPillarCard({ trust }: Props) {
       </div>
 
       {trust.grade === 'poor' && (
-        <p className="text-xs text-red-500/80 border-t pt-3">
+        <p className="text-xs text-tx-flare/80 border-t pt-3">
           Trust signals are below threshold. Check for recent complaint surges, regulatory notices, or low app store ratings.
         </p>
       )}

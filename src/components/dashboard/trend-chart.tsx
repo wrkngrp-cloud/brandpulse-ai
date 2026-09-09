@@ -36,8 +36,8 @@ function CustomTooltip({ active, payload, label }: {
     : ''
 
   return (
-    <div className="bg-[#14182B] border border-white/10 rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[150px]">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-white/40 mb-2">{date}</p>
+    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[150px]">
+      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-tx-inv/40 mb-2">{date}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center justify-between gap-4 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
@@ -45,7 +45,7 @@ function CustomTooltip({ active, payload, label }: {
               className="h-1.5 w-3 rounded-full shrink-0"
               style={{ background: p.color }}
             />
-            <span className="text-[11.5px] text-white/60 capitalize">{p.name}</span>
+            <span className="text-[11.5px] text-tx-inv/60 capitalize">{p.name}</span>
           </div>
           <span
             className="text-[13px] font-semibold tabular-nums"
@@ -65,7 +65,7 @@ function DateTick({ x, y, payload }: { x?: number; y?: number; payload?: { value
   if (!payload?.value) return null
   const label = new Date(payload.value).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
   return (
-    <text x={x} y={(y ?? 0) + 12} textAnchor="middle" fontSize={10} fill="currentColor" className="text-muted-foreground opacity-40" fontFamily="var(--font-sans)">
+    <text x={x} y={(y ?? 0) + 12} textAnchor="middle" fontSize={10} fill="currentColor" className="text-muted-foreground opacity-40" fontFamily="var(--font)">
       {label}
     </text>
   )
@@ -95,8 +95,8 @@ export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day
   if (!data.length || (!hasBHI && !hasSentiment)) return null
 
   const legendItems = [
-    hasBHI       && { label: 'Brand Health',    color: '#2B59FF' },
-    hasSentiment && { label: 'Sentiment Score', color: '#22c55e'  },
+    hasBHI       && { label: 'Brand Health',    color: 'var(--flare)' },
+    hasSentiment && { label: 'Sentiment Score', color: 'var(--pos)'  },
   ].filter(Boolean) as { label: string; color: string }[]
 
   return (
@@ -121,15 +121,15 @@ export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day
           <defs>
             {/* Blue gradient — BHI */}
             <linearGradient id="gradBHI" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#2B59FF" stopOpacity={0.30} />
-              <stop offset="40%"  stopColor="#2B59FF" stopOpacity={0.12} />
-              <stop offset="100%" stopColor="#2B59FF" stopOpacity={0}    />
+              <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.30} />
+              <stop offset="40%"  stopColor="var(--flare)" stopOpacity={0.12} />
+              <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
             </linearGradient>
             {/* Green gradient — Sentiment */}
             <linearGradient id="gradSentiment" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#22c55e" stopOpacity={0.28} />
-              <stop offset="40%"  stopColor="#22c55e" stopOpacity={0.10} />
-              <stop offset="100%" stopColor="#22c55e" stopOpacity={0}    />
+              <stop offset="0%"   stopColor="var(--pos)" stopOpacity={0.28} />
+              <stop offset="40%"  stopColor="var(--pos)" stopOpacity={0.10} />
+              <stop offset="100%" stopColor="var(--pos)" stopOpacity={0}    />
             </linearGradient>
           </defs>
 
@@ -155,7 +155,7 @@ export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day
             tickLine={false}
             axisLine={false}
             tickCount={5}
-            fontFamily="var(--font-sans)"
+            fontFamily="var(--font)"
           />
 
           {/* 50% reference line — neutral threshold */}
@@ -176,11 +176,11 @@ export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day
               type="monotone"
               dataKey="sentiment"
               name="Sentiment"
-              stroke="#22c55e"
+              stroke="var(--pos)"
               strokeWidth={2}
               fill="url(#gradSentiment)"
               dot={false}
-              activeDot={{ r: 4, fill: '#22c55e', strokeWidth: 2, stroke: '#fff' }}
+              activeDot={{ r: 4, fill: 'var(--pos)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
               connectNulls={false}
             />
           )}
@@ -190,11 +190,11 @@ export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day
               type="monotone"
               dataKey="bhi"
               name="Brand Health"
-              stroke="#2B59FF"
+              stroke="var(--flare)"
               strokeWidth={2.5}
               fill="url(#gradBHI)"
               dot={false}
-              activeDot={{ r: 4.5, fill: '#2B59FF', strokeWidth: 2, stroke: '#fff' }}
+              activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
               connectNulls={false}
             />
           )}

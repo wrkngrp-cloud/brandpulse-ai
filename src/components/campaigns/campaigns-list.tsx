@@ -48,9 +48,9 @@ const CHANNEL_LABELS: Record<string, string> = {
 
 const STATUS_STYLES: Record<string, string> = {
   draft:     'bg-muted text-muted-foreground',
-  active:    'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300',
-  paused:    'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300',
-  completed: 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300',
+  active:    'bg-shell text-pos dark:bg-shell/50 dark:text-pos',
+  paused:    'bg-shell text-tx-2 dark:bg-shell/50 dark:text-tx-2',
+  completed: 'bg-flare-wash text-tx-flare dark:bg-shell/50 dark:text-tx-2',
 }
 
 function fmtDate(d: string | null) {

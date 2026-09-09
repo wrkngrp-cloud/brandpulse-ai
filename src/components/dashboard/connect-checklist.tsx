@@ -101,11 +101,11 @@ export function ConnectChecklist({ items, serverDismissed }: {
               className={cn(
                 'h-5 w-5 rounded-full flex items-center justify-center shrink-0 border',
                 item.done
-                  ? 'bg-green-500 border-green-500'
+                  ? 'bg-pos border-line'
                   : 'border-border bg-background',
               )}
             >
-              {item.done && <Check className="h-3 w-3 text-white" />}
+              {item.done && <Check className="h-3 w-3 text-tx-inv" />}
             </span>
             <span className="flex-1 min-w-0">
               <span className={cn('block text-[13px] font-medium truncate', item.done && 'line-through decoration-muted-foreground/40')}>
@@ -116,7 +116,7 @@ export function ConnectChecklist({ items, serverDismissed }: {
               </span>
             </span>
             {item.done ? (
-              <span className="text-[11px] font-medium text-green-600 shrink-0">Connected</span>
+              <span className="text-[11px] font-medium text-pos shrink-0">Connected</span>
             ) : (
               <span className="inline-flex items-center gap-1 text-[11.5px] font-medium text-muted-foreground group-hover:text-foreground transition-colors shrink-0">
                 Set up

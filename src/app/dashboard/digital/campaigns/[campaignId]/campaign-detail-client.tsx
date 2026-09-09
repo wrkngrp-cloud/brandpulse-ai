@@ -178,13 +178,13 @@ function GoalBar({
     ? actual >= target.target_value
     : actual <= target.target_value
 
-  const color = onTrack ? 'bg-emerald-500' : pct >= 70 ? 'bg-amber-500' : 'bg-rose-500'
+  const color = onTrack ? 'bg-pos' : pct >= 70 ? 'bg-ember' : 'bg-flare'
 
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">{METRIC_FRIENDLY[target.metric] ?? target.metric}</span>
-        <span className={onTrack ? 'text-emerald-600 font-medium' : 'text-rose-500 font-medium'}>
+        <span className={onTrack ? 'text-pos font-medium' : 'text-tx-flare font-medium'}>
           {onTrack ? 'On track' : 'Off track'}
         </span>
       </div>
@@ -436,7 +436,7 @@ export function CampaignDetailClient({
             const h = Math.max(4, Math.round((dateSpend[d] / maxSpend) * 76))
             return (
               <div key={d} className="flex-1 flex items-end" title={`${d}: ${fmtNGN(dateSpend[d])}`}>
-                <div className="w-full rounded-sm bg-indigo-500/70 hover:bg-indigo-500 transition-colors" style={{ height: h }} />
+                <div className="w-full rounded-sm bg-flare/70 hover:bg-flare transition-colors" style={{ height: h }} />
               </div>
             )
           })}
@@ -446,7 +446,7 @@ export function CampaignDetailClient({
       {/* All metrics — expandable */}
       <Card className="border rounded-xl p-5 space-y-4">
         <h2 className="text-sm font-semibold flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-indigo-500" />
+          <TrendingUp className="h-4 w-4 text-tx-2" />
           All Metrics
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
@@ -478,7 +478,7 @@ export function CampaignDetailClient({
       <Card className="border rounded-xl p-5 space-y-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Target className="h-4 w-4 text-amber-500" />
+            <Target className="h-4 w-4 text-tx-2" />
             <h2 className="text-sm font-semibold">Performance Targets</h2>
           </div>
           <AddTargetForm
@@ -505,7 +505,7 @@ export function CampaignDetailClient({
                     <span className="text-[10px] text-muted-foreground capitalize">{t.period} target</span>
                     <button
                       onClick={() => removeTarget(t.id, t.metric)}
-                      className="text-[10px] text-muted-foreground hover:text-rose-500 flex items-center gap-1 transition-colors"
+                      className="text-[10px] text-muted-foreground hover:text-tx-flare flex items-center gap-1 transition-colors"
                     >
                       <Trash2 className="h-3 w-3" /> Remove
                     </button>

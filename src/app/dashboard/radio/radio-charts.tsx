@@ -34,9 +34,9 @@ export function RadioReachChart() {
           formatter={(val) => [typeof val === 'number' ? formatNum(val) : val, '']}
         />
         <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-        <Bar dataKey="coolFm"  name="Cool FM"   fill="#6366f1" radius={[3, 3, 0, 0]} />
-        <Bar dataKey="beatFm"  name="Beat FM"   fill="#10b981" radius={[3, 3, 0, 0]} />
-        <Bar dataKey="wazobia" name="Wazobia FM" fill="#f59e0b" radius={[3, 3, 0, 0]} />
+        <Bar dataKey="coolFm"  name="Cool FM"   fill="var(--neu)" radius={[3, 3, 0, 0]} />
+        <Bar dataKey="beatFm"  name="Beat FM"   fill="var(--pos)" radius={[3, 3, 0, 0]} />
+        <Bar dataKey="wazobia" name="Wazobia FM" fill="var(--ember)" radius={[3, 3, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )

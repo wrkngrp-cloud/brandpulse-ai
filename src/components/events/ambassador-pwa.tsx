@@ -41,14 +41,14 @@ interface Props {
 const QUEUE_KEY = (token: string) => `bp_queue_${token}`
 
 const BUTTONS = [
-  { type: 'engaged',           label: 'Engaged',          icon: Users,       color: 'bg-blue-500'    },
-  { type: 'new_lead',          label: 'New Lead',          icon: Target,      color: 'bg-green-500'   },
-  { type: 'new_customer',      label: 'New Customer',      icon: Handshake,   color: 'bg-emerald-600' },
-  { type: 'existing_customer', label: 'Existing Customer', icon: UserCheck,   color: 'bg-purple-500'  },
-  { type: 'merch',             label: 'Merch Given',       icon: Gift,        color: 'bg-orange-400'  },
-  { type: 'sample',            label: 'Sample Given',      icon: FlaskConical,color: 'bg-yellow-500'  },
-  { type: 'prize',             label: 'Prize Won',         icon: Trophy,      color: 'bg-pink-500'    },
-  { type: 'photo',             label: 'Photo Moment',      icon: Camera,      color: 'bg-violet-500'  },
+  { type: 'engaged',           label: 'Engaged',          icon: Users,       color: 'bg-flare'    },
+  { type: 'new_lead',          label: 'New Lead',          icon: Target,      color: 'bg-pos'   },
+  { type: 'new_customer',      label: 'New Customer',      icon: Handshake,   color: 'bg-pos' },
+  { type: 'existing_customer', label: 'Existing Customer', icon: UserCheck,   color: 'bg-neu'  },
+  { type: 'merch',             label: 'Merch Given',       icon: Gift,        color: 'bg-ember'  },
+  { type: 'sample',            label: 'Sample Given',      icon: FlaskConical,color: 'bg-ember'  },
+  { type: 'prize',             label: 'Prize Won',         icon: Trophy,      color: 'bg-neu'    },
+  { type: 'photo',             label: 'Photo Moment',      icon: Camera,      color: 'bg-neu'  },
 ] as const
 
 const SURVEY_QUESTIONS = [
@@ -268,9 +268,9 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
           <div className="text-right">
             <p className="text-xs opacity-70">{ambassadorName}</p>
             <div className="flex items-center gap-1.5 justify-end">
-              {!isOnline && <WifiOff className="h-3 w-3 text-red-400" />}
+              {!isOnline && <WifiOff className="h-3 w-3 text-tx-flare" />}
               {queue.length > 0 && (
-                <span className="text-xs bg-yellow-400 text-black rounded-full px-1.5 font-medium">{queue.length} pending</span>
+                <span className="text-xs bg-ember text-tx rounded-full px-1.5 font-medium">{queue.length} pending</span>
               )}
               <span className="text-sm font-bold tabular-nums">{totalMine}</span>
             </div>
@@ -340,8 +340,8 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
         <div className="flex-1 p-6 flex flex-col safe-bottom">
           {surveyDone ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
-              <div className="h-16 w-16 rounded-full bg-green-500/10 flex items-center justify-center">
-                <ClipboardList className="h-8 w-8 text-green-600" />
+              <div className="h-16 w-16 rounded-full bg-pos/10 flex items-center justify-center">
+                <ClipboardList className="h-8 w-8 text-pos" />
               </div>
               <div>
                 <p className="font-semibold">Survey submitted!</p>

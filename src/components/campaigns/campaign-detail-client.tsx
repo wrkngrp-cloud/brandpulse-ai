@@ -131,33 +131,33 @@ const OBJECTIVE_LABELS: Record<string, string> = {
 }
 
 const OBJECTIVE_COLOR: Record<string, string> = {
-  awareness:     'bg-blue-500',
-  consideration: 'bg-purple-500',
-  conversion:    'bg-green-500',
-  retention:     'bg-amber-500',
+  awareness:     'bg-flare',
+  consideration: 'bg-neu',
+  conversion:    'bg-pos',
+  retention:     'bg-ember',
 }
 
 const CHANNEL_META: Record<string, { label: string; color: string }> = {
-  ooh:     { label: 'OOH / Outdoor',        color: 'bg-blue-400'    },
-  events:  { label: 'Events & Activations',  color: 'bg-emerald-400' },
-  digital: { label: 'Digital',              color: 'bg-violet-400'  },
-  radio:   { label: 'Radio',                color: 'bg-orange-400'  },
-  tv:      { label: 'TV',                   color: 'bg-red-400'     },
-  print:   { label: 'Print',                color: 'bg-stone-400'   },
+  ooh:     { label: 'OOH / Outdoor',        color: 'bg-flare'    },
+  events:  { label: 'Events & Activations',  color: 'bg-pos' },
+  digital: { label: 'Digital',              color: 'bg-neu'  },
+  radio:   { label: 'Radio',                color: 'bg-ember'  },
+  tv:      { label: 'TV',                   color: 'bg-flare'     },
+  print:   { label: 'Print',                color: 'bg-neu'   },
 }
 
 const STATUS_STYLES: Record<string, string> = {
   draft:     'bg-muted text-muted-foreground',
-  active:    'bg-green-100 text-green-800',
-  paused:    'bg-amber-100 text-amber-800',
-  completed: 'bg-blue-100 text-blue-800',
+  active:    'bg-shell text-pos',
+  paused:    'bg-shell text-tx-2',
+  completed: 'bg-flare-wash text-tx-flare',
 }
 
 const EVENT_STATUS: Record<string, string> = {
-  planned:  'bg-blue-100 text-blue-800',
-  live:     'bg-green-100 text-green-800',
+  planned:  'bg-flare-wash text-tx-flare',
+  live:     'bg-shell text-pos',
   closed:   'bg-muted text-muted-foreground',
-  reported: 'bg-purple-100 text-purple-800',
+  reported: 'bg-shell text-tx-2',
 }
 
 function fmtDate(d: string | null) {
@@ -178,25 +178,25 @@ function formatFollowers(n: number | null): string {
 }
 
 const PLATFORM_COLORS: Record<string, string> = {
-  instagram: 'bg-pink-100 text-pink-800',
-  tiktok:    'bg-black/10 text-black dark:bg-white/10 dark:text-white',
-  youtube:   'bg-red-100 text-red-800',
-  twitter:   'bg-sky-100 text-sky-800',
-  facebook:  'bg-blue-100 text-blue-800',
+  instagram: 'bg-shell text-tx-2',
+  tiktok:    'bg-ink/10 text-tx dark:bg-card/10 dark:text-tx-inv',
+  youtube:   'bg-flare-wash text-tx-flare',
+  twitter:   'bg-flare-wash text-tx-flare',
+  facebook:  'bg-flare-wash text-tx-flare',
 }
 
 const INF_STATUS_STYLES: Record<string, string> = {
-  active:   'bg-green-100 text-green-800',
-  paused:   'bg-amber-100 text-amber-800',
+  active:   'bg-shell text-pos',
+  paused:   'bg-shell text-tx-2',
   prospect: 'bg-muted text-muted-foreground',
-  rejected: 'bg-red-100 text-red-800',
+  rejected: 'bg-flare-wash text-tx-flare',
 }
 
 function CulturalIQBadge({ score }: { score: number | null }) {
   if (score === null) return <span className="text-xs text-muted-foreground">—</span>
-  const color = score >= 70 ? 'text-green-700 bg-green-100'
-    : score >= 50 ? 'text-amber-700 bg-amber-100'
-    : 'text-red-700 bg-red-100'
+  const color = score >= 70 ? 'text-pos bg-shell'
+    : score >= 50 ? 'text-tx-2 bg-shell'
+    : 'text-tx-flare bg-flare-wash'
   return <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold', color)}>{score}</span>
 }
 
@@ -698,12 +698,12 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <BarChart data={weeklyChartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                       <XAxis
                         dataKey="week"
-                        tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
+                        tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
                         axisLine={false}
                         tickLine={false}
                       />
                       <YAxis
-                        tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
+                        tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
                         axisLine={false}
                         tickLine={false}
                         width={36}
@@ -711,17 +711,17 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                       />
                       <Tooltip
                         contentStyle={{
-                          background: '#14182B',
-                          border: '1px solid rgba(255,255,255,0.10)',
+                          background: 'var(--bg-ink)',
+                          border: 'var(--line)',
                           borderRadius: 12,
                           fontSize: 12,
-                          color: '#fff',
+                          color: 'var(--bg-card)',
                         }}
-                        labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
+                        labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
                         formatter={(value) => [Number(value).toLocaleString(), 'Impressions']}
                         cursor={{ fill: 'currentColor', opacity: 0.05 }}
                       />
-                      <Bar dataKey="impressions" fill="#2B59FF" radius={[4, 4, 0, 0]} opacity={0.85} />
+                      <Bar dataKey="impressions" fill="var(--flare)" radius={[4, 4, 0, 0]} opacity={0.85} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -1036,7 +1036,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
 
           {/* Link influencer dialog */}
           {linkingOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setLinkingOpen(false)}>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" onClick={() => setLinkingOpen(false)}>
               <div className="bg-background border rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between">
                   <p className="font-semibold">Link influencer to campaign</p>
@@ -1263,9 +1263,9 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               <button
                                 type="button"
                                 onClick={() => handleCreativeDelete(ch.id, url)}
-                                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                                className="absolute inset-0 bg-ink/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
                               >
-                                <X className="h-4 w-4 text-white" />
+                                <X className="h-4 w-4 text-tx-inv" />
                               </button>
                             </div>
                           ))}

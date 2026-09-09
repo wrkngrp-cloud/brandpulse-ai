@@ -21,13 +21,13 @@ interface HubSpotConnectCardProps {
 function HubSpotIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="15.5" cy="13.5" r="4.25" stroke="#FF7A59" strokeWidth="2" />
-      <path d="M15.5 9.25V5.5" stroke="#FF7A59" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="15.5" cy="4.5" r="1.5" fill="#FF7A59" />
-      <path d="M12.3 10.6 6.5 6.2" stroke="#FF7A59" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="5.5" cy="5.5" r="1.5" fill="#FF7A59" />
-      <path d="m12.6 16.2-3.4 3.3" stroke="#FF7A59" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="8.25" cy="20.25" r="1.5" fill="#FF7A59" />
+      <circle cx="15.5" cy="13.5" r="4.25" stroke="var(--ember)" strokeWidth="2" />
+      <path d="M15.5 9.25V5.5" stroke="var(--ember)" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="15.5" cy="4.5" r="1.5" fill="var(--ember)" />
+      <path d="M12.3 10.6 6.5 6.2" stroke="var(--ember)" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="5.5" cy="5.5" r="1.5" fill="var(--ember)" />
+      <path d="m12.6 16.2-3.4 3.3" stroke="var(--ember)" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="8.25" cy="20.25" r="1.5" fill="var(--ember)" />
     </svg>
   )
 }
@@ -90,7 +90,7 @@ export function HubSpotConnectCard({ connection: initialConnection }: HubSpotCon
           </div>
         </div>
         {connection && (
-          <span className="flex items-center gap-1 text-xs text-green-600">
+          <span className="flex items-center gap-1 text-xs text-pos">
             <CheckCircle2 className="h-3.5 w-3.5" /> Connected
           </span>
         )}

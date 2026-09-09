@@ -128,21 +128,21 @@ export function AdvocacyClient() {
         <div className="space-y-4">
           {/* NPS candidates banner */}
           {candidates.length > 0 && (
-            <div className="rounded-xl border border-green-200 bg-green-50 p-4">
+            <div className="rounded-xl border border-line bg-shell p-4">
               <div className="flex items-start gap-3">
-                <Star className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                <Star className="h-4 w-4 text-pos mt-0.5 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-green-800">
+                  <p className="text-sm font-medium text-pos">
                     {candidates.length} high-NPS respondent{candidates.length > 1 ? 's' : ''} ready to activate
                   </p>
-                  <p className="text-xs text-green-700 mt-0.5">
+                  <p className="text-xs text-pos mt-0.5">
                     These customers scored 9-10 in your NPS surveys and haven't been activated yet.
                   </p>
                 </div>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-green-300 text-green-800 hover:bg-green-100 shrink-0"
+                  className="border-line text-pos hover:bg-shell shrink-0"
                   onClick={() => setShowAddForm(true)}
                 >
                   Activate
@@ -322,10 +322,10 @@ function PromoterCard({
   onStatusChange: (s: string) => void
 }) {
   const statusColor = {
-    invited: 'bg-blue-50 text-blue-700 border-blue-200',
-    active:  'bg-green-50 text-green-700 border-green-200',
-    paused:  'bg-yellow-50 text-yellow-700 border-yellow-200',
-    removed: 'bg-red-50 text-red-700 border-red-200',
+    invited: 'bg-flare-wash text-tx-flare border-line-strong',
+    active:  'bg-shell text-pos border-line',
+    paused:  'bg-shell text-tx-2 border-line',
+    removed: 'bg-flare-wash text-tx-flare border-line-strong',
   }[promoter.status] ?? 'bg-muted text-foreground'
 
   return (
@@ -340,7 +340,7 @@ function PromoterCard({
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium text-sm">{promoter.name}</span>
             {promoter.nps_score !== null && (
-              <Badge variant="outline" className="text-xs border-green-300 text-green-700">
+              <Badge variant="outline" className="text-xs border-line text-pos">
                 NPS {promoter.nps_score}
               </Badge>
             )}
@@ -378,7 +378,7 @@ function PromoterCard({
               </Button>
             )}
             {promoter.status !== 'removed' && (
-              <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => onStatusChange('removed')}>
+              <Button size="sm" variant="ghost" className="text-tx-flare hover:text-tx-flare" onClick={() => onStatusChange('removed')}>
                 <UserX className="h-3 w-3 mr-1.5" />Remove
               </Button>
             )}
@@ -447,7 +447,7 @@ function ReferralCodeRow({ code }: { code: ReferralCode }) {
       <td className="px-3 py-2">
         <div className="flex items-center gap-1">
           <button onClick={copyLink} className="p-1 hover:bg-muted rounded" title="Copy referral link">
-            {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+            {copied ? <Check className="h-3 w-3 text-pos" /> : <Copy className="h-3 w-3" />}
           </button>
           <a href={code.destination_url} target="_blank" rel="noreferrer" className="p-1 hover:bg-muted rounded">
             <ExternalLink className="h-3 w-3" />
@@ -572,9 +572,9 @@ function CandidateRow({
   const [open, setOpen]   = useState(false)
 
   return (
-    <div className="bg-white/60 rounded-lg border border-green-100 px-3 py-2">
+    <div className="bg-card/60 rounded-lg border border-line px-3 py-2">
       <div className="flex items-center gap-2 text-xs">
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-200 font-bold text-green-800 text-[11px]">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-shell font-bold text-pos text-[11px]">
           {candidate.score}
         </span>
         <span className="flex-1 text-muted-foreground line-clamp-1">
@@ -584,7 +584,7 @@ function CandidateRow({
         {!open && (
           <button
             onClick={() => setOpen(true)}
-            className="text-green-700 font-medium hover:underline"
+            className="text-pos font-medium hover:underline"
           >
             Activate
           </button>
@@ -606,7 +606,7 @@ function CandidateRow({
           />
           <button
             onClick={() => { if (!name.trim()) return; onActivate(name, email); setOpen(false) }}
-            className="bg-green-600 text-white text-xs px-3 py-1 rounded"
+            className="bg-pos text-tx-inv text-xs px-3 py-1 rounded"
           >
             Save
           </button>

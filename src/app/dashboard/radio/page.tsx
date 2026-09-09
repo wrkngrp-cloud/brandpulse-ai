@@ -126,8 +126,8 @@ export default async function RadioPage({
       {/* Header */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-xl bg-violet-500/10 flex items-center justify-center shrink-0 mt-0.5">
-            <Radio className="h-5 w-5 text-violet-500" />
+          <div className="h-10 w-10 rounded-xl bg-neu/10 flex items-center justify-center shrink-0 mt-0.5">
+            <Radio className="h-5 w-5 text-tx-2" />
           </div>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Radio Intelligence</h1>
@@ -155,8 +155,8 @@ export default async function RadioPage({
       {!hasData ? (
         /* ── Empty state ──────────────────────────────────────────────────── */
         <Card className="border rounded-xl p-10 bg-card flex flex-col items-center gap-4 text-center">
-          <div className="h-14 w-14 rounded-2xl bg-violet-500/10 flex items-center justify-center">
-            <Radio className="h-7 w-7 text-violet-500" />
+          <div className="h-14 w-14 rounded-2xl bg-neu/10 flex items-center justify-center">
+            <Radio className="h-7 w-7 text-tx-2" />
           </div>
           <div>
             <h2 className="text-lg font-semibold">No radio schedules yet</h2>
@@ -186,10 +186,10 @@ export default async function RadioPage({
           {/* Key metrics */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { label: 'Spots Planned',  value: totalSpotPlanned.toLocaleString(), sub: `Last ${days} days`,          icon: Radio,      color: 'text-violet-500' },
-              { label: 'Spots Aired',    value: totalSpotAired.toLocaleString(),   sub: `${deliveryPct}% delivery`, icon: Volume2, color: 'text-emerald-500' },
-              { label: 'Gross Impressions', value: fmt(totalReach),                sub: 'Total listener-spots',  icon: Users,      color: 'text-blue-500' },
-              { label: 'Total Spend',    value: formatNGN(totalSpend),           sub: `CPT: ${formatNGN(cpt)}/k`, icon: TrendingUp, color: 'text-indigo-500' },
+              { label: 'Spots Planned',  value: totalSpotPlanned.toLocaleString(), sub: `Last ${days} days`,          icon: Radio,      color: 'text-tx-2' },
+              { label: 'Spots Aired',    value: totalSpotAired.toLocaleString(),   sub: `${deliveryPct}% delivery`, icon: Volume2, color: 'text-pos' },
+              { label: 'Gross Impressions', value: fmt(totalReach),                sub: 'Total listener-spots',  icon: Users,      color: 'text-tx-2' },
+              { label: 'Total Spend',    value: formatNGN(totalSpend),           sub: `CPT: ${formatNGN(cpt)}/k`, icon: TrendingUp, color: 'text-tx-2' },
             ].map(m => (
               <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">
                 <div className="flex items-center justify-between">

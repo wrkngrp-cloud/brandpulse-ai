@@ -103,7 +103,7 @@ function CopyButton({ text }: { text: string }) {
   }
   return (
     <button type="button" onClick={handleCopy} className="text-muted-foreground hover:text-foreground transition-colors">
-      {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+      {copied ? <Check className="w-3.5 h-3.5 text-pos" /> : <Copy className="w-3.5 h-3.5" />}
     </button>
   )
 }
@@ -195,8 +195,8 @@ export function ApiKeysSection() {
 
       {/* Revealed key — shown once */}
       {revealed && (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-3 space-y-2">
-          <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
+        <div className="rounded-lg border border-line bg-shell dark:bg-shell/30 p-3 space-y-2">
+          <p className="text-xs font-medium text-tx-2 dark:text-tx-2">
             Copy this key now — it will not be shown again.
           </p>
           <div className="flex items-center gap-2 rounded-md bg-background border px-3 py-2">

@@ -119,20 +119,20 @@ export function SpendJustification({
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${currency} ${Number(v).toFixed(2)}`, 'CPM']}
                   contentStyle={{
-                    background: '#14182B',
-                    border: '1px solid rgba(255,255,255,0.10)',
+                    background: 'var(--bg-ink)',
+                    border: 'var(--line)',
                     borderRadius: 12,
                     fontSize: 11,
-                    color: '#fff',
+                    color: 'var(--bg-card)',
                   }}
-                  labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
                   cursor={{ fill: 'currentColor', opacity: 0.05 }}
                 />
                 <Bar dataKey="cpm" radius={[0, 4, 4, 0]}>
                   {[{ channel: 'This OOH' }, ...DIGITAL_BENCHMARKS].map((entry, i) => (
                     <Cell
                       key={entry.channel}
-                      fill={i === 0 ? '#2B59FF' : 'rgba(43,89,255,0.18)'}
+                      fill={i === 0 ? 'var(--flare)' : 'rgba(43,89,255,0.18)'}
                     />
                   ))}
                 </Bar>
@@ -140,7 +140,7 @@ export function SpendJustification({
             </ResponsiveContainer>
           </div>
           {oohIsChapest && (
-            <p className="text-xs text-green-700 dark:text-green-400 mt-2 bg-green-50 dark:bg-green-950/30 rounded-md px-3 py-2">
+            <p className="text-xs text-pos dark:text-pos mt-2 bg-shell dark:bg-shell/30 rounded-md px-3 py-2">
               This OOH site is delivering a lower CPM than all tracked digital channels.
             </p>
           )}

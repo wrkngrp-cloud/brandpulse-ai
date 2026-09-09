@@ -20,7 +20,7 @@ interface Survey {
 
 const STATUS_STYLES: Record<string, string> = {
   draft:  'bg-muted text-muted-foreground',
-  live:   'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400',
+  live:   'bg-shell text-pos dark:bg-pos dark:text-pos',
   closed: 'bg-muted text-muted-foreground',
 }
 

@@ -49,7 +49,7 @@ export function SendSurvey({ surveyId, surveyName: _surveyName, shareUrl: _share
         </div>
 
         {emailsSent && (
-          <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+          <div className="flex items-center gap-2 text-sm text-pos bg-shell border border-line rounded-lg px-3 py-2">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
             Emails sent. Add more recipients below to send again.
           </div>

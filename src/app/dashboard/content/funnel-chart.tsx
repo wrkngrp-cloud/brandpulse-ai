@@ -17,11 +17,11 @@ interface Props {
 }
 
 const STAGE_COLOURS: Record<string, string> = {
-  Awareness:     '#3b82f6',
-  Consideration: '#8b5cf6',
-  Conversion:    '#22c55e',
-  Loyalty:       '#f59e0b',
-  'Re-engagement': '#f87171',
+  Awareness:     'var(--flare)',
+  Consideration: 'var(--neu)',
+  Conversion:    'var(--pos)',
+  Loyalty:       'var(--ember)',
+  'Re-engagement': 'var(--flare)',
 }
 
 function CustomTooltip({ active, payload, label }: {
@@ -31,15 +31,15 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-[#14182B] border border-white/10 rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[148px]">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-white/40 mb-2">{label}</p>
+    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[148px]">
+      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-tx-inv/40 mb-2">{label}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center justify-between gap-4 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
-            <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: p.color ?? '#2B59FF' }} />
-            <span className="text-[11.5px] text-white/55 capitalize">{p.name.replace(/_/g, ' ')}</span>
+            <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: p.color ?? 'var(--flare)' }} />
+            <span className="text-[11.5px] text-tx-inv/55 capitalize">{p.name.replace(/_/g, ' ')}</span>
           </div>
-          <span className="text-[13px] font-semibold tabular-nums text-white">
+          <span className="text-[13px] font-semibold tabular-nums text-tx-inv">
             {typeof p.value === 'number' ? (p.name === 'avg_engagement' ? `${p.value.toFixed(2)}%` : p.value.toLocaleString()) : p.value}
           </span>
         </div>
@@ -64,7 +64,7 @@ export function FunnelChart({ data }: Props) {
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="posts" radius={[4, 4, 0, 0]}>
                 {data.map(entry => (
-                  <Cell key={entry.stage} fill={STAGE_COLOURS[entry.stage] ?? '#94a3b8'} />
+                  <Cell key={entry.stage} fill={STAGE_COLOURS[entry.stage] ?? 'var(--tx-3)'} />
                 ))}
               </Bar>
             </BarChart>
@@ -82,7 +82,7 @@ export function FunnelChart({ data }: Props) {
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="avg_engagement" radius={[4, 4, 0, 0]}>
                 {data.map(entry => (
-                  <Cell key={entry.stage} fill={STAGE_COLOURS[entry.stage] ?? '#94a3b8'} opacity={0.7} />
+                  <Cell key={entry.stage} fill={STAGE_COLOURS[entry.stage] ?? 'var(--tx-3)'} opacity={0.7} />
                 ))}
               </Bar>
             </BarChart>
@@ -94,7 +94,7 @@ export function FunnelChart({ data }: Props) {
       <div className="flex flex-wrap gap-3">
         {data.map(d => (
           <div key={d.stage} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="h-2.5 w-2.5 rounded-sm shrink-0" style={{ background: STAGE_COLOURS[d.stage] ?? '#94a3b8' }} />
+            <span className="h-2.5 w-2.5 rounded-sm shrink-0" style={{ background: STAGE_COLOURS[d.stage] ?? 'var(--tx-3)' }} />
             {d.stage}
           </div>
         ))}

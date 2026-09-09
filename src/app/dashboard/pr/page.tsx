@@ -27,9 +27,9 @@ interface SovSnapshot {
 }
 
 const SENTIMENT_STYLE: Record<string, string> = {
-  positive: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  positive: 'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
   neutral:  'bg-muted text-muted-foreground',
-  negative: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  negative: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
 }
 
 function fmtReach(n: number | null): string {
@@ -198,8 +198,8 @@ export default async function PRTrackingPage({
                 <div
                   key={label}
                   className={`rounded-lg p-3 space-y-1 ${
-                    label === 'positive' ? 'bg-green-50 dark:bg-green-900/10'
-                    : label === 'negative' ? 'bg-red-50 dark:bg-red-900/10'
+                    label === 'positive' ? 'bg-shell dark:bg-shell/10'
+                    : label === 'negative' ? 'bg-flare-wash dark:bg-shell/10'
                     : 'bg-muted/40'
                   }`}
                 >
@@ -213,13 +213,13 @@ export default async function PRTrackingPage({
             </div>
             <div className="h-2 rounded-full overflow-hidden flex">
               {sentCounts.positive > 0 && (
-                <div className="bg-green-500" style={{ width: `${(sentCounts.positive / total) * 100}%` }} />
+                <div className="bg-pos" style={{ width: `${(sentCounts.positive / total) * 100}%` }} />
               )}
               {sentCounts.neutral > 0 && (
                 <div className="bg-muted-foreground/30" style={{ width: `${(sentCounts.neutral / total) * 100}%` }} />
               )}
               {sentCounts.negative > 0 && (
-                <div className="bg-red-400" style={{ width: `${(sentCounts.negative / total) * 100}%` }} />
+                <div className="bg-flare" style={{ width: `${(sentCounts.negative / total) * 100}%` }} />
               )}
             </div>
           </div>

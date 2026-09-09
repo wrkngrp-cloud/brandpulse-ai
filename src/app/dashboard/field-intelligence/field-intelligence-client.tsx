@@ -55,15 +55,15 @@ interface Props {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function availColor(pct: number) {
-  if (pct >= 80) return 'text-emerald-600'
-  if (pct >= 60) return 'text-amber-500'
-  return 'text-red-500'
+  if (pct >= 80) return 'text-pos'
+  if (pct >= 60) return 'text-tx-2'
+  return 'text-tx-flare'
 }
 
 function availBg(pct: number) {
-  if (pct >= 80) return 'bg-emerald-50 dark:bg-emerald-900/20'
-  if (pct >= 60) return 'bg-amber-50 dark:bg-amber-900/20'
-  return 'bg-red-50 dark:bg-red-900/20'
+  if (pct >= 80) return 'bg-shell dark:bg-shell/20'
+  if (pct >= 60) return 'bg-shell dark:bg-shell/20'
+  return 'bg-flare-wash dark:bg-shell/20'
 }
 
 function teamName(fso_teams: ReportRow['fso_teams']): string {
@@ -144,7 +144,7 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
         <StatCard
           label="Out-of-stock alerts"
           value={stats.oos}
-          colorFn={v => v > 0 ? 'text-red-500' : 'text-foreground'}
+          colorFn={v => v > 0 ? 'text-tx-flare' : 'text-foreground'}
           note={stats.oos > 0 ? 'Outlets with no product' : 'All outlets stocked'}
         />
       </div>
@@ -229,7 +229,7 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
       {competitorFeed.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <AlertTriangle className="h-4 w-4 text-tx-2" />
             <h2 className="text-sm font-semibold">Competitor activity</h2>
             <span className="text-xs text-muted-foreground">Last 30 days</span>
           </div>
@@ -237,7 +237,7 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
             {competitorFeed.map((c, i) => (
               <div key={i} className="rounded-xl border border-border bg-card p-4 space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-amber-600 dark:text-amber-400">{c.competitor_name ?? 'Unknown'}</span>
+                  <span className="text-xs font-bold text-tx-2 dark:text-tx-2">{c.competitor_name ?? 'Unknown'}</span>
                   {c.outlet_type && (
                     <span className="text-[10px] text-muted-foreground">· {OUTLET_LABELS[c.outlet_type] ?? c.outlet_type}</span>
                   )}

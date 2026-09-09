@@ -188,8 +188,8 @@ export default async function ConnectorsPage() {
             developer app registered before it can go live — see
             docs/connector-setup-guide.md. */}
         <ComingSoonConnectorCard
-          icon={<Users className="h-5 w-5 text-[#FF7A59]" />}
-          iconBg="bg-[#FF7A59]/10"
+          icon={<Users className="h-5 w-5 text-[var(--ember)]" />}
+          iconBg="bg-[var(--ember)]/10"
           label="HubSpot"
           description="Read your marketing qualified lead count from HubSpot."
         />

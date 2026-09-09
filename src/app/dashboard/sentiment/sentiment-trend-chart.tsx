@@ -30,15 +30,15 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-[#14182B] border border-white/10 rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[155px]">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-white/40 mb-2">
+    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[155px]">
+      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-tx-inv/40 mb-2">
         {shortDate(label ?? '')}
       </p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center justify-between gap-4 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
             <span className="h-[3px] w-3 rounded-full shrink-0" style={{ background: p.color }} />
-            <span className="text-[11.5px] text-white/55 capitalize">{p.name}</span>
+            <span className="text-[11.5px] text-tx-inv/55 capitalize">{p.name}</span>
           </div>
           <span className="text-[13px] font-semibold tabular-nums" style={{ color: p.color }}>
             {Math.round(p.value)}
@@ -60,19 +60,19 @@ export function SentimentTrendChart({ data, weekly = false, benchmarkP50 }: Prop
         <defs>
           {/* Sentiment score — blue */}
           <linearGradient id="sgScore" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#2B59FF" stopOpacity={0.28} />
-            <stop offset="40%"  stopColor="#2B59FF" stopOpacity={0.10} />
-            <stop offset="100%" stopColor="#2B59FF" stopOpacity={0}    />
+            <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.28} />
+            <stop offset="40%"  stopColor="var(--flare)" stopOpacity={0.10} />
+            <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
           </linearGradient>
           {/* Positive — green */}
           <linearGradient id="sgPositive" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#22c55e" stopOpacity={0.22} />
-            <stop offset="100%" stopColor="#22c55e" stopOpacity={0}    />
+            <stop offset="0%"   stopColor="var(--pos)" stopOpacity={0.22} />
+            <stop offset="100%" stopColor="var(--pos)" stopOpacity={0}    />
           </linearGradient>
           {/* Negative — red */}
           <linearGradient id="sgNegative" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#f87171" stopOpacity={0.22} />
-            <stop offset="100%" stopColor="#f87171" stopOpacity={0}    />
+            <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.22} />
+            <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
           </linearGradient>
         </defs>
 
@@ -88,14 +88,14 @@ export function SentimentTrendChart({ data, weekly = false, benchmarkP50 }: Prop
           dataKey={dateKey}
           tickFormatter={shortDate}
           interval={weekly ? 1 : Math.floor(data.length / 6)}
-          tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
+          tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
           axisLine={false}
           tickLine={false}
         />
 
         <YAxis
           domain={[0, 100]}
-          tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
+          tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
           tickLine={false}
           axisLine={false}
           tickCount={5}
@@ -116,11 +116,11 @@ export function SentimentTrendChart({ data, weekly = false, benchmarkP50 }: Prop
         {benchmarkP50 != null && (
           <ReferenceLine
             y={benchmarkP50}
-            stroke="#f59e0b"
+            stroke="var(--ember)"
             strokeDasharray="6 3"
             strokeWidth={1.5}
             strokeOpacity={0.7}
-            label={{ value: `Sector P50 (${Math.round(benchmarkP50)})`, position: 'insideTopRight', fontSize: 9, fill: '#f59e0b', opacity: 0.85 }}
+            label={{ value: `Sector P50 (${Math.round(benchmarkP50)})`, position: 'insideTopRight', fontSize: 9, fill: 'var(--ember)', opacity: 0.85 }}
           />
         )}
 
@@ -129,12 +129,12 @@ export function SentimentTrendChart({ data, weekly = false, benchmarkP50 }: Prop
           type="monotone"
           dataKey="negative"
           name="negative %"
-          stroke="#f87171"
+          stroke="var(--flare)"
           strokeWidth={1.5}
           strokeDasharray="5 3"
           fill="url(#sgNegative)"
           dot={false}
-          activeDot={{ r: 3.5, fill: '#f87171', strokeWidth: 2, stroke: '#fff' }}
+          activeDot={{ r: 3.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
         />
 
         {/* Positive % */}
@@ -142,12 +142,12 @@ export function SentimentTrendChart({ data, weekly = false, benchmarkP50 }: Prop
           type="monotone"
           dataKey="positive"
           name="positive %"
-          stroke="#22c55e"
+          stroke="var(--pos)"
           strokeWidth={1.5}
           strokeDasharray="5 3"
           fill="url(#sgPositive)"
           dot={false}
-          activeDot={{ r: 3.5, fill: '#22c55e', strokeWidth: 2, stroke: '#fff' }}
+          activeDot={{ r: 3.5, fill: 'var(--pos)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
         />
 
         {/* Sentiment score — primary, on top */}
@@ -155,11 +155,11 @@ export function SentimentTrendChart({ data, weekly = false, benchmarkP50 }: Prop
           type="monotone"
           dataKey="score"
           name="sentiment"
-          stroke="#2B59FF"
+          stroke="var(--flare)"
           strokeWidth={2.5}
           fill="url(#sgScore)"
           dot={false}
-          activeDot={{ r: 4.5, fill: '#2B59FF', strokeWidth: 2, stroke: '#fff' }}
+          activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
         />
       </AreaChart>
     </ResponsiveContainer>

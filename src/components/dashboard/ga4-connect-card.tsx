@@ -93,7 +93,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <BarChart3 className="h-4 w-4 text-orange-500" />
+          <BarChart3 className="h-4 w-4 text-tx-2" />
           <div>
             <h3 className="text-sm font-semibold">Google Analytics 4</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -102,7 +102,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
           </div>
         </div>
         {connection && (
-          <span className="flex items-center gap-1 text-xs text-green-600">
+          <span className="flex items-center gap-1 text-xs text-pos">
             <CheckCircle2 className="h-3.5 w-3.5" /> Connected
           </span>
         )}

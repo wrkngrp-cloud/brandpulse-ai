@@ -19,15 +19,15 @@ interface Props {
 }
 
 const SENTIMENT_DOT: Record<string, string> = {
-  positive: 'bg-green-500',
+  positive: 'bg-pos',
   neutral:  'bg-muted-foreground/40',
-  negative: 'bg-red-400',
+  negative: 'bg-flare',
 }
 
 const SENTIMENT_LABEL: Record<string, string> = {
-  positive: 'text-green-600',
+  positive: 'text-pos',
   neutral:  'text-muted-foreground',
-  negative: 'text-red-500',
+  negative: 'text-tx-flare',
 }
 
 export function TopicClusters({ mentions }: Props) {

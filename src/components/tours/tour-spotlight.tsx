@@ -222,7 +222,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className={`fixed inset-0 z-[9990] ${hasHighlight ? '' : 'bg-black/30'}`}
+        className={`fixed inset-0 z-[9990] ${hasHighlight ? '' : 'bg-ink/30'}`}
         onClick={handleSkip}
         aria-hidden="true"
       />
@@ -244,7 +244,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
               width:        box.width,
               height:       box.height,
               borderRadius: 14,
-              boxShadow:    '0 0 0 3px #E8763E, 0 0 24px 4px rgba(232,118,62,0.35), 0 0 0 9999px rgba(0,0,0,0.6)',
+              boxShadow:    '0 0 0 3px var(--ember), 0 0 24px 4px rgba(232,118,62,0.35), 0 0 0 9999px rgba(0,0,0,0.6)',
               zIndex:       9992,
               pointerEvents: 'none',
             }}

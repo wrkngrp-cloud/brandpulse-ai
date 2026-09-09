@@ -16,8 +16,8 @@ interface AnalysisResult {
 }
 
 const CONFIDENCE_COLOUR: Record<string, string> = {
-  High:   'bg-green-100 text-green-800',
-  Medium: 'bg-amber-100 text-amber-800',
+  High:   'bg-shell text-pos',
+  Medium: 'bg-shell text-tx-2',
   Low:    'bg-muted text-muted-foreground',
 }
 

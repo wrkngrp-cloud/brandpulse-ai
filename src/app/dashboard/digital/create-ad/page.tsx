@@ -305,9 +305,9 @@ function ImageUploadZone({
           <button
             type="button"
             onClick={onRemove}
-            className="absolute top-2 right-2 bg-black/60 rounded-full p-1 hover:bg-black/80 transition-colors"
+            className="absolute top-2 right-2 bg-ink/60 rounded-full p-1 hover:bg-ink/80 transition-colors"
           >
-            <X className="h-3.5 w-3.5 text-white" />
+            <X className="h-3.5 w-3.5 text-tx-inv" />
           </button>
         )}
       </div>
@@ -384,14 +384,14 @@ function VideoUploadZone({
   if (url) {
     return (
       <div className="border rounded-xl overflow-hidden relative">
-        <video src={url} controls className="w-full max-h-56 bg-black" />
+        <video src={url} controls className="w-full max-h-56 bg-ink" />
         {onRemove && (
           <button
             type="button"
             onClick={onRemove}
-            className="absolute top-2 right-2 bg-black/60 rounded-full p-1 hover:bg-black/80 transition-colors"
+            className="absolute top-2 right-2 bg-ink/60 rounded-full p-1 hover:bg-ink/80 transition-colors"
           >
-            <X className="h-3.5 w-3.5 text-white" />
+            <X className="h-3.5 w-3.5 text-tx-inv" />
           </button>
         )}
       </div>
@@ -674,7 +674,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
 
         {/* Image upload */}
         <div className="space-y-1.5">
-          <Label>Image <span className="text-rose-500">*</span></Label>
+          <Label>Image <span className="text-tx-flare">*</span></Label>
           <ImageUploadZone
             url={state.media_urls[0]}
             onUpload={url => set('media_urls', [url])}
@@ -775,7 +775,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
             </Button>
           )}
           {cards.length < 2 && (
-            <p className="text-xs text-amber-600 flex items-center gap-1.5">
+            <p className="text-xs text-tx-2 flex items-center gap-1.5">
               <AlertCircle className="h-3.5 w-3.5" />
               At least 2 cards are required for a carousel.
             </p>
@@ -852,7 +852,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
         {/* Final URL + Display URL */}
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label>Final URL <span className="text-rose-500">*</span></Label>
+            <Label>Final URL <span className="text-tx-flare">*</span></Label>
             <Input
               placeholder="https://yourbrand.com/page"
               value={state.destination_url}
@@ -890,7 +890,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label>Main image <span className="text-rose-500">*</span></Label>
+            <Label>Main image <span className="text-tx-flare">*</span></Label>
             <ImageUploadZone
               url={state.media_urls[0]}
               onUpload={url => set('media_urls', [url])}
@@ -952,7 +952,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
         </div>
 
         <div className="space-y-1.5">
-          <Label>Video file <span className="text-rose-500">*</span></Label>
+          <Label>Video file <span className="text-tx-flare">*</span></Label>
           <VideoUploadZone
             url={state.media_urls[0]}
             onUpload={url => set('media_urls', [url])}
@@ -1105,7 +1105,7 @@ function AdCopyFields({
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Destination URL <span className="text-rose-500">*</span></Label>
+          <Label>Destination URL <span className="text-tx-flare">*</span></Label>
           <Input
             type="url"
             placeholder="https://yourbrand.com/promo"
@@ -1252,7 +1252,7 @@ function StepAudience({ state, setState }: { state: WizardState; setState: React
       {isGoogle && state.ad_format === 'responsive_search' && (
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Keywords <span className="text-rose-500">*</span></Label>
+            <Label>Keywords <span className="text-tx-flare">*</span></Label>
             <p className="text-xs text-muted-foreground">
               Words or phrases your customers search for. Use broad, phrase, or exact match (wrap in quotes or brackets).
             </p>
@@ -1396,7 +1396,7 @@ function StepBudget({ state, setState }: { state: WizardState; setState: React.D
           <p className="text-xs text-muted-foreground">Leave blank to start when approved.</p>
         </div>
         <div className="space-y-1.5">
-          <Label>End date {state.budget_type === 'lifetime' && <span className="text-rose-500">*</span>}</Label>
+          <Label>End date {state.budget_type === 'lifetime' && <span className="text-tx-flare">*</span>}</Label>
           <Input
             type="date"
             value={state.end_date}
@@ -1597,8 +1597,8 @@ function StepReview({ state }: { state: WizardState }) {
         </Section>
       </div>
 
-      <div className="border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/30 rounded-xl px-4 py-3">
-        <p className="text-xs text-amber-800 dark:text-amber-300">
+      <div className="border border-line bg-shell dark:border-line dark:bg-shell/30 rounded-xl px-4 py-3">
+        <p className="text-xs text-tx-2 dark:text-tx-2">
           This draft will be saved with status <strong>Draft</strong>. It will not go live until reviewed and pushed from the Ads Drafts panel.
         </p>
       </div>
@@ -1775,8 +1775,8 @@ export default function CreateAdPage() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0">
-            <Megaphone className="h-5 w-5 text-indigo-500" />
+          <div className="h-10 w-10 rounded-xl bg-flare/10 flex items-center justify-center shrink-0">
+            <Megaphone className="h-5 w-5 text-tx-2" />
           </div>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Create Ad</h1>
@@ -1791,7 +1791,7 @@ export default function CreateAdPage() {
           <div key={s.id} className="flex items-center gap-1 shrink-0">
             <div className={cn(
               'h-7 w-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors',
-              step > s.id  ? 'bg-emerald-500 text-white'
+              step > s.id  ? 'bg-pos text-tx-inv'
               : step === s.id ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-muted-foreground'
             )}>
@@ -1802,7 +1802,7 @@ export default function CreateAdPage() {
               step === s.id ? 'text-foreground' : 'text-muted-foreground'
             )}>{s.label}</span>
             {i < STEPS.length - 1 && (
-              <div className={cn('h-px w-5 mx-1 transition-colors', step > s.id ? 'bg-emerald-500' : 'bg-border')} />
+              <div className={cn('h-px w-5 mx-1 transition-colors', step > s.id ? 'bg-pos' : 'bg-border')} />
             )}
           </div>
         ))}

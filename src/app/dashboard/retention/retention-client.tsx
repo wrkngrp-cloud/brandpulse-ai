@@ -13,10 +13,10 @@ import type { RetentionRiskData, RetentionSignal } from '@/app/api/retention/ris
 import { TourTrigger } from '@/components/tours/tour-trigger'
 
 const RISK_COLOR = {
-  low:      'text-green-600  bg-green-50  border-green-200',
-  medium:   'text-yellow-700 bg-yellow-50 border-yellow-200',
-  high:     'text-orange-700 bg-orange-50 border-orange-200',
-  critical: 'text-red-700   bg-red-50    border-red-200',
+  low:      'text-pos  bg-shell  border-line',
+  medium:   'text-tx-2 bg-shell border-line',
+  high:     'text-tx-2 bg-shell border-line',
+  critical: 'text-tx-flare   bg-flare-wash    border-line-strong',
 } as const
 
 const RISK_LABEL = {
@@ -27,10 +27,10 @@ const RISK_LABEL = {
 } as const
 
 const SEVERITY_ICON = {
-  low:      <Info className="h-4 w-4 text-blue-500" />,
-  medium:   <AlertCircle className="h-4 w-4 text-yellow-500" />,
-  high:     <AlertTriangle className="h-4 w-4 text-orange-500" />,
-  critical: <XCircle className="h-4 w-4 text-red-500" />,
+  low:      <Info className="h-4 w-4 text-tx-2" />,
+  medium:   <AlertCircle className="h-4 w-4 text-tx-2" />,
+  high:     <AlertTriangle className="h-4 w-4 text-tx-2" />,
+  critical: <XCircle className="h-4 w-4 text-tx-flare" />,
 }
 
 export function RetentionClient() {
@@ -79,7 +79,7 @@ export function RetentionClient() {
 
       <div data-tour="retention-main">
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-lg border border-line-strong bg-flare-wash p-4 text-sm text-tx-flare">
           {error}
         </div>
       )}
@@ -130,9 +130,9 @@ export function RetentionClient() {
                 <p className="text-sm text-muted-foreground">No NPS data yet</p>
               ) : (
                 <div className="space-y-2">
-                  <NpsBar label="Promoters" count={data.nps_breakdown.promoters} total={data.nps_breakdown.total} color="bg-green-500" />
-                  <NpsBar label="Passives"  count={data.nps_breakdown.passives}  total={data.nps_breakdown.total} color="bg-yellow-400" />
-                  <NpsBar label="Detractors" count={data.nps_breakdown.detractors} total={data.nps_breakdown.total} color="bg-red-500" />
+                  <NpsBar label="Promoters" count={data.nps_breakdown.promoters} total={data.nps_breakdown.total} color="bg-pos" />
+                  <NpsBar label="Passives"  count={data.nps_breakdown.passives}  total={data.nps_breakdown.total} color="bg-ember" />
+                  <NpsBar label="Detractors" count={data.nps_breakdown.detractors} total={data.nps_breakdown.total} color="bg-flare" />
                 </div>
               )}
             </div>
@@ -152,7 +152,7 @@ export function RetentionClient() {
                   {data.sentiment_30d_avg !== null && data.sentiment_7d_avg !== null && (
                     <div className={cn(
                       'text-xs font-medium flex items-center gap-1',
-                      data.sentiment_7d_avg < data.sentiment_30d_avg ? 'text-red-600' : 'text-green-600'
+                      data.sentiment_7d_avg < data.sentiment_30d_avg ? 'text-tx-flare' : 'text-pos'
                     )}>
                       <TrendingDown className="h-3 w-3" />
                       {data.sentiment_7d_avg < data.sentiment_30d_avg
@@ -179,7 +179,7 @@ export function RetentionClient() {
                   {data.bhi_30d_ago !== null && (
                     <div className={cn(
                       'text-xs font-medium flex items-center gap-1',
-                      data.bhi_latest < data.bhi_30d_ago ? 'text-red-600' : 'text-green-600'
+                      data.bhi_latest < data.bhi_30d_ago ? 'text-tx-flare' : 'text-pos'
                     )}>
                       <TrendingDown className="h-3 w-3" />
                       {data.bhi_latest < data.bhi_30d_ago
@@ -207,11 +207,11 @@ export function RetentionClient() {
           )}
 
           {data.signals.length === 0 && (
-            <div className="rounded-xl border bg-green-50 border-green-200 p-6 flex items-center gap-3">
-              <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />
+            <div className="rounded-xl border bg-shell border-line p-6 flex items-center gap-3">
+              <CheckCircle className="h-5 w-5 text-pos shrink-0" />
               <div>
-                <p className="font-medium text-green-800">No significant risk signals detected</p>
-                <p className="text-sm text-green-700 mt-0.5">Sentiment, NPS, and brand health are within healthy ranges over the last 30 days.</p>
+                <p className="font-medium text-pos">No significant risk signals detected</p>
+                <p className="text-sm text-pos mt-0.5">Sentiment, NPS, and brand health are within healthy ranges over the last 30 days.</p>
               </div>
             </div>
           )}
@@ -220,14 +220,14 @@ export function RetentionClient() {
           {data.detractors.length > 0 && (
             <div className="rounded-xl border bg-card">
               <div className="px-5 py-4 border-b flex items-center gap-2">
-                <ThumbsDown className="h-4 w-4 text-red-500" />
+                <ThumbsDown className="h-4 w-4 text-tx-flare" />
                 <h2 className="font-semibold text-sm">Recent detractor voices</h2>
                 <Badge variant="secondary" className="ml-auto text-xs">{data.detractors.length}</Badge>
               </div>
               <div className="divide-y">
                 {data.detractors.map((d) => (
                   <div key={d.id} className="px-5 py-3 flex items-start gap-3">
-                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700">
+                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-flare-wash text-xs font-bold text-tx-flare">
                       {d.score}
                     </span>
                     <div className="min-w-0">
@@ -282,10 +282,10 @@ function SentimentStat({ label, value }: { label: string; value: number | null }
 
 function SignalRow({ signal }: { signal: RetentionSignal }) {
   const severityBg = {
-    low:      'bg-blue-50',
-    medium:   'bg-yellow-50',
-    high:     'bg-orange-50',
-    critical: 'bg-red-50',
+    low:      'bg-flare-wash',
+    medium:   'bg-shell',
+    high:     'bg-shell',
+    critical: 'bg-flare-wash',
   }[signal.severity]
 
   return (

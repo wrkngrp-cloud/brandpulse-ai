@@ -17,9 +17,9 @@ interface Props {
 }
 
 const LEVEL_META = {
-  critical: { label: 'Critical',       color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',    border: 'border-red-200 dark:border-red-800',    icon: AlertTriangle },
-  watch:    { label: 'Watch',          color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', border: 'border-amber-200 dark:border-amber-800', icon: Eye },
-  refresh:  { label: 'Refresh Soon',   color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',  border: 'border-blue-200 dark:border-blue-800',  icon: RefreshCw },
+  critical: { label: 'Critical',       color: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',    border: 'border-line-strong dark:border-line-strong',    icon: AlertTriangle },
+  watch:    { label: 'Watch',          color: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2', border: 'border-line dark:border-line', icon: Eye },
+  refresh:  { label: 'Refresh Soon',   color: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',  border: 'border-line-strong dark:border-line-strong',  icon: RefreshCw },
 }
 
 const ASSET_TYPE_LABELS: Record<string, string> = {
@@ -31,7 +31,7 @@ function fmtPct(n: number | null | undefined) {
 }
 
 function FatigueBar({ score, level }: { score: number; level: FatiguedAsset['fatigue_level'] }) {
-  const color = level === 'critical' ? 'bg-red-500' : level === 'watch' ? 'bg-amber-500' : 'bg-blue-500'
+  const color = level === 'critical' ? 'bg-flare' : level === 'watch' ? 'bg-ember' : 'bg-flare'
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-xs text-muted-foreground">
@@ -64,7 +64,7 @@ function AssetCard({ asset }: { asset: FatiguedAsset }) {
             </span>
             <Badge variant="outline" className="text-xs">{ASSET_TYPE_LABELS[asset.asset_type] ?? asset.asset_type}</Badge>
             {asset.platform && <Badge variant="secondary" className="text-xs">{formatPlatformLabel(asset.platform)}</Badge>}
-            {asset.fit_for_ads && <Badge className="text-xs bg-emerald-600 text-white hover:bg-emerald-700">Fit for Ads</Badge>}
+            {asset.fit_for_ads && <Badge className="text-xs bg-pos text-tx-inv hover:bg-pos">Fit for Ads</Badge>}
           </div>
           <h3 className="font-semibold text-sm truncate">{asset.title}</h3>
           {asset.description && (
@@ -80,7 +80,7 @@ function AssetCard({ asset }: { asset: FatiguedAsset }) {
       <div className="space-y-1.5">
         {asset.fatigue_signals.map((s, i) => (
           <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-            <TrendingDown className="h-3 w-3 mt-0.5 shrink-0 text-red-500" />
+            <TrendingDown className="h-3 w-3 mt-0.5 shrink-0 text-tx-flare" />
             <span>{s}</span>
           </div>
         ))}
@@ -156,10 +156,10 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
       {/* Summary tiles */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Critical',     count: critical.length, color: 'text-red-600',   bg: 'bg-red-50 dark:bg-red-900/10'    },
-          { label: 'Watch',        count: watch.length,    color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/10'},
-          { label: 'Refresh Soon', count: refresh.length,  color: 'text-blue-600',  bg: 'bg-blue-50 dark:bg-blue-900/10'  },
-          { label: 'Healthy',      count: healthy,         color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/10'},
+          { label: 'Critical',     count: critical.length, color: 'text-tx-flare',   bg: 'bg-flare-wash dark:bg-shell/10'    },
+          { label: 'Watch',        count: watch.length,    color: 'text-tx-2', bg: 'bg-shell dark:bg-shell/10'},
+          { label: 'Refresh Soon', count: refresh.length,  color: 'text-tx-flare',  bg: 'bg-flare-wash dark:bg-shell/10'  },
+          { label: 'Healthy',      count: healthy,         color: 'text-pos', bg: 'bg-shell dark:bg-shell/10'},
         ].map(t => (
           <div key={t.label} className={cn('rounded-lg p-4 text-center', t.bg)}>
             <div className={cn('text-3xl font-bold tabular-nums', t.color)}>{t.count}</div>
@@ -170,7 +170,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
 
       {assets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-          <CheckCircle2 className="h-10 w-10 text-emerald-500" />
+          <CheckCircle2 className="h-10 w-10 text-pos" />
           <p className="font-medium">All active creatives are healthy</p>
           <p className="text-sm text-muted-foreground">No fatigue signals detected. Check back after your next campaign run.</p>
         </div>
@@ -178,7 +178,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
         <div className="space-y-8">
           {critical.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-red-600 uppercase tracking-wide flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-tx-flare uppercase tracking-wide flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" /> Critical — Pause or Replace Now
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -189,7 +189,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
 
           {watch.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-amber-600 uppercase tracking-wide flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-tx-2 uppercase tracking-wide flex items-center gap-2">
                 <Eye className="h-4 w-4" /> Watch — Plan Refresh This Week
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -200,7 +200,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
 
           {refresh.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wide flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-tx-flare uppercase tracking-wide flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" /> Refresh Soon — Schedule Within 2 Weeks
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">

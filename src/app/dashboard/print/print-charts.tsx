@@ -28,7 +28,7 @@ export function PrintReadershipChart() {
           contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
           formatter={(val) => [typeof val === 'number' ? formatNum(val) : val, 'Readership']}
         />
-        <Bar dataKey="readers" name="Readership" fill="#6366f1" radius={[0, 4, 4, 0]} />
+        <Bar dataKey="readers" name="Readership" fill="var(--neu)" radius={[0, 4, 4, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )

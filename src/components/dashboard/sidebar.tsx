@@ -37,13 +37,13 @@ function PulseMark({ size = 32 }: { size?: number }) {
       style={{
         height: size,
         width:  size,
-        background: 'linear-gradient(135deg, #5E7FFF 0%, #2B59FF 100%)',
+        background: 'var(--flare)',
       }}
     >
       <svg viewBox="0 0 20 20" fill="none" style={{ height: size * 0.46, width: size * 0.46 }} aria-hidden>
         <polyline
           points="2,10 6,6 9.5,13 13.5,7.5 18,10"
-          stroke="white"
+          stroke="var(--bg-paper)"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -87,9 +87,9 @@ function SidebarUserBlock({
         <span
           className="h-8 w-8 shrink-0 rounded-lg grid place-items-center text-[12px] font-bold select-none"
           style={{
-            background: 'linear-gradient(135deg, oklch(0.485 0.25 258 / 0.18) 0%, oklch(0.585 0.163 37 / 0.12) 100%)',
-            color: 'oklch(0.485 0.25 258)',
-            border: '1px solid oklch(0.485 0.25 258 / 0.20)',
+            background: 'var(--bg-shell)',
+            color: 'var(--tx-2)',
+            border: 'var(--line)',
           }}
         >
           {initials}
@@ -190,7 +190,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
         {/* Wordmark */}
         <span
           className={cn(
-            'font-bold text-[15px] tracking-tight whitespace-nowrap text-gradient-blue',
+            'font-bold text-[15px] tracking-tight whitespace-nowrap text-tx-inv',
             'transition-opacity duration-150',
             expanded ? 'opacity-100 delay-75' : 'opacity-0',
           )}

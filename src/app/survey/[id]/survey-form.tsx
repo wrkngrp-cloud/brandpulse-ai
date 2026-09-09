@@ -65,7 +65,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
   if (done) {
     return (
       <div className="w-full max-w-md text-center space-y-4 py-16">
-        <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto" />
+        <CheckCircle2 className="h-12 w-12 text-pos mx-auto" />
         <h2 className="text-xl font-semibold">Thank you!</h2>
         <p className="text-muted-foreground text-sm">
           Your feedback helps {brandName} improve.

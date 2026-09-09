@@ -90,7 +90,7 @@ export function GoogleAdsConnectCard({ account: initialAccount }: Props) {
             <p className="text-sm font-semibold">Google Ads</p>
             {account ? (
               <div className="flex items-center gap-1.5 mt-0.5">
-                <CheckCircle2 className="h-3 w-3 text-green-500" />
+                <CheckCircle2 className="h-3 w-3 text-pos" />
                 <p className="text-xs text-muted-foreground">
                   {account.account_name ?? 'Connected'}
                   {account.ad_account_id && (

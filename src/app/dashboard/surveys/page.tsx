@@ -24,9 +24,9 @@ const PERCEPTION_DIMENSIONS = [
 ]
 
 function dimScoreColor(score: number) {
-  if (score >= 4)   return 'text-green-600'
-  if (score >= 3)   return 'text-amber-600'
-  return 'text-red-500'
+  if (score >= 4)   return 'text-pos'
+  if (score >= 3)   return 'text-tx-2'
+  return 'text-tx-flare'
 }
 
 function dimBarWidth(score: number) {
@@ -34,9 +34,9 @@ function dimBarWidth(score: number) {
 }
 
 function dimBarColor(score: number) {
-  if (score >= 4)   return 'bg-green-500'
-  if (score >= 3)   return 'bg-amber-400'
-  return 'bg-red-400'
+  if (score >= 4)   return 'bg-pos'
+  if (score >= 3)   return 'bg-ember'
+  return 'bg-flare'
 }
 
 // ── Perception Audit Section ─────────────────────────────────────────────────
@@ -179,7 +179,7 @@ async function PerceptionAuditSection() {
                   </div>
                   <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full capitalize ${
                     isLive
-                      ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400'
+                      ? 'bg-shell text-pos dark:bg-pos dark:text-pos'
                       : s.status === 'draft'
                         ? 'bg-muted text-muted-foreground'
                         : 'bg-muted text-muted-foreground'

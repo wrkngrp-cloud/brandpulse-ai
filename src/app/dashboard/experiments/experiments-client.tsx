@@ -42,10 +42,10 @@ interface Experiment {
 }
 
 const STATUS_COLOR: Record<string, string> = {
-  draft:     'bg-gray-100 text-gray-700 border-gray-200',
-  running:   'bg-green-100 text-green-700 border-green-200',
-  paused:    'bg-yellow-100 text-yellow-700 border-yellow-200',
-  concluded: 'bg-blue-100 text-blue-700 border-blue-200',
+  draft:     'bg-shell text-tx-2 border-line',
+  running:   'bg-shell text-pos border-line',
+  paused:    'bg-shell text-tx-2 border-line',
+  concluded: 'bg-flare-wash text-tx-flare border-line-strong',
 }
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
@@ -240,10 +240,10 @@ export function ExperimentsClient() {
                             const sig       = v.is_control ? null : calcSignificance(control, v, exp.confidence_target)
                             const isWinner  = exp.winner_variant_id === v.id
                             return (
-                              <tr key={v.id} className={cn('hover:bg-muted/20', isWinner && 'bg-green-50/50')}>
+                              <tr key={v.id} className={cn('hover:bg-muted/20', isWinner && 'bg-shell/50')}>
                                 <td className="px-3 py-2">
                                   <div className="flex items-center gap-1.5">
-                                    {isWinner && <Trophy className="h-3 w-3 text-yellow-500" />}
+                                    {isWinner && <Trophy className="h-3 w-3 text-tx-2" />}
                                     <span className="font-medium">{v.name}</span>
                                     {v.is_control && <Badge variant="outline" className="text-[10px] py-0">Control</Badge>}
                                   </div>
@@ -254,14 +254,14 @@ export function ExperimentsClient() {
                                 <td className="px-3 py-2">₦{v.revenue.toLocaleString()}</td>
                                 <td className="px-3 py-2">
                                   {sig ? (
-                                    <span className={cn('font-medium', sig.liftPct > 0 ? 'text-green-600' : 'text-red-600')}>
+                                    <span className={cn('font-medium', sig.liftPct > 0 ? 'text-pos' : 'text-tx-flare')}>
                                       {sig.liftPct > 0 ? '+' : ''}{sig.liftPct.toFixed(1)}%
                                     </span>
                                   ) : '—'}
                                 </td>
                                 <td className="px-3 py-2">
                                   {sig ? (
-                                    <Badge variant="outline" className={cn('text-xs', sig.significant ? 'border-green-300 text-green-700' : 'border-gray-300 text-gray-500')}>
+                                    <Badge variant="outline" className={cn('text-xs', sig.significant ? 'border-line text-pos' : 'border-line text-tx-3')}>
                                       {sig.significant ? '✓ Sig.' : `p=${sig.pValue.toFixed(2)}`}
                                     </Badge>
                                   ) : '—'}

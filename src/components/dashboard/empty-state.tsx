@@ -30,7 +30,7 @@ const SIZE = {
 const TONE_ICON: Record<string, string> = {
   default: 'bg-muted/60 text-muted-foreground/40',
   blue:    'bg-primary/8 text-primary/50',
-  clay:    'bg-[#D4602A]/8 text-[#D4602A]/60',
+  clay:    'bg-[var(--char)]/8 text-[var(--char)]/60',
 }
 
 export function EmptyState({
@@ -77,11 +77,11 @@ export function EmptyState({
             const cls = cn(
               'inline-flex items-center h-8 rounded-xl px-4 text-[12.5px] font-semibold transition-all duration-150 active:scale-[0.98]',
               a.primary
-                ? 'text-white hover:opacity-90'
+                ? 'text-tx-inv hover:opacity-90'
                 : 'border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50',
             )
             const style = a.primary
-              ? { background: 'linear-gradient(135deg, #E8763E 0%, #C4501D 100%)', boxShadow: '0 4px 14px -4px rgba(212,96,42,0.5)' }
+              ? { background: 'var(--char)', boxShadow: '0 4px 14px -4px rgba(212,96,42,0.5)' }
               : undefined
 
             if (a.href) {

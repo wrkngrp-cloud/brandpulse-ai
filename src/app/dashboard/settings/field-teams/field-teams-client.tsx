@@ -138,7 +138,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold truncate">{team.name}</p>
-                <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${team.active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-muted text-muted-foreground'}`}>
+                <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${team.active ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos' : 'bg-muted text-muted-foreground'}`}>
                   {team.active ? 'Active' : 'Inactive'}
                 </span>
               </div>

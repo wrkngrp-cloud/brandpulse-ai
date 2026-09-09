@@ -86,8 +86,8 @@ const STAGE_EMPTY: Record<StageKey, { text: string; linkLabel?: string; linkHref
 
 function scoreColor(score: number) {
   if (score >= 65) return 'text-foreground'
-  if (score >= 40) return 'text-amber-500'
-  return 'text-red-500'
+  if (score >= 40) return 'text-tx-2'
+  return 'text-tx-flare'
 }
 
 function dropOffMeta(from: number | null, to: number | null) {
@@ -96,15 +96,15 @@ function dropOffMeta(from: number | null, to: number | null) {
   const pct = Math.round(((from - to) / from) * 100)
   const isLift = pct < 0
   const urgent = pct > 30
-  const colorClass = isLift ? 'text-green-600' : pct <= 15 ? 'text-green-600' : pct <= 30 ? 'text-amber-500' : 'text-red-500'
+  const colorClass = isLift ? 'text-pos' : pct <= 15 ? 'text-pos' : pct <= 30 ? 'text-tx-2' : 'text-tx-flare'
   return { pct: Math.abs(pct), isLift, colorClass, urgent }
 }
 
 function scoreBarColor(score: number | null) {
-  if (score == null) return '#94a3b8'
-  if (score >= 65)   return '#22c55e'
-  if (score >= 40)   return '#f59e0b'
-  return '#ef4444'
+  if (score == null) return 'var(--tx-3)'
+  if (score >= 65)   return 'var(--pos)'
+  if (score >= 40)   return 'var(--ember)'
+  return 'var(--flare)'
 }
 
 export function FunnelClient({ scores, brandName, industry }: Props) {
@@ -395,7 +395,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                         {analysis.initiatives.map(init => (
                           <span
                             key={init}
-                            className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40"
+                            className="text-xs px-2 py-0.5 rounded-full bg-flare/10 text-tx-flare dark:text-tx-2 border border-line-strong dark:border-line-strong"
                           >
                             {init}
                           </span>
@@ -456,7 +456,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                         {drop.pct}% {drop.isLift ? 'lift' : 'drop-off'}
                       </span>
                       {drop.urgent && (
-                        <span className="flex items-center gap-0.5 text-[10px] font-medium text-red-500 ml-1">
+                        <span className="flex items-center gap-0.5 text-[10px] font-medium text-tx-flare ml-1">
                           <AlertCircle className="h-3 w-3" />
                           Priority gap
                         </span>
@@ -520,17 +520,17 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
           65–100 Healthy
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-amber-500 inline-block" />
+          <span className="h-2 w-2 rounded-full bg-ember inline-block" />
           40–64 Building
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-red-500 inline-block" />
+          <span className="h-2 w-2 rounded-full bg-flare inline-block" />
           0–39 At risk
         </span>
         <span className="ml-auto flex flex-wrap gap-x-2">
-          <span className="text-green-600 font-medium">≤15% drop good</span>
-          <span className="text-amber-500 font-medium">16–30% watch</span>
-          <span className="text-red-500 font-medium">&gt;30% urgent</span>
+          <span className="text-pos font-medium">≤15% drop good</span>
+          <span className="text-tx-2 font-medium">16–30% watch</span>
+          <span className="text-tx-flare font-medium">&gt;30% urgent</span>
         </span>
       </div>
     </div>

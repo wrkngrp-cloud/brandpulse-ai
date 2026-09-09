@@ -58,7 +58,7 @@ export function HorizontalTour() {
         <div className="mx-auto mb-8 w-full max-w-6xl px-6">
           <p className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>The product, not a mockup</p>
           <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-            <h2 className="max-w-xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+            <h2 className="max-w-xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
               Scroll sideways through the dashboard.
             </h2>
             {/* progress dots */}
@@ -94,7 +94,7 @@ export function HorizontalTour() {
                     <div className="mb-4 flex items-end justify-between gap-6">
                       <div>
                         <p className="font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--lp-clay)' }}>{panel.kicker}</p>
-                        <h3 className="mt-1.5 text-xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>{panel.title}</h3>
+                        <h3 className="mt-1.5 text-xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{panel.title}</h3>
                       </div>
                       <p className="hidden max-w-[260px] text-[12px] leading-relaxed sm:block" style={{ color: 'var(--lp-mut)' }}>{panel.body}</p>
                     </div>

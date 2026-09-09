@@ -103,7 +103,7 @@ export function UseCasesPage() {
           Use cases
         </motion.p>
         <motion.h1 {...rise} className="mt-4 max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           One gauge, tuned to your industry.
         </motion.h1>
         <motion.p {...rise} className="mt-5 max-w-2xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--lp-mut)' }}>
@@ -128,14 +128,14 @@ export function UseCasesPage() {
             className="scroll-mt-28 rounded-2xl border p-7 sm:p-10"
             style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', boxShadow: '0 1px 2px rgba(20,24,43,0.04)' }}>
             <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl"
-              style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+              style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
               {ind.name}
             </h2>
             <p className="mt-2 max-w-2xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{ind.who}</p>
             <div className="mt-8 grid gap-6 md:grid-cols-3">
               {ind.jobs.map(job => (
                 <div key={job.title}>
-                  <h3 className="text-[15px] font-bold leading-snug" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+                  <h3 className="text-[15px] font-bold leading-snug" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
                     {job.title}
                   </h3>
                   <p className="mt-2 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{job.how}</p>
@@ -156,7 +156,7 @@ export function UseCasesPage() {
 
       <section className="px-6 py-20 text-center">
         <motion.h2 {...rise} className="mx-auto max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Your industry is already set up.
         </motion.h2>
         <motion.p {...rise} className="mx-auto mt-4 max-w-xl text-[14px]" style={{ color: 'var(--lp-mut)' }}>
@@ -164,7 +164,7 @@ export function UseCasesPage() {
         </motion.p>
         <motion.div {...rise} className="mt-8">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-bold text-white shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
+            className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-bold text-tx-inv shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
             style={{ background: 'var(--lp-clay)' }}>
             Start free in beta <ArrowRight className="h-4 w-4" />
           </Link>

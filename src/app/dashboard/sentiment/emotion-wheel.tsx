@@ -3,14 +3,14 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 
 const PLUTCHIK: Record<string, { color: string; label: string }> = {
-  joy:          { color: '#FBBF24', label: 'Joy'          },
-  trust:        { color: '#34D399', label: 'Trust'        },
-  fear:         { color: '#84CC16', label: 'Fear'         },
-  surprise:     { color: '#22D3EE', label: 'Surprise'     },
-  sadness:      { color: '#60A5FA', label: 'Sadness'      },
-  disgust:      { color: '#A78BFA', label: 'Disgust'      },
-  anger:        { color: '#F87171', label: 'Anger'        },
-  anticipation: { color: '#FB923C', label: 'Anticipation' },
+  joy:          { color: 'var(--danfo)', label: 'Joy'          },
+  trust:        { color: 'var(--pos)', label: 'Trust'        },
+  fear:         { color: 'var(--pos)', label: 'Fear'         },
+  surprise:     { color: 'var(--neu)', label: 'Surprise'     },
+  sadness:      { color: 'var(--ember)', label: 'Sadness'      },
+  disgust:      { color: 'var(--neu)', label: 'Disgust'      },
+  anger:        { color: 'var(--flare)', label: 'Anger'        },
+  anticipation: { color: 'var(--danfo)', label: 'Anticipation' },
 }
 
 interface Props {
@@ -41,7 +41,7 @@ export function EmotionWheel({ distribution }: Props) {
     .map(([key, value]) => ({
       name:  PLUTCHIK[key]?.label ?? key,
       value,
-      color: PLUTCHIK[key]?.color ?? '#94a3b8',
+      color: PLUTCHIK[key]?.color ?? 'var(--tx-3)',
     }))
 
   return (

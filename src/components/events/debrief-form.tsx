@@ -86,8 +86,8 @@ export function DebriefForm({ eventId, existingDebrief }: Props) {
   if (state?.success) {
     return (
       <div className="border rounded-xl bg-card p-8 flex flex-col items-center gap-4 text-center max-w-md mx-auto">
-        <div className="h-14 w-14 rounded-full bg-green-50 flex items-center justify-center">
-          <CheckCircle2 className="h-7 w-7 text-green-600" />
+        <div className="h-14 w-14 rounded-full bg-shell flex items-center justify-center">
+          <CheckCircle2 className="h-7 w-7 text-pos" />
         </div>
         <div className="space-y-1">
           <h3 className="text-base font-semibold">Debrief saved</h3>

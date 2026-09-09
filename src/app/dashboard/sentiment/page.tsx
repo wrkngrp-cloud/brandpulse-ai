@@ -16,9 +16,9 @@ import { MentionsList } from './mentions-list'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 
 const SENTIMENT_BAR: Record<string, string> = {
-  positive: 'bg-green-500',
+  positive: 'bg-pos',
   neutral:  'bg-muted-foreground/40',
-  negative: 'bg-red-400',
+  negative: 'bg-flare',
 }
 
 const PLATFORM_LABEL: Record<string, string> = {
@@ -36,11 +36,11 @@ const AUDIENCE_LABEL: Record<string, string> = {
 }
 
 const AUDIENCE_BAR: Record<string, string> = {
-  consumer:  'bg-blue-500',
-  creator:   'bg-fuchsia-500',
-  developer: 'bg-violet-500',
-  retailer:  'bg-emerald-500',
-  media:     'bg-amber-500',
+  consumer:  'bg-flare',
+  creator:   'bg-neu',
+  developer: 'bg-neu',
+  retailer:  'bg-pos',
+  media:     'bg-ember',
   general:   'bg-muted-foreground/40',
 }
 
@@ -252,9 +252,9 @@ async function SentimentData({ days = 84 }: { days: number }) {
           {alerts.map((a, i) => {
             const Icon      = a.severity === 'critical' ? AlertTriangle : a.type === 'spike' ? TrendingUp : Info
             const colorClass =
-              a.severity === 'critical' ? 'border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400' :
-              a.severity === 'warning'  ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-400' :
-              'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-400'
+              a.severity === 'critical' ? 'border-line-strong bg-flare-wash text-tx-flare dark:border-line-strong dark:bg-shell/40 dark:text-tx-flare' :
+              a.severity === 'warning'  ? 'border-line bg-shell text-tx-2 dark:border-line dark:bg-shell/40 dark:text-tx-2' :
+              'border-line-strong bg-flare-wash text-tx-flare dark:border-line-strong dark:bg-shell/40 dark:text-tx-2'
             const aiQuestion =
               a.type === 'spike'
                 ? `What drove the positive sentiment surge on ${new Date(a.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}? What can we do to sustain it?`
@@ -269,7 +269,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
                 </div>
                 <Link
                   href={`/dashboard/ask?q=${encodeURIComponent(aiQuestion)}`}
-                  className="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border border-current/20 bg-white/30 hover:bg-white/50 dark:bg-black/20 dark:hover:bg-black/30 transition-colors whitespace-nowrap"
+                  className="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border border-current/20 bg-card/30 hover:bg-card/50 dark:bg-ink/20 dark:hover:bg-ink/30 transition-colors whitespace-nowrap"
                 >
                   <Search className="h-3 w-3" />
                   Find out why
@@ -286,16 +286,16 @@ async function SentimentData({ days = 84 }: { days: number }) {
           <p className="eyebrow">Sentiment score</p>
           <div className="flex items-baseline gap-1.5">
             <p className={`metric text-[34px] ${latest
-              ? latest.social_score >= 60 ? 'text-green-500'
-                : latest.social_score <= 40 ? 'text-red-500' : 'text-amber-500'
+              ? latest.social_score >= 60 ? 'text-pos'
+                : latest.social_score <= 40 ? 'text-tx-flare' : 'text-tx-2'
               : 'text-muted-foreground/30'}`}>
               {latest ? Math.round(latest.social_score) : '—'}
             </p>
             {latest && (
               latest.social_score >= 60
-                ? <TrendingUp   className="h-4 w-4 text-green-500 mb-1" />
+                ? <TrendingUp   className="h-4 w-4 text-pos mb-1" />
                 : latest.social_score <= 40
-                  ? <TrendingDown className="h-4 w-4 text-red-500 mb-1" />
+                  ? <TrendingDown className="h-4 w-4 text-tx-flare mb-1" />
                   : <Minus        className="h-4 w-4 text-muted-foreground/40 mb-1" />
             )}
           </div>
@@ -313,7 +313,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
 
         <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
           <p className="eyebrow">Positive</p>
-          <p className="metric text-[34px] text-green-500">
+          <p className="metric text-[34px] text-pos">
             {latest ? `${Math.round(latest.positive_pct)}%` : '—'}
           </p>
           <p className="text-[11px] text-muted-foreground/50">of mentions</p>
@@ -321,7 +321,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
 
         <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
           <p className="eyebrow">Negative</p>
-          <p className="metric text-[34px] text-red-500">
+          <p className="metric text-[34px] text-tx-flare">
             {latest ? `${Math.round(latest.negative_pct)}%` : '—'}
           </p>
           <p className="text-[11px] text-muted-foreground/50">of mentions</p>
@@ -344,9 +344,9 @@ async function SentimentData({ days = 84 }: { days: number }) {
             </div>
             <div className="flex items-center gap-4">
               {[
-                { label: 'Score', color: '#2B59FF' },
-                { label: 'Positive', color: '#22c55e' },
-                { label: 'Negative', color: '#f87171' },
+                { label: 'Score', color: 'var(--flare)' },
+                { label: 'Positive', color: 'var(--pos)' },
+                { label: 'Negative', color: 'var(--flare)' },
               ].map(l => (
                 <div key={l.label} className="hidden sm:flex items-center gap-1.5">
                   <span className="h-[3px] w-4 rounded-full" style={{ background: l.color }} />

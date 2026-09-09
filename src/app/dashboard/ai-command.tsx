@@ -27,8 +27,8 @@ interface Message {
 }
 
 const CONFIDENCE_CLASS: Record<string, string> = {
-  High:   'bg-green-50 text-green-700 border-green-200',
-  Medium: 'bg-amber-50 text-amber-700 border-amber-200',
+  High:   'bg-shell text-pos border-line',
+  Medium: 'bg-shell text-tx-2 border-line',
   Low:    'bg-muted text-muted-foreground border-border',
 }
 
@@ -134,7 +134,7 @@ export function AiCommand() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
             <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500" />
+              <div className="h-2 w-2 rounded-full bg-pos" />
               <span className="text-sm font-semibold">BrandGauge</span>
             </div>
             <div className="flex items-center gap-1">
@@ -200,7 +200,7 @@ export function AiCommand() {
 
                     {/* Collection recommendation */}
                     {m.collectionRecommendation && (
-                      <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
+                      <div className="text-[11px] text-tx-2 bg-shell border border-line rounded-lg px-3 py-2 leading-relaxed">
                         <span className="font-medium">To get a better answer:</span> {m.collectionRecommendation}
                       </div>
                     )}

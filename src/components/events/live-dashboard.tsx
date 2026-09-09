@@ -31,14 +31,14 @@ interface Props {
 }
 
 const TYPE_META: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  engaged:           { label: 'Engaged',           color: 'bg-blue-500',   icon: Users    },
-  new_lead:          { label: 'New Lead',           color: 'bg-green-500',  icon: Target   },
-  new_customer:      { label: 'New Customer',       color: 'bg-emerald-600',icon: Handshake},
-  existing_customer: { label: 'Existing Customer',  color: 'bg-purple-500', icon: Users    },
-  merch:             { label: 'Merch Given',         color: 'bg-orange-400', icon: Gift     },
-  sample:            { label: 'Sample Given',        color: 'bg-yellow-500', icon: Gift     },
-  prize:             { label: 'Prize Won',           color: 'bg-pink-500',   icon: Gift     },
-  photo:             { label: 'Photo Moment',        color: 'bg-violet-500', icon: Camera   },
+  engaged:           { label: 'Engaged',           color: 'bg-flare',   icon: Users    },
+  new_lead:          { label: 'New Lead',           color: 'bg-pos',  icon: Target   },
+  new_customer:      { label: 'New Customer',       color: 'bg-pos',icon: Handshake},
+  existing_customer: { label: 'Existing Customer',  color: 'bg-neu', icon: Users    },
+  merch:             { label: 'Merch Given',         color: 'bg-ember', icon: Gift     },
+  sample:            { label: 'Sample Given',        color: 'bg-ember', icon: Gift     },
+  prize:             { label: 'Prize Won',           color: 'bg-neu',   icon: Gift     },
+  photo:             { label: 'Photo Moment',        color: 'bg-neu', icon: Camera   },
 }
 
 function buildHourlyData(interactions: Interaction[]): { hour: string; count: number }[] {
@@ -94,7 +94,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {status === 'live' && (
-            <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-pos">
               <Radio className="h-4 w-4 animate-pulse" />
               Live
             </span>
@@ -158,20 +158,20 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
           <p className="text-sm font-medium">Interactions per hour</p>
           <ResponsiveContainer width="100%" height={100}>
             <BarChart data={hourlyData} margin={{ top: 0, right: 0, bottom: 0, left: -30 }}>
-              <XAxis dataKey="hour" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <XAxis dataKey="hour" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
                 contentStyle={{
-                  background: '#14182B',
-                  border: '1px solid rgba(255,255,255,0.10)',
+                  background: 'var(--bg-ink)',
+                  border: 'var(--line)',
                   borderRadius: 12,
                   fontSize: 12,
-                  color: '#fff',
+                  color: 'var(--bg-card)',
                 }}
-                labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
                 cursor={{ fill: 'currentColor', opacity: 0.05 }}
               />
-              <Bar dataKey="count" fill="#2B59FF" radius={[4,4,0,0]} opacity={0.85} />
+              <Bar dataKey="count" fill="var(--flare)" radius={[4,4,0,0]} opacity={0.85} />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -65,12 +65,12 @@ export function DigitalSpendChart({ data, demo }: SpendChartProps) {
       <AreaChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="spendGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%"  stopColor="#6366f1" stopOpacity={0.25} />
-            <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+            <stop offset="5%"  stopColor="var(--neu)" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="var(--neu)" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="imprGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%"  stopColor="#10b981" stopOpacity={0.2} />
-            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+            <stop offset="5%"  stopColor="var(--pos)" stopOpacity={0.2} />
+            <stop offset="95%" stopColor="var(--pos)" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
@@ -86,8 +86,8 @@ export function DigitalSpendChart({ data, demo }: SpendChartProps) {
           }
         />
         <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-        <Area yAxisId="spend" type="monotone" dataKey="spend"       stroke="#6366f1" strokeWidth={2} fill="url(#spendGrad)" name="spend"       dot={false} />
-        <Area yAxisId="impr"  type="monotone" dataKey="impressions" stroke="#10b981" strokeWidth={2} fill="url(#imprGrad)"  name="impressions" dot={false} />
+        <Area yAxisId="spend" type="monotone" dataKey="spend"       stroke="var(--neu)" strokeWidth={2} fill="url(#spendGrad)" name="spend"       dot={false} />
+        <Area yAxisId="impr"  type="monotone" dataKey="impressions" stroke="var(--pos)" strokeWidth={2} fill="url(#imprGrad)"  name="impressions" dot={false} />
       </AreaChart>
     </ResponsiveContainer>
   )
@@ -133,21 +133,21 @@ export function ConversionFunnelChart({ data, demo }: { data?: FunnelData; demo?
       label:  'Impressions',
       value:  d.impressions,
       barPct: 100,
-      color:  '#6366f1',
+      color:  'var(--neu)',
       rate:   null as string | null,
     },
     {
       label:  'Clicks',
       value:  d.clicks,
       barPct: logBarPct(d.clicks, d.impressions),
-      color:  '#8b5cf6',
+      color:  'var(--neu)',
       rate:   `↓ ${ctr.toFixed(2)}% CTR`,
     },
     {
       label:  'Conversions',
       value:  d.conversions,
       barPct: logBarPct(d.conversions, d.impressions),
-      color:  '#10b981',
+      color:  'var(--pos)',
       rate:   `↓ ${cvr.toFixed(2)}% CVR`,
     },
   ]
@@ -195,9 +195,9 @@ const DEMO_FREQUENCY: FrequencyPoint[] = [
 ]
 
 function freqColor(f: number): string {
-  if (f >= 7) return '#ef4444'
-  if (f >= 4) return '#f59e0b'
-  return '#10b981'
+  if (f >= 7) return 'var(--flare)'
+  if (f >= 4) return 'var(--ember)'
+  return 'var(--pos)'
 }
 
 interface FreqProps {
@@ -230,8 +230,8 @@ export function FrequencyBarChart({ data, demo }: FreqProps) {
             contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
             formatter={(val) => [typeof val === 'number' ? val.toFixed(2) : String(val), 'Avg Frequency']}
           />
-          <ReferenceLine y={7} stroke="#ef4444" strokeDasharray="4 2" />
-          <ReferenceLine y={4} stroke="#f59e0b" strokeDasharray="4 2" />
+          <ReferenceLine y={7} stroke="var(--flare)" strokeDasharray="4 2" />
+          <ReferenceLine y={4} stroke="var(--ember)" strokeDasharray="4 2" />
           <Bar dataKey="frequency" radius={[4, 4, 0, 0]} maxBarSize={56}>
             {chartData.map((entry, i) => (
               <Cell key={i} fill={freqColor(entry.frequency)} />
@@ -241,15 +241,15 @@ export function FrequencyBarChart({ data, demo }: FreqProps) {
       </ResponsiveContainer>
       <div className="flex items-center gap-5 text-[10px] text-muted-foreground">
         <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-emerald-500 inline-block" />
+          <span className="h-2 w-2 rounded-full bg-pos inline-block" />
           {'<4 Healthy'}
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-amber-500 inline-block" />
+          <span className="h-2 w-2 rounded-full bg-ember inline-block" />
           {'4–7 Watch'}
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-rose-500 inline-block" />
+          <span className="h-2 w-2 rounded-full bg-flare inline-block" />
           {'>7 Fatigue'}
         </div>
       </div>

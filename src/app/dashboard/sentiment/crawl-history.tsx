@@ -27,17 +27,17 @@ function duration(start: string, end: string | null) {
 
 function StatusBadge({ status }: { status: string }) {
   if (status === 'done') return (
-    <span className="inline-flex items-center gap-1 text-xs text-green-600">
+    <span className="inline-flex items-center gap-1 text-xs text-pos">
       <CheckCircle2 className="h-3 w-3" /> Done
     </span>
   )
   if (status === 'error') return (
-    <span className="inline-flex items-center gap-1 text-xs text-red-500">
+    <span className="inline-flex items-center gap-1 text-xs text-tx-flare">
       <AlertCircle className="h-3 w-3" /> Error
     </span>
   )
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-amber-500">
+    <span className="inline-flex items-center gap-1 text-xs text-tx-2">
       <Clock className="h-3 w-3" /> Running
     </span>
   )
@@ -99,7 +99,7 @@ export function CrawlHistory() {
                       <StatusBadge status={run.status} />
                       <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
                         run.trigger_type === 'manual'
-                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400'
+                          ? 'bg-flare-wash text-tx-flare dark:bg-flare dark:text-tx-2'
                           : 'bg-muted text-muted-foreground'
                       }`}>
                         {run.trigger_type === 'manual' ? 'Manual' : 'Scheduled'}
@@ -119,7 +119,7 @@ export function CrawlHistory() {
                   </div>
 
                   {run.error_message && (
-                    <p className="text-xs text-red-500 truncate">{run.error_message}</p>
+                    <p className="text-xs text-tx-flare truncate">{run.error_message}</p>
                   )}
                 </div>
               ))}

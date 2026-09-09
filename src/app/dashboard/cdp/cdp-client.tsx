@@ -33,9 +33,9 @@ interface CustomerProfile {
 }
 
 const NPS_ICON = {
-  promoter:  <Star className="h-3 w-3 text-green-500" />,
-  passive:   <Minus className="h-3 w-3 text-yellow-500" />,
-  detractor: <ThumbsDown className="h-3 w-3 text-red-500" />,
+  promoter:  <Star className="h-3 w-3 text-pos" />,
+  passive:   <Minus className="h-3 w-3 text-tx-2" />,
+  detractor: <ThumbsDown className="h-3 w-3 text-tx-flare" />,
 }
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -123,10 +123,10 @@ export function CdpClient() {
       {/* KPI chips */}
       <div className="flex flex-wrap gap-2" data-tour="cdp-main">
         <KpiChip icon={<Users className="h-3 w-3" />}      label="Total profiles"   value={total} />
-        <KpiChip icon={<Star className="h-3 w-3 text-green-500" />}     label="Promoters"   value={promoters} />
-        <KpiChip icon={<Minus className="h-3 w-3 text-yellow-500" />}   label="Passives"    value={passives} />
-        <KpiChip icon={<ThumbsDown className="h-3 w-3 text-red-500" />} label="Detractors"  value={detractors} />
-        <KpiChip icon={<Activity className="h-3 w-3 text-orange-500" />} label="At risk"    value={atRisk} />
+        <KpiChip icon={<Star className="h-3 w-3 text-pos" />}     label="Promoters"   value={promoters} />
+        <KpiChip icon={<Minus className="h-3 w-3 text-tx-2" />}   label="Passives"    value={passives} />
+        <KpiChip icon={<ThumbsDown className="h-3 w-3 text-tx-flare" />} label="Detractors"  value={detractors} />
+        <KpiChip icon={<Activity className="h-3 w-3 text-tx-2" />} label="At risk"    value={atRisk} />
       </div>
 
       {/* Filters */}
@@ -218,8 +218,8 @@ function KpiChip({ icon, label, value }: { icon: React.ReactNode; label: string;
 
 function ProfileCard({ profile }: { profile: CustomerProfile }) {
   const riskColor =
-    profile.retention_risk_score >= 70 ? 'border-red-300 bg-red-50/30' :
-    profile.retention_risk_score >= 45 ? 'border-orange-200 bg-orange-50/20' :
+    profile.retention_risk_score >= 70 ? 'border-line-strong bg-flare-wash/30' :
+    profile.retention_risk_score >= 45 ? 'border-line bg-shell/20' :
     'border-border bg-card'
 
   const activeSources = Object.entries(profile.sources)
@@ -240,7 +240,7 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
         </div>
         <div className="flex items-center gap-1 shrink-0">
           {profile.is_promoter && (
-            <Badge variant="outline" className="text-xs border-green-300 text-green-700">Promoter</Badge>
+            <Badge variant="outline" className="text-xs border-line text-pos">Promoter</Badge>
           )}
           {profile.nps_label && (
             <div className="flex items-center gap-1">
@@ -277,9 +277,9 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
         {profile.nps_score !== null && (
           <Badge variant="outline" className={cn(
             'text-xs',
-            profile.nps_label === 'promoter' ? 'border-green-300 text-green-700' :
-            profile.nps_label === 'detractor' ? 'border-red-300 text-red-700' :
-            'border-yellow-300 text-yellow-700'
+            profile.nps_label === 'promoter' ? 'border-line text-pos' :
+            profile.nps_label === 'detractor' ? 'border-line-strong text-tx-flare' :
+            'border-line text-tx-2'
           )}>
             NPS {profile.nps_score} · {profile.nps_label}
           </Badge>
@@ -287,7 +287,7 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
         {profile.retention_risk_score >= 45 && (
           <Badge variant="outline" className={cn(
             'text-xs',
-            profile.retention_risk_score >= 70 ? 'border-red-300 text-red-700' : 'border-orange-300 text-orange-700'
+            profile.retention_risk_score >= 70 ? 'border-line-strong text-tx-flare' : 'border-line text-tx-2'
           )}>
             Risk: {profile.retention_risk_score}
           </Badge>

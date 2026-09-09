@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
     return shell(
       <Card>
         <CardContent className="pt-8 pb-6 text-center space-y-4">
-          <CheckCircle2 className="h-10 w-10 text-green-500 mx-auto" />
+          <CheckCircle2 className="h-10 w-10 text-pos mx-auto" />
           <div className="space-y-1">
             <p className="font-semibold">Check your inbox</p>
             <p className="text-sm text-muted-foreground">

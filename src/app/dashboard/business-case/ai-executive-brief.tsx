@@ -128,7 +128,7 @@ export async function AiExecutiveBrief(props: Props) {
   if (!aiBusinessCase) {
     return (
       <div className="rounded-2xl border bg-muted/30 px-5 py-4 flex items-center gap-3 text-[13px] text-muted-foreground">
-        <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
+        <AlertCircle className="h-4 w-4 shrink-0 text-tx-2" />
         <span>AI executive brief could not be generated — your brand data is all here, but there was not enough historical data to produce a board-ready narrative yet. Try again once you have at least 4 weeks of campaign and sentiment data.</span>
       </div>
     )
@@ -153,9 +153,9 @@ export async function AiExecutiveBrief(props: Props) {
             <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Proof Points</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {aiBusinessCase.proof_points.map((p, i) => (
-                <div key={i} className="rounded-lg bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 px-3 py-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 mb-1" />
-                  <p className="text-[12px] text-emerald-800 dark:text-emerald-300">{p}</p>
+                <div key={i} className="rounded-lg bg-shell/70 dark:bg-shell/20 border border-line dark:border-line px-3 py-2">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-pos mb-1" />
+                  <p className="text-[12px] text-pos dark:text-pos">{p}</p>
                 </div>
               ))}
             </div>
@@ -183,7 +183,7 @@ export async function AiExecutiveBrief(props: Props) {
             <ul className="space-y-1.5">
               {aiBusinessCase.risks.map((r, i) => (
                 <li key={i} className="flex items-start gap-2 text-[13px]">
-                  <AlertCircle className="h-3.5 w-3.5 text-red-500 shrink-0 mt-0.5" />
+                  <AlertCircle className="h-3.5 w-3.5 text-tx-flare shrink-0 mt-0.5" />
                   {r}
                 </li>
               ))}

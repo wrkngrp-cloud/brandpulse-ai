@@ -107,26 +107,26 @@ function getGreeting() {
 }
 
 const STATUS_DOT: Record<string, string> = {
-  active:    'bg-green-400',
-  paused:    'bg-amber-400',
+  active:    'bg-pos',
+  paused:    'bg-ember',
   draft:     'bg-muted-foreground/30',
-  completed: 'bg-blue-400',
+  completed: 'bg-flare',
 }
 
 const EVENT_STATUS_DOT: Record<string, string> = {
-  planned:  'bg-blue-400',
-  live:     'bg-green-400',
+  planned:  'bg-flare',
+  live:     'bg-pos',
   closed:   'bg-muted-foreground/30',
-  reported: 'bg-violet-400',
+  reported: 'bg-neu',
 }
 
 const PLATFORM_LABEL: Record<string, string> = { twitter: 'X', instagram: 'IG' }
 
 const SENTIMENT_COLOUR: Record<string, string> = {
-  positive: 'text-green-500',
+  positive: 'text-pos',
   neutral:  'text-muted-foreground',
-  negative: 'text-red-500',
-  mixed:    'text-amber-500',
+  negative: 'text-tx-flare',
+  mixed:    'text-tx-2',
 }
 
 // ── Card shell ─────────────────────────────────────────────────────────────
@@ -226,8 +226,8 @@ export function OverviewClient({
             </Link>
             <Link
               href="/dashboard/campaigns/new"
-              className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-white rounded-xl px-4 py-2 transition-all hover:opacity-90 active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #E8763E 0%, #C4501D 100%)', boxShadow: '0 4px 14px -4px oklch(0.585 0.163 37 / 0.55)' }}
+              className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-tx-inv rounded-xl px-4 py-2 transition-all hover:opacity-90 active:scale-[0.98]"
+              style={{ background: 'var(--char)', boxShadow: '0 4px 14px -4px oklch(0.585 0.163 37 / 0.55)' }}
             >
               <Plus className="h-3.5 w-3.5" />
               Campaign
@@ -401,17 +401,17 @@ export function OverviewClient({
             <div className="flex items-start gap-6">
               <div className="shrink-0">
                 <div className={cn('metric text-[58px] leading-none tabular-nums',
-                  sentiment.social_score >= 60 ? 'text-green-500'
-                  : sentiment.social_score <= 40 ? 'text-red-500'
-                  : 'text-amber-500'
+                  sentiment.social_score >= 60 ? 'text-pos'
+                  : sentiment.social_score <= 40 ? 'text-tx-flare'
+                  : 'text-tx-2'
                 )}>
                   {Math.round(sentiment.social_score)}
                 </div>
                 <div className="flex items-center gap-1.5 mt-2">
                   {sentiment.social_score >= 60
-                    ? <TrendingUp className="h-3.5 w-3.5 text-green-500" />
+                    ? <TrendingUp className="h-3.5 w-3.5 text-pos" />
                     : sentiment.social_score <= 40
-                    ? <TrendingDown className="h-3.5 w-3.5 text-red-500" />
+                    ? <TrendingDown className="h-3.5 w-3.5 text-tx-flare" />
                     : <Minus className="h-3.5 w-3.5 text-muted-foreground/40" />
                   }
                   <span className="text-[11px] font-medium text-muted-foreground/45">/ 100</span>
@@ -420,8 +420,8 @@ export function OverviewClient({
 
               <div className="flex-1 space-y-3 pt-1">
                 {[
-                  { label: 'Positive', pct: sentiment.positive_pct, bar: 'from-green-500 to-green-400', text: 'text-green-500' },
-                  { label: 'Negative', pct: sentiment.negative_pct, bar: 'from-red-500 to-red-400',     text: 'text-red-500'   },
+                  { label: 'Positive', pct: sentiment.positive_pct, bar: 'bg-pos',  text: 'text-pos' },
+                  { label: 'Negative', pct: sentiment.negative_pct, bar: 'bg-flare', text: 'text-tx-flare' },
                 ].map(row => (
                   <div key={row.label} className="space-y-1.5">
                     <div className="flex justify-between items-center">
@@ -432,7 +432,7 @@ export function OverviewClient({
                     </div>
                     <div className="h-[3px] bg-muted/40 rounded-full overflow-hidden">
                       <motion.div
-                        className={cn('h-full rounded-full bg-gradient-to-r', row.bar)}
+                        className={cn('h-full', row.bar)}
                         initial={{ width: 0 }}
                         animate={{ width: `${row.pct}%` }}
                         transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -476,7 +476,7 @@ export function OverviewClient({
               <div className="h-[3px] bg-muted/40 rounded-full overflow-hidden mt-4">
                 <motion.div
                   className="h-full rounded-full"
-                  style={{ background: 'linear-gradient(90deg, #6B8FFF 0%, #2B59FF 100%)' }}
+                  style={{ background: 'var(--flare)' }}
                   initial={{ width: 0 }}
                   animate={{ width: `${Math.min(sovScore, 100)}%` }}
                   transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -551,8 +551,8 @@ export function OverviewClient({
               <p className="text-[12.5px] text-muted-foreground">No active campaigns. Create your first one.</p>
               <Link
                 href="/dashboard/campaigns/new"
-                className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-white rounded-xl px-4 py-2 transition-all hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg, #E8763E 0%, #C4501D 100%)' }}
+                className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-tx-inv rounded-xl px-4 py-2 transition-all hover:opacity-90"
+                style={{ background: 'var(--char)' }}
               >
                 <Plus className="h-3.5 w-3.5" /> New campaign
               </Link>
@@ -611,10 +611,10 @@ export function OverviewClient({
                     </span>
                     {m.sentiment_label && (
                       <span className={cn('text-[10px] font-semibold capitalize ml-auto shrink-0 px-1.5 py-0.5 rounded-md', {
-                        'bg-green-500/10 text-green-600 dark:text-green-400': m.sentiment_label === 'positive',
-                        'bg-red-500/10 text-red-600 dark:text-red-400':       m.sentiment_label === 'negative',
+                        'bg-pos/10 text-pos dark:text-pos': m.sentiment_label === 'positive',
+                        'bg-flare/10 text-tx-flare dark:text-tx-flare':       m.sentiment_label === 'negative',
                         'bg-muted text-muted-foreground':                      m.sentiment_label === 'neutral',
-                        'bg-amber-500/10 text-amber-600 dark:text-amber-400': m.sentiment_label === 'mixed',
+                        'bg-ember/10 text-tx-2 dark:text-tx-2': m.sentiment_label === 'mixed',
                       })}>
                         {m.sentiment_label}
                       </span>

@@ -55,21 +55,21 @@ const PLATFORMS   = ['Instagram', 'X (Twitter)', 'LinkedIn', 'WhatsApp', 'TikTok
 const FUNNEL_STAGES = ['Awareness', 'Consideration', 'Conversion', 'Loyalty', 'Re-engagement']
 
 function scoreColor(score: number): string {
-  if (score >= 75) return 'text-green-600'
-  if (score >= 50) return 'text-amber-600'
-  return 'text-red-500'
+  if (score >= 75) return 'text-pos'
+  if (score >= 50) return 'text-tx-2'
+  return 'text-tx-flare'
 }
 
 function scoreBarColor(score: number): string {
-  if (score >= 75) return 'bg-green-500'
-  if (score >= 50) return 'bg-amber-400'
-  return 'bg-red-400'
+  if (score >= 75) return 'bg-pos'
+  if (score >= 50) return 'bg-ember'
+  return 'bg-flare'
 }
 
 function riskBarColor(score: number): string {
-  if (score <= 20) return 'bg-green-500'
-  if (score <= 50) return 'bg-amber-400'
-  return 'bg-red-400'
+  if (score <= 20) return 'bg-pos'
+  if (score <= 50) return 'bg-ember'
+  return 'bg-flare'
 }
 
 function ScoreCard({ label, dim, isRisk = false }: {
@@ -92,7 +92,7 @@ function ScoreCard({ label, dim, isRisk = false }: {
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-medium text-foreground">{label}</span>
-          <span className={cn('text-xs font-semibold tabular-nums', isRisk ? (score <= 20 ? 'text-green-600' : score <= 50 ? 'text-amber-600' : 'text-red-500') : scoreColor(score))}>
+          <span className={cn('text-xs font-semibold tabular-nums', isRisk ? (score <= 20 ? 'text-pos' : score <= 50 ? 'text-tx-2' : 'text-tx-flare') : scoreColor(score))}>
             {score}
             <span className="text-muted-foreground font-normal">/100</span>
           </span>
@@ -353,10 +353,10 @@ export function PrePostWidget() {
                       </span>
                       <button
                         onClick={() => { setImage(null); setImageError(null) }}
-                        className="bg-background/80 backdrop-blur-sm rounded-full p-0.5 hover:bg-red-50 transition-colors"
+                        className="bg-background/80 backdrop-blur-sm rounded-full p-0.5 hover:bg-flare-wash transition-colors"
                         title="Remove"
                       >
-                        <XCircle className="h-4 w-4 text-red-500" />
+                        <XCircle className="h-4 w-4 text-tx-flare" />
                       </button>
                     </div>
                     <div className="absolute bottom-2 left-2">
@@ -386,7 +386,7 @@ export function PrePostWidget() {
                     </button>
                   </div>
                 )}
-                {imageError && <p className="text-xs text-red-500">{imageError}</p>}
+                {imageError && <p className="text-xs text-tx-flare">{imageError}</p>}
 
                 <Textarea
                   value={content}
@@ -413,7 +413,7 @@ export function PrePostWidget() {
                   </Select>
                 </div>
                 {error && (
-                  <p className="text-xs text-red-500">{error}</p>
+                  <p className="text-xs text-tx-flare">{error}</p>
                 )}
                 <Button
                   className="w-full"
@@ -455,21 +455,21 @@ export function PrePostWidget() {
                 {result.risk.flags?.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                      <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                      <AlertTriangle className="h-3.5 w-3.5 text-tx-2" />
                       Cultural Risk Flags
                     </p>
                     {result.risk.flags.map((f, i) => (
-                      <div key={i} className="rounded-xl border border-amber-200 bg-amber-50 p-3 space-y-1.5 text-sm">
-                        <p className="font-semibold text-amber-800 text-xs">{f.title}</p>
+                      <div key={i} className="rounded-xl border border-line bg-shell p-3 space-y-1.5 text-sm">
+                        <p className="font-semibold text-tx-2 text-xs">{f.title}</p>
                         {f.offending_text && (
-                          <p className="text-amber-700 text-xs">
+                          <p className="text-tx-2 text-xs">
                             <span className="font-medium">Flagged: </span>
                             <span className="italic">"{f.offending_text}"</span>
                           </p>
                         )}
-                        <p className="text-amber-700 text-xs">{f.reason}</p>
+                        <p className="text-tx-2 text-xs">{f.reason}</p>
                         {f.replacement && (
-                          <p className="text-amber-700 text-xs">
+                          <p className="text-tx-2 text-xs">
                             <span className="font-medium">Suggestion: </span>{f.replacement}
                           </p>
                         )}
@@ -503,7 +503,7 @@ export function PrePostWidget() {
                         className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
                       >
                         {copiedRewrite
-                          ? <><Check className="h-3 w-3 text-green-600" /> Copied</>
+                          ? <><Check className="h-3 w-3 text-pos" /> Copied</>
                           : <><Copy className="h-3 w-3" /> Copy</>
                         }
                       </button>

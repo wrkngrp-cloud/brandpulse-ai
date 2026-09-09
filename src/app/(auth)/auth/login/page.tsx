@@ -185,7 +185,7 @@ function LoginContent() {
 
             <form ref={formRef} id="email-login-form" action={action} className="space-y-4">
               {linkExpired && (
-                <p className="text-sm text-amber-700 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400 px-3 py-2 rounded-lg">
+                <p className="text-sm text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2 px-3 py-2 rounded-lg">
                   That reset link has expired. Request a new one below.
                 </p>
               )}

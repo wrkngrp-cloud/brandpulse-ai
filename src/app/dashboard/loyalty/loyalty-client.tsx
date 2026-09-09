@@ -219,7 +219,7 @@ export function LoyaltyClient() {
                       <td className="px-4 py-3">
                         {m.tier ? (
                           <span
-                            className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
+                            className="px-2 py-0.5 rounded-full text-xs font-medium text-tx-inv"
                             style={{ backgroundColor: m.tier.color }}
                           >
                             {m.tier.name}
@@ -285,9 +285,9 @@ export function LoyaltyClient() {
                   <div key={m.id} className="flex items-center gap-4 px-5 py-3">
                     <span className={cn(
                       'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold shrink-0',
-                      i === 0 ? 'bg-yellow-400 text-yellow-900' :
-                      i === 1 ? 'bg-gray-300 text-gray-700' :
-                      i === 2 ? 'bg-orange-300 text-orange-900' :
+                      i === 0 ? 'bg-ember text-tx-2' :
+                      i === 1 ? 'bg-neu text-tx-2' :
+                      i === 2 ? 'bg-ember text-tx-2' :
                       'bg-muted text-muted-foreground'
                     )}>
                       {i + 1}
@@ -297,7 +297,7 @@ export function LoyaltyClient() {
                       <p className="text-xs text-muted-foreground">{m.email ?? m.phone ?? '—'}</p>
                     </div>
                     {m.tier && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium text-white" style={{ backgroundColor: m.tier.color }}>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium text-tx-inv" style={{ backgroundColor: m.tier.color }}>
                         {m.tier.name}
                       </span>
                     )}
@@ -339,7 +339,7 @@ function ProgramCard({ program }: { program: LoyaltyProgram }) {
           {program.description && <p className="text-sm text-muted-foreground mt-0.5">{program.description}</p>}
           <p className="text-xs text-muted-foreground mt-1">{program.points_per_ngn} {program.points_currency} per ₦1 · {memberCount} members</p>
         </div>
-        <Award className="h-5 w-5 text-yellow-500 shrink-0" />
+        <Award className="h-5 w-5 text-tx-2 shrink-0" />
       </div>
 
       {program.tiers?.length > 0 && (
@@ -347,7 +347,7 @@ function ProgramCard({ program }: { program: LoyaltyProgram }) {
           {program.tiers
             .sort((a, b) => a.sort_order - b.sort_order)
             .map(t => (
-              <div key={t.id} className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-white" style={{ backgroundColor: t.color }}>
+              <div key={t.id} className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-tx-inv" style={{ backgroundColor: t.color }}>
                 {t.name} · {t.min_points.toLocaleString()}+ pts
               </div>
             ))}

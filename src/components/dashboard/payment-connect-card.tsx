@@ -69,7 +69,7 @@ function PaymentProviderCard({
           </p>
         </div>
         {configured && (
-          <span className="flex items-center gap-1 text-xs text-green-600">
+          <span className="flex items-center gap-1 text-xs text-pos">
             <CheckCircle2 className="h-3.5 w-3.5" /> Configured
           </span>
         )}
@@ -91,7 +91,7 @@ function PaymentProviderCard({
               'shrink-0 gap-1.5 text-xs px-2.5'
             )}
           >
-            {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? <Check className="h-3.5 w-3.5 text-pos" /> : <Copy className="h-3.5 w-3.5" />}
             {copied ? 'Copied' : 'Copy'}
           </button>
         </div>

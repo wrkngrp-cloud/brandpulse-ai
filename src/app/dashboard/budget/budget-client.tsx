@@ -37,14 +37,14 @@ interface BudgetPlan {
 }
 
 const CHANNEL_COLOR: Record<string, string> = {
-  digital:    'bg-blue-100 text-blue-800',
-  tv:         'bg-purple-100 text-purple-800',
-  radio:      'bg-green-100 text-green-800',
-  ooh:        'bg-orange-100 text-orange-800',
-  influencer: 'bg-pink-100 text-pink-800',
-  events:     'bg-yellow-100 text-yellow-800',
-  print:      'bg-gray-100 text-gray-800',
-  other:      'bg-slate-100 text-slate-800',
+  digital:    'bg-flare-wash text-tx-flare',
+  tv:         'bg-shell text-tx-2',
+  radio:      'bg-shell text-pos',
+  ooh:        'bg-shell text-tx-2',
+  influencer: 'bg-shell text-tx-2',
+  events:     'bg-shell text-tx-2',
+  print:      'bg-shell text-tx',
+  other:      'bg-shell text-tx',
 }
 
 export function BudgetClient() {
@@ -187,14 +187,14 @@ export function BudgetClient() {
                               <td className="px-3 py-2 font-medium">{li.label}</td>
                               <td className="px-3 py-2">{formatNGN(li.planned_amount)}</td>
                               <td className="px-3 py-2">{formatNGN(li.actual_amount)}</td>
-                              <td className={cn('px-3 py-2 font-medium', isOver ? 'text-red-600' : variance < 0 ? 'text-green-600' : 'text-muted-foreground')}>
+                              <td className={cn('px-3 py-2 font-medium', isOver ? 'text-tx-flare' : variance < 0 ? 'text-pos' : 'text-muted-foreground')}>
                                 {variance !== 0 ? (isOver ? '+' : '') + formatNGN(variance) : '—'}
                               </td>
                               <td className="px-3 py-2 w-28">
                                 <div className="flex items-center gap-1.5">
                                   <div className="flex-1 bg-muted rounded-full h-1.5">
                                     <div
-                                      className={cn('h-1.5 rounded-full', pacingPct > 110 ? 'bg-red-500' : pacingPct > 90 ? 'bg-yellow-500' : 'bg-green-500')}
+                                      className={cn('h-1.5 rounded-full', pacingPct > 110 ? 'bg-flare' : pacingPct > 90 ? 'bg-ember' : 'bg-pos')}
                                       style={{ width: `${Math.min(100, pacingPct)}%` }}
                                     />
                                   </div>
@@ -288,10 +288,10 @@ function ActivePlanSummary({ plan }: { plan: BudgetPlan }) {
           <p className="text-xs text-muted-foreground">Pace</p>
           <div className="flex items-center gap-1">
             {Math.abs(paceGap) < 5
-              ? <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+              ? <CheckCircle className="h-3.5 w-3.5 text-pos" />
               : paceGap > 5
-                ? <AlertCircle className="h-3.5 w-3.5 text-orange-500" />
-                : <AlertCircle className="h-3.5 w-3.5 text-blue-500" />}
+                ? <AlertCircle className="h-3.5 w-3.5 text-tx-2" />
+                : <AlertCircle className="h-3.5 w-3.5 text-tx-2" />}
             <span className="text-sm font-bold">
               {Math.abs(paceGap) < 5 ? 'On track' : paceGap > 5 ? 'Ahead' : 'Behind'}
             </span>
@@ -331,7 +331,7 @@ function SpendProgress({ plan }: { plan: BudgetPlan }) {
             </span>
             <div className="flex-1 bg-muted rounded-full h-2">
               <div
-                className={cn('h-2 rounded-full', pct > 110 ? 'bg-red-500' : pct > 90 ? 'bg-yellow-500' : 'bg-primary')}
+                className={cn('h-2 rounded-full', pct > 110 ? 'bg-flare' : pct > 90 ? 'bg-ember' : 'bg-primary')}
                 style={{ width: `${pct}%` }}
               />
             </div>
@@ -453,8 +453,8 @@ function AddActualForm({ lineItemId, onSave, onCancel }: { lineItemId: string; o
   }
 
   return (
-    <div className="rounded-lg border bg-blue-50/50 border-blue-200 p-4 space-y-3">
-      <p className="text-xs font-medium text-blue-800">Log actual spend</p>
+    <div className="rounded-lg border bg-flare-wash/50 border-line-strong p-4 space-y-3">
+      <p className="text-xs font-medium text-tx-flare">Log actual spend</p>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
           <Label className="text-xs">Amount (₦) *</Label>

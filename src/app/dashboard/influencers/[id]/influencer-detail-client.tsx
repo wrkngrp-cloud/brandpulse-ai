@@ -123,10 +123,10 @@ function PlatformIcon({ platform }: { platform: string }) {
 
 function IqScore({ score }: { score: number | null }) {
   if (score === null) return <span className="text-muted-foreground text-sm">Not scored</span>
-  const color = score >= 70 ? 'text-emerald-600 dark:text-emerald-400'
-    : score >= 50 ? 'text-amber-600 dark:text-amber-400'
-    : 'text-rose-600 dark:text-rose-400'
-  const barColor = score >= 70 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-400' : 'bg-rose-500'
+  const color = score >= 70 ? 'text-pos dark:text-pos'
+    : score >= 50 ? 'text-tx-2 dark:text-tx-2'
+    : 'text-tx-flare dark:text-tx-flare'
+  const barColor = score >= 70 ? 'bg-pos' : score >= 50 ? 'bg-ember' : 'bg-flare'
   return (
     <div className="space-y-1">
       <span className={cn('text-2xl font-bold tabular-nums', color)}>{score}</span>
@@ -139,10 +139,10 @@ function IqScore({ score }: { score: number | null }) {
 
 function RiskScore({ score }: { score: number | null }) {
   if (score === null) return <span className="text-muted-foreground text-sm">—</span>
-  const color = score < 30 ? 'text-emerald-600 dark:text-emerald-400'
-    : score <= 60 ? 'text-amber-600 dark:text-amber-400'
-    : 'text-rose-600 dark:text-rose-400'
-  const barColor = score < 30 ? 'bg-emerald-500' : score <= 60 ? 'bg-amber-400' : 'bg-rose-500'
+  const color = score < 30 ? 'text-pos dark:text-pos'
+    : score <= 60 ? 'text-tx-2 dark:text-tx-2'
+    : 'text-tx-flare dark:text-tx-flare'
+  const barColor = score < 30 ? 'bg-pos' : score <= 60 ? 'bg-ember' : 'bg-flare'
   const label    = score < 30 ? 'Low risk' : score <= 60 ? 'Medium' : 'High risk'
   return (
     <div className="space-y-1">
@@ -160,9 +160,9 @@ function RiskScore({ score }: { score: number | null }) {
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     prospect: 'bg-muted text-muted-foreground',
-    active:   'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-    paused:   'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    rejected: 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400',
+    active:   'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+    paused:   'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+    rejected: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
   }
   return (
     <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
@@ -173,9 +173,9 @@ function StatusBadge({ status }: { status: string }) {
 
 function RecommendationBadge({ rec }: { rec: string }) {
   const map: Record<string, string> = {
-    strong_fit:    'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-    potential_fit: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    poor_fit:      'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400',
+    strong_fit:    'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+    potential_fit: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+    poor_fit:      'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
   }
   const labels: Record<string, string> = {
     strong_fit: 'Strong fit', potential_fit: 'Potential fit', poor_fit: 'Poor fit',
@@ -373,16 +373,16 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
                   </Button>
                   <span className="text-xs text-muted-foreground">Score</span>
                   <span className={cn('text-lg font-bold tabular-nums',
-                    bf.score >= 70 ? 'text-emerald-600 dark:text-emerald-400'
-                    : bf.score >= 40 ? 'text-amber-600 dark:text-amber-400'
-                    : 'text-rose-600 dark:text-rose-400'
+                    bf.score >= 70 ? 'text-pos dark:text-pos'
+                    : bf.score >= 40 ? 'text-tx-2 dark:text-tx-2'
+                    : 'text-tx-flare dark:text-tx-flare'
                   )}>{bf.score}/100</span>
                 </div>
               </div>
 
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className={cn('h-full rounded-full', bf.score >= 70 ? 'bg-emerald-500' : bf.score >= 40 ? 'bg-amber-400' : 'bg-rose-500')}
+                  className={cn('h-full rounded-full', bf.score >= 70 ? 'bg-pos' : bf.score >= 40 ? 'bg-ember' : 'bg-flare')}
                   style={{ width: `${bf.score}%` }}
                 />
               </div>
@@ -414,11 +414,11 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
 
               {bf.positive_indicators?.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Positive indicators</p>
+                  <p className="text-xs font-semibold text-pos dark:text-pos uppercase tracking-wide">Positive indicators</p>
                   <div className="space-y-1">
                     {bf.positive_indicators.map(s => (
                       <p key={s} className="text-xs flex gap-1.5">
-                        <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                        <CheckCircle className="h-3.5 w-3.5 text-pos shrink-0 mt-0.5" />
                         {s}
                       </p>
                     ))}
@@ -428,11 +428,11 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
 
               {bf.risk_factors?.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold text-rose-500 uppercase tracking-wide">Risk factors</p>
+                  <p className="text-xs font-semibold text-tx-flare uppercase tracking-wide">Risk factors</p>
                   <div className="space-y-1">
                     {bf.risk_factors.map(r => (
                       <p key={r} className="text-xs flex gap-1.5">
-                        <XCircle className="h-3.5 w-3.5 text-rose-500 shrink-0 mt-0.5" />
+                        <XCircle className="h-3.5 w-3.5 text-tx-flare shrink-0 mt-0.5" />
                         {r}
                       </p>
                     ))}
@@ -561,21 +561,21 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
               {pd.online_reputation.positive_signals?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {pd.online_reputation.positive_signals.map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">{s}</span>
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-shell text-pos dark:bg-shell/30 dark:text-pos">{s}</span>
                   ))}
                 </div>
               )}
               {pd.online_reputation.negative_signals?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {pd.online_reputation.negative_signals.map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">{s}</span>
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">{s}</span>
                   ))}
                 </div>
               )}
               {pd.online_reputation.controversy_flags?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {pd.online_reputation.controversy_flags.map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400">{s}</span>
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{s}</span>
                   ))}
                 </div>
               )}

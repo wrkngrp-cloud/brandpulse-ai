@@ -38,7 +38,7 @@ function fmtLimit(n: number) {
 
 function UsageBar({ used, limit, label }: { used: number; limit: number; label: string }) {
   const pct = limit === -1 ? 0 : Math.min(100, (used / limit) * 100)
-  const color = pct > 90 ? 'bg-red-500' : pct > 70 ? 'bg-amber-500' : 'bg-green-500'
+  const color = pct > 90 ? 'bg-flare' : pct > 70 ? 'bg-ember' : 'bg-pos'
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-[12px]">
@@ -93,9 +93,9 @@ export function BillingClient({
     }
   }
 
-  const statusColor = subscriptionStatus === 'active' ? 'text-green-600'
-    : subscriptionStatus === 'trialing' ? 'text-blue-600'
-    : subscriptionStatus === 'past_due' ? 'text-red-600'
+  const statusColor = subscriptionStatus === 'active' ? 'text-pos'
+    : subscriptionStatus === 'trialing' ? 'text-tx-flare'
+    : subscriptionStatus === 'past_due' ? 'text-tx-flare'
     : 'text-muted-foreground'
 
   return (
@@ -179,7 +179,7 @@ export function BillingClient({
                   )
                 ) : (
                   <div className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
-                    <Check className="h-3.5 w-3.5 text-green-500" />Your current plan
+                    <Check className="h-3.5 w-3.5 text-pos" />Your current plan
                   </div>
                 )}
               </div>

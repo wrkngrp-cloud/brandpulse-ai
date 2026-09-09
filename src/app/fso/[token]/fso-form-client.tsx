@@ -74,8 +74,8 @@ function YesNoToggle({
               'h-12 rounded-xl text-sm font-semibold border-2 transition-all duration-150',
               value === opt
                 ? opt
-                  ? 'bg-emerald-500 border-emerald-500 text-white'
-                  : 'bg-red-500 border-red-500 text-white'
+                  ? 'bg-pos border-line text-tx-inv'
+                  : 'bg-flare border-line-strong text-tx-inv'
                 : 'bg-background border-border text-muted-foreground hover:border-primary/50',
             )}
           >
@@ -245,8 +245,8 @@ export function FsoFormClient({
   if (submitted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background gap-6">
-        <div className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-          <Check className="h-8 w-8 text-emerald-600" />
+        <div className="h-16 w-16 rounded-full bg-shell dark:bg-shell/30 flex items-center justify-center">
+          <Check className="h-8 w-8 text-pos" />
         </div>
         <div className="text-center space-y-2 max-w-xs">
           <p className="text-lg font-bold">Report submitted!</p>
@@ -295,7 +295,7 @@ export function FsoFormClient({
 
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Your name <span className="text-red-500">*</span></label>
+                <label className="text-sm font-medium">Your name <span className="text-tx-flare">*</span></label>
                 <input
                   type="text"
                   placeholder="e.g. Emeka Okafor"
@@ -555,14 +555,14 @@ export function FsoFormClient({
               </div>
               <div className={cn(
                 'rounded-xl p-4 space-y-1',
-                stats.availPct >= 80 ? 'bg-emerald-50 dark:bg-emerald-900/20' :
-                stats.availPct >= 60 ? 'bg-amber-50 dark:bg-amber-900/20' :
-                                        'bg-red-50 dark:bg-red-900/20',
+                stats.availPct >= 80 ? 'bg-shell dark:bg-shell/20' :
+                stats.availPct >= 60 ? 'bg-shell dark:bg-shell/20' :
+                                        'bg-flare-wash dark:bg-shell/20',
               )}>
                 <p className={cn(
                   'text-2xl font-bold',
-                  stats.availPct >= 80 ? 'text-emerald-600' :
-                  stats.availPct >= 60 ? 'text-amber-600' : 'text-red-600',
+                  stats.availPct >= 80 ? 'text-pos' :
+                  stats.availPct >= 60 ? 'text-tx-2' : 'text-tx-flare',
                 )}>{stats.availPct}%</p>
                 <p className="text-xs text-muted-foreground">Availability</p>
               </div>
@@ -572,9 +572,9 @@ export function FsoFormClient({
               </div>
               <div className={cn(
                 'rounded-xl p-4 space-y-1',
-                stats.oos > 0 ? 'bg-red-50 dark:bg-red-900/20' : 'bg-muted/40',
+                stats.oos > 0 ? 'bg-flare-wash dark:bg-shell/20' : 'bg-muted/40',
               )}>
-                <p className={cn('text-2xl font-bold', stats.oos > 0 && 'text-red-600')}>{stats.oos}</p>
+                <p className={cn('text-2xl font-bold', stats.oos > 0 && 'text-tx-flare')}>{stats.oos}</p>
                 <p className="text-xs text-muted-foreground">Out-of-stock alerts</p>
               </div>
             </div>
@@ -586,18 +586,18 @@ export function FsoFormClient({
                 <div key={i} className="flex items-center gap-3 rounded-xl border border-border p-3">
                   <Package className={cn(
                     'h-4 w-4 shrink-0',
-                    o.product_available === true ? 'text-emerald-500' :
-                    o.product_available === false ? 'text-red-500' : 'text-muted-foreground',
+                    o.product_available === true ? 'text-pos' :
+                    o.product_available === false ? 'text-tx-flare' : 'text-muted-foreground',
                   )} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{o.outlet_name || `Outlet ${i + 1}`}</p>
                     <p className="text-xs text-muted-foreground">{OUTLET_TYPES.find(t => t.value === o.outlet_type)?.label ?? 'Not specified'}</p>
                   </div>
                   {o.product_available === true && (
-                    <span className="text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded px-1.5 py-0.5">IN STOCK</span>
+                    <span className="text-[10px] font-bold bg-shell dark:bg-shell/30 text-pos dark:text-pos rounded px-1.5 py-0.5">IN STOCK</span>
                   )}
                   {o.product_available === false && (
-                    <span className="text-[10px] font-bold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded px-1.5 py-0.5">NO STOCK</span>
+                    <span className="text-[10px] font-bold bg-flare-wash dark:bg-shell/30 text-tx-flare dark:text-tx-flare rounded px-1.5 py-0.5">NO STOCK</span>
                   )}
                 </div>
               ))}
@@ -616,9 +616,9 @@ export function FsoFormClient({
             </div>
 
             {submitError && (
-              <div className="flex gap-2 items-start rounded-xl border border-red-200 bg-red-50 dark:bg-red-900/20 p-3">
-                <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
-                <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>
+              <div className="flex gap-2 items-start rounded-xl border border-line-strong bg-flare-wash dark:bg-shell/20 p-3">
+                <AlertCircle className="h-4 w-4 text-tx-flare shrink-0 mt-0.5" />
+                <p className="text-sm text-tx-flare dark:text-tx-flare">{submitError}</p>
               </div>
             )}
           </div>

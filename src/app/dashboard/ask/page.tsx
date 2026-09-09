@@ -40,8 +40,8 @@ interface ConversationSummary {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const CONFIDENCE_CLASS: Record<string, string> = {
-  High:   'bg-green-50 text-green-700 border-green-200',
-  Medium: 'bg-amber-50 text-amber-700 border-amber-200',
+  High:   'bg-shell text-pos border-line',
+  Medium: 'bg-shell text-tx-2 border-line',
   Low:    'bg-muted text-muted-foreground border-border',
 }
 
@@ -376,7 +376,7 @@ function AskPageContent() {
                       )}
 
                       {m.role === 'assistant' && m.collectionRecommendation && (
-                        <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 leading-relaxed max-w-2xl">
+                        <div className="text-sm text-tx-2 bg-shell border border-line rounded-xl px-4 py-3 leading-relaxed max-w-2xl">
                           <span className="font-medium">To get a better answer: </span>
                           {m.collectionRecommendation}
                         </div>

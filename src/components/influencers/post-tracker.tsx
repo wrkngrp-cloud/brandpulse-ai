@@ -116,32 +116,32 @@ function postTypeLabel(t: string): string {
 
 function verdictConfig(v: string): { label: string; cls: string } {
   const m: Record<string, { label: string; cls: string }> = {
-    strong_fit:   { label: 'Strong Fit',   cls: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' },
-    good_fit:     { label: 'Good Fit',     cls: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
-    moderate_fit: { label: 'Moderate Fit', cls: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' },
-    poor_fit:     { label: 'Poor Fit',     cls: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' },
+    strong_fit:   { label: 'Strong Fit',   cls: 'bg-shell text-pos dark:bg-shell/30 dark:text-pos' },
+    good_fit:     { label: 'Good Fit',     cls: 'bg-shell text-pos dark:bg-shell/30 dark:text-pos' },
+    moderate_fit: { label: 'Moderate Fit', cls: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2' },
+    poor_fit:     { label: 'Poor Fit',     cls: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare' },
   }
   return m[v] ?? { label: v, cls: 'bg-muted text-muted-foreground' }
 }
 
 function recommendConfig(r: string): { label: string; cls: string } {
   const m: Record<string, { label: string; cls: string }> = {
-    renew:       { label: 'Renew',       cls: 'bg-emerald-500 text-white' },
-    consider:    { label: 'Consider',    cls: 'bg-amber-500 text-white' },
-    discontinue: { label: 'Discontinue', cls: 'bg-red-500 text-white' },
+    renew:       { label: 'Renew',       cls: 'bg-pos text-tx-inv' },
+    consider:    { label: 'Consider',    cls: 'bg-ember text-tx-inv' },
+    discontinue: { label: 'Discontinue', cls: 'bg-flare text-tx-inv' },
   }
   return m[r] ?? { label: r, cls: 'bg-muted text-foreground' }
 }
 
 function scoreColor(s: number): string {
-  if (s >= 75) return 'text-emerald-600 dark:text-emerald-400'
-  if (s >= 55) return 'text-amber-600 dark:text-amber-400'
-  return 'text-rose-600 dark:text-rose-400'
+  if (s >= 75) return 'text-pos dark:text-pos'
+  if (s >= 55) return 'text-tx-2 dark:text-tx-2'
+  return 'text-tx-flare dark:text-tx-flare'
 }
 
 function sentimentColor(s: string): string {
-  if (s === 'positive') return 'text-emerald-600 dark:text-emerald-400'
-  if (s === 'negative') return 'text-rose-600 dark:text-rose-400'
+  if (s === 'positive') return 'text-pos dark:text-pos'
+  if (s === 'negative') return 'text-tx-flare dark:text-tx-flare'
   return 'text-muted-foreground'
 }
 
@@ -157,7 +157,7 @@ function ScoreTile({ label, score, icon: Icon }: { label: string; score: number;
       <p className={cn('text-xl font-bold tabular-nums', scoreColor(score))}>{score}</p>
       <div className="h-1.5 bg-muted rounded-full overflow-hidden">
         <div
-          className={cn('h-full rounded-full transition-all', score >= 75 ? 'bg-emerald-500' : score >= 55 ? 'bg-amber-400' : 'bg-rose-500')}
+          className={cn('h-full rounded-full transition-all', score >= 75 ? 'bg-pos' : score >= 55 ? 'bg-ember' : 'bg-flare')}
           style={{ width: `${score}%` }}
         />
       </div>
@@ -215,8 +215,8 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
       <div className="border rounded-xl p-3 space-y-1">
         <div className="flex items-center gap-2">
           {analysis.campaign_alignment.met
-            ? <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0" />
-            : <XCircle    className="h-4 w-4 text-rose-500 shrink-0" />
+            ? <CheckCircle className="h-4 w-4 text-pos shrink-0" />
+            : <XCircle    className="h-4 w-4 text-tx-flare shrink-0" />
           }
           <span className="text-xs font-semibold capitalize">
             {analysis.campaign_alignment.objective} objective {analysis.campaign_alignment.met ? 'met' : 'not met'}
@@ -224,9 +224,9 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
           <span className={cn(
             'text-[10px] px-1.5 py-0.5 rounded font-medium ml-auto capitalize',
             analysis.campaign_alignment.confidence === 'high'
-              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+              ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos'
               : analysis.campaign_alignment.confidence === 'medium'
-              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+              ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
               : 'bg-muted text-muted-foreground'
           )}>
             {analysis.campaign_alignment.confidence} confidence
@@ -243,9 +243,9 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
             {analysis.sentiment_analysis.brand_mention_sentiment} on brand mentions
           </span>
         </div>
-        <SentimentBar pct={analysis.sentiment_analysis.positive_pct} color="#10b981" label="Positive" />
-        <SentimentBar pct={analysis.sentiment_analysis.neutral_pct}  color="#94a3b8" label="Neutral"  />
-        <SentimentBar pct={analysis.sentiment_analysis.negative_pct} color="#f43f5e" label="Negative" />
+        <SentimentBar pct={analysis.sentiment_analysis.positive_pct} color="var(--pos)" label="Positive" />
+        <SentimentBar pct={analysis.sentiment_analysis.neutral_pct}  color="var(--tx-3)" label="Neutral"  />
+        <SentimentBar pct={analysis.sentiment_analysis.negative_pct} color="var(--flare)" label="Negative" />
         {analysis.sentiment_analysis.key_themes.length > 0 && (
           <div className="flex flex-wrap gap-1 pt-1">
             {analysis.sentiment_analysis.key_themes.map(t => (
@@ -255,17 +255,17 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
         )}
         {analysis.sentiment_analysis.conversion_signals.length > 0 && (
           <div className="space-y-1 pt-1">
-            <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Conversion signals</p>
+            <p className="text-[10px] font-semibold text-pos dark:text-pos uppercase tracking-wide">Conversion signals</p>
             {analysis.sentiment_analysis.conversion_signals.map(s => (
-              <p key={s} className="text-xs text-muted-foreground flex gap-1.5"><CheckCircle className="h-3 w-3 text-emerald-500 mt-0.5 shrink-0" />{s}</p>
+              <p key={s} className="text-xs text-muted-foreground flex gap-1.5"><CheckCircle className="h-3 w-3 text-pos mt-0.5 shrink-0" />{s}</p>
             ))}
           </div>
         )}
         {analysis.sentiment_analysis.concern_signals.length > 0 && (
           <div className="space-y-1 pt-1">
-            <p className="text-[10px] font-semibold text-rose-500 uppercase tracking-wide">Concerns</p>
+            <p className="text-[10px] font-semibold text-tx-flare uppercase tracking-wide">Concerns</p>
             {analysis.sentiment_analysis.concern_signals.map(s => (
-              <p key={s} className="text-xs text-muted-foreground flex gap-1.5"><AlertCircle className="h-3 w-3 text-rose-500 mt-0.5 shrink-0" />{s}</p>
+              <p key={s} className="text-xs text-muted-foreground flex gap-1.5"><AlertCircle className="h-3 w-3 text-tx-flare mt-0.5 shrink-0" />{s}</p>
             ))}
           </div>
         )}
@@ -306,7 +306,7 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
       {analysis.action_items.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-1.5">
-            <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
+            <Lightbulb className="h-3.5 w-3.5 text-tx-2" />
             <span className="text-xs font-semibold">Action Items</span>
           </div>
           <ol className="space-y-1.5">
@@ -333,30 +333,30 @@ function PostAnalysisView({ analysis }: { analysis: PostAnalysis }) {
         <div className="space-y-3 pt-1">
           {analysis.fit_verdict.strengths.length > 0 && (
             <div className="space-y-1">
-              <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Strengths</p>
+              <p className="text-[10px] font-semibold text-pos dark:text-pos uppercase tracking-wide">Strengths</p>
               {analysis.fit_verdict.strengths.map(s => (
                 <p key={s} className="text-xs text-muted-foreground flex gap-1.5">
-                  <CheckCircle className="h-3 w-3 text-emerald-500 mt-0.5 shrink-0" />{s}
+                  <CheckCircle className="h-3 w-3 text-pos mt-0.5 shrink-0" />{s}
                 </p>
               ))}
             </div>
           )}
           {analysis.fit_verdict.weaknesses.length > 0 && (
             <div className="space-y-1">
-              <p className="text-[10px] font-semibold text-amber-500 uppercase tracking-wide">Weaknesses</p>
+              <p className="text-[10px] font-semibold text-tx-2 uppercase tracking-wide">Weaknesses</p>
               {analysis.fit_verdict.weaknesses.map(w => (
                 <p key={w} className="text-xs text-muted-foreground flex gap-1.5">
-                  <AlertCircle className="h-3 w-3 text-amber-500 mt-0.5 shrink-0" />{w}
+                  <AlertCircle className="h-3 w-3 text-tx-2 mt-0.5 shrink-0" />{w}
                 </p>
               ))}
             </div>
           )}
           {analysis.fit_verdict.risks.length > 0 && (
             <div className="space-y-1">
-              <p className="text-[10px] font-semibold text-rose-500 uppercase tracking-wide">Risks</p>
+              <p className="text-[10px] font-semibold text-tx-flare uppercase tracking-wide">Risks</p>
               {analysis.fit_verdict.risks.map(r => (
                 <p key={r} className="text-xs text-muted-foreground flex gap-1.5">
-                  <XCircle className="h-3 w-3 text-rose-500 mt-0.5 shrink-0" />{r}
+                  <XCircle className="h-3 w-3 text-tx-flare mt-0.5 shrink-0" />{r}
                 </p>
               ))}
             </div>
@@ -391,7 +391,7 @@ function PostCard({ post }: { post: InfluencerPost }) {
               <span className={cn('text-[10px] px-2 py-0.5 rounded-full font-semibold', verdict.cls)}>{verdict.label}</span>
             )}
             {!post.analysis && (
-              <span className="text-[10px] text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full">Analysis pending</span>
+              <span className="text-[10px] text-tx-2 bg-shell dark:bg-shell/20 px-2 py-0.5 rounded-full">Analysis pending</span>
             )}
           </div>
           <a
@@ -556,7 +556,7 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
 
       {/* Post URL */}
       <div className="space-y-1.5">
-        <Label className="text-xs">Post URL <span className="text-rose-500">*</span></Label>
+        <Label className="text-xs">Post URL <span className="text-tx-flare">*</span></Label>
         <div className="relative">
           <Input
             placeholder="https://instagram.com/reel/abc123"
@@ -571,7 +571,7 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
         </div>
         <p className="text-[10px] text-muted-foreground">Instagram, TikTok, X, YouTube, or Facebook — caption auto-fetches for TikTok, YouTube, and X</p>
         {metaNote && (
-          <p className="text-[10px] text-amber-600 dark:text-amber-400">{metaNote}</p>
+          <p className="text-[10px] text-tx-2 dark:text-tx-2">{metaNote}</p>
         )}
       </div>
 

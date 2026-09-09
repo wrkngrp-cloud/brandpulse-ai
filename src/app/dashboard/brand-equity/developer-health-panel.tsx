@@ -31,7 +31,7 @@ function Delta({ current, previous }: { current: number | null; previous: number
   if (diff === 0) return null
   const up = diff > 0
   return (
-    <span className={`ml-1.5 inline-flex items-center gap-0.5 text-xs font-medium ${up ? 'text-green-600' : 'text-red-500'}`}>
+    <span className={`ml-1.5 inline-flex items-center gap-0.5 text-xs font-medium ${up ? 'text-pos' : 'text-tx-flare'}`}>
       {up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
       {up ? '+' : ''}{diff.toLocaleString('en-NG')}
     </span>

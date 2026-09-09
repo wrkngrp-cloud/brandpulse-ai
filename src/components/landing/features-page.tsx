@@ -88,7 +88,7 @@ export function FeaturesPage() {
           Features
         </motion.p>
         <motion.h1 {...rise} className="mt-4 max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Every module, working today.
         </motion.h1>
         <motion.p {...rise} className="mt-5 max-w-2xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--lp-mut)' }}>
@@ -105,7 +105,7 @@ export function FeaturesPage() {
             <div className={f.Scene ? 'lg:w-[38%]' : 'max-w-2xl'}>
               <span className="font-mono text-[11px]" style={{ color: 'var(--lp-clay)' }}>{f.n}</span>
               <h2 className="mt-2 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl"
-                style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+                style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
                 {f.title}
               </h2>
               <p className="mt-3 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{f.body}</p>
@@ -129,12 +129,12 @@ export function FeaturesPage() {
 
       <section className="px-6 py-20 text-center">
         <motion.h2 {...rise} className="mx-auto max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           See it with your own data.
         </motion.h2>
         <motion.div {...rise} className="mt-8">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-bold text-white shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
+            className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-bold text-tx-inv shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
             style={{ background: 'var(--lp-clay)' }}>
             Start free in beta <ArrowRight className="h-4 w-4" />
           </Link>

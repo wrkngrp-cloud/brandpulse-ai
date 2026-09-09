@@ -96,13 +96,13 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
             <div className="flex items-center gap-2">
               <div
                 className="h-6 w-6 rounded-lg grid place-items-center"
-                style={{ background: 'linear-gradient(135deg, #6B8FFF 0%, #2B59FF 100%)' }}
+                style={{ background: 'var(--flare)' }}
               >
                 <svg viewBox="0 0 20 20" className="h-3 w-3" fill="none" aria-hidden>
-                  <polyline points="2,10 6,6 9.5,13 13.5,7.5 18,10" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <polyline points="2,10 6,6 9.5,13 13.5,7.5 18,10" stroke="var(--bg-paper)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <span className="font-bold text-[14px] tracking-tight text-gradient-blue">BrandGauge</span>
+              <span className="font-bold text-[14px] tracking-tight text-tx">BrandGauge</span>
             </div>
           </div>
 

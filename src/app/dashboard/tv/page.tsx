@@ -121,8 +121,8 @@ export default async function TVPage({
       {/* Header */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0 mt-0.5">
-            <Tv className="h-5 w-5 text-blue-500" />
+          <div className="h-10 w-10 rounded-xl bg-flare/10 flex items-center justify-center shrink-0 mt-0.5">
+            <Tv className="h-5 w-5 text-tx-2" />
           </div>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">TV Intelligence</h1>
@@ -150,8 +150,8 @@ export default async function TVPage({
       {!hasData ? (
         /* ── Empty state ──────────────────────────────────────────────────── */
         <Card className="border rounded-xl p-10 bg-card flex flex-col items-center gap-4 text-center">
-          <div className="h-14 w-14 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-            <Tv className="h-7 w-7 text-blue-500" />
+          <div className="h-14 w-14 rounded-2xl bg-flare/10 flex items-center justify-center">
+            <Tv className="h-7 w-7 text-tx-2" />
           </div>
           <div>
             <h2 className="text-lg font-semibold">No TV schedules yet</h2>
@@ -180,10 +180,10 @@ export default async function TVPage({
           {/* Key metrics */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { label: 'GRPs Planned',   value: totalGrpPlanned.toFixed(1),    sub: `Last ${days} days`,          icon: TrendingUp, color: 'text-blue-500' },
-              { label: 'GRPs Delivered', value: totalGrpDelivered.toFixed(1),  sub: `${deliveryPct}% delivery`, icon: Activity, color: 'text-emerald-500' },
-              { label: 'Gross Impressions', value: fmt(totalReach),            sub: 'Total viewer-spots',    icon: Users,      color: 'text-indigo-500' },
-              { label: 'Total Spend',    value: formatNGN(totalSpend),       sub: `CPRP: ${formatNGN(cprp)}`, icon: Tv, color: 'text-violet-500' },
+              { label: 'GRPs Planned',   value: totalGrpPlanned.toFixed(1),    sub: `Last ${days} days`,          icon: TrendingUp, color: 'text-tx-2' },
+              { label: 'GRPs Delivered', value: totalGrpDelivered.toFixed(1),  sub: `${deliveryPct}% delivery`, icon: Activity, color: 'text-pos' },
+              { label: 'Gross Impressions', value: fmt(totalReach),            sub: 'Total viewer-spots',    icon: Users,      color: 'text-tx-2' },
+              { label: 'Total Spend',    value: formatNGN(totalSpend),       sub: `CPRP: ${formatNGN(cprp)}`, icon: Tv, color: 'text-tx-2' },
             ].map(m => (
               <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">
                 <div className="flex items-center justify-between">

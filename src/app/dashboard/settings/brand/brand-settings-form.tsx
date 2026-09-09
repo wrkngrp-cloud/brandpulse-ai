@@ -104,7 +104,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
     const hex = colorInput.trim()
     if (!hex) return
     const normalized = hex.startsWith('#') ? hex : `#${hex}`
-    if (!/^#[0-9A-Fa-f]{3,6}$/.test(normalized)) { toast.error('Enter a valid hex color (e.g. #FF6B35)'); return }
+    if (!/^#[0-9A-Fa-f]{3,6}$/.test(normalized)) { toast.error('Enter a valid hex color (e.g. var(--flare))'); return }
     if (colors.includes(normalized)) return
     setColors(prev => [...prev, normalized])
     setColorInput('')
@@ -190,7 +190,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                 value={colorInput}
                 onChange={e => setColorInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addColor())}
-                placeholder="#FF6B35"
+                placeholder="var(--flare)"
                 className="font-mono text-xs h-8"
               />
               <Button type="button" size="sm" variant="outline" className="h-8 text-xs shrink-0" onClick={addColor}>

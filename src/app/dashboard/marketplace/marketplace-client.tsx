@@ -33,10 +33,10 @@ interface MarketplaceProduct {
 }
 
 const PLATFORM_COLOR: Record<string, string> = {
-  jumia:  'bg-orange-100 text-orange-800 border-orange-200',
-  konga:  'bg-red-100 text-red-800 border-red-200',
-  amazon: 'bg-blue-100 text-blue-800 border-blue-200',
-  other:  'bg-gray-100 text-gray-800 border-gray-200',
+  jumia:  'bg-shell text-tx-2 border-line',
+  konga:  'bg-flare-wash text-tx-flare border-line-strong',
+  amazon: 'bg-flare-wash text-tx-flare border-line-strong',
+  other:  'bg-shell text-tx border-line',
 }
 
 export function MarketplaceClient() {
@@ -211,14 +211,14 @@ function ProductRow({
               {product.platform}
             </Badge>
             {!product.is_own_product && (
-              <Badge variant="outline" className="text-xs text-purple-700 border-purple-200">Competitor</Badge>
+              <Badge variant="outline" className="text-xs text-tx-2 border-line">Competitor</Badge>
             )}
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">{productSummary(product)}</p>
         </button>
         <div className="flex items-center gap-4 shrink-0 text-sm">
           {snap?.price    != null && <span className="font-semibold">{formatNGN(snap.price)}</span>}
-          {snap?.rating   != null && <span className="text-yellow-500 font-medium">★ {snap.rating.toFixed(1)}</span>}
+          {snap?.rating   != null && <span className="text-tx-2 font-medium">★ {snap.rating.toFixed(1)}</span>}
           {snap?.in_stock === false && <Badge variant="destructive" className="text-xs">Out of stock</Badge>}
           {snap?.shelf_position != null && <span className="text-muted-foreground text-xs">#{snap.shelf_position}</span>}
           {product.product_url && (

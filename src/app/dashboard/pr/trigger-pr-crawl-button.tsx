@@ -37,7 +37,7 @@ export function TriggerPrCrawlButton() {
 
   if (phase === 'done') {
     return (
-      <div className="flex items-center gap-2 text-sm text-emerald-600">
+      <div className="flex items-center gap-2 text-sm text-pos">
         <CheckCircle2 className="h-4 w-4 shrink-0" />
         {message}
       </div>
@@ -47,7 +47,7 @@ export function TriggerPrCrawlButton() {
   if (phase === 'error') {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs text-rose-500 flex items-center gap-1">
+        <span className="text-xs text-tx-flare flex items-center gap-1">
           <AlertCircle className="h-3.5 w-3.5" />{message}
         </span>
         <Button size="sm" variant="outline" onClick={trigger}>Retry</Button>

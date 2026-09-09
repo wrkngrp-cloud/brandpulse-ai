@@ -40,10 +40,10 @@ const TRACK_D = `M ${START.x} ${START.y} A ${R} ${R} 0 1 1 ${END.x} ${END.y}`
 // Zone colour + gradient stops for the arc
 // Elite uses brand true blue #2B59FF; never blend clay with blue
 const ZONE_STOPS: Record<string, { from: string; to: string; glow: string }> = {
-  critical: { from: '#ef4444', to: '#f87171', glow: 'rgba(239,68,68,0.4)'  },
-  building: { from: '#f59e0b', to: '#fbbf24', glow: 'rgba(245,158,11,0.4)' },
-  strong:   { from: '#22c55e', to: '#4ade80', glow: 'rgba(34,197,94,0.35)' },
-  elite:    { from: '#2B59FF', to: '#4F79FF', glow: 'rgba(43,89,255,0.4)'  },
+  critical: { from: 'var(--flare)', to: 'var(--flare)', glow: 'rgba(239,68,68,0.4)'  },
+  building: { from: 'var(--ember)', to: 'var(--danfo)', glow: 'rgba(245,158,11,0.4)' },
+  strong:   { from: 'var(--pos)', to: 'var(--pos)', glow: 'rgba(34,197,94,0.35)' },
+  elite:    { from: 'var(--flare)', to: 'var(--flare)', glow: 'rgba(43,89,255,0.4)'  },
 }
 
 // Indicator dot position for a given score (0-100)
@@ -185,7 +185,7 @@ export function BHIGauge({ bhi, sparkline = [], trendLabel = '30-day' }: Props) 
               cx={dot.x}
               cy={dot.y}
               r={3.5}
-              fill="white"
+              fill="var(--bg-paper)"
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 1.25, duration: 0.25 }}
@@ -200,7 +200,7 @@ export function BHIGauge({ bhi, sparkline = [], trendLabel = '30-day' }: Props) 
             dominantBaseline="auto"
             fontSize="48"
             fontWeight="700"
-            fontFamily="var(--font-display), system-ui, sans-serif"
+            fontFamily="var(--font)"
             letterSpacing="-2"
             fill="currentColor"
           >
@@ -235,12 +235,12 @@ export function BHIGauge({ bhi, sparkline = [], trendLabel = '30-day' }: Props) 
         <span
           className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full border"
           style={{
-            color:            zone?.color ?? '#94a3b8',
+            color:            zone?.color ?? 'var(--tx-3)',
             backgroundColor:  zone ? `${zone.color}15` : 'transparent',
             borderColor:      zone ? `${zone.color}30` : 'transparent',
           }}
         >
-          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: zone?.color ?? '#94a3b8' }} />
+          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: zone?.color ?? 'var(--tx-3)' }} />
           {zone?.label ?? 'No data yet'}
         </span>
       </motion.div>

@@ -87,7 +87,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
 
           {showQr && (
             <div className="mt-3 flex flex-col sm:flex-row items-start gap-4">
-              <div className="p-3 bg-white rounded-lg border">
+              <div className="p-3 bg-card rounded-lg border">
                 <QRCodeSVG value={qrLink} size={120} />
               </div>
               <div className="space-y-2 text-xs text-muted-foreground">

@@ -72,11 +72,11 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
 const PLATFORMS = ['Instagram', 'Twitter', 'TikTok', 'Facebook']
 
 const SCORE_META: { key: keyof Omit<CreativeScore, 'summary'>; label: string; color: string }[] = [
-  { key: 'engagement',        label: 'Engagement',        color: 'bg-blue-500'   },
-  { key: 'cultural_resonance',label: 'Cultural Resonance',color: 'bg-purple-500' },
-  { key: 'tone',              label: 'Tone',              color: 'bg-green-500'  },
-  { key: 'clarity',           label: 'Clarity',           color: 'bg-amber-500'  },
-  { key: 'risk',              label: 'Risk',              color: 'bg-red-400'    },
+  { key: 'engagement',        label: 'Engagement',        color: 'bg-flare'   },
+  { key: 'cultural_resonance',label: 'Cultural Resonance',color: 'bg-neu' },
+  { key: 'tone',              label: 'Tone',              color: 'bg-pos'  },
+  { key: 'clarity',           label: 'Clarity',           color: 'bg-ember'  },
+  { key: 'risk',              label: 'Risk',              color: 'bg-flare'    },
 ]
 
 function ScoreBar({ score, color, label }: { score: number; color: string; label: string }) {
@@ -98,7 +98,7 @@ function ScoreBar({ score, color, label }: { score: number; color: string; label
 
 function Gauge({ score }: { score: number }) {
   const pct = Math.min(score, 100)
-  const color = pct >= 70 ? 'text-green-600' : pct >= 40 ? 'text-amber-600' : 'text-red-500'
+  const color = pct >= 70 ? 'text-pos' : pct >= 40 ? 'text-tx-2' : 'text-tx-flare'
   return (
     <div className="flex flex-col items-center gap-1 py-4">
       <span className={cn('text-5xl font-bold tabular-nums', color)}>{score}</span>
@@ -428,11 +428,11 @@ export function CreativeClient({
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={media.previewUrl} alt="Creative visual" className="w-full max-h-36 object-cover" />
                       <div className="absolute top-1.5 left-1.5 flex items-center gap-1">
-                        {media.isVideo && <Film className="h-3 w-3 text-white" />}
-                        <span className="text-[9px] bg-black/60 text-white px-1.5 py-0.5 rounded font-mono">{media.isVideo ? 'VIDEO FRAME' : 'IMAGE'}</span>
+                        {media.isVideo && <Film className="h-3 w-3 text-tx-inv" />}
+                        <span className="text-[9px] bg-ink/60 text-tx-inv px-1.5 py-0.5 rounded font-mono">{media.isVideo ? 'VIDEO FRAME' : 'IMAGE'}</span>
                       </div>
-                      <button onClick={() => setMedia(null)} className="absolute top-1.5 right-1.5 bg-black/60 rounded-full p-0.5">
-                        <XCircle className="h-3.5 w-3.5 text-white" />
+                      <button onClick={() => setMedia(null)} className="absolute top-1.5 right-1.5 bg-ink/60 rounded-full p-0.5">
+                        <XCircle className="h-3.5 w-3.5 text-tx-inv" />
                       </button>
                     </div>
                   ) : extracting ? (
@@ -491,7 +491,7 @@ export function CreativeClient({
               {/* Winner banner */}
               <div className="border rounded-xl p-4 bg-muted/30 space-y-2">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-pos" />
                   <span className="text-sm font-semibold">
                     Creative {compareResult.winner} wins on {platform}
                   </span>
@@ -512,13 +512,13 @@ export function CreativeClient({
                       key={key}
                       className={cn(
                         'border rounded-xl p-4 space-y-4',
-                        isWinner && 'border-green-400 ring-1 ring-green-300',
+                        isWinner && 'border-line ring-1 ring-flare',
                       )}
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold">Creative {label}</span>
                         {isWinner && (
-                          <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                          <span className="text-[10px] font-bold bg-shell text-pos px-2 py-0.5 rounded-full uppercase tracking-wide">
                             Winner
                           </span>
                         )}
@@ -608,14 +608,14 @@ export function CreativeClient({
                 {/* Strengths */}
                 <div className="border rounded-xl p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <CheckCircle2 className="h-4 w-4 text-pos" />
                     <span className="text-sm font-medium">Strengths</span>
                   </div>
                   {identityResult.strengths.length > 0 ? (
                     <ul className="space-y-1.5">
                       {identityResult.strengths.map((s, i) => (
                         <li key={i} className="text-sm text-muted-foreground leading-relaxed flex gap-2">
-                          <span className="text-green-500 shrink-0">•</span>
+                          <span className="text-pos shrink-0">•</span>
                           {s}
                         </li>
                       ))}
@@ -628,14 +628,14 @@ export function CreativeClient({
                 {/* Drift warnings */}
                 <div className="border rounded-xl p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-amber-500" />
+                    <AlertCircle className="h-4 w-4 text-tx-2" />
                     <span className="text-sm font-medium">Drift warnings</span>
                   </div>
                   {identityResult.drift_warnings.length > 0 ? (
                     <ul className="space-y-1.5">
                       {identityResult.drift_warnings.map((w, i) => (
                         <li key={i} className="text-sm text-muted-foreground leading-relaxed flex gap-2">
-                          <span className="text-amber-500 shrink-0">•</span>
+                          <span className="text-tx-2 shrink-0">•</span>
                           {w}
                         </li>
                       ))}
@@ -650,7 +650,7 @@ export function CreativeClient({
               {identityResult.adjustments.length > 0 && (
                 <div className="border rounded-xl p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-blue-500" />
+                    <TrendingUp className="h-4 w-4 text-tx-2" />
                     <span className="text-sm font-medium">Recommended adjustments</span>
                   </div>
                   <ul className="space-y-2">
@@ -745,7 +745,7 @@ export function CreativeClient({
               {/* Strategic insights */}
               <div className="border rounded-xl p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-blue-500" />
+                  <TrendingUp className="h-4 w-4 text-tx-2" />
                   <span className="text-sm font-medium">Strategic insights</span>
                 </div>
                 {competitorResult.strategic_insights.length > 0 ? (
@@ -767,14 +767,14 @@ export function CreativeClient({
               {/* Counter-positioning */}
               <div className="border rounded-xl p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <Palette className="h-4 w-4 text-purple-500" />
+                  <Palette className="h-4 w-4 text-tx-2" />
                   <span className="text-sm font-medium">Counter-positioning ideas for {brandName}</span>
                 </div>
                 {competitorResult.counter_positions.length > 0 ? (
                   <ul className="space-y-2">
                     {competitorResult.counter_positions.map((cp, i) => (
                       <li key={i} className="flex gap-2.5 text-sm leading-relaxed">
-                        <span className="shrink-0 text-purple-400 font-bold">#{i + 1}</span>
+                        <span className="shrink-0 text-tx-2 font-bold">#{i + 1}</span>
                         {cp}
                       </li>
                     ))}
@@ -813,13 +813,13 @@ export function CreativeClient({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={videoMedia.previewUrl} alt="Video frame" className="w-full max-h-56 object-cover" />
               <div className="absolute top-2 left-2 flex items-center gap-1.5">
-                {videoMedia.isVideo && <Film className="h-3.5 w-3.5 text-white" />}
-                <span className="text-[10px] bg-black/60 text-white px-2 py-0.5 rounded font-mono">
+                {videoMedia.isVideo && <Film className="h-3.5 w-3.5 text-tx-inv" />}
+                <span className="text-[10px] bg-ink/60 text-tx-inv px-2 py-0.5 rounded font-mono">
                   {videoMedia.isVideo ? 'VIDEO (first frame)' : 'IMAGE'}
                 </span>
               </div>
-              <button onClick={() => setVideoMedia(null)} className="absolute top-2 right-2 bg-black/60 rounded-full p-1">
-                <XCircle className="h-4 w-4 text-white" />
+              <button onClick={() => setVideoMedia(null)} className="absolute top-2 right-2 bg-ink/60 rounded-full p-1">
+                <XCircle className="h-4 w-4 text-tx-inv" />
               </button>
             </div>
           ) : videoExtracting ? (
@@ -906,10 +906,10 @@ export function CreativeClient({
               {/* Score grid */}
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
-                  { label: 'Hook',       score: videoResult.hook_score,      color: 'text-violet-600' },
-                  { label: 'Visual',     score: videoResult.visual_score,    color: 'text-blue-600'   },
-                  { label: 'Sound-off',  score: videoResult.sound_off_score, color: 'text-emerald-600'},
-                  { label: 'CTA',        score: videoResult.cta_visibility,  color: 'text-amber-600'  },
+                  { label: 'Hook',       score: videoResult.hook_score,      color: 'text-tx-2' },
+                  { label: 'Visual',     score: videoResult.visual_score,    color: 'text-tx-flare'   },
+                  { label: 'Sound-off',  score: videoResult.sound_off_score, color: 'text-pos'},
+                  { label: 'CTA',        score: videoResult.cta_visibility,  color: 'text-tx-2'  },
                 ].map(m => (
                   <div key={m.label} className="border rounded-xl p-3 text-center space-y-1">
                     <p className="text-xs text-muted-foreground">{m.label}</p>
@@ -922,7 +922,7 @@ export function CreativeClient({
               {/* Overall */}
               <div className="border rounded-xl p-4 bg-muted/30 flex items-center justify-between gap-3">
                 <span className="text-sm font-medium">Overall score</span>
-                <span className={cn('text-3xl font-bold tabular-nums', videoResult.overall >= 70 ? 'text-green-600' : videoResult.overall >= 50 ? 'text-amber-600' : 'text-red-500')}>
+                <span className={cn('text-3xl font-bold tabular-nums', videoResult.overall >= 70 ? 'text-pos' : videoResult.overall >= 50 ? 'text-tx-2' : 'text-tx-flare')}>
                   {videoResult.overall}<span className="text-base text-muted-foreground font-normal">/100</span>
                 </span>
               </div>
@@ -941,7 +941,7 @@ export function CreativeClient({
               ))}
 
               {/* Top recommendation */}
-              <div className="border-l-4 border-violet-500 pl-4 py-1">
+              <div className="border-l-4 border-line pl-4 py-1">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">Top recommendation</p>
                 <p className="text-sm leading-relaxed font-medium">{videoResult.top_recommendation}</p>
               </div>

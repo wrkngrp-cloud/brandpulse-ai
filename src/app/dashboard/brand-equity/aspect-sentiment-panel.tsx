@@ -36,9 +36,9 @@ const PLATFORM_LABELS: Record<string, string> = {
 }
 
 const SENTIMENT_STYLES: Record<AspectScore['sentiment'], { badge: string; bar: string; label: string }> = {
-  positive: { badge: 'bg-green-100 text-green-700', bar: 'bg-green-500',  label: 'Positive' },
-  neutral:  { badge: 'bg-amber-100 text-amber-700', bar: 'bg-amber-400',  label: 'Neutral'  },
-  negative: { badge: 'bg-red-100 text-red-700',     bar: 'bg-red-500',    label: 'Negative' },
+  positive: { badge: 'bg-shell text-pos', bar: 'bg-pos',  label: 'Positive' },
+  neutral:  { badge: 'bg-shell text-tx-2', bar: 'bg-ember',  label: 'Neutral'  },
+  negative: { badge: 'bg-flare-wash text-tx-flare',     bar: 'bg-flare',    label: 'Negative' },
 }
 
 export function AspectSentimentPanel({ aspects, platform }: Props) {

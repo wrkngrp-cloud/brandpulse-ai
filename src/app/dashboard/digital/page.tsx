@@ -364,49 +364,49 @@ export default async function DigitalPage({
       label: 'Total Spend',
       value: hasRealData ? fmtNGN(totalSpend)       : isDemo ? '₦2.4M'  : '—',
       sub:   hasRealData ? `Last ${days} days`       : isDemo ? 'Demo data'          : 'Connect an ad account',
-      icon: Coins,            color: 'text-indigo-500',
+      icon: Coins,            color: 'text-tx-2',
     },
     {
       label: 'Impressions',
       value: hasRealData ? fmtNum(totalImpressions) : isDemo ? '4.2M'   : '—',
       sub:   hasRealData ? `Last ${days} days`       : isDemo ? 'Demo data'          : 'No data yet',
-      icon: Eye,              color: 'text-emerald-500',
+      icon: Eye,              color: 'text-pos',
     },
     {
       label: 'Reach',
       value: hasRealData ? fmtNum(totalReach)       : isDemo ? '2.8M'   : '—',
       sub:   hasRealData ? 'Unique users'            : isDemo ? 'Demo data'          : 'No data yet',
-      icon: Users,            color: 'text-sky-500',
+      icon: Users,            color: 'text-tx-2',
     },
     {
       label: 'Avg CTR',
       value: hasRealData ? fmtPct(avgCtr)           : isDemo ? '2.30%'  : '—',
       sub:   'Est. benchmark: >1.8%',
-      icon: MousePointerClick, color: 'text-blue-500',
+      icon: MousePointerClick, color: 'text-tx-2',
     },
     {
       label: 'Avg CPC',
       value: hasRealData ? (avgCpc > 0 ? fmtNGN(avgCpc) : 'N/A') : isDemo ? '₦127'   : '—',
       sub:   'Est. benchmark: <₦150',
-      icon: MousePointerClick, color: 'text-violet-500',
+      icon: MousePointerClick, color: 'text-tx-2',
     },
     {
       label: 'Avg CPM',
       value: hasRealData ? (avgCpm > 0 ? fmtNGN(avgCpm) : 'N/A') : isDemo ? '₦462'   : '—',
       sub:   'Est. benchmark: <₦1,000',
-      icon: Eye,              color: 'text-teal-500',
+      icon: Eye,              color: 'text-pos',
     },
     {
       label: 'Avg CPA',
       value: hasRealData ? (avgCpa > 0 ? fmtNGN(avgCpa) : 'N/A') : isDemo ? '₦850'   : '—',
       sub:   'Cost per acquisition',
-      icon: Target,           color: 'text-orange-500',
+      icon: Target,           color: 'text-tx-2',
     },
     {
       label: 'Avg ROAS',
       value: hasRealData ? (avgRoas > 0 ? `${avgRoas.toFixed(1)}x` : 'N/A') : isDemo ? '3.4x' : '—',
       sub:   'Est. benchmark: >2.0x',
-      icon: TrendingUp,       color: 'text-rose-500',
+      icon: TrendingUp,       color: 'text-tx-flare',
     },
   ]
 
@@ -415,8 +415,8 @@ export default async function DigitalPage({
   const pillars = [
     {
       name:      'Awareness',
-      dotColor:  'bg-blue-500',
-      textColor: 'text-blue-500',
+      dotColor:  'bg-flare',
+      textColor: 'text-tx-2',
       metrics: [
         {
           label: 'CPM',
@@ -437,8 +437,8 @@ export default async function DigitalPage({
     },
     {
       name:      'Consideration',
-      dotColor:  'bg-violet-500',
-      textColor: 'text-violet-500',
+      dotColor:  'bg-neu',
+      textColor: 'text-tx-2',
       metrics: [
         {
           label: 'CPC',
@@ -459,8 +459,8 @@ export default async function DigitalPage({
     },
     {
       name:      'Conversion',
-      dotColor:  'bg-emerald-500',
-      textColor: 'text-emerald-500',
+      dotColor:  'bg-pos',
+      textColor: 'text-pos',
       metrics: [
         {
           label: 'CPA',
@@ -489,8 +489,8 @@ export default async function DigitalPage({
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0 mt-0.5">
-            <Monitor className="h-5 w-5 text-indigo-500" />
+          <div className="h-10 w-10 rounded-xl bg-flare/10 flex items-center justify-center shrink-0 mt-0.5">
+            <Monitor className="h-5 w-5 text-tx-2" />
           </div>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Digital Campaigns</h1>
@@ -519,25 +519,25 @@ export default async function DigitalPage({
 
       {/* Banners */}
       {connected && (
-        <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 dark:border-green-800/40 dark:bg-green-950/30 px-4 py-3">
-          <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
-          <p className="text-sm text-green-800 dark:text-green-300 capitalize">
+        <div className="flex items-center gap-3 rounded-xl border border-line bg-shell dark:border-line dark:bg-shell/30 px-4 py-3">
+          <CheckCircle className="h-4 w-4 text-pos shrink-0" />
+          <p className="text-sm text-pos dark:text-pos capitalize">
             {connected} Ads connected. Data will appear after tonight&apos;s sync at 5 AM Lagos time.
           </p>
         </div>
       )}
 
       {setupNeeded && (
-        <div className="rounded-xl border border-blue-200 bg-blue-50 dark:border-blue-800/40 dark:bg-blue-950/30 px-4 py-3 space-y-1">
+        <div className="rounded-xl border border-line-strong bg-flare-wash dark:border-line-strong dark:bg-shell/30 px-4 py-3 space-y-1">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 text-blue-600 shrink-0" />
-            <p className="text-sm font-medium text-blue-800 dark:text-blue-300 capitalize">
+            <AlertCircle className="h-4 w-4 text-tx-flare shrink-0" />
+            <p className="text-sm font-medium text-tx-flare dark:text-tx-2 capitalize">
               {setupNeeded} Ads: environment variables needed
             </p>
           </div>
-          <p className="text-xs text-blue-700 dark:text-blue-400 ml-6">
+          <p className="text-xs text-tx-flare dark:text-tx-2 ml-6">
             Add{' '}
-            <code className="bg-blue-100 dark:bg-blue-900/40 px-1 rounded">
+            <code className="bg-flare-wash dark:bg-shell/40 px-1 rounded">
               {setupNeeded === 'google'
                 ? 'GOOGLE_ADS_CLIENT_ID + GOOGLE_ADS_CLIENT_SECRET'
                 : setupNeeded === 'tiktok'
@@ -552,22 +552,22 @@ export default async function DigitalPage({
       )}
 
       {oauthError === 'oauth_cancelled' && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/30 px-4 py-3 space-y-2">
+        <div className="rounded-xl border border-line bg-shell dark:border-line dark:bg-shell/30 px-4 py-3 space-y-2">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
-            <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+            <AlertCircle className="h-4 w-4 text-tx-2 shrink-0" />
+            <p className="text-sm font-medium text-tx-2 dark:text-tx-2">
               Meta Ads: Redirect URI not whitelisted
             </p>
           </div>
-          <p className="text-xs text-amber-700 dark:text-amber-400">
+          <p className="text-xs text-tx-2 dark:text-tx-2">
             In your <strong>Meta for Developers</strong> app, go to{' '}
             <strong>Facebook Login → Settings</strong> and add this exact URL to{' '}
             <strong>Valid OAuth Redirect URIs</strong>:
           </p>
-          <code className="block text-xs bg-amber-100 dark:bg-amber-900/40 px-3 py-1.5 rounded font-mono">
+          <code className="block text-xs bg-shell dark:bg-shell/40 px-3 py-1.5 rounded font-mono">
             {process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'}/api/ads/meta/callback
           </code>
-          <p className="text-xs text-amber-700 dark:text-amber-400">
+          <p className="text-xs text-tx-2 dark:text-tx-2">
             Also ensure your app has <strong>Marketing API</strong> enabled and that{' '}
             <strong>Client OAuth Login</strong> and <strong>Web OAuth Login</strong> are both on.
           </p>
@@ -575,9 +575,9 @@ export default async function DigitalPage({
       )}
 
       {isDemo && (
-        <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/30 px-4 py-3">
-          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-          <p className="text-sm text-amber-800 dark:text-amber-300">
+        <div className="flex items-center gap-3 rounded-xl border border-line bg-shell dark:border-line dark:bg-shell/30 px-4 py-3">
+          <AlertCircle className="h-4 w-4 text-tx-2 dark:text-tx-2 shrink-0" />
+          <p className="text-sm text-tx-2 dark:text-tx-2">
             You are viewing demo data for Jara Foods. Connect a real ad account below to see your actual performance.
           </p>
         </div>
@@ -597,7 +597,7 @@ export default async function DigitalPage({
                   <p className="text-xs text-muted-foreground mt-0.5">{p.description}</p>
                 </div>
                 {isConnected ? (
-                  <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-pos shrink-0 mt-0.5" />
                 ) : p.available ? (
                   <LinkIcon className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                 ) : null}
@@ -605,7 +605,7 @@ export default async function DigitalPage({
 
               {isConnected && acct ? (
                 <div className="space-y-1">
-                  <Badge variant="default" className="text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-0">
+                  <Badge variant="default" className="text-[10px] bg-pos/10 text-pos dark:text-pos border-0">
                     Connected
                   </Badge>
                   {acct.last_synced_at && (
@@ -614,7 +614,7 @@ export default async function DigitalPage({
                     </p>
                   )}
                   {acct.sync_status === 'error' && (
-                    <p className="text-[10px] text-rose-500">Sync error — check connection</p>
+                    <p className="text-[10px] text-tx-flare">Sync error — check connection</p>
                   )}
                 </div>
               ) : p.available ? (
@@ -684,7 +684,7 @@ export default async function DigitalPage({
                       <td className="py-3 px-4">
                         <Link
                           href={`/dashboard/digital/campaigns/${encodeURIComponent(c.campaign_id)}`}
-                          className="font-medium hover:text-indigo-500 transition-colors line-clamp-1 max-w-[180px]"
+                          className="font-medium hover:text-tx-2 transition-colors line-clamp-1 max-w-[180px]"
                         >
                           {c.campaign_name}
                         </Link>

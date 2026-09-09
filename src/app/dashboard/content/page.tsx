@@ -207,9 +207,9 @@ export default async function ContentPage({
 
       {/* Success banner */}
       {connected && (
-        <div className="flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 dark:bg-green-950/30 dark:border-green-900 p-4">
-          <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
-          <p className="text-sm text-green-800 dark:text-green-300 capitalize">
+        <div className="flex items-start gap-3 rounded-lg border border-line bg-shell dark:bg-shell/30 dark:border-line p-4">
+          <CheckCircle2 className="h-4 w-4 text-pos mt-0.5 shrink-0" />
+          <p className="text-sm text-pos dark:text-pos capitalize">
             {connected} connected. Data will appear after tonight&apos;s sync at 3 AM Lagos time.
           </p>
         </div>
@@ -220,14 +220,14 @@ export default async function ContentPage({
 
       {/* OAuth error banner with setup steps */}
       {errorInfo && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900 p-4 space-y-3">
+        <div className="rounded-lg border border-line bg-shell dark:bg-shell/30 dark:border-line p-4 space-y-3">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
-            <p className="text-sm font-medium text-amber-800 dark:text-amber-300">{errorInfo.title}</p>
+            <AlertTriangle className="h-4 w-4 text-tx-2 mt-0.5 shrink-0" />
+            <p className="text-sm font-medium text-tx-2 dark:text-tx-2">{errorInfo.title}</p>
           </div>
           <ol className="ml-7 space-y-1.5 list-decimal list-outside">
             {errorInfo.steps.map((step, i) => (
-              <li key={i} className="text-sm text-amber-700 dark:text-amber-400">{step}</li>
+              <li key={i} className="text-sm text-tx-2 dark:text-tx-2">{step}</li>
             ))}
           </ol>
         </div>

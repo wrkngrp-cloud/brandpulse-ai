@@ -33,14 +33,14 @@ function TriggerCompetitiveCrawlButton() {
   }
   if (phase === 'done') {
     return (
-      <span className="text-xs text-emerald-600 flex items-center gap-1">
+      <span className="text-xs text-pos flex items-center gap-1">
         <CheckCircle2 className="h-3.5 w-3.5" /> Crawl started — data appears in a few minutes.
       </span>
     )
   }
   if (phase === 'error') {
     return (
-      <span className="text-xs text-rose-500 flex items-center gap-1">
+      <span className="text-xs text-tx-flare flex items-center gap-1">
         <AlertCircle className="h-3.5 w-3.5" /> Failed to start crawl.
         <button onClick={trigger} className="underline">Retry</button>
       </span>
@@ -110,26 +110,26 @@ interface Props {
 // ─── Style maps ─────────────────────────────────────────────────────────────
 
 const PRIORITY_STYLE: Record<string, string> = {
-  High:   'bg-red-100 text-red-800',
-  Medium: 'bg-amber-100 text-amber-800',
+  High:   'bg-flare-wash text-tx-flare',
+  Medium: 'bg-shell text-tx-2',
   Low:    'bg-muted text-muted-foreground',
 }
 
 const CONFIDENCE_STYLE: Record<string, string> = {
-  High:   'bg-green-100 text-green-800',
-  Medium: 'bg-amber-100 text-amber-800',
+  High:   'bg-shell text-pos',
+  Medium: 'bg-shell text-tx-2',
   Low:    'bg-muted text-muted-foreground',
 }
 
 const SIGHTING_TYPE_STYLE: Record<string, string> = {
-  billboard:  'bg-purple-100 text-purple-800',
-  event:      'bg-blue-100 text-blue-800',
-  digital:    'bg-sky-100 text-sky-800',
-  print:      'bg-gray-100 text-gray-800',
-  tv:         'bg-rose-100 text-rose-800',
-  radio:      'bg-orange-100 text-orange-800',
-  activation: 'bg-green-100 text-green-800',
-  pr:         'bg-indigo-100 text-indigo-800',
+  billboard:  'bg-shell text-tx-2',
+  event:      'bg-flare-wash text-tx-flare',
+  digital:    'bg-flare-wash text-tx-flare',
+  print:      'bg-shell text-tx',
+  tv:         'bg-flare-wash text-tx-flare',
+  radio:      'bg-shell text-tx-2',
+  activation: 'bg-shell text-pos',
+  pr:         'bg-flare-wash text-tx-flare',
 }
 
 const SIGHTING_TYPES = ['billboard', 'event', 'digital', 'print', 'tv', 'radio', 'activation', 'pr']
@@ -246,12 +246,12 @@ function BriefingTab({
   }
 
   const errorBlock = error ? (
-    <div className="rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-3 space-y-2">
-      <p className="text-sm text-amber-800 leading-relaxed">{error}</p>
+    <div className="rounded-lg border border-line bg-shell px-3.5 py-3 space-y-2">
+      <p className="text-sm text-tx-2 leading-relaxed">{error}</p>
       {errorCta && (
         <Link
           href={errorCta.href}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-900 border border-amber-300 rounded-full px-3 py-1.5 hover:bg-amber-100 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-tx-2 border border-line rounded-full px-3 py-1.5 hover:bg-shell transition-colors"
         >
           {errorCta.label}
           <ArrowRight className="h-3 w-3" />
@@ -286,16 +286,16 @@ function BriefingTab({
             </div>
             <div className="border rounded-lg p-3 space-y-0.5">
               <p className="text-xs text-muted-foreground">SOV data</p>
-              <p className={cn('font-medium', brandSov !== null ? 'text-green-600' : 'text-muted-foreground')}>
+              <p className={cn('font-medium', brandSov !== null ? 'text-pos' : 'text-muted-foreground')}>
                 {brandSov !== null ? `${brandSov}%` : 'Not yet — run a crawl first'}
               </p>
             </div>
           </div>
 
           {competitorNames.length === 0 && (
-            <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
-              <AlertCircle className="h-3.5 w-3.5 text-amber-600 mt-0.5 shrink-0" />
-              <p className="text-xs text-amber-800">
+            <div className="flex items-start gap-2 bg-shell border border-line rounded-lg px-3 py-2.5">
+              <AlertCircle className="h-3.5 w-3.5 text-tx-2 mt-0.5 shrink-0" />
+              <p className="text-xs text-tx-2">
                 Add competitors in Settings to get a richer briefing with named competitive comparisons.
               </p>
             </div>
@@ -357,9 +357,9 @@ function BriefingTab({
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-3">
                   <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold border', {
-                    'bg-red-50 text-red-700 border-red-200':    result.porter_forces.overall_intensity === 'High',
-                    'bg-amber-50 text-amber-700 border-amber-200': result.porter_forces.overall_intensity === 'Medium',
-                    'bg-green-50 text-green-700 border-green-200':  result.porter_forces.overall_intensity === 'Low',
+                    'bg-flare-wash text-tx-flare border-line-strong':    result.porter_forces.overall_intensity === 'High',
+                    'bg-shell text-tx-2 border-line': result.porter_forces.overall_intensity === 'Medium',
+                    'bg-shell text-pos border-line':  result.porter_forces.overall_intensity === 'Low',
                   })}>
                     Competitive intensity: {result.porter_forces.overall_intensity}
                   </span>
@@ -381,10 +381,10 @@ function BriefingTab({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Section title="Brand strengths" icon={TrendingUp} defaultOpen>
-              <StringList items={result.brand_strengths} icon={TrendingUp} iconClass="text-green-500" />
+              <StringList items={result.brand_strengths} icon={TrendingUp} iconClass="text-pos" />
             </Section>
             <Section title="Vulnerabilities" icon={TrendingDown} defaultOpen>
-              <StringList items={result.brand_vulnerabilities} icon={TrendingDown} iconClass="text-red-400" />
+              <StringList items={result.brand_vulnerabilities} icon={TrendingDown} iconClass="text-tx-flare" />
             </Section>
           </div>
 
@@ -484,10 +484,10 @@ function EsovLeagueTab({
               const esovColor = esov === null
                 ? 'text-muted-foreground'
                 : esov > 0
-                  ? 'text-green-700 font-semibold'
+                  ? 'text-pos font-semibold'
                   : esov === 0
-                    ? 'text-amber-600 font-semibold'
-                    : 'text-red-600 font-semibold'
+                    ? 'text-tx-2 font-semibold'
+                    : 'text-tx-flare font-semibold'
 
               return (
                 <tr
@@ -526,9 +526,9 @@ function EsovLeagueTab({
       </div>
 
       <div className="flex gap-4 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> Positive ESOV — growth mode</span>
-        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" /> Zero — at parity</span>
-        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500 inline-block" /> Negative — decline risk</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-pos inline-block" /> Positive ESOV — growth mode</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-ember inline-block" /> Zero — at parity</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-flare inline-block" /> Negative — decline risk</span>
       </div>
 
       <p className="text-xs text-muted-foreground border-t pt-3">

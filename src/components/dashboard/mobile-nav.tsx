@@ -48,13 +48,13 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
           <div className="flex items-center gap-2.5">
             <div
               className="h-8 w-8 rounded-xl grid place-items-center shrink-0"
-              style={{ background: 'linear-gradient(135deg, #6B8FFF 0%, #2B59FF 100%)', boxShadow: '0 4px 14px -4px oklch(0.485 0.25 258 / 0.55)' }}
+              style={{ background: 'var(--flare)', boxShadow: '0 4px 14px -4px oklch(0.485 0.25 258 / 0.55)' }}
             >
               <svg viewBox="0 0 20 20" className="h-[14px] w-[14px]" fill="none" aria-hidden>
-                <polyline points="2,10 6,6 9.5,13 13.5,7.5 18,10" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                <polyline points="2,10 6,6 9.5,13 13.5,7.5 18,10" stroke="var(--bg-paper)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <span className="font-bold text-[15px] tracking-tight text-gradient-blue">BrandGauge</span>
+            <span className="font-bold text-[15px] tracking-tight text-tx">BrandGauge</span>
           </div>
           <button
             onClick={() => setOpen(false)}
@@ -77,9 +77,9 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
               <span
                 className="h-8 w-8 shrink-0 rounded-lg grid place-items-center text-[12px] font-bold select-none"
                 style={{
-                  background: 'linear-gradient(135deg, oklch(0.485 0.25 258 / 0.18) 0%, oklch(0.585 0.163 37 / 0.12) 100%)',
-                  color: 'oklch(0.485 0.25 258)',
-                  border: '1px solid oklch(0.485 0.25 258 / 0.20)',
+                  background: 'var(--bg-shell)',
+                  color: 'var(--tx-2)',
+                  border: 'var(--line)',
                 }}
               >
                 {(userName || userEmail).trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?'}

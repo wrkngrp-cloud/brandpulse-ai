@@ -34,9 +34,9 @@ function Stars({ rating }: { rating: number }) {
         const fill = Math.max(0, Math.min(1, rating - (i - 1)))
         return (
           <div key={i} className="relative h-5 w-5">
-            <Star className="absolute inset-0 h-5 w-5 text-amber-300/40" />
+            <Star className="absolute inset-0 h-5 w-5 text-tx-2/40" />
             <div className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
-              <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+              <Star className="h-5 w-5 fill-tx-2 text-tx-2" />
             </div>
           </div>
         )
@@ -161,7 +161,7 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
             <div>
               <p className={cn(
                 'text-2xl font-semibold tabular-nums flex items-center gap-1',
-                velocity && velocity > 0 ? 'text-green-600' : 'text-muted-foreground',
+                velocity && velocity > 0 ? 'text-pos' : 'text-muted-foreground',
               )}>
                 {velocity && velocity > 0 && <TrendingUp className="h-4 w-4" />}
                 {velocity != null ? `+${velocity}` : '—'}
@@ -178,8 +178,8 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
               {reviews.map((r, i) => (
                 <div key={i} className="flex items-start gap-2.5">
                   {r.rating != null && (
-                    <span className="shrink-0 mt-0.5 inline-flex items-center gap-0.5 text-xs font-medium text-amber-600">
-                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                    <span className="shrink-0 mt-0.5 inline-flex items-center gap-0.5 text-xs font-medium text-tx-2">
+                      <Star className="h-3 w-3 fill-tx-2 text-tx-2" />
                       {r.rating}
                     </span>
                   )}

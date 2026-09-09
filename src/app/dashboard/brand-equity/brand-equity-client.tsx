@@ -44,13 +44,13 @@ interface Props {
 
 // Marker reference-line colors by type
 const MARKER_STROKE: Record<string, string> = {
-  product_launch:  '#6366f1', // indigo
-  campaign_launch: '#a855f7', // purple
-  partnership:     '#14b8a6', // teal
-  crisis:          '#ef4444', // red
-  rebrand:         '#f97316', // orange
-  event:           '#22c55e', // green
-  other:           '#94a3b8', // gray
+  product_launch:  'var(--neu)', // indigo
+  campaign_launch: 'var(--neu)', // purple
+  partnership:     'var(--pos)', // teal
+  crisis:          'var(--flare)', // red
+  rebrand:         'var(--ember)', // orange
+  event:           'var(--pos)', // green
+  other:           'var(--tx-3)', // gray
 }
 
 const COMPONENT_META: {
@@ -78,11 +78,11 @@ const ZONE_GUIDE: { zone: BHIZone; range: string; description: string }[] = [
 ]
 
 const ESOV_POSTURE = (esov: number) =>
-  esov > 5    ? { label: 'Growth Mode',      color: 'text-green-600',  bg: 'bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900'  } :
-  esov > 0    ? { label: 'Mild Growth',      color: 'text-green-600',  bg: 'bg-green-50 border-green-100 dark:bg-green-950/30 dark:border-green-900'  } :
+  esov > 5    ? { label: 'Growth Mode',      color: 'text-pos',  bg: 'bg-shell border-line dark:bg-shell/40 dark:border-line'  } :
+  esov > 0    ? { label: 'Mild Growth',      color: 'text-pos',  bg: 'bg-shell border-line dark:bg-shell/30 dark:border-line'  } :
   esov === 0  ? { label: 'Parity',           color: 'text-muted-foreground', bg: 'bg-muted border-border' } :
-  esov > -5   ? { label: 'Decline Risk',     color: 'text-amber-500',  bg: 'bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900' } :
-                { label: 'Critical Decline', color: 'text-red-500',    bg: 'bg-red-50 border-red-200 dark:bg-red-950/40 dark:border-red-900'         }
+  esov > -5   ? { label: 'Decline Risk',     color: 'text-tx-2',  bg: 'bg-shell border-line dark:bg-shell/40 dark:border-line' } :
+                { label: 'Critical Decline', color: 'text-tx-flare',    bg: 'bg-flare-wash border-line-strong dark:bg-shell/40 dark:border-line-strong'         }
 
 export function BrandEquityClient({
   bhi, sparkline, sovPct, currentNps, npsTotal, emvRaw, perceptionDimensions, brandName, days = 30,
@@ -146,7 +146,7 @@ export function BrandEquityClient({
             <p className="text-xs text-muted-foreground">7 components · {bhi.coverage}% data coverage</p>
           </div>
           {bhi.coverage < 70 && (
-            <div className="flex items-center gap-1.5 text-xs text-amber-500">
+            <div className="flex items-center gap-1.5 text-xs text-tx-2">
               <Info className="h-3.5 w-3.5 shrink-0" />
               <span>Low coverage — run more surveys to improve accuracy</span>
             </div>
@@ -181,10 +181,10 @@ export function BrandEquityClient({
                   : (score as number) >= b.p25       ? 'Below P50'
                   : 'Bottom 25%'
                 : null
-              const pctileColor = pctile === 'Top 10%' || pctile === 'Top 25%' ? 'text-green-600'
-                : pctile === 'Above P50' ? 'text-blue-500'
-                : pctile === 'Below P50' ? 'text-amber-500'
-                : pctile ? 'text-red-500' : ''
+              const pctileColor = pctile === 'Top 10%' || pctile === 'Top 25%' ? 'text-pos'
+                : pctile === 'Above P50' ? 'text-tx-2'
+                : pctile === 'Below P50' ? 'text-tx-2'
+                : pctile ? 'text-tx-flare' : ''
 
               return (
                 <div key={meta.key} className="rounded-lg transition-colors">
@@ -203,7 +203,7 @@ export function BrandEquityClient({
                           className="h-full rounded-full transition-all duration-700"
                           style={{
                             width: available ? `${score}%` : '0%',
-                            backgroundColor: available ? (zone?.color ?? '#94a3b8') : undefined,
+                            backgroundColor: available ? (zone?.color ?? 'var(--tx-3)') : undefined,
                             opacity: available ? 1 : 0,
                           }}
                         />
@@ -260,9 +260,9 @@ export function BrandEquityClient({
                                     <span className={cn(
                                       'text-[11px] font-bold tabular-nums w-10 text-right',
                                       source.score !== null
-                                        ? source.score >= 70 ? 'text-green-600'
-                                          : source.score >= 45 ? 'text-amber-500'
-                                          : 'text-red-500'
+                                        ? source.score >= 70 ? 'text-pos'
+                                          : source.score >= 45 ? 'text-tx-2'
+                                          : 'text-tx-flare'
                                         : 'text-muted-foreground/30',
                                     )}>
                                       {source.score !== null ? `${source.score}/100` : '—'}
@@ -282,8 +282,8 @@ export function BrandEquityClient({
                                       className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
                                       style={{
                                         width: `${(source.weight / 100) * source.score}%`,
-                                        backgroundColor: source.score >= 70 ? '#22c55e'
-                                          : source.score >= 45 ? '#f59e0b' : '#ef4444',
+                                        backgroundColor: source.score >= 70 ? 'var(--pos)'
+                                          : source.score >= 45 ? 'var(--ember)' : 'var(--flare)',
                                         opacity: 0.8,
                                       }}
                                     />
@@ -381,10 +381,10 @@ export function BrandEquityClient({
                 : value >= b.p50       ? 'Above median'
                 : value >= b.p25       ? 'Below median'
                 : 'Bottom 25%'
-              const colour = pctile === 'Top 10%' || pctile === 'Top 25%' ? 'text-green-600'
-                : pctile === 'Above median' ? 'text-blue-500'
-                : pctile === 'Below median' ? 'text-amber-500'
-                : 'text-red-500'
+              const colour = pctile === 'Top 10%' || pctile === 'Top 25%' ? 'text-pos'
+                : pctile === 'Above median' ? 'text-tx-2'
+                : pctile === 'Below median' ? 'text-tx-2'
+                : 'text-tx-flare'
               return (
                 <div key={key} className="rounded-lg border border-border/60 p-3 space-y-2">
                   <div className="flex items-center justify-between">
@@ -415,7 +415,7 @@ export function BrandEquityClient({
                       return (
                         <div
                           className="absolute top-1/2 -translate-y-1/2 h-3 w-3 rounded-full border-2 border-background shadow"
-                          style={{ left: `${pos}%`, transform: `translateX(-50%) translateY(-50%)`, backgroundColor: '#3b82f6' }}
+                          style={{ left: `${pos}%`, transform: `translateX(-50%) translateY(-50%)`, backgroundColor: 'var(--flare)' }}
                         />
                       )
                     })()}
@@ -450,33 +450,33 @@ export function BrandEquityClient({
                 axisLine={false}
                 interval="preserveStartEnd"
                 tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
-                fontFamily="var(--font-sans)"
+                fontFamily="var(--font)"
               />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }} tickLine={false} axisLine={false} tickCount={5} fontFamily="var(--font-sans)" />
-              <ReferenceLine y={80} stroke="#14b8a6" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Leading', fontSize: 9, fill: '#14b8a6', opacity: 0.5 }} />
-              <ReferenceLine y={65} stroke="#22c55e" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Healthy', fontSize: 9, fill: '#22c55e', opacity: 0.5 }} />
-              <ReferenceLine y={40} stroke="#f59e0b" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Building', fontSize: 9, fill: '#f59e0b', opacity: 0.5 }} />
+              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }} tickLine={false} axisLine={false} tickCount={5} fontFamily="var(--font)" />
+              <ReferenceLine y={80} stroke="var(--pos)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Leading', fontSize: 9, fill: 'var(--pos)', opacity: 0.5 }} />
+              <ReferenceLine y={65} stroke="var(--pos)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Healthy', fontSize: 9, fill: 'var(--pos)', opacity: 0.5 }} />
+              <ReferenceLine y={40} stroke="var(--ember)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Building', fontSize: 9, fill: 'var(--ember)', opacity: 0.5 }} />
               {benchmarks['bhi']?.p50 != null && (
                 <ReferenceLine
                   y={benchmarks['bhi'].p50}
-                  stroke="#a855f7"
+                  stroke="var(--neu)"
                   strokeDasharray="6 3"
                   strokeWidth={1.5}
                   strokeOpacity={0.65}
-                  label={{ value: `Sector P50 (${Math.round(benchmarks['bhi'].p50)})`, position: 'insideBottomRight', fontSize: 9, fill: '#a855f7', opacity: 0.8 }}
+                  label={{ value: `Sector P50 (${Math.round(benchmarks['bhi'].p50)})`, position: 'insideBottomRight', fontSize: 9, fill: 'var(--neu)', opacity: 0.8 }}
                 />
               )}
               <RechartTooltip
                 formatter={(v) => [typeof v === 'number' ? Math.round(v) : v, 'BHI Score']}
                 labelFormatter={(v) => typeof v === 'string' ? new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' }) : String(v)}
                 contentStyle={{
-                  background: '#14182B',
-                  border: '1px solid rgba(255,255,255,0.10)',
+                  background: 'var(--bg-ink)',
+                  border: 'var(--line)',
                   borderRadius: 12,
                   fontSize: 12,
-                  color: '#fff',
+                  color: 'var(--bg-card)',
                 }}
-                labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
+                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
               />
               {markers.map(m => (
                 <ReferenceLine
@@ -491,20 +491,20 @@ export function BrandEquityClient({
                 type="monotone"
                 dataKey="score"
                 name="BHI"
-                stroke="#2B59FF"
+                stroke="var(--flare)"
                 strokeWidth={2.5}
                 dot={false}
-                activeDot={{ r: 5, fill: '#2B59FF', strokeWidth: 2, stroke: '#fff' }}
+                activeDot={{ r: 5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
                 connectNulls={false}
               />
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-4 flex-wrap">
             {[
-              { label: 'Leading', color: '#14b8a6', range: '80–100' },
-              { label: 'Healthy', color: '#22c55e', range: '65–79' },
-              { label: 'Building', color: '#f59e0b', range: '40–64' },
-              { label: 'At Risk', color: '#ef4444', range: '0–39' },
+              { label: 'Leading', color: 'var(--pos)', range: '80–100' },
+              { label: 'Healthy', color: 'var(--pos)', range: '65–79' },
+              { label: 'Building', color: 'var(--ember)', range: '40–64' },
+              { label: 'At Risk', color: 'var(--flare)', range: '0–39' },
             ].map(z => (
               <div key={z.label} className="flex items-center gap-1.5">
                 <span className="h-[2px] w-4 rounded-full" style={{ background: z.color, opacity: 0.5 }} />
@@ -628,8 +628,8 @@ export function BrandEquityClient({
               <Radar
                 name={brandName}
                 dataKey="score"
-                stroke="#2B59FF"
-                fill="#2B59FF"
+                stroke="var(--flare)"
+                fill="var(--flare)"
                 fillOpacity={0.18}
                 strokeWidth={2}
               />
@@ -639,13 +639,13 @@ export function BrandEquityClient({
                   (props.payload as { fullLabel?: string })?.fullLabel ?? String(_name),
                 ]}
                 contentStyle={{
-                  background: '#14182B',
-                  border: '1px solid rgba(255,255,255,0.10)',
+                  background: 'var(--bg-ink)',
+                  border: 'var(--line)',
                   borderRadius: 12,
                   fontSize: 12,
-                  color: '#fff',
+                  color: 'var(--bg-card)',
                 }}
-                labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
               />
             </RadarChart>
           </ResponsiveContainer>
@@ -688,8 +688,8 @@ export function BrandEquityClient({
             </Link>
           </div>
           <p className={cn('text-3xl font-bold', currentNps == null ? 'text-muted-foreground/40' :
-            currentNps >= 50 ? 'text-green-600' : currentNps >= 30 ? 'text-foreground' :
-            currentNps >= 0 ? 'text-amber-500' : 'text-red-500')}>
+            currentNps >= 50 ? 'text-pos' : currentNps >= 30 ? 'text-foreground' :
+            currentNps >= 0 ? 'text-tx-2' : 'text-tx-flare')}>
             {currentNps != null ? `${currentNps >= 0 ? '+' : ''}${currentNps}` : '—'}
           </p>
           <p className="text-xs text-muted-foreground">

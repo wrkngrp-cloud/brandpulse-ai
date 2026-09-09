@@ -36,8 +36,8 @@ export function SuccessDialog({
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <div className="flex flex-col items-center text-center gap-3 pt-2">
-            <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-950/40 flex items-center justify-center">
-              <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <div className="h-12 w-12 rounded-full bg-shell dark:bg-shell/40 flex items-center justify-center">
+              <CheckCircle2 className="h-6 w-6 text-pos dark:text-pos" />
             </div>
             <DialogTitle className="text-base">{title}</DialogTitle>
             {description && (

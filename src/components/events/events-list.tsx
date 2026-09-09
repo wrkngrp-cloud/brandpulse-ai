@@ -47,13 +47,13 @@ const ACTIVATION_LABELS: Record<string, string> = {
 
 function activationBadgeClass(type: string): string {
   if (['sampling', 'roadshow', 'market_activation'].includes(type)) {
-    return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+    return 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
   }
   if (['church_mosque', 'estate_community', 'school_contact'].includes(type)) {
-    return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+    return 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2'
   }
   if (['branded_truck', 'sports_sponsorship', 'concert_festival'].includes(type)) {
-    return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+    return 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
   }
   return 'bg-muted text-muted-foreground'
 }

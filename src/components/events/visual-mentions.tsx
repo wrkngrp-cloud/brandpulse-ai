@@ -28,15 +28,15 @@ interface Props {
 }
 
 const CONFIDENCE_STYLE: Record<string, string> = {
-  high:   'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  medium: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+  high:   'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  medium: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
   low:    'bg-muted text-muted-foreground',
 }
 
 const SENTIMENT_DOT: Record<string, string> = {
-  positive: 'bg-green-500',
+  positive: 'bg-pos',
   neutral:  'bg-muted-foreground',
-  negative: 'bg-red-500',
+  negative: 'bg-flare',
 }
 
 function MentionCard({ m }: { m: VisualMention }) {
@@ -54,7 +54,7 @@ function MentionCard({ m }: { m: VisualMention }) {
         {/* Visibility badge */}
         <div className="absolute top-2 left-2">
           {m.brand_visible
-            ? <CheckCircle2 className="h-5 w-5 text-green-500 drop-shadow" />
+            ? <CheckCircle2 className="h-5 w-5 text-pos drop-shadow" />
             : <XCircle      className="h-5 w-5 text-muted-foreground/60 drop-shadow" />}
         </div>
         {/* Confidence */}
@@ -175,7 +175,7 @@ export function VisualMentions({ eventId, initialData, hasIgConnection, hasHasht
 
       {/* Blockers */}
       {!hasIgConnection && (
-        <div className="border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 text-sm text-amber-800 dark:text-amber-400">
+        <div className="border border-line dark:border-line bg-shell dark:bg-shell/20 rounded-xl p-4 text-sm text-tx-2 dark:text-tx-2">
           Connect Instagram in Settings to enable visual brand detection.
         </div>
       )}
@@ -187,7 +187,7 @@ export function VisualMentions({ eventId, initialData, hasIgConnection, hasHasht
 
       {/* Error */}
       {error && (
-        <div className="border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 rounded-xl p-3 text-sm text-red-700 dark:text-red-400">
+        <div className="border border-line-strong dark:border-line-strong bg-flare-wash dark:bg-shell/20 rounded-xl p-3 text-sm text-tx-flare dark:text-tx-flare">
           {error}
         </div>
       )}
@@ -196,7 +196,7 @@ export function VisualMentions({ eventId, initialData, hasIgConnection, hasHasht
       {lastScan && (
         <div className="border rounded-xl px-4 py-3 bg-card flex items-center gap-6 text-sm">
           <span><span className="font-semibold">{lastScan.processed}</span> photos scanned</span>
-          <span><span className="font-semibold text-green-600">{lastScan.brandDetected}</span> brand visible</span>
+          <span><span className="font-semibold text-pos">{lastScan.brandDetected}</span> brand visible</span>
           <span className="text-muted-foreground">{lastScan.processed - lastScan.brandDetected} not detected</span>
         </div>
       )}
@@ -212,7 +212,7 @@ export function VisualMentions({ eventId, initialData, hasIgConnection, hasHasht
       {/* Brand-visible grid */}
       {visible.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs font-medium text-green-600">
+          <p className="text-xs font-medium text-pos">
             Brand detected — {visible.length} photo{visible.length !== 1 ? 's' : ''}
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

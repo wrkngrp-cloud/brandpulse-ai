@@ -42,11 +42,11 @@ function platformLabel(p: string) {
 
 function platformColor(p: string) {
   const map: Record<string, string> = {
-    meta:     'bg-blue-500/10 text-blue-700 dark:text-blue-400',
-    google:   'bg-red-500/10 text-red-700 dark:text-red-400',
-    tiktok:   'bg-black/10 text-gray-700 dark:text-gray-300',
-    linkedin: 'bg-sky-500/10 text-sky-700 dark:text-sky-400',
-    twitter:  'bg-slate-500/10 text-slate-700 dark:text-slate-400',
+    meta:     'bg-flare/10 text-tx-flare dark:text-tx-2',
+    google:   'bg-flare/10 text-tx-flare dark:text-tx-flare',
+    tiktok:   'bg-ink/10 text-tx-2 dark:text-tx-inv-2',
+    linkedin: 'bg-flare/10 text-tx-flare dark:text-tx-2',
+    twitter:  'bg-neu/10 text-tx-2 dark:text-tx-3',
   }
   return map[p] ?? 'bg-muted text-muted-foreground'
 }
@@ -108,9 +108,9 @@ export default function DraftsPage() {
       </div>
 
       {/* How publishing works */}
-      <div className="rounded-xl border border-blue-200 bg-blue-50 dark:border-blue-800/40 dark:bg-blue-950/30 px-4 py-3 space-y-1">
-        <p className="text-sm font-medium text-blue-800 dark:text-blue-300">How publishing works</p>
-        <p className="text-xs text-blue-700 dark:text-blue-400">
+      <div className="rounded-xl border border-line-strong bg-flare-wash dark:border-line-strong dark:bg-shell/30 px-4 py-3 space-y-1">
+        <p className="text-sm font-medium text-tx-flare dark:text-tx-2">How publishing works</p>
+        <p className="text-xs text-tx-flare dark:text-tx-2">
           Drafts are saved here until you are ready to go live. Once you connect your Meta or Google Ads account, use the
           {' '}<strong>Publish</strong> button to send the campaign to the platform. Until then, drafts remain private on BrandGauge.
         </p>
@@ -153,7 +153,7 @@ export default function DraftsPage() {
                         {draft.ad_format.replace(/_/g, ' ')}
                       </Badge>
                     )}
-                    <Badge variant="outline" className="text-[10px] text-amber-600 border-amber-300 bg-amber-50 dark:bg-amber-950/30">
+                    <Badge variant="outline" className="text-[10px] text-tx-2 border-line bg-shell dark:bg-shell/30">
                       Draft
                     </Badge>
                   </div>
@@ -166,7 +166,7 @@ export default function DraftsPage() {
                 </div>
                 <button
                   onClick={() => deleteDraft(draft.id)}
-                  className="shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                  className="shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-tx-flare hover:bg-flare-wash dark:hover:bg-shell/30 transition-colors"
                   title="Delete draft"
                 >
                   <Trash2 className="h-4 w-4" />

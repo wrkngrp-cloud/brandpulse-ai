@@ -18,15 +18,15 @@ export function WhatsAppConnectCard({ configured, contactCount, campaignCount }:
         <div className="flex items-start gap-3">
           <div className={cn(
             'h-9 w-9 rounded-lg flex items-center justify-center shrink-0',
-            configured ? 'bg-green-50 dark:bg-green-950/30' : 'bg-muted'
+            configured ? 'bg-shell dark:bg-shell/30' : 'bg-muted'
           )}>
-            <MessageCircle className={cn('h-4 w-4', configured ? 'text-green-600' : 'text-muted-foreground')} />
+            <MessageCircle className={cn('h-4 w-4', configured ? 'text-pos' : 'text-muted-foreground')} />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold">WhatsApp Business</p>
               {configured && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/40 rounded-full px-2 py-0.5">
+                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-pos dark:text-pos bg-shell dark:bg-shell/40 rounded-full px-2 py-0.5">
                   <CheckCircle2 className="h-2.5 w-2.5" /> Active
                 </span>
               )}
@@ -55,7 +55,7 @@ export function WhatsAppConnectCard({ configured, contactCount, campaignCount }:
       </div>
 
       {!configured && (
-        <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 px-3 py-2.5 text-[11.5px] text-amber-800 dark:text-amber-300 leading-relaxed">
+        <div className="rounded-lg bg-shell dark:bg-shell/20 border border-line dark:border-line px-3 py-2.5 text-[11.5px] text-tx-2 dark:text-tx-2 leading-relaxed">
           Add <code className="font-mono">WHATSAPP_PHONE_NUMBER_ID</code>, <code className="font-mono">WHATSAPP_BUSINESS_ACCOUNT_ID</code>, and <code className="font-mono">WHATSAPP_ACCESS_TOKEN</code> to your environment variables to activate.
         </div>
       )}

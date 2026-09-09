@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import { TOKENS } from '@/lib/brand-tokens'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -90,24 +91,24 @@ function printHtml(title: string, body: string) {
 <title>${title}</title>
 <style>
   *{box-sizing:border-box}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:760px;margin:40px auto;padding:0 24px;color:#111;line-height:1.65;font-size:13px}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:760px;margin:40px auto;padding:0 24px;color:${TOKENS.tx};line-height:1.65;font-size:13px}
   h1{font-size:1.35rem;font-weight:700;margin:0 0 .5rem}
-  h2{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#888;margin:1.75rem 0 .5rem}
+  h2{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:${TOKENS.tx3};margin:1.75rem 0 .5rem}
   p{margin:.4rem 0}
   ul{padding-left:1.4rem;margin:.4rem 0}
   li{margin-bottom:.35rem}
   .banner{padding:.75rem 1rem;border-radius:6px;margin:1rem 0;border:1px solid}
-  .green{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
-  .amber{background:#fffbeb;border-color:#fde68a;color:#92400e}
+  .green{background:${TOKENS.shell};border-color:${TOKENS.line};color:${TOKENS.tx}}
+  .amber{background:${TOKENS.shell};border-color:${TOKENS.line};color:${TOKENS.tx2}}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:.5rem 0}
   .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin:.5rem 0}
-  .card{padding:.65rem .85rem;border:1px solid #e5e7eb;border-radius:6px}
-  .label{font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:#888;display:block;margin-bottom:.2rem}
-  .wins{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:.65rem .85rem}
-  .concerns{background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:.65rem .85rem}
+  .card{padding:.65rem .85rem;border:1px solid ${TOKENS.line};border-radius:4px}
+  .label{font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:${TOKENS.tx3};display:block;margin-bottom:.2rem}
+  .wins{background:${TOKENS.shell};border:1px solid ${TOKENS.line};border-radius:4px;padding:.65rem .85rem}
+  .concerns{background:${TOKENS.shell};border:1px solid ${TOKENS.line};border-radius:4px;padding:.65rem .85rem}
   table{width:100%;border-collapse:collapse;margin:.5rem 0}
-  th{text-align:left;font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:#888;border-bottom:1px solid #e5e7eb;padding:.4rem .5rem}
-  td{padding:.45rem .5rem;border-bottom:1px solid #f3f4f6;vertical-align:top}
+  th{text-align:left;font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:${TOKENS.tx3};border-bottom:1px solid ${TOKENS.line};padding:.4rem .5rem}
+  td{padding:.45rem .5rem;border-bottom:1px solid ${TOKENS.line};vertical-align:top}
   @media print{body{margin:16px}button{display:none}}
 </style>
 </head>
@@ -151,9 +152,9 @@ function BulletList({ items }: { items: string[] }) {
 
 function DataQualityBadge({ quality }: { quality: 'High' | 'Medium' | 'Low' }) {
   const styles: Record<string, string> = {
-    High:   'bg-green-50 text-green-700 border-green-200',
-    Medium: 'bg-amber-50 text-amber-700 border-amber-200',
-    Low:    'bg-red-50 text-red-700 border-red-200',
+    High:   'bg-shell text-pos border-line',
+    Medium: 'bg-shell text-tx-2 border-line',
+    Low:    'bg-flare-wash text-tx-flare border-line-strong',
   }
   return (
     <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border', styles[quality])}>
@@ -243,7 +244,7 @@ export function BusinessCaseTab() {
       <h2>Expected Outcomes</h2>
       <table><tr><th>Metric</th><th>Target</th><th>Timeline</th></tr>${(result.expected_outcomes ?? []).map(o => `<tr><td>${o.metric}</td><td>${o.target}</td><td>${o.timeline}</td></tr>`).join('')}</table>
       <h2>Risk Factors</h2>
-      ${(result.risk_factors ?? []).map(r => `<div class="card" style="margin-bottom:.5rem"><strong>${r.risk}</strong><p style="color:#666">${r.mitigation}</p></div>`).join('')}
+      ${(result.risk_factors ?? []).map(r => `<div class="card" style="margin-bottom:.5rem"><strong>${r.risk}</strong><p style="color:var(--tx-2)">${r.mitigation}</p></div>`).join('')}
       <h2>Decision Gates</h2><ul>${(result.decision_gates ?? []).map(g => `<li>${g}</li>`).join('')}</ul>
       <h2>Success Metrics</h2><ul>${(result.success_metrics ?? []).map(m => `<li>${m}</li>`).join('')}</ul>
       <h2>Alternatives Considered</h2><p>${result.alternatives_considered ?? ''}</p>
@@ -320,8 +321,8 @@ export function BusinessCaseTab() {
       <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
-            <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-              <FileText className="h-4 w-4 text-blue-600" />
+            <div className="h-8 w-8 rounded-lg bg-flare-wash flex items-center justify-center shrink-0">
+              <FileText className="h-4 w-4 text-tx-flare" />
             </div>
             <h2 className="text-lg font-semibold">Marketing Business Case</h2>
           </div>
@@ -334,7 +335,7 @@ export function BusinessCaseTab() {
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-medium mb-1.5">
-              Initiative description <span className="text-red-500">*</span>
+              Initiative description <span className="text-tx-flare">*</span>
             </label>
             <Textarea
               value={initiative}
@@ -368,7 +369,7 @@ export function BusinessCaseTab() {
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2.5">
+            <div className="flex items-start gap-2 text-sm text-tx-flare bg-flare-wash border border-line-strong rounded-lg px-3 py-2.5">
               <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
               {error}
             </div>
@@ -412,9 +413,9 @@ export function BusinessCaseTab() {
           {/* Recommendation banner */}
           <div className={cn(
             'flex items-start gap-3 rounded-xl px-5 py-4 border',
-            verdictIsGo ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'
+            verdictIsGo ? 'bg-shell border-line' : 'bg-shell border-line'
           )}>
-            <CheckCircle2 className={cn('h-5 w-5 shrink-0 mt-0.5', verdictIsGo ? 'text-green-600' : 'text-amber-600')} />
+            <CheckCircle2 className={cn('h-5 w-5 shrink-0 mt-0.5', verdictIsGo ? 'text-pos' : 'text-tx-2')} />
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Recommendation</p>
               <p className="text-sm font-semibold">{result.recommendation}</p>
@@ -475,9 +476,9 @@ export function BusinessCaseTab() {
               <SectionLabel>Scenario Analysis</SectionLabel>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
-                  { label: 'Base Case',  value: result.scenario_analysis.base, color: 'border-blue-200 bg-blue-50/40' },
-                  { label: 'Bull Case',  value: result.scenario_analysis.bull, color: 'border-green-200 bg-green-50/40' },
-                  { label: 'Bear Case',  value: result.scenario_analysis.bear, color: 'border-amber-200 bg-amber-50/40' },
+                  { label: 'Base Case',  value: result.scenario_analysis.base, color: 'border-line-strong bg-flare-wash/40' },
+                  { label: 'Bull Case',  value: result.scenario_analysis.bull, color: 'border-line bg-shell/40' },
+                  { label: 'Bear Case',  value: result.scenario_analysis.bear, color: 'border-line bg-shell/40' },
                 ].filter(s => s.value).map(s => (
                   <div key={s.label} className={cn('rounded-xl border px-4 py-3 space-y-1', s.color)}>
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{s.label}</p>
@@ -574,7 +575,7 @@ export function BusinessCaseTab() {
                 {result.risk_factors.map((r, i) => (
                   <div key={i} className="rounded-xl border bg-card px-4 py-3">
                     <div className="flex items-start gap-2">
-                      <AlertCircle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                      <AlertCircle className="h-4 w-4 text-tx-2 shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm font-medium">{r.risk}</p>
                         <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{r.mitigation}</p>
@@ -648,14 +649,14 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
       <p><strong>${result.headline_score}</strong></p>
       <h2>Executive Summary</h2><p>${result.executive_summary}</p>
       <div class="grid2">
-        <div class="wins"><strong style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#15803d">Key Wins</strong><ul>${(result.key_wins ?? []).map(w => `<li>${w}</li>`).join('')}</ul></div>
-        <div class="concerns"><strong style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#92400e">Key Concerns</strong><ul>${(result.key_concerns ?? []).map(c => `<li>${c}</li>`).join('')}</ul></div>
+        <div class="wins"><strong style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--pos)">Key Wins</strong><ul>${(result.key_wins ?? []).map(w => `<li>${w}</li>`).join('')}</ul></div>
+        <div class="concerns"><strong style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--char)">Key Concerns</strong><ul>${(result.key_concerns ?? []).map(c => `<li>${c}</li>`).join('')}</ul></div>
       </div>
       <h2>Sentiment Narrative</h2><p>${result.sentiment_narrative}</p>
       <h2>Content Performance</h2><p>${result.content_performance}</p>
       <h2>Audience Signals</h2><p>${result.audience_signals}</p>
       <h2>Next Month Priorities</h2>
-      ${(result.next_month_priorities ?? []).map((p, i) => `<div class="card" style="margin-bottom:.5rem"><strong>${i + 1}. ${p.priority}</strong><p style="color:#666">${p.rationale}</p></div>`).join('')}
+      ${(result.next_month_priorities ?? []).map((p, i) => `<div class="card" style="margin-bottom:.5rem"><strong>${i + 1}. ${p.priority}</strong><p style="color:var(--tx-2)">${p.rationale}</p></div>`).join('')}
     `
     printHtml(`Monthly Brand Report — ${result.month}`, html)
   }
@@ -694,8 +695,8 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
   if (!result) {
     return (
       <div className="max-w-lg mx-auto py-16 px-4 text-center space-y-6">
-        <div className="h-12 w-12 rounded-2xl bg-violet-50 flex items-center justify-center mx-auto">
-          <TrendingUp className="h-6 w-6 text-violet-600" />
+        <div className="h-12 w-12 rounded-2xl bg-shell flex items-center justify-center mx-auto">
+          <TrendingUp className="h-6 w-6 text-tx-2" />
         </div>
         <div>
           <h2 className="text-lg font-semibold">Monthly Brand Report</h2>
@@ -706,7 +707,7 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
         </div>
 
         {error && (
-          <div className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-left space-y-2">
+          <div className="text-sm text-tx-2 bg-shell border border-line rounded-lg px-3 py-2.5 text-left space-y-2">
             <div className="flex items-start gap-2">
               <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
               <span className="leading-relaxed">{error}</span>
@@ -714,7 +715,7 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
             {errorCta && (
               <Link
                 href={errorCta.href}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-900 border border-amber-300 rounded-full px-3 py-1.5 hover:bg-amber-100 transition-colors ml-6"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-tx-2 border border-line rounded-full px-3 py-1.5 hover:bg-shell transition-colors ml-6"
               >
                 {errorCta.label}
                 <ArrowRight className="h-3 w-3" />
@@ -762,23 +763,23 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
 
           {/* Wins / concerns */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="rounded-xl bg-green-50 border border-green-100 px-4 py-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-green-700 mb-2.5">Key Wins</p>
+            <div className="rounded-xl bg-shell border border-line px-4 py-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-pos mb-2.5">Key Wins</p>
               <ul className="space-y-2">
                 {(result.key_wins ?? []).map((w, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-green-900">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0 mt-0.5" />
+                  <li key={i} className="flex items-start gap-2 text-sm text-pos">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-pos shrink-0 mt-0.5" />
                     {w}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-amber-700 mb-2.5">Key Concerns</p>
+            <div className="rounded-xl bg-shell border border-line px-4 py-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-tx-2 mb-2.5">Key Concerns</p>
               <ul className="space-y-2">
                 {(result.key_concerns ?? []).map((c, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-amber-900">
-                    <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0 mt-0.5" />
+                  <li key={i} className="flex items-start gap-2 text-sm text-tx-2">
+                    <AlertCircle className="h-3.5 w-3.5 text-tx-2 shrink-0 mt-0.5" />
                     {c}
                   </li>
                 ))}
@@ -820,7 +821,7 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
 
           {result.emailSent && userEmail && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-xl px-3 py-2.5 border">
-              <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
+              <CheckCircle2 className="h-3.5 w-3.5 text-pos shrink-0" />
               Report also sent to {userEmail}
             </div>
           )}
@@ -835,8 +836,8 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
 export function FunnelDiagnosticTab() {
   return (
     <div className="max-w-lg mx-auto py-16 px-4 text-center space-y-6">
-      <div className="h-12 w-12 rounded-2xl bg-orange-50 flex items-center justify-center mx-auto">
-        <Filter className="h-6 w-6 text-orange-500" />
+      <div className="h-12 w-12 rounded-2xl bg-shell flex items-center justify-center mx-auto">
+        <Filter className="h-6 w-6 text-tx-2" />
       </div>
       <div>
         <h2 className="text-lg font-semibold">Funnel Diagnostic</h2>

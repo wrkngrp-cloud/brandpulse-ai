@@ -84,10 +84,10 @@ function SentimentBadge({ score }: { score: number | null }) {
   if (score == null) return <span className="text-xs text-muted-foreground">—</span>
   const label = score >= 65 ? 'Positive' : score >= 40 ? 'Mixed' : 'Negative'
   const cls   = score >= 65
-    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+    ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos'
     : score >= 40
-    ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+    ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
+    : 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
   return (
     <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', cls)}>
       {label} ({score})
@@ -120,8 +120,8 @@ function SetupPrompt({ onSaved }: { onSaved: () => void }) {
   return (
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center gap-3">
-        <div className="h-9 w-9 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
-          <PlayCircle className="h-4 w-4 text-red-600" />
+        <div className="h-9 w-9 rounded-lg bg-flare-wash flex items-center justify-center shrink-0">
+          <PlayCircle className="h-4 w-4 text-tx-flare" />
         </div>
         <div>
           <p className="text-sm font-semibold">Connect YouTube Data API</p>
@@ -338,8 +338,8 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
           ) : (
             <div className="border rounded-xl p-4 bg-card flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                <div className="h-8 w-8 rounded-lg bg-shell flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="h-4 w-4 text-pos" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">YouTube monitoring active</p>
@@ -538,9 +538,9 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                           <span className={cn(
                             'font-medium',
                             delivPct == null ? 'text-muted-foreground'
-                              : delivPct >= 100 ? 'text-green-600'
-                              : delivPct >= 70 ? 'text-amber-500'
-                              : 'text-red-500',
+                              : delivPct >= 100 ? 'text-pos'
+                              : delivPct >= 70 ? 'text-tx-2'
+                              : 'text-tx-flare',
                           )}>
                             {deal.actual_views != null
                               ? `${deal.actual_views.toLocaleString()} / ${deal.view_guarantee.toLocaleString()} (${delivPct ?? 0}%)`
@@ -552,9 +552,9 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                             <div
                               className={cn(
                                 'h-full rounded-full transition-all',
-                                (delivPct ?? 0) >= 100 ? 'bg-green-500'
-                                  : (delivPct ?? 0) >= 70 ? 'bg-amber-500'
-                                  : 'bg-red-500',
+                                (delivPct ?? 0) >= 100 ? 'bg-pos'
+                                  : (delivPct ?? 0) >= 70 ? 'bg-ember'
+                                  : 'bg-flare',
                               )}
                               style={{ width: `${Math.min(delivPct ?? 0, 100)}%` }}
                             />

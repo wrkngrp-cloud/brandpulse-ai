@@ -25,17 +25,17 @@ const ASSET_ICON: Record<string, React.ElementType> = {
 }
 
 const ASSET_COLOR: Record<string, string> = {
-  image:    'bg-blue-500/10 text-blue-600',
-  video:    'bg-purple-500/10 text-purple-600',
-  copy:     'bg-amber-500/10 text-amber-600',
-  carousel: 'bg-teal-500/10 text-teal-600',
-  audio:    'bg-pink-500/10 text-pink-600',
+  image:    'bg-flare/10 text-tx-flare',
+  video:    'bg-neu/10 text-tx-2',
+  copy:     'bg-ember/10 text-tx-2',
+  carousel: 'bg-pos/10 text-pos',
+  audio:    'bg-neu/10 text-tx-2',
 }
 
 const STATUS_BADGE: Record<string, string> = {
   draft:    'bg-muted text-muted-foreground',
-  active:   'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  vetted:   'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  active:   'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
+  vetted:   'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
   archived: 'bg-muted/60 text-muted-foreground/60',
 }
 
@@ -69,7 +69,7 @@ function AssetCard({
       <div
         className={cn(
           'relative h-36 flex items-center justify-center cursor-pointer',
-          'bg-gradient-to-br from-muted/60 to-muted',
+          'bg-shell',
         )}
         onClick={onView}
       >
@@ -102,7 +102,7 @@ function AssetCard({
         >
           {selected
             ? <CheckSquare className="h-5 w-5 text-primary fill-primary" />
-            : <Square className="h-5 w-5 text-white/80 drop-shadow" />}
+            : <Square className="h-5 w-5 text-tx-inv/80 drop-shadow" />}
         </button>
       </div>
 
@@ -158,7 +158,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="absolute inset-0 bg-ink/40" onClick={onClose} />
       <div className="relative w-full max-w-md bg-background border-l shadow-2xl overflow-y-auto flex flex-col">
         {/* Header */}
         <div className="p-5 border-b flex items-start gap-3">

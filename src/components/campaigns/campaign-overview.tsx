@@ -4,19 +4,19 @@ import { cn, formatNGN } from '@/lib/utils'
 import { CampaignAiSummary } from './campaign-ai-summary'
 
 const OBJECTIVE_META: Record<string, { label: string; color: string }> = {
-  awareness:     { label: 'Brand Awareness',  color: 'bg-blue-500' },
-  consideration: { label: 'Consideration',    color: 'bg-purple-500' },
-  conversion:    { label: 'Conversion',       color: 'bg-green-500' },
-  retention:     { label: 'Retention',        color: 'bg-amber-500' },
+  awareness:     { label: 'Brand Awareness',  color: 'bg-flare' },
+  consideration: { label: 'Consideration',    color: 'bg-neu' },
+  conversion:    { label: 'Conversion',       color: 'bg-pos' },
+  retention:     { label: 'Retention',        color: 'bg-ember' },
 }
 
 const CHANNEL_META: Record<string, { label: string; color: string }> = {
-  ooh:     { label: 'OOH / Outdoor',        color: 'bg-blue-400' },
-  events:  { label: 'Events & Activations',  color: 'bg-emerald-400' },
-  digital: { label: 'Digital',              color: 'bg-violet-400' },
-  radio:   { label: 'Radio',                color: 'bg-orange-400' },
-  tv:      { label: 'TV',                   color: 'bg-red-400' },
-  print:   { label: 'Print',                color: 'bg-stone-400' },
+  ooh:     { label: 'OOH / Outdoor',        color: 'bg-flare' },
+  events:  { label: 'Events & Activations',  color: 'bg-pos' },
+  digital: { label: 'Digital',              color: 'bg-neu' },
+  radio:   { label: 'Radio',                color: 'bg-ember' },
+  tv:      { label: 'TV',                   color: 'bg-flare' },
+  print:   { label: 'Print',                color: 'bg-neu' },
 }
 
 interface Channel {
@@ -94,11 +94,11 @@ function formatFollowers(n: number | null): string {
 }
 
 const PLATFORM_BADGE: Record<string, string> = {
-  instagram: 'bg-pink-100 text-pink-800',
+  instagram: 'bg-shell text-tx-2',
   tiktok:    'bg-muted text-muted-foreground',
-  youtube:   'bg-red-100 text-red-800',
-  twitter:   'bg-sky-100 text-sky-800',
-  facebook:  'bg-blue-100 text-blue-800',
+  youtube:   'bg-flare-wash text-tx-flare',
+  twitter:   'bg-flare-wash text-tx-flare',
+  facebook:  'bg-flare-wash text-tx-flare',
 }
 
 export function CampaignOverview({ campaign, oohSites, events, influencers = [] }: CampaignOverviewProps) {
@@ -375,9 +375,9 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
                 {inf.cultural_iq !== null && (
                   <span className={cn(
                     'text-xs px-1.5 py-0.5 rounded-full font-semibold shrink-0',
-                    inf.cultural_iq >= 70 ? 'text-green-700 bg-green-100'
-                    : inf.cultural_iq >= 50 ? 'text-amber-700 bg-amber-100'
-                    : 'text-red-700 bg-red-100',
+                    inf.cultural_iq >= 70 ? 'text-pos bg-shell'
+                    : inf.cultural_iq >= 50 ? 'text-tx-2 bg-shell'
+                    : 'text-tx-flare bg-flare-wash',
                   )}>
                     IQ {inf.cultural_iq}
                   </span>

@@ -23,14 +23,14 @@ interface MmmRun {
 }
 
 const CHANNEL_COLORS: Record<string, string> = {
-  events:  '#22c55e',
-  email:   '#6366f1',
-  digital: '#3b82f6',
-  social:  '#f59e0b',
-  radio:   '#ec4899',
-  tv:      '#8b5cf6',
-  ooh:     '#14b8a6',
-  print:   '#f97316',
+  events:  'var(--pos)',
+  email:   'var(--neu)',
+  digital: 'var(--flare)',
+  social:  'var(--ember)',
+  radio:   'var(--neu)',
+  tv:      'var(--neu)',
+  ooh:     'var(--pos)',
+  print:   'var(--ember)',
 }
 
 const CHANNEL_LABELS: Record<string, string> = {
@@ -95,7 +95,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
     .map(([ch, pct]) => ({
       name:  CHANNEL_LABELS[ch] ?? ch,
       value: pct,
-      color: CHANNEL_COLORS[ch] ?? '#94a3b8',
+      color: CHANNEL_COLORS[ch] ?? 'var(--tx-3)',
       ch,
     }))
 
@@ -162,8 +162,8 @@ export function MmmClient({ brandName, lastRun }: Props) {
           {/* Summary bar */}
           <div className="rounded-2xl border bg-card p-5">
             <div className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
-                <Zap className="h-4 w-4 text-blue-500" />
+              <div className="h-8 w-8 rounded-xl bg-flare/10 flex items-center justify-center shrink-0">
+                <Zap className="h-4 w-4 text-tx-2" />
               </div>
               <div className="flex-1">
                 <p className="text-[13px] font-medium mb-1">AI Summary</p>
@@ -203,7 +203,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
                       contentStyle={{ fontSize: 12, borderRadius: 8 }}
                     />
                     <Legend
-                      formatter={(value) => <span style={{ fontSize: 12, color: '#888' }}>{value}</span>}
+                      formatter={(value) => <span style={{ fontSize: 12, color: 'var(--tx-3)' }}>{value}</span>}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -224,7 +224,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
                       {roi[ch.ch] !== undefined && (
                         <span className={cn(
                           'text-[11px] font-medium w-14 text-right',
-                          roi[ch.ch] > 0 ? 'text-green-500' : 'text-red-500'
+                          roi[ch.ch] > 0 ? 'text-pos' : 'text-tx-flare'
                         )}>
                           {roi[ch.ch] > 0 ? '+' : ''}{roi[ch.ch]}x
                         </span>
@@ -246,20 +246,20 @@ export function MmmClient({ brandName, lastRun }: Props) {
           {(result.increase || result.reduce) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {result.increase && (
-                <div className="rounded-2xl border border-green-200 bg-green-50 dark:bg-green-950/30 dark:border-green-900 p-5">
+                <div className="rounded-2xl border border-line bg-shell dark:bg-shell/30 dark:border-line p-5">
                   <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-green-600" />
-                    <p className="text-[13px] font-semibold text-green-700 dark:text-green-400">Increase investment</p>
+                    <TrendingUp className="h-4 w-4 text-pos" />
+                    <p className="text-[13px] font-semibold text-pos dark:text-pos">Increase investment</p>
                   </div>
                   <p className="text-[13px] font-medium capitalize mb-1">{result.increase.channel}</p>
                   <p className="text-[12.5px] text-muted-foreground leading-relaxed">{result.increase.rationale}</p>
                 </div>
               )}
               {result.reduce && (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900 p-5">
+                <div className="rounded-2xl border border-line bg-shell dark:bg-shell/30 dark:border-line p-5">
                   <div className="flex items-center gap-2 mb-2">
-                    <TrendingDown className="h-4 w-4 text-amber-600" />
-                    <p className="text-[13px] font-semibold text-amber-700 dark:text-amber-400">Optimise or reduce</p>
+                    <TrendingDown className="h-4 w-4 text-tx-2" />
+                    <p className="text-[13px] font-semibold text-tx-2 dark:text-tx-2">Optimise or reduce</p>
                   </div>
                   <p className="text-[13px] font-medium capitalize mb-1">{result.reduce.channel}</p>
                   <p className="text-[12.5px] text-muted-foreground leading-relaxed">{result.reduce.rationale}</p>

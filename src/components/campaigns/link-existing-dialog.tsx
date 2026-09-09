@@ -70,7 +70,7 @@ export function LinkOohSiteDialog({ campaignId, availableSites }: LinkOohDialogP
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40">
           <div className="bg-background border rounded-2xl shadow-xl w-full max-w-md space-y-4 p-5">
             <div className="flex items-center justify-between">
               <p className="font-semibold text-sm">Link an OOH site to this campaign</p>
@@ -139,10 +139,10 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
   if (availableEvents.length === 0) return null
 
   const STATUS_COLOURS: Record<string, string> = {
-    planned:  'bg-blue-100 text-blue-800',
-    live:     'bg-green-100 text-green-800',
+    planned:  'bg-flare-wash text-tx-flare',
+    live:     'bg-shell text-pos',
     closed:   'bg-muted text-muted-foreground',
-    reported: 'bg-purple-100 text-purple-800',
+    reported: 'bg-shell text-tx-2',
   }
 
   return (
@@ -156,7 +156,7 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40">
           <div className="bg-background border rounded-2xl shadow-xl w-full max-w-md space-y-4 p-5">
             <div className="flex items-center justify-between">
               <p className="font-semibold text-sm">Link an event to this campaign</p>

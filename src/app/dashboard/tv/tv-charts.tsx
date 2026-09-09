@@ -34,9 +34,9 @@ export function TVGRPChart() {
           contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
         />
         <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-        <Line type="monotone" dataKey="nta"      name="NTA"          stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} />
-        <Line type="monotone" dataKey="channels" name="Channels TV"  stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} />
-        <Line type="monotone" dataKey="tvc"      name="TVC News"     stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
+        <Line type="monotone" dataKey="nta"      name="NTA"          stroke="var(--neu)" strokeWidth={2} dot={{ r: 3 }} />
+        <Line type="monotone" dataKey="channels" name="Channels TV"  stroke="var(--pos)" strokeWidth={2} dot={{ r: 3 }} />
+        <Line type="monotone" dataKey="tvc"      name="TVC News"     stroke="var(--ember)" strokeWidth={2} dot={{ r: 3 }} />
       </LineChart>
     </ResponsiveContainer>
   )
@@ -52,7 +52,7 @@ export function TVDaypartChart() {
         <Tooltip
           contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
         />
-        <Bar dataKey="grp" name="GRP" fill="#6366f1" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="grp" name="GRP" fill="var(--neu)" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )

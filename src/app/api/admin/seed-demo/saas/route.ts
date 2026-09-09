@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
+import { TOKENS } from '@/lib/brand-tokens'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Bridger CRM — Nigerian B2B SaaS brand
@@ -101,8 +102,8 @@ export async function POST(req: NextRequest) {
     category:        'SaaS / Technology',
     industry:        'b2b_saas',
     brand_type:      'b2b_saas',
-    primary_color:   '#0F4C81',
-    secondary_color: '#00C6A7',
+    primary_color:   TOKENS.char,
+    secondary_color: TOKENS.pos,
     brand_values:    ['Built for Nigeria', 'Simplicity', 'Reliability', 'Local First'],
     cultural_profile: {
       community_corporate: 60,

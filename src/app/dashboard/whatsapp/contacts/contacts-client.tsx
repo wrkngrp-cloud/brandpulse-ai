@@ -96,7 +96,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
             </div>
           ) : imported ? (
             <div className="flex flex-col items-center gap-2">
-              <CheckCircle2 className="h-6 w-6 text-green-500" />
+              <CheckCircle2 className="h-6 w-6 text-pos" />
               <p className="text-sm font-medium">{imported.count} contacts imported</p>
             </div>
           ) : (
@@ -109,7 +109,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
 
         <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
 
-        <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+        <div className="rounded-lg bg-shell dark:bg-shell/20 border border-line dark:border-line p-3 text-xs text-tx-2 dark:text-tx-2 leading-relaxed">
           <strong>NDPR reminder:</strong> Only import numbers from people who have explicitly opted in to receive WhatsApp messages from your brand. Contacts who reply "STOP" are automatically removed.
         </div>
       </div>
@@ -125,7 +125,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
               <div key={c.id} className="flex items-center gap-3 px-4 py-3">
                 <div className={cn(
                   'h-2 w-2 rounded-full shrink-0',
-                  c.whatsapp_opted_in ? 'bg-green-500' : 'bg-muted-foreground/30'
+                  c.whatsapp_opted_in ? 'bg-pos' : 'bg-muted-foreground/30'
                 )} />
                 <div className="flex-1 min-w-0">
                   {c.name && <p className="text-sm font-medium truncate">{c.name}</p>}
@@ -134,7 +134,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
                 <span className={cn(
                   'text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0',
                   c.whatsapp_opted_in
-                    ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400'
+                    ? 'bg-shell text-pos dark:bg-shell/40 dark:text-pos'
                     : 'bg-muted text-muted-foreground'
                 )}>
                   {c.whatsapp_opted_in ? 'Opted in' : 'Opted out'}

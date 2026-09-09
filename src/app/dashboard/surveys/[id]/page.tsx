@@ -13,7 +13,7 @@ const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
 
 const STATUS_COLOURS: Record<string, string> = {
   draft:  'bg-muted text-muted-foreground',
-  live:   'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400',
+  live:   'bg-shell text-pos dark:bg-pos dark:text-pos',
   closed: 'bg-muted text-muted-foreground',
 }
 
@@ -179,7 +179,7 @@ export default async function SurveyDetailPage({
                     <span>{new Date(r.collected_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}</span>
                     <div className="flex items-center gap-2">
                       {r.source && <span className="bg-muted px-1.5 py-0.5 rounded">{r.source}</span>}
-                      <span className={r.quality_flag === 'ok' ? 'text-green-600' : 'text-amber-500'}>
+                      <span className={r.quality_flag === 'ok' ? 'text-pos' : 'text-tx-2'}>
                         {r.quality_flag}
                       </span>
                     </div>

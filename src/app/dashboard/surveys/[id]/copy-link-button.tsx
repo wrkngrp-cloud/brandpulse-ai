@@ -15,7 +15,7 @@ export function CopyLinkButton({ url }: { url: string }) {
 
   return (
     <Button size="sm" variant="outline" onClick={copy} className="shrink-0">
-      {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
+      {copied ? <Check className="h-3.5 w-3.5 text-pos" /> : <Copy className="h-3.5 w-3.5" />}
       <span className="ml-1.5">{copied ? 'Copied' : 'Copy'}</span>
     </Button>
   )

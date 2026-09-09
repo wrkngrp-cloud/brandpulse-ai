@@ -34,21 +34,21 @@ export function InstagramPageIdForm({ pendingKey }: { pendingKey: string }) {
   }
 
   return (
-    <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900 p-4 space-y-4">
+    <div className="rounded-lg border border-line bg-shell dark:bg-shell/30 dark:border-line p-4 space-y-4">
       <div className="flex items-start gap-3">
-        <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+        <AlertTriangle className="h-4 w-4 text-tx-2 mt-0.5 shrink-0" />
         <div>
-          <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+          <p className="text-sm font-medium text-tx-2 dark:text-tx-2">
             One more step to connect Instagram
           </p>
-          <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+          <p className="text-sm text-tx-2 dark:text-tx-2 mt-1">
             Your permissions are all set. We just need your Facebook Page ID to link your Instagram Business account — Facebook&apos;s API doesn&apos;t surface newer Pages automatically.
           </p>
         </div>
       </div>
 
       <div className="ml-7 space-y-3">
-        <div className="text-sm text-amber-700 dark:text-amber-400 space-y-1">
+        <div className="text-sm text-tx-2 dark:text-tx-2 space-y-1">
           <p className="font-medium">How to find your Page ID:</p>
           <ol className="list-decimal list-outside ml-4 space-y-1">
             <li>Click your Page&apos;s name in the left menu to go to it</li>
@@ -59,7 +59,7 @@ export function InstagramPageIdForm({ pendingKey }: { pendingKey: string }) {
             href="https://www.facebook.com/help/1503421039731588"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-amber-600 hover:underline mt-1"
+            className="inline-flex items-center gap-1 text-tx-2 hover:underline mt-1"
           >
             Facebook help: Find your Page ID <ExternalLink className="h-3 w-3" />
           </a>
@@ -70,7 +70,7 @@ export function InstagramPageIdForm({ pendingKey }: { pendingKey: string }) {
             placeholder="e.g. 123456789012345"
             value={pageId}
             onChange={e => setPageId(e.target.value)}
-            className="max-w-xs bg-white dark:bg-background"
+            className="max-w-xs bg-card dark:bg-background"
           />
           <Button type="submit" disabled={loading || !pageId.trim()} size="sm">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Connect'}

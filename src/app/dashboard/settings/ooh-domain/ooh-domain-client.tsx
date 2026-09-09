@@ -94,7 +94,7 @@ export function OohDomainClient({ brandName, currentDomain, appUrl, appHost }: O
       {tier === 'brandgauge' && (
         <div className="border rounded-xl p-5 space-y-4">
           <div className="flex items-start gap-3">
-            <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+            <CheckCircle2 className="h-4 w-4 text-pos mt-0.5 shrink-0" />
             <div>
               <p className="text-sm font-medium">You&apos;re already set up</p>
               <p className="text-sm text-muted-foreground mt-0.5">
@@ -169,7 +169,7 @@ export function OohDomainClient({ brandName, currentDomain, appUrl, appHost }: O
       {tier === 'main-domain' && (
         <div className="border rounded-xl p-5 space-y-5">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+            <AlertCircle className="h-4 w-4 text-tx-2 mt-0.5 shrink-0" />
             <div>
               <p className="text-sm font-medium">Your main domain — two steps</p>
               <p className="text-sm text-muted-foreground mt-0.5">
@@ -229,9 +229,9 @@ function TierCard({
   description: string; example: string
 }) {
   const badgeStyles = {
-    green: 'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300',
-    blue:  'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300',
-    amber: 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300',
+    green: 'bg-shell text-pos dark:bg-shell/50 dark:text-pos',
+    blue:  'bg-flare-wash text-tx-flare dark:bg-shell/50 dark:text-tx-2',
+    amber: 'bg-shell text-tx-2 dark:bg-shell/50 dark:text-tx-2',
   }
 
   return (
@@ -263,7 +263,7 @@ function DnsInstructions({ domain, appHost, onCopy }: { domain: string; appHost:
   return (
     <div className="space-y-3 rounded-xl border bg-muted/30 p-4">
       <p className="text-sm font-medium flex items-center gap-1.5">
-        <CheckCircle2 className="h-4 w-4 text-green-600" />
+        <CheckCircle2 className="h-4 w-4 text-pos" />
         Domain added to routing. Now add this DNS record:
       </p>
       <div className="overflow-x-auto">

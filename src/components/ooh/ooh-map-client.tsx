@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Map, { Marker, Popup, NavigationControl, type MapRef } from 'react-map-gl/mapbox'
 import { MapPin } from 'lucide-react'
+import { TOKENS } from '@/lib/brand-tokens'
 
 interface Site {
   id: string
@@ -25,9 +26,9 @@ interface OohMapClientProps {
 }
 
 function getRoiColor(visits: number): string {
-  if (visits >= 500) return '#16a34a'
-  if (visits >= 100) return '#d97706'
-  return '#dc2626'
+  if (visits >= 500) return TOKENS.flare
+  if (visits >= 100) return TOKENS.ember
+  return TOKENS.danfo
 }
 
 function fmtDate(iso: string | null) {
@@ -113,12 +114,12 @@ export function OohMapClient({ sites, onMapReady }: OohMapClientProps) {
           >
             <div style={{ fontSize: '12px', lineHeight: 1.65, padding: '2px 0' }}>
               <strong style={{ fontSize: '13px', display: 'block', marginBottom: '3px' }}>{popupSite.site_name}</strong>
-              {popupSite.format_type && <span style={{ color: '#6b7280' }}>{popupSite.format_type}<br /></span>}
+              {popupSite.format_type && <span style={{ color: 'var(--tx-2)' }}>{popupSite.format_type}<br /></span>}
               {[popupSite.city, popupSite.lga, popupSite.state].filter(Boolean).join(' · ')
                 ? <span>{[popupSite.city, popupSite.lga, popupSite.state].filter(Boolean).join(' · ')}<br /></span>
                 : null}
               {popupSite.campaign_start && (
-                <span style={{ color: '#6b7280', fontSize: '11px' }}>
+                <span style={{ color: 'var(--tx-2)', fontSize: '11px' }}>
                   Campaign: {fmtDate(popupSite.campaign_start)}{popupSite.campaign_end ? ` – ${fmtDate(popupSite.campaign_end)}` : ''}<br />
                 </span>
               )}

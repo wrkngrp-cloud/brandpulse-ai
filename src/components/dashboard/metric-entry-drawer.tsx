@@ -87,7 +87,7 @@ export function MetricEntryDrawer({ industry, onClose, onSaved }: Props) {
             <div key={m.metricKey} className="space-y-1.5">
               <Label className="text-sm font-medium flex items-center gap-2">
                 {m.label}
-                {saved[m.metricKey] && <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />}
+                {saved[m.metricKey] && <CheckCircle2 className="h-3.5 w-3.5 text-pos" />}
               </Label>
               <p className="text-xs text-muted-foreground">{m.description}</p>
               <div className="flex gap-2">

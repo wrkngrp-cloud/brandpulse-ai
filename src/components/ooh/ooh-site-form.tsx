@@ -14,6 +14,7 @@ import { UrlLengthAdvisor }   from '@/components/ooh/url-length-advisor'
 import Link                   from 'next/link'
 import type { PlaceDemographics } from '@/lib/ooh/places-demographics'
 import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
+import { TOKENS } from '@/lib/brand-tokens'
 
 const FORMAT_TYPES = [
   'Billboard', 'Unipole', 'Bridge Panel', 'Transit Shelter',
@@ -221,7 +222,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         'top-right',
       )
 
-      const marker = new mapboxgl.Marker({ color: '#2563eb', draggable: true })
+      const marker = new mapboxgl.Marker({ color: TOKENS.flare, draggable: true })
 
       if (hasCoords) {
         marker.setLngLat([Number(lng), Number(lat)]).addTo(map)

@@ -102,7 +102,7 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
           {errors.length > 0 && (
             <div className="text-left max-w-xs mx-auto space-y-1">
               {errors.map((e, i) => (
-                <p key={i} className="text-[11px] text-red-500 bg-red-50 border border-red-200 rounded px-2 py-1 font-mono break-all">{e}</p>
+                <p key={i} className="text-[11px] text-tx-flare bg-flare-wash border border-line-strong rounded px-2 py-1 font-mono break-all">{e}</p>
               ))}
             </div>
           )}
@@ -115,14 +115,14 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
 
     return (
       <div className="flex flex-col items-center gap-2">
-        <div className="flex items-center gap-1.5 text-sm text-green-600">
+        <div className="flex items-center gap-1.5 text-sm text-pos">
           <CheckCircle2 className="h-4 w-4" />
           {state.mentionsFound} mention{state.mentionsFound !== 1 ? 's' : ''} found{platformList ? ` from ${platformList}` : ''} and classified.
         </div>
         {errors.length > 0 && (
           <div className="w-full max-w-xs space-y-1">
             {errors.map((e, i) => (
-              <p key={i} className="text-[11px] text-red-500 bg-red-50 border border-red-200 rounded px-2 py-1 font-mono break-all">{e}</p>
+              <p key={i} className="text-[11px] text-tx-flare bg-flare-wash border border-line-strong rounded px-2 py-1 font-mono break-all">{e}</p>
             ))}
           </div>
         )}
@@ -136,7 +136,7 @@ export function TriggerCrawlButton({ hasRanBefore = false }: Props) {
   if (state.phase === 'error') {
     return (
       <div className="flex flex-col items-center gap-2">
-        <div className="flex items-center gap-1.5 text-sm text-red-500">
+        <div className="flex items-center gap-1.5 text-sm text-tx-flare">
           <AlertCircle className="h-4 w-4" />
           {state.message}
         </div>

@@ -34,8 +34,8 @@ const SOURCE_LABELS: Record<string, string> = {
 }
 
 const CONFIDENCE_META: Record<string, { label: string; class: string }> = {
-  High:   { label: 'High confidence', class: 'bg-green-50 text-green-700 border-green-200' },
-  Medium: { label: 'Medium confidence', class: 'bg-amber-50 text-amber-700 border-amber-200' },
+  High:   { label: 'High confidence', class: 'bg-shell text-pos border-line' },
+  Medium: { label: 'Medium confidence', class: 'bg-shell text-tx-2 border-line' },
   Low:    { label: 'Low confidence, review carefully', class: 'bg-muted text-muted-foreground border-border' },
 }
 
@@ -379,7 +379,7 @@ export default function OnboardingPage() {
             <span className="text-xs opacity-70">Drawn from: {sourceLabels}</span>
           </div>
         ) : (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-center gap-2 text-sm text-amber-700">
+          <div className="rounded-xl border border-line bg-shell px-4 py-3 flex items-center gap-2 text-sm text-tx-2">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>AI research was unavailable, so the fields below are empty. Fill them in yourself, or go back, add a website URL and try again.</span>
           </div>

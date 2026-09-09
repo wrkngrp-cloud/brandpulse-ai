@@ -7,8 +7,8 @@ const sections = [
   {
     id: 'bhi',
     icon: BarChart2,
-    color: 'text-blue-600',
-    bg: 'bg-blue-50 dark:bg-blue-950/30',
+    color: 'text-tx-flare',
+    bg: 'bg-flare-wash dark:bg-shell/30',
     title: 'Brand Health Index (BHI)',
     subtitle: 'A composite score that tracks the overall health of your brand across three live data signals.',
     body: [
@@ -29,8 +29,8 @@ const sections = [
   {
     id: 'brand-equity',
     icon: Award,
-    color: 'text-violet-600',
-    bg: 'bg-violet-50 dark:bg-violet-950/30',
+    color: 'text-tx-2',
+    bg: 'bg-shell dark:bg-shell/30',
     title: 'Brand Equity Tracker',
     subtitle: 'A seven-component view that separates brand equity into its constituent parts — awareness, salience, sentiment, perception, cultural fit, voice, and media value.',
     body: [
@@ -51,8 +51,8 @@ const sections = [
   {
     id: 'sentiment',
     icon: TrendingUp,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+    color: 'text-pos',
+    bg: 'bg-shell dark:bg-shell/30',
     title: 'Social Sentiment Intelligence',
     subtitle: 'Real-time analysis of how audiences talk about your brand across connected social platforms.',
     body: [
@@ -77,8 +77,8 @@ const sections = [
   {
     id: 'sov',
     icon: Target,
-    color: 'text-sky-600',
-    bg: 'bg-sky-50 dark:bg-sky-950/30',
+    color: 'text-tx-flare',
+    bg: 'bg-flare-wash dark:bg-shell/30',
     title: 'Share of Voice (SOV)',
     subtitle: 'The proportion of total category conversation that your brand owns across social media.',
     body: [
@@ -95,8 +95,8 @@ const sections = [
   {
     id: 'funnel',
     icon: Filter,
-    color: 'text-indigo-600',
-    bg: 'bg-indigo-50 dark:bg-indigo-950/30',
+    color: 'text-tx-flare',
+    bg: 'bg-flare-wash dark:bg-shell/30',
     title: 'Brand Funnel',
     subtitle: 'Six funnel stages — each scored 0–100 from live data — showing where audiences are converting and where they are dropping off.',
     body: [
@@ -113,8 +113,8 @@ const sections = [
   {
     id: 'nps',
     icon: ClipboardListIcon,
-    color: 'text-teal-600',
-    bg: 'bg-teal-50 dark:bg-teal-950/30',
+    color: 'text-pos',
+    bg: 'bg-shell dark:bg-shell/30',
     title: 'Net Promoter Score (NPS)',
     subtitle: 'The globally standard measure of customer loyalty and advocacy likelihood.',
     body: [
@@ -131,8 +131,8 @@ const sections = [
   {
     id: 'prepost',
     icon: Zap,
-    color: 'text-amber-600',
-    bg: 'bg-amber-50 dark:bg-amber-950/30',
+    color: 'text-tx-2',
+    bg: 'bg-shell dark:bg-shell/30',
     title: 'Pre-Post Content Intelligence',
     subtitle: 'AI-powered scoring of brand content before publication and comparison against post-campaign sentiment shifts.',
     body: [
@@ -153,8 +153,8 @@ const sections = [
   {
     id: 'cultural',
     icon: Globe,
-    color: 'text-rose-600',
-    bg: 'bg-rose-50 dark:bg-rose-950/30',
+    color: 'text-tx-flare',
+    bg: 'bg-flare-wash dark:bg-shell/30',
     title: 'Cultural Resonance Score (CRS)',
     subtitle: 'A running measure of how consistently your brand content connects with Nigerian cultural context.',
     body: [
@@ -175,8 +175,8 @@ const sections = [
   {
     id: 'influencer',
     icon: Users,
-    color: 'text-purple-600',
-    bg: 'bg-purple-50 dark:bg-purple-950/30',
+    color: 'text-tx-2',
+    bg: 'bg-shell dark:bg-shell/30',
     title: 'Influencer Intelligence',
     subtitle: 'Two proprietary scores that assess creator fit for your brand from a cultural and reputational lens.',
     body: [
@@ -197,8 +197,8 @@ const sections = [
   {
     id: 'creative',
     icon: Palette,
-    color: 'text-pink-600',
-    bg: 'bg-pink-50 dark:bg-pink-950/30',
+    color: 'text-tx-2',
+    bg: 'bg-shell dark:bg-shell/30',
     title: 'Creative Analysis',
     subtitle: 'AI-powered comparison, identity consistency checking, and video performance scoring for brand creatives.',
     body: [
@@ -219,8 +219,8 @@ const sections = [
   {
     id: 'ooh',
     icon: MapPin,
-    color: 'text-orange-600',
-    bg: 'bg-orange-50 dark:bg-orange-950/30',
+    color: 'text-tx-2',
+    bg: 'bg-shell dark:bg-shell/30',
     title: 'OOH Intelligence',
     subtitle: 'Out-of-home attribution and performance tracking using branded vanity links and search uplift correlation.',
     body: [
@@ -241,8 +241,8 @@ const sections = [
   {
     id: 'radio',
     icon: Radio,
-    color: 'text-blue-500',
-    bg: 'bg-blue-50 dark:bg-blue-950/30',
+    color: 'text-tx-2',
+    bg: 'bg-flare-wash dark:bg-shell/30',
     title: 'Radio Intelligence',
     subtitle: 'Daypart efficiency analysis and agency post-buy reconciliation for Nigerian radio buys.',
     body: [
@@ -259,8 +259,8 @@ const sections = [
   {
     id: 'tv',
     icon: Tv,
-    color: 'text-cyan-600',
-    bg: 'bg-cyan-50 dark:bg-cyan-950/30',
+    color: 'text-tx-flare',
+    bg: 'bg-flare-wash dark:bg-shell/30',
     title: 'TV Intelligence',
     subtitle: 'GRP reconciliation and prime time vs fringe efficiency analysis for logged TV buys.',
     body: [
@@ -281,8 +281,8 @@ const sections = [
   {
     id: 'print',
     icon: Newspaper,
-    color: 'text-amber-700',
-    bg: 'bg-amber-50 dark:bg-amber-950/30',
+    color: 'text-tx-2',
+    bg: 'bg-shell dark:bg-shell/30',
     title: 'Print Intelligence',
     subtitle: 'Publication reach, cost efficiency, and QR-primary digital attribution for newspaper and magazine placements.',
     body: [
@@ -303,8 +303,8 @@ const sections = [
   {
     id: 'competitive',
     icon: Trophy,
-    color: 'text-yellow-600',
-    bg: 'bg-yellow-50 dark:bg-yellow-950/30',
+    color: 'text-tx-2',
+    bg: 'bg-shell dark:bg-shell/30',
     title: 'Competitive Intelligence',
     subtitle: 'Weekly AI briefings, ESOV league table, and a structured sightings feed for tracking competitor activity.',
     body: [

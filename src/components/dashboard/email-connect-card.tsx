@@ -103,7 +103,7 @@ function ProviderCard({
           <span className="text-sm font-medium">{label}</span>
         </div>
         {connected && (
-          <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+          <span className="flex items-center gap-1.5 text-xs text-pos font-medium">
             <CheckCircle2 className="h-3.5 w-3.5" />
             Connected
           </span>
