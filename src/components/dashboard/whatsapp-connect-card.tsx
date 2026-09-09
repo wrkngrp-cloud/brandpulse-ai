@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2, Users } from 'lucide-react'
+import { ForwardIcon as ArrowRight, ConfirmedIcon as CheckCircle2, PeopleIcon as Users } from '@/components/brand/icon'
 import { MentionsIcon as MessageCircle } from '@/components/brand/icon'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'

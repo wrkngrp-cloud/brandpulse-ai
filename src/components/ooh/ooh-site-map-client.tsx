@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl/mapbox'
-import { MapPin } from 'lucide-react'
+import { PlaceIcon as MapPin } from '@/components/brand/icon'
 import { TOKENS } from '@/lib/brand-tokens'
 
 interface OohSiteMapClientProps {

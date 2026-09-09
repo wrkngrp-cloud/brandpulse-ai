@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Target, Plus, Trash2, ChevronDown } from 'lucide-react'
+import { ReturnIcon as ArrowLeft, TargetIcon as Target, AddIcon as Plus, DeleteIcon as Trash2, DownIcon as ChevronDown } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'

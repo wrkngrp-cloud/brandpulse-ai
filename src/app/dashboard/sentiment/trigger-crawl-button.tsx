@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { RefreshCw, CheckCircle2, SearchX } from 'lucide-react'
+import { RefreshIcon as RefreshCw, ConfirmedIcon as CheckCircle2, SearchIcon as SearchX } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Crescendo } from '@/components/brand/crescendo'
 

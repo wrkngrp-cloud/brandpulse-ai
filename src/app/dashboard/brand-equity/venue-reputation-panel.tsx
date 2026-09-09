@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Star, MapPin, RefreshCw } from 'lucide-react'
+import { StarIcon as Star, PlaceIcon as MapPin, RefreshIcon as RefreshCw } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

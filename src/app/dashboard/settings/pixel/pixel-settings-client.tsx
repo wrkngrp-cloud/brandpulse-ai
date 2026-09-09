@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Copy, Check, Zap, Code2, Activity, HelpCircle } from 'lucide-react'
+import { CopyIcon as Copy, TickMarkIcon as Check, SparkIcon as Zap, CodeIcon as Code2, PulseIcon as Activity, HelpIcon as HelpCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 

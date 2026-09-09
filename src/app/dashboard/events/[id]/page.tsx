@@ -1,7 +1,7 @@
 import { createClient }       from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link                   from 'next/link'
-import { ArrowLeft, Megaphone, Trophy } from 'lucide-react'
+import { ReturnIcon as ArrowLeft, BroadcastIcon as Megaphone, AwardIcon as Trophy } from '@/components/brand/icon'
 import { LiveDashboard }       from '@/components/events/live-dashboard'
 import { AmbassadorList }      from '@/components/events/ambassador-list'
 import { computeEventMetrics, fmtNGN, fmtPct } from '@/lib/events/roi'

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Key, Plus, Trash2, Copy, Check, ChevronDown, ChevronRight } from 'lucide-react'
+import { LockIcon as Key, AddIcon as Plus, DeleteIcon as Trash2, CopyIcon as Copy, TickMarkIcon as Check, DownIcon as ChevronDown, NextIcon as ChevronRight } from '@/components/brand/icon'
 
 interface ApiKey {
   id: string

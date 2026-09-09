@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Upload, Users, UserCheck, UserX, CheckCircle2 } from 'lucide-react'
+import { ReturnIcon as ArrowLeft, UploadIcon as Upload, PeopleIcon as Users, PeopleIcon as UserCheck, PersonIcon as UserX, ConfirmedIcon as CheckCircle2 } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'

@@ -12,7 +12,7 @@ import { AppStoreConnectCard, type AppStoreConfigData }     from '@/components/d
 import { EmailConnectCard, type EmailConnectorStatus }      from '@/components/dashboard/email-connect-card'
 // WhatsAppConnectCard hidden until dedicated number is configured
 import { PixelCard } from './pixel-card'
-import { ShoppingCart, ArrowRight, Users, Music2 } from 'lucide-react'
+import { Icon, type BrandIconName, PackageIcon as ShoppingCart, ForwardIcon as ArrowRight, PeopleIcon as Users, BroadcastIcon as Music2 } from '@/components/brand/icon'
 import { SearchIcon as Search } from '@/components/brand/icon'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -130,7 +130,8 @@ export default async function ConnectorsPage() {
       {industryMeta && suggestedConns.length > 0 && (
         <div className="rounded-xl border bg-card px-4 py-4 space-y-2">
           <p className="text-[11px] font-bold text-muted-foreground">
-            {industryMeta.icon} Recommended for {industryMeta.label}
+            <Icon name={industryMeta.icon as BrandIconName} size={14} className="inline-block align-[-2px] mr-1.5" />
+            Recommended for {industryMeta.label}
           </p>
           <div className="flex flex-wrap gap-2">
             {suggestedConns.map(key => (

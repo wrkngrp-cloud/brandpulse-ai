@@ -7,7 +7,7 @@ import { Button }                    from '@/components/ui/button'
 import { Input }                     from '@/components/ui/input'
 import { Label }                     from '@/components/ui/label'
 import { saveOohDomain, removeOohDomain } from './actions'
-import { Copy, CheckCircle2, Globe, Link2, Wrench } from 'lucide-react'
+import { CopyIcon as Copy, ConfirmedIcon as CheckCircle2, GlobeIcon as Globe, LinkIcon as Link2, SettingsIcon as Wrench } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn }                        from '@/lib/utils'
 

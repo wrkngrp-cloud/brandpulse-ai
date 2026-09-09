@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Filter, CheckCircle2, Send, Printer, Copy, ArrowRight } from 'lucide-react'
+import { DocIcon as FileText, FilterIcon as Filter, ConfirmedIcon as CheckCircle2, SendIcon as Send, PrintIcon as Printer, CopyIcon as Copy, ForwardIcon as ArrowRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
@@ -132,7 +132,7 @@ function BulletList({ items }: { items: string[] }) {
     <ul className="space-y-1.5">
       {items.map((item, i) => (
         <li key={i} className="flex items-start gap-2 text-sm">
-          <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-foreground/30 shrink-0" />
+          <span className="mt-[6px] h-[11px] w-[5px] rounded-[var(--r-tick)] bg-foreground/30 shrink-0" />
           <span>{item}</span>
         </li>
       ))}

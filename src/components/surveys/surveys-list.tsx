@@ -6,7 +6,7 @@ import { toast }     from 'sonner'
 import Link          from 'next/link'
 import { ItemActions, type ItemAction } from '@/components/ui/item-actions'
 import { updateSurveyStatus, deleteSurvey } from '@/app/dashboard/surveys/actions'
-import { Link2, Play, PauseCircle, RotateCcw, Trash2, ExternalLink } from 'lucide-react'
+import { LinkIcon as Link2, PlayIcon as Play, PauseIcon as PauseCircle, RefreshIcon as RotateCcw, DeleteIcon as Trash2, OpenIcon as ExternalLink } from '@/components/brand/icon'
 import { getTemplateLabel } from '@/lib/survey-templates'
 
 interface Survey {

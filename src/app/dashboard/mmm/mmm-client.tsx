@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { TrendingDown, Zap, RefreshCw } from 'lucide-react'
+import { FallingIcon as TrendingDown, SparkIcon as Zap, RefreshIcon as RefreshCw } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
@@ -220,7 +220,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
                 <div className="space-y-2">
                   {chartData.map(ch => (
                     <div key={ch.ch} className="flex items-center gap-3">
-                      <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: ch.color }} />
+                      <div className="h-[11px] w-[5px] rounded-[var(--r-tick)] shrink-0" style={{ background: ch.color }} />
                       <span className="text-[13px] flex-1">{ch.name}</span>
                       <span className="text-[13px] font-semibold bg-num w-12 text-right">{ch.value}%</span>
                       {spend[ch.ch] > 0 && (

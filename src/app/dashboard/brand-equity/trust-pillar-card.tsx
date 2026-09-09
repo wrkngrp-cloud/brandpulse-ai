@@ -1,7 +1,7 @@
 'use client'
 
 import type { TrustScore } from '@/lib/bhi'
-import { Shield, ShieldCheck, ShieldAlert, ShieldX } from 'lucide-react'
+import { ShieldIcon as Shield, ShieldIcon as ShieldCheck, ShieldIcon as ShieldAlert, ShieldIcon as ShieldX } from '@/components/brand/icon'
 
 interface Props {
   trust: TrustScore

@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Plus, Pencil, Trash2, Check, ArrowRight, Building2 } from 'lucide-react'
+import { AddIcon as Plus, EditIcon as Pencil, DeleteIcon as Trash2, TickMarkIcon as Check, ForwardIcon as ArrowRight, VenueIcon as Building2 } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'

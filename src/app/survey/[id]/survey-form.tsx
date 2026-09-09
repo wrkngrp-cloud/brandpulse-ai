@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { CheckCircle2, ChevronLeft } from 'lucide-react'
+import { ConfirmedIcon as CheckCircle2, BackIcon as ChevronLeft } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 
 export interface SurveyQuestion {

@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { TrendingDown, Minus, Megaphone, CalendarDays, MapPin, ClipboardList, Plus, ArrowRight, Zap, ArrowUpRight, Activity, BarChart2, Radio } from 'lucide-react'
+import { FallingIcon as TrendingDown, RemoveIcon as Minus, BroadcastIcon as Megaphone, CalendarIcon as CalendarDays, PlaceIcon as MapPin, SurveyIcon as ClipboardList, AddIcon as Plus, ForwardIcon as ArrowRight, SparkIcon as Zap, ForwardIcon as ArrowUpRight, PulseIcon as Activity, BarsIcon as BarChart2, BroadcastIcon as Radio } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp, MentionsIcon as MessageSquare } from '@/components/brand/icon'
 import { BHIGauge }         from '@/components/dashboard/bhi-gauge'
 import { StatCard }         from '@/components/dashboard/stat-card'
@@ -134,7 +134,7 @@ function Card({
 }: {
   children: React.ReactNode
   className?: string
-  accent?: 'blue' | 'green' | 'amber' | 'clay' | 'red'
+  accent?: 'hero' | 'nominal' | 'neutral' | 'alert'
 }) {
   return (
     <motion.div
@@ -293,7 +293,7 @@ export function OverviewClient({
           label="Brand Health"
           value={bhi.score !== null ? Math.round(bhi.score) : null}
           suffix="/100"
-          tone="blue"
+          tone="hero"
           icon={Activity}
           spark={bhiSpark.length > 1 ? bhiSpark : undefined}
           deltaLabel={`${rl.toLowerCase()} trend`}
@@ -303,7 +303,7 @@ export function OverviewClient({
           label="Sentiment Score"
           value={sentiment ? Math.round(sentiment.social_score) : null}
           suffix="/100"
-          tone={sentiment && sentiment.social_score >= 60 ? 'green' : sentiment && sentiment.social_score <= 40 ? 'clay' : 'amber'}
+          tone={sentiment && sentiment.social_score >= 60 ? 'nominal' : sentiment && sentiment.social_score <= 40 ? 'hero' : 'neutral'}
           icon={BarChart2}
           deltaLabel={sentiment ? `from ${fmtDate(sentiment.day)}` : undefined}
           href="/dashboard/sentiment"
@@ -312,7 +312,7 @@ export function OverviewClient({
           label="Share of Voice"
           value={sovScore !== null ? Math.round(sovScore) : null}
           suffix="%"
-          tone="violet"
+          tone="neutral"
           icon={Radio}
           deltaLabel={sovDate ? `as of ${fmtDate(sovDate)}` : undefined}
           href="/dashboard/content"
@@ -320,7 +320,7 @@ export function OverviewClient({
         <StatCard
           label="Mentions"
           value={mentionCount7d}
-          tone="amber"
+          tone="neutral"
           icon={MessageSquare}
           deltaLabel="last 7 days"
           href="/dashboard/sentiment"
@@ -349,7 +349,7 @@ export function OverviewClient({
       >
 
         {/* BHI gauge — tall left card */}
-        <Card accent="blue" className="bento-bhi p-5 flex flex-col gap-4">
+        <Card accent="hero" className="bento-bhi p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <Label>Brand Health Index</Label>
             <Link href="/dashboard/brand-equity" className="text-muted-foreground/40 hover:text-foreground transition-colors">
@@ -380,9 +380,9 @@ export function OverviewClient({
         <Card
           accent={
             sentiment === null ? undefined
-            : sentiment.social_score >= 60 ? 'green'
-            : sentiment.social_score <= 40 ? 'red'
-            : 'amber'
+            : sentiment.social_score >= 60 ? 'nominal'
+            : sentiment.social_score <= 40 ? 'alert'
+            : 'neutral'
           }
           className="bento-sentiment p-5"
         >
@@ -450,7 +450,7 @@ export function OverviewClient({
         </Card>
 
         {/* SOV */}
-        <Card accent="blue" className="bento-sov p-5 flex flex-col justify-between">
+        <Card accent="hero" className="bento-sov p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <Label>Share of Voice</Label>
             <Link href="/dashboard/content" className="text-muted-foreground/40 hover:text-foreground transition-colors">
@@ -531,7 +531,7 @@ export function OverviewClient({
         </Card>
 
         {/* Campaigns */}
-        <Card accent="clay" className="bento-campaigns p-5">
+        <Card accent="hero" className="bento-campaigns p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Megaphone className="h-3.5 w-3.5 text-muted-foreground/50" />

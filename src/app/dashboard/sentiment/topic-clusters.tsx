@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { MessageSquareQuote } from 'lucide-react'
+import { MentionsIcon as MessageSquareQuote } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

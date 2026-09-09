@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Check, ExternalLink, Zap } from 'lucide-react'
+import { TickMarkIcon as Check, OpenIcon as ExternalLink, SparkIcon as Zap } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

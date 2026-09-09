@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Flag, CheckCircle, ChevronDown } from 'lucide-react'
+import { FlagIcon as Flag, ConfirmedIcon as CheckCircle, DownIcon as ChevronDown } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import {
   DropdownMenu,

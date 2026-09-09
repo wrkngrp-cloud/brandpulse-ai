@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, RefreshCw, Smartphone, Star } from 'lucide-react'
+import { ConfirmedIcon as CheckCircle2, RefreshIcon as RefreshCw, PhoneIcon as Smartphone, StarIcon as Star } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'

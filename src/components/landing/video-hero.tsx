@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Play } from 'lucide-react'
+import { PlayIcon as Play } from '@/components/brand/icon'
 
 /**
  * Hero video frame: plays the rendered BrandGauge unveil MP4. Autoplays muted

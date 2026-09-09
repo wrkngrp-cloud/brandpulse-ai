@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowRight } from 'lucide-react'
+import { ForwardIcon as ArrowRight } from '@/components/brand/icon'
 import { MarketingShell } from './marketing-shell'
 import { FunnelScene, GaugeScene, OohScene, SentimentScene } from './scenes'
 

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { RefreshCw } from 'lucide-react'
+import { RefreshIcon as RefreshCw } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 export default function DashboardError({

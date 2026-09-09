@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Star, Globe, CheckCircle, XCircle, ExternalLink, Users, BarChart2, Activity, Calendar, RefreshCw } from 'lucide-react'
+import { ReturnIcon as ArrowLeft, StarIcon as Star, GlobeIcon as Globe, ConfirmedIcon as CheckCircle, BlockedIcon as XCircle, OpenIcon as ExternalLink, PeopleIcon as Users, BarsIcon as BarChart2, PulseIcon as Activity, CalendarIcon as Calendar, RefreshIcon as RefreshCw } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Copy, Check } from 'lucide-react'
+import { ConfirmedIcon as CheckCircle2, CopyIcon as Copy, TickMarkIcon as Check } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'

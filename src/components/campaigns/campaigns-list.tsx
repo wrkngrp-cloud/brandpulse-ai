@@ -4,7 +4,7 @@ import Link             from 'next/link'
 import { useRouter }    from 'next/navigation'
 import { cn }           from '@/lib/utils'
 import { ItemActions }  from '@/components/ui/item-actions'
-import { Eye, Trash2, PauseCircle, PlayCircle } from 'lucide-react'
+import { ViewIcon as Eye, DeleteIcon as Trash2, PauseIcon as PauseCircle, PlayIcon as PlayCircle } from '@/components/brand/icon'
 import { deleteCampaign, updateCampaignStatus } from '@/app/dashboard/campaigns/actions'
 
 interface Channel {

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Globe, Eye, Heart, Zap, Shield, Share2, ChevronDown, ChevronRight, Info } from 'lucide-react'
+import { ShareIcon as Share2 } from '@/components/brand/icon'
+import { GlobeIcon as Globe, ViewIcon as Eye, HeartIcon as Heart, SparkIcon as Zap, ShieldIcon as Shield, DownIcon as ChevronDown, NextIcon as ChevronRight, InfoIcon as Info } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
@@ -515,15 +516,15 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-foreground inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-foreground inline-block" />
           65–100 Healthy
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-ember inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-ember inline-block" />
           40–64 Building
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-flare inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-flare inline-block" />
           0–39 At risk
         </span>
         <span className="ml-auto flex flex-wrap gap-x-2">

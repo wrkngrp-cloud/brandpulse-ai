@@ -1,4 +1,4 @@
-import { BookOpen, BarChart2, Target, Users, Palette, Radio, Tv, Newspaper, MapPin, Zap, Award, Globe, Filter, Trophy } from 'lucide-react'
+import { DocIcon as BookOpen, BarsIcon as BarChart2, TargetIcon as Target, PeopleIcon as Users, CreativeIcon as Palette, BroadcastIcon as Radio, ScreenIcon as Tv, PrintIcon as Newspaper, PlaceIcon as MapPin, SparkIcon as Zap, AwardIcon as Award, GlobeIcon as Globe, FilterIcon as Filter, AwardIcon as Trophy } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 

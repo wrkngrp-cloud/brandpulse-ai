@@ -242,15 +242,15 @@ export function FrequencyBarChart({ data, demo }: FreqProps) {
       </ChartState>
       <div className="flex items-center gap-5 text-[10px] text-muted-foreground">
         <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-pos inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-pos inline-block" />
           {'<4 Healthy'}
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-ember inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-ember inline-block" />
           {'4–7 Watch'}
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-flare inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-flare inline-block" />
           {'>7 Fatigue'}
         </div>
       </div>

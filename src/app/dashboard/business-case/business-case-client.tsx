@@ -4,7 +4,7 @@ import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
-import { TrendingDown, Target, DollarSign, Award, CheckCircle2, ChevronRight, BarChart3, ArrowUpRight, Minus } from 'lucide-react'
+import { FallingIcon as TrendingDown, TargetIcon as Target, MoneyIcon as DollarSign, AwardIcon as Award, ConfirmedIcon as CheckCircle2, NextIcon as ChevronRight, BarsIcon as BarChart3, ForwardIcon as ArrowUpRight, RemoveIcon as Minus } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
@@ -353,7 +353,7 @@ export function BusinessCaseClient({
                 <p className="text-[11px] text-muted-foreground font-medium w-full">Channel portfolio classification (BCG lens):</p>
                 {channelRows.map(r => (
                   <div key={r.channel} className="flex items-center gap-1.5 text-[11px]">
-                    <span className="h-2 w-2 rounded-full" style={{ background: r.bcg.color }} />
+                    <span className="h-[11px] w-[5px] rounded-[var(--r-tick)]" style={{ background: r.bcg.color }} />
                     <span className="capitalize">{r.channel}</span>
                     <span className="text-muted-foreground">({r.bcg.quadrant} · {r.share}%)</span>
                   </div>

@@ -204,7 +204,7 @@ export function AskBar({ placeholder = 'Ask your data', value, onChange, onSubmi
 export function Icon({ name, size = 20, colour = 'currentColor', title }:
   { name: string; size?: number; colour?: string; title?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={colour}
       stroke={colour} strokeWidth="1.75" strokeLinecap="butt" strokeLinejoin="miter"
       role={title ? 'img' : 'presentation'} aria-hidden={title ? undefined : true}>
       {title && <title>{title}</title>}

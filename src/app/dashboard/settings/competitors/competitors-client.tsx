@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Plus, Trash2, Building } from 'lucide-react'
+import { AddIcon as Plus, DeleteIcon as Trash2, VenueIcon as Building } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Input }  from '@/components/ui/input'

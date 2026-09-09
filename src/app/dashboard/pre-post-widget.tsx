@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Zap, X, ChevronDown, Send, Copy, Check, ImagePlus, Video, XCircle } from 'lucide-react'
+import { SparkIcon as Zap, CloseIcon as X, DownIcon as ChevronDown, SendIcon as Send, CopyIcon as Copy, TickMarkIcon as Check, UploadIcon as ImagePlus, CameraIcon as Video, BlockedIcon as XCircle } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

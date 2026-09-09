@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Flame, TrendingDown, Calendar, ChevronRight, ChevronDown, Star, Globe } from 'lucide-react'
+import { SparkIcon as Flame, FallingIcon as TrendingDown, CalendarIcon as Calendar, NextIcon as ChevronRight, DownIcon as ChevronDown, StarIcon as Star, GlobeIcon as Globe } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AskIcon as Sparkles, AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'

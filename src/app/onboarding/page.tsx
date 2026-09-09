@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Check, Globe, ArrowRight, ArrowLeft, X, Plus } from 'lucide-react'
+import { Icon, type BrandIconName, TickMarkIcon as Check, GlobeIcon as Globe, ForwardIcon as ArrowRight, ReturnIcon as ArrowLeft, CloseIcon as X, AddIcon as Plus } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
@@ -203,7 +203,7 @@ export default function OnboardingPage() {
                       <Check className="h-2.5 w-2.5 text-background" />
                     </span>
                   )}
-                  <span className="text-2xl leading-none block mb-2">{meta.icon}</span>
+                  <Icon name={meta.icon as BrandIconName} size={24} className="mb-2 block text-tx" />
                   <span className="text-[13px] font-semibold leading-snug block">{meta.label}</span>
                   <span className="text-[11px] text-muted-foreground leading-snug mt-0.5 block line-clamp-2">
                     {meta.tagline}

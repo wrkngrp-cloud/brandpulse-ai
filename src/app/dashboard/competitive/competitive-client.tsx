@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Trophy, TrendingDown, MapPin, Plus, RefreshCw, ChevronDown, ChevronUp, Lightbulb, Eye, CheckCircle2, ArrowRight } from 'lucide-react'
+import { AwardIcon as Trophy, FallingIcon as TrendingDown, PlaceIcon as MapPin, AddIcon as Plus, RefreshIcon as RefreshCw, DownIcon as ChevronDown, UpIcon as ChevronUp, IdeaIcon as Lightbulb, ViewIcon as Eye, ConfirmedIcon as CheckCircle2, ForwardIcon as ArrowRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
@@ -525,9 +525,9 @@ function EsovLeagueTab({
       </div>
 
       <div className="flex gap-4 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-pos inline-block" /> Positive ESOV — growth mode</span>
-        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-ember inline-block" /> Zero — at parity</span>
-        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-flare inline-block" /> Negative — decline risk</span>
+        <span className="flex items-center gap-1.5"><span className="w-[5px] h-[11px] rounded-[var(--r-tick)] bg-pos inline-block" /> Positive ESOV — growth mode</span>
+        <span className="flex items-center gap-1.5"><span className="w-[5px] h-[11px] rounded-[var(--r-tick)] bg-ember inline-block" /> Zero — at parity</span>
+        <span className="flex items-center gap-1.5"><span className="w-[5px] h-[11px] rounded-[var(--r-tick)] bg-flare inline-block" /> Negative — decline risk</span>
       </div>
 
       <p className="text-xs text-muted-foreground border-t pt-3">

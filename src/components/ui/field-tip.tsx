@@ -1,6 +1,6 @@
 'use client'
 
-import { HelpCircle } from 'lucide-react'
+import { HelpIcon as HelpCircle } from '@/components/brand/icon'
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
 
 export function FieldTip({ tip }: { tip: string }) {

@@ -5,7 +5,7 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, AreaChart, Area, BarChart, Bar, Legend,
 } from 'recharts'
-import { TrendingDown, Activity, Radio, DollarSign, Target, Award, CheckCircle2, ChevronRight, RefreshCw, Calendar, BarChart3, Eye, Newspaper } from 'lucide-react'
+import { FallingIcon as TrendingDown, PulseIcon as Activity, BroadcastIcon as Radio, MoneyIcon as DollarSign, TargetIcon as Target, AwardIcon as Award, ConfirmedIcon as CheckCircle2, NextIcon as ChevronRight, RefreshIcon as RefreshCw, CalendarIcon as Calendar, BarsIcon as BarChart3, ViewIcon as Eye, PrintIcon as Newspaper } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp, MentionsIcon as MessageSquare, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn, formatNGN } from '@/lib/utils'
 import { Crescendo } from '@/components/brand/crescendo'

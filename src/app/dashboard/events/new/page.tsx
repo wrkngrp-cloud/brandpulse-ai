@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ReturnIcon as ArrowLeft } from '@/components/brand/icon'
 import { createClient } from '@/lib/supabase/server'
 import { EventWizard } from '@/components/events/event-wizard'
 

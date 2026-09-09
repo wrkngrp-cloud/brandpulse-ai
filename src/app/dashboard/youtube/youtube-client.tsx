@@ -12,7 +12,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
-import { PlayCircle, ExternalLink, Eye, ThumbsUp, RefreshCw, Plus, Settings, CheckCircle2 } from 'lucide-react'
+import { PlayIcon as PlayCircle, OpenIcon as ExternalLink, ViewIcon as Eye, TickMarkIcon as ThumbsUp, RefreshIcon as RefreshCw, AddIcon as Plus, SettingsIcon as Settings, ConfirmedIcon as CheckCircle2 } from '@/components/brand/icon'
 import { MentionsIcon as MessageSquare, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 

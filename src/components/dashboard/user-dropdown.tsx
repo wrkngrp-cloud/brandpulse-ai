@@ -8,7 +8,7 @@ import {
   DropdownMenuLabel, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Settings, LogOut, ChevronDown } from 'lucide-react'
+import { SettingsIcon as Settings, ExitIcon as LogOut, DownIcon as ChevronDown } from '@/components/brand/icon'
 
 interface Props {
   name: string

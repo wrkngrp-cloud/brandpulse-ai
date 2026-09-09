@@ -4,9 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion, LayoutGroup } from 'framer-motion'
-import {
-  LayoutDashboard, CalendarDays, Megaphone, Zap, Trophy, ChevronDown, Monitor, Radio, Tv, Newspaper, Users, Globe, Target, FileSearch, BookOpen, ClipboardCheck, BarChart3, Heart, Database, DollarSign, FlaskConical, Gift, FileText, Video, Eye,
-} from 'lucide-react'
+import { LayoutIcon as LayoutDashboard, CalendarIcon as CalendarDays, BroadcastIcon as Megaphone, SparkIcon as Zap, AwardIcon as Trophy, DownIcon as ChevronDown, ScreenIcon as Monitor, BroadcastIcon as Radio, ScreenIcon as Tv, PrintIcon as Newspaper, PeopleIcon as Users, GlobeIcon as Globe, TargetIcon as Target, DocIcon as FileSearch, DocIcon as BookOpen, ConfirmedIcon as ClipboardCheck, BarsIcon as BarChart3, HeartIcon as Heart, DatabaseIcon as Database, MoneyIcon as DollarSign, LabIcon as FlaskConical, GiftIcon as Gift, DocIcon as FileText, CameraIcon as Video, ViewIcon as Eye } from '@/components/brand/icon'
 import {
   AskIcon as Sparkles, ConnectIcon as Plug, AlertIcon as AlertTriangle,
   TrendIcon as TrendingUp, ExportIcon as FileDown, MentionsIcon as MessageCircle,

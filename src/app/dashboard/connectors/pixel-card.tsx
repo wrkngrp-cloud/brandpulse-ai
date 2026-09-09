@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Check, Code2, ChevronDown } from 'lucide-react'
+import { CopyIcon as Copy, TickMarkIcon as Check, CodeIcon as Code2, DownIcon as ChevronDown } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 

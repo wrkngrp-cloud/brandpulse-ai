@@ -7,7 +7,7 @@ import { Label }          from '@/components/ui/label'
 import { Textarea }       from '@/components/ui/textarea'
 import { SuccessDialog }  from '@/components/ui/success-dialog'
 import { cn, formatNGN }  from '@/lib/utils'
-import { ChevronRight, ChevronLeft, Lock, Check } from 'lucide-react'
+import { NextIcon as ChevronRight, BackIcon as ChevronLeft, LockIcon as Lock, TickMarkIcon as Check } from '@/components/brand/icon'
 import { FieldTip } from '@/components/ui/field-tip'
 import type { CampaignFormState } from '@/app/dashboard/campaigns/actions'
 

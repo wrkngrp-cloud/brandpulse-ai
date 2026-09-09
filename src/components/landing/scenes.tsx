@@ -61,14 +61,12 @@ function Panel({ children, className = '' }: { children: React.ReactNode; classN
   )
 }
 
-function Tag({ children, tone = 'dim' }: { children: React.ReactNode; tone?: 'dim' | 'clay' | 'blue' | 'green' | 'red' | 'teal' }) {
+function Tag({ children, tone = 'quiet' }: { children: React.ReactNode; tone?: 'quiet' | 'hero' | 'nominal' | 'alert' }) {
   const tones: Record<string, CSSProperties> = {
-    dim:   { color: 'var(--s-mut)', borderColor: 'var(--s-line)' },
-    clay:  { color: 'var(--tx-flare)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
-    blue:  { color: 'var(--tx-2)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
-    green: { color: 'var(--pos)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
-    red:   { color: 'var(--tx-flare)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
-    teal:  { color: 'var(--pos)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
+    quiet:   { color: 'var(--s-mut)', borderColor: 'var(--s-line)' },
+    hero:    { color: 'var(--tx-flare)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
+    nominal: { color: 'var(--pos)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
+    alert:   { color: 'var(--tx-flare)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
   }
   return (
     <span className="inline-flex items-center whitespace-nowrap rounded-sm border px-2 py-0.5 text-[9px]" style={tones[tone]}>
@@ -144,7 +142,7 @@ export function GaugeScene({ t }: { t: number }) {
         </svg>
         <span className="inline-flex items-center gap-1.5 rounded-sm border px-3 py-1 text-xs font-semibold"
           style={{ color: 'var(--pos)', backgroundColor: 'var(--bg-shell)', borderColor: 'var(--bg-shell)', opacity: win(t, 0.5, 0.62) }}>
-          <span className="h-1.5 w-1.5 rounded-full bg-[var(--pos)]" /> Healthy
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-[var(--pos)]" /> Healthy
         </span>
       </div>
       <div className="flex w-full max-w-[280px] flex-col gap-3 @xl:w-[240px]">
@@ -182,11 +180,11 @@ export function GaugeScene({ t }: { t: number }) {
 }
 
 // ————— Scene 2: sentiment with street sense —————
-const MENTIONS: { text: string; lang: string; tone: 'green' | 'red' }[] = [
-  { text: 'This app no dey fall my hand at all 🙌', lang: 'Pidgin',  tone: 'green' },
-  { text: 'Ẹ jọ̀wọ́, transfer ti stuck since morning', lang: 'Yoruba', tone: 'red' },
-  { text: 'Their customer care sabi wetin dem dey do', lang: 'Pidgin', tone: 'green' },
-  { text: 'Onye ọ bụla kwesịrị ịnwale ya. Solid app!', lang: 'Igbo',   tone: 'green' },
+const MENTIONS: { text: string; lang: string; tone: 'nominal' | 'alert' }[] = [
+  { text: 'This app no dey fall my hand at all 🙌', lang: 'Pidgin',  tone: 'nominal' },
+  { text: 'Ẹ jọ̀wọ́, transfer ti stuck since morning', lang: 'Yoruba', tone: 'alert' },
+  { text: 'Their customer care sabi wetin dem dey do', lang: 'Pidgin', tone: 'nominal' },
+  { text: 'Onye ọ bụla kwesịrị ịnwale ya. Solid app!', lang: 'Igbo',   tone: 'nominal' },
 ]
 export function SentimentScene({ t }: { t: number }) {
   const line = easeInOut(win(t, 0.1, 0.9))
@@ -197,7 +195,7 @@ export function SentimentScene({ t }: { t: number }) {
       <div className="flex w-full flex-col gap-2.5 @xl:w-[52%]">
         <div className="flex items-center justify-between">
           <Label>Live mentions</Label>
-          <div className="flex gap-1.5"><Tag tone="blue">X</Tag><Tag tone="clay">Instagram</Tag></div>
+          <div className="flex gap-1.5"><Tag tone="hero">X</Tag><Tag tone="hero">Instagram</Tag></div>
         </div>
         {MENTIONS.map((m, i) => {
           const p = easeOut(win(t, 0.08 + i * 0.16, 0.24 + i * 0.16))
@@ -208,7 +206,7 @@ export function SentimentScene({ t }: { t: number }) {
               <p className="flex-1 text-[11.5px] leading-snug text-[var(--s-body)]">{m.text}</p>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <Tag>{m.lang}</Tag>
-                {tagged && <Tag tone={m.tone}>{m.tone === 'green' ? 'Positive' : 'Negative'}</Tag>}
+                {tagged && <Tag tone={m.tone}>{m.tone === 'nominal' ? 'Positive' : 'Negative'}</Tag>}
               </div>
             </div>
           )
@@ -222,7 +220,7 @@ export function SentimentScene({ t }: { t: number }) {
           {line > 0.97 && <circle cx={280} cy={80 - 0.68 * 72} r="4" fill={HERO} />}
         </svg>
         <div className="flex gap-2" style={{ opacity: win(t, 0.55, 0.7) }}>
-          <Tag tone="green"><span className="bg-num">68</span>&nbsp;positive</Tag><Tag><span className="bg-num">21</span>&nbsp;neutral</Tag><Tag tone="red"><span className="bg-num">11</span>&nbsp;negative</Tag>
+          <Tag tone="nominal"><span className="bg-num">68</span>&nbsp;positive</Tag><Tag><span className="bg-num">21</span>&nbsp;neutral</Tag><Tag tone="alert"><span className="bg-num">11</span>&nbsp;negative</Tag>
         </div>
         <p className="hidden text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.65, 0.8) }}>
           Pidgin, Yoruba, Igbo and Hausa classified correctly. No lost-in-translation scores.
@@ -252,7 +250,7 @@ export function FunnelScene({ t }: { t: number }) {
         <Label>Funnel, from live connector data</Label>
         <div className="flex flex-wrap gap-1.5">
           {srcs.map((s, i) => (
-            <span key={s} style={{ opacity: win(t, 0.05 + i * 0.06, 0.15 + i * 0.06) }}><Tag tone="blue">{s}</Tag></span>
+            <span key={s} style={{ opacity: win(t, 0.05 + i * 0.06, 0.15 + i * 0.06) }}><Tag tone="hero">{s}</Tag></span>
           ))}
         </div>
       </div>
@@ -304,10 +302,10 @@ export function SurveyScene({ t }: { t: number }) {
       <div className="flex w-full flex-col gap-2.5 @xl:w-1/2">
         <div className="flex items-center justify-between">
           <Label>NPS survey, wave 4</Label>
-          <Tag tone="green">Opt-in only</Tag>
+          <Tag tone="nominal">Opt-in only</Tag>
         </div>
         <div className="flex gap-1.5" style={{ opacity: easeOut(win(t, 0.03, 0.14)) }}>
-          <Tag tone="blue">Email</Tag><Tag tone="blue">In-app</Tag><Tag tone="blue">Share link</Tag>
+          <Tag tone="hero">Email</Tag><Tag tone="hero">In-app</Tag><Tag tone="hero">Share link</Tag>
         </div>
         <div className="rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2 text-[11.5px] leading-snug text-[var(--s-body)]"
           style={{ opacity: easeOut(win(t, 0.08, 0.2)) }}>
@@ -320,7 +318,7 @@ export function SurveyScene({ t }: { t: number }) {
               style={{ opacity: p, transform: `translateX(${(1 - p) * -16}px)` }}>
               <p className="text-[11.5px] text-[var(--s-body)]">{r.text}</p>
               <Tag>{r.via}</Tag>
-              <Tag tone={r.score >= 9 ? 'green' : r.score >= 7 ? 'dim' : 'red'}><span className="bg-num">{r.score}</span></Tag>
+              <Tag tone={r.score >= 9 ? 'nominal' : r.score >= 7 ? 'quiet' : 'alert'}><span className="bg-num">{r.score}</span></Tag>
             </div>
           )
         })}
@@ -329,7 +327,7 @@ export function SurveyScene({ t }: { t: number }) {
         <Label>Net Promoter Score</Label>
         <span className="text-5xl font-extrabold text-[var(--s-strong)] @xl:text-6xl bg-num" style={{ fontFamily: 'var(--font-num)' }}>+{nps}</span>
         <div className="flex gap-2" style={{ opacity: win(t, 0.7, 0.85) }}>
-          <Tag tone="green"><span className="bg-num">61%</span>&nbsp;promoters</Tag><Tag tone="red"><span className="bg-num">3%</span>&nbsp;detractors</Tag>
+          <Tag tone="nominal"><span className="bg-num">61%</span>&nbsp;promoters</Tag><Tag tone="alert"><span className="bg-num">3%</span>&nbsp;detractors</Tag>
         </div>
         <p className="hidden max-w-[220px] text-center text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.78, 0.92) }}>
           Email, in-app and shareable-link surveys, with every reply scored as it lands.
@@ -360,7 +358,7 @@ export function OohScene({ t }: { t: number }) {
       <div className="flex w-full flex-col justify-center gap-3 @xl:w-[55%]">
         <div className="flex items-center justify-between">
           <Label>OOH sites in Lagos</Label>
-          <Tag tone="clay">5 live</Tag>
+          <Tag tone="hero">5 live</Tag>
         </div>
         <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[var(--s-line)]"
           style={{ opacity: easeOut(win(t, 0.02, 0.18)) }}>
@@ -390,7 +388,7 @@ export function OohScene({ t }: { t: number }) {
           <span className="absolute bottom-1 right-1.5 text-[7px] text-[var(--s-mut)]">© OpenStreetMap · © CARTO</span>
         </div>
         <div className="hidden items-center gap-2 rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2.5 @xl:flex">
-          <span className="h-2 w-2 rounded-full" style={{ background: HERO }} />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)]" style={{ background: HERO }} />
           <span className="bg-num text-[11px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: 'var(--tx-flare)' }}>▍</span></span>
         </div>
       </div>
@@ -453,7 +451,7 @@ export function AiScene({ t }: { t: number }) {
       <div className="border-t border-[var(--s-line)] pt-3">
         <div className="mb-2 flex items-center justify-between">
           <Label>How AI answers about your brand</Label>
-          <Tag tone="clay">Weekly check</Tag>
+          <Tag tone="hero">Weekly check</Tag>
         </div>
         <div className="grid grid-cols-3 gap-3">
           {platforms.map((pl, i) => {
@@ -497,7 +495,7 @@ export function CompetitiveScene({ t }: { t: number }) {
           })}
         </svg>
         <div className="flex flex-wrap justify-center gap-1.5">
-          {share.map(s => <Tag key={s.name} tone={s.name === 'You' ? 'clay' : 'dim'}>{s.name} {Math.round(s.v * sweep)}%</Tag>)}
+          {share.map(s => <Tag key={s.name} tone={s.name === 'You' ? 'hero' : 'quiet'}>{s.name} {Math.round(s.v * sweep)}%</Tag>)}
         </div>
       </div>
       <div className="flex flex-1 flex-col justify-center gap-3">

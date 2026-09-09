@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback } from 'react'
-import { Mail, Link2, TrendingDown, Minus } from 'lucide-react'
+import { MailIcon as Mail, LinkIcon as Link2, FallingIcon as TrendingDown, RemoveIcon as Minus } from '@/components/brand/icon'
 import { ExportIcon as Download, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'

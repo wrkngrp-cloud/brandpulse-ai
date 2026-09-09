@@ -1,6 +1,6 @@
 'use client'
 
-import { Star, GitFork, CircleDot, MessageCircleQuestion, GitBranch, Code2, Package, TrendingDown } from 'lucide-react'
+import { StarIcon as Star, BranchIcon as GitFork, TargetIcon as CircleDot, HelpIcon as MessageCircleQuestion, BranchIcon as GitBranch, CodeIcon as Code2, PackageIcon as Package, FallingIcon as TrendingDown } from '@/components/brand/icon'
 import { ExportIcon as Download, TrendIcon as TrendingUp } from '@/components/brand/icon'
 
 interface Snapshot {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { MoreHorizontal } from 'lucide-react'
+import { MoreIcon as MoreHorizontal } from '@/components/brand/icon'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
   DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,

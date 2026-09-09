@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { PanelLeftClose, PanelLeft, Settings, LogOut, ChevronsUpDown } from 'lucide-react'
+import { PanelIcon as PanelLeftClose, PanelIcon as PanelLeft, SettingsIcon as Settings, ExitIcon as LogOut, SortIcon as ChevronsUpDown } from '@/components/brand/icon'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'

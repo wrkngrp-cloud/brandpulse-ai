@@ -5,7 +5,7 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip as RechartTooltip,
   LineChart, Line, XAxis, YAxis, CartesianGrid, ReferenceLine,
 } from 'recharts'
-import { Info, Link as LinkIcon, ChevronDown } from 'lucide-react'
+import { InfoIcon as Info, LinkIcon, DownIcon as ChevronDown } from '@/components/brand/icon'
 import Link from 'next/link'
 import { BHIGauge } from '@/components/dashboard/bhi-gauge'
 import { cn, formatNGN } from '@/lib/utils'
@@ -343,7 +343,7 @@ export function BrandEquityClient({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: meta.color }} />
+                    <span className="h-[11px] w-[5px] rounded-[var(--r-tick)]" style={{ backgroundColor: meta.color }} />
                     <span className="text-xs font-semibold" style={{ color: meta.color }}>{meta.label}</span>
                   </div>
                   <span className="text-[10px] bg-num text-muted-foreground/50 bg-num">{range}</span>
@@ -415,7 +415,7 @@ export function BrandEquityClient({
                       const pos   = Math.min(100, Math.max(0, ((value - min) / range) * 100))
                       return (
                         <div
-                          className="absolute top-1/2 -translate-y-1/2 h-3 w-3 rounded-full border-2 border-background"
+                          className="absolute top-1/2 -translate-y-1/2 h-[11px] w-[5px] rounded-[var(--r-tick)] border-2 border-background"
                           style={{ left: `${pos}%`, transform: `translateX(-50%) translateY(-50%)`, backgroundColor: 'var(--flare)' }}
                         />
                       )

@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
 import { FieldTip } from '@/components/ui/field-tip'
-import { Upload, X, ImageIcon, ArrowRight } from 'lucide-react'
+import { UploadIcon as Upload, CloseIcon as X, ImageIcon, ForwardIcon as ArrowRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import Link from 'next/link'
@@ -180,7 +180,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
             <div className="flex flex-wrap gap-2 mb-2">
               {colors.map(color => (
                 <div key={color} className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-sm border">
-                  <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                  <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] shrink-0" style={{ backgroundColor: color }} />
                   <span className="bg-num">{color}</span>
                   <button
                     type="button"

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams }              from 'next/navigation'
-import { CheckCircle2, Unplug }         from 'lucide-react'
+import { ConfirmedIcon as CheckCircle2, OfflineIcon as Unplug } from '@/components/brand/icon'
 import { toast }                        from 'sonner'
 import { buttonVariants }               from '@/components/ui/button'
 import { cn }                           from '@/lib/utils'

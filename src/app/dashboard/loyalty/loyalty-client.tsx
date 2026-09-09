@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Award, Plus, Users, Star, RefreshCw, X, Gift, Coins } from 'lucide-react'
+import { AwardIcon as Award, AddIcon as Plus, PeopleIcon as Users, StarIcon as Star, RefreshIcon as RefreshCw, CloseIcon as X, GiftIcon as Gift, MoneyIcon as Coins } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

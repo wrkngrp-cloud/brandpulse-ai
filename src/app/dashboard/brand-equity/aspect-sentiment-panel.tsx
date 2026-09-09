@@ -1,6 +1,6 @@
 'use client'
 
-import { MessageSquareText } from 'lucide-react'
+import { MentionsIcon as MessageSquareText } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { Crescendo } from '@/components/brand/crescendo'
 

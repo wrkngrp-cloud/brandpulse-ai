@@ -1,6 +1,6 @@
 import { createClient }         from '@/lib/supabase/server'
 import { redirect }             from 'next/navigation'
-import { Globe, FileSearch, BarChart2, ExternalLink, Clock, Rss } from 'lucide-react'
+import { GlobeIcon as Globe, DocIcon as FileSearch, BarsIcon as BarChart2, OpenIcon as ExternalLink, ClockIcon as Clock, BroadcastIcon as Rss } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { getActiveBrand }       from '@/lib/active-brand'
 import { PrMentionsChart }      from './pr-mentions-chart'

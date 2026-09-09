@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Map, { Marker, Popup, NavigationControl, type MapRef } from 'react-map-gl/mapbox'
-import { MapPin } from 'lucide-react'
+import { PlaceIcon as MapPin } from '@/components/brand/icon'
 import { TOKENS } from '@/lib/brand-tokens'
 
 interface Site {
@@ -132,9 +132,9 @@ export function OohMapClient({ sites, onMapReady }: OohMapClientProps) {
       </Map>
 
       <div className="absolute bottom-3 right-3 bg-background/90 rounded-lg px-3 py-1.5 flex items-center gap-3 text-xs z-10 pointer-events-none">
-        <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5 rounded-full bg-green-600" /> 500+ visits</span>
-        <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-600" /> 100–499</span>
-        <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5 rounded-full bg-red-600" /> &lt;100</span>
+        <span className="flex items-center gap-1"><span className="inline-block w-[5px] h-[11px] rounded-[var(--r-tick)] bg-green-600" /> 500+ visits</span>
+        <span className="flex items-center gap-1"><span className="inline-block w-[5px] h-[11px] rounded-[var(--r-tick)] bg-amber-600" /> 100–499</span>
+        <span className="flex items-center gap-1"><span className="inline-block w-[5px] h-[11px] rounded-[var(--r-tick)] bg-red-600" /> &lt;100</span>
       </div>
     </div>
   )

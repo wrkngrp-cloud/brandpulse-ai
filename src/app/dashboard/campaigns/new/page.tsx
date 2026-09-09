@@ -1,5 +1,5 @@
 import Link               from 'next/link'
-import { ArrowLeft }      from 'lucide-react'
+import { ReturnIcon as ArrowLeft } from '@/components/brand/icon'
 import { CampaignForm }   from '@/components/campaigns/campaign-form'
 import { createCampaign } from '../actions'
 

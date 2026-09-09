@@ -72,7 +72,7 @@ export function EmotionWheel({ distribution }: Props) {
       <div className="flex flex-wrap gap-x-3 gap-y-1.5 justify-center">
         {data.map(d => (
           <span key={d.name} className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+            <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] shrink-0" style={{ backgroundColor: d.color }} />
             {d.name}
             <span className="text-muted-foreground/60 bg-num">
               {Math.round((d.value / total) * 100)}%

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { Bot, RefreshCw, CheckCircle2, XCircle, MinusCircle, Trophy } from 'lucide-react'
+import { IdeaIcon as Bot, RefreshIcon as RefreshCw, ConfirmedIcon as CheckCircle2, BlockedIcon as XCircle, RemoveIcon as MinusCircle, AwardIcon as Trophy } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
@@ -61,7 +61,7 @@ function PlatformScore({ platform, score }: { platform: string; score: number | 
   return (
     <div className="border rounded-xl p-4 bg-card space-y-2">
       <div className="flex items-center gap-2">
-        <div className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
+        <div className="h-[11px] w-[5px] rounded-[var(--r-tick)]" style={{ backgroundColor: color }} />
         <p className="text-[12px] font-semibold text-muted-foreground">{label}</p>
       </div>
       {score === null ? (

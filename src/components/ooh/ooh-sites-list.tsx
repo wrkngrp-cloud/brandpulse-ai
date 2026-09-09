@@ -5,7 +5,7 @@ import Link               from 'next/link'
 import { cn }             from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { ItemActions }    from '@/components/ui/item-actions'
-import { MapPin, Copy, Crosshair, Eye, Pencil, Trash2, BarChart2, Megaphone } from 'lucide-react'
+import { PlaceIcon as MapPin, CopyIcon as Copy, TargetIcon as Crosshair, ViewIcon as Eye, EditIcon as Pencil, DeleteIcon as Trash2, BarsIcon as BarChart2, BroadcastIcon as Megaphone } from '@/components/brand/icon'
 import { toast }          from 'sonner'
 import { deleteSite }     from '@/app/dashboard/ooh/actions'
 

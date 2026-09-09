@@ -18,7 +18,7 @@ interface EmptyStateProps {
   actions?:    Action[]
   className?:  string
   size?:       'sm' | 'md' | 'lg'
-  tone?:       'default' | 'blue' | 'clay'
+  tone?:       'quiet' | 'hero'
 }
 
 const SIZE = {
@@ -28,9 +28,8 @@ const SIZE = {
 }
 
 const TONE_ICON: Record<string, string> = {
-  default: 'bg-muted/60 text-muted-foreground/40',
-  blue:    'bg-primary/8 text-primary/50',
-  clay:    'bg-[var(--char)]/8 text-[var(--char)]/60',
+  quiet: 'bg-shell text-tx-3',
+  hero:  'bg-flare-wash text-tx-flare',
 }
 
 export function EmptyState({
@@ -40,7 +39,7 @@ export function EmptyState({
   actions = [],
   className,
   size = 'md',
-  tone = 'default',
+  tone = 'quiet',
 }: EmptyStateProps) {
   const s = SIZE[size]
 

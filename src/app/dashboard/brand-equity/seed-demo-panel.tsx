@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Database } from 'lucide-react'
+import { DatabaseIcon as Database } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 

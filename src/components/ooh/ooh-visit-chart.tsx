@@ -4,7 +4,7 @@ import {
   AreaChart, Area, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { Activity } from 'lucide-react'
+import { PulseIcon as Activity } from '@/components/brand/icon'
 import { ChartState } from '@/components/brand/chart-states'
 
 interface Visit {

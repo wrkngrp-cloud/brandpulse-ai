@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Camera, ExternalLink, CheckCircle2, XCircle, RefreshCw } from 'lucide-react'
+import { CameraIcon as Camera, OpenIcon as ExternalLink, ConfirmedIcon as CheckCircle2, BlockedIcon as XCircle, RefreshIcon as RefreshCw } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 
 interface VisualMention {

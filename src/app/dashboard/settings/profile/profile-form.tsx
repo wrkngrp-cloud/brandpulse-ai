@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
 } from '@/components/ui/dialog'
-import { TriangleAlert } from 'lucide-react'
+import { AlertIcon as TriangleAlert } from '@/components/brand/icon'
 
 export function ProfileForm({ name, email }: { name: string; email: string }) {
   const [profileState, profileAction, profilePending] = useActionState(updateProfile, null)

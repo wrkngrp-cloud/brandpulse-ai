@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn, toSentenceCase } from '@/lib/utils'
-import { Link2, X, MapPin, CalendarDays, Check } from 'lucide-react'
+import { LinkIcon as Link2, CloseIcon as X, PlaceIcon as MapPin, CalendarIcon as CalendarDays, TickMarkIcon as Check } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { linkOohSiteToCampaign, linkEventToCampaign } from '@/app/dashboard/campaigns/actions'
 

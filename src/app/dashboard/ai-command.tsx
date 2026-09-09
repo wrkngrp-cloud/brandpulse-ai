@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { X, Send, ChevronDown, ArrowRight } from 'lucide-react'
+import { CloseIcon as X, SendIcon as Send, DownIcon as ChevronDown, ForwardIcon as ArrowRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { MentionsIcon as MessageSquare } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
@@ -136,7 +136,7 @@ export function AiCommand() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
             <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-pos" />
+              <div className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-pos" />
               <span className="text-sm font-semibold">BrandGauge</span>
             </div>
             <div className="flex items-center gap-1">

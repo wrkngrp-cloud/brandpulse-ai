@@ -334,6 +334,7 @@
 
   /* A card whose subject is the hero gets the tinted surface, not a tint of
      some other hue. One hero plane per frame. */
+  .tone-surface,
   .tone-surface-blue,
   .tone-surface-green,
   .tone-surface-amber,
@@ -344,6 +345,7 @@
 
   /* Icon plate. Ink on shell; the icon is Flare only when it is the single
      hero element of the card. No gradient fills, no coloured shadow. */
+  .icon-plate,
   .icon-box-blue,
   .icon-box-clay,
   .icon-box-green,

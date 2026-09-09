@@ -3,12 +3,12 @@
 import { useId } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { TrendingDown } from 'lucide-react'
+import { FallingIcon as TrendingDown } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { fadeUp } from '@/lib/motion'
 
-type Tone = 'blue' | 'green' | 'amber' | 'clay' | 'violet'
+type Tone = 'hero' | 'nominal' | 'neutral' | 'alert' | 'quiet'
 
 interface SparkPoint { date: string; value: number }
 
@@ -25,28 +25,31 @@ interface StatCardProps {
   loading?:    boolean
 }
 
+/* The icon plate is the same shell in every tone: the tone is carried by the
+   mark inside it, not by a coloured box. */
 const TONE_BOX: Record<Tone, string> = {
-  blue:   'icon-box-blue',
-  green:  'icon-box-green',
-  amber:  'icon-box-amber',
-  clay:   'icon-box-clay',
-  violet: 'icon-box-violet',
+  hero:    'icon-plate',
+  nominal: 'icon-plate',
+  neutral: 'icon-plate',
+  alert:   'icon-plate',
+  quiet:   'icon-plate',
 }
 
 const TONE_SURFACE: Record<Tone, string> = {
-  blue:   'tone-surface-blue',
-  green:  'tone-surface-green',
-  amber:  'tone-surface-amber',
-  clay:   'tone-surface-clay',
-  violet: 'tone-surface-violet',
+  hero:    'tone-surface',
+  nominal: 'tone-surface',
+  neutral: 'tone-surface',
+  alert:   'tone-surface',
+  quiet:   'tone-surface',
 }
 
+/* Heat marks the subject. Everything else is ink, ash or the hairline. */
 const STROKE: Record<Tone, string> = {
-  blue:   'var(--flare)',
-  green:  'var(--pos)',
-  amber:  'var(--ember)',
-  clay:   'var(--char)',
-  violet: 'var(--neu)',
+  hero:    'var(--flare)',
+  nominal: 'var(--pos)',
+  neutral: 'var(--neu)',
+  alert:   'var(--neg)',
+  quiet:   'var(--tx-3)',
 }
 
 // ── Smooth bezier sparkline ────────────────────────────────────────────────
@@ -129,7 +132,7 @@ export function StatCard({
   suffix,
   delta,
   deltaLabel = 'vs last period',
-  tone = 'blue',
+  tone = 'hero',
   icon: Icon,
   spark,
   href,

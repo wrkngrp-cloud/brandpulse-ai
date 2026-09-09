@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast }    from 'sonner'
-import { Copy, Plus, ToggleLeft, ToggleRight } from 'lucide-react'
+import { CopyIcon as Copy, AddIcon as Plus, ToggleIcon as ToggleLeft, ToggleIcon as ToggleRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 
 interface FsoTeam {

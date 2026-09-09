@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell } from 'lucide-react'
+import { BellIcon as Bell } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
 export function NotificationBell({

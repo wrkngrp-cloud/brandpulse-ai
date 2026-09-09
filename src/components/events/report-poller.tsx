@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Check } from 'lucide-react'
+import { TickMarkIcon as Check } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Crescendo } from '@/components/brand/crescendo'
 

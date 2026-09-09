@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
-import { Plus, Trash2, CheckCircle2, Wand2, PenLine, Copy, RefreshCw, ChevronDown } from 'lucide-react'
+import { AddIcon as Plus, DeleteIcon as Trash2, ConfirmedIcon as CheckCircle2, IdeaIcon as Wand2, EditIcon as PenLine, CopyIcon as Copy, RefreshIcon as RefreshCw, DownIcon as ChevronDown } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter }     from 'next/navigation'
-import { ArrowRight, LayoutDashboard, Plus, Settings2, X, ChevronRight } from 'lucide-react'
+import { ForwardIcon as ArrowRight, LayoutIcon as LayoutDashboard, AddIcon as Plus, SettingsIcon as Settings2, CloseIcon as X, NextIcon as ChevronRight } from '@/components/brand/icon'
 import { SearchIcon as Search } from '@/components/brand/icon'
 import { Button }        from '@/components/ui/button'
 import { cn }            from '@/lib/utils'

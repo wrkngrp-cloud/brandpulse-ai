@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { Menu, X } from 'lucide-react'
+import { MenuIcon as Menu, CloseIcon as X } from '@/components/brand/icon'
 import { usePathname } from 'next/navigation'
 import { DashboardNav } from './dashboard-nav'
 import { cn } from '@/lib/utils'

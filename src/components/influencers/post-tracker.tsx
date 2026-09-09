@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, X, ExternalLink, ChevronDown, ChevronUp, BarChart2, Users, Shield, CheckCircle, XCircle, Lightbulb, RefreshCw } from 'lucide-react'
+import { AddIcon as Plus, CloseIcon as X, OpenIcon as ExternalLink, DownIcon as ChevronDown, UpIcon as ChevronUp, BarsIcon as BarChart2, PeopleIcon as Users, ShieldIcon as Shield, ConfirmedIcon as CheckCircle, BlockedIcon as XCircle, IdeaIcon as Lightbulb, RefreshIcon as RefreshCw } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

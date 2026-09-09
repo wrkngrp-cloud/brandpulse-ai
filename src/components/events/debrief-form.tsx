@@ -7,7 +7,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { Input }                  from '@/components/ui/input'
 import { Label }                  from '@/components/ui/label'
 import { Textarea }               from '@/components/ui/textarea'
-import { CheckCircle2, FileText, ArrowLeft } from 'lucide-react'
+import { ConfirmedIcon as CheckCircle2, DocIcon as FileText, ReturnIcon as ArrowLeft } from '@/components/brand/icon'
 import Link                       from 'next/link'
 import { cn }                     from '@/lib/utils'
 

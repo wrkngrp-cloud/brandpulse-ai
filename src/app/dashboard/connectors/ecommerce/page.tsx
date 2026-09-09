@@ -1,6 +1,6 @@
 import { createClient }  from '@/lib/supabase/server'
 import { redirect }       from 'next/navigation'
-import { ArrowLeft }      from 'lucide-react'
+import { ReturnIcon as ArrowLeft } from '@/components/brand/icon'
 import Link               from 'next/link'
 import { EcommerceImportClient } from './ecommerce-import-client'
 

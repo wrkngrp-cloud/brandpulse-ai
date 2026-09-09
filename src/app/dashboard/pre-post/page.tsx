@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Zap } from 'lucide-react'
+import { SparkIcon as Zap } from '@/components/brand/icon'
 import { AnalysisCard } from './analysis-card'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { HelpCircle } from 'lucide-react'
+import { HelpIcon as HelpCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TourSpotlight } from '@/components/tours/tour-spotlight'

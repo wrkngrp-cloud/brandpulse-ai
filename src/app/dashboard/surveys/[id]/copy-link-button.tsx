@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Copy, Check } from 'lucide-react'
+import { CopyIcon as Copy, TickMarkIcon as Check } from '@/components/brand/icon'
 
 export function CopyLinkButton({ url }: { url: string }) {
   const [copied, setCopied] = useState(false)

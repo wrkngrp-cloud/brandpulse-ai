@@ -1,4 +1,4 @@
-import { CheckCircle2, Briefcase } from 'lucide-react'
+import { ConfirmedIcon as CheckCircle2, PackageIcon as Briefcase } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { callAi } from '@/lib/ai/client'
 

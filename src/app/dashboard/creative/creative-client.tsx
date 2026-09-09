@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import { Palette, Zap, Eye, Target, CheckCircle2, ImagePlus, Video, XCircle, Film } from 'lucide-react'
+import { CreativeIcon as Palette, SparkIcon as Zap, ViewIcon as Eye, TargetIcon as Target, ConfirmedIcon as CheckCircle2, UploadIcon as ImagePlus, CameraIcon as Video, BlockedIcon as XCircle, CameraIcon as Film } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

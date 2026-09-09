@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, X } from 'lucide-react'
+import { AddIcon as Plus, CloseIcon as X } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { Crescendo } from '@/components/brand/crescendo'
