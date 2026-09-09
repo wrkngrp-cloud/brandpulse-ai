@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
-import { Check, ArrowRight, X, Plug } from 'lucide-react'
+import { Check, ArrowRight, X } from 'lucide-react'
+import { ConnectIcon as Plug } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { markTourStatus } from '@/app/dashboard/tours/actions'
 

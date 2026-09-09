@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { MessageCircle, ArrowRight, CheckCircle2, Users } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Users } from 'lucide-react'
+import { MentionsIcon as MessageCircle } from '@/components/brand/icon'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Sparkles, RefreshCw }      from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { toast }                    from 'sonner'
 import { Button }                   from '@/components/ui/button'
 

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { AlertTriangle, Camera, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
+import { Camera, ChevronDown, ChevronUp } from 'lucide-react'
+import { AlertIcon as AlertTriangle, AskIcon as Sparkles } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'
 
 interface RiskFlag {

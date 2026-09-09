@@ -15,11 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  ArrowLeft, ArrowRight, Check, Loader2, Megaphone, Upload, X,
-  ImageIcon, Plus, AlertCircle, Globe, Users, BarChart2, ShoppingCart,
-  MousePointer, Smartphone,
-} from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Loader2, Megaphone, Upload, X, ImageIcon, Plus, Globe, Users, BarChart2, ShoppingCart, MousePointer, Smartphone } from 'lucide-react'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 // ── types ─────────────────────────────────────────────────────────────────────
 

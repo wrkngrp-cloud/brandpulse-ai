@@ -1,7 +1,8 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react'
+import { CheckCircle2, RefreshCw } from 'lucide-react'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 function IgIcon({ className }: { className?: string }) {
   return (

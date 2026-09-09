@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { Bot, Loader2, RefreshCw, AlertCircle, CheckCircle2, XCircle, MinusCircle, Sparkles, Trophy } from 'lucide-react'
+import { Bot, Loader2, RefreshCw, CheckCircle2, XCircle, MinusCircle, Trophy } from 'lucide-react'
+import { AlertIcon as AlertCircle, AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'

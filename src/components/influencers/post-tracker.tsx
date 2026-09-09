@@ -1,11 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  Loader2, Plus, X, ExternalLink, ChevronDown, ChevronUp,
-  BarChart2, TrendingUp, Users, Shield, CheckCircle, XCircle,
-  AlertCircle, Lightbulb, RefreshCw,
-} from 'lucide-react'
+import { Loader2, Plus, X, ExternalLink, ChevronDown, ChevronUp, BarChart2, Users, Shield, CheckCircle, XCircle, Lightbulb, RefreshCw } from 'lucide-react'
+import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

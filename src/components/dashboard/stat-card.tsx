@@ -3,7 +3,8 @@
 import { useId } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { TrendingUp, TrendingDown } from 'lucide-react'
+import { TrendingDown } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { fadeUp } from '@/lib/motion'
 

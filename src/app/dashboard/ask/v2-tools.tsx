@@ -1,19 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  FileText,
-  TrendingUp,
-  Filter,
-  Sparkles,
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  Send,
-  Printer,
-  Copy,
-  ArrowRight,
-} from 'lucide-react'
+import { FileText, Filter, Loader2, CheckCircle2, Send, Printer, Copy, ArrowRight } from 'lucide-react'
+import { TrendIcon as TrendingUp, AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'

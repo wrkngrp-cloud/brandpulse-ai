@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { MessageSquare, X, Send, Loader2, ChevronDown, ArrowRight } from 'lucide-react'
+import { X, Send, Loader2, ChevronDown, ArrowRight } from 'lucide-react'
+import { MentionsIcon as MessageSquare } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'

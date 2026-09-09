@@ -1,11 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  FlaskConical, Plus, Play, Pause, CheckSquare,
-  RefreshCw, Loader2, X, TrendingUp, Users,
-  BarChart3, Trophy,
-} from 'lucide-react'
+import { FlaskConical, Plus, Play, Pause, CheckSquare, RefreshCw, Loader2, X, Users, BarChart3, Trophy } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

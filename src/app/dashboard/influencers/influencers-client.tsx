@@ -1,11 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Users, Star, AlertCircle, TrendingUp, Loader2,
-  Plus, X, Globe, ChevronDown, Eye,
-  Megaphone, Filter,
-} from 'lucide-react'
+import { Users, Star, Loader2, Plus, X, Globe, ChevronDown, Eye, Megaphone, Filter } from 'lucide-react'
+import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn, formatNGN } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

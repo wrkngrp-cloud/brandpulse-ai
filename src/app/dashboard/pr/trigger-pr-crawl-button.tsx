@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
+import { RefreshCw, CheckCircle2 } from 'lucide-react'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 export function TriggerPrCrawlButton() {
   const [phase, setPhase] = useState<'idle' | 'running' | 'done' | 'error'>('idle')

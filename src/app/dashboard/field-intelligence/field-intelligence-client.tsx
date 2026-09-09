@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { ClipboardList, MapPin, Package, AlertTriangle, ChevronRight, TrendingDown } from 'lucide-react'
+import { ClipboardList, MapPin, Package, ChevronRight, TrendingDown } from 'lucide-react'
+import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 
 // ── Types ──────────────────────────────────────────────────────────────────────

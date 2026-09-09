@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { MapPin, TrendingUp, DollarSign, Link2, BarChart2 } from 'lucide-react'
+import { MapPin, DollarSign, Link2, BarChart2 } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import Link from 'next/link'
 
 interface Props {

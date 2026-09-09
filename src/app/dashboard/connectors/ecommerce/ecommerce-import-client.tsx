@@ -4,7 +4,8 @@ import { useState, useRef, useCallback } from 'react'
 import { toast }    from 'sonner'
 import { Button }   from '@/components/ui/button'
 import { cn }       from '@/lib/utils'
-import { Upload, FileText, CheckCircle, AlertCircle, ShoppingCart, Truck, Package } from 'lucide-react'
+import { Upload, FileText, CheckCircle, ShoppingCart, Truck, Package } from 'lucide-react'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 type Source = 'jumia' | 'konga' | 'manual'
 

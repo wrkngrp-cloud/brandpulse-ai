@@ -14,7 +14,8 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ArrowUpDown, TrendingUp } from 'lucide-react'
+import { ArrowUpDown } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { toast } from 'sonner'
 
 function IgIcon({ className }: { className?: string }) {

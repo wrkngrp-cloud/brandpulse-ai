@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Sparkles, Loader2, MessageSquareQuote } from 'lucide-react'
+import { Loader2, MessageSquareQuote } from 'lucide-react'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'

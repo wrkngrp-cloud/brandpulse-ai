@@ -4,11 +4,8 @@ import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
-import {
-  TrendingUp, TrendingDown, Target, DollarSign, Award,
-  CheckCircle2, ChevronRight, BarChart3,
-  ArrowUpRight, Minus,
-} from 'lucide-react'
+import { TrendingDown, Target, DollarSign, Award, CheckCircle2, ChevronRight, BarChart3, ArrowUpRight, Minus } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 import {

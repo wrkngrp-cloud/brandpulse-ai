@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { TrendingUp } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 
 interface SpendJustificationProps {
   monthlyCost:    number

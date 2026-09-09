@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, X, TrendingUp } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { toast } from 'sonner'
 
 export interface SovData {

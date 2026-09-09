@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
-import {
-  Loader2, Sparkles, Plus, Trash2, CheckCircle2, Wand2,
-  PenLine, Copy, RefreshCw, ChevronDown,
-} from 'lucide-react'
+import { Loader2, Plus, Trash2, CheckCircle2, Wand2, PenLine, Copy, RefreshCw, ChevronDown } from 'lucide-react'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'

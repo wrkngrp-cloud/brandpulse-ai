@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { MessageCircle, Users, Send, BarChart2, CheckCircle2, AlertCircle,
-         Plus, Loader2, ChevronRight, Clock, CheckCheck } from 'lucide-react'
+import { Users, Send, BarChart2, CheckCircle2, Plus, Loader2, ChevronRight, Clock, CheckCheck } from 'lucide-react'
+import { MentionsIcon as MessageCircle, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

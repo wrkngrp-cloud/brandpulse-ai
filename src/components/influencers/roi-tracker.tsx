@@ -1,11 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  TrendingUp, TrendingDown, Plus, DollarSign, Eye, Heart,
-  MousePointerClick, ShoppingBag, ChevronDown, ChevronUp,
-  Info,
-} from 'lucide-react'
+import { TrendingDown, Plus, DollarSign, Eye, Heart, MousePointerClick, ShoppingBag, ChevronDown, ChevronUp, Info } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input }  from '@/components/ui/input'
 import { Label }  from '@/components/ui/label'

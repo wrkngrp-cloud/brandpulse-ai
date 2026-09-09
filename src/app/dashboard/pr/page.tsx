@@ -1,6 +1,7 @@
 import { createClient }         from '@/lib/supabase/server'
 import { redirect }             from 'next/navigation'
-import { Globe, TrendingUp, FileSearch, BarChart2, ExternalLink, Clock, Rss } from 'lucide-react'
+import { Globe, FileSearch, BarChart2, ExternalLink, Clock, Rss } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { getActiveBrand }       from '@/lib/active-brand'
 import { PrMentionsChart }      from './pr-mentions-chart'
 import { DateRangeFilter }      from '@/components/dashboard/date-range-filter'

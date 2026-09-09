@@ -1,10 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Flame, TrendingUp, TrendingDown, Calendar, Sparkles, Loader2,
-  AlertTriangle, ChevronRight, ChevronDown, Star, Globe,
-} from 'lucide-react'
+import { Flame, TrendingDown, Calendar, Loader2, ChevronRight, ChevronDown, Star, Globe } from 'lucide-react'
+import { TrendIcon as TrendingUp, AskIcon as Sparkles, AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { TourTrigger } from '@/components/tours/tour-trigger'

@@ -1,11 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  DollarSign, Plus, RefreshCw, Loader2, X,
-  ChevronDown, ChevronRight, TrendingUp, AlertCircle,
-  CheckCircle,
-} from 'lucide-react'
+import { DollarSign, Plus, RefreshCw, Loader2, X, ChevronDown, ChevronRight, CheckCircle } from 'lucide-react'
+import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

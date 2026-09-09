@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { ChevronRight, ChevronLeft, Plus, Check, MapPin, Package, AlertCircle } from 'lucide-react'
+import { ChevronRight, ChevronLeft, Plus, Check, MapPin, Package } from 'lucide-react'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

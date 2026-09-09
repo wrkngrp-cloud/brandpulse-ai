@@ -1,12 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  Users, Plus, Copy, Check, ExternalLink, Star,
-  TrendingUp, MousePointer, ShoppingCart, Activity,
-  ChevronDown, ChevronRight, Loader2, X, Link2,
-  RefreshCw, UserCheck, Pause, UserX,
-} from 'lucide-react'
+import { Users, Plus, Copy, Check, ExternalLink, Star, MousePointer, ShoppingCart, Activity, ChevronDown, ChevronRight, Loader2, X, Link2, RefreshCw, UserCheck, Pause, UserX } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

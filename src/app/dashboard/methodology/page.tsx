@@ -1,4 +1,5 @@
-import { BookOpen, BarChart2, TrendingUp, Target, Users, Palette, Radio, Tv, Newspaper, MapPin, Zap, Award, Globe, Filter, Trophy } from 'lucide-react'
+import { BookOpen, BarChart2, Target, Users, Palette, Radio, Tv, Newspaper, MapPin, Zap, Award, Globe, Filter, Trophy } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 
 export const metadata = { title: 'Methodology — BrandGauge' }

@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Building2, Link2, MapPin, Swords, Share2, Layers, Plug, ExternalLink, ClipboardList, Code2 } from 'lucide-react'
+import { User, Building2, Link2, MapPin, Swords, Share2, Layers, ExternalLink, ClipboardList, Code2 } from 'lucide-react'
+import { ConnectIcon as Plug } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
 const SETTINGS_LINKS = [

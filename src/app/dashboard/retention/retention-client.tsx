@@ -1,11 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  AlertTriangle, TrendingDown, MessageSquare,
-  RefreshCw, CheckCircle, XCircle, AlertCircle, Info,
-  Users, ThumbsDown, Activity,
-} from 'lucide-react'
+import { TrendingDown, RefreshCw, CheckCircle, XCircle, Info, Users, ThumbsDown, Activity } from 'lucide-react'
+import { AlertIcon as AlertTriangle, MentionsIcon as MessageSquare, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'

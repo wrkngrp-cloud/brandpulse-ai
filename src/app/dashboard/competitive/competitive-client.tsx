@@ -2,10 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import {
-  Trophy, TrendingUp, TrendingDown, MapPin, Plus, Loader2, RefreshCw,
-  ChevronDown, ChevronUp, AlertCircle, Lightbulb, Eye, CheckCircle2, ArrowRight,
-} from 'lucide-react'
+import { Trophy, TrendingDown, MapPin, Plus, Loader2, RefreshCw, ChevronDown, ChevronUp, Lightbulb, Eye, CheckCircle2, ArrowRight } from 'lucide-react'
+import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { NigeriaLocationSelect } from '@/components/nigeria-location-select'

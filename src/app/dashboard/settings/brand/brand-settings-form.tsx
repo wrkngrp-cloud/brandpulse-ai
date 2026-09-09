@@ -9,19 +9,25 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
 import { FieldTip } from '@/components/ui/field-tip'
-import { Upload, X, Loader2, ImageIcon, Sparkles, ArrowRight } from 'lucide-react'
+import { Upload, X, Loader2, ImageIcon, ArrowRight } from 'lucide-react'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import Link from 'next/link'
+import {
+  ShelfIcon, CardIcon, VenueIcon, SaasIcon, MarketIcon, BottleIcon, TruckIcon,
+} from '@/components/brand/icon'
 
 type CulturalKey = 'community_corporate' | 'traditional_modern' | 'religious_secular' | 'mass_premium' | 'local_global'
 
-const BRAND_TYPES: { value: BrandSettingsData['brandType']; label: string; description: string }[] = [
-  { value: 'fmcg',              label: 'FMCG / Consumer Goods', description: 'Physical products sold through retail or direct' },
-  { value: 'fintech',           label: 'Fintech / Digital Finance', description: 'Payment platforms, digital banks, savings/investment apps' },
-  { value: 'venue',             label: 'Venue / Hospitality', description: 'Restaurants, clubs, hotels, experience venues' },
-  { value: 'b2b_saas',          label: 'B2B SaaS', description: 'Software tools, API platforms, developer products' },
-  { value: 'marketplace',       label: 'Creator Marketplace', description: 'Platforms for creators to sell or build on' },
-  { value: 'beverage_alcohol',  label: 'Alcohol / Beverage', description: 'Regulated consumer beverages' },
-  { value: 'b2b_distribution',  label: 'B2B Distribution', description: 'Trade and supply chain platforms' },
+// The seven verticals, and the seven glyphs the icon set draws for them.
+const BRAND_TYPES: { value: BrandSettingsData['brandType']; label: string; description: string;
+                     icon: React.ComponentType<{ className?: string }> }[] = [
+  { value: 'fmcg',              label: 'FMCG / Consumer Goods', description: 'Physical products sold through retail or direct', icon: ShelfIcon },
+  { value: 'fintech',           label: 'Fintech / Digital Finance', description: 'Payment platforms, digital banks, savings/investment apps', icon: CardIcon },
+  { value: 'venue',             label: 'Venue / Hospitality', description: 'Restaurants, clubs, hotels, experience venues', icon: VenueIcon },
+  { value: 'b2b_saas',          label: 'B2B SaaS', description: 'Software tools, API platforms, developer products', icon: SaasIcon },
+  { value: 'marketplace',       label: 'Creator Marketplace', description: 'Platforms for creators to sell or build on', icon: MarketIcon },
+  { value: 'beverage_alcohol',  label: 'Alcohol / Beverage', description: 'Regulated consumer beverages', icon: BottleIcon },
+  { value: 'b2b_distribution',  label: 'B2B Distribution', description: 'Trade and supply chain platforms', icon: TruckIcon },
 ]
 
 interface BrandSettingsFormProps {
@@ -301,7 +307,10 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                       selected ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-accent'
                     }`}
                   >
-                    <p className="text-sm font-medium">{t.label}</p>
+                    <p className="text-sm font-medium flex items-center gap-2">
+                      <t.icon className="h-4 w-4 shrink-0" />
+                      {t.label}
+                    </p>
                     <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>
                   </button>
                 )

@@ -5,14 +5,14 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion, LayoutGroup } from 'framer-motion'
 import {
-  LayoutDashboard, BarChart2, ClipboardList, CalendarDays,
-  MapPin, Megaphone, Zap, Trophy, ChevronDown, Monitor, Radio,
-  Tv, Newspaper, Filter, Users, Palette, Globe, Target,
-  FileSearch, BookOpen, PieChart, Sparkles, ClipboardCheck,
-  Plug, BarChart3, Clipboard, AlertTriangle, Heart, Database,
-  ShoppingBag, DollarSign, FlaskConical, Activity, Gift,
-  FileText, TrendingUp, FileDown, MessageCircle, Video, Eye,
+  LayoutDashboard, CalendarDays, Megaphone, Zap, Trophy, ChevronDown, Monitor, Radio, Tv, Newspaper, Users, Globe, Target, FileSearch, BookOpen, ClipboardCheck, BarChart3, Heart, Database, DollarSign, FlaskConical, Gift, FileText, Video, Eye,
 } from 'lucide-react'
+import {
+  AskIcon as Sparkles, ConnectIcon as Plug, AlertIcon as AlertTriangle,
+  TrendIcon as TrendingUp, ExportIcon as FileDown, MentionsIcon as MessageCircle,
+  GaugeIcon, MentionsIcon, FunnelIcon, OohIcon, SurveyIcon, ShareIcon,
+  FieldIcon, CreativeIcon, MarketIcon,
+} from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { isPathHidden, type IndustryId } from '@/lib/industry-config'
 
@@ -43,17 +43,17 @@ type NavEntry =
 // ── Section data ──────────────────────────────────────────────────────────────
 
 const BRAND_HEALTH: NavEntry[] = [
-  { label: 'Sentiment',    href: '/dashboard/sentiment',    icon: BarChart2 },
-  { label: 'Brand Health', href: '/dashboard/brand-equity', icon: Activity  },
+  { label: 'Sentiment',    href: '/dashboard/sentiment',    icon: MentionsIcon },
+  { label: 'Brand Health', href: '/dashboard/brand-equity', icon: GaugeIcon },
   { label: 'Content',      href: '/dashboard/content',      icon: FileText  },
-  { label: 'Funnel',       href: '/dashboard/funnel',       icon: Filter    },
+  { label: 'Funnel',       href: '/dashboard/funnel',       icon: FunnelIcon },
 ]
 
 const INTELLIGENCE: NavEntry[] = [
   { label: 'Competitive',        href: '/dashboard/competitive',        icon: Trophy      },
-  { label: 'Marketplace',        href: '/dashboard/marketplace',        icon: ShoppingBag },
+  { label: 'Marketplace',        href: '/dashboard/marketplace',        icon: MarketIcon },
   { label: 'Cultural Insights',  href: '/dashboard/cultural',           icon: Globe       },
-  { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: Clipboard   },
+  { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: FieldIcon   },
   { label: 'PR Tracking',        href: '/dashboard/pr',                 icon: FileSearch  },
   { label: 'YouTube',            href: '/dashboard/youtube',            icon: Video,      comingSoon: true },
   { label: 'AI Visibility',      href: '/dashboard/ai-visibility',      icon: Eye,        comingSoon: true },
@@ -67,7 +67,7 @@ const CAMPAIGNS: NavEntry[] = [
   { label: 'Digital Ads',         href: '/dashboard/digital',     icon: Monitor     },
   { label: 'Influencers',         href: '/dashboard/influencers', icon: Users       },
   { divider: true },
-  { label: 'Out of Home',         href: '/dashboard/ooh',         icon: MapPin      },
+  { label: 'Out of Home',         href: '/dashboard/ooh',         icon: OohIcon     },
   { label: 'Events & Activation', href: '/dashboard/events',      icon: CalendarDays },
   { divider: true },
   { label: 'Radio',               href: '/dashboard/radio',       icon: Radio       },
@@ -80,18 +80,18 @@ const CREATIVE_LAB_PATHS = ['/dashboard/voice-builder', '/dashboard/pre-post', '
 const CREATIVE_LAB_SUB = [
   { label: 'Voice Builder',    href: '/dashboard/voice-builder', icon: Sparkles },
   { label: 'Pre-Post Intel',   href: '/dashboard/pre-post',      icon: Zap      },
-  { label: 'Creative Analysis',href: '/dashboard/creative',      icon: Palette  },
+  { label: 'Creative Analysis',href: '/dashboard/creative',      icon: CreativeIcon },
 ]
 
 const SURVEY_PATHS = ['/dashboard/surveys']
 const SURVEY_SUB = [
-  { label: 'All Surveys',     href: '/dashboard/surveys',        icon: ClipboardList  },
+  { label: 'All Surveys',     href: '/dashboard/surveys',        icon: SurveyIcon     },
   { label: 'NPS Tracker',     href: '/dashboard/surveys/nps',    icon: TrendingUp     },
   { label: 'Tracking Panels', href: '/dashboard/surveys/panels', icon: ClipboardCheck },
 ]
 
 const MEASUREMENT: NavEntry[] = [
-  { label: 'Media Mix',       href: '/dashboard/mmm',      icon: PieChart   },
+  { label: 'Media Mix',       href: '/dashboard/mmm',      icon: ShareIcon  },
   { label: 'Geo-Lift',        href: '/dashboard/geo-lift', icon: Target     },
   { label: 'Budget & Pacing', href: '/dashboard/budget',   icon: DollarSign },
 ]
@@ -322,7 +322,7 @@ export function DashboardNav({ expanded = true, industry = null }: { expanded?: 
           label="Surveys"
           paths={SURVEY_PATHS}
           sub={SURVEY_SUB}
-          icon={ClipboardList}
+          icon={SurveyIcon}
           expanded={expanded}
           pathname={pathname}
         />
@@ -340,7 +340,7 @@ export function DashboardNav({ expanded = true, industry = null }: { expanded?: 
           label="Creative Lab"
           paths={CREATIVE_LAB_PATHS}
           sub={CREATIVE_LAB_SUB}
-          icon={Palette}
+          icon={CreativeIcon}
           expanded={expanded}
           pathname={pathname}
         />

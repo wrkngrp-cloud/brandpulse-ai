@@ -9,11 +9,8 @@ import { Label }      from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator }  from '@/components/ui/separator'
 import { cn }         from '@/lib/utils'
-import {
-  MapPin, TrendingUp, Target, Zap, Globe, Smartphone,
-  Monitor, ExternalLink, Plus, ChevronRight, Radio,
-  AlertCircle, CheckCircle2, Clock, Users,
-} from 'lucide-react'
+import { MapPin, Target, Zap, Globe, Smartphone, Monitor, ExternalLink, Plus, ChevronRight, Radio, CheckCircle2, Clock, Users } from 'lucide-react'
+import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { toast } from 'sonner'
 
 interface GeoVisit {

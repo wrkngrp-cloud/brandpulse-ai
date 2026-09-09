@@ -1,11 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import {
-  Database, RefreshCw, Search, Loader2, Users,
-  Star, Minus, ThumbsDown, ShieldCheck, Activity,
-  Mail, Phone, Calendar,
-} from 'lucide-react'
+import { Database, RefreshCw, Loader2, Users, Star, Minus, ThumbsDown, ShieldCheck, Activity, Mail, Phone, Calendar } from 'lucide-react'
+import { SearchIcon as Search } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'

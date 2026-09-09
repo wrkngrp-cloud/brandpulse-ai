@@ -6,7 +6,8 @@ import {
   ComposedChart, Line, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts'
-import { TrendingUp, Search, Info } from 'lucide-react'
+import { Info } from 'lucide-react'
+import { TrendIcon as TrendingUp, SearchIcon as Search } from '@/components/brand/icon'
 import { Button }          from '@/components/ui/button'
 import { Input }           from '@/components/ui/input'
 import { Label }           from '@/components/ui/label'

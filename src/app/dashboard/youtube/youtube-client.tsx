@@ -12,11 +12,8 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
-import {
-  PlayCircle, ExternalLink, Eye, ThumbsUp, MessageSquare,
-  RefreshCw, Plus, Settings, CheckCircle2,
-  TrendingUp,
-} from 'lucide-react'
+import { PlayCircle, ExternalLink, Eye, ThumbsUp, RefreshCw, Plus, Settings, CheckCircle2 } from 'lucide-react'
+import { MentionsIcon as MessageSquare, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
 interface YtMention {

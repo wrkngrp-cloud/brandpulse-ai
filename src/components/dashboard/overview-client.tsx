@@ -4,12 +4,8 @@ import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import {
-  TrendingUp, TrendingDown, Minus,
-  Megaphone, CalendarDays, MapPin, ClipboardList,
-  Plus, ArrowRight, Zap, ArrowUpRight, Activity,
-  BarChart2, Radio, MessageSquare,
-} from 'lucide-react'
+import { TrendingDown, Minus, Megaphone, CalendarDays, MapPin, ClipboardList, Plus, ArrowRight, Zap, ArrowUpRight, Activity, BarChart2, Radio } from 'lucide-react'
+import { TrendIcon as TrendingUp, MentionsIcon as MessageSquare } from '@/components/brand/icon'
 import { BHIGauge }         from '@/components/dashboard/bhi-gauge'
 import { StatCard }         from '@/components/dashboard/stat-card'
 import { TrendChart }       from '@/components/dashboard/trend-chart'

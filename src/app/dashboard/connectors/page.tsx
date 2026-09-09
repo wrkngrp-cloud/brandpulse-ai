@@ -12,7 +12,8 @@ import { AppStoreConnectCard, type AppStoreConfigData }     from '@/components/d
 import { EmailConnectCard, type EmailConnectorStatus }      from '@/components/dashboard/email-connect-card'
 // WhatsAppConnectCard hidden until dedicated number is configured
 import { PixelCard } from './pixel-card'
-import { ShoppingCart, ArrowRight, Search, Users, Music2 } from 'lucide-react'
+import { ShoppingCart, ArrowRight, Users, Music2 } from 'lucide-react'
+import { SearchIcon as Search } from '@/components/brand/icon'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'

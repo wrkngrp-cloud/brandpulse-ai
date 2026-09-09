@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
 } from '@/components/ui/sheet'
-import { History, RefreshCw, CheckCircle2, AlertCircle, Clock } from 'lucide-react'
+import { History, RefreshCw, CheckCircle2, Clock } from 'lucide-react'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 interface CrawlRun {
   id: string

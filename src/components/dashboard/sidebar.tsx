@@ -4,10 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import {
-  PanelLeftClose, PanelLeft, Sparkles, Settings,
-  LogOut, ChevronUp, ChevronsUpDown,
-} from 'lucide-react'
+import { PanelLeftClose, PanelLeft, Settings, LogOut, ChevronUp, ChevronsUpDown } from 'lucide-react'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { logout } from '@/app/auth/actions'

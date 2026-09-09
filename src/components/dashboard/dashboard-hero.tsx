@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter }     from 'next/navigation'
-import { Search, ArrowRight, LayoutDashboard, Plus, Settings2, X, ChevronRight } from 'lucide-react'
+import { ArrowRight, LayoutDashboard, Plus, Settings2, X, ChevronRight } from 'lucide-react'
+import { SearchIcon as Search } from '@/components/brand/icon'
 import { Button }        from '@/components/ui/button'
 import { cn }            from '@/lib/utils'
 import { WIDGET_CATALOG, WIDGET_BY_ID, DASHBOARD_TEMPLATES, DEFAULT_WIDGET_IDS, type WidgetDef } from '@/lib/widget-catalog'

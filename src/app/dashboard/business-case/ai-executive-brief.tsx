@@ -1,4 +1,5 @@
-import { AlertCircle, CheckCircle2, Briefcase } from 'lucide-react'
+import { CheckCircle2, Briefcase } from 'lucide-react'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { callAi } from '@/lib/ai/client'
 
 // SectionHead from business-case-client.tsx is a Client Component that

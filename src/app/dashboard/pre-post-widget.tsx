@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Zap, X, ChevronDown, Send, Loader2, AlertTriangle, Copy, Check, ImagePlus, Video, XCircle } from 'lucide-react'
+import { Zap, X, ChevronDown, Send, Loader2, Copy, Check, ImagePlus, Video, XCircle } from 'lucide-react'
+import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {

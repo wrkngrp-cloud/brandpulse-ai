@@ -3,10 +3,8 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  Send, Loader2, Sparkles, Plus, MessageSquare,
-  TrendingUp, FileText, Filter, ArrowRight,
-} from 'lucide-react'
+import { Send, Loader2, Plus, FileText, Filter, ArrowRight } from 'lucide-react'
+import { AskIcon as Sparkles, MentionsIcon as MessageSquare, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'

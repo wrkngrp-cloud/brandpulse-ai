@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { AlertTriangle, ExternalLink, Loader2 } from 'lucide-react'
+import { ExternalLink, Loader2 } from 'lucide-react'
+import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 
 export function InstagramPageIdForm({ pendingKey }: { pendingKey: string }) {
   const router = useRouter()

@@ -1,10 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  Award, Plus, Users, Star, TrendingUp,
-  RefreshCw, Loader2, X, Gift, Coins,
-} from 'lucide-react'
+import { Award, Plus, Users, Star, RefreshCw, Loader2, X, Gift, Coins } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

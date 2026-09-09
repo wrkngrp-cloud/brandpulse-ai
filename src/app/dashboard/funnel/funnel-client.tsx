@@ -1,10 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import {
-  Globe, Eye, Heart, Zap, Shield, Share2,
-  ChevronDown, Sparkles, Loader2, AlertCircle, ChevronRight, Info,
-} from 'lucide-react'
+import { Globe, Eye, Heart, Zap, Shield, Share2, ChevronDown, Loader2, ChevronRight, Info } from 'lucide-react'
+import { AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'

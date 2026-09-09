@@ -10,7 +10,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertTriangle, Loader2 } from 'lucide-react'
+import { Upload, FileSpreadsheet, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
+import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
 export type MediaPlanType = 'radio' | 'tv' | 'print'

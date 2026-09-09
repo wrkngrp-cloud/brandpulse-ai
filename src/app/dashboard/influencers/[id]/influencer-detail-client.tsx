@@ -2,11 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  ArrowLeft, Star, AlertCircle, Globe, TrendingUp, CheckCircle,
-  XCircle, Loader2, ExternalLink, Users, BarChart2, Activity,
-  Calendar, RefreshCw,
-} from 'lucide-react'
+import { ArrowLeft, Star, Globe, CheckCircle, XCircle, Loader2, ExternalLink, Users, BarChart2, Activity, Calendar, RefreshCw } from 'lucide-react'
+import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

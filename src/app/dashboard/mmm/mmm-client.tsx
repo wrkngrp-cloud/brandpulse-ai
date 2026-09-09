@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { Loader2, TrendingUp, TrendingDown, Zap, RefreshCw } from 'lucide-react'
+import { Loader2, TrendingDown, Zap, RefreshCw } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'

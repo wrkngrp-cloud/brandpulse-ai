@@ -3,11 +3,8 @@
 import { useState, useMemo } from 'react'
 import { useRouter }          from 'next/navigation'
 import { toast }              from 'sonner'
-import {
-  Image as ImageIcon, Video, FileText, LayoutGrid, Sparkles,
-  Filter, CheckSquare, Square, Zap, ExternalLink, Tag,
-  TrendingUp, BookOpen, Copy, Star, Eye,
-} from 'lucide-react'
+import { Image as ImageIcon, Video, FileText, LayoutGrid, Filter, CheckSquare, Square, Zap, ExternalLink, Tag, BookOpen, Copy, Star, Eye } from 'lucide-react'
+import { AskIcon as Sparkles, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button }  from '@/components/ui/button'
 import { Badge }   from '@/components/ui/badge'
 import { cn, formatPlatformLabel, toSentenceCase } from '@/lib/utils'

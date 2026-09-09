@@ -5,7 +5,8 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine,
 } from 'recharts'
-import { Sparkles, Loader2, Users, TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { Loader2, Users, TrendingDown, Minus } from 'lucide-react'
+import { AskIcon as Sparkles, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'

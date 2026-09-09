@@ -1,10 +1,8 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import {
-  Palette, Zap, Eye, Target, Loader2, CheckCircle2, AlertCircle, TrendingUp,
-  ImagePlus, Video, XCircle, Film,
-} from 'lucide-react'
+import { Palette, Zap, Eye, Target, Loader2, CheckCircle2, ImagePlus, Video, XCircle, Film } from 'lucide-react'
+import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'

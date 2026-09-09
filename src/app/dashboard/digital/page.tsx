@@ -3,10 +3,8 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { cn, formatNGN } from '@/lib/utils'
-import {
-  Monitor, TrendingUp, Eye, MousePointerClick, Coins, Users, Target,
-  CheckCircle, AlertCircle, Link as LinkIcon, ChevronRight,
-} from 'lucide-react'
+import { Monitor, Eye, MousePointerClick, Coins, Users, Target, CheckCircle, Link as LinkIcon, ChevronRight } from 'lucide-react'
+import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import {
   DigitalSpendChart,
   ConversionFunnelChart,

@@ -6,12 +6,8 @@ import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput,
   CommandItem, CommandList, CommandSeparator,
 } from '@/components/ui/command'
-import {
-  LayoutDashboard, FileText, BarChart2, ClipboardList, CalendarDays,
-  MapPin, Megaphone, Zap, Trophy, Filter, Award, Users, Palette, Globe,
-  Plus, Settings, TrendingUp, Sparkles, Radio, Search, ArrowRight,
-  Monitor, Tv, Newspaper,
-} from 'lucide-react'
+import { LayoutDashboard, FileText, BarChart2, ClipboardList, CalendarDays, MapPin, Megaphone, Zap, Trophy, Filter, Award, Users, Palette, Globe, Plus, Settings, Radio, ArrowRight, Monitor, Tv, Newspaper } from 'lucide-react'
+import { TrendIcon as TrendingUp, AskIcon as Sparkles, SearchIcon as Search } from '@/components/brand/icon'
 
 // ── Nav items ──────────────────────────────────────────────────────────────
 
