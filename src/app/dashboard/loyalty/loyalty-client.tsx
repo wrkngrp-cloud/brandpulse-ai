@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  Award, Plus, Users, Star, TrendingUp,
-  RefreshCw, Loader2, X, Gift, Coins,
-} from 'lucide-react'
+import { StarIcon as Award, PlusIcon as Plus, UsersIcon as Users, StarIcon as Star, RefreshIcon as RefreshCw, XIcon as X, GiftIcon as Gift, CurrencyIcon as Coins } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -85,7 +84,7 @@ export function LoyaltyClient() {
         <div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="loyalty" autoStart />
           <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
         </div>
@@ -120,7 +119,7 @@ export function LoyaltyClient() {
 
       {loading && programs.length === 0 && (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loader2 className="h-6 w-6 text-muted-foreground" />
         </div>
       )}
 
@@ -219,22 +218,22 @@ export function LoyaltyClient() {
                       <td className="px-4 py-3">
                         {m.tier ? (
                           <span
-                            className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
+                            className="px-2 py-0.5 rounded-sm text-xs font-medium text-tx-inv"
                             style={{ backgroundColor: m.tier.color }}
                           >
                             {m.tier.name}
                           </span>
                         ) : <span className="text-muted-foreground text-xs">—</span>}
                       </td>
-                      <td className="px-4 py-3 font-semibold">{m.points_balance.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{m.lifetime_points.toLocaleString()}</td>
+                      <td className="px-4 py-3 font-semibold bg-num">{m.points_balance.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-muted-foreground bg-num">{m.lifetime_points.toLocaleString()}</td>
                       <td className="px-4 py-3">
                         <Badge variant={m.status === 'active' ? 'default' : 'secondary'} className="text-xs capitalize">{m.status}</Badge>
                       </td>
                       <td className="px-4 py-3">
                         <button
                           onClick={() => setAwardFor(awardFor === m.id ? null : m.id)}
-                          className="text-xs text-primary hover:underline"
+                          className="text-xs text-primary hover:underline bg-press"
                         >
                           Award pts
                         </button>
@@ -285,9 +284,9 @@ export function LoyaltyClient() {
                   <div key={m.id} className="flex items-center gap-4 px-5 py-3">
                     <span className={cn(
                       'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold shrink-0',
-                      i === 0 ? 'bg-yellow-400 text-yellow-900' :
-                      i === 1 ? 'bg-gray-300 text-gray-700' :
-                      i === 2 ? 'bg-orange-300 text-orange-900' :
+                      i === 0 ? 'bg-ember text-tx-2' :
+                      i === 1 ? 'bg-neu text-tx-2' :
+                      i === 2 ? 'bg-ember text-tx-2' :
                       'bg-muted text-muted-foreground'
                     )}>
                       {i + 1}
@@ -297,13 +296,13 @@ export function LoyaltyClient() {
                       <p className="text-xs text-muted-foreground">{m.email ?? m.phone ?? '—'}</p>
                     </div>
                     {m.tier && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium text-white" style={{ backgroundColor: m.tier.color }}>
+                      <span className="px-2 py-0.5 rounded-sm text-xs font-medium text-tx-inv" style={{ backgroundColor: m.tier.color }}>
                         {m.tier.name}
                       </span>
                     )}
                     <div className="text-right shrink-0">
-                      <p className="font-bold">{m.lifetime_points.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground">{m.points_balance.toLocaleString()} balance</p>
+                      <p className="font-bold bg-num">{m.lifetime_points.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground bg-num">{m.points_balance.toLocaleString()} balance</p>
                     </div>
                   </div>
                 ))}
@@ -321,7 +320,7 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">{icon} {label}</div>
-      <p className="text-xl font-bold">{value}</p>
+      <p className="text-xl font-bold"><span className="bg-num">{value}</span></p>
     </div>
   )
 }
@@ -339,7 +338,7 @@ function ProgramCard({ program }: { program: LoyaltyProgram }) {
           {program.description && <p className="text-sm text-muted-foreground mt-0.5">{program.description}</p>}
           <p className="text-xs text-muted-foreground mt-1">{program.points_per_ngn} {program.points_currency} per ₦1 · {memberCount} members</p>
         </div>
-        <Award className="h-5 w-5 text-yellow-500 shrink-0" />
+        <Award className="h-5 w-5 text-tx-2 shrink-0" />
       </div>
 
       {program.tiers?.length > 0 && (
@@ -347,7 +346,7 @@ function ProgramCard({ program }: { program: LoyaltyProgram }) {
           {program.tiers
             .sort((a, b) => a.sort_order - b.sort_order)
             .map(t => (
-              <div key={t.id} className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-white" style={{ backgroundColor: t.color }}>
+              <div key={t.id} className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-tx-inv bg-num" style={{ backgroundColor: t.color }}>
                 {t.name} · {t.min_points.toLocaleString()}+ pts
               </div>
             ))}
@@ -375,7 +374,7 @@ function NewProgramForm({ onSave, onCancel }: { onSave: (d: Record<string, unkno
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">New loyalty program</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -397,7 +396,7 @@ function NewProgramForm({ onSave, onCancel }: { onSave: (d: Record<string, unkno
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Create
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -424,7 +423,7 @@ function AddMemberForm({ programs, onSave, onCancel }: { programs: LoyaltyProgra
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">Add member</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -448,7 +447,7 @@ function AddMemberForm({ programs, onSave, onCancel }: { programs: LoyaltyProgra
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Add member
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -481,7 +480,7 @@ function AwardPointsForm({ memberId, memberName, onSave, onCancel }: { memberId:
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">Award / adjust points for {memberName}</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
@@ -501,7 +500,7 @@ function AwardPointsForm({ memberId, memberName, onSave, onCancel }: { memberId:
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Confirm
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>

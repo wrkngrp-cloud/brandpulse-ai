@@ -8,7 +8,8 @@ import { goLive, closeEvent } from '@/app/dashboard/events/actions'
 import { Button }       from '@/components/ui/button'
 import { Badge }        from '@/components/ui/badge'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { Radio, Square, Users, Target, Handshake, Gift, Camera } from 'lucide-react'
+import { MusicIcon as Radio, LayoutGridIcon as Square, UsersIcon as Users, CircleDotIcon as Target, UsersIcon as Handshake, GiftIcon as Gift, CameraIcon as Camera } from '@/components/brand/icon'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface Interaction {
   id:               string
@@ -31,14 +32,14 @@ interface Props {
 }
 
 const TYPE_META: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  engaged:           { label: 'Engaged',           color: 'bg-blue-500',   icon: Users    },
-  new_lead:          { label: 'New Lead',           color: 'bg-green-500',  icon: Target   },
-  new_customer:      { label: 'New Customer',       color: 'bg-emerald-600',icon: Handshake},
-  existing_customer: { label: 'Existing Customer',  color: 'bg-purple-500', icon: Users    },
-  merch:             { label: 'Merch Given',         color: 'bg-orange-400', icon: Gift     },
-  sample:            { label: 'Sample Given',        color: 'bg-yellow-500', icon: Gift     },
-  prize:             { label: 'Prize Won',           color: 'bg-pink-500',   icon: Gift     },
-  photo:             { label: 'Photo Moment',        color: 'bg-violet-500', icon: Camera   },
+  engaged:           { label: 'Engaged',           color: 'bg-flare',   icon: Users    },
+  new_lead:          { label: 'New Lead',           color: 'bg-pos',  icon: Target   },
+  new_customer:      { label: 'New Customer',       color: 'bg-pos',icon: Handshake},
+  existing_customer: { label: 'Existing Customer',  color: 'bg-neu', icon: Users    },
+  merch:             { label: 'Merch Given',         color: 'bg-ember', icon: Gift     },
+  sample:            { label: 'Sample Given',        color: 'bg-ember', icon: Gift     },
+  prize:             { label: 'Prize Won',           color: 'bg-neu',   icon: Gift     },
+  photo:             { label: 'Photo Moment',        color: 'bg-neu', icon: Camera   },
 }
 
 function buildHourlyData(interactions: Interaction[]): { hour: string; count: number }[] {
@@ -94,12 +95,12 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {status === 'live' && (
-            <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-pos">
               <Radio className="h-4 w-4 animate-pulse" />
               Live
             </span>
           )}
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-muted-foreground bg-num">
             {interactions.length} interactions logged
           </span>
         </div>
@@ -145,7 +146,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
               <div className={`h-7 w-7 rounded-md ${meta.color} bg-opacity-15 flex items-center justify-center`}>
                 <Icon className={`h-4 w-4 ${meta.color.replace('bg-', 'text-')}`} />
               </div>
-              <p className="text-2xl font-semibold tabular-nums">{counts[type] ?? 0}</p>
+              <p className="text-2xl font-semibold bg-num">{counts[type] ?? 0}</p>
               <p className="text-xs text-muted-foreground">{meta.label}</p>
             </div>
           )
@@ -156,24 +157,26 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
       {hourlyData.length > 0 && (
         <div className="border rounded-xl p-5 bg-card space-y-3">
           <p className="text-sm font-medium">Interactions per hour</p>
-          <ResponsiveContainer width="100%" height={100}>
-            <BarChart data={hourlyData} margin={{ top: 0, right: 0, bottom: 0, left: -30 }}>
-              <XAxis dataKey="hour" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip
-                contentStyle={{
-                  background: '#14182B',
-                  border: '1px solid rgba(255,255,255,0.10)',
-                  borderRadius: 12,
-                  fontSize: 12,
-                  color: '#fff',
-                }}
-                labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
-                cursor={{ fill: 'currentColor', opacity: 0.05 }}
-              />
-              <Bar dataKey="count" fill="#2B59FF" radius={[4,4,0,0]} opacity={0.85} />
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartState rows={hourlyData} height={100} empty="Interactions appear here as ambassadors capture them.">
+                      <ResponsiveContainer width="100%" height={100}>
+              <BarChart data={hourlyData} margin={{ top: 0, right: 0, bottom: 0, left: -30 }}>
+                <XAxis dataKey="hour" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{
+                    background: 'var(--bg-ink)',
+                    border: 'var(--line)',
+                    borderRadius: 'var(--r-card)',
+                    fontSize: 12,
+                    color: 'var(--bg-card)',
+                  }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
+                  cursor={{ fill: 'currentColor', opacity: 0.05 }}
+                />
+                <Bar dataKey="count" fill="var(--flare)" radius={[4,4,0,0]} opacity={0.85} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartState>
         </div>
       )}
 
@@ -188,7 +191,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-medium truncate">{a.name}</p>
-                    <p className="text-sm tabular-nums shrink-0">{a.total}</p>
+                    <p className="text-sm bg-num shrink-0">{a.total}</p>
                   </div>
                   <p className="text-xs text-muted-foreground">{a.leads} leads</p>
                 </div>

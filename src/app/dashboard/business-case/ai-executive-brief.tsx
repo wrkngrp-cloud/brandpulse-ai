@@ -1,4 +1,5 @@
-import { AlertCircle, CheckCircle2, Briefcase } from 'lucide-react'
+import { CheckIcon as CheckCircle2, BriefcaseIcon as Briefcase } from '@/components/brand/icon'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { callAi } from '@/lib/ai/client'
 
 // SectionHead from business-case-client.tsx is a Client Component that
@@ -10,7 +11,7 @@ function SectionHead({ icon: Icon, children }: { icon: React.ElementType; childr
   return (
     <div className="flex items-center gap-2.5 mb-5">
       <Icon className="h-4.5 w-4.5 text-muted-foreground shrink-0" />
-      <h2 className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground">{children}</h2>
+      <h2 className="text-[12px] font-bold text-muted-foreground">{children}</h2>
       <div className="flex-1 h-px bg-border/60" />
     </div>
   )
@@ -128,7 +129,7 @@ export async function AiExecutiveBrief(props: Props) {
   if (!aiBusinessCase) {
     return (
       <div className="rounded-2xl border bg-muted/30 px-5 py-4 flex items-center gap-3 text-[13px] text-muted-foreground">
-        <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
+        <AlertCircle className="h-4 w-4 shrink-0 text-tx-2" />
         <span>AI executive brief could not be generated — your brand data is all here, but there was not enough historical data to produce a board-ready narrative yet. Try again once you have at least 4 weeks of campaign and sentiment data.</span>
       </div>
     )
@@ -144,18 +145,18 @@ export async function AiExecutiveBrief(props: Props) {
         <div className="p-5 space-y-4">
           <p className="text-[13.5px] leading-relaxed">{aiBusinessCase.case}</p>
           <div className="rounded-xl bg-muted/40 px-4 py-3">
-            <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground mb-1">ROI Argument</p>
+            <p className="text-[12px] font-bold text-muted-foreground mb-1">ROI Argument</p>
             <p className="text-[13px] leading-relaxed">{aiBusinessCase.roi_argument}</p>
           </div>
 
           {/* Proof points */}
           <div>
-            <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Proof Points</p>
+            <p className="text-[12px] font-bold text-muted-foreground mb-2">Proof Points</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {aiBusinessCase.proof_points.map((p, i) => (
-                <div key={i} className="rounded-lg bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 px-3 py-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 mb-1" />
-                  <p className="text-[12px] text-emerald-800 dark:text-emerald-300">{p}</p>
+                <div key={i} className="rounded-lg bg-shell/70 dark:bg-shell/20 border border-line dark:border-line px-3 py-2">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-pos mb-1" />
+                  <p className="text-[12px] text-pos dark:text-pos">{p}</p>
                 </div>
               ))}
             </div>
@@ -164,7 +165,7 @@ export async function AiExecutiveBrief(props: Props) {
           {/* Budget asks */}
           {aiBusinessCase.asks.length > 0 && (
             <div>
-              <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Budget Ask</p>
+              <p className="text-[12px] font-bold text-muted-foreground mb-2">Budget Ask</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {aiBusinessCase.asks.map((a, i) => (
                   <div key={i} className="rounded-xl border bg-muted/20 p-3">
@@ -179,11 +180,11 @@ export async function AiExecutiveBrief(props: Props) {
 
           {/* Risk if not approved */}
           <div className="border-t pt-4">
-            <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Risks if Budget is Not Approved</p>
+            <p className="text-[12px] font-bold text-muted-foreground mb-2">Risks if Budget is Not Approved</p>
             <ul className="space-y-1.5">
               {aiBusinessCase.risks.map((r, i) => (
                 <li key={i} className="flex items-start gap-2 text-[13px]">
-                  <AlertCircle className="h-3.5 w-3.5 text-red-500 shrink-0 mt-0.5" />
+                  <AlertCircle className="h-3.5 w-3.5 text-tx-flare shrink-0 mt-0.5" />
                   {r}
                 </li>
               ))}

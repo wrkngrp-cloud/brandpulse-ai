@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Check, Code2, ChevronDown } from 'lucide-react'
+import { CopyIcon as Copy, CheckIcon as Check, CodeIcon as Code2, ChevronDownIcon as ChevronDown } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
@@ -31,7 +31,7 @@ export function PixelCard() {
     <div className="rounded-2xl border bg-card overflow-hidden">
       <div className="flex items-center gap-3 px-5 py-4">
         <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shrink-0">
-          <Code2 className="h-4.5 w-4.5 text-white" />
+          <Code2 className="h-4.5 w-4.5 text-tx-inv" />
         </div>
         <div className="flex-1">
           <p className="text-[13.5px] font-semibold">BrandGauge Pixel & SDK</p>
@@ -39,7 +39,7 @@ export function PixelCard() {
         </div>
         <button
           onClick={() => setOpen(o => !o)}
-          className="flex items-center gap-1.5 text-[12px] font-medium text-primary hover:underline shrink-0"
+          className="flex items-center gap-1.5 text-[12px] font-medium text-primary hover:underline shrink-0 bg-press"
         >
           {open ? 'Collapse' : 'Setup'}
           <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} />
@@ -52,11 +52,11 @@ export function PixelCard() {
           {/* Web snippet */}
           <div>
             <p className="text-[12px] font-semibold mb-2">1. Add this snippet to your website {"<head>"}</p>
-            <div className="rounded-xl bg-zinc-950 text-zinc-100 p-4 text-[11.5px] font-mono leading-relaxed relative">
+            <div className="rounded-xl bg-ink text-tx-inv-2 p-4 text-[11.5px] bg-num leading-relaxed relative">
               <pre className="whitespace-pre-wrap break-all">{snippet}</pre>
               <button
                 onClick={() => copy(snippet, 'snippet')}
-                className="absolute top-3 right-3 flex items-center gap-1 text-[10px] bg-white/10 hover:bg-white/20 rounded px-2 py-1"
+                className="absolute top-3 right-3 flex items-center gap-1 text-[10px] bg-card/10 hover:bg-card/20 rounded px-2 py-1 bg-press"
               >
                 {copied === 'snippet' ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                 {copied === 'snippet' ? 'Copied' : 'Copy'}
@@ -67,7 +67,7 @@ export function PixelCard() {
           {/* Track events */}
           <div>
             <p className="text-[12px] font-semibold mb-2">2. Track custom events (optional)</p>
-            <div className="rounded-xl bg-zinc-950 text-zinc-100 p-4 text-[11.5px] font-mono leading-relaxed">
+            <div className="rounded-xl bg-ink text-tx-inv-2 p-4 text-[11.5px] bg-num leading-relaxed">
               <pre>{`// Track a purchase
 window.__bp.track('purchase', 4500, { product: 'Jara Combo' });
 
@@ -89,9 +89,9 @@ window.__bp.track('cta_click', 1, { label: 'Order Now' });`}</pre>
                 { label: 'Flutter', cmd: 'flutter pub add brandgauge_sdk' },
               ].map(({ label, cmd }) => (
                 <div key={label} className="rounded-lg bg-muted px-3 py-2 flex items-center gap-2">
-                  <code className="text-[11.5px] font-mono text-foreground">{cmd}</code>
-                  <button onClick={() => copy(cmd, label)} className="text-muted-foreground hover:text-foreground">
-                    {copied === label ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                  <code className="text-[11.5px] bg-num text-foreground">{cmd}</code>
+                  <button onClick={() => copy(cmd, label)} className="text-muted-foreground hover:text-foreground bg-press">
+                    {copied === label ? <Check className="h-3 w-3 text-pos" /> : <Copy className="h-3 w-3" />}
                   </button>
                 </div>
               ))}

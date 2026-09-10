@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Calculator } from 'lucide-react'
+import { CurrencyIcon as Calculator } from '@/components/brand/icon'
 
 interface ImpressionCalculatorProps {
   dailyTraffic:    number | null
@@ -149,7 +149,7 @@ function MetricTile({ label, value, note }: { label: string; value: string; note
   return (
     <div className="bg-muted/40 rounded-lg p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-base font-semibold mt-0.5 tabular-nums">{value}</p>
+      <p className="text-base font-semibold mt-0.5 bg-num">{value}</p>
       <p className="text-xs text-muted-foreground mt-0.5">{note}</p>
     </div>
   )

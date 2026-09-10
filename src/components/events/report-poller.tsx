@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Check, Loader2 } from 'lucide-react'
+import { CheckIcon as Check } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { Crescendo } from '@/components/brand/crescendo'
 
 const STEPS = [
   { label: 'Aggregating interactions',   threshold: 15  },
@@ -70,7 +72,7 @@ export function ReportPoller({ eventId }: { eventId: string }) {
           ? <div className="h-9 w-9 rounded-full bg-foreground/10 flex items-center justify-center shrink-0">
               <Check className="h-4 w-4 text-foreground" />
             </div>
-          : <Loader2 className="h-5 w-5 animate-spin text-muted-foreground shrink-0 mt-0.5" />
+          : <Loader2 className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
         }
         <div>
           <p className="text-sm font-medium">
@@ -88,14 +90,9 @@ export function ReportPoller({ eventId }: { eventId: string }) {
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>Progress</span>
-          <span>{Math.round(progress)}%</span>
+          <span className="bg-num">{Math.round(progress)}%</span>
         </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-foreground rounded-full transition-all duration-1000 ease-out"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+        <Crescendo value={progress} height={8} />
       </div>
 
       {/* Step list */}

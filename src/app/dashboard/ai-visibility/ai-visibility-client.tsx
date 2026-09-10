@@ -2,12 +2,15 @@
 
 import { useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { Bot, Loader2, RefreshCw, AlertCircle, CheckCircle2, XCircle, MinusCircle, Sparkles, Trophy } from 'lucide-react'
+import { LightbulbIcon as Bot, RefreshIcon as RefreshCw, CheckIcon as CheckCircle2, XCircleIcon as XCircle, MinusIcon as MinusCircle, StarIcon as Trophy } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AlertIcon as AlertCircle, AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { VisibilityScore, VisibilityCheck } from './page'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface Props {
   brandName: string
@@ -23,17 +26,19 @@ const PLATFORM_LABELS: Record<string, string> = {
   perplexity: 'Perplexity',
 }
 
+// These are data series, not logos. Only the brand's own overall reading
+// carries heat; the platforms it is compared across are neutral ink.
 const PLATFORM_COLORS: Record<string, string> = {
-  chatgpt:    '#10a37f',
-  gemini:     '#4285f4',
-  perplexity: '#5436da',
+  chatgpt:    'var(--chart-2)',
+  gemini:     'var(--chart-3)',
+  perplexity: 'var(--chart-4)',
 }
 
 function ScoreRing({ score, size = 80 }: { score: number; size?: number }) {
   const r = size * 0.38
   const circumference = 2 * Math.PI * r
   const filled = (score / 100) * circumference
-  const color = score >= 70 ? '#16a34a' : score >= 40 ? '#d97706' : '#dc2626'
+  const color = score >= 70 ? 'var(--pos)' : score >= 40 ? 'var(--ember)' : 'var(--flare)'
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -52,11 +57,11 @@ function ScoreRing({ score, size = 80 }: { score: number; size?: number }) {
 
 function PlatformScore({ platform, score }: { platform: string; score: number | null }) {
   const label = PLATFORM_LABELS[platform] ?? platform
-  const color = PLATFORM_COLORS[platform] ?? '#888'
+  const color = PLATFORM_COLORS[platform] ?? 'var(--tx-3)'
   return (
     <div className="border rounded-xl p-4 bg-card space-y-2">
       <div className="flex items-center gap-2">
-        <div className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
+        <div className="h-[11px] w-[5px] rounded-[var(--r-tick)]" style={{ backgroundColor: color }} />
         <p className="text-[12px] font-semibold text-muted-foreground">{label}</p>
       </div>
       {score === null ? (
@@ -70,20 +75,20 @@ function PlatformScore({ platform, score }: { platform: string; score: number | 
 
 function MentionIcon({ mentioned, tone }: { mentioned: boolean; tone: string | null }) {
   if (!mentioned) return <XCircle className="h-4 w-4 text-muted-foreground/40 shrink-0" />
-  if (tone === 'positive') return <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
-  if (tone === 'negative') return <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
-  return <MinusCircle className="h-4 w-4 text-amber-500 shrink-0" />
+  if (tone === 'positive') return <CheckCircle2 className="h-4 w-4 text-pos shrink-0" />
+  if (tone === 'negative') return <AlertCircle className="h-4 w-4 text-tx-flare shrink-0" />
+  return <MinusCircle className="h-4 w-4 text-tx-2 shrink-0" />
 }
 
 function toneBadge(tone: string | null) {
   if (!tone) return null
   const map = {
-    positive: 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400',
-    neutral:  'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
-    negative: 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400',
+    positive: 'bg-shell text-pos dark:bg-shell/40 dark:text-pos',
+    neutral:  'bg-shell text-tx-2 dark:bg-shell/40 dark:text-tx-2',
+    negative: 'bg-flare-wash text-tx-flare dark:bg-shell/40 dark:text-tx-flare',
   }
   return (
-    <span className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded-full capitalize', map[tone as keyof typeof map])}>
+    <span className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded-sm capitalize', map[tone as keyof typeof map])}>
       {tone}
     </span>
   )
@@ -131,24 +136,24 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
         </div>
         <Button onClick={runCheck} disabled={running || noKeys} size="sm" className="shrink-0">
           {running
-            ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Running...</>
+            ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Running...</>
             : <><RefreshCw className="h-3.5 w-3.5 mr-1.5" />Run check now</>}
         </Button>
       </div>
 
       {/* No API keys warning */}
       {noKeys && (
-        <div className="border border-amber-200 dark:border-amber-800 rounded-xl p-5 bg-amber-50 dark:bg-amber-950/20 space-y-3">
+        <div className="border border-line dark:border-line rounded-xl p-5 bg-shell dark:bg-shell/20 space-y-3">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-tx-2 dark:text-tx-2 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">No AI platform keys configured</p>
-              <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5 leading-relaxed">
+              <p className="text-sm font-semibold text-tx-2 dark:text-tx-2">No AI platform keys configured</p>
+              <p className="text-xs text-tx-2 dark:text-tx-2 mt-0.5 leading-relaxed">
                 Add at least one key to start tracking. All three are optional — BrandGauge will check whichever platforms are configured.
               </p>
             </div>
           </div>
-          <div className="font-mono text-xs bg-amber-100 dark:bg-amber-950/40 rounded-lg p-3 space-y-1 text-amber-900 dark:text-amber-300">
+          <div className="bg-num text-xs bg-shell dark:bg-shell/40 rounded-lg p-3 space-y-1 text-tx-2 dark:text-tx-2">
             <p>OPENAI_API_KEY=          ← ChatGPT (GPT-4o mini)</p>
             <p>GOOGLE_AI_API_KEY=       ← Gemini 2.0 Flash</p>
             <p>PERPLEXITY_API_KEY=      ← Perplexity Sonar</p>
@@ -162,7 +167,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
           {/* Overall score */}
           <div className="border rounded-2xl p-6 bg-card flex flex-col items-center justify-center gap-2 sm:col-span-1">
             <ScoreRing score={latest.visibility_score} size={80} />
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">AI Visibility Score</p>
+            <p className="text-[11px] font-semibold text-muted-foreground text-center">AI Visibility Score</p>
             <p className="text-[11px] text-muted-foreground">
               Week of {new Date(latest.week_of).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', timeZone: 'Africa/Lagos' })}
             </p>
@@ -189,7 +194,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
           </div>
           {!noKeys && (
             <Button onClick={runCheck} disabled={running}>
-              {running ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Running...</> : 'Run first check'}
+              {running ? <><Loader2 className="h-4 w-4 mr-2" />Running...</> : 'Run first check'}
             </Button>
           )}
         </div>
@@ -198,25 +203,27 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
       {/* Trend chart */}
       {chartData.length > 1 && (
         <div className="border rounded-2xl p-5 bg-card space-y-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">12-week trend</p>
-          <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border/40" />
-              <XAxis dataKey="week" tick={{ fontSize: 11 }} tickLine={false} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickLine={false} />
-              <Tooltip
-                contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid hsl(var(--border))' }}
-                formatter={(value, name) => [
-                  String(value ?? 0) + '/100',
-                  PLATFORM_LABELS[String(name)] ?? String(name),
-                ]}
-              />
-              <Line type="monotone" dataKey="score"      stroke="#6366f1" strokeWidth={2.5} dot={false} name="Overall" />
-              <Line type="monotone" dataKey="chatgpt"    stroke={PLATFORM_COLORS.chatgpt}    strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="chatgpt" />
-              <Line type="monotone" dataKey="gemini"     stroke={PLATFORM_COLORS.gemini}     strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="gemini" />
-              <Line type="monotone" dataKey="perplexity" stroke={PLATFORM_COLORS.perplexity} strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="perplexity" />
-            </LineChart>
-          </ResponsiveContainer>
+          <p className="text-[11px] font-bold text-muted-foreground">12-week trend</p>
+          <ChartState rows={chartData} loading={running && chartData.length === 0} height={180} empty="Run a visibility check to see how AI assistants describe your brand.">
+                      <ResponsiveContainer width="100%" height={180}>
+              <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border/40" />
+                <XAxis dataKey="week" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} tickLine={false} />
+                <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)', border: '1px solid hsl(var(--border))' }}
+                  formatter={(value, name) => [
+                    String(value ?? 0) + '/100',
+                    PLATFORM_LABELS[String(name)] ?? String(name),
+                  ]}
+                />
+                <Line type="monotone" dataKey="score"      stroke="var(--chart-1)" strokeWidth={2.5} dot={false} name="Overall" />
+                <Line type="monotone" dataKey="chatgpt"    stroke={PLATFORM_COLORS.chatgpt}    strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="chatgpt" />
+                <Line type="monotone" dataKey="gemini"     stroke={PLATFORM_COLORS.gemini}     strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="gemini" />
+                <Line type="monotone" dataKey="perplexity" stroke={PLATFORM_COLORS.perplexity} strokeWidth={1.5} dot={false} strokeDasharray="4 2" name="perplexity" />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartState>
         </div>
       )}
 
@@ -235,7 +242,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
       {latest?.top_competitors && latest.top_competitors.length > 0 && (
         <div className="border rounded-2xl p-5 bg-card space-y-3">
           <div className="flex items-center gap-2">
-            <Trophy className="h-4 w-4 text-amber-500" />
+            <Trophy className="h-4 w-4 text-tx-2" />
             <p className="text-sm font-semibold">Competitors surfaced by AI assistants</p>
             <p className="text-[11px] text-muted-foreground ml-auto">This week</p>
           </div>
@@ -250,7 +257,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
       {/* Check log */}
       {checks.length > 0 && (
         <section>
-          <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">
+          <h2 className="text-[11px] font-bold text-muted-foreground mb-3">
             Question-by-question breakdown
           </h2>
           <div className="border rounded-2xl bg-card overflow-hidden divide-y">
@@ -260,8 +267,8 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white shrink-0"
-                      style={{ backgroundColor: PLATFORM_COLORS[c.platform] ?? '#888' }}
+                      className="text-[10px] font-bold px-2 py-0.5 rounded-sm text-tx-inv shrink-0"
+                      style={{ backgroundColor: PLATFORM_COLORS[c.platform] ?? 'var(--tx-3)' }}
                     >
                       {PLATFORM_LABELS[c.platform] ?? c.platform}
                     </span>

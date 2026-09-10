@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Zap, X, ChevronDown, Send, Loader2, AlertTriangle, Copy, Check, ImagePlus, Video, XCircle } from 'lucide-react'
+import { AskIcon as Zap, XIcon as X, ChevronDownIcon as ChevronDown, SendIcon as Send, CopyIcon as Copy, CheckIcon as Check, ExportIcon as ImagePlus, CameraIcon as Video, XCircleIcon as XCircle } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -12,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { Crescendo } from '@/components/brand/crescendo'
 
 type SupportedMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
 
@@ -55,21 +58,9 @@ const PLATFORMS   = ['Instagram', 'X (Twitter)', 'LinkedIn', 'WhatsApp', 'TikTok
 const FUNNEL_STAGES = ['Awareness', 'Consideration', 'Conversion', 'Loyalty', 'Re-engagement']
 
 function scoreColor(score: number): string {
-  if (score >= 75) return 'text-green-600'
-  if (score >= 50) return 'text-amber-600'
-  return 'text-red-500'
-}
-
-function scoreBarColor(score: number): string {
-  if (score >= 75) return 'bg-green-500'
-  if (score >= 50) return 'bg-amber-400'
-  return 'bg-red-400'
-}
-
-function riskBarColor(score: number): string {
-  if (score <= 20) return 'bg-green-500'
-  if (score <= 50) return 'bg-amber-400'
-  return 'bg-red-400'
+  if (score >= 75) return 'text-pos'
+  if (score >= 50) return 'text-tx-2'
+  return 'text-tx-flare'
 }
 
 function ScoreCard({ label, dim, isRisk = false }: {
@@ -92,17 +83,12 @@ function ScoreCard({ label, dim, isRisk = false }: {
       >
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-medium text-foreground">{label}</span>
-          <span className={cn('text-xs font-semibold tabular-nums', isRisk ? (score <= 20 ? 'text-green-600' : score <= 50 ? 'text-amber-600' : 'text-red-500') : scoreColor(score))}>
+          <span className={cn('text-xs font-semibold bg-num', isRisk ? (score <= 20 ? 'text-pos' : score <= 50 ? 'text-tx-2' : 'text-tx-flare') : scoreColor(score))}>
             {score}
             <span className="text-muted-foreground font-normal">/100</span>
           </span>
         </div>
-        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-          <div
-            className={cn('h-full rounded-full transition-all duration-500', isRisk ? riskBarColor(score) : scoreBarColor(score))}
-            style={{ width: `${score}%` }}
-          />
-        </div>
+        <Crescendo value={score} height={6} />
       </button>
       {open && reasoning && (
         <p className="text-[11px] text-muted-foreground leading-relaxed pt-1 pl-0.5">{reasoning}</p>
@@ -279,7 +265,7 @@ export function PrePostWidget() {
   const trigger = (
     <button
       onClick={() => { setOpen(true); setMinimised(false) }}
-      className="h-12 w-12 rounded-full bg-foreground text-background shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center"
+      className="h-12 w-12 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center border border-line bg-press"
       title="Pre-Post Analysis (⌘⇧P)"
     >
       <Zap className="h-5 w-5" />
@@ -295,7 +281,7 @@ export function PrePostWidget() {
       {minimised ? (
         <button
           onClick={() => setMinimised(false)}
-          className="flex items-center gap-2 bg-foreground text-background text-xs font-medium px-4 py-2 rounded-full shadow-lg hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 bg-foreground text-background text-xs font-medium px-4 py-2 rounded-sm hover:opacity-90 transition-opacity border border-line bg-press"
         >
           <Zap className="h-3.5 w-3.5" />
           Pre-Post
@@ -303,7 +289,7 @@ export function PrePostWidget() {
       ) : (
         <div
           className={cn(
-            'w-[92vw] sm:w-[480px] bg-background border rounded-2xl shadow-2xl flex flex-col',
+            'w-[92vw] sm:w-[480px] bg-background border rounded-2xl flex flex-col',
             'max-h-[80vh] overflow-hidden'
           )}
         >
@@ -315,10 +301,10 @@ export function PrePostWidget() {
               <kbd className="hidden sm:inline-flex items-center text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">⌘⇧P</kbd>
             </div>
             <div className="flex items-center gap-1">
-              <button onClick={() => setMinimised(true)} className="p-1 hover:bg-muted rounded transition-colors" title="Minimise">
+              <button onClick={() => setMinimised(true)} className="p-1 hover:bg-muted rounded transition-colors bg-press" title="Minimise">
                 <ChevronDown className="h-4 w-4" />
               </button>
-              <button onClick={() => { setOpen(false); reset() }} className="p-1 hover:bg-muted rounded transition-colors" title="Close">
+              <button onClick={() => { setOpen(false); reset() }} className="p-1 hover:bg-muted rounded transition-colors bg-press" title="Close">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -348,45 +334,45 @@ export function PrePostWidget() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={image.previewUrl} alt="Visual to analyse" className="w-full max-h-48 object-cover" />
                     <div className="absolute top-2 right-2 flex items-center gap-1.5">
-                      <span className="text-[10px] bg-background/80 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-full border font-mono">
+                      <span className="text-[10px] bg-background/80 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-sm border bg-num">
                         {image.isVideo ? 'VIDEO' : image.mediaType.split('/')[1].toUpperCase()} · {image.sizeKb}KB
                       </span>
                       <button
                         onClick={() => { setImage(null); setImageError(null) }}
-                        className="bg-background/80 backdrop-blur-sm rounded-full p-0.5 hover:bg-red-50 transition-colors"
+                        className="bg-background/80 backdrop-blur-sm rounded-sm p-0.5 hover:bg-flare-wash transition-colors bg-press"
                         title="Remove"
                       >
-                        <XCircle className="h-4 w-4 text-red-500" />
+                        <XCircle className="h-4 w-4 text-tx-flare" />
                       </button>
                     </div>
                     <div className="absolute bottom-2 left-2">
-                      <span className="text-[10px] bg-foreground text-background px-2 py-0.5 rounded-full font-medium">Visual attached</span>
+                      <span className="text-[10px] bg-foreground text-background px-2 py-0.5 rounded-sm font-medium">Visual attached</span>
                     </div>
                   </div>
                 ) : extracting ? (
                   <div className="w-full flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4" />
                     Extracting video frame...
                   </div>
                 ) : (
                   <div className="flex gap-2">
                     <button
                       onClick={() => imageInputRef.current?.click()}
-                      className="flex-1 flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
                     >
                       <ImagePlus className="h-4 w-4" />
                       Add image
                     </button>
                     <button
                       onClick={() => videoInputRef.current?.click()}
-                      className="flex-1 flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 border border-dashed rounded-xl py-3 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
                     >
                       <Video className="h-4 w-4" />
                       Add video
                     </button>
                   </div>
                 )}
-                {imageError && <p className="text-xs text-red-500">{imageError}</p>}
+                {imageError && <p className="text-xs text-tx-flare">{imageError}</p>}
 
                 <Textarea
                   value={content}
@@ -413,7 +399,7 @@ export function PrePostWidget() {
                   </Select>
                 </div>
                 {error && (
-                  <p className="text-xs text-red-500">{error}</p>
+                  <p className="text-xs text-tx-flare">{error}</p>
                 )}
                 <Button
                   className="w-full"
@@ -422,7 +408,7 @@ export function PrePostWidget() {
                   disabled={(!content.trim() && !image) || !platform || !funnel || loading}
                 >
                   {loading
-                    ? <><Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> Analysing...</>
+                    ? <><Loader2 className="h-3.5 w-3.5 mr-2" /> Analysing...</>
                     : <><Send className="h-3.5 w-3.5 mr-2" /> {image ? (image.isVideo ? 'Analyse video + copy' : 'Analyse image + copy') : 'Analyse content'}</>
                   }
                 </Button>
@@ -443,7 +429,7 @@ export function PrePostWidget() {
 
                 {/* Score cards */}
                 <div className="space-y-3">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Scores — tap any bar to see reasoning</p>
+                  <p className="text-xs font-medium text-muted-foreground">Scores — tap any bar to see reasoning</p>
                   <ScoreCard label="Predicted Engagement" dim={result.engagement} />
                   <ScoreCard label="Cultural Resonance"   dim={result.cultural} />
                   <ScoreCard label="Tone Match"           dim={result.tone} />
@@ -454,22 +440,22 @@ export function PrePostWidget() {
                 {/* Risk flags */}
                 {result.risk.flags?.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                      <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                    <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5 text-tx-2" />
                       Cultural Risk Flags
                     </p>
                     {result.risk.flags.map((f, i) => (
-                      <div key={i} className="rounded-xl border border-amber-200 bg-amber-50 p-3 space-y-1.5 text-sm">
-                        <p className="font-semibold text-amber-800 text-xs">{f.title}</p>
+                      <div key={i} className="rounded-xl border border-line bg-shell p-3 space-y-1.5 text-sm">
+                        <p className="font-semibold text-tx-2 text-xs">{f.title}</p>
                         {f.offending_text && (
-                          <p className="text-amber-700 text-xs">
+                          <p className="text-tx-2 text-xs">
                             <span className="font-medium">Flagged: </span>
-                            <span className="italic">"{f.offending_text}"</span>
+                            <span className="">"{f.offending_text}"</span>
                           </p>
                         )}
-                        <p className="text-amber-700 text-xs">{f.reason}</p>
+                        <p className="text-tx-2 text-xs">{f.reason}</p>
                         {f.replacement && (
-                          <p className="text-amber-700 text-xs">
+                          <p className="text-tx-2 text-xs">
                             <span className="font-medium">Suggestion: </span>{f.replacement}
                           </p>
                         )}
@@ -481,7 +467,7 @@ export function PrePostWidget() {
                 {/* Improvements */}
                 {result.improvements?.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Improvements</p>
+                    <p className="text-xs font-medium text-muted-foreground">Improvements</p>
                     <ul className="space-y-1.5">
                       {result.improvements.map((imp, i) => (
                         <li key={i} className="flex gap-2 text-sm">
@@ -497,13 +483,13 @@ export function PrePostWidget() {
                 {result.suggested_rewrite && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Suggested Rewrite</p>
+                      <p className="text-xs font-medium text-muted-foreground">Suggested Rewrite</p>
                       <button
                         onClick={copyRewrite}
-                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                       >
                         {copiedRewrite
-                          ? <><Check className="h-3 w-3 text-green-600" /> Copied</>
+                          ? <><Check className="h-3 w-3 text-pos" /> Copied</>
                           : <><Copy className="h-3 w-3" /> Copy</>
                         }
                       </button>
@@ -528,7 +514,7 @@ export function PrePostWidget() {
       {minimised && (
         <button
           onClick={() => { setOpen(true); setMinimised(false) }}
-          className="h-12 w-12 rounded-full bg-foreground text-background shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center"
+          className="h-12 w-12 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center border border-line bg-press"
           title="Pre-Post Analysis"
         >
           <Zap className="h-5 w-5" />

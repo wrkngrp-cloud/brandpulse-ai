@@ -2,7 +2,8 @@
 
 import { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { CheckCircle2, Loader2, ChevronLeft } from 'lucide-react'
+import { CheckIcon as CheckCircle2, ChevronLeftIcon as ChevronLeft } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 
 export interface SurveyQuestion {
   id:       string
@@ -65,7 +66,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
   if (done) {
     return (
       <div className="w-full max-w-md text-center space-y-4 py-16">
-        <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto" />
+        <CheckCircle2 className="h-12 w-12 text-pos mx-auto" />
         <h2 className="text-xl font-semibold">Thank you!</h2>
         <p className="text-muted-foreground text-sm">
           Your feedback helps {brandName} improve.
@@ -77,7 +78,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
   return (
     <div className="w-full max-w-md space-y-8 px-4 sm:px-0">
       {/* Brand */}
-      <p className="text-center text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+      <p className="text-center text-xs font-semibold text-muted-foreground">
         {brandName}
       </p>
 
@@ -87,7 +88,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
           <div
             key={i}
             className={cn(
-              'h-1 flex-1 rounded-full transition-colors duration-300',
+              'h-1 flex-1 rounded-sm transition-colors duration-300',
               i < step  ? 'bg-foreground'
             : i === step ? 'bg-foreground/60'
             : 'bg-muted'
@@ -97,7 +98,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
       </div>
 
       {/* Step counter */}
-      <p className="text-xs text-muted-foreground text-right -mt-4">
+      <p className="text-xs text-muted-foreground text-right -mt-4 bg-num">
         {step + 1} / {questions.length}
       </p>
 
@@ -114,7 +115,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
                 onClick={() => selectChoice(question.id, option)}
                 disabled={submitting}
                 className={cn(
-                  'w-full text-left px-4 py-3.5 rounded-xl border text-sm transition-all active:scale-[0.98]',
+                  'w-full text-left px-4 py-3.5 rounded-xl border text-sm transition-colors active:scale-[0.98]',
                   answers[question.id] === option
                     ? 'border-foreground bg-foreground text-background'
                     : 'border-border bg-background hover:bg-muted hover:border-foreground/30'
@@ -135,7 +136,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
                   key={i}
                   onClick={() => setAnswers(a => ({ ...a, [question.id]: i }))}
                   className={cn(
-                    'w-10 h-10 rounded-lg text-sm font-semibold border transition-all active:scale-95',
+                    'w-10 h-10 rounded-lg text-sm font-semibold border transition-colors active:scale-95',
                     answers[question.id] === i
                       ? 'border-foreground bg-foreground text-background'
                       : 'border-border bg-background hover:bg-muted hover:border-foreground/30'
@@ -164,7 +165,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
                   key={val}
                   onClick={() => setAnswers(a => ({ ...a, [question.id]: val }))}
                   className={cn(
-                    'flex-1 py-3.5 rounded-xl border text-sm font-semibold transition-all active:scale-95',
+                    'flex-1 py-3.5 rounded-xl border text-sm font-semibold transition-colors active:scale-95',
                     answers[question.id] === val
                       ? 'border-foreground bg-foreground text-background'
                       : 'border-border bg-background hover:bg-muted hover:border-foreground/30'
@@ -200,7 +201,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
           <button
             onClick={() => setStep(s => s - 1)}
             disabled={submitting}
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40 bg-press"
           >
             <ChevronLeft className="h-4 w-4" />
             Back
@@ -213,13 +214,13 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
             onClick={handleNext}
             disabled={(question.required && !hasAnswer) || submitting}
             className={cn(
-              'ml-auto px-6 py-3 rounded-xl text-sm font-semibold transition-all active:scale-95',
+              'ml-auto px-6 py-3 rounded-xl text-sm font-semibold transition-colors active:scale-95',
               'bg-foreground text-background',
               'disabled:opacity-40 disabled:cursor-not-allowed'
             )}
           >
             {submitting
-              ? <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+              ? <Loader2 className="h-4 w-4 mx-auto" />
               : isLast ? 'Submit' : 'Next'}
           </button>
         )}
@@ -228,7 +229,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
         {!needsExplicit && !question.required && (
           <button
             onClick={() => advance(answers)}
-            className="ml-auto text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+            className="ml-auto text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors bg-press"
           >
             Skip
           </button>

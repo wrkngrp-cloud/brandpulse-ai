@@ -1,6 +1,7 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
+import { TOKENS } from '@/lib/brand-tokens'
 
 const resend  = new Resend(process.env.RESEND_API_KEY)
 const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
@@ -83,10 +84,10 @@ export const panelDispatch = inngest.createFunction(
             from:    `${brandName} <surveys@brandgauge.app>`,
             to:      batch,
             subject: `${brandName} — ${panel.name} (${new Date().toLocaleDateString('en-NG', { month: 'long', timeZone: 'Africa/Lagos' })})`,
-            html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a;">
+            html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:${TOKENS.tx};">
               <p style="font-size:15px;line-height:1.6;">${brandName} is running its ${panel.cadence} tracking survey. It takes less than 2 minutes.</p>
-              <p style="margin:28px 0;"><a href="${surveyUrl}" style="display:inline-block;background:#1a1a1a;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;">Take the survey</a></p>
-              <p style="font-size:13px;color:#aaa;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">Powered by BrandGauge</p>
+              <p style="margin:28px 0;"><a href="${surveyUrl}" style="display:inline-block;background:${TOKENS.tx};color:${TOKENS.paper};text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;">Take the survey</a></p>
+              <p style="font-size:13px;color:${TOKENS.tx3};margin-top:32px;border-top:1px solid ${TOKENS.shell};padding-top:16px;">Powered by BrandGauge</p>
             </div>`,
           })
         }

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Sparkles, RefreshCw }      from 'lucide-react'
+import { RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { toast }                    from 'sonner'
 import { Button }                   from '@/components/ui/button'
 
@@ -45,7 +46,7 @@ export function CampaignAiSummary({ campaignId, initialSummary }: CampaignAiSumm
           onClick={analyse}
           disabled={pending}
         >
-          <RefreshCw className={`h-3 w-3 ${pending ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-3 w-3 ${pending ? '' : ''}`} />
           {pending ? 'Analysing…' : summary ? 'Re-analyse' : 'Analyse campaign'}
         </Button>
       </div>

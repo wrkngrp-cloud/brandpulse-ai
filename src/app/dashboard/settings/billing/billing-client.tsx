@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2, Check, ExternalLink, Zap } from 'lucide-react'
+import { CheckIcon as Check, ExternalLinkIcon as ExternalLink, AskIcon as Zap } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface PlanLimits {
   brand_count:  number
@@ -38,17 +40,14 @@ function fmtLimit(n: number) {
 
 function UsageBar({ used, limit, label }: { used: number; limit: number; label: string }) {
   const pct = limit === -1 ? 0 : Math.min(100, (used / limit) * 100)
-  const color = pct > 90 ? 'bg-red-500' : pct > 70 ? 'bg-amber-500' : 'bg-green-500'
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-[12px]">
         <span className="text-muted-foreground">{label}</span>
-        <span className="font-medium">{used.toLocaleString()} / {fmtLimit(limit)}</span>
+        <span className="font-medium bg-num">{used.toLocaleString()} / {fmtLimit(limit)}</span>
       </div>
       {limit !== -1 && (
-        <div className="h-1.5 rounded-full bg-muted/60 overflow-hidden">
-          <div className={cn('h-full rounded-full transition-all', color)} style={{ width: `${pct}%` }} />
-        </div>
+        <Crescendo value={pct} height={6} />
       )}
     </div>
   )
@@ -93,9 +92,9 @@ export function BillingClient({
     }
   }
 
-  const statusColor = subscriptionStatus === 'active' ? 'text-green-600'
-    : subscriptionStatus === 'trialing' ? 'text-blue-600'
-    : subscriptionStatus === 'past_due' ? 'text-red-600'
+  const statusColor = subscriptionStatus === 'active' ? 'text-pos'
+    : subscriptionStatus === 'trialing' ? 'text-tx-flare'
+    : subscriptionStatus === 'past_due' ? 'text-tx-flare'
     : 'text-muted-foreground'
 
   return (
@@ -110,12 +109,12 @@ export function BillingClient({
       <div className="rounded-2xl border bg-card p-5 space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[12px] text-muted-foreground uppercase tracking-wider font-semibold mb-1">Current plan</p>
+            <p className="text-[12px] text-muted-foreground font-semibold mb-1">Current plan</p>
             <p className="text-2xl font-bold capitalize">{planDisplay[currentPlan]?.name ?? currentPlan}</p>
             <p className={cn('text-[12.5px] font-medium mt-0.5 capitalize', statusColor)}>{subscriptionStatus}</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold">{fmtNGN(planDisplay[currentPlan]?.priceNGN ?? 0)}</p>
+            <p className="text-2xl font-bold bg-num">{fmtNGN(planDisplay[currentPlan]?.priceNGN ?? 0)}</p>
             {trialEndsAt && subscriptionStatus === 'trialing' && (
               <p className="text-[12px] text-muted-foreground">Trial ends {new Date(trialEndsAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', timeZone: 'Africa/Lagos' })}</p>
             )}
@@ -135,7 +134,7 @@ export function BillingClient({
 
         {currentPlan !== 'starter' && (
           <Button variant="outline" size="sm" onClick={openPortal} disabled={portalPending}>
-            {portalPending ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5 mr-1.5" />}
+            {portalPending ? <Loader2 className="h-3.5 w-3.5 mr-1.5" /> : <ExternalLink className="h-3.5 w-3.5 mr-1.5" />}
             Manage subscription
           </Button>
         )}
@@ -150,7 +149,7 @@ export function BillingClient({
             const isCurrent = plan === currentPlan
             return (
               <div key={plan} className={cn(
-                'rounded-2xl border p-5 space-y-3 transition-all',
+                'rounded-2xl border p-5 space-y-3 transition-colors',
                 isCurrent ? 'border-foreground bg-card' : 'border-border bg-card hover:border-border/80'
               )}>
                 <div className="flex items-start justify-between">
@@ -160,7 +159,7 @@ export function BillingClient({
                   </div>
                   {isCurrent && <Badge variant="secondary" className="text-[11px]">Current</Badge>}
                 </div>
-                <p className="text-xl font-bold">{fmtNGN(display?.priceNGN ?? 0)}</p>
+                <p className="text-xl font-bold bg-num">{fmtNGN(display?.priceNGN ?? 0)}</p>
                 {!isCurrent ? (
                   PLAN_ORDER.indexOf(plan) > PLAN_ORDER.indexOf(currentPlan) ? (
                     <Button
@@ -169,7 +168,7 @@ export function BillingClient({
                       disabled={!!upgrading}
                     >
                       {upgrading === plan
-                        ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Redirecting...</>
+                        ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Redirecting...</>
                         : <><Zap className="h-3.5 w-3.5 mr-1.5" />Upgrade to {display?.name}</>}
                     </Button>
                   ) : (
@@ -179,7 +178,7 @@ export function BillingClient({
                   )
                 ) : (
                   <div className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
-                    <Check className="h-3.5 w-3.5 text-green-500" />Your current plan
+                    <Check className="h-3.5 w-3.5 text-pos" />Your current plan
                   </div>
                 )}
               </div>

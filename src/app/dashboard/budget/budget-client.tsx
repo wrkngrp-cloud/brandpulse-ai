@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  DollarSign, Plus, RefreshCw, Loader2, X,
-  ChevronDown, ChevronRight, TrendingUp, AlertCircle,
-  CheckCircle,
-} from 'lucide-react'
+import { CurrencyIcon as DollarSign, PlusIcon as Plus, RefreshIcon as RefreshCw, XIcon as X, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight, CheckIcon as CheckCircle } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -37,14 +35,14 @@ interface BudgetPlan {
 }
 
 const CHANNEL_COLOR: Record<string, string> = {
-  digital:    'bg-blue-100 text-blue-800',
-  tv:         'bg-purple-100 text-purple-800',
-  radio:      'bg-green-100 text-green-800',
-  ooh:        'bg-orange-100 text-orange-800',
-  influencer: 'bg-pink-100 text-pink-800',
-  events:     'bg-yellow-100 text-yellow-800',
-  print:      'bg-gray-100 text-gray-800',
-  other:      'bg-slate-100 text-slate-800',
+  digital:    'bg-flare-wash text-tx-flare',
+  tv:         'bg-shell text-tx-2',
+  radio:      'bg-shell text-pos',
+  ooh:        'bg-shell text-tx-2',
+  influencer: 'bg-shell text-tx-2',
+  events:     'bg-shell text-tx-2',
+  print:      'bg-shell text-tx',
+  other:      'bg-shell text-tx',
 }
 
 export function BudgetClient() {
@@ -78,7 +76,7 @@ export function BudgetClient() {
         <div className="flex gap-2">
           <TourTrigger module="budget" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
           <Button size="sm" onClick={() => setShowNewPlan(true)}>
@@ -112,7 +110,7 @@ export function BudgetClient() {
 
       {loading && plans.length === 0 && (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loader2 className="h-6 w-6 text-muted-foreground" />
         </div>
       )}
 
@@ -132,7 +130,7 @@ export function BudgetClient() {
             {/* Plan header */}
             <button
               onClick={() => setExpandedId(expandedId === plan.id ? null : plan.id)}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/20 text-left"
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/20 text-left bg-press"
             >
               {expandedId === plan.id ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
               <div className="flex-1 min-w-0">
@@ -148,7 +146,7 @@ export function BudgetClient() {
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <p className="font-semibold">{formatNGN(plan.total_budget)}</p>
+                <p className="font-semibold bg-num">{formatNGN(plan.total_budget)}</p>
                 <p className="text-xs text-muted-foreground">
                   {formatNGN(plan.line_items?.reduce((s, li) => s + li.actual_amount, 0) ?? 0)} spent
                 </p>
@@ -185,26 +183,26 @@ export function BudgetClient() {
                                 </span>
                               </td>
                               <td className="px-3 py-2 font-medium">{li.label}</td>
-                              <td className="px-3 py-2">{formatNGN(li.planned_amount)}</td>
-                              <td className="px-3 py-2">{formatNGN(li.actual_amount)}</td>
-                              <td className={cn('px-3 py-2 font-medium', isOver ? 'text-red-600' : variance < 0 ? 'text-green-600' : 'text-muted-foreground')}>
+                              <td className="px-3 py-2 bg-num">{formatNGN(li.planned_amount)}</td>
+                              <td className="px-3 py-2 bg-num">{formatNGN(li.actual_amount)}</td>
+                              <td className={cn('px-3 py-2 font-medium bg-num', isOver ? 'text-tx-flare' : variance < 0 ? 'text-pos' : 'text-muted-foreground')}>
                                 {variance !== 0 ? (isOver ? '+' : '') + formatNGN(variance) : '—'}
                               </td>
                               <td className="px-3 py-2 w-28">
                                 <div className="flex items-center gap-1.5">
-                                  <div className="flex-1 bg-muted rounded-full h-1.5">
+                                  <div className="flex-1 bg-muted rounded-sm h-1.5">
                                     <div
-                                      className={cn('h-1.5 rounded-full', pacingPct > 110 ? 'bg-red-500' : pacingPct > 90 ? 'bg-yellow-500' : 'bg-green-500')}
+                                      className={cn('h-1.5 rounded-sm', pacingPct > 110 ? 'bg-flare' : pacingPct > 90 ? 'bg-ember' : 'bg-pos')}
                                       style={{ width: `${Math.min(100, pacingPct)}%` }}
                                     />
                                   </div>
-                                  <span className="text-xs text-muted-foreground w-8 shrink-0">{Math.round(pacingPct)}%</span>
+                                  <span className="text-xs text-muted-foreground w-8 shrink-0 bg-num">{Math.round(pacingPct)}%</span>
                                 </div>
                               </td>
                               <td className="px-3 py-2">
                                 <button
                                   onClick={() => setAddActualFor(addActualFor === li.id ? null : li.id)}
-                                  className="text-xs text-primary hover:underline"
+                                  className="text-xs text-primary hover:underline bg-press"
                                 >
                                   + Actual
                                 </button>
@@ -281,17 +279,17 @@ function ActivePlanSummary({ plan }: { plan: BudgetPlan }) {
         <span className="font-semibold text-sm">Active plan: {plan.name}</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <div><p className="text-xs text-muted-foreground">Total budget</p><p className="font-bold">{formatNGN(plan.total_budget)}</p></div>
-        <div><p className="text-xs text-muted-foreground">Spent</p><p className="font-bold">{formatNGN(totalActual)}</p></div>
-        <div><p className="text-xs text-muted-foreground">Remaining</p><p className="font-bold">{formatNGN(remaining)}</p></div>
+        <div><p className="text-xs text-muted-foreground">Total budget</p><p className="font-bold bg-num">{formatNGN(plan.total_budget)}</p></div>
+        <div><p className="text-xs text-muted-foreground">Spent</p><p className="font-bold bg-num">{formatNGN(totalActual)}</p></div>
+        <div><p className="text-xs text-muted-foreground">Remaining</p><p className="font-bold bg-num">{formatNGN(remaining)}</p></div>
         <div>
           <p className="text-xs text-muted-foreground">Pace</p>
           <div className="flex items-center gap-1">
             {Math.abs(paceGap) < 5
-              ? <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+              ? <CheckCircle className="h-3.5 w-3.5 text-pos" />
               : paceGap > 5
-                ? <AlertCircle className="h-3.5 w-3.5 text-orange-500" />
-                : <AlertCircle className="h-3.5 w-3.5 text-blue-500" />}
+                ? <AlertCircle className="h-3.5 w-3.5 text-tx-2" />
+                : <AlertCircle className="h-3.5 w-3.5 text-tx-2" />}
             <span className="text-sm font-bold">
               {Math.abs(paceGap) < 5 ? 'On track' : paceGap > 5 ? 'Ahead' : 'Behind'}
             </span>
@@ -300,11 +298,11 @@ function ActivePlanSummary({ plan }: { plan: BudgetPlan }) {
       </div>
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Spend ({Math.round(pacingPct)}%)</span>
-          <span>Time ({Math.round(timePct)}%)</span>
+          <span className="bg-num">Spend ({Math.round(pacingPct)}%)</span>
+          <span className="bg-num">Time ({Math.round(timePct)}%)</span>
         </div>
-        <div className="relative bg-muted rounded-full h-2">
-          <div className="absolute h-2 rounded-full bg-primary" style={{ width: `${Math.min(100, pacingPct)}%` }} />
+        <div className="relative bg-muted rounded-sm h-2">
+          <div className="absolute h-2 rounded-sm bg-primary" style={{ width: `${Math.min(100, pacingPct)}%` }} />
           <div className="absolute h-2 w-0.5 bg-foreground/30" style={{ left: `${Math.min(100, timePct)}%` }} />
         </div>
       </div>
@@ -329,14 +327,14 @@ function SpendProgress({ plan }: { plan: BudgetPlan }) {
             <span className={cn('px-1.5 py-0.5 rounded text-[11px] font-medium capitalize w-20 text-center shrink-0', CHANNEL_COLOR[ch] ?? 'bg-muted')}>
               {ch}
             </span>
-            <div className="flex-1 bg-muted rounded-full h-2">
+            <div className="flex-1 bg-muted rounded-sm h-2">
               <div
-                className={cn('h-2 rounded-full', pct > 110 ? 'bg-red-500' : pct > 90 ? 'bg-yellow-500' : 'bg-primary')}
+                className={cn('h-2 rounded-sm', pct > 110 ? 'bg-flare' : pct > 90 ? 'bg-ember' : 'bg-primary')}
                 style={{ width: `${pct}%` }}
               />
             </div>
-            <span className="text-xs text-muted-foreground w-10 text-right">{Math.round(pct)}%</span>
-            <span className="text-xs font-medium w-24 text-right">{formatNGN(actual)}</span>
+            <span className="text-xs text-muted-foreground w-10 text-right bg-num">{Math.round(pct)}%</span>
+            <span className="text-xs font-medium w-24 text-right bg-num">{formatNGN(actual)}</span>
           </div>
         )
       })}
@@ -362,7 +360,7 @@ function NewPlanForm({ onSave, onCancel }: { onSave: (d: Record<string, unknown>
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">New budget plan</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -384,7 +382,7 @@ function NewPlanForm({ onSave, onCancel }: { onSave: (d: Record<string, unknown>
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Create plan
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -429,7 +427,7 @@ function AddLineItemForm({ planId, onSave, onCancel }: { planId: string; onSave:
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Add
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -453,8 +451,8 @@ function AddActualForm({ lineItemId, onSave, onCancel }: { lineItemId: string; o
   }
 
   return (
-    <div className="rounded-lg border bg-blue-50/50 border-blue-200 p-4 space-y-3">
-      <p className="text-xs font-medium text-blue-800">Log actual spend</p>
+    <div className="rounded-lg border bg-flare-wash/50 border-line-strong p-4 space-y-3">
+      <p className="text-xs font-medium text-tx-flare">Log actual spend</p>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
           <Label className="text-xs">Amount (₦) *</Label>
@@ -475,7 +473,7 @@ function AddActualForm({ lineItemId, onSave, onCancel }: { lineItemId: string; o
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Log spend
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>

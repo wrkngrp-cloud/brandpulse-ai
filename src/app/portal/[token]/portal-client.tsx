@@ -5,12 +5,11 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, AreaChart, Area, BarChart, Bar, Legend,
 } from 'recharts'
-import {
-  TrendingUp, TrendingDown, Activity, Radio, MessageSquare,
-  DollarSign, Target, Award, AlertCircle, CheckCircle2, ChevronRight,
-  RefreshCw, Calendar, BarChart3, Eye, Newspaper,
-} from 'lucide-react'
+import { TrendDownIcon as TrendingDown, TrendIcon as Activity, MusicIcon as Radio, CurrencyIcon as DollarSign, CircleDotIcon as Target, StarIcon as Award, CheckIcon as CheckCircle2, ChevronRightIcon as ChevronRight, RefreshIcon as RefreshCw, CalendarIcon as Calendar, TrendIcon as BarChart3, EyeIcon as Eye, PrinterIcon as Newspaper } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp, MentionsIcon as MessageSquare, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn, formatNGN } from '@/lib/utils'
+import { Crescendo } from '@/components/brand/crescendo'
+import { ChartState } from '@/components/brand/chart-states'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -85,17 +84,17 @@ function fmtNGN(naira: number) {
 }
 
 function bhiZone(bhi: number): { label: string; color: string } {
-  if (bhi >= 75) return { label: 'Strong',   color: 'text-emerald-600' }
-  if (bhi >= 55) return { label: 'Healthy',  color: 'text-blue-600'    }
-  if (bhi >= 40) return { label: 'Caution',  color: 'text-amber-600'   }
-  return           { label: 'At Risk',  color: 'text-red-600'    }
+  if (bhi >= 75) return { label: 'Strong',   color: 'text-pos' }
+  if (bhi >= 55) return { label: 'Healthy',  color: 'text-tx-flare'    }
+  if (bhi >= 40) return { label: 'Caution',  color: 'text-tx-2'   }
+  return           { label: 'At Risk',  color: 'text-tx-flare'    }
 }
 
 function DeltaBadge({ delta, unit = '' }: { delta: number | null; unit?: string }) {
   if (delta == null) return <span className="text-[11px] text-muted-foreground">—</span>
   const pos = delta >= 0
   return (
-    <span className={cn('inline-flex items-center gap-0.5 text-[11px] font-semibold', pos ? 'text-emerald-600' : 'text-red-600')}>
+    <span className={cn('inline-flex items-center gap-0.5 text-[11px] font-semibold', pos ? 'text-pos' : 'text-tx-flare')}>
       {pos ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
       {pos ? '+' : ''}{delta.toFixed(1)}{unit}
     </span>
@@ -109,10 +108,10 @@ function KpiCard({ icon: Icon, iconColor, label, value, delta, unit = '', sub }:
     <div className="rounded-2xl border bg-card p-5 flex flex-col gap-2">
       <div className="flex items-center gap-2">
         <Icon className={cn('h-4 w-4', iconColor)} />
-        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="text-[11px] font-bold text-muted-foreground">{label}</p>
       </div>
       <div className="flex items-end justify-between gap-2">
-        <p className="text-[28px] font-bold leading-none tracking-tight">{value}</p>
+        <p className="text-[28px] font-bold leading-none tracking-tight"><span className="bg-num">{value}</span></p>
         {delta !== undefined && <DeltaBadge delta={delta} unit={unit} />}
       </div>
       {sub && <p className="text-[11px] text-muted-foreground">{sub}</p>}
@@ -124,7 +123,7 @@ function SectionHeading({ icon: Icon, children }: { icon: React.ElementType; chi
   return (
     <div className="flex items-center gap-2.5 mb-4">
       <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-      <h2 className="text-[13px] font-bold uppercase tracking-wider text-muted-foreground">{children}</h2>
+      <h2 className="text-[13px] font-bold text-muted-foreground">{children}</h2>
       <div className="flex-1 h-px bg-border/60" />
     </div>
   )
@@ -143,9 +142,9 @@ function RangePicker({ value, onChange, loading }: { value: Range; onChange: (r:
           key={o.v}
           onClick={() => !loading && onChange(o.v)}
           className={cn(
-            'px-3 py-1 text-[12px] font-semibold rounded-md transition-all',
+            'px-3 py-1 text-[12px] font-semibold rounded-md transition-colors',
             value === o.v
-              ? 'bg-background shadow-sm text-foreground'
+              ? 'bg-background text-foreground border border-line'
               : 'text-muted-foreground hover:text-foreground'
           )}
         >
@@ -218,10 +217,10 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
   }))
 
   return (
-    <div className={cn('min-h-screen bg-[#f9fafb] dark:bg-background', loading && 'opacity-60 pointer-events-none')}>
+    <div className={cn('min-h-screen bg-[var(--bg-shell)] dark:bg-background', loading && 'opacity-60 pointer-events-none')}>
 
       {/* ── Sticky header ──────────────────────────────────────── */}
-      <header className="sticky top-0 z-20 bg-white/90 dark:bg-card/90 backdrop-blur-md border-b">
+      <header className="sticky top-0 z-20 bg-card/90 dark:bg-card/90 backdrop-blur-md border-b">
         <div className="max-w-5xl mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             {brand.logo_url && (
@@ -237,7 +236,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <RangePicker value={range} onChange={fetchRange} loading={loading} />
-            {loading && <RefreshCw className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+            {loading && <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />}
           </div>
         </div>
       </header>
@@ -270,7 +269,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             {sections.includes('bhi') && (
               <KpiCard
                 icon={Activity}
-                iconColor="text-blue-500"
+                iconColor="text-tx-2"
                 label="Brand Health"
                 value={latestBhi != null ? latestBhi.toFixed(1) : '—'}
                 delta={bhiDelta}
@@ -280,7 +279,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             {sections.includes('sentiment') && (
               <KpiCard
                 icon={TrendingUp}
-                iconColor="text-emerald-500"
+                iconColor="text-pos"
                 label="Sentiment"
                 value={latestSentiment != null ? latestSentiment.toFixed(1) : '—'}
                 delta={sentimentDelta}
@@ -290,7 +289,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             {sections.includes('sov') && (
               <KpiCard
                 icon={Radio}
-                iconColor="text-violet-500"
+                iconColor="text-tx-2"
                 label="Share of Voice"
                 value={latestSov ? `${latestSov.social_sov}%` : '—'}
                 sub="Social SOV"
@@ -298,7 +297,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             )}
             <KpiCard
               icon={MessageSquare}
-              iconColor="text-orange-500"
+              iconColor="text-tx-2"
               label="Total Mentions"
               value={mentionCount.toLocaleString()}
               sub={`Last ${days} days`}
@@ -306,7 +305,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             {sections.includes('nps') && (
               <KpiCard
                 icon={Award}
-                iconColor="text-teal-500"
+                iconColor="text-pos"
                 label="NPS Score"
                 value={avgNps != null ? avgNps.toFixed(1) : '—'}
                 sub={`${npsResponses.length} responses`}
@@ -315,7 +314,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             {sections.includes('campaigns') && (
               <KpiCard
                 icon={DollarSign}
-                iconColor="text-amber-500"
+                iconColor="text-tx-2"
                 label="Media Spend"
                 value={fmtNGN(totalSpend)}
                 sub={`${activeCampaigns} active campaign${activeCampaigns !== 1 ? 's' : ''}`}
@@ -324,7 +323,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             {brand.market_share_pct != null && (
               <KpiCard
                 icon={Target}
-                iconColor="text-pink-500"
+                iconColor="text-tx-2"
                 label="Market Share"
                 value={`${brand.market_share_pct}%`}
                 sub="Last reported"
@@ -341,7 +340,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               <div className="flex items-center gap-3 mb-4 flex-wrap">
                 {latestBhi != null && zone && (
                   <div className="flex items-center gap-2">
-                    <span className={cn('text-[26px] font-bold', zone.color)}>{latestBhi.toFixed(1)}</span>
+                    <span className={cn('text-[26px] font-bold bg-num', zone.color)}>{latestBhi.toFixed(1)}</span>
                     <span className="text-[12px] text-muted-foreground">/ 100</span>
                     <span className={cn('text-[12px] font-semibold ml-1', zone.color)}>{zone.label}</span>
                   </div>
@@ -349,21 +348,23 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                 <DeltaBadge delta={bhiDelta} unit=" pts" />
                 <span className="text-[11px] text-muted-foreground ml-auto">BHI = sentiment + share-of-voice + reach blend</span>
               </div>
-              <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={bhiHistory.map(r => ({ date: r.snapshot_date, bhi: Number(r.bhi) }))}>
-                  <defs>
-                    <linearGradient id="bhiGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 10 }} />
-                  <Area type="monotone" dataKey="bhi" stroke="#3b82f6" strokeWidth={2.5} fill="url(#bhiGrad)" dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
+              <ChartState rows={bhiHistory} height={220} empty="No reading for this period yet.">
+                              <ResponsiveContainer width="100%" height={220}>
+                  <AreaChart data={bhiHistory.map(r => ({ date: r.snapshot_date, bhi: Number(r.bhi) }))}>
+                    <defs>
+                      <linearGradient id="bhiGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor="var(--flare)" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="var(--flare)" stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
+                    <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                    <Area type="monotone" dataKey="bhi" stroke="var(--flare)" strokeWidth={2.5} fill="url(#bhiGrad)" dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartState>
             </div>
           </section>
         )}
@@ -373,18 +374,20 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
           <section>
             <SectionHeading icon={TrendingUp}>Sentiment Analysis</SectionHeading>
             <div className="rounded-2xl border bg-card p-5">
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={sentimentChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, '']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 10 }} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Line type="monotone" dataKey="score" name="Overall" stroke="#10b981" strokeWidth={2.5} dot={false} />
-                  <Line type="monotone" dataKey="pos"   name="Positive" stroke="#6366f1" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
-                  <Line type="monotone" dataKey="neg"   name="Negative" stroke="#f43f5e" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
-                </LineChart>
-              </ResponsiveContainer>
+              <ChartState rows={sentimentChartData} height={220} empty="No reading for this period yet.">
+                              <ResponsiveContainer width="100%" height={220}>
+                  <LineChart data={sentimentChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
+                    <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, '']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Line type="monotone" dataKey="score" name="Overall" stroke="var(--tx)" strokeWidth={2.5} dot={false} />
+                    <Line type="monotone" dataKey="pos"   name="Positive" stroke="var(--chart-3)" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
+                    <Line type="monotone" dataKey="neg"   name="Negative" stroke="var(--flare)" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </ChartState>
             </div>
           </section>
         )}
@@ -394,21 +397,23 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
           <section>
             <SectionHeading icon={Radio}>Share of Voice Trend</SectionHeading>
             <div className="rounded-2xl border bg-card p-5">
-              <ResponsiveContainer width="100%" height={180}>
-                <AreaChart data={sovChartData}>
-                  <defs>
-                    <linearGradient id="sovGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="#8b5cf6" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                  <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10 }} width={32} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [typeof v === 'number' ? `${v.toFixed(1)}%` : v, 'SOV']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 10 }} />
-                  <Area type="monotone" dataKey="sov" stroke="#8b5cf6" strokeWidth={2.5} fill="url(#sovGrad)" dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
+              <ChartState rows={sovChartData} height={180} empty="No reading for this period yet.">
+                              <ResponsiveContainer width="100%" height={180}>
+                  <AreaChart data={sovChartData}>
+                    <defs>
+                      <linearGradient id="sovGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor="var(--neu)" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="var(--neu)" stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={32} tickLine={false} axisLine={false} />
+                    <Tooltip formatter={(v) => [typeof v === 'number' ? `${v.toFixed(1)}%` : v, 'SOV']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                    <Area type="monotone" dataKey="sov" stroke="var(--chart-1)" strokeWidth={2.5} fill="url(#sovGrad)" dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartState>
             </div>
           </section>
         )}
@@ -422,7 +427,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                 <div className="flex gap-6">
                   <div>
                     <p className="text-[11px] text-muted-foreground">Total budget</p>
-                    <p className="text-[16px] font-bold">{fmtNGN(totalBudget)}</p>
+                    <p className="text-[16px] font-bold bg-num">{fmtNGN(totalBudget)}</p>
                   </div>
                   <div>
                     <p className="text-[11px] text-muted-foreground">Active campaigns</p>
@@ -445,11 +450,11 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                       <tr key={c.id} className="border-b last:border-0 hover:bg-muted/20">
                         <td className="px-5 py-3">
                           <div className="flex items-center gap-2">
-                            <span className={cn('h-1.5 w-1.5 rounded-full shrink-0', c.status === 'active' ? 'bg-emerald-500' : 'bg-muted-foreground/40')} />
+                            <span className={cn('h-1.5 w-1.5 rounded-full shrink-0', c.status === 'active' ? 'bg-pos' : 'bg-muted-foreground/40')} />
                             <span className="font-medium truncate max-w-[160px]">{c.name}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-right font-medium">{c.total_budget != null ? fmtNGN(c.total_budget) : '—'}</td>
+                        <td className="px-4 py-3 text-right font-medium bg-num">{c.total_budget != null ? fmtNGN(c.total_budget) : '—'}</td>
                         <td className="px-4 py-3 text-muted-foreground">{c.start_date ?? '—'}</td>
                         <td className="px-5 py-3 capitalize text-muted-foreground">{c.status}</td>
                       </tr>
@@ -467,20 +472,20 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             <SectionHeading icon={Award}>Net Promoter Score</SectionHeading>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="rounded-2xl border bg-card p-5 text-center">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Avg NPS</p>
-                <p className={cn('text-[42px] font-bold leading-none', (avgNps ?? 0) >= 7 ? 'text-emerald-600' : (avgNps ?? 0) >= 5 ? 'text-amber-600' : 'text-red-600')}>
+                <p className="text-[11px] font-bold text-muted-foreground mb-2">Avg NPS</p>
+                <p className={cn('text-[42px] font-bold leading-none', (avgNps ?? 0) >= 7 ? 'text-pos' : (avgNps ?? 0) >= 5 ? 'text-tx-2' : 'text-tx-flare')}>
                   {avgNps != null ? avgNps.toFixed(1) : '—'}
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-1">out of 10</p>
               </div>
               <div className="rounded-2xl border bg-card p-5 text-center">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Responses</p>
-                <p className="text-[42px] font-bold leading-none">{npsResponses.length}</p>
+                <p className="text-[11px] font-bold text-muted-foreground mb-2">Responses</p>
+                <p className="text-[42px] font-bold leading-none bg-num">{npsResponses.length}</p>
                 <p className="text-[11px] text-muted-foreground mt-1">survey replies</p>
               </div>
               <div className="rounded-2xl border bg-card p-5 text-center">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Promoters</p>
-                <p className="text-[42px] font-bold leading-none text-emerald-600">
+                <p className="text-[11px] font-bold text-muted-foreground mb-2">Promoters</p>
+                <p className="text-[42px] font-bold leading-none text-pos">
                   {Math.round((npsResponses.filter(r => r.score >= 9).length / npsResponses.length) * 100)}%
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-1">scored 9-10</p>
@@ -489,15 +494,17 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             {npsWeeks.length > 1 && (
               <div className="rounded-2xl border bg-card p-5 mt-4">
                 <p className="text-[12px] font-medium mb-4 text-muted-foreground">NPS trend (weekly avg)</p>
-                <ResponsiveContainer width="100%" height={160}>
-                  <BarChart data={npsWeeks} barSize={24}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                    <XAxis dataKey="week" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                    <YAxis domain={[0, 10]} tick={{ fontSize: 10 }} width={24} tickLine={false} axisLine={false} />
-                    <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'NPS']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 10 }} />
-                    <Bar dataKey="score" fill="#14b8a6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <ChartState rows={npsWeeks} height={160} empty="No reading for this period yet.">
+                                  <ResponsiveContainer width="100%" height={160}>
+                    <BarChart data={npsWeeks} barSize={24}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <XAxis dataKey="week" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
+                      <YAxis domain={[0, 10]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={24} tickLine={false} axisLine={false} />
+                      <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'NPS']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                      <Bar dataKey="score" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartState>
               </div>
             )}
           </section>
@@ -545,7 +552,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                         )}
                       >
                         <p className={cn(
-                          'text-[11px] font-bold uppercase tracking-wider mb-1 truncate',
+                          'text-[11px] font-bold mb-1 truncate',
                           item.isBrand ? 'text-primary' : 'text-muted-foreground'
                         )}>
                           {item.name}
@@ -563,19 +570,14 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                   {/* SOV comparison bar chart when real data exists */}
                   {allWithSov.length > 1 && maxSov > 0 && (
                     <div className="space-y-2.5 pt-2 border-t">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">SOV Comparison</p>
+                      <p className="text-[11px] font-bold text-muted-foreground">SOV Comparison</p>
                       {allItems.filter(i => i.sov != null).map(item => (
                         <div key={item.name} className="flex items-center gap-3">
                           <p className={cn('text-[11px] font-medium w-28 shrink-0 truncate', item.isBrand ? 'text-primary' : 'text-foreground')}>
                             {item.name}
                           </p>
-                          <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
-                            <div
-                              className={cn('h-full rounded-full', item.isBrand ? 'bg-primary' : 'bg-muted-foreground/40')}
-                              style={{ width: `${(item.sov! / maxSov) * 100}%` }}
-                            />
-                          </div>
-                          <p className="text-[11px] font-semibold w-10 text-right shrink-0">{item.sov!.toFixed(1)}%</p>
+                          <Crescendo value={(item.sov! / maxSov) * 100} height={8} />
+                          <p className="text-[11px] font-semibold w-10 text-right shrink-0 bg-num">{item.sov!.toFixed(1)}%</p>
                         </div>
                       ))}
                     </div>
@@ -601,22 +603,22 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               {competitorSightings.length > 0 && (
                 <div className="rounded-2xl border bg-card overflow-hidden">
                   <div className="px-5 py-3.5 border-b bg-muted/30">
-                    <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Field Intelligence</p>
+                    <p className="text-[12px] font-bold text-muted-foreground">Field Intelligence</p>
                   </div>
                   <ul className="divide-y">
                     {competitorSightings.map(s => (
                       <li key={s.id} className="px-5 py-3.5 flex items-start gap-3">
                         <span className={cn(
                           'shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full',
-                          s.scale === 'major'    ? 'bg-red-500'    :
-                          s.scale === 'moderate' ? 'bg-amber-500'  :
+                          s.scale === 'major'    ? 'bg-flare'    :
+                          s.scale === 'moderate' ? 'bg-ember'  :
                           'bg-muted-foreground/40'
                         )} />
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-0.5">
                             <span className="text-[13px] font-semibold">{s.competitor_name ?? 'Unknown competitor'}</span>
                             {s.sighting_type && (
-                              <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded uppercase font-semibold text-muted-foreground">
+                              <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded font-semibold text-muted-foreground">
                                 {s.sighting_type}
                               </span>
                             )}
@@ -641,7 +643,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                   <div className="px-5 py-3.5 border-b bg-muted/30">
                     <div className="flex items-center gap-1.5">
                       <Newspaper className="h-3.5 w-3.5 text-muted-foreground" />
-                      <p className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Recent Competitor Coverage</p>
+                      <p className="text-[12px] font-bold text-muted-foreground">Recent Competitor Coverage</p>
                     </div>
                   </div>
                   <ul className="divide-y">
@@ -649,8 +651,8 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                       <li key={m.id} className="px-5 py-3.5 flex items-start gap-3">
                         <span className={cn(
                           'shrink-0 mt-1 h-1.5 w-1.5 rounded-full',
-                          m.sentiment_label === 'positive' ? 'bg-emerald-500' :
-                          m.sentiment_label === 'negative' ? 'bg-red-500' :
+                          m.sentiment_label === 'positive' ? 'bg-pos' :
+                          m.sentiment_label === 'negative' ? 'bg-flare' :
                           'bg-muted-foreground/40'
                         )} />
                         <div className="min-w-0">
@@ -677,14 +679,14 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
             <SectionHeading icon={CheckCircle2}>Strategic Insights</SectionHeading>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Wins */}
-              <div className="rounded-2xl border bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/40 p-5">
+              <div className="rounded-2xl border bg-shell/70 dark:bg-shell/20 border-line dark:border-line p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  <p className="text-[12px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Key Wins</p>
+                  <CheckCircle2 className="h-4 w-4 text-pos" />
+                  <p className="text-[12px] font-bold text-pos dark:text-pos">Key Wins</p>
                 </div>
                 <ul className="space-y-2">
                   {winsAndConcerns.wins.map((w, i) => (
-                    <li key={i} className="flex items-start gap-2 text-[13px] text-emerald-800 dark:text-emerald-300">
+                    <li key={i} className="flex items-start gap-2 text-[13px] text-pos dark:text-pos">
                       <ChevronRight className="h-3.5 w-3.5 shrink-0 mt-0.5 opacity-60" />
                       {w}
                     </li>
@@ -693,14 +695,14 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               </div>
 
               {/* Concerns */}
-              <div className="rounded-2xl border bg-red-50/70 dark:bg-red-950/20 border-red-100 dark:border-red-900/40 p-5">
+              <div className="rounded-2xl border bg-flare-wash/70 dark:bg-shell/20 border-line-strong dark:border-line-strong p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <AlertCircle className="h-4 w-4 text-red-500" />
-                  <p className="text-[12px] font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">Watch Items</p>
+                  <AlertCircle className="h-4 w-4 text-tx-flare" />
+                  <p className="text-[12px] font-bold text-tx-flare dark:text-tx-flare">Watch Items</p>
                 </div>
                 <ul className="space-y-2">
                   {winsAndConcerns.concerns.map((c, i) => (
-                    <li key={i} className="flex items-start gap-2 text-[13px] text-red-800 dark:text-red-300">
+                    <li key={i} className="flex items-start gap-2 text-[13px] text-tx-flare dark:text-tx-flare">
                       <ChevronRight className="h-3.5 w-3.5 shrink-0 mt-0.5 opacity-60" />
                       {c}
                     </li>
@@ -709,15 +711,15 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               </div>
 
               {/* Priorities */}
-              <div className="rounded-2xl border bg-blue-50/70 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/40 p-5">
+              <div className="rounded-2xl border bg-flare-wash/70 dark:bg-shell/20 border-line-strong dark:border-line-strong p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Target className="h-4 w-4 text-blue-600" />
-                  <p className="text-[12px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Next Priorities</p>
+                  <Target className="h-4 w-4 text-tx-flare" />
+                  <p className="text-[12px] font-bold text-tx-flare dark:text-tx-2">Next Priorities</p>
                 </div>
                 <ul className="space-y-2">
                   {winsAndConcerns.priorities.map((p, i) => (
-                    <li key={i} className="flex items-start gap-2 text-[13px] text-blue-800 dark:text-blue-300">
-                      <span className="text-[10px] font-bold mt-0.5 shrink-0 w-4 text-blue-500">{i + 1}.</span>
+                    <li key={i} className="flex items-start gap-2 text-[13px] text-tx-flare dark:text-tx-2">
+                      <span className="text-[10px] font-bold mt-0.5 shrink-0 w-4 text-tx-2">{i + 1}.</span>
                       {p}
                     </li>
                   ))}
@@ -735,23 +737,23 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               {/* KPI summary table */}
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
                 <div className="rounded-xl bg-muted/40 p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">BHI</p>
-                  <p className="text-3xl font-bold">{latestBhi != null ? latestBhi.toFixed(1) : '—'}</p>
+                  <p className="text-[11px] font-bold text-muted-foreground mb-1">BHI</p>
+                  <p className="text-3xl font-bold bg-num">{latestBhi != null ? latestBhi.toFixed(1) : '—'}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Brand Health</p>
                 </div>
                 <div className="rounded-xl bg-muted/40 p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">SOV</p>
+                  <p className="text-[11px] font-bold text-muted-foreground mb-1">SOV</p>
                   <p className="text-3xl font-bold">{latestSov ? `${Number(latestSov.social_sov).toFixed(1)}%` : '—'}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Share of Voice</p>
                 </div>
                 <div className="rounded-xl bg-muted/40 p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">NPS</p>
-                  <p className="text-3xl font-bold">{avgNps != null ? avgNps.toFixed(1) : '—'}</p>
+                  <p className="text-[11px] font-bold text-muted-foreground mb-1">NPS</p>
+                  <p className="text-3xl font-bold bg-num">{avgNps != null ? avgNps.toFixed(1) : '—'}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Avg score</p>
                 </div>
                 <div className="rounded-xl bg-muted/40 p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Campaigns</p>
-                  <p className="text-3xl font-bold">{campaigns.length}</p>
+                  <p className="text-[11px] font-bold text-muted-foreground mb-1">Campaigns</p>
+                  <p className="text-3xl font-bold bg-num">{campaigns.length}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Active</p>
                 </div>
               </div>
@@ -760,31 +762,31 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               {winsAndConcerns && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t">
                   <div>
-                    <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-2">Key wins</p>
+                    <p className="text-xs font-bold text-pos mb-2">Key wins</p>
                     <ul className="space-y-1.5">
                       {winsAndConcerns.wins.slice(0, 3).map((w, i) => (
                         <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
-                          <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>{w}
+                          <span className="text-pos shrink-0 mt-0.5">✓</span>{w}
                         </li>
                       ))}
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-2">Watch items</p>
+                    <p className="text-xs font-bold text-tx-flare mb-2">Watch items</p>
                     <ul className="space-y-1.5">
                       {winsAndConcerns.concerns.slice(0, 3).map((c, i) => (
                         <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
-                          <span className="text-red-400 shrink-0 mt-0.5">!</span>{c}
+                          <span className="text-tx-flare shrink-0 mt-0.5">!</span>{c}
                         </li>
                       ))}
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Next priorities</p>
+                    <p className="text-xs font-bold text-tx-flare mb-2">Next priorities</p>
                     <ul className="space-y-1.5">
                       {winsAndConcerns.priorities.slice(0, 3).map((p, i) => (
                         <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
-                          <span className="text-blue-500 shrink-0 mt-0.5">→</span>{p}
+                          <span className="text-tx-2 shrink-0 mt-0.5">→</span>{p}
                         </li>
                       ))}
                     </ul>

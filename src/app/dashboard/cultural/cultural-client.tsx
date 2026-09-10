@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Flame, TrendingUp, TrendingDown, Calendar, Sparkles, Loader2,
-  AlertTriangle, ChevronRight, ChevronDown, Star, Globe,
-} from 'lucide-react'
+import { AskIcon as Flame, TrendDownIcon as TrendingDown, CalendarIcon as Calendar, ChevronRightIcon as ChevronRight, ChevronDownIcon as ChevronDown, StarIcon as Star, GlobeIcon as Globe } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { TrendIcon as TrendingUp, AskIcon as Sparkles, AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { TourTrigger } from '@/components/tours/tour-trigger'
@@ -445,26 +444,26 @@ function fitLabel(score: number): 'High fit' | 'Good fit' | 'Monitor' {
 // ---------------------------------------------------------------------------
 
 const TYPE_BADGE: Record<MomentType, string> = {
-  Religious:     'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-  National:      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  Cultural:      'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-  Seasonal:      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-  Sports:        'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
-  Entertainment: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300',
-  Health:        'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
-  Commerce:      'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
+  Religious:     'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+  National:      'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  Cultural:      'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+  Seasonal:      'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
+  Sports:        'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
+  Entertainment: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+  Health:        'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  Commerce:      'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
 }
 
 const FIT_BADGE: Record<string, string> = {
-  'High fit':  'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-  'Good fit':  'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+  'High fit':  'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  'Good fit':  'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
   'Monitor':   'bg-muted text-muted-foreground',
 }
 
 const EFFORT_BADGE: Record<string, string> = {
-  Low:    'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  Medium: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-  High:   'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+  Low:    'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  Medium: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+  High:   'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
 }
 
 function daysUntil(dateStr: string, todayStr: string): number {
@@ -473,15 +472,15 @@ function daysUntil(dateStr: string, todayStr: string): number {
 }
 
 function crsColor(score: number): string {
-  if (score >= 70) return 'text-green-600'
-  if (score >= 50) return 'text-amber-500'
-  return 'text-red-500'
+  if (score >= 70) return 'text-pos'
+  if (score >= 50) return 'text-tx-2'
+  return 'text-tx-flare'
 }
 
 function crsRingColor(score: number): string {
-  if (score >= 70) return 'stroke-green-500'
-  if (score >= 50) return 'stroke-amber-400'
-  return 'stroke-red-500'
+  if (score >= 70) return 'stroke-pos'
+  if (score >= 50) return 'stroke-tx-2'
+  return 'stroke-tx-flare'
 }
 
 // ---------------------------------------------------------------------------
@@ -502,13 +501,13 @@ function CRSGauge({ score, drift }: { score: number | null; drift: number | null
           {score !== null && (
             <circle cx="68" cy="68" r={radius} fill="none" strokeWidth="10" strokeLinecap="round"
               strokeDasharray={circumference} strokeDashoffset={dashOffset}
-              className={cn('transition-all duration-700', crsRingColor(score))} />
+              className={cn('transition-colors duration-700', crsRingColor(score))} />
           )}
         </svg>
         <div className="absolute flex flex-col items-center">
           {score !== null ? (
             <>
-              <span className={cn('text-4xl font-bold tabular-nums', crsColor(score))}>{Math.round(score)}</span>
+              <span className={cn('text-4xl font-bold bg-num', crsColor(score))}>{Math.round(score)}</span>
               <span className="text-xs text-muted-foreground mt-0.5">/ 100</span>
             </>
           ) : (
@@ -517,9 +516,9 @@ function CRSGauge({ score, drift }: { score: number | null; drift: number | null
         </div>
       </div>
       {drift !== null && (
-        <div className={cn('inline-flex items-center gap-1 text-sm font-medium px-2.5 py-1 rounded-full',
-          drift >= 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                     : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+        <div className={cn('inline-flex items-center gap-1 text-sm font-medium px-2.5 py-1 rounded-sm',
+          drift >= 0 ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos'
+                     : 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
         )}>
           {drift >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
           {drift >= 0 ? '+' : ''}{drift.toFixed(1)} pts vs prior period
@@ -534,11 +533,11 @@ function EmotionBar({ value }: { value: number | null }) {
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <span className="text-sm text-muted-foreground">Audience emotional positivity</span>
-        <span className="text-sm font-semibold tabular-nums">{value !== null ? `${Math.round(value)}%` : '—'}</span>
+        <span className="text-sm font-semibold bg-num">{value !== null ? `${Math.round(value)}%` : '—'}</span>
       </div>
-      <div className="h-2.5 bg-muted rounded-full overflow-hidden">
-        <div className={cn('h-full rounded-full transition-all duration-700',
-          value === null ? 'w-0' : value >= 60 ? 'bg-green-500' : value >= 40 ? 'bg-amber-400' : 'bg-red-400'
+      <div className="h-2.5 bg-muted rounded-sm overflow-hidden">
+        <div className={cn('h-full rounded-sm transition-colors duration-700',
+          value === null ? 'w-0' : value >= 60 ? 'bg-pos' : value >= 40 ? 'bg-ember' : 'bg-flare'
         )} style={{ width: value !== null ? `${Math.min(100, value)}%` : '0%' }} />
       </div>
       <p className="text-xs text-muted-foreground">Based on joy, trust and anticipation signals in recent posts</p>
@@ -565,19 +564,19 @@ function CalendarRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
           <p className="text-sm font-medium">{moment.name}</p>
-          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', TYPE_BADGE[moment.type])}>
+          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', TYPE_BADGE[moment.type])}>
             {moment.type}
           </span>
-          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', FIT_BADGE[fit])}>
+          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', FIT_BADGE[fit])}>
             {fit}
           </span>
         </div>
         <p className="text-xs text-muted-foreground mt-0.5 leading-snug line-clamp-2">{moment.brandRelevance}</p>
       </div>
       <div className="shrink-0 text-right pt-0.5">
-        <span className={cn('text-xs font-semibold tabular-nums px-2 py-0.5 rounded-full',
-          daysAway <= 14 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-          : daysAway <= 30 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+        <span className={cn('text-xs font-semibold bg-num px-2 py-0.5 rounded-sm',
+          daysAway <= 14 ? 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
+          : daysAway <= 30 ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
           : 'bg-muted text-muted-foreground'
         )}>
           {daysAway === 0 ? 'Today' : daysAway === 1 ? 'Tomorrow' : `${daysAway}d`}
@@ -636,24 +635,24 @@ function TopPickCard({
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
             <p className="text-sm font-semibold">{moment.name}</p>
-            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', TYPE_BADGE[moment.type])}>
+            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', TYPE_BADGE[moment.type])}>
               {moment.type}
             </span>
-            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', FIT_BADGE[fit])}>
+            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', FIT_BADGE[fit])}>
               {fit}
             </span>
           </div>
           <p className="text-[11px] text-muted-foreground">
             {new Date(moment.date + 'T00:00:00').toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}
             {' · '}
-            <span className={cn('font-medium', daysAway <= 14 ? 'text-red-600' : daysAway <= 30 ? 'text-amber-600' : 'text-muted-foreground')}>
+            <span className={cn('font-medium', daysAway <= 14 ? 'text-tx-flare' : daysAway <= 30 ? 'text-tx-2' : 'text-muted-foreground')}>
               {daysAway === 0 ? 'Today' : daysAway === 1 ? 'Tomorrow' : `${daysAway} days away`}
             </span>
           </p>
         </div>
         {!ideas && (
           <Button size="sm" variant="outline" onClick={generate} disabled={loading} className="shrink-0 h-8 text-xs gap-1">
-            {loading ? <><Loader2 className="h-3 w-3 animate-spin" />Thinking</> : <><Sparkles className="h-3 w-3" />Get ideas</>}
+            {loading ? <><Loader2 className="h-3 w-3" />Thinking</> : <><Sparkles className="h-3 w-3" />Get ideas</>}
           </Button>
         )}
       </div>
@@ -663,7 +662,7 @@ function TopPickCard({
         {relevanceReason}
       </div>
 
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-tx-flare">{error}</p>}
 
       {ideas && (
         <div className="space-y-2 pt-1">
@@ -673,7 +672,7 @@ function TopPickCard({
                 <p className="text-sm font-medium">{idea.title}</p>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className="text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">{idea.channel}</span>
-                  <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', EFFORT_BADGE[idea.effort] ?? 'bg-muted text-muted-foreground')}>
+                  <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', EFFORT_BADGE[idea.effort] ?? 'bg-muted text-muted-foreground')}>
                     {idea.effort}
                   </span>
                 </div>
@@ -681,7 +680,7 @@ function TopPickCard({
               <p className="text-xs text-muted-foreground leading-snug">{idea.description}</p>
             </div>
           ))}
-          <button onClick={() => setIdeas(null)} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 pt-1">
+          <button onClick={() => setIdeas(null)} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 pt-1 bg-press">
             Regenerate
           </button>
         </div>
@@ -776,7 +775,7 @@ export function CulturalClient({
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Flame className="h-5 w-5 text-orange-500" />
+            <Flame className="h-5 w-5 text-tx-2" />
             <h1 className="text-2xl font-semibold tracking-tight">Cultural Intelligence</h1>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
@@ -789,9 +788,9 @@ export function CulturalClient({
       <div data-tour="cultural-main" className="space-y-6">
       {/* Drift alert */}
       {showDriftAlert && (
-        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/40 px-4 py-3">
-          <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700 dark:text-red-300">
+        <div className="flex items-start gap-3 rounded-xl border border-line-strong bg-flare-wash dark:bg-shell/20 dark:border-line-strong px-4 py-3">
+          <AlertTriangle className="h-4 w-4 text-tx-flare dark:text-tx-flare shrink-0 mt-0.5" />
+          <p className="text-sm text-tx-flare dark:text-tx-flare">
             Cultural drift detected — your content has become less resonant with Nigerian audiences recently.
           </p>
         </div>
@@ -828,7 +827,7 @@ export function CulturalClient({
 
         {crsOpen && analyses.length > 0 && (
           <div className="border-t pt-4 mt-2 space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Breakdown — last 30 days</p>
+            <p className="text-xs font-semibold text-muted-foreground">Breakdown — last 30 days</p>
             {analyses.map(a => {
               const date = new Date(a.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
               const preview = a.content_text ? a.content_text.slice(0, 80) + (a.content_text.length > 80 ? '…' : '') : null
@@ -836,18 +835,18 @@ export function CulturalClient({
                 <div key={a.id} className="rounded-lg border bg-muted/30 px-3 py-2.5 space-y-1.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      {a.platform && <span className="text-[10px] font-medium bg-background border rounded px-1.5 py-0.5">{formatPlatformLabel(a.platform)}</span>}
+                      {a.platform && <span className="text-[10px] font-medium bg-background border rounded px-1.5 py-0.5 bg-num">{formatPlatformLabel(a.platform)}</span>}
                       {a.funnel_goal && <span className="text-[10px] text-muted-foreground capitalize">{a.funnel_goal}</span>}
                     </div>
                     <span className="text-[10px] text-muted-foreground shrink-0">{date}</span>
                   </div>
                   {preview && <p className="text-xs text-muted-foreground leading-snug">{preview}</p>}
                   <div className="flex flex-wrap items-center gap-3 pt-0.5">
-                    <span className={cn('text-xs font-semibold tabular-nums', crsColor(a.cultural_score))}>Cultural {Math.round(a.cultural_score)}</span>
-                    {a.engagement_score != null && <span className="text-xs text-muted-foreground tabular-nums">Eng {Math.round(a.engagement_score)}</span>}
-                    {a.tone_score != null && <span className="text-xs text-muted-foreground tabular-nums">Tone {Math.round(a.tone_score)}</span>}
+                    <span className={cn('text-xs font-semibold bg-num', crsColor(a.cultural_score))}>Cultural {Math.round(a.cultural_score)}</span>
+                    {a.engagement_score != null && <span className="text-xs text-muted-foreground bg-num">Eng {Math.round(a.engagement_score)}</span>}
+                    {a.tone_score != null && <span className="text-xs text-muted-foreground bg-num">Tone {Math.round(a.tone_score)}</span>}
                     {a.risk_score != null && (
-                      <span className={cn('text-xs tabular-nums', a.risk_score > 50 ? 'text-red-500' : a.risk_score > 20 ? 'text-amber-500' : 'text-muted-foreground')}>
+                      <span className={cn('text-xs bg-num', a.risk_score > 50 ? 'text-tx-flare' : a.risk_score > 20 ? 'text-tx-2' : 'text-muted-foreground')}>
                         Risk {Math.round(a.risk_score)}
                       </span>
                     )}
@@ -867,7 +866,7 @@ export function CulturalClient({
       {/* ── Top picks for this brand ────────────────────────────────────────── */}
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
-          <Star className="h-4 w-4 text-amber-500" />
+          <Star className="h-4 w-4 text-tx-2" />
           <p className="text-sm font-semibold">Top picks for {brandName}</p>
           <span className="hidden sm:inline text-xs text-muted-foreground">— ranked by audience fit, next 6 months</span>
         </div>
@@ -923,7 +922,7 @@ export function CulturalClient({
             {calendarList.length > 12 && (
               <button
                 onClick={() => setShowAllCalendar(o => !o)}
-                className="w-full text-center text-xs text-muted-foreground hover:text-foreground mt-2 py-1.5 border rounded-lg transition-colors hover:bg-muted/30"
+                className="w-full text-center text-xs text-muted-foreground hover:text-foreground mt-2 py-1.5 border rounded-lg transition-colors hover:bg-muted/30 bg-press"
               >
                 {showAllCalendar ? 'Show less' : `Show all ${calendarList.length} moments`}
               </button>

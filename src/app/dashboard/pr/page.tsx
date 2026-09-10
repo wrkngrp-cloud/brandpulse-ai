@@ -1,11 +1,13 @@
 import { createClient }         from '@/lib/supabase/server'
 import { redirect }             from 'next/navigation'
-import { Globe, TrendingUp, FileSearch, BarChart2, ExternalLink, Clock, Rss } from 'lucide-react'
+import { GlobeIcon as Globe, FileIcon as FileSearch, TrendIcon as BarChart2, ExternalLinkIcon as ExternalLink, ClockIcon as Clock, MusicIcon as Rss } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { getActiveBrand }       from '@/lib/active-brand'
 import { PrMentionsChart }      from './pr-mentions-chart'
 import { DateRangeFilter }      from '@/components/dashboard/date-range-filter'
 import { TriggerPrCrawlButton } from './trigger-pr-crawl-button'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface PressMention {
   id:              string
@@ -27,9 +29,9 @@ interface SovSnapshot {
 }
 
 const SENTIMENT_STYLE: Record<string, string> = {
-  positive: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  positive: 'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
   neutral:  'bg-muted text-muted-foreground',
-  negative: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  negative: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
 }
 
 function fmtReach(n: number | null): string {
@@ -158,7 +160,7 @@ export default async function PRTrackingPage({
                 <TrendingUp className="h-4 w-4" />
                 <span className="text-xs font-medium">Total EMV</span>
               </div>
-              <p className="text-2xl font-bold">{fmtEmv(totalEmv)}</p>
+              <p className="text-2xl font-bold bg-num">{fmtEmv(totalEmv)}</p>
               <p className="text-xs text-muted-foreground">earned media value</p>
             </div>
             <div className="border rounded-xl p-4 bg-card space-y-1">
@@ -166,7 +168,7 @@ export default async function PRTrackingPage({
                 <Globe className="h-4 w-4" />
                 <span className="text-xs font-medium">Total Reach</span>
               </div>
-              <p className="text-2xl font-bold">{fmtReach(totalReach)}</p>
+              <p className="text-2xl font-bold bg-num">{fmtReach(totalReach)}</p>
               <p className="text-xs text-muted-foreground">estimated readers</p>
             </div>
             <div className="border rounded-xl p-4 bg-card space-y-1">
@@ -174,7 +176,7 @@ export default async function PRTrackingPage({
                 <FileSearch className="h-4 w-4" />
                 <span className="text-xs font-medium">Press Mentions</span>
               </div>
-              <p className="text-2xl font-bold">{total}</p>
+              <p className="text-2xl font-bold bg-num">{total}</p>
               <p className="text-xs text-muted-foreground">last {days} days</p>
             </div>
             <div className="border rounded-xl p-4 bg-card space-y-1">
@@ -198,28 +200,28 @@ export default async function PRTrackingPage({
                 <div
                   key={label}
                   className={`rounded-lg p-3 space-y-1 ${
-                    label === 'positive' ? 'bg-green-50 dark:bg-green-900/10'
-                    : label === 'negative' ? 'bg-red-50 dark:bg-red-900/10'
+                    label === 'positive' ? 'bg-shell dark:bg-shell/10'
+                    : label === 'negative' ? 'bg-flare-wash dark:bg-shell/10'
                     : 'bg-muted/40'
                   }`}
                 >
                   <p className="text-xs text-muted-foreground capitalize">{label}</p>
-                  <p className="text-xl font-bold">{sentCounts[label]}</p>
+                  <p className="text-xl font-bold"><span className="bg-num">{sentCounts[label]}</span></p>
                   <p className="text-xs text-muted-foreground">
                     {total > 0 ? Math.round((sentCounts[label] / total) * 100) : 0}%
                   </p>
                 </div>
               ))}
             </div>
-            <div className="h-2 rounded-full overflow-hidden flex">
+            <div className="h-2 rounded-sm overflow-hidden flex">
               {sentCounts.positive > 0 && (
-                <div className="bg-green-500" style={{ width: `${(sentCounts.positive / total) * 100}%` }} />
+                <div className="bg-pos" style={{ width: `${(sentCounts.positive / total) * 100}%` }} />
               )}
               {sentCounts.neutral > 0 && (
                 <div className="bg-muted-foreground/30" style={{ width: `${(sentCounts.neutral / total) * 100}%` }} />
               )}
               {sentCounts.negative > 0 && (
-                <div className="bg-red-400" style={{ width: `${(sentCounts.negative / total) * 100}%` }} />
+                <div className="bg-flare" style={{ width: `${(sentCounts.negative / total) * 100}%` }} />
               )}
             </div>
           </div>
@@ -234,7 +236,7 @@ export default async function PRTrackingPage({
                     <div className="space-y-0.5 flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xs font-semibold">{mention.publication}</span>
-                        <span className="text-xs text-muted-foreground">{fmtDate(mention.published_at)}</span>
+                        <span className="text-xs text-muted-foreground bg-num">{fmtDate(mention.published_at)}</span>
                       </div>
                       <p className="text-sm text-foreground/90 leading-snug line-clamp-2">{mention.headline}</p>
                     </div>
@@ -253,8 +255,8 @@ export default async function PRTrackingPage({
                     </div>
                   </div>
                   <div className="flex items-center gap-4 pt-1 border-t text-xs text-muted-foreground flex-wrap">
-                    <span>Reach: <span className="font-medium text-foreground">{fmtReach(mention.estimated_reach)}</span></span>
-                    <span>EMV: <span className="font-medium text-foreground">{fmtEmv(mention.emv)}</span></span>
+                    <span>Reach: <span className="font-medium text-foreground bg-num">{fmtReach(mention.estimated_reach)}</span></span>
+                    <span>EMV: <span className="font-medium text-foreground bg-num">{fmtEmv(mention.emv)}</span></span>
                   </div>
                 </div>
               ))}
@@ -277,7 +279,7 @@ export default async function PRTrackingPage({
             <div className="space-y-3">
               <h2 className="text-sm font-semibold">
                 Competitor Mentions
-                <span className="text-xs font-normal text-muted-foreground ml-2">{competitorMentions.length} articles</span>
+                <span className="text-xs font-normal text-muted-foreground ml-2 bg-num">{competitorMentions.length} articles</span>
               </h2>
               <div className="space-y-2">
                 {competitorMentions.slice(0, 10).map(mention => (
@@ -289,7 +291,7 @@ export default async function PRTrackingPage({
                           <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                             {mention.competitor_name}
                           </span>
-                          <span className="text-xs text-muted-foreground">{fmtDate(mention.published_at)}</span>
+                          <span className="text-xs text-muted-foreground bg-num">{fmtDate(mention.published_at)}</span>
                         </div>
                         <p className="text-sm text-foreground/80 leading-snug line-clamp-2">{mention.headline}</p>
                       </div>
@@ -301,7 +303,7 @@ export default async function PRTrackingPage({
                       )}
                     </div>
                     <div className="flex items-center gap-3 pt-1 border-t text-xs text-muted-foreground">
-                      <span>Reach: {fmtReach(mention.estimated_reach)}</span>
+                      <span className="bg-num">Reach: {fmtReach(mention.estimated_reach)}</span>
                       {mention.sentiment_label && (
                         <span className={`px-1.5 py-0.5 rounded-full font-medium ${SENTIMENT_STYLE[mention.sentiment_label] ?? SENTIMENT_STYLE.neutral}`}>
                           {mention.sentiment_label.charAt(0).toUpperCase() + mention.sentiment_label.slice(1)}
@@ -326,14 +328,9 @@ export default async function PRTrackingPage({
                   <p className="text-xs text-muted-foreground">
                     Share of press coverage voice · {fmtDate(latestSov.snapshot_date)}
                   </p>
-                  <p className="text-3xl font-bold">{latestSov.press_sov?.toFixed(1)}%</p>
+                  <p className="text-3xl font-bold bg-num">{latestSov.press_sov?.toFixed(1)}%</p>
                 </div>
-                <div className="h-2.5 flex-1 min-w-[120px] rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full"
-                    style={{ width: `${latestSov.press_sov ?? 0}%` }}
-                  />
-                </div>
+                <Crescendo value={latestSov.press_sov ?? 0} height={10} />
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">

@@ -2,7 +2,8 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Upload, Users, UserCheck, UserX, Loader2, CheckCircle2 } from 'lucide-react'
+import { ArrowLeftIcon as ArrowLeft, ExportIcon as Upload, UsersIcon as Users, UsersIcon as UserCheck, UsersIcon as UserX, CheckIcon as CheckCircle2 } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -67,7 +68,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="border rounded-xl p-4 bg-card space-y-1">
             <Icon className="h-4 w-4 text-muted-foreground" />
-            <p className="text-xl font-bold tracking-tight">{value}</p>
+            <p className="text-xl font-bold tracking-tight"><span className="bg-num">{value}</span></p>
             <p className="text-[11px] text-muted-foreground">{label}</p>
           </div>
         ))}
@@ -78,7 +79,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
         <div>
           <p className="text-sm font-semibold">Import contacts</p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Upload a CSV with phone numbers. Columns: <span className="font-mono">name, phone</span> or just <span className="font-mono">phone</span>. Nigerian numbers (080…, 090…, +234…) are all accepted.
+            Upload a CSV with phone numbers. Columns: <span className="bg-num">name, phone</span> or just <span className="bg-num">phone</span>. Nigerian numbers (080…, 090…, +234…) are all accepted.
           </p>
         </div>
 
@@ -91,13 +92,13 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
         >
           {uploading ? (
             <div className="flex flex-col items-center gap-2">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <Loader2 className="h-6 w-6 text-primary" />
               <p className="text-sm text-muted-foreground">Importing…</p>
             </div>
           ) : imported ? (
             <div className="flex flex-col items-center gap-2">
-              <CheckCircle2 className="h-6 w-6 text-green-500" />
-              <p className="text-sm font-medium">{imported.count} contacts imported</p>
+              <CheckCircle2 className="h-6 w-6 text-pos" />
+              <p className="text-sm font-medium bg-num"><span className="bg-num">{imported.count}</span> contacts imported</p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
@@ -109,7 +110,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
 
         <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
 
-        <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+        <div className="rounded-lg bg-shell dark:bg-shell/20 border border-line dark:border-line p-3 text-xs text-tx-2 dark:text-tx-2 leading-relaxed">
           <strong>NDPR reminder:</strong> Only import numbers from people who have explicitly opted in to receive WhatsApp messages from your brand. Contacts who reply "STOP" are automatically removed.
         </div>
       </div>
@@ -117,7 +118,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
       {/* Contact list preview */}
       {contacts.length > 0 && (
         <section>
-          <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">
+          <h2 className="text-[11px] font-bold text-muted-foreground mb-3">
             Recent contacts {totalCount > 100 && `(showing 100 of ${totalCount.toLocaleString()})`}
           </h2>
           <div className="border rounded-xl bg-card overflow-hidden divide-y">
@@ -125,16 +126,16 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
               <div key={c.id} className="flex items-center gap-3 px-4 py-3">
                 <div className={cn(
                   'h-2 w-2 rounded-full shrink-0',
-                  c.whatsapp_opted_in ? 'bg-green-500' : 'bg-muted-foreground/30'
+                  c.whatsapp_opted_in ? 'bg-pos' : 'bg-muted-foreground/30'
                 )} />
                 <div className="flex-1 min-w-0">
                   {c.name && <p className="text-sm font-medium truncate">{c.name}</p>}
-                  <p className={cn('font-mono text-xs', c.name ? 'text-muted-foreground' : 'text-foreground')}>{c.phone_e164}</p>
+                  <p className={cn('bg-num text-xs', c.name ? 'text-muted-foreground' : 'text-foreground')}>{c.phone_e164}</p>
                 </div>
                 <span className={cn(
-                  'text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0',
+                  'text-[10px] font-medium px-2 py-0.5 rounded-sm shrink-0',
                   c.whatsapp_opted_in
-                    ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400'
+                    ? 'bg-shell text-pos dark:bg-shell/40 dark:text-pos'
                     : 'bg-muted text-muted-foreground'
                 )}>
                   {c.whatsapp_opted_in ? 'Opted in' : 'Opted out'}

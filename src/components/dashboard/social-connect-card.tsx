@@ -1,7 +1,8 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react'
+import { CheckIcon as CheckCircle2, RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 function IgIcon({ className }: { className?: string }) {
   return (
@@ -33,9 +34,9 @@ export interface ConnectionStatus {
 }
 
 const PLATFORM_META = {
-  instagram: { label: 'Instagram', Icon: IgIcon, colour: 'text-pink-600' },
-  facebook: { label: 'Facebook', Icon: FbIcon, colour: 'text-blue-600' },
-  twitter: { label: 'X (Twitter)', Icon: XIcon, colour: 'text-sky-500' },
+  instagram: { label: 'Instagram', Icon: IgIcon, colour: 'text-tx-2' },
+  facebook: { label: 'Facebook', Icon: FbIcon, colour: 'text-tx-flare' },
+  twitter: { label: 'X (Twitter)', Icon: XIcon, colour: 'text-tx-2' },
 } as const
 
 export function SocialConnectCard({ connections }: { connections: ConnectionStatus[] }) {
@@ -79,7 +80,7 @@ export function SocialConnectCard({ connections }: { connections: ConnectionStat
               <div className="flex items-center gap-2">
                 {conn ? (
                   conn.sync_status === 'active' ? (
-                    <span className="flex items-center gap-1 text-xs text-green-600">
+                    <span className="flex items-center gap-1 text-xs text-pos">
                       <CheckCircle2 className="h-3.5 w-3.5" /> Connected
                     </span>
                   ) : (

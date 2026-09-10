@@ -7,10 +7,7 @@ import Link           from 'next/link'
 import { Badge }      from '@/components/ui/badge'
 import { ItemActions, type ItemAction } from '@/components/ui/item-actions'
 import { goLive, closeEvent, deleteEvent } from '@/app/dashboard/events/actions'
-import {
-  CalendarDays, MapPin, Radio, Square,
-  ClipboardEdit, Trash2, ExternalLink,
-} from 'lucide-react'
+import { CalendarIcon as CalendarDays, MapIcon as MapPin, MusicIcon as Radio, LayoutGridIcon as Square, EditIcon as ClipboardEdit, TrashIcon as Trash2, ExternalLinkIcon as ExternalLink } from '@/components/brand/icon'
 import { formatNGN, cn } from '@/lib/utils'
 
 interface Event {
@@ -47,13 +44,13 @@ const ACTIVATION_LABELS: Record<string, string> = {
 
 function activationBadgeClass(type: string): string {
   if (['sampling', 'roadshow', 'market_activation'].includes(type)) {
-    return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+    return 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
   }
   if (['church_mosque', 'estate_community', 'school_contact'].includes(type)) {
-    return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+    return 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2'
   }
   if (['branded_truck', 'sports_sponsorship', 'concert_festival'].includes(type)) {
-    return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+    return 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
   }
   return 'bg-muted text-muted-foreground'
 }
@@ -127,7 +124,7 @@ function EventRow({ ev }: { ev: Event }) {
               <Badge variant={badge.variant} className="text-xs shrink-0">{badge.label}</Badge>
               {activationType && (
                 <span className={cn(
-                  'text-xs px-2 py-0.5 rounded-full font-medium shrink-0',
+                  'text-xs px-2 py-0.5 rounded-sm font-medium shrink-0',
                   activationBadgeClass(activationType),
                 )}>
                   {ACTIVATION_LABELS[activationType] ?? activationType}
@@ -150,7 +147,7 @@ function EventRow({ ev }: { ev: Event }) {
           {ev.expected_attendance != null && (
             <div className="text-right shrink-0 pr-8">
               <p className="text-xs text-muted-foreground">Est. Attendance</p>
-              <p className="text-sm font-medium">{ev.expected_attendance.toLocaleString()}</p>
+              <p className="text-sm font-medium bg-num">{ev.expected_attendance.toLocaleString()}</p>
             </div>
           )}
         </div>

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { Menu, X } from 'lucide-react'
+import { MenuIcon as Menu, XIcon as X } from '@/components/brand/icon'
 import { usePathname } from 'next/navigation'
 import { DashboardNav } from './dashboard-nav'
 import { cn } from '@/lib/utils'
+import { BrandLockup } from '@/components/brand/logo'
 
 interface MobileNavProps {
   userName?:  string
@@ -46,19 +47,11 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
         {/* Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border/70 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div
-              className="h-8 w-8 rounded-xl grid place-items-center shrink-0"
-              style={{ background: 'linear-gradient(135deg, #6B8FFF 0%, #2B59FF 100%)', boxShadow: '0 4px 14px -4px oklch(0.485 0.25 258 / 0.55)' }}
-            >
-              <svg viewBox="0 0 20 20" className="h-[14px] w-[14px]" fill="none" aria-hidden>
-                <polyline points="2,10 6,6 9.5,13 13.5,7.5 18,10" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <span className="font-bold text-[15px] tracking-tight text-gradient-blue">BrandGauge</span>
+            <BrandLockup height={20} tone="duotone" ground="ink" />
           </div>
           <button
             onClick={() => setOpen(false)}
-            className="p-1.5 rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer bg-press"
             aria-label="Close navigation"
           >
             <X className="h-4 w-4" />
@@ -77,9 +70,9 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
               <span
                 className="h-8 w-8 shrink-0 rounded-lg grid place-items-center text-[12px] font-bold select-none"
                 style={{
-                  background: 'linear-gradient(135deg, oklch(0.485 0.25 258 / 0.18) 0%, oklch(0.585 0.163 37 / 0.12) 100%)',
-                  color: 'oklch(0.485 0.25 258)',
-                  border: '1px solid oklch(0.485 0.25 258 / 0.20)',
+                  background: 'var(--bg-shell)',
+                  color: 'var(--tx-2)',
+                  border: 'var(--line)',
                 }}
               >
                 {(userName || userEmail).trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?'}
@@ -101,7 +94,7 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
       {/* Hamburger button — stays inside the header */}
       <button
         onClick={() => setOpen(true)}
-        className="md:hidden p-2 -ml-1 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
+        className="md:hidden p-2 -ml-1 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer bg-press"
         aria-label="Open navigation"
         aria-expanded={open}
       >

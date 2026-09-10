@@ -1,13 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
-import {
-  PanelLeftClose, PanelLeft, Sparkles, Settings,
-  LogOut, ChevronUp, ChevronsUpDown,
-} from 'lucide-react'
+import { PanelIcon as PanelLeftClose, PanelIcon as PanelLeft, SettingsIcon as Settings, LogoutIcon as LogOut, ChevronsUpdownIcon as ChevronsUpDown } from '@/components/brand/icon'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { logout } from '@/app/auth/actions'
@@ -19,39 +16,7 @@ import { DashboardNav } from './dashboard-nav'
 import { BrandSwitcher } from './brand-switcher'
 import type { BrandOption } from './brand-switcher'
 import { cn } from '@/lib/utils'
-
-// ── Logo / pulse mark ─────────────────────────────────────────────────────
-
-function PulseMark({ size = 32 }: { size?: number }) {
-  return (
-    <motion.div
-      className="shrink-0 grid place-items-center rounded-xl"
-      animate={{
-        boxShadow: [
-          '0 4px 14px -4px rgba(43,89,255,0.50)',
-          '0 4px 22px -2px rgba(43,89,255,0.78)',
-          '0 4px 14px -4px rgba(43,89,255,0.50)',
-        ],
-      }}
-      transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-      style={{
-        height: size,
-        width:  size,
-        background: 'linear-gradient(135deg, #5E7FFF 0%, #2B59FF 100%)',
-      }}
-    >
-      <svg viewBox="0 0 20 20" fill="none" style={{ height: size * 0.46, width: size * 0.46 }} aria-hidden>
-        <polyline
-          points="2,10 6,6 9.5,13 13.5,7.5 18,10"
-          stroke="white"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </motion.div>
-  )
-}
+import { BrandMark, BrandLockup } from '@/components/brand/logo'
 
 // ── Sidebar user block ─────────────────────────────────────────────────────
 
@@ -87,9 +52,9 @@ function SidebarUserBlock({
         <span
           className="h-8 w-8 shrink-0 rounded-lg grid place-items-center text-[12px] font-bold select-none"
           style={{
-            background: 'linear-gradient(135deg, oklch(0.485 0.25 258 / 0.18) 0%, oklch(0.585 0.163 37 / 0.12) 100%)',
-            color: 'oklch(0.485 0.25 258)',
-            border: '1px solid oklch(0.485 0.25 258 / 0.20)',
+            background: 'var(--bg-shell)',
+            color: 'var(--tx-2)',
+            border: 'var(--line)',
           }}
         >
           {initials}
@@ -174,9 +139,11 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
       className={cn(
         'fixed inset-y-0 left-0 z-40 hidden md:flex flex-col',
         'bg-sidebar border-r border-sidebar-border',
-        'overflow-hidden transition-[width] duration-200 ease-out',
+        /* No animation touches width in this system: the rail changes
+           width outright and the state reads through colour instead. */
+        'overflow-hidden',
         /* subtle shadow when expanded as overlay (collapsed mode) */
-        !pinned && hovering && 'shadow-[4px_0_24px_-4px_rgba(0,0,0,0.12)] dark:shadow-[4px_0_24px_-4px_rgba(0,0,0,0.40)]',
+        !pinned && hovering && 'border-r border-line-inv',
       )}
       style={{ width: expanded ? '256px' : '72px' }}
       onMouseEnter={() => !pinned && setHovering(true)}
@@ -185,17 +152,16 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
 
       {/* ── Logo area ──────────────────────────────────────────── */}
       <div className="h-14 shrink-0 flex items-center gap-3 border-b border-sidebar-border/70 px-[18px]">
-        <PulseMark size={32} />
-
-        {/* Wordmark */}
+        {/* The mark as supplied. Duotone on the ink plane, and the lockup
+            only once the rail is wide enough to carry the wordmark. */}
+        <BrandMark size={28} ground="ink" className="shrink-0" />
         <span
           className={cn(
-            'font-bold text-[15px] tracking-tight whitespace-nowrap text-gradient-blue',
             'transition-opacity duration-150',
             expanded ? 'opacity-100 delay-75' : 'opacity-0',
           )}
         >
-          BrandGauge
+          <BrandLockup height={16} ground="ink" />
         </span>
 
         {/* Collapse/expand toggle */}
@@ -204,7 +170,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
           className={cn(
             'ml-auto h-7 w-7 shrink-0 grid place-items-center rounded-lg cursor-pointer',
             'text-sidebar-foreground/35 hover:text-sidebar-foreground hover:bg-sidebar-accent',
-            'transition-all duration-150',
+            'transition-colors duration-150',
             expanded ? 'opacity-100 delay-75' : 'opacity-0 pointer-events-none',
           )}
           aria-label={pinned ? 'Collapse sidebar' : 'Pin sidebar'}
@@ -226,7 +192,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
         <Link
           href="/dashboard/ask"
           className={cn(
-            'ask-ai-btn flex items-center gap-2.5 rounded-xl transition-all duration-150',
+            'ask-ai-btn flex items-center gap-2.5 rounded-xl transition-colors duration-150',
             'overflow-hidden',
             expanded ? 'h-10 px-3' : 'h-10 justify-center px-0',
             isAskActive && 'ring-1 ring-primary/30',
@@ -236,7 +202,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
           {expanded && (
             <>
               <span className="text-[13px] font-semibold whitespace-nowrap">Ask AI</span>
-              <kbd className="ml-auto text-[9.5px] font-mono bg-background/50 border border-current/20 rounded px-1.5 py-0.5 opacity-60 leading-none">
+              <kbd className="ml-auto text-[9.5px] bg-num bg-background/50 border border-current/20 rounded px-1.5 py-0.5 opacity-60 leading-none">
                 ⌘K
               </kbd>
             </>

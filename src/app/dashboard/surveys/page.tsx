@@ -3,7 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { Skeleton }     from '@/components/ui/skeleton'
 import { NewSurveyDialog } from './new-survey-dialog'
 import { SurveysList }  from '@/components/surveys/surveys-list'
-import { MessageSquare, TrendingUp, BarChart2, Users, CheckCircle2, Clock } from 'lucide-react'
+import { TrendIcon as BarChart2, UsersIcon as Users, CheckIcon as CheckCircle2, ClockIcon as Clock } from '@/components/brand/icon'
+import { MentionsIcon as MessageSquare, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 import { LaunchPerceptionAuditButton } from './launch-perception-audit-button'
@@ -24,9 +25,9 @@ const PERCEPTION_DIMENSIONS = [
 ]
 
 function dimScoreColor(score: number) {
-  if (score >= 4)   return 'text-green-600'
-  if (score >= 3)   return 'text-amber-600'
-  return 'text-red-500'
+  if (score >= 4)   return 'text-pos'
+  if (score >= 3)   return 'text-tx-2'
+  return 'text-tx-flare'
 }
 
 function dimBarWidth(score: number) {
@@ -34,9 +35,9 @@ function dimBarWidth(score: number) {
 }
 
 function dimBarColor(score: number) {
-  if (score >= 4)   return 'bg-green-500'
-  if (score >= 3)   return 'bg-amber-400'
-  return 'bg-red-400'
+  if (score >= 4)   return 'bg-pos'
+  if (score >= 3)   return 'bg-ember'
+  return 'bg-flare'
 }
 
 // ── Perception Audit Section ─────────────────────────────────────────────────
@@ -106,7 +107,7 @@ async function PerceptionAuditSection() {
           <BarChart2 className="h-4 w-4 text-muted-foreground" />
           <h2 className="text-base font-semibold">Perception Audit</h2>
           {totalResponses > 0 && (
-            <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+            <span className="text-xs bg-muted px-2 py-0.5 rounded-sm text-muted-foreground">
               {totalResponses} {totalResponses === 1 ? 'response' : 'responses'}
             </span>
           )}
@@ -127,7 +128,7 @@ async function PerceptionAuditSection() {
               {dimensionScores.map(dim => (
                 <div key={dim.key} className="flex items-center gap-3 px-4 sm:px-5 py-3">
                   <p className="text-xs sm:text-sm w-24 sm:w-36 shrink-0">{dim.label}</p>
-                  <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="flex-1 h-1.5 bg-muted rounded-sm overflow-hidden">
                     {dim.avg != null && (
                       <div
                         className={`h-full rounded-full ${dimBarColor(dim.avg)}`}
@@ -135,7 +136,7 @@ async function PerceptionAuditSection() {
                       />
                     )}
                   </div>
-                  <span className={`text-sm font-semibold tabular-nums w-8 text-right shrink-0 ${dim.avg != null ? dimScoreColor(dim.avg) : 'text-muted-foreground/40'}`}>
+                  <span className={`text-sm font-semibold bg-num w-8 text-right shrink-0 ${dim.avg != null ? dimScoreColor(dim.avg) : 'text-muted-foreground/40'}`}>
                     {dim.avg != null ? dim.avg.toFixed(1) : '—'}
                   </span>
                 </div>
@@ -179,7 +180,7 @@ async function PerceptionAuditSection() {
                   </div>
                   <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full capitalize ${
                     isLive
-                      ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400'
+                      ? 'bg-shell text-pos dark:bg-pos dark:text-pos'
                       : s.status === 'draft'
                         ? 'bg-muted text-muted-foreground'
                         : 'bg-muted text-muted-foreground'

@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import {
-  Database, RefreshCw, Search, Loader2, Users,
-  Star, Minus, ThumbsDown, ShieldCheck, Activity,
-  Mail, Phone, Calendar,
-} from 'lucide-react'
+import { DatabaseIcon as Database, RefreshIcon as RefreshCw, UsersIcon as Users, StarIcon as Star, MinusIcon as Minus, XCircleIcon as ThumbsDown, ShieldIcon as ShieldCheck, TrendIcon as Activity, MailIcon as Mail, PhoneIcon as Phone, CalendarIcon as Calendar } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { SearchIcon as Search } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -33,9 +31,9 @@ interface CustomerProfile {
 }
 
 const NPS_ICON = {
-  promoter:  <Star className="h-3 w-3 text-green-500" />,
-  passive:   <Minus className="h-3 w-3 text-yellow-500" />,
-  detractor: <ThumbsDown className="h-3 w-3 text-red-500" />,
+  promoter:  <Star className="h-3 w-3 text-pos" />,
+  passive:   <Minus className="h-3 w-3 text-tx-2" />,
+  detractor: <ThumbsDown className="h-3 w-3 text-tx-flare" />,
 }
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -114,7 +112,7 @@ export function CdpClient() {
           <TourTrigger module="cdp" autoStart />
           <Button onClick={handleSync} disabled={syncing} size="sm">
             {syncing
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Syncing...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" />Syncing...</>
               : <><RefreshCw className="h-4 w-4 mr-2" />Sync data</>}
           </Button>
         </div>
@@ -123,10 +121,10 @@ export function CdpClient() {
       {/* KPI chips */}
       <div className="flex flex-wrap gap-2" data-tour="cdp-main">
         <KpiChip icon={<Users className="h-3 w-3" />}      label="Total profiles"   value={total} />
-        <KpiChip icon={<Star className="h-3 w-3 text-green-500" />}     label="Promoters"   value={promoters} />
-        <KpiChip icon={<Minus className="h-3 w-3 text-yellow-500" />}   label="Passives"    value={passives} />
-        <KpiChip icon={<ThumbsDown className="h-3 w-3 text-red-500" />} label="Detractors"  value={detractors} />
-        <KpiChip icon={<Activity className="h-3 w-3 text-orange-500" />} label="At risk"    value={atRisk} />
+        <KpiChip icon={<Star className="h-3 w-3 text-pos" />}     label="Promoters"   value={promoters} />
+        <KpiChip icon={<Minus className="h-3 w-3 text-tx-2" />}   label="Passives"    value={passives} />
+        <KpiChip icon={<ThumbsDown className="h-3 w-3 text-tx-flare" />} label="Detractors"  value={detractors} />
+        <KpiChip icon={<Activity className="h-3 w-3 text-tx-2" />} label="At risk"    value={atRisk} />
       </div>
 
       {/* Filters */}
@@ -146,7 +144,7 @@ export function CdpClient() {
               key={v}
               onClick={() => { setNpsFilter(v); setPage(1); load(search, v, 1) }}
               className={cn(
-                'px-3 py-1.5 rounded-full border text-xs font-medium transition-colors capitalize',
+                'px-3 py-1.5 rounded-sm border text-xs font-medium transition-colors capitalize',
                 npsFilter === v
                   ? 'bg-foreground text-background border-foreground'
                   : 'hover:bg-muted border-border'
@@ -167,7 +165,7 @@ export function CdpClient() {
             Click "Sync data" to merge customer records from your surveys, WhatsApp contacts, and app reviews.
           </p>
           <Button className="mt-4" size="sm" onClick={handleSync} disabled={syncing}>
-            {syncing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+            {syncing ? <Loader2 className="h-4 w-4 mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
             Sync now
           </Button>
         </div>
@@ -208,18 +206,18 @@ export function CdpClient() {
 
 function KpiChip({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-card text-xs">
+    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm border bg-card text-xs">
       {icon}
       <span className="text-muted-foreground">{label}:</span>
-      <span className="font-semibold">{value.toLocaleString()}</span>
+      <span className="font-semibold bg-num">{value.toLocaleString()}</span>
     </div>
   )
 }
 
 function ProfileCard({ profile }: { profile: CustomerProfile }) {
   const riskColor =
-    profile.retention_risk_score >= 70 ? 'border-red-300 bg-red-50/30' :
-    profile.retention_risk_score >= 45 ? 'border-orange-200 bg-orange-50/20' :
+    profile.retention_risk_score >= 70 ? 'border-line-strong bg-flare-wash/30' :
+    profile.retention_risk_score >= 45 ? 'border-line bg-shell/20' :
     'border-border bg-card'
 
   const activeSources = Object.entries(profile.sources)
@@ -227,7 +225,7 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
     .map(([k]) => SOURCE_LABEL[k] ?? k)
 
   return (
-    <div className={cn('rounded-xl border p-4 space-y-3 hover:shadow-sm transition-shadow', riskColor)}>
+    <div className={cn('rounded-xl border p-4 space-y-3 transition-shadow', riskColor)}>
       {/* Identity */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
@@ -240,7 +238,7 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
         </div>
         <div className="flex items-center gap-1 shrink-0">
           {profile.is_promoter && (
-            <Badge variant="outline" className="text-xs border-green-300 text-green-700">Promoter</Badge>
+            <Badge variant="outline" className="text-xs border-line text-pos">Promoter</Badge>
           )}
           {profile.nps_label && (
             <div className="flex items-center gap-1">
@@ -277,9 +275,9 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
         {profile.nps_score !== null && (
           <Badge variant="outline" className={cn(
             'text-xs',
-            profile.nps_label === 'promoter' ? 'border-green-300 text-green-700' :
-            profile.nps_label === 'detractor' ? 'border-red-300 text-red-700' :
-            'border-yellow-300 text-yellow-700'
+            profile.nps_label === 'promoter' ? 'border-line text-pos' :
+            profile.nps_label === 'detractor' ? 'border-line-strong text-tx-flare' :
+            'border-line text-tx-2'
           )}>
             NPS {profile.nps_score} · {profile.nps_label}
           </Badge>
@@ -287,7 +285,7 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
         {profile.retention_risk_score >= 45 && (
           <Badge variant="outline" className={cn(
             'text-xs',
-            profile.retention_risk_score >= 70 ? 'border-red-300 text-red-700' : 'border-orange-300 text-orange-700'
+            profile.retention_risk_score >= 70 ? 'border-line-strong text-tx-flare' : 'border-line text-tx-2'
           )}>
             Risk: {profile.retention_risk_score}
           </Badge>
@@ -306,8 +304,8 @@ function ProfileCard({ profile }: { profile: CustomerProfile }) {
       {/* Spend */}
       {profile.total_spend > 0 && (
         <div className="flex items-center justify-between text-xs border-t pt-2 mt-1">
-          <span className="text-muted-foreground">{profile.total_orders} orders</span>
-          <span className="font-semibold">{formatNGN(profile.total_spend)}</span>
+          <span className="text-muted-foreground"><span className="bg-num">{profile.total_orders}</span> orders</span>
+          <span className="font-semibold bg-num">{formatNGN(profile.total_spend)}</span>
         </div>
       )}
     </div>

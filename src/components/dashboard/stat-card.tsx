@@ -3,11 +3,10 @@
 import { useId } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { TrendingUp, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { fadeUp } from '@/lib/motion'
 
-type Tone = 'blue' | 'green' | 'amber' | 'clay' | 'violet'
+type Tone = 'hero' | 'nominal' | 'neutral' | 'alert' | 'quiet'
 
 interface SparkPoint { date: string; value: number }
 
@@ -24,28 +23,31 @@ interface StatCardProps {
   loading?:    boolean
 }
 
+/* The icon plate is the same shell in every tone: the tone is carried by the
+   mark inside it, not by a coloured box. */
 const TONE_BOX: Record<Tone, string> = {
-  blue:   'icon-box-blue',
-  green:  'icon-box-green',
-  amber:  'icon-box-amber',
-  clay:   'icon-box-clay',
-  violet: 'icon-box-violet',
+  hero:    'icon-plate',
+  nominal: 'icon-plate',
+  neutral: 'icon-plate',
+  alert:   'icon-plate',
+  quiet:   'icon-plate',
 }
 
 const TONE_SURFACE: Record<Tone, string> = {
-  blue:   'tone-surface-blue',
-  green:  'tone-surface-green',
-  amber:  'tone-surface-amber',
-  clay:   'tone-surface-clay',
-  violet: 'tone-surface-violet',
+  hero:    'tone-surface',
+  nominal: 'tone-surface',
+  neutral: 'tone-surface',
+  alert:   'tone-surface',
+  quiet:   'tone-surface',
 }
 
+/* Heat marks the subject. Everything else is ink, ash or the hairline. */
 const STROKE: Record<Tone, string> = {
-  blue:   '#4F79FF',
-  green:  '#22c55e',
-  amber:  '#f59e0b',
-  clay:   '#D4602A',
-  violet: '#7C3AED',
+  hero:    'var(--flare)',
+  nominal: 'var(--pos)',
+  neutral: 'var(--neu)',
+  alert:   'var(--neg)',
+  quiet:   'var(--tx-3)',
 }
 
 // ── Smooth bezier sparkline ────────────────────────────────────────────────
@@ -128,7 +130,7 @@ export function StatCard({
   suffix,
   delta,
   deltaLabel = 'vs last period',
-  tone = 'blue',
+  tone = 'hero',
   icon: Icon,
   spark,
   href,
@@ -136,7 +138,6 @@ export function StatCard({
 }: StatCardProps) {
   const uid    = useId()
   const isUp   = delta != null && delta >= 0
-  const isDown = delta != null && delta < 0
 
   const inner = (
     <motion.div
@@ -150,21 +151,19 @@ export function StatCard({
     >
       {/* Header row */}
       <div className="flex items-start justify-between mb-3.5">
-        <div className={cn('h-10 w-10 rounded-xl grid place-items-center shrink-0 text-white', TONE_BOX[tone])}>
+        <div className={cn('h-10 w-10 rounded-xl grid place-items-center shrink-0 text-tx-inv', TONE_BOX[tone])}>
           <Icon className="h-[17px] w-[17px]" />
         </div>
 
         {delta != null && !loading && (
           <span className={cn(
-            'inline-flex items-center gap-1 rounded-full px-2 py-0.5',
+            'inline-flex items-center gap-1 rounded-sm px-2 py-0.5',
             'text-[10.5px] font-semibold leading-none',
             isUp ? 'trend-up' : 'trend-down',
           )}>
-            {isUp
-              ? <TrendingUp  className="h-2.5 w-2.5" />
-              : <TrendingDown className="h-2.5 w-2.5" />
-            }
-            {Math.abs(delta).toFixed(1)}%
+            <span className="bg-num">
+              {isUp ? '+' : '−'}{Math.abs(delta).toFixed(1)}%
+            </span>
           </span>
         )}
       </div>
@@ -184,7 +183,7 @@ export function StatCard({
       )}
 
       {/* Label */}
-      <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.11em] text-muted-foreground/50 select-none leading-none">
+      <p className="mt-2 text-[11px] font-semibold text-muted-foreground/50 select-none leading-none">
         {label}
       </p>
 

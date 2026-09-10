@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
 } from '@/components/ui/dialog'
-import { TriangleAlert } from 'lucide-react'
+import { AlertIcon as TriangleAlert } from '@/components/brand/icon'
 
 export function ProfileForm({ name, email }: { name: string; email: string }) {
   const [profileState, profileAction, profilePending] = useActionState(updateProfile, null)
@@ -115,7 +115,7 @@ export function ProfileForm({ name, email }: { name: string; email: string }) {
 
           <div className="space-y-2 py-2">
             <Label htmlFor="deleteConfirm" className="text-sm">
-              Type <span className="font-mono font-semibold">DELETE</span> to confirm
+              Type <span className="bg-num font-semibold">DELETE</span> to confirm
             </Label>
             <Input
               id="deleteConfirm"
@@ -131,7 +131,7 @@ export function ProfileForm({ name, email }: { name: string; email: string }) {
 
           <DialogFooter>
             <DialogClose
-              render={<button type="button" />}
+              render={<button type="button" className="bg-press" />}
               className="inline-flex items-center justify-center h-9 px-4 rounded-md border border-input bg-background text-sm font-medium hover:bg-accent transition-colors"
             >
               Cancel

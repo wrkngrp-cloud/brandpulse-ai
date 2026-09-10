@@ -12,6 +12,7 @@ export type IndustryId = typeof INDUSTRY_IDS[number]
 export type IndustryMeta = {
   id:       IndustryId
   label:    string
+  /** A glyph id in brand/icons.svg, drawn on the section 7 grid. */
   icon:     string
   tagline:  string
   examples: string
@@ -21,91 +22,91 @@ export const INDUSTRY_META: Record<IndustryId, IndustryMeta> = {
   fmcg: {
     id:       'fmcg',
     label:    'FMCG / Consumer Goods',
-    icon:     '🛒',
+    icon:     'bg-shelf',
     tagline:  'Packaged goods, food and beverage, home and personal care',
     examples: 'Nestle, Dangote, PZ Cussons, Unilever, Cadbury',
   },
   fintech: {
     id:       'fintech',
     label:    'Fintech / Financial Services',
-    icon:     '💳',
+    icon:     'bg-card',
     tagline:  'Digital banking, payments, lending, savings and insurance tech',
     examples: 'Kuda, Paystack, PiggyVest, Flutterwave, Moniepoint',
   },
   telco: {
     id:       'telco',
     label:    'Telco / Telecoms',
-    icon:     '📡',
+    icon:     'bg-broadcast',
     tagline:  'Mobile networks, data services, broadband and enterprise connectivity',
     examples: 'MTN, Airtel, Glo, 9mobile, Smile Communications',
   },
   qsr: {
     id:       'qsr',
     label:    'QSR / Food Service',
-    icon:     '🍔',
+    icon:     'bg-venue',
     tagline:  'Quick service restaurants, food delivery, cafes and casual dining',
     examples: 'Chicken Republic, Mr Biggs, Dominos, Cold Stone, Bolt Food',
   },
   ecommerce: {
     id:       'ecommerce',
     label:    'E-commerce / Retail',
-    icon:     '🛍',
+    icon:     'bg-market',
     tagline:  'Online and physical retail, DTC brands and marketplace sellers',
     examples: 'Jumia, Konga, Spar, Shoprite, Payporte',
   },
   b2b_saas: {
     id:       'b2b_saas',
     label:    'B2B / SaaS',
-    icon:     '🖥',
+    icon:     'bg-saas',
     tagline:  'Business software, enterprise services, professional tools',
     examples: 'Zoho, Termii, Sendchamp, BuyPower, Accounteer',
   },
   media: {
     id:       'media',
     label:    'Media / Entertainment',
-    icon:     '🎬',
+    icon:     'bg-camera',
     tagline:  'Publishing, streaming, film, music and digital content',
     examples: 'Showmax, Africa Magic, Audiomack, Boomplay, Pulse',
   },
   healthcare: {
     id:       'healthcare',
     label:    'Healthcare / Pharma',
-    icon:     '🏥',
+    icon:     'bg-shield',
     tagline:  'Hospitals, pharmaceuticals, healthtech and wellness brands',
     examples: 'Emzor, May and Baker, LifeBank, Reliance HMO, Helium Health',
   },
   real_estate: {
     id:       'real_estate',
     label:    'Real Estate',
-    icon:     '🏢',
+    icon:     'bg-venue',
     tagline:  'Property development, agencies, proptech and facilities',
     examples: 'Landwey, Revolution Plus, PropertyPro, Mixta Africa',
   },
   insurance: {
     id:       'insurance',
     label:    'Insurance',
-    icon:     '🛡',
+    icon:     'bg-shield',
     tagline:  'Life, health, auto and SME insurance providers',
     examples: 'Leadway, AXA Mansard, Stanbic IBTC, NEM Insurance',
   },
   fashion: {
     id:       'fashion',
     label:    'Fashion / Lifestyle',
-    icon:     '👗',
+    icon:     'bg-shop',
     tagline:  'Clothing, footwear, beauty, accessories and lifestyle brands',
     examples: 'Polo Ralph Lauren Nigeria, Veekee James, Zaron, House of Lunaris',
   },
   agency: {
     id:       'agency',
     label:    'Marketing Agency',
-    icon:     '🏆',
+    icon:     'bg-people',
     tagline:  'Managing campaigns, strategy and measurement for multiple clients',
     examples: 'Insight Publicis, Noah, X3M Ideas, Rosabel, DDB Lagos',
   },
   other: {
     id:       'other',
     label:    'Other',
-    icon:     '✦',
+    icon:     'bg-gauge',
     tagline:  'Logistics, education, automotive, NGO or another vertical',
     examples: '',
   },

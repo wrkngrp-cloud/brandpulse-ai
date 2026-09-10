@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button'
 import { cn } from '@/lib/utils'
-import { Loader2, ArrowRight, BarChart2, Globe2, Users2, Zap } from 'lucide-react'
+import { ArrowRightIcon as ArrowRight, TrendIcon as BarChart2, GlobeIcon as Globe2, UsersIcon as Users2, AskIcon as Zap } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 
 // ── Demo accounts ──────────────────────────────────────────────────────────────
 
@@ -77,7 +78,7 @@ function DemoTile({
       type="button"
       onClick={() => onSelect(demo)}
       className={cn(
-        'w-full text-left rounded-xl border p-3 transition-all hover:border-foreground/40 hover:bg-muted/30',
+        'w-full text-left rounded-xl border p-3 transition-colors hover:border-foreground/40 hover:bg-muted/30',
         active && 'border-foreground/60 bg-muted/40 ring-1 ring-foreground/10',
       )}
     >
@@ -86,7 +87,7 @@ function DemoTile({
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-1.5">
             <span className="text-[13px] font-semibold">{demo.brand}</span>
-            <span className="text-[11px] text-muted-foreground border rounded-full px-1.5 py-0.5 leading-none">{demo.industry}</span>
+            <span className="text-[11px] text-muted-foreground border rounded-sm px-1.5 py-0.5 leading-none">{demo.industry}</span>
           </div>
           <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{demo.tagline}</p>
         </div>
@@ -185,7 +186,7 @@ function LoginContent() {
 
             <form ref={formRef} id="email-login-form" action={action} className="space-y-4">
               {linkExpired && (
-                <p className="text-sm text-amber-700 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400 px-3 py-2 rounded-lg">
+                <p className="text-sm text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2 px-3 py-2 rounded-lg">
                   That reset link has expired. Request a new one below.
                 </p>
               )}
@@ -233,7 +234,7 @@ function LoginContent() {
               )}
 
               <Button className="w-full" type="submit" form="email-login-form" disabled={pending}>
-                {pending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                {pending ? <Loader2 className="h-4 w-4 mr-2" /> : null}
                 {pending ? 'Signing in...' : 'Sign in'}
               </Button>
             </form>

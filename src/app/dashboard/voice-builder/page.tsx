@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
-import {
-  Loader2, Sparkles, Plus, Trash2, CheckCircle2, Wand2,
-  PenLine, Copy, RefreshCw, ChevronDown,
-} from 'lucide-react'
+import { PlusIcon as Plus, TrashIcon as Trash2, CheckIcon as CheckCircle2, LightbulbIcon as Wand2, EditIcon as PenLine, CopyIcon as Copy, RefreshIcon as RefreshCw, ChevronDownIcon as ChevronDown } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
@@ -232,7 +231,7 @@ export default function VoiceBuilderPage() {
                   <button
                     type="button"
                     onClick={() => removeSample(i)}
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 rounded-md hover:bg-muted flex items-center justify-center"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 rounded-md hover:bg-muted flex items-center justify-center bg-press"
                   >
                     <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
                   </button>
@@ -245,7 +244,7 @@ export default function VoiceBuilderPage() {
               </Button>
               <Button onClick={build} disabled={building} size="sm">
                 {building
-                  ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Analysing...</>
+                  ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Analysing...</>
                   : <><Sparkles className="h-3.5 w-3.5 mr-1.5" />Build voice profile</>}
               </Button>
             </div>
@@ -254,14 +253,14 @@ export default function VoiceBuilderPage() {
           {voiceResult && (
             <div className="rounded-2xl border bg-card divide-y divide-border/50">
               <div className="p-5 flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                <CheckCircle2 className="h-5 w-5 text-pos shrink-0 mt-0.5" />
                 <div>
                   <p className="text-[14px] font-semibold">Voice profile extracted</p>
                   <p className="text-[12.5px] text-muted-foreground mt-0.5">{voiceResult.confidenceNote}</p>
                 </div>
               </div>
               <div className="p-5">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Voice adjectives</p>
+                <p className="text-[11px] font-bold text-muted-foreground mb-3">Voice adjectives</p>
                 <div className="flex flex-wrap gap-2">
                   {voiceResult.adjectives.map(a => (
                     <Badge key={a} variant="secondary" className="text-[12px] px-2.5 py-1">{a}</Badge>
@@ -269,33 +268,33 @@ export default function VoiceBuilderPage() {
                 </div>
               </div>
               <div className="p-5">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Tone</p>
+                <p className="text-[11px] font-bold text-muted-foreground mb-2">Tone</p>
                 <p className="text-[13.5px] leading-relaxed">{voiceResult.tone}</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border/50">
                 <div className="p-5">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-green-600 dark:text-green-400 mb-3">Dos</p>
+                  <p className="text-[11px] font-bold text-pos dark:text-pos mb-3">Dos</p>
                   <ul className="space-y-1.5">
                     {voiceResult.dos.map((d, i) => (
-                      <li key={i} className="text-[13px] flex gap-2"><span className="text-green-500 shrink-0">✓</span>{d}</li>
+                      <li key={i} className="text-[13px] flex gap-2"><span className="text-pos shrink-0">✓</span>{d}</li>
                     ))}
                   </ul>
                 </div>
                 <div className="p-5">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-red-500 mb-3">Don&apos;ts</p>
+                  <p className="text-[11px] font-bold text-tx-flare mb-3">Don&apos;ts</p>
                   <ul className="space-y-1.5">
                     {voiceResult.donts.map((d, i) => (
-                      <li key={i} className="text-[13px] flex gap-2"><span className="text-red-400 shrink-0">✗</span>{d}</li>
+                      <li key={i} className="text-[13px] flex gap-2"><span className="text-tx-flare shrink-0">✗</span>{d}</li>
                     ))}
                   </ul>
                 </div>
               </div>
               {voiceResult.signaturePhrases?.length > 0 && (
                 <div className="p-5">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Signature phrases</p>
+                  <p className="text-[11px] font-bold text-muted-foreground mb-3">Signature phrases</p>
                   <div className="flex flex-wrap gap-2">
                     {voiceResult.signaturePhrases.map((p, i) => (
-                      <span key={i} className="px-3 py-1.5 rounded-full bg-muted text-[12.5px] italic">&ldquo;{p}&rdquo;</span>
+                      <span key={i} className="px-3 py-1.5 rounded-sm bg-muted text-[12.5px]">&ldquo;{p}&rdquo;</span>
                     ))}
                   </div>
                 </div>
@@ -304,7 +303,7 @@ export default function VoiceBuilderPage() {
                 <div className="p-5">
                   <button
                     onClick={() => setShowPrism(p => !p)}
-                    className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-2 text-[12px] font-semibold text-muted-foreground hover:text-foreground transition-colors bg-press"
                   >
                     Kapferer Brand Identity Prism
                     <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', showPrism && 'rotate-180')} />
@@ -320,7 +319,7 @@ export default function VoiceBuilderPage() {
                         { key: 'self_image',  label: 'Self-Image',  desc: 'How users feel' },
                       ] as const).map(({ key, label, desc }) => (
                         <div key={key} className="rounded-xl border bg-muted/20 p-3.5 space-y-1">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-primary">{label}</p>
+                          <p className="text-[10px] font-bold text-primary">{label}</p>
                           <p className="text-[10px] text-muted-foreground">{desc}</p>
                           <p className="text-[12.5px] leading-snug">{voiceResult.kapferer_prism![key]}</p>
                         </div>
@@ -372,7 +371,7 @@ export default function VoiceBuilderPage() {
             </div>
             <Button onClick={retune} disabled={retuning}>
               {retuning
-                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Retuning...</>
+                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Retuning...</>
                 : <><Wand2 className="h-3.5 w-3.5 mr-1.5" />Retune caption</>}
             </Button>
           </div>
@@ -385,8 +384,8 @@ export default function VoiceBuilderPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] text-muted-foreground">Voice match</span>
                     <span className={cn(
-                      'text-[12px] font-bold tabular-nums',
-                      retuneResult.voice_match_score >= 80 ? 'text-green-500' : 'text-amber-500',
+                      'text-[12px] font-bold bg-num',
+                      retuneResult.voice_match_score >= 80 ? 'text-pos' : 'text-tx-2',
                     )}>
                       {retuneResult.voice_match_score}%
                     </span>
@@ -397,13 +396,13 @@ export default function VoiceBuilderPage() {
                 </div>
                 <button
                   onClick={() => { navigator.clipboard.writeText(retuneResult.retuned); toast.success('Copied') }}
-                  className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                 >
                   <Copy className="h-3 w-3" />Copy
                 </button>
               </div>
               <div className="p-5">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">What changed</p>
+                <p className="text-[11px] font-bold text-muted-foreground mb-3">What changed</p>
                 <ul className="space-y-1.5">
                   {retuneResult.changes.map((c, i) => (
                     <li key={i} className="text-[12.5px] flex gap-2 text-muted-foreground">
@@ -464,7 +463,7 @@ export default function VoiceBuilderPage() {
             </div>
             <Button onClick={generate} disabled={generating}>
               {generating
-                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Generating...</>
+                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Generating...</>
                 : <><PenLine className="h-3.5 w-3.5 mr-1.5" />Generate captions</>}
             </Button>
           </div>
@@ -472,7 +471,7 @@ export default function VoiceBuilderPage() {
           {genResults.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-[13px] font-semibold">{genResults.length} caption variations</p>
+                <p className="text-[13px] font-semibold bg-num">{genResults.length} caption variations</p>
                 <Button variant="outline" size="sm" onClick={generate} disabled={generating}>
                   <RefreshCw className="h-3.5 w-3.5 mr-1.5" />Regenerate
                 </Button>
@@ -483,7 +482,7 @@ export default function VoiceBuilderPage() {
                     <Badge variant="secondary" className="text-[11px]">{c.angle}</Badge>
                     <button
                       onClick={() => { navigator.clipboard.writeText(c.caption); toast.success('Copied') }}
-                      className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+                      className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                     >
                       <Copy className="h-3 w-3" />Copy
                     </button>

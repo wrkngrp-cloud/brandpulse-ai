@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Loader2 } from 'lucide-react'
+import { PlusIcon as Plus } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
@@ -60,7 +61,7 @@ export function LaunchPerceptionAuditButton() {
           </div>
           <Button type="submit" className="w-full" disabled={!name.trim() || pending}>
             {pending
-              ? <Loader2 className="h-4 w-4 animate-spin" />
+              ? <Loader2 className="h-4 w-4" />
               : 'Create and configure'
             }
           </Button>

@@ -4,12 +4,8 @@ import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import {
-  TrendingUp, TrendingDown, Minus,
-  Megaphone, CalendarDays, MapPin, ClipboardList,
-  Plus, ArrowRight, Zap, ArrowUpRight, Activity,
-  BarChart2, Radio, MessageSquare,
-} from 'lucide-react'
+import { TrendDownIcon as TrendingDown, MinusIcon as Minus, MusicIcon as Megaphone, CalendarIcon as CalendarDays, MapIcon as MapPin, SurveyIcon as ClipboardList, PlusIcon as Plus, ArrowRightIcon as ArrowRight, AskIcon as Zap, ArrowRightIcon as ArrowUpRight, TrendIcon as Activity, TrendIcon as BarChart2, MusicIcon as Radio } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp, MentionsIcon as MessageSquare } from '@/components/brand/icon'
 import { BHIGauge }         from '@/components/dashboard/bhi-gauge'
 import { StatCard }         from '@/components/dashboard/stat-card'
 import { TrendChart }       from '@/components/dashboard/trend-chart'
@@ -107,26 +103,26 @@ function getGreeting() {
 }
 
 const STATUS_DOT: Record<string, string> = {
-  active:    'bg-green-400',
-  paused:    'bg-amber-400',
+  active:    'bg-pos',
+  paused:    'bg-ember',
   draft:     'bg-muted-foreground/30',
-  completed: 'bg-blue-400',
+  completed: 'bg-flare',
 }
 
 const EVENT_STATUS_DOT: Record<string, string> = {
-  planned:  'bg-blue-400',
-  live:     'bg-green-400',
+  planned:  'bg-flare',
+  live:     'bg-pos',
   closed:   'bg-muted-foreground/30',
-  reported: 'bg-violet-400',
+  reported: 'bg-neu',
 }
 
 const PLATFORM_LABEL: Record<string, string> = { twitter: 'X', instagram: 'IG' }
 
 const SENTIMENT_COLOUR: Record<string, string> = {
-  positive: 'text-green-500',
+  positive: 'text-pos',
   neutral:  'text-muted-foreground',
-  negative: 'text-red-500',
-  mixed:    'text-amber-500',
+  negative: 'text-tx-flare',
+  mixed:    'text-tx-2',
 }
 
 // ── Card shell ─────────────────────────────────────────────────────────────
@@ -138,7 +134,7 @@ function Card({
 }: {
   children: React.ReactNode
   className?: string
-  accent?: 'blue' | 'green' | 'amber' | 'clay' | 'red'
+  accent?: 'hero' | 'nominal' | 'neutral' | 'alert'
 }) {
   return (
     <motion.div
@@ -226,8 +222,8 @@ export function OverviewClient({
             </Link>
             <Link
               href="/dashboard/campaigns/new"
-              className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-white rounded-xl px-4 py-2 transition-all hover:opacity-90 active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #E8763E 0%, #C4501D 100%)', boxShadow: '0 4px 14px -4px oklch(0.585 0.163 37 / 0.55)' }}
+              className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-tx-inv rounded-xl px-4 py-2 transition-colors hover:opacity-90 active:scale-[0.98]"
+              style={{ background: 'var(--char)' }}
             >
               <Plus className="h-3.5 w-3.5" />
               Campaign
@@ -272,7 +268,7 @@ export function OverviewClient({
           <Link
             key={label}
             href={href}
-            className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 hover:bg-muted/40 hover:border-border transition-all card-hover"
+            className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 hover:bg-muted/40 hover:border-border transition-colors card-hover"
           >
             <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center shrink-0">
               <Icon className="h-3.5 w-3.5 text-muted-foreground/70" />
@@ -297,7 +293,7 @@ export function OverviewClient({
           label="Brand Health"
           value={bhi.score !== null ? Math.round(bhi.score) : null}
           suffix="/100"
-          tone="blue"
+          tone="hero"
           icon={Activity}
           spark={bhiSpark.length > 1 ? bhiSpark : undefined}
           deltaLabel={`${rl.toLowerCase()} trend`}
@@ -307,7 +303,7 @@ export function OverviewClient({
           label="Sentiment Score"
           value={sentiment ? Math.round(sentiment.social_score) : null}
           suffix="/100"
-          tone={sentiment && sentiment.social_score >= 60 ? 'green' : sentiment && sentiment.social_score <= 40 ? 'clay' : 'amber'}
+          tone={sentiment && sentiment.social_score >= 60 ? 'nominal' : sentiment && sentiment.social_score <= 40 ? 'hero' : 'neutral'}
           icon={BarChart2}
           deltaLabel={sentiment ? `from ${fmtDate(sentiment.day)}` : undefined}
           href="/dashboard/sentiment"
@@ -316,7 +312,7 @@ export function OverviewClient({
           label="Share of Voice"
           value={sovScore !== null ? Math.round(sovScore) : null}
           suffix="%"
-          tone="violet"
+          tone="neutral"
           icon={Radio}
           deltaLabel={sovDate ? `as of ${fmtDate(sovDate)}` : undefined}
           href="/dashboard/content"
@@ -324,7 +320,7 @@ export function OverviewClient({
         <StatCard
           label="Mentions"
           value={mentionCount7d}
-          tone="amber"
+          tone="neutral"
           icon={MessageSquare}
           deltaLabel="last 7 days"
           href="/dashboard/sentiment"
@@ -353,7 +349,7 @@ export function OverviewClient({
       >
 
         {/* BHI gauge — tall left card */}
-        <Card accent="blue" className="bento-bhi p-5 flex flex-col gap-4">
+        <Card accent="hero" className="bento-bhi p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <Label>Brand Health Index</Label>
             <Link href="/dashboard/brand-equity" className="text-muted-foreground/40 hover:text-foreground transition-colors">
@@ -384,9 +380,9 @@ export function OverviewClient({
         <Card
           accent={
             sentiment === null ? undefined
-            : sentiment.social_score >= 60 ? 'green'
-            : sentiment.social_score <= 40 ? 'red'
-            : 'amber'
+            : sentiment.social_score >= 60 ? 'nominal'
+            : sentiment.social_score <= 40 ? 'alert'
+            : 'neutral'
           }
           className="bento-sentiment p-5"
         >
@@ -400,39 +396,39 @@ export function OverviewClient({
           {sentiment !== null ? (
             <div className="flex items-start gap-6">
               <div className="shrink-0">
-                <div className={cn('metric text-[58px] leading-none tabular-nums',
-                  sentiment.social_score >= 60 ? 'text-green-500'
-                  : sentiment.social_score <= 40 ? 'text-red-500'
-                  : 'text-amber-500'
+                <div className={cn('metric text-[58px] leading-none bg-num',
+                  sentiment.social_score >= 60 ? 'text-pos'
+                  : sentiment.social_score <= 40 ? 'text-tx-flare'
+                  : 'text-tx-2'
                 )}>
                   {Math.round(sentiment.social_score)}
                 </div>
                 <div className="flex items-center gap-1.5 mt-2">
                   {sentiment.social_score >= 60
-                    ? <TrendingUp className="h-3.5 w-3.5 text-green-500" />
+                    ? <TrendingUp className="h-3.5 w-3.5 text-pos" />
                     : sentiment.social_score <= 40
-                    ? <TrendingDown className="h-3.5 w-3.5 text-red-500" />
+                    ? <TrendingDown className="h-3.5 w-3.5 text-tx-flare" />
                     : <Minus className="h-3.5 w-3.5 text-muted-foreground/40" />
                   }
-                  <span className="text-[11px] font-medium text-muted-foreground/45">/ 100</span>
+                  <span className="text-[11px] font-medium text-muted-foreground/45 bg-num">/ 100</span>
                 </div>
               </div>
 
               <div className="flex-1 space-y-3 pt-1">
                 {[
-                  { label: 'Positive', pct: sentiment.positive_pct, bar: 'from-green-500 to-green-400', text: 'text-green-500' },
-                  { label: 'Negative', pct: sentiment.negative_pct, bar: 'from-red-500 to-red-400',     text: 'text-red-500'   },
+                  { label: 'Positive', pct: sentiment.positive_pct, bar: 'bg-pos',  text: 'text-pos' },
+                  { label: 'Negative', pct: sentiment.negative_pct, bar: 'bg-flare', text: 'text-tx-flare' },
                 ].map(row => (
                   <div key={row.label} className="space-y-1.5">
                     <div className="flex justify-between items-center">
                       <span className="text-[12px] text-muted-foreground/65">{row.label}</span>
-                      <span className={cn('text-[12px] font-semibold tabular-nums', row.text)}>
+                      <span className={cn('text-[12px] font-semibold bg-num', row.text)}>
                         {Math.round(row.pct)}%
                       </span>
                     </div>
-                    <div className="h-[3px] bg-muted/40 rounded-full overflow-hidden">
+                    <div className="h-[3px] bg-muted/40 rounded-sm overflow-hidden">
                       <motion.div
-                        className={cn('h-full rounded-full bg-gradient-to-r', row.bar)}
+                        className={cn('h-full', row.bar)}
                         initial={{ width: 0 }}
                         animate={{ width: `${row.pct}%` }}
                         transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -440,7 +436,7 @@ export function OverviewClient({
                     </div>
                   </div>
                 ))}
-                <p className="text-[10px] text-muted-foreground/38 pt-0.5 tracking-wide uppercase">
+                <p className="text-[10px] text-muted-foreground/38 pt-0.5 bg-num">
                   {fmtDate(sentiment.day)}
                 </p>
               </div>
@@ -454,7 +450,7 @@ export function OverviewClient({
         </Card>
 
         {/* SOV */}
-        <Card accent="blue" className="bento-sov p-5 flex flex-col justify-between">
+        <Card accent="hero" className="bento-sov p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <Label>Share of Voice</Label>
             <Link href="/dashboard/content" className="text-muted-foreground/40 hover:text-foreground transition-colors">
@@ -473,10 +469,10 @@ export function OverviewClient({
                   Social share of voice{sovDate ? ` · ${fmtDate(sovDate)}` : ''}
                 </p>
               </div>
-              <div className="h-[3px] bg-muted/40 rounded-full overflow-hidden mt-4">
+              <div className="h-[3px] bg-muted/40 rounded-sm overflow-hidden mt-4">
                 <motion.div
-                  className="h-full rounded-full"
-                  style={{ background: 'linear-gradient(90deg, #6B8FFF 0%, #2B59FF 100%)' }}
+                  className="h-full rounded-sm"
+                  style={{ background: 'var(--flare)' }}
                   initial={{ width: 0 }}
                   animate={{ width: `${Math.min(sovScore, 100)}%` }}
                   transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -535,7 +531,7 @@ export function OverviewClient({
         </Card>
 
         {/* Campaigns */}
-        <Card accent="clay" className="bento-campaigns p-5">
+        <Card accent="hero" className="bento-campaigns p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Megaphone className="h-3.5 w-3.5 text-muted-foreground/50" />
@@ -551,8 +547,8 @@ export function OverviewClient({
               <p className="text-[12.5px] text-muted-foreground">No active campaigns. Create your first one.</p>
               <Link
                 href="/dashboard/campaigns/new"
-                className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-white rounded-xl px-4 py-2 transition-all hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg, #E8763E 0%, #C4501D 100%)' }}
+                className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-tx-inv rounded-xl px-4 py-2 transition-colors hover:opacity-90"
+                style={{ background: 'var(--char)' }}
               >
                 <Plus className="h-3.5 w-3.5" /> New campaign
               </Link>
@@ -600,10 +596,10 @@ export function OverviewClient({
               {recentMentions.map(m => (
                 <div
                   key={m.id}
-                  className="group rounded-xl border border-border/40 bg-muted/15 px-3.5 py-3.5 space-y-2.5 hover:bg-muted/30 hover:border-border/70 transition-all duration-200 cursor-default"
+                  className="group rounded-xl border border-border/40 bg-muted/15 px-3.5 py-3.5 space-y-2.5 hover:bg-muted/30 hover:border-border/70 transition-colors duration-200 cursor-default"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-foreground/8 text-foreground/50 shrink-0 uppercase tracking-[0.12em]">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-foreground/8 text-foreground/50 shrink-0">
                       {PLATFORM_LABEL[m.platform] ?? m.platform}
                     </span>
                     <span className="text-[11px] text-muted-foreground/65 truncate font-medium">
@@ -611,10 +607,10 @@ export function OverviewClient({
                     </span>
                     {m.sentiment_label && (
                       <span className={cn('text-[10px] font-semibold capitalize ml-auto shrink-0 px-1.5 py-0.5 rounded-md', {
-                        'bg-green-500/10 text-green-600 dark:text-green-400': m.sentiment_label === 'positive',
-                        'bg-red-500/10 text-red-600 dark:text-red-400':       m.sentiment_label === 'negative',
+                        'bg-pos/10 text-pos dark:text-pos': m.sentiment_label === 'positive',
+                        'bg-flare/10 text-tx-flare dark:text-tx-flare':       m.sentiment_label === 'negative',
                         'bg-muted text-muted-foreground':                      m.sentiment_label === 'neutral',
-                        'bg-amber-500/10 text-amber-600 dark:text-amber-400': m.sentiment_label === 'mixed',
+                        'bg-ember/10 text-tx-2 dark:text-tx-2': m.sentiment_label === 'mixed',
                       })}>
                         {m.sentiment_label}
                       </span>

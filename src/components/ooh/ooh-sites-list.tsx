@@ -5,7 +5,7 @@ import Link               from 'next/link'
 import { cn }             from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { ItemActions }    from '@/components/ui/item-actions'
-import { MapPin, Copy, Crosshair, Eye, Pencil, Trash2, BarChart2, Megaphone } from 'lucide-react'
+import { MapIcon as MapPin, CopyIcon as Copy, CircleDotIcon as Crosshair, EyeIcon as Eye, EditIcon as Pencil, TrashIcon as Trash2, TrendIcon as BarChart2, MusicIcon as Megaphone } from '@/components/brand/icon'
 import { toast }          from 'sonner'
 import { deleteSite }     from '@/app/dashboard/ooh/actions'
 
@@ -47,8 +47,8 @@ function campaignStatus(start: string | null | undefined, end: string | null | u
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  live:       'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300',
-  upcoming:   'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300',
+  live:       'bg-shell text-pos dark:bg-shell/50 dark:text-pos',
+  upcoming:   'bg-flare-wash text-tx-flare dark:bg-shell/50 dark:text-tx-2',
   ended:      'bg-muted text-muted-foreground',
   'no-dates': 'bg-muted text-muted-foreground',
 }
@@ -58,9 +58,9 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const FORMAT_BADGE: Record<string, { label: string; style: string }> = {
-  'Keke Fleet':      { label: 'Keke Fleet',      style: 'bg-orange-100 text-orange-800 dark:bg-orange-950/50 dark:text-orange-300' },
-  'Wall Painting':   { label: 'Wall Painting',   style: 'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300' },
-  'Branded Vehicle': { label: 'Branded Vehicle', style: 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300' },
+  'Keke Fleet':      { label: 'Keke Fleet',      style: 'bg-shell text-tx-2 dark:bg-shell/50 dark:text-tx-2' },
+  'Wall Painting':   { label: 'Wall Painting',   style: 'bg-shell text-pos dark:bg-shell/50 dark:text-pos' },
+  'Branded Vehicle': { label: 'Branded Vehicle', style: 'bg-flare-wash text-tx-flare dark:bg-shell/50 dark:text-tx-2' },
 }
 
 export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps) {
@@ -90,22 +90,22 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                   <Link href={`/dashboard/ooh/${site.id}`} className="text-sm font-medium hover:underline truncate">
                     {site.site_name}
                   </Link>
-                  <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', STATUS_STYLES[status])}>
+                  <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium', STATUS_STYLES[status])}>
                     {STATUS_LABELS[status]}
                   </span>
                   {site.campaign_id && site.campaign_name ? (
                     <Link
                       href={`/dashboard/campaigns/${site.campaign_id}`}
-                      className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                      className="inline-flex items-center gap-1 text-xs text-tx-flare dark:text-tx-2 hover:underline"
                     >
                       <Megaphone className="h-3 w-3" />
                       {site.campaign_name}
                     </Link>
                   ) : !site.campaign_id ? (
-                    <span className="text-xs text-muted-foreground/60 italic">Always On</span>
+                    <span className="text-xs text-muted-foreground/60">Always On</span>
                   ) : null}
                   {site.format_type && FORMAT_BADGE[site.format_type] ? (
-                    <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', FORMAT_BADGE[site.format_type].style)}>
+                    <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium', FORMAT_BADGE[site.format_type].style)}>
                       {FORMAT_BADGE[site.format_type].label}
                     </span>
                   ) : site.format_type ? (
@@ -120,7 +120,7 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
               </div>
 
               <div className="shrink-0 text-right">
-                <p className="text-sm font-semibold tabular-nums">{site.visits.toLocaleString()}</p>
+                <p className="text-sm font-semibold bg-num">{site.visits.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">visits</p>
               </div>
 
@@ -129,7 +129,7 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
                 {hasCoords && onLocateSite && (
                   <button
                     onClick={() => onLocateSite(site.lat!, site.lng!, site.id)}
-                    className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-muted transition-colors"
+                    className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-muted transition-colors bg-press"
                     title="Locate on map"
                   >
                     <Crosshair className="h-3.5 w-3.5 text-muted-foreground" />

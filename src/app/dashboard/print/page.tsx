@@ -2,7 +2,8 @@ import { createClient }   from '@/lib/supabase/server'
 import { redirect }        from 'next/navigation'
 import { Card }            from '@/components/ui/card'
 import { Badge }           from '@/components/ui/badge'
-import { Newspaper, BookOpen, TrendingUp, BarChart2, Download, QrCode, ExternalLink } from 'lucide-react'
+import { PrinterIcon as Newspaper, FileIcon as BookOpen, TrendIcon as BarChart2, QrIcon as QrCode, ExternalLinkIcon as ExternalLink } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp, ExportIcon as Download } from '@/components/brand/icon'
 import { MediaPlanUploadDialog } from '@/components/offline-media/media-plan-upload-dialog'
 import { buttonVariants }  from '@/components/ui/button'
 import { cn, formatNGN }   from '@/lib/utils'
@@ -123,8 +124,8 @@ export default async function PrintPage({
       {/* Header */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
-            <Newspaper className="h-5 w-5 text-amber-600" />
+          <div className="h-10 w-10 rounded-xl bg-ember/10 flex items-center justify-center shrink-0 mt-0.5">
+            <Newspaper className="h-5 w-5 text-tx-2" />
           </div>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Print Intelligence</h1>
@@ -153,8 +154,8 @@ export default async function PrintPage({
       {!hasData ? (
         /* ── Empty state ──────────────────────────────────────────────────── */
         <Card className="border rounded-xl p-10 bg-card flex flex-col items-center gap-4 text-center">
-          <div className="h-14 w-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
-            <Newspaper className="h-7 w-7 text-amber-600" />
+          <div className="h-14 w-14 rounded-2xl bg-ember/10 flex items-center justify-center">
+            <Newspaper className="h-7 w-7 text-tx-2" />
           </div>
           <div>
             <h2 className="text-lg font-semibold">No print placements yet</h2>
@@ -184,17 +185,17 @@ export default async function PrintPage({
           {/* Key metrics */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { label: 'Total Insertions',   value: totalInsertions.toLocaleString(), sub: `Last ${days} days`,           icon: Newspaper,  color: 'text-amber-600' },
-              { label: 'Total Spend',        value: formatNGN(totalSpend),          sub: 'Net cost across all buys', icon: TrendingUp,  color: 'text-indigo-500' },
-              { label: 'Est. Readership',    value: fmt(totalReadership),             sub: 'Circ. × pass-along',      icon: BookOpen,    color: 'text-emerald-500' },
-              { label: 'QR Scans',           value: totalQrScans.toLocaleString(),    sub: `${qrScanRate}% scan rate`, icon: BarChart2,  color: 'text-blue-500' },
+              { label: 'Total Insertions',   value: totalInsertions.toLocaleString(), sub: `Last ${days} days`,           icon: Newspaper,  color: 'text-tx-2' },
+              { label: 'Total Spend',        value: formatNGN(totalSpend),          sub: 'Net cost across all buys', icon: TrendingUp,  color: 'text-tx-2' },
+              { label: 'Est. Readership',    value: fmt(totalReadership),             sub: 'Circ. × pass-along',      icon: BookOpen,    color: 'text-pos' },
+              { label: 'QR Scans',           value: totalQrScans.toLocaleString(),    sub: `${qrScanRate}% scan rate`, icon: BarChart2,  color: 'text-tx-2' },
             ].map(m => (
               <Card key={m.label} className="border rounded-xl p-5 bg-card space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{m.label}</span>
+                  <span className="text-xs text-muted-foreground font-medium">{m.label}</span>
                   <m.icon className={`h-4 w-4 ${m.color}`} />
                 </div>
-                <p className="text-2xl font-bold tracking-tight">{m.value}</p>
+                <p className="text-2xl font-bold tracking-tight"><span className="bg-num">{m.value}</span></p>
                 <p className="text-xs text-muted-foreground">{m.sub}</p>
               </Card>
             ))}
@@ -211,7 +212,7 @@ export default async function PrintPage({
                 <thead>
                   <tr className="border-b border-border/50">
                     {['Publication', 'Date', 'Position', 'Size', 'Colour', 'Insertions', 'Net Cost', 'QR Link', 'Scans', 'Status'].map(h => (
-                      <th key={h} className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</th>
+                      <th key={h} className="text-left pb-2.5 pr-4 text-xs font-semibold text-muted-foreground whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -226,7 +227,7 @@ export default async function PrintPage({
                         <td className="py-2.5 pr-4 text-muted-foreground whitespace-nowrap">{SIZE_LABEL[p.size] ?? p.size}</td>
                         <td className="py-2.5 pr-4 text-muted-foreground whitespace-nowrap">{p.colour === 'full_colour' ? 'Colour' : 'B&W'}</td>
                         <td className="py-2.5 pr-4">{p.insertions}</td>
-                        <td className="py-2.5 pr-4 font-medium">{p.net_cost ? formatNGN(Number(p.net_cost)) : '–'}</td>
+                        <td className="py-2.5 pr-4 font-medium bg-num">{p.net_cost ? formatNGN(Number(p.net_cost)) : '–'}</td>
                         <td className="py-2.5 pr-4">
                           {qrUrl ? (
                             <a
@@ -245,7 +246,7 @@ export default async function PrintPage({
                         </td>
                         <td className="py-2.5 pr-4 font-medium">
                           {p.qr_scan_count > 0 ? (
-                            <span className="text-emerald-600">{p.qr_scan_count.toLocaleString()}</span>
+                            <span className="text-pos bg-num">{p.qr_scan_count.toLocaleString()}</span>
                           ) : (
                             <span className="text-muted-foreground">0</span>
                           )}

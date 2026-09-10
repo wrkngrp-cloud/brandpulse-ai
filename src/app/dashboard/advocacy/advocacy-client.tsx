@@ -1,12 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  Users, Plus, Copy, Check, ExternalLink, Star,
-  TrendingUp, MousePointer, ShoppingCart, Activity,
-  ChevronDown, ChevronRight, Loader2, X, Link2,
-  RefreshCw, UserCheck, Pause, UserX,
-} from 'lucide-react'
+import { UsersIcon as Users, PlusIcon as Plus, CopyIcon as Copy, CheckIcon as Check, ExternalLinkIcon as ExternalLink, StarIcon as Star, CircleDotIcon as MousePointer, BriefcaseIcon as ShoppingCart, TrendIcon as Activity, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight, XIcon as X, LinkIcon as Link2, RefreshIcon as RefreshCw, UsersIcon as UserCheck, PauseIcon as Pause, UsersIcon as UserX } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -98,7 +95,7 @@ export function AdvocacyClient() {
         <div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="advocacy" autoStart />
           <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
         </div>
@@ -128,21 +125,21 @@ export function AdvocacyClient() {
         <div className="space-y-4">
           {/* NPS candidates banner */}
           {candidates.length > 0 && (
-            <div className="rounded-xl border border-green-200 bg-green-50 p-4">
+            <div className="rounded-xl border border-line bg-shell p-4">
               <div className="flex items-start gap-3">
-                <Star className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                <Star className="h-4 w-4 text-pos mt-0.5 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-green-800">
+                  <p className="text-sm font-medium text-pos">
                     {candidates.length} high-NPS respondent{candidates.length > 1 ? 's' : ''} ready to activate
                   </p>
-                  <p className="text-xs text-green-700 mt-0.5">
+                  <p className="text-xs text-pos mt-0.5">
                     These customers scored 9-10 in your NPS surveys and haven't been activated yet.
                   </p>
                 </div>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-green-300 text-green-800 hover:bg-green-100 shrink-0"
+                  className="border-line text-pos hover:bg-shell shrink-0"
                   onClick={() => setShowAddForm(true)}
                 >
                   Activate
@@ -191,7 +188,7 @@ export function AdvocacyClient() {
           {/* List */}
           {loading && promoters.length === 0 && (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <Loader2 className="h-6 w-6 text-muted-foreground" />
             </div>
           )}
 
@@ -263,12 +260,12 @@ export function AdvocacyClient() {
                       .sort((a, b) => b.clicks - a.clicks)
                       .map(c => (
                         <tr key={c.id} className="hover:bg-muted/20">
-                          <td className="px-4 py-2 font-mono text-xs font-bold">{c.code}</td>
+                          <td className="px-4 py-2 bg-num text-xs font-bold">{c.code}</td>
                           <td className="px-4 py-2 text-muted-foreground">{c.promoter.name}</td>
                           <td className="px-4 py-2">{c.clicks}</td>
                           <td className="px-4 py-2">{c.unique_clicks}</td>
                           <td className="px-4 py-2">{c.conversions}</td>
-                          <td className="px-4 py-2">{formatNGN(c.attributed_revenue)}</td>
+                          <td className="px-4 py-2 bg-num">{formatNGN(c.attributed_revenue)}</td>
                           <td className="px-4 py-2">
                             <Badge variant={c.is_active ? 'default' : 'secondary'} className="text-xs">
                               {c.is_active ? 'Active' : 'Paused'}
@@ -304,7 +301,7 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
       <div className="flex items-center gap-2 text-muted-foreground text-xs mb-2">
         {icon} {label}
       </div>
-      <p className="text-2xl font-bold">{value}</p>
+      <p className="text-2xl font-bold"><span className="bg-num">{value}</span></p>
     </div>
   )
 }
@@ -322,10 +319,10 @@ function PromoterCard({
   onStatusChange: (s: string) => void
 }) {
   const statusColor = {
-    invited: 'bg-blue-50 text-blue-700 border-blue-200',
-    active:  'bg-green-50 text-green-700 border-green-200',
-    paused:  'bg-yellow-50 text-yellow-700 border-yellow-200',
-    removed: 'bg-red-50 text-red-700 border-red-200',
+    invited: 'bg-flare-wash text-tx-flare border-line-strong',
+    active:  'bg-shell text-pos border-line',
+    paused:  'bg-shell text-tx-2 border-line',
+    removed: 'bg-flare-wash text-tx-flare border-line-strong',
   }[promoter.status] ?? 'bg-muted text-foreground'
 
   return (
@@ -333,14 +330,14 @@ function PromoterCard({
       {/* Row */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/20 transition-colors"
+        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/20 transition-colors bg-press"
       >
         {expanded ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium text-sm">{promoter.name}</span>
             {promoter.nps_score !== null && (
-              <Badge variant="outline" className="text-xs border-green-300 text-green-700">
+              <Badge variant="outline" className="text-xs border-line text-pos">
                 NPS {promoter.nps_score}
               </Badge>
             )}
@@ -354,7 +351,7 @@ function PromoterCard({
         </div>
         <div className="text-right shrink-0">
           <p className="text-sm font-semibold">{promoter.referral_codes.reduce((s, c) => s + c.clicks, 0)} clicks</p>
-          <p className="text-xs text-muted-foreground">{promoter.referral_codes.length} code{promoter.referral_codes.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-muted-foreground bg-num">{promoter.referral_codes.length} code{promoter.referral_codes.length !== 1 ? 's' : ''}</p>
         </div>
       </button>
 
@@ -378,7 +375,7 @@ function PromoterCard({
               </Button>
             )}
             {promoter.status !== 'removed' && (
-              <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => onStatusChange('removed')}>
+              <Button size="sm" variant="ghost" className="text-tx-flare hover:text-tx-flare" onClick={() => onStatusChange('removed')}>
                 <UserX className="h-3 w-3 mr-1.5" />Remove
               </Button>
             )}
@@ -395,7 +392,7 @@ function PromoterCard({
 
           {/* Notes */}
           {promoter.notes && (
-            <p className="text-xs text-muted-foreground italic">"{promoter.notes}"</p>
+            <p className="text-xs text-muted-foreground">"{promoter.notes}"</p>
           )}
 
           {/* Referral codes table */}
@@ -438,16 +435,16 @@ function ReferralCodeRow({ code }: { code: ReferralCode }) {
 
   return (
     <tr className={cn('hover:bg-muted/20', !code.is_active && 'opacity-50')}>
-      <td className="px-3 py-2 font-mono font-bold">{code.code}</td>
+      <td className="px-3 py-2 bg-num font-bold">{code.code}</td>
       <td className="px-3 py-2 text-muted-foreground">{code.label ?? '—'}</td>
       <td className="px-3 py-2">{code.clicks}</td>
       <td className="px-3 py-2">{code.unique_clicks}</td>
       <td className="px-3 py-2">{code.conversions}</td>
-      <td className="px-3 py-2">{formatNGN(code.attributed_revenue)}</td>
+      <td className="px-3 py-2 bg-num">{formatNGN(code.attributed_revenue)}</td>
       <td className="px-3 py-2">
         <div className="flex items-center gap-1">
-          <button onClick={copyLink} className="p-1 hover:bg-muted rounded" title="Copy referral link">
-            {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+          <button onClick={copyLink} className="p-1 hover:bg-muted rounded bg-press" title="Copy referral link">
+            {copied ? <Check className="h-3 w-3 text-pos" /> : <Copy className="h-3 w-3" />}
           </button>
           <a href={code.destination_url} target="_blank" rel="noreferrer" className="p-1 hover:bg-muted rounded">
             <ExternalLink className="h-3 w-3" />
@@ -489,7 +486,7 @@ function GenerateCodeForm({ promoterId, onSaved, onCancel }: { promoterId: strin
     <div className="rounded-lg border bg-card p-4 space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium">Generate referral code</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
@@ -503,7 +500,7 @@ function GenerateCodeForm({ promoterId, onSaved, onCancel }: { promoterId: strin
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handleSave} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Generate code
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -530,7 +527,7 @@ function AddPromoterForm({ onSave, onCancel }: { onSave: (d: Record<string, unkn
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">Add promoter</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -552,7 +549,7 @@ function AddPromoterForm({ onSave, onCancel }: { onSave: (d: Record<string, unkn
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Add promoter
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -572,9 +569,9 @@ function CandidateRow({
   const [open, setOpen]   = useState(false)
 
   return (
-    <div className="bg-white/60 rounded-lg border border-green-100 px-3 py-2">
+    <div className="bg-card/60 rounded-lg border border-line px-3 py-2">
       <div className="flex items-center gap-2 text-xs">
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-200 font-bold text-green-800 text-[11px]">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-shell font-bold text-pos text-[11px] bg-num">
           {candidate.score}
         </span>
         <span className="flex-1 text-muted-foreground line-clamp-1">
@@ -584,7 +581,7 @@ function CandidateRow({
         {!open && (
           <button
             onClick={() => setOpen(true)}
-            className="text-green-700 font-medium hover:underline"
+            className="text-pos font-medium hover:underline bg-press"
           >
             Activate
           </button>
@@ -606,11 +603,11 @@ function CandidateRow({
           />
           <button
             onClick={() => { if (!name.trim()) return; onActivate(name, email); setOpen(false) }}
-            className="bg-green-600 text-white text-xs px-3 py-1 rounded"
+            className="bg-pos text-tx-inv text-xs px-3 py-1 rounded bg-press"
           >
             Save
           </button>
-          <button onClick={() => setOpen(false)} className="text-xs text-muted-foreground">Cancel</button>
+          <button onClick={() => setOpen(false)} className="text-xs text-muted-foreground bg-press">Cancel</button>
         </div>
       )}
     </div>

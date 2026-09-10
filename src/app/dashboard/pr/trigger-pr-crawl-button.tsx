@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
+import { RefreshIcon as RefreshCw, CheckIcon as CheckCircle2 } from '@/components/brand/icon'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 export function TriggerPrCrawlButton() {
   const [phase, setPhase] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
@@ -29,7 +30,7 @@ export function TriggerPrCrawlButton() {
   if (phase === 'running') {
     return (
       <Button size="sm" variant="outline" disabled>
-        <RefreshCw className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+        <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
         Starting crawl…
       </Button>
     )
@@ -37,7 +38,7 @@ export function TriggerPrCrawlButton() {
 
   if (phase === 'done') {
     return (
-      <div className="flex items-center gap-2 text-sm text-emerald-600">
+      <div className="flex items-center gap-2 text-sm text-pos">
         <CheckCircle2 className="h-4 w-4 shrink-0" />
         {message}
       </div>
@@ -47,7 +48,7 @@ export function TriggerPrCrawlButton() {
   if (phase === 'error') {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs text-rose-500 flex items-center gap-1">
+        <span className="text-xs text-tx-flare flex items-center gap-1">
           <AlertCircle className="h-3.5 w-3.5" />{message}
         </span>
         <Button size="sm" variant="outline" onClick={trigger}>Retry</Button>

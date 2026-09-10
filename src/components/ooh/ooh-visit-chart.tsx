@@ -4,7 +4,8 @@ import {
   AreaChart, Area, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { Activity } from 'lucide-react'
+import { TrendIcon as Activity } from '@/components/brand/icon'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface Visit {
   visited_at: string
@@ -73,50 +74,52 @@ export function OohVisitChart({ visits }: OohVisitChartProps) {
       ) : (
         <>
           <div className="h-44">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
-                <defs>
-                  <linearGradient id="visitGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"   stopColor="hsl(var(--primary))" stopOpacity={0.25} />
-                    <stop offset="95%"  stopColor="hsl(var(--primary))" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                  tickLine={false} axisLine={false}
-                  interval="preserveStartEnd"
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                  tickLine={false} axisLine={false}
-                  allowDecimals={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    fontSize: 12,
-                    border: '1px solid hsl(var(--border))',
-                    background: 'hsl(var(--card))',
-                    borderRadius: '8px',
-                  }}
-                />
-                <Area
-                  type="monotone" dataKey="visits"
-                  stroke="hsl(var(--primary))" strokeWidth={2}
-                  fill="url(#visitGradient)"
-                  dot={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            <ChartState rows={chartData} height={220} empty="Share the site link to start counting visits.">
+                          <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
+                  <defs>
+                    <linearGradient id="visitGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"   stopColor="hsl(var(--primary))" stopOpacity={0.25} />
+                      <stop offset="95%"  stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tickLine={false} axisLine={false}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis
+                    tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tickLine={false} axisLine={false}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      fontSize: 12,
+                      border: '1px solid hsl(var(--border))',
+                      background: 'hsl(var(--card))',
+                      borderRadius: 'var(--r-card)',
+                    }}
+                  />
+                  <Area
+                    type="monotone" dataKey="visits"
+                    stroke="hsl(var(--primary))" strokeWidth={2}
+                    fill="url(#visitGradient)"
+                    dot={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartState>
           </div>
 
           {/* Device breakdown */}
           <div className="flex items-center gap-5 text-xs text-muted-foreground pt-1 border-t">
             <span>Device mix: </span>
-            {devices.mobile  > 0 && <span><strong className="text-foreground">{Math.round(devices.mobile  / total * 100)}%</strong> mobile</span>}
-            {devices.desktop > 0 && <span><strong className="text-foreground">{Math.round(devices.desktop / total * 100)}%</strong> desktop</span>}
-            {devices.tablet  > 0 && <span><strong className="text-foreground">{Math.round(devices.tablet  / total * 100)}%</strong> tablet</span>}
+            {devices.mobile  > 0 && <span><strong className="text-foreground bg-num">{Math.round(devices.mobile  / total * 100)}%</strong> mobile</span>}
+            {devices.desktop > 0 && <span><strong className="text-foreground bg-num">{Math.round(devices.desktop / total * 100)}%</strong> desktop</span>}
+            {devices.tablet  > 0 && <span><strong className="text-foreground bg-num">{Math.round(devices.tablet  / total * 100)}%</strong> tablet</span>}
           </div>
         </>
       )}

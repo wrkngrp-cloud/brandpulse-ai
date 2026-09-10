@@ -1,14 +1,14 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import {
-  Palette, Zap, Eye, Target, Loader2, CheckCircle2, AlertCircle, TrendingUp,
-  ImagePlus, Video, XCircle, Film,
-} from 'lucide-react'
+import { CreativeIcon as Palette, AskIcon as Zap, EyeIcon as Eye, CircleDotIcon as Target, CheckIcon as CheckCircle2, ExportIcon as ImagePlus, CameraIcon as Video, XCircleIcon as XCircle, CameraIcon as Film } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { Crescendo } from '@/components/brand/crescendo'
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
 
@@ -71,37 +71,32 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
 
 const PLATFORMS = ['Instagram', 'Twitter', 'TikTok', 'Facebook']
 
-const SCORE_META: { key: keyof Omit<CreativeScore, 'summary'>; label: string; color: string }[] = [
-  { key: 'engagement',        label: 'Engagement',        color: 'bg-blue-500'   },
-  { key: 'cultural_resonance',label: 'Cultural Resonance',color: 'bg-purple-500' },
-  { key: 'tone',              label: 'Tone',              color: 'bg-green-500'  },
-  { key: 'clarity',           label: 'Clarity',           color: 'bg-amber-500'  },
-  { key: 'risk',              label: 'Risk',              color: 'bg-red-400'    },
+const SCORE_META: { key: keyof Omit<CreativeScore, 'summary'>; label: string }[] = [
+  { key: 'engagement',        label: 'Engagement' },
+  { key: 'cultural_resonance',label: 'Cultural Resonance' },
+  { key: 'tone',              label: 'Tone' },
+  { key: 'clarity',           label: 'Clarity' },
+  { key: 'risk',              label: 'Risk' },
 ]
 
-function ScoreBar({ score, color, label }: { score: number; color: string; label: string }) {
+function ScoreBar({ score, label }: { score: number; label: string }) {
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
-        <span className="font-medium tabular-nums">{score}</span>
+        <span className="font-medium bg-num">{score}</span>
       </div>
-      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-        <div
-          className={cn('h-full rounded-full transition-all', color)}
-          style={{ width: `${Math.min(score, 100)}%` }}
-        />
-      </div>
+      <Crescendo value={Math.min(score, 100)} height={6} />
     </div>
   )
 }
 
 function Gauge({ score }: { score: number }) {
   const pct = Math.min(score, 100)
-  const color = pct >= 70 ? 'text-green-600' : pct >= 40 ? 'text-amber-600' : 'text-red-500'
+  const color = pct >= 70 ? 'text-pos' : pct >= 40 ? 'text-tx-2' : 'text-tx-flare'
   return (
     <div className="flex flex-col items-center gap-1 py-4">
-      <span className={cn('text-5xl font-bold tabular-nums', color)}>{score}</span>
+      <span className={cn('text-5xl font-bold bg-num', color)}>{score}</span>
       <span className="text-sm text-muted-foreground">Consistency score / 100</span>
     </div>
   )
@@ -389,7 +384,7 @@ export function CreativeClient({
                 key={p}
                 onClick={() => setPlatform(p)}
                 className={cn(
-                  'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
+                  'px-3 py-1.5 rounded-sm text-xs font-medium border transition-colors',
                   platform === p
                     ? 'bg-foreground text-background border-foreground'
                     : 'text-muted-foreground border-border hover:border-foreground/40',
@@ -428,28 +423,28 @@ export function CreativeClient({
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={media.previewUrl} alt="Creative visual" className="w-full max-h-36 object-cover" />
                       <div className="absolute top-1.5 left-1.5 flex items-center gap-1">
-                        {media.isVideo && <Film className="h-3 w-3 text-white" />}
-                        <span className="text-[9px] bg-black/60 text-white px-1.5 py-0.5 rounded font-mono">{media.isVideo ? 'VIDEO FRAME' : 'IMAGE'}</span>
+                        {media.isVideo && <Film className="h-3 w-3 text-tx-inv" />}
+                        <span className="text-[9px] bg-ink/60 text-tx-inv px-1.5 py-0.5 rounded bg-num">{media.isVideo ? 'VIDEO FRAME' : 'IMAGE'}</span>
                       </div>
-                      <button onClick={() => setMedia(null)} className="absolute top-1.5 right-1.5 bg-black/60 rounded-full p-0.5">
-                        <XCircle className="h-3.5 w-3.5 text-white" />
+                      <button onClick={() => setMedia(null)} className="absolute top-1.5 right-1.5 bg-ink/60 rounded-sm p-0.5 bg-press">
+                        <XCircle className="h-3.5 w-3.5 text-tx-inv" />
                       </button>
                     </div>
                   ) : extracting ? (
                     <div className="flex items-center justify-center gap-2 border border-dashed rounded-lg py-4 text-xs text-muted-foreground">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5" />
                       Extracting frame…
                     </div>
                   ) : (
                     <div className="flex gap-2">
                       <button onClick={() => imgRef.current?.click()}
-                        className="flex-1 flex items-center justify-center gap-1.5 border border-dashed rounded-lg py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 border border-dashed rounded-lg py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
                       >
                         <ImagePlus className="h-3.5 w-3.5" />
                         Image
                       </button>
                       <button onClick={() => vidRef.current?.click()}
-                        className="flex-1 flex items-center justify-center gap-1.5 border border-dashed rounded-lg py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 border border-dashed rounded-lg py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
                       >
                         <Video className="h-3.5 w-3.5" />
                         Video
@@ -480,7 +475,7 @@ export function CreativeClient({
             className="w-full"
           >
             {compareLoading
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Comparing creatives...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Comparing creatives...</>
               : <><Zap className="h-4 w-4 mr-2" /> Compare creatives</>
             }
           </Button>
@@ -491,7 +486,7 @@ export function CreativeClient({
               {/* Winner banner */}
               <div className="border rounded-xl p-4 bg-muted/30 space-y-2">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-pos" />
                   <span className="text-sm font-semibold">
                     Creative {compareResult.winner} wins on {platform}
                   </span>
@@ -512,20 +507,20 @@ export function CreativeClient({
                       key={key}
                       className={cn(
                         'border rounded-xl p-4 space-y-4',
-                        isWinner && 'border-green-400 ring-1 ring-green-300',
+                        isWinner && 'border-line ring-1 ring-flare',
                       )}
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold">Creative {label}</span>
                         {isWinner && (
-                          <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                          <span className="text-[10px] font-bold bg-shell text-pos px-2 py-0.5 rounded-sm">
                             Winner
                           </span>
                         )}
                       </div>
                       <div className="space-y-3">
-                        {SCORE_META.map(({ key: sk, label: sl, color }) => (
-                          <ScoreBar key={sk} score={scores[sk]} label={sl} color={color} />
+                        {SCORE_META.map(({ key: sk, label: sl }) => (
+                          <ScoreBar key={sk} score={scores[sk]} label={sl} />
                         ))}
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed pt-1 border-t">
@@ -555,7 +550,7 @@ export function CreativeClient({
               <div className="flex flex-wrap gap-1.5 pt-1">
                 <span className="text-xs text-muted-foreground">Brand values:</span>
                 {brandValues.map(v => (
-                  <span key={v} className="text-xs bg-muted px-2 py-0.5 rounded-full">
+                  <span key={v} className="text-xs bg-muted px-2 py-0.5 rounded-sm">
                     {v}
                   </span>
                 ))}
@@ -592,7 +587,7 @@ export function CreativeClient({
             className="w-full"
           >
             {identityLoading
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Checking identity...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Checking identity...</>
               : <><Eye className="h-4 w-4 mr-2" /> Check identity consistency</>
             }
           </Button>
@@ -608,14 +603,14 @@ export function CreativeClient({
                 {/* Strengths */}
                 <div className="border rounded-xl p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <CheckCircle2 className="h-4 w-4 text-pos" />
                     <span className="text-sm font-medium">Strengths</span>
                   </div>
                   {identityResult.strengths.length > 0 ? (
                     <ul className="space-y-1.5">
                       {identityResult.strengths.map((s, i) => (
                         <li key={i} className="text-sm text-muted-foreground leading-relaxed flex gap-2">
-                          <span className="text-green-500 shrink-0">•</span>
+                          <span className="text-pos shrink-0">•</span>
                           {s}
                         </li>
                       ))}
@@ -628,14 +623,14 @@ export function CreativeClient({
                 {/* Drift warnings */}
                 <div className="border rounded-xl p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-amber-500" />
+                    <AlertCircle className="h-4 w-4 text-tx-2" />
                     <span className="text-sm font-medium">Drift warnings</span>
                   </div>
                   {identityResult.drift_warnings.length > 0 ? (
                     <ul className="space-y-1.5">
                       {identityResult.drift_warnings.map((w, i) => (
                         <li key={i} className="text-sm text-muted-foreground leading-relaxed flex gap-2">
-                          <span className="text-amber-500 shrink-0">•</span>
+                          <span className="text-tx-2 shrink-0">•</span>
                           {w}
                         </li>
                       ))}
@@ -650,7 +645,7 @@ export function CreativeClient({
               {identityResult.adjustments.length > 0 && (
                 <div className="border rounded-xl p-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-blue-500" />
+                    <TrendingUp className="h-4 w-4 text-tx-2" />
                     <span className="text-sm font-medium">Recommended adjustments</span>
                   </div>
                   <ul className="space-y-2">
@@ -718,7 +713,7 @@ export function CreativeClient({
             className="w-full"
           >
             {competitorLoading
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analysing...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Analysing...</>
               : <><Target className="h-4 w-4 mr-2" /> Analyse competitor creative</>
             }
           </Button>
@@ -734,18 +729,18 @@ export function CreativeClient({
                 </div>
                 <div className="border rounded-xl p-3 text-center space-y-1">
                   <p className="text-xs text-muted-foreground">Cultural fit</p>
-                  <p className="text-sm font-semibold tabular-nums">{competitorResult.cultural_fit}/100</p>
+                  <p className="text-sm font-semibold bg-num">{competitorResult.cultural_fit}/100</p>
                 </div>
                 <div className="border rounded-xl p-3 text-center space-y-1">
                   <p className="text-xs text-muted-foreground">Est. engagement</p>
-                  <p className="text-sm font-semibold tabular-nums">{competitorResult.engagement_potential}/100</p>
+                  <p className="text-sm font-semibold bg-num">{competitorResult.engagement_potential}/100</p>
                 </div>
               </div>
 
               {/* Strategic insights */}
               <div className="border rounded-xl p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-blue-500" />
+                  <TrendingUp className="h-4 w-4 text-tx-2" />
                   <span className="text-sm font-medium">Strategic insights</span>
                 </div>
                 {competitorResult.strategic_insights.length > 0 ? (
@@ -767,14 +762,14 @@ export function CreativeClient({
               {/* Counter-positioning */}
               <div className="border rounded-xl p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <Palette className="h-4 w-4 text-purple-500" />
+                  <Palette className="h-4 w-4 text-tx-2" />
                   <span className="text-sm font-medium">Counter-positioning ideas for {brandName}</span>
                 </div>
                 {competitorResult.counter_positions.length > 0 ? (
                   <ul className="space-y-2">
                     {competitorResult.counter_positions.map((cp, i) => (
                       <li key={i} className="flex gap-2.5 text-sm leading-relaxed">
-                        <span className="shrink-0 text-purple-400 font-bold">#{i + 1}</span>
+                        <span className="shrink-0 text-tx-2 font-bold">#{i + 1}</span>
                         {cp}
                       </li>
                     ))}
@@ -813,30 +808,30 @@ export function CreativeClient({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={videoMedia.previewUrl} alt="Video frame" className="w-full max-h-56 object-cover" />
               <div className="absolute top-2 left-2 flex items-center gap-1.5">
-                {videoMedia.isVideo && <Film className="h-3.5 w-3.5 text-white" />}
-                <span className="text-[10px] bg-black/60 text-white px-2 py-0.5 rounded font-mono">
+                {videoMedia.isVideo && <Film className="h-3.5 w-3.5 text-tx-inv" />}
+                <span className="text-[10px] bg-ink/60 text-tx-inv px-2 py-0.5 rounded bg-num">
                   {videoMedia.isVideo ? 'VIDEO (first frame)' : 'IMAGE'}
                 </span>
               </div>
-              <button onClick={() => setVideoMedia(null)} className="absolute top-2 right-2 bg-black/60 rounded-full p-1">
-                <XCircle className="h-4 w-4 text-white" />
+              <button onClick={() => setVideoMedia(null)} className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1 bg-press">
+                <XCircle className="h-4 w-4 text-tx-inv" />
               </button>
             </div>
           ) : videoExtracting ? (
             <div className="flex items-center justify-center gap-2 border border-dashed rounded-xl py-8 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4" />
               Extracting video frame…
             </div>
           ) : (
             <div className="flex gap-3">
               <button onClick={() => videoImgRef.current?.click()}
-                className="flex-1 flex flex-col items-center justify-center gap-2 border border-dashed rounded-xl py-6 text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                className="flex-1 flex flex-col items-center justify-center gap-2 border border-dashed rounded-xl py-6 text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
               >
                 <ImagePlus className="h-5 w-5" />
                 Upload image
               </button>
               <button onClick={() => videoVidRef.current?.click()}
-                className="flex-1 flex flex-col items-center justify-center gap-2 border border-dashed rounded-xl py-6 text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                className="flex-1 flex flex-col items-center justify-center gap-2 border border-dashed rounded-xl py-6 text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors bg-press"
               >
                 <Video className="h-5 w-5" />
                 Upload video
@@ -896,7 +891,7 @@ export function CreativeClient({
             className="w-full"
           >
             {videoLoading
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analysing video…</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Analysing video…</>
               : <><Film className="h-4 w-4 mr-2" /> Analyse video creative</>
             }
           </Button>
@@ -906,14 +901,14 @@ export function CreativeClient({
               {/* Score grid */}
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
-                  { label: 'Hook',       score: videoResult.hook_score,      color: 'text-violet-600' },
-                  { label: 'Visual',     score: videoResult.visual_score,    color: 'text-blue-600'   },
-                  { label: 'Sound-off',  score: videoResult.sound_off_score, color: 'text-emerald-600'},
-                  { label: 'CTA',        score: videoResult.cta_visibility,  color: 'text-amber-600'  },
+                  { label: 'Hook',       score: videoResult.hook_score,      color: 'text-tx-2' },
+                  { label: 'Visual',     score: videoResult.visual_score,    color: 'text-tx-flare'   },
+                  { label: 'Sound-off',  score: videoResult.sound_off_score, color: 'text-pos'},
+                  { label: 'CTA',        score: videoResult.cta_visibility,  color: 'text-tx-2'  },
                 ].map(m => (
                   <div key={m.label} className="border rounded-xl p-3 text-center space-y-1">
                     <p className="text-xs text-muted-foreground">{m.label}</p>
-                    <p className={cn('text-2xl font-bold tabular-nums', m.color)}>{m.score}</p>
+                    <p className={cn('text-2xl font-bold bg-num', m.color)}>{m.score}</p>
                     <p className="text-[10px] text-muted-foreground">/100</p>
                   </div>
                 ))}
@@ -922,7 +917,7 @@ export function CreativeClient({
               {/* Overall */}
               <div className="border rounded-xl p-4 bg-muted/30 flex items-center justify-between gap-3">
                 <span className="text-sm font-medium">Overall score</span>
-                <span className={cn('text-3xl font-bold tabular-nums', videoResult.overall >= 70 ? 'text-green-600' : videoResult.overall >= 50 ? 'text-amber-600' : 'text-red-500')}>
+                <span className={cn('text-3xl font-bold bg-num', videoResult.overall >= 70 ? 'text-pos' : videoResult.overall >= 50 ? 'text-tx-2' : 'text-tx-flare')}>
                   {videoResult.overall}<span className="text-base text-muted-foreground font-normal">/100</span>
                 </span>
               </div>
@@ -935,21 +930,21 @@ export function CreativeClient({
                 { label: 'CTA notes',          note: videoResult.cta_notes        },
               ].map(({ label, note }) => (
                 <div key={label} className="border rounded-xl p-4 space-y-1.5">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+                  <p className="text-xs font-semibold text-muted-foreground">{label}</p>
                   <p className="text-sm leading-relaxed">{note}</p>
                 </div>
               ))}
 
               {/* Top recommendation */}
-              <div className="border-l-4 border-violet-500 pl-4 py-1">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">Top recommendation</p>
+              <div className="border-l-4 border-line pl-4 py-1">
+                <p className="text-xs font-semibold text-muted-foreground mb-1">Top recommendation</p>
                 <p className="text-sm leading-relaxed font-medium">{videoResult.top_recommendation}</p>
               </div>
 
               {/* Improvements */}
               {videoResult.improvements.length > 0 && (
                 <div className="border rounded-xl p-4 space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Improvements</p>
+                  <p className="text-xs font-semibold text-muted-foreground">Improvements</p>
                   <ul className="space-y-2">
                     {videoResult.improvements.map((imp, i) => (
                       <li key={i} className="flex gap-2.5 text-sm leading-relaxed">
@@ -981,7 +976,7 @@ export function CreativeClient({
                   </span>
                   <span className="text-muted-foreground truncate">{analysisSummary(a)}</span>
                 </div>
-                <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
+                <span className="text-xs text-muted-foreground shrink-0 bg-num">
                   {new Date(a.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', timeZone: 'Africa/Lagos' })}
                 </span>
               </li>

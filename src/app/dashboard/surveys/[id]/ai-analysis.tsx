@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Sparkles, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -16,8 +18,8 @@ interface AnalysisResult {
 }
 
 const CONFIDENCE_COLOUR: Record<string, string> = {
-  High:   'bg-green-100 text-green-800',
-  Medium: 'bg-amber-100 text-amber-800',
+  High:   'bg-shell text-pos',
+  Medium: 'bg-shell text-tx-2',
   Low:    'bg-muted text-muted-foreground',
 }
 
@@ -26,10 +28,10 @@ function InsightRow({ label, text }: { label: string; text: string }) {
   return (
     <div className="border-b last:border-0 py-3">
       <button
-        className="w-full flex items-center justify-between text-left"
+        className="w-full flex items-center justify-between text-left bg-press"
         onClick={() => setOpen(o => !o)}
       >
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="text-xs font-semibold text-muted-foreground">{label}</span>
         {open ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
       </button>
       {open && <p className="text-sm leading-relaxed mt-1.5">{text}</p>}
@@ -74,12 +76,12 @@ export function SurveyAiAnalysis({ surveyId, responseCount }: { surveyId: string
         {!result && (
           <Button size="sm" variant="outline" onClick={generate} disabled={loading}>
             {loading
-              ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Analysing...</>
+              ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" /> Analysing...</>
               : <><Sparkles className="h-3.5 w-3.5 mr-1.5" /> Generate</>}
           </Button>
         )}
         {result && (
-          <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', CONFIDENCE_COLOUR[result.confidence])}>
+          <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium', CONFIDENCE_COLOUR[result.confidence])}>
             {result.confidence} confidence
           </span>
         )}
@@ -89,7 +91,7 @@ export function SurveyAiAnalysis({ surveyId, responseCount }: { surveyId: string
 
       {loading && !result && (
         <div className="py-6 text-center space-y-2">
-          <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+          <Loader2 className="h-6 w-6 mx-auto text-muted-foreground" />
           <p className="text-xs text-muted-foreground animate-pulse">Reading your survey data and generating insights...</p>
         </div>
       )}
@@ -110,7 +112,7 @@ export function SurveyAiAnalysis({ surveyId, responseCount }: { surveyId: string
           {/* Recommendations */}
           {result.recommendations?.length > 0 && (
             <div className="pt-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Recommendations</p>
+              <p className="text-xs font-semibold text-muted-foreground mb-2">Recommendations</p>
               <ul className="space-y-2">
                 {result.recommendations.map((rec, i) => (
                   <li key={i} className="flex gap-2.5 text-sm">
@@ -125,7 +127,7 @@ export function SurveyAiAnalysis({ surveyId, responseCount }: { surveyId: string
           )}
 
           <div className="pt-2 flex justify-end">
-            <button onClick={() => setResult(null)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={() => setResult(null)} className="text-xs text-muted-foreground hover:text-foreground transition-colors bg-press">
               Regenerate
             </button>
           </div>

@@ -6,10 +6,12 @@ import {
   ComposedChart, Line, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts'
-import { TrendingUp, Search, Info } from 'lucide-react'
+import { InfoIcon as Info } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp, SearchIcon as Search } from '@/components/brand/icon'
 import { Button }          from '@/components/ui/button'
 import { Input }           from '@/components/ui/input'
 import { Label }           from '@/components/ui/label'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface UpliftRow {
   week_start:     string
@@ -76,9 +78,9 @@ export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId, tota
       {upliftRows.length === 0 ? (
         <div className="space-y-3">
           {totalTrackedVisits === 0 && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20 p-3 flex items-start gap-2">
-              <TrendingUp className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-              <p className="text-xs text-amber-800 dark:text-amber-300">
+            <div className="rounded-lg border border-line bg-shell dark:border-line dark:bg-shell/20 p-3 flex items-start gap-2">
+              <TrendingUp className="h-3.5 w-3.5 text-tx-2 dark:text-tx-2 mt-0.5 shrink-0" />
+              <p className="text-xs text-tx-2 dark:text-tx-2">
                 No visits tracked yet. Make sure your attribution link is live and being used — once visits come in, the uplift analysis will have data to work with.
               </p>
             </div>
@@ -123,49 +125,52 @@ export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId, tota
         <>
           {latestCorr != null && (
             <div className={`rounded-lg px-3 py-2 text-xs flex items-center gap-2 ${
-              latestCorr >= 0.5 ? 'bg-green-50 text-green-800 dark:bg-green-950/30 dark:text-green-300'
-              : latestCorr >= 0 ? 'bg-amber-50 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300'
-              : 'bg-red-50 text-red-800 dark:bg-red-950/30 dark:text-red-300'
+              latestCorr >= 0.5 ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos'
+              : latestCorr >= 0 ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
+              : 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
             }`}>
-              <strong>r = {latestCorr.toFixed(2)}</strong>
+              <strong className="bg-num">r = {latestCorr.toFixed(2)}</strong>
               {latestInterp && <span className="ml-1">{latestInterp}</span>}
             </div>
           )}
 
           <div className="h-52">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
-                <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
-                <XAxis dataKey="week" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} tickLine={false} axisLine={false} />
-                <YAxis yAxisId="left"  tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} tickLine={false} axisLine={false} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }} tickLine={false} axisLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    background: '#14182B',
-                    border: '1px solid rgba(255,255,255,0.10)',
-                    borderRadius: 12,
-                    fontSize: 11,
-                    color: '#fff',
-                  }}
-                  labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
-                  cursor={{ fill: 'currentColor', opacity: 0.05 }}
-                />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar
-                  yAxisId="right" dataKey="OOH visits"
-                  fill="#2B59FF"
-                  fillOpacity={0.22}
-                  radius={[4,4,0,0]}
-                />
-                <Line
-                  yAxisId="left" type="monotone"
-                  dataKey="Search index"
-                  stroke="#E8763E"
-                  strokeWidth={2.5} dot={false}
-                  activeDot={{ r: 4, fill: '#E8763E', strokeWidth: 2, stroke: '#fff' }}
-                />
-              </ComposedChart>
-            </ResponsiveContainer>
+            <ChartState rows={chartData} loading={loading} height={220} empty="Connect search data to measure uplift around this site.">
+                          <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
+                  <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
+                  <XAxis dataKey="week" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="left"  tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }} tickLine={false} axisLine={false} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'var(--bg-ink)',
+                      border: 'var(--line)',
+                      borderRadius: 'var(--r-card)',
+                      fontSize: 11,
+                      color: 'var(--bg-card)',
+                    }}
+                    labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
+                    cursor={{ fill: 'currentColor', opacity: 0.05 }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Bar
+                    yAxisId="right" dataKey="OOH visits"
+                    fill="var(--flare)"
+                    fillOpacity={0.22}
+                    radius={[4,4,0,0]}
+                  />
+                  <Line
+                    yAxisId="left" type="monotone"
+                    dataKey="Search index"
+                    stroke="var(--chart-2)"
+                    strokeDasharray="4 3"
+                    strokeWidth={2.5} dot={false}
+                    activeDot={{ r: 4, fill: 'var(--ember)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </ChartState>
           </div>
 
           <div className="flex gap-2">

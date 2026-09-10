@@ -10,7 +10,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Check, Sparkles, Globe, ArrowRight, ArrowLeft, Loader2, AlertCircle, X, Plus } from 'lucide-react'
+import { Icon, type BrandIconName, CheckIcon as Check, GlobeIcon as Globe, ArrowRightIcon as ArrowRight, ArrowLeftIcon as ArrowLeft, XIcon as X, PlusIcon as Plus } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
 import { INDUSTRY_META, INDUSTRY_IDS, type IndustryId, getIndustryFromCategory } from '@/lib/industry-config'
@@ -34,14 +36,14 @@ const SOURCE_LABELS: Record<string, string> = {
 }
 
 const CONFIDENCE_META: Record<string, { label: string; class: string }> = {
-  High:   { label: 'High confidence', class: 'bg-green-50 text-green-700 border-green-200' },
-  Medium: { label: 'Medium confidence', class: 'bg-amber-50 text-amber-700 border-amber-200' },
+  High:   { label: 'High confidence', class: 'bg-shell text-pos border-line' },
+  Medium: { label: 'Medium confidence', class: 'bg-shell text-tx-2 border-line' },
   Low:    { label: 'Low confidence, review carefully', class: 'bg-muted text-muted-foreground border-border' },
 }
 
 function StepBadge({ step, label }: { step: number; label?: string }) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70">
+    <p className="text-[11px] font-semibold text-muted-foreground/70">
       Brand setup · Step {step} of 3{label ? ` · ${label}` : ''}
     </p>
   )
@@ -168,7 +170,7 @@ export default function OnboardingPage() {
   if (screen === 'industry') {
     return (
       <div className="min-h-screen bg-muted/40 flex flex-col items-center justify-center px-4 py-12">
-        <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-full px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
+        <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-sm px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
         <div className="w-full max-w-2xl space-y-8">
           <div className="text-center space-y-2">
             <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
@@ -191,8 +193,8 @@ export default function OnboardingPage() {
                   type="button"
                   onClick={() => patch('industry', id)}
                   className={cn(
-                    'relative text-left rounded-xl border p-4 transition-all duration-150 bg-card hover:border-foreground/40 hover:shadow-sm',
-                    selected && 'border-foreground ring-2 ring-foreground/10 bg-card shadow-sm',
+                    'relative text-left rounded-xl border p-4 transition-colors duration-150 bg-card hover:border-foreground/40',
+                    selected && 'border-foreground ring-2 ring-foreground/10 bg-card',
                     !selected && 'border-border',
                   )}
                 >
@@ -201,7 +203,7 @@ export default function OnboardingPage() {
                       <Check className="h-2.5 w-2.5 text-background" />
                     </span>
                   )}
-                  <span className="text-2xl leading-none block mb-2">{meta.icon}</span>
+                  <Icon name={meta.icon as BrandIconName} size={24} className="mb-2 block text-tx" />
                   <span className="text-[13px] font-semibold leading-snug block">{meta.label}</span>
                   <span className="text-[11px] text-muted-foreground leading-snug mt-0.5 block line-clamp-2">
                     {meta.tagline}
@@ -241,7 +243,7 @@ export default function OnboardingPage() {
   if (screen === 'identify') {
     return (
       <div className="min-h-screen bg-muted/40 flex flex-col items-center justify-center px-4 py-12">
-        <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-full px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
+        <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-sm px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
         <div className="w-full max-w-md space-y-8">
           <div className="text-center space-y-2">
             <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
@@ -254,7 +256,7 @@ export default function OnboardingPage() {
             </p>
           </div>
 
-          <div className="bg-card border rounded-xl p-6 space-y-5 shadow-sm">
+          <div className="bg-card border rounded-xl p-6 space-y-5">
             <div className="space-y-2">
               <Label htmlFor="brandName">Brand name <span className="text-destructive">*</span></Label>
               <Input
@@ -292,7 +294,7 @@ export default function OnboardingPage() {
             <button
               type="button"
               onClick={() => setScreen('industry')}
-              className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors pt-1"
+              className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors pt-1 bg-press"
             >
               <ArrowLeft className="h-3 w-3 inline mr-1" />
               Change industry
@@ -316,15 +318,15 @@ export default function OnboardingPage() {
   if (screen === 'analysing') {
     return (
       <div className="min-h-screen bg-muted/40 flex flex-col items-center justify-center px-4">
-        <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-full px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
+        <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-sm px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
         <div className="w-full max-w-md text-center space-y-6">
           <div className="inline-flex h-12 w-12 rounded-full bg-foreground items-center justify-center">
-            <Loader2 className="h-6 w-6 text-background animate-spin" />
+            <Loader2 className="h-6 w-6 text-background" />
           </div>
           <div className="space-y-2">
             <StepBadge step={2} />
             <h2 className="text-lg font-semibold">Drafting a profile for {brandName}</h2>
-            <p className="text-sm text-muted-foreground transition-all duration-500 min-h-[20px]">
+            <p className="text-sm text-muted-foreground transition-colors duration-500 min-h-[20px]">
               {LOADING_MESSAGES[msgIdx]}
             </p>
             <p className="text-xs text-muted-foreground/70">
@@ -339,7 +341,7 @@ export default function OnboardingPage() {
           <button
             type="button"
             onClick={() => setScreen('identify')}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
           >
             ← Cancel and go back
           </button>
@@ -354,7 +356,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-muted/40 py-10 px-4">
-      <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-full px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
+      <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-sm px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
       <div className="w-full max-w-xl mx-auto space-y-6">
 
         {/* Header */}
@@ -379,7 +381,7 @@ export default function OnboardingPage() {
             <span className="text-xs opacity-70">Drawn from: {sourceLabels}</span>
           </div>
         ) : (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-center gap-2 text-sm text-amber-700">
+          <div className="rounded-xl border border-line bg-shell px-4 py-3 flex items-center gap-2 text-sm text-tx-2">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>AI research was unavailable, so the fields below are empty. Fill them in yourself, or go back, add a website URL and try again.</span>
           </div>
@@ -461,7 +463,7 @@ export default function OnboardingPage() {
                   <button
                     type="button"
                     onClick={() => patch('targetSegments', data.targetSegments.filter((_, j) => j !== i))}
-                    className="text-muted-foreground hover:text-destructive transition-colors"
+                    className="text-muted-foreground hover:text-destructive transition-colors bg-press"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -495,7 +497,7 @@ export default function OnboardingPage() {
             disabled={!data.brandName.trim() || !data.category || isPending}
           >
             {isPending
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving your profile...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Saving your profile...</>
               : <><Check className="h-4 w-4 mr-2" /> Save profile and open my dashboard</>
             }
           </Button>

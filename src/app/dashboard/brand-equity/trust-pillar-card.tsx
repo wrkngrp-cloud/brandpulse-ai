@@ -1,17 +1,17 @@
 'use client'
 
 import type { TrustScore } from '@/lib/bhi'
-import { Shield, ShieldCheck, ShieldAlert, ShieldX } from 'lucide-react'
+import { ShieldIcon as Shield, ShieldIcon as ShieldCheck, ShieldIcon as ShieldAlert, ShieldIcon as ShieldX } from '@/components/brand/icon'
 
 interface Props {
   trust: TrustScore
 }
 
 const GRADE_CONFIG = {
-  excellent: { icon: ShieldCheck, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/30', label: 'Excellent' },
-  good:      { icon: Shield,      color: 'text-blue-500',    bg: 'bg-blue-50 dark:bg-blue-950/30',       label: 'Good' },
-  fair:      { icon: ShieldAlert, color: 'text-amber-500',   bg: 'bg-amber-50 dark:bg-amber-950/30',     label: 'Fair' },
-  poor:      { icon: ShieldX,     color: 'text-red-500',     bg: 'bg-red-50 dark:bg-red-950/30',         label: 'Needs attention' },
+  excellent: { icon: ShieldCheck, color: 'text-pos', bg: 'bg-shell dark:bg-shell/30', label: 'Excellent' },
+  good:      { icon: Shield,      color: 'text-tx-2',    bg: 'bg-flare-wash dark:bg-shell/30',       label: 'Good' },
+  fair:      { icon: ShieldAlert, color: 'text-tx-2',   bg: 'bg-shell dark:bg-shell/30',     label: 'Fair' },
+  poor:      { icon: ShieldX,     color: 'text-tx-flare',     bg: 'bg-flare-wash dark:bg-shell/30',         label: 'Needs attention' },
 } as const
 
 const DIMENSION_LABELS: Record<keyof TrustScore['breakdown'], string> = {
@@ -35,11 +35,11 @@ export function TrustPillarCard({ trust }: Props) {
         {trust.score != null && cfg ? (
           <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${cfg.bg}`}>
             <Icon className={`w-4 h-4 ${cfg.color}`} />
-            <span className={`text-sm font-semibold ${cfg.color}`}>{trust.score}/100</span>
+            <span className={`text-sm font-semibold bg-num ${cfg.color}`}>{trust.score}/100</span>
             <span className={`text-xs ${cfg.color} opacity-80`}>{cfg.label}</span>
           </div>
         ) : (
-          <span className="text-sm text-muted-foreground italic">No data yet</span>
+          <span className="text-sm text-muted-foreground">No data yet</span>
         )}
       </div>
 
@@ -56,13 +56,13 @@ export function TrustPillarCard({ trust }: Props) {
                   {dim.display && <span className="ml-1.5 opacity-70">{dim.display}</span>}
                 </span>
               </div>
-              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all ${
+                  className={`h-full rounded-full transition-colors ${
                     dim.score == null   ? 'w-0' :
-                    dim.score >= 80     ? 'bg-emerald-500' :
-                    dim.score >= 60     ? 'bg-blue-500' :
-                    dim.score >= 40     ? 'bg-amber-500' : 'bg-red-500'
+                    dim.score >= 80     ? 'bg-pos' :
+                    dim.score >= 60     ? 'bg-flare' :
+                    dim.score >= 40     ? 'bg-ember' : 'bg-flare'
                   }`}
                   style={{ width: dim.score != null ? `${dim.score}%` : '0%' }}
                 />
@@ -73,12 +73,12 @@ export function TrustPillarCard({ trust }: Props) {
       </div>
 
       {trust.grade === 'poor' && (
-        <p className="text-xs text-red-500/80 border-t pt-3">
+        <p className="text-xs text-tx-flare/80 border-t pt-3">
           Trust signals are below threshold. Check for recent complaint surges, regulatory notices, or low app store ratings.
         </p>
       )}
       {trust.grade === null && (
-        <p className="text-xs text-muted-foreground/60 border-t pt-3 italic">
+        <p className="text-xs text-muted-foreground/60 border-t pt-3">
           Connect your App Store IDs and ensure sentiment data is flowing to see your trust score.
         </p>
       )}

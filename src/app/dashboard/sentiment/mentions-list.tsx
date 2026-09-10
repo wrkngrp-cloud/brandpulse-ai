@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Flag, CheckCircle, ChevronDown } from 'lucide-react'
+import { FlagIcon as Flag, CheckIcon as CheckCircle, ChevronDownIcon as ChevronDown } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import {
   DropdownMenu,
@@ -17,9 +17,9 @@ const PLATFORM_LABEL: Record<string, string> = {
 }
 
 const LABEL_COLOR: Record<string, string> = {
-  positive: 'text-green-600',
-  negative: 'text-red-500',
-  mixed:    'text-amber-500',
+  positive: 'text-pos',
+  negative: 'text-tx-flare',
+  mixed:    'text-tx-2',
   neutral:  'text-muted-foreground',
 }
 
@@ -66,7 +66,7 @@ function DisputeMenu({
 
   if (done || mention.disputed) {
     return (
-      <span className="flex items-center gap-1 text-[10px] text-green-600 font-medium">
+      <span className="flex items-center gap-1 text-[10px] text-pos font-medium">
         <CheckCircle className="h-3 w-3" /> Corrected
       </span>
     )
@@ -99,7 +99,7 @@ function DisputeMenu({
         <ChevronDown className="h-2.5 w-2.5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
-        <p className="px-2 py-1.5 text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
+        <p className="px-2 py-1.5 text-[10px] text-muted-foreground font-medium">
           Correct label to
         </p>
         <DropdownMenuSeparator />
@@ -162,7 +162,7 @@ export function MentionsList({ initialMentions }: { initialMentions: Mention[] }
                   </span>
                 )}
                 {m.disputed && (
-                  <span className="text-xs font-semibold capitalize text-amber-600 dark:text-amber-400">
+                  <span className="text-xs font-semibold capitalize text-tx-2 dark:text-tx-2">
                     disputed
                   </span>
                 )}

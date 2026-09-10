@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Key, Plus, Trash2, Copy, Check, ChevronDown, ChevronRight } from 'lucide-react'
+import { LockIcon as Key, PlusIcon as Plus, TrashIcon as Trash2, CopyIcon as Copy, CheckIcon as Check, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight } from '@/components/brand/icon'
 
 interface ApiKey {
   id: string
@@ -102,8 +102,8 @@ function CopyButton({ text }: { text: string }) {
     setTimeout(() => setCopied(false), 2000)
   }
   return (
-    <button type="button" onClick={handleCopy} className="text-muted-foreground hover:text-foreground transition-colors">
-      {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+    <button type="button" onClick={handleCopy} className="text-muted-foreground hover:text-foreground transition-colors bg-press">
+      {copied ? <Check className="w-3.5 h-3.5 text-pos" /> : <Copy className="w-3.5 h-3.5" />}
     </button>
   )
 }
@@ -171,11 +171,11 @@ export function ApiKeysSection() {
           <p className="text-xs text-muted-foreground">Loading...</p>
         )}
         {!loading && keys.length === 0 && (
-          <p className="text-xs text-muted-foreground italic">No active keys. Generate one below.</p>
+          <p className="text-xs text-muted-foreground">No active keys. Generate one below.</p>
         )}
         {keys.map(k => (
           <div key={k.id} className="flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm">
-            <code className="flex-1 font-mono text-xs text-muted-foreground">{k.key_prefix}</code>
+            <code className="flex-1 bg-num text-xs text-muted-foreground">{k.key_prefix}</code>
             <span className="text-xs text-muted-foreground/70 shrink-0">{k.name}</span>
             <span className="text-xs text-muted-foreground/50 shrink-0">
               {k.last_used_at
@@ -185,7 +185,7 @@ export function ApiKeysSection() {
             <button
               type="button"
               onClick={() => void handleRevoke(k.id)}
-              className="text-muted-foreground hover:text-destructive transition-colors ml-1"
+              className="text-muted-foreground hover:text-destructive transition-colors ml-1 bg-press"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -195,12 +195,12 @@ export function ApiKeysSection() {
 
       {/* Revealed key — shown once */}
       {revealed && (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-3 space-y-2">
-          <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
+        <div className="rounded-lg border border-line bg-shell dark:bg-shell/30 p-3 space-y-2">
+          <p className="text-xs font-medium text-tx-2 dark:text-tx-2">
             Copy this key now — it will not be shown again.
           </p>
           <div className="flex items-center gap-2 rounded-md bg-background border px-3 py-2">
-            <code className="flex-1 font-mono text-xs break-all select-all">{revealed.key}</code>
+            <code className="flex-1 bg-num text-xs break-all select-all">{revealed.key}</code>
             <CopyButton text={revealed.key} />
           </div>
           <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setRevealed(null)}>
@@ -232,7 +232,7 @@ export function ApiKeysSection() {
         <button
           type="button"
           onClick={() => setShowDocs(v => !v)}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
         >
           {showDocs ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
           How to send your data
@@ -241,9 +241,9 @@ export function ApiKeysSection() {
         {showDocs && (
           <div className="mt-3 space-y-2">
             <p className="text-xs text-muted-foreground">
-              POST to <code className="font-mono bg-muted px-1 rounded">https://your-domain.com/api/first-party/[type]</code> with your key in the Authorization header.
+              POST to <code className="bg-num bg-muted px-1 rounded">https://your-domain.com/api/first-party/[type]</code> with your key in the Authorization header.
             </p>
-            <div className="rounded-md bg-muted p-2 font-mono text-xs text-muted-foreground overflow-x-auto">
+            <div className="rounded-md bg-muted p-2 bg-num text-xs text-muted-foreground overflow-x-auto">
               Authorization: Bearer bp_live_...
             </div>
 
@@ -252,7 +252,7 @@ export function ApiKeysSection() {
                 <button
                   type="button"
                   onClick={() => setOpenDoc(v => v === doc.type ? null : doc.type)}
-                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium hover:bg-accent transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium hover:bg-accent transition-colors bg-press"
                 >
                   <span>{doc.label}</span>
                   <div className="flex items-center gap-2">
@@ -266,7 +266,7 @@ export function ApiKeysSection() {
                       <p className="text-xs text-muted-foreground">POST /api/first-party/{doc.type}</p>
                       <CopyButton text={doc.example} />
                     </div>
-                    <pre className="text-[11px] font-mono bg-background rounded-md p-2 overflow-x-auto max-h-52 border">
+                    <pre className="text-[11px] bg-num bg-background rounded-md p-2 overflow-x-auto max-h-52 border">
                       {doc.example}
                     </pre>
                   </div>

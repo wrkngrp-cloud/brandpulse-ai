@@ -2,7 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Building2, Link2, MapPin, Swords, Share2, Layers, Plug, ExternalLink, ClipboardList, Code2 } from 'lucide-react'
+import { ShareIcon as Share2 } from '@/components/brand/icon'
+import { UsersIcon as User, VenueIcon as Building2, LinkIcon as Link2, MapIcon as MapPin, StarIcon as Swords, LayoutGridIcon as Layers, ExternalLinkIcon as ExternalLink, SurveyIcon as ClipboardList, CodeIcon as Code2 } from '@/components/brand/icon'
+import { ConnectIcon as Plug } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
 const SETTINGS_LINKS = [
@@ -43,7 +45,7 @@ export function SettingsNav() {
 
       {/* Connector management lives under Platform → Connectors */}
       <div className="border-l border-border/50 pl-2 ml-1 md:mt-3 md:pt-3 md:border-l-0 md:border-t md:pl-0 md:ml-0 shrink-0">
-        <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 hidden md:block">Add integrations</p>
+        <p className="px-3 pb-1.5 text-[10px] font-bold text-muted-foreground/50 hidden md:block">Add integrations</p>
         <Link
           href="/dashboard/connectors"
           className="flex shrink-0 items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"

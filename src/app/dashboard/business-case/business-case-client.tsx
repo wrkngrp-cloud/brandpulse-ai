@@ -4,11 +4,8 @@ import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
-import {
-  TrendingUp, TrendingDown, Target, DollarSign, Award,
-  CheckCircle2, ChevronRight, BarChart3,
-  ArrowUpRight, Minus,
-} from 'lucide-react'
+import { TrendDownIcon as TrendingDown, CircleDotIcon as Target, CurrencyIcon as DollarSign, StarIcon as Award, CheckIcon as CheckCircle2, ChevronRightIcon as ChevronRight, TrendIcon as BarChart3, ArrowRightIcon as ArrowUpRight, MinusIcon as Minus } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 import {
@@ -17,6 +14,7 @@ import {
   type CommercialMetricId,
 } from '@/lib/commercial-metrics'
 import type { BrandType } from '@/lib/bhi'
+import { ChartState } from '@/components/brand/chart-states'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -59,11 +57,11 @@ function fmtDate(d: string) {
 }
 
 const ESOV_POSTURE: Record<string, { label: string; color: string; bg: string; text: string }> = {
-  growth:   { label: 'Growth Mode',     color: 'text-emerald-700', bg: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200', text: 'You are outspending your market share weight. Sustained positive share of voice above your market share is the strongest predictor of future market share growth — keep this up.' },
-  mild:     { label: 'Mild Growth',     color: 'text-teal-700',    bg: 'bg-teal-50 dark:bg-teal-950/30 border-teal-200',         text: 'Slight share-of-voice advantage. Incremental budget can tip this into strong growth mode.' },
-  parity:   { label: 'Parity',          color: 'text-amber-700',   bg: 'bg-amber-50 dark:bg-amber-950/30 border-amber-200',       text: 'You are matching your share with spending. No net gain or loss in market share expected at this rate.' },
-  decline:  { label: 'Decline Risk',    color: 'text-orange-700',  bg: 'bg-orange-50 dark:bg-orange-950/30 border-orange-200',    text: 'You are underspending relative to market share. Competitors with positive ESOV will take share from you.' },
-  critical: { label: 'Critical',        color: 'text-red-700',     bg: 'bg-red-50 dark:bg-red-950/30 border-red-200',            text: 'Significant underinvestment. Without correction, market share loss is statistically likely within 6–12 months.' },
+  growth:   { label: 'Growth Mode',     color: 'text-pos', bg: 'bg-shell dark:bg-shell/30 border-line', text: 'You are outspending your market share weight. Sustained positive share of voice above your market share is the strongest predictor of future market share growth — keep this up.' },
+  mild:     { label: 'Mild Growth',     color: 'text-pos',    bg: 'bg-shell dark:bg-shell/30 border-line',         text: 'Slight share-of-voice advantage. Incremental budget can tip this into strong growth mode.' },
+  parity:   { label: 'Parity',          color: 'text-tx-2',   bg: 'bg-shell dark:bg-shell/30 border-line',       text: 'You are matching your share with spending. No net gain or loss in market share expected at this rate.' },
+  decline:  { label: 'Decline Risk',    color: 'text-tx-2',  bg: 'bg-shell dark:bg-shell/30 border-line',    text: 'You are underspending relative to market share. Competitors with positive ESOV will take share from you.' },
+  critical: { label: 'Critical',        color: 'text-tx-flare',     bg: 'bg-flare-wash dark:bg-shell/30 border-line-strong',            text: 'Significant underinvestment. Without correction, market share loss is statistically likely within 6–12 months.' },
 }
 
 function esovPosture(esov: number | null) {
@@ -82,11 +80,11 @@ function KpiTile({ icon: Icon, iconColor, label, value, delta, sub }: {
     <div className="rounded-2xl border bg-card p-5">
       <div className="flex items-center gap-2 mb-2">
         <Icon className={cn('h-4 w-4', iconColor)} />
-        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="text-[11px] font-bold text-muted-foreground">{label}</p>
       </div>
-      <p className="text-[28px] font-bold leading-none tracking-tight">{value}</p>
+      <p className="text-[28px] font-bold leading-none tracking-tight"><span className="bg-num">{value}</span></p>
       {delta != null && (
-        <p className={cn('text-[12px] font-semibold mt-1 flex items-center gap-0.5', delta >= 0 ? 'text-emerald-600' : 'text-red-600')}>
+        <p className={cn('text-[12px] font-semibold mt-1 flex items-center gap-0.5', delta >= 0 ? 'text-pos' : 'text-tx-flare')}>
           {delta >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
           {delta > 0 ? '+' : ''}{delta.toFixed(1)} pts (90d)
         </p>
@@ -100,7 +98,7 @@ function SectionHead({ icon: Icon, children }: { icon: React.ElementType; childr
   return (
     <div className="flex items-center gap-2.5 mb-5">
       <Icon className="h-4.5 w-4.5 text-muted-foreground shrink-0" />
-      <h2 className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground">{children}</h2>
+      <h2 className="text-[12px] font-bold text-muted-foreground">{children}</h2>
       <div className="flex-1 h-px bg-border/60" />
     </div>
   )
@@ -115,15 +113,15 @@ const COMMERCIAL_DEFS: Record<CommercialMetricId, {
   fmt: (v: number) => string
   goodWhenDown?: boolean
 }> = {
-  revenue:   { label: 'Revenue',         icon: DollarSign, iconColor: 'text-emerald-500', fmt: fmtNGN },
-  spend:     { label: 'Marketing Spend', icon: DollarSign, iconColor: 'text-amber-500',   fmt: fmtNGN },
-  roiPct:    { label: 'Marketing ROI',   icon: TrendingUp, iconColor: 'text-blue-500',    fmt: v => `${v >= 0 ? '+' : ''}${v.toFixed(0)}%` },
-  roas:      { label: 'ROAS',            icon: TrendingUp, iconColor: 'text-blue-500',    fmt: v => `${v.toFixed(1)}x` },
-  cac:       { label: 'CAC',             icon: Target,     iconColor: 'text-violet-500',  fmt: fmtNGN, goodWhenDown: true },
-  cpl:       { label: 'Cost per Lead',   icon: Target,     iconColor: 'text-violet-500',  fmt: fmtNGN, goodWhenDown: true },
-  mql:       { label: 'MQLs',            icon: ArrowUpRight, iconColor: 'text-orange-500', fmt: v => v.toLocaleString('en-NG') },
-  churnRate: { label: 'Churn Rate',      icon: TrendingDown, iconColor: 'text-red-500',   fmt: v => `${(v * 100).toFixed(1)}%`, goodWhenDown: true },
-  ltvToCac:  { label: 'LTV : CAC',       icon: Award,      iconColor: 'text-teal-500',    fmt: v => `${v.toFixed(1)}x` },
+  revenue:   { label: 'Revenue',         icon: DollarSign, iconColor: 'text-pos', fmt: fmtNGN },
+  spend:     { label: 'Marketing Spend', icon: DollarSign, iconColor: 'text-tx-2',   fmt: fmtNGN },
+  roiPct:    { label: 'Marketing ROI',   icon: TrendingUp, iconColor: 'text-tx-2',    fmt: v => `${v >= 0 ? '+' : ''}${v.toFixed(0)}%` },
+  roas:      { label: 'ROAS',            icon: TrendingUp, iconColor: 'text-tx-2',    fmt: v => `${v.toFixed(1)}x` },
+  cac:       { label: 'CAC',             icon: Target,     iconColor: 'text-tx-2',  fmt: fmtNGN, goodWhenDown: true },
+  cpl:       { label: 'Cost per Lead',   icon: Target,     iconColor: 'text-tx-2',  fmt: fmtNGN, goodWhenDown: true },
+  mql:       { label: 'MQLs',            icon: ArrowUpRight, iconColor: 'text-tx-2', fmt: v => v.toLocaleString('en-NG') },
+  churnRate: { label: 'Churn Rate',      icon: TrendingDown, iconColor: 'text-tx-flare',   fmt: v => `${(v * 100).toFixed(1)}%`, goodWhenDown: true },
+  ltvToCac:  { label: 'LTV : CAC',       icon: Award,      iconColor: 'text-pos',    fmt: v => `${v.toFixed(1)}x` },
 }
 
 function periodDelta(trend: { date: string; value: number }[]): number | null {
@@ -142,7 +140,7 @@ function CommercialKpiTile({ id, metric }: { id: CommercialMetricId; metric: Com
       <div className="rounded-2xl border border-dashed bg-muted/20 p-5">
         <div className="flex items-center gap-2 mb-2">
           <def.icon className={cn('h-4 w-4', def.iconColor)} />
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{def.label}</p>
+          <p className="text-[11px] font-bold text-muted-foreground">{def.label}</p>
         </div>
         <p className="text-[12px] text-muted-foreground leading-relaxed">{metric.unavailableReason}</p>
       </div>
@@ -156,11 +154,11 @@ function CommercialKpiTile({ id, metric }: { id: CommercialMetricId; metric: Com
     <div className="rounded-2xl border bg-card p-5">
       <div className="flex items-center gap-2 mb-2">
         <def.icon className={cn('h-4 w-4', def.iconColor)} />
-        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{def.label}</p>
+        <p className="text-[11px] font-bold text-muted-foreground">{def.label}</p>
       </div>
-      <p className="text-[28px] font-bold leading-none tracking-tight">{def.fmt(metric.value)}</p>
+      <p className="text-[28px] font-bold leading-none tracking-tight bg-num">{def.fmt(metric.value)}</p>
       {delta != null ? (
-        <p className={cn('text-[12px] font-semibold mt-1 flex items-center gap-0.5', improved ? 'text-emerald-600' : 'text-red-600')}>
+        <p className={cn('text-[12px] font-semibold mt-1 flex items-center gap-0.5', improved ? 'text-pos' : 'text-tx-flare')}>
           {delta > 0
             ? <TrendingUp className="h-3.5 w-3.5" />
             : delta < 0
@@ -178,14 +176,14 @@ function CommercialKpiTile({ id, metric }: { id: CommercialMetricId; metric: Com
 // ── BCG-style campaign portfolio ───────────────────────────────────────────
 
 const BCG_CHANNELS: Record<string, { quadrant: string; color: string }> = {
-  digital:    { quadrant: 'Star',        color: '#3b82f6' },
-  social:     { quadrant: 'Star',        color: '#6366f1' },
-  influencer: { quadrant: 'Question',    color: '#f59e0b' },
-  tv:         { quadrant: 'Cash Cow',    color: '#10b981' },
-  radio:      { quadrant: 'Cash Cow',    color: '#14b8a6' },
-  ooh:        { quadrant: 'Question',    color: '#8b5cf6' },
-  print:      { quadrant: 'Dog',         color: '#6b7280' },
-  event:      { quadrant: 'Question',    color: '#f97316' },
+  digital:    { quadrant: 'Star',        color: 'var(--flare)' },
+  social:     { quadrant: 'Star',        color: 'var(--neu)' },
+  influencer: { quadrant: 'Question',    color: 'var(--ember)' },
+  tv:         { quadrant: 'Cash Cow',    color: 'var(--pos)' },
+  radio:      { quadrant: 'Cash Cow',    color: 'var(--pos)' },
+  ooh:        { quadrant: 'Question',    color: 'var(--neu)' },
+  print:      { quadrant: 'Dog',         color: 'var(--tx-2)' },
+  event:      { quadrant: 'Question',    color: 'var(--ember)' },
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
@@ -205,7 +203,7 @@ export function BusinessCaseClient({
       channel,
       spend,
       share: totalSpend > 0 ? Math.round((spend / totalSpend) * 100) : 0,
-      bcg:   BCG_CHANNELS[channel] ?? { quadrant: 'Other', color: '#9ca3af' },
+      bcg:   BCG_CHANNELS[channel] ?? { quadrant: 'Other', color: 'var(--tx-3)' },
     }))
 
   const bhiZone = currentBhi == null ? null
@@ -246,14 +244,14 @@ export function BusinessCaseClient({
       <section>
         <SectionHead icon={BarChart3}>Performance Scorecard (90 days)</SectionHead>
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <KpiTile icon={Award}       iconColor="text-blue-500"    label="Brand Health"   value={currentBhi != null ? `${currentBhi.toFixed(1)}` : '—'} delta={bhiChange} sub={bhiZone ? `Zone: ${bhiZone}` : undefined} />
-          <KpiTile icon={Target}      iconColor="text-violet-500"  label="Share of Voice"  value={sov != null ? `${sov.toFixed(1)}%` : '—'} sub={marketShare ? `Market share: ${marketShare}%` : undefined} />
-          <KpiTile icon={TrendingUp}  iconColor="text-emerald-500" label="Avg Sentiment"   value={avgSentiment != null ? `${avgSentiment.toFixed(1)}` : '—'} sub="/ 100" />
-          <KpiTile icon={DollarSign}  iconColor="text-amber-500"   label="Media Spend"     value={fmtNGN(totalSpend)} sub={`${activeCampaigns} active campaigns`} />
-          <KpiTile icon={CheckCircle2} iconColor="text-teal-500"   label="NPS"             value={avgNps != null ? avgNps.toFixed(1) : '—'} sub={`${npsCount} responses`} />
-          <KpiTile icon={ArrowUpRight} iconColor="text-orange-500" label="Mentions (30d)"  value={mentions30d.toLocaleString()} />
+          <KpiTile icon={Award}       iconColor="text-tx-2"    label="Brand Health"   value={currentBhi != null ? `${currentBhi.toFixed(1)}` : '—'} delta={bhiChange} sub={bhiZone ? `Zone: ${bhiZone}` : undefined} />
+          <KpiTile icon={Target}      iconColor="text-tx-2"  label="Share of Voice"  value={sov != null ? `${sov.toFixed(1)}%` : '—'} sub={marketShare ? `Market share: ${marketShare}%` : undefined} />
+          <KpiTile icon={TrendingUp}  iconColor="text-pos" label="Avg Sentiment"   value={avgSentiment != null ? `${avgSentiment.toFixed(1)}` : '—'} sub="/ 100" />
+          <KpiTile icon={DollarSign}  iconColor="text-tx-2"   label="Media Spend"     value={fmtNGN(totalSpend)} sub={`${activeCampaigns} active campaigns`} />
+          <KpiTile icon={CheckCircle2} iconColor="text-pos"   label="NPS"             value={avgNps != null ? avgNps.toFixed(1) : '—'} sub={`${npsCount} responses`} />
+          <KpiTile icon={ArrowUpRight} iconColor="text-tx-2" label="Mentions (30d)"  value={mentions30d.toLocaleString()} />
           {esov != null && (
-            <KpiTile icon={Target} iconColor={esov >= 0 ? 'text-emerald-500' : 'text-red-500'} label="ESOV" value={`${esov > 0 ? '+' : ''}${esov.toFixed(1)}%`} sub="SOV minus market share" />
+            <KpiTile icon={Target} iconColor={esov >= 0 ? 'text-pos' : 'text-tx-flare'} label="ESOV" value={`${esov > 0 ? '+' : ''}${esov.toFixed(1)}%`} sub="SOV minus market share" />
           )}
         </div>
       </section>
@@ -281,7 +279,7 @@ export function BusinessCaseClient({
               ].map(({ label, value, note }) => (
                 <div key={label} className="rounded-xl bg-background/60 p-3 text-center">
                   <p className="text-[11px] text-muted-foreground">{label}</p>
-                  <p className="text-[20px] font-bold">{value}</p>
+                  <p className="text-[20px] font-bold"><span className="bg-num">{value}</span></p>
                   <p className="text-[10px] text-muted-foreground">{note}</p>
                 </div>
               ))}
@@ -295,21 +293,23 @@ export function BusinessCaseClient({
         <section>
           <SectionHead icon={Award}>Brand Health Index — 90-day Trend</SectionHead>
           <div className="rounded-2xl border bg-card p-5">
-            <ResponsiveContainer width="100%" height={200}>
-              <AreaChart data={bhiTrend}>
-                <defs>
-                  <linearGradient id="bhiGradBC" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
-                <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 10 }} />
-                <Area type="monotone" dataKey="bhi" stroke="#3b82f6" strokeWidth={2.5} fill="url(#bhiGradBC)" dot={false} />
-              </AreaChart>
-            </ResponsiveContainer>
+            <ChartState rows={bhiTrend} height={200} empty="Connect a source to build the commercial case.">
+                          <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={bhiTrend}>
+                  <defs>
+                    <linearGradient id="bhiGradBC" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="var(--flare)" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="var(--flare)" stopOpacity={0.02} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
+                  <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
+                  <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                  <Area type="monotone" dataKey="bhi" stroke="var(--flare)" strokeWidth={2.5} fill="url(#bhiGradBC)" dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartState>
           </div>
         </section>
       )}
@@ -322,11 +322,11 @@ export function BusinessCaseClient({
             <div className="px-5 py-4 border-b flex gap-6 flex-wrap">
               <div>
                 <p className="text-[11px] text-muted-foreground">Total budget</p>
-                <p className="text-[16px] font-bold">{fmtNGN(totalBudget)}</p>
+                <p className="text-[16px] font-bold bg-num">{fmtNGN(totalBudget)}</p>
               </div>
               <div>
                 <p className="text-[11px] text-muted-foreground">Deployed</p>
-                <p className="text-[16px] font-bold">{fmtNGN(totalSpend)}</p>
+                <p className="text-[16px] font-bold bg-num">{fmtNGN(totalSpend)}</p>
               </div>
               <div>
                 <p className="text-[11px] text-muted-foreground">Utilisation</p>
@@ -334,24 +334,26 @@ export function BusinessCaseClient({
               </div>
             </div>
             <div className="p-5">
-              <ResponsiveContainer width="100%" height={channelRows.length * 44 + 20}>
-                <BarChart data={channelRows} layout="vertical" margin={{ left: 8 }}>
-                  <XAxis type="number" hide />
-                  <YAxis type="category" dataKey="channel" tick={{ fontSize: 12 }} width={80} tickLine={false} axisLine={false} />
-                  <Tooltip formatter={(v) => [fmtNGN(Number(v)), 'Spend']} contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-                  <Bar dataKey="spend" radius={[0, 6, 6, 0]} barSize={22}>
-                    {channelRows.map((r) => (
-                      <Cell key={r.channel} fill={r.bcg.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              <ChartState rows={channelRows} height={220} empty="Connect a source to build the commercial case.">
+                              <ResponsiveContainer width="100%" height={channelRows.length * 44 + 20}>
+                  <BarChart data={channelRows} layout="vertical" margin={{ left: 8 }}>
+                    <XAxis type="number" hide />
+                    <YAxis type="category" dataKey="channel" tick={{ fontFamily: 'var(--font-num)',  fontSize: 12 }} width={80} tickLine={false} axisLine={false} />
+                    <Tooltip formatter={(v) => [fmtNGN(Number(v)), 'Spend']} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
+                    <Bar dataKey="spend" radius={[0, 6, 6, 0]} barSize={22}>
+                      {channelRows.map((r) => (
+                        <Cell key={r.channel} fill={r.bcg.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartState>
               {/* BCG legend */}
               <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t">
                 <p className="text-[11px] text-muted-foreground font-medium w-full">Channel portfolio classification (BCG lens):</p>
                 {channelRows.map(r => (
                   <div key={r.channel} className="flex items-center gap-1.5 text-[11px]">
-                    <span className="h-2 w-2 rounded-full" style={{ background: r.bcg.color }} />
+                    <span className="h-[11px] w-[5px] rounded-[var(--r-tick)]" style={{ background: r.bcg.color }} />
                     <span className="capitalize">{r.channel}</span>
                     <span className="text-muted-foreground">({r.bcg.quadrant} · {r.share}%)</span>
                   </div>
@@ -386,7 +388,7 @@ export function BusinessCaseClient({
 
       {/* Methodology note */}
       <div className="rounded-xl border bg-muted/20 p-5">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Methodology</p>
+        <p className="text-[11px] font-bold text-muted-foreground mb-2">Methodology</p>
         <p className="text-[12px] text-muted-foreground leading-relaxed">
           Brand Health Index uses a 40/30/30 sentiment/SOV/survey weighting. ESOV (your share of voice minus your market share) consistently predicts market share growth in 12–18 month windows across FMCG and QSR categories when positive. Channel portfolio classification: Stars (high growth/high investment), Cash Cows (established/efficient), Question Marks (unproven/potential), Dogs (low efficiency).
           Business case generated by BrandGauge using board-grade analysis.

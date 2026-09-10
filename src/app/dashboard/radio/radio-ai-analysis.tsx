@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Sparkles, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { buttonVariants } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -20,7 +22,7 @@ function renderAnalysis(text: string) {
     const body = rest.join('\n').trim()
     return (
       <div key={i} className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{heading.trim()}</p>
+        <p className="text-xs font-semibold text-muted-foreground">{heading.trim()}</p>
         <p className="text-sm leading-relaxed">{body}</p>
       </div>
     )
@@ -68,8 +70,8 @@ export function RadioAiAnalysis({ days, brandName, hasData }: RadioAiAnalysisPro
         )}
       >
         {loading
-          ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          : <Sparkles className="h-3.5 w-3.5 text-violet-500" />
+          ? <Loader2 className="h-3.5 w-3.5" />
+          : <Sparkles className="h-3.5 w-3.5 text-tx-2" />
         }
         {loading ? 'Analysing…' : 'Analyse with AI'}
       </button>
@@ -78,12 +80,12 @@ export function RadioAiAnalysis({ days, brandName, hasData }: RadioAiAnalysisPro
         <Card className="border rounded-xl p-5 bg-card space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-violet-500" />
+              <Sparkles className="h-4 w-4 text-tx-2" />
               <span className="text-sm font-semibold">AI Radio Analysis</span>
             </div>
             <button
               onClick={() => setCollapsed(c => !c)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors bg-press"
             >
               {collapsed
                 ? <ChevronDown className="h-4 w-4" />

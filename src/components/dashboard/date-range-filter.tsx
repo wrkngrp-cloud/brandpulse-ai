@@ -36,9 +36,9 @@ export function DateRangeFilter({
           title={p.title}
           onClick={() => select(p.days)}
           className={cn(
-            'text-[11px] font-medium px-2.5 py-1 rounded-md transition-all',
+            'text-[11px] font-medium px-2.5 py-1 rounded-md transition-colors',
             currentDays === p.days
-              ? 'bg-background text-foreground shadow-sm'
+              ? 'bg-background text-foreground border border-line'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >

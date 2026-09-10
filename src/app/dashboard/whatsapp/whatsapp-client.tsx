@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { MessageCircle, Users, Send, BarChart2, CheckCircle2, AlertCircle,
-         Plus, Loader2, ChevronRight, Clock, CheckCheck } from 'lucide-react'
+import { UsersIcon as Users, SendIcon as Send, TrendIcon as BarChart2, CheckIcon as CheckCircle2, PlusIcon as Plus, ChevronRightIcon as ChevronRight, ClockIcon as Clock, CheckIcon as CheckCheck } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { MentionsIcon as MessageCircle, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -47,13 +48,13 @@ function pct(n: number, of: number) {
 
 function statusBadge(status: string) {
   const map: Record<string, { label: string; className: string }> = {
-    sent:      { label: 'Sent',      className: 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400' },
-    sending:   { label: 'Sending…',  className: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400' },
-    scheduled: { label: 'Scheduled', className: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400' },
-    failed:    { label: 'Failed',    className: 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400' },
+    sent:      { label: 'Sent',      className: 'bg-shell text-pos dark:bg-shell/40 dark:text-pos' },
+    sending:   { label: 'Sending…',  className: 'bg-flare-wash text-tx-flare dark:bg-shell/40 dark:text-tx-2' },
+    scheduled: { label: 'Scheduled', className: 'bg-shell text-tx-2 dark:bg-shell/40 dark:text-tx-2' },
+    failed:    { label: 'Failed',    className: 'bg-flare-wash text-tx-flare dark:bg-shell/40 dark:text-tx-flare' },
   }
   const { label, className } = map[status] ?? { label: status, className: 'bg-muted text-muted-foreground' }
-  return <span className={cn('text-[10px] font-semibold px-2 py-0.5 rounded-full', className)}>{label}</span>
+  return <span className={cn('text-[10px] font-semibold px-2 py-0.5 rounded-sm', className)}>{label}</span>
 }
 
 export function WhatsAppClient({ brandName, configured, stats, campaigns }: Props) {
@@ -116,8 +117,8 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
           <h1 className="h-display text-[26px] leading-none">WhatsApp</h1>
         </div>
         <div className="border rounded-xl p-8 bg-card text-center space-y-4">
-          <div className="h-12 w-12 rounded-xl bg-green-50 dark:bg-green-950/30 flex items-center justify-center mx-auto">
-            <MessageCircle className="h-6 w-6 text-green-600" />
+          <div className="h-12 w-12 rounded-xl bg-shell dark:bg-shell/30 flex items-center justify-center mx-auto">
+            <MessageCircle className="h-6 w-6 text-pos" />
           </div>
           <div>
             <p className="font-semibold">WhatsApp not configured</p>
@@ -125,7 +126,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
               Add your WhatsApp Business API credentials to start sending. All sends come from your BrandGauge-verified number.
             </p>
           </div>
-          <div className="text-left bg-muted/40 rounded-lg p-4 text-xs font-mono space-y-1 max-w-sm mx-auto">
+          <div className="text-left bg-muted/40 rounded-lg p-4 text-xs bg-num space-y-1 max-w-sm mx-auto">
             <p>WHATSAPP_PHONE_NUMBER_ID=</p>
             <p>WHATSAPP_BUSINESS_ACCOUNT_ID=</p>
             <p>WHATSAPP_ACCESS_TOKEN=</p>
@@ -164,7 +165,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="border rounded-xl p-4 bg-card space-y-1">
             <Icon className="h-4 w-4 text-muted-foreground" />
-            <p className="text-xl font-bold tracking-tight">{value}</p>
+            <p className="text-xl font-bold tracking-tight"><span className="bg-num">{value}</span></p>
             <p className="text-[11px] text-muted-foreground">{label}</p>
           </div>
         ))}
@@ -189,7 +190,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
 
       {/* Campaign history */}
       <section>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Campaign history</h2>
+        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Campaign history</h2>
 
         {campaigns.length === 0 ? (
           <div className="border rounded-xl p-8 bg-card text-center text-sm text-muted-foreground">
@@ -199,14 +200,14 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
           <div className="border rounded-xl bg-card overflow-hidden divide-y">
             {campaigns.map(c => (
               <div key={c.id} className="p-4 flex items-start gap-4">
-                <div className="h-8 w-8 rounded-lg bg-green-50 dark:bg-green-950/30 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="h-8 w-8 rounded-lg bg-shell dark:bg-shell/30 flex items-center justify-center shrink-0 mt-0.5">
                   {c.status === 'sending'
-                    ? <Loader2 className="h-3.5 w-3.5 text-green-600 animate-spin" />
+                    ? <Loader2 className="h-3.5 w-3.5 text-pos" />
                     : c.status === 'sent'
-                    ? <CheckCheck className="h-3.5 w-3.5 text-green-600" />
+                    ? <CheckCheck className="h-3.5 w-3.5 text-pos" />
                     : c.status === 'failed'
-                    ? <AlertCircle className="h-3.5 w-3.5 text-red-500" />
-                    : <Clock className="h-3.5 w-3.5 text-amber-500" />
+                    ? <AlertCircle className="h-3.5 w-3.5 text-tx-flare" />
+                    : <Clock className="h-3.5 w-3.5 text-tx-2" />
                   }
                 </div>
                 <div className="flex-1 min-w-0">
@@ -215,21 +216,21 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
                     {statusBadge(c.status)}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                    Template: <span className="font-mono">{c.template_name}</span>
+                    Template: <span className="bg-num">{c.template_name}</span>
                   </p>
                   {c.status === 'sent' && c.sent > 0 && (
                     <div className="flex items-center gap-3 mt-1.5 text-[11px] text-muted-foreground">
-                      <span>{c.sent.toLocaleString()} sent</span>
+                      <span className="bg-num">{c.sent.toLocaleString()} sent</span>
                       <span>·</span>
-                      <span className="text-green-700 dark:text-green-400">
+                      <span className="text-pos dark:text-pos">
                         {pct(c.delivered, c.sent)} delivered
                       </span>
                       <span>·</span>
-                      <span className="text-blue-700 dark:text-blue-400">
+                      <span className="text-tx-flare dark:text-tx-2 bg-num">
                         {pct(c.read_count, c.sent)} read
                       </span>
                       {c.failed > 0 && (
-                        <><span>·</span><span className="text-red-600">{c.failed} failed</span></>
+                        <><span>·</span><span className="text-tx-flare">{c.failed} failed</span></>
                       )}
                     </div>
                   )}
@@ -280,10 +281,10 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
               <Label>Message template</Label>
               {loadingTemplates ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading approved templates…
+                  <Loader2 className="h-3.5 w-3.5" /> Loading approved templates…
                 </div>
               ) : templates.length === 0 ? (
-                <div className="rounded-lg border bg-amber-50 dark:bg-amber-950/20 p-3 text-xs text-amber-800 dark:text-amber-300">
+                <div className="rounded-lg border bg-shell dark:bg-shell/20 p-3 text-xs text-tx-2 dark:text-tx-2">
                   No approved templates found. Create and get templates approved in your Meta Business Manager first.
                 </div>
               ) : (
@@ -296,7 +297,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
                   <SelectContent>
                     {templates.map(t => (
                       <SelectItem key={t.name} value={t.name}>
-                        <span className="font-mono text-xs">{t.name}</span>
+                        <span className="bg-num text-xs">{t.name}</span>
                         <span className="ml-2 text-muted-foreground text-xs">{t.category}</span>
                       </SelectItem>
                     ))}
@@ -329,7 +330,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
               onClick={handleSend}
               disabled={sending || !form.name || !form.template_name || !form.consented}
             >
-              {sending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Queuing…</> : 'Send campaign'}
+              {sending ? <><Loader2 className="h-4 w-4 mr-2" /> Queuing…</> : 'Send campaign'}
             </Button>
           </div>
         </SheetContent>

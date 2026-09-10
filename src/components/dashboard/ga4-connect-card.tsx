@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams }              from 'next/navigation'
-import { CheckCircle2, RefreshCw, Unplug, BarChart3 } from 'lucide-react'
+import { CheckIcon as CheckCircle2, RefreshIcon as RefreshCw, WifiOffIcon as Unplug, TrendIcon as BarChart3 } from '@/components/brand/icon'
 import { toast }                        from 'sonner'
 import { buttonVariants }               from '@/components/ui/button'
 import { cn }                           from '@/lib/utils'
@@ -93,7 +93,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <BarChart3 className="h-4 w-4 text-orange-500" />
+          <BarChart3 className="h-4 w-4 text-tx-2" />
           <div>
             <h3 className="text-sm font-semibold">Google Analytics 4</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -102,7 +102,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
           </div>
         </div>
         {connection && (
-          <span className="flex items-center gap-1 text-xs text-green-600">
+          <span className="flex items-center gap-1 text-xs text-pos">
             <CheckCircle2 className="h-3.5 w-3.5" /> Connected
           </span>
         )}
@@ -113,7 +113,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
           <div className="rounded-lg bg-muted/50 px-3 py-2 text-xs space-y-1">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Property</span>
-              <span className="font-mono">{connection.property_name ?? connection.property_id}</span>
+              <span className="bg-num">{connection.property_name ?? connection.property_id}</span>
             </div>
             {connection.last_synced_at && (
               <div className="flex justify-between">
@@ -134,7 +134,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
               disabled={loading !== null}
               className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5 text-xs')}
             >
-              <RefreshCw className={cn('h-3.5 w-3.5', loading === 'sync' && 'animate-spin')} />
+              <RefreshCw className={cn('h-3.5 w-3.5', loading === 'sync' && '')} />
               {loading === 'sync' ? 'Syncing...' : 'Sync now'}
             </button>
             <button

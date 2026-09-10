@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Plus, Pencil, Trash2, Check, ArrowRight, Building2 } from 'lucide-react'
+import { PlusIcon as Plus, EditIcon as Pencil, TrashIcon as Trash2, CheckIcon as Check, ArrowRightIcon as ArrowRight, VenueIcon as Building2 } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -127,14 +127,14 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
 
       {/* Demo seed banner — only for demo account */}
       {isDemoUser && (
-        <div className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/60 dark:bg-amber-950/20 p-4 flex items-center gap-3 flex-wrap">
+        <div className="rounded-2xl border border-dashed border-line bg-shell/60 dark:bg-shell/20 p-4 flex items-center gap-3 flex-wrap">
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-amber-800 dark:text-amber-300">Demo Mode</p>
-            <p className="text-[12px] text-amber-700/80 dark:text-amber-400/70">
+            <p className="text-[13px] font-semibold text-tx-2 dark:text-tx-2">Demo Mode</p>
+            <p className="text-[12px] text-tx-2/80 dark:text-tx-2/70">
               Seed a second brand (Jara Express) with 90 days of BHI, sentiment, SOV, and competitive intelligence data.
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={seedDemo} disabled={seeding} className="border-amber-400 text-amber-800 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/30 shrink-0">
+          <Button variant="outline" size="sm" onClick={seedDemo} disabled={seeding} className="border-line text-tx-2 hover:bg-shell dark:text-tx-2 dark:hover:bg-shell/30 shrink-0">
             {seeding ? 'Seeding…' : 'Seed demo data'}
           </Button>
         </div>

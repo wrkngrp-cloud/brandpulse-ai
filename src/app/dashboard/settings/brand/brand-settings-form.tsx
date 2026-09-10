@@ -9,19 +9,24 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
 import { FieldTip } from '@/components/ui/field-tip'
-import { Upload, X, Loader2, ImageIcon, Sparkles, ArrowRight } from 'lucide-react'
+import { ExportIcon as Upload, XIcon as X, ImageIcon, ArrowRightIcon as ArrowRight } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import Link from 'next/link'
+import { ShelfIcon, CardIcon, VenueIcon, SaasIcon, MarketIcon, BottleIcon, TruckIcon } from '@/components/brand/icon'
 
 type CulturalKey = 'community_corporate' | 'traditional_modern' | 'religious_secular' | 'mass_premium' | 'local_global'
 
-const BRAND_TYPES: { value: BrandSettingsData['brandType']; label: string; description: string }[] = [
-  { value: 'fmcg',              label: 'FMCG / Consumer Goods', description: 'Physical products sold through retail or direct' },
-  { value: 'fintech',           label: 'Fintech / Digital Finance', description: 'Payment platforms, digital banks, savings/investment apps' },
-  { value: 'venue',             label: 'Venue / Hospitality', description: 'Restaurants, clubs, hotels, experience venues' },
-  { value: 'b2b_saas',          label: 'B2B SaaS', description: 'Software tools, API platforms, developer products' },
-  { value: 'marketplace',       label: 'Creator Marketplace', description: 'Platforms for creators to sell or build on' },
-  { value: 'beverage_alcohol',  label: 'Alcohol / Beverage', description: 'Regulated consumer beverages' },
-  { value: 'b2b_distribution',  label: 'B2B Distribution', description: 'Trade and supply chain platforms' },
+// The seven verticals, and the seven glyphs the icon set draws for them.
+const BRAND_TYPES: { value: BrandSettingsData['brandType']; label: string; description: string;
+                     icon: React.ComponentType<{ className?: string }> }[] = [
+  { value: 'fmcg',              label: 'FMCG / Consumer Goods', description: 'Physical products sold through retail or direct', icon: ShelfIcon },
+  { value: 'fintech',           label: 'Fintech / Digital Finance', description: 'Payment platforms, digital banks, savings/investment apps', icon: CardIcon },
+  { value: 'venue',             label: 'Venue / Hospitality', description: 'Restaurants, clubs, hotels, experience venues', icon: VenueIcon },
+  { value: 'b2b_saas',          label: 'B2B SaaS', description: 'Software tools, API platforms, developer products', icon: SaasIcon },
+  { value: 'marketplace',       label: 'Creator Marketplace', description: 'Platforms for creators to sell or build on', icon: MarketIcon },
+  { value: 'beverage_alcohol',  label: 'Alcohol / Beverage', description: 'Regulated consumer beverages', icon: BottleIcon },
+  { value: 'b2b_distribution',  label: 'B2B Distribution', description: 'Trade and supply chain platforms', icon: TruckIcon },
 ]
 
 interface BrandSettingsFormProps {
@@ -104,7 +109,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
     const hex = colorInput.trim()
     if (!hex) return
     const normalized = hex.startsWith('#') ? hex : `#${hex}`
-    if (!/^#[0-9A-Fa-f]{3,6}$/.test(normalized)) { toast.error('Enter a valid hex color (e.g. #FF6B35)'); return }
+    if (!/^#[0-9A-Fa-f]{3,6}$/.test(normalized)) { toast.error('Enter a valid hex color (e.g. var(--flare))'); return }
     if (colors.includes(normalized)) return
     setColors(prev => [...prev, normalized])
     setColorInput('')
@@ -131,7 +136,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                     type="button"
                     onClick={handleLogoRemove}
                     disabled={logoLoading}
-                    className="absolute top-1 right-1 h-5 w-5 rounded-full bg-background/80 hover:bg-background border flex items-center justify-center"
+                    className="absolute top-1 right-1 h-5 w-5 rounded-full bg-background/80 hover:bg-background border flex items-center justify-center bg-press"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -156,7 +161,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                   className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-md border text-xs font-medium cursor-pointer transition-colors
                     ${logoLoading ? 'pointer-events-none opacity-50' : 'hover:bg-accent'}`}
                 >
-                  {logoLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+                  {logoLoading ? <Loader2 className="h-3.5 w-3.5" /> : <Upload className="h-3.5 w-3.5" />}
                   {logoUrl ? 'Replace logo' : 'Upload logo'}
                 </label>
                 <p className="text-[11px] text-muted-foreground">JPEG, PNG, WebP, SVG · max 5 MB</p>
@@ -172,13 +177,13 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
             </p>
             <div className="flex flex-wrap gap-2 mb-2">
               {colors.map(color => (
-                <div key={color} className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-full border">
-                  <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
-                  <span className="font-mono">{color}</span>
+                <div key={color} className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-sm border">
+                  <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] shrink-0" style={{ backgroundColor: color }} />
+                  <span className="bg-num">{color}</span>
                   <button
                     type="button"
                     onClick={() => setColors(prev => prev.filter(c => c !== color))}
-                    className="text-muted-foreground hover:text-foreground ml-0.5"
+                    className="text-muted-foreground hover:text-foreground ml-0.5 bg-press"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -190,8 +195,8 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                 value={colorInput}
                 onChange={e => setColorInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addColor())}
-                placeholder="#FF6B35"
-                className="font-mono text-xs h-8"
+                placeholder="var(--flare)"
+                className="bg-num text-xs h-8"
               />
               <Button type="button" size="sm" variant="outline" className="h-8 text-xs shrink-0" onClick={addColor}>
                 Add
@@ -221,12 +226,12 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
               value={data.googlePlaceId ?? ''}
               onChange={e => patch('googlePlaceId', e.target.value)}
               placeholder="ChIJ..."
-              className="max-w-sm font-mono text-xs"
+              className="max-w-sm bg-num text-xs"
             />
           </div>
           {(data.brandType === 'b2b_saas' || data.brandType === 'marketplace') && (
             <div className="space-y-4 pt-2 border-t">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Review Platforms</p>
+              <p className="text-xs font-medium text-muted-foreground">Review Platforms</p>
               <div className="space-y-2">
                 <Label htmlFor="g2Slug">G2 Product Slug</Label>
                 <p className="text-xs text-muted-foreground">
@@ -237,7 +242,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                   value={data.g2Slug ?? ''}
                   onChange={e => patch('g2Slug', e.target.value)}
                   placeholder="your-product-name"
-                  className="max-w-sm font-mono text-xs"
+                  className="max-w-sm bg-num text-xs"
                 />
               </div>
               <div className="space-y-2">
@@ -250,7 +255,7 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                   value={data.capterraSlug ?? ''}
                   onChange={e => patch('capterraSlug', e.target.value)}
                   placeholder="your-product-slug"
-                  className="max-w-sm font-mono text-xs"
+                  className="max-w-sm bg-num text-xs"
                 />
               </div>
             </div>
@@ -258,19 +263,19 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
 
           {(['fintech', 'b2b_saas', 'marketplace'] as const).includes(data.brandType as 'fintech') && (
             <div className="space-y-4 pt-2 border-t">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Developer Ecosystem</p>
+              <p className="text-xs font-medium text-muted-foreground">Developer Ecosystem</p>
               <div className="space-y-2">
                 <Label htmlFor="githubRepo">GitHub Repository</Label>
                 <p className="text-xs text-muted-foreground">owner/repo format, e.g. paystack/paystack-php</p>
-                <Input id="githubRepo" value={data.githubRepo ?? ''} onChange={e => patch('githubRepo', e.target.value)} placeholder="org/repo" className="max-w-sm font-mono text-xs" />
+                <Input id="githubRepo" value={data.githubRepo ?? ''} onChange={e => patch('githubRepo', e.target.value)} placeholder="org/repo" className="max-w-sm bg-num text-xs" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="npmPackageName">npm Package</Label>
-                <Input id="npmPackageName" value={data.npmPackageName ?? ''} onChange={e => patch('npmPackageName', e.target.value)} placeholder="@scope/package or package-name" className="max-w-sm font-mono text-xs" />
+                <Input id="npmPackageName" value={data.npmPackageName ?? ''} onChange={e => patch('npmPackageName', e.target.value)} placeholder="@scope/package or package-name" className="max-w-sm bg-num text-xs" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="stackoverflowTag">Stack Overflow Tag</Label>
-                <Input id="stackoverflowTag" value={data.stackoverflowTag ?? ''} onChange={e => patch('stackoverflowTag', e.target.value)} placeholder="paystack" className="max-w-sm font-mono text-xs" />
+                <Input id="stackoverflowTag" value={data.stackoverflowTag ?? ''} onChange={e => patch('stackoverflowTag', e.target.value)} placeholder="paystack" className="max-w-sm bg-num text-xs" />
               </div>
             </div>
           )}
@@ -301,7 +306,10 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                       selected ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-accent'
                     }`}
                   >
-                    <p className="text-sm font-medium">{t.label}</p>
+                    <p className="text-sm font-medium flex items-center gap-2">
+                      <t.icon className="h-4 w-4 shrink-0" />
+                      {t.label}
+                    </p>
                     <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>
                   </button>
                 )
@@ -343,26 +351,26 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
           <div className="space-y-4">
             {data.brandVoice.tone && (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Tone</p>
+                <p className="text-[11px] font-semibold text-muted-foreground mb-1">Tone</p>
                 <p className="text-sm">{data.brandVoice.tone}</p>
               </div>
             )}
             {data.brandVoice.adjectives.length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Voice adjectives</p>
+                <p className="text-[11px] font-semibold text-muted-foreground mb-1.5">Voice adjectives</p>
                 <div className="flex flex-wrap gap-1.5">
                   {data.brandVoice.adjectives.map(a => (
-                    <span key={a} className="text-xs px-2 py-0.5 rounded-full bg-muted border border-border font-medium">{a}</span>
+                    <span key={a} className="text-xs px-2 py-0.5 rounded-sm bg-muted border border-border font-medium">{a}</span>
                   ))}
                 </div>
               </div>
             )}
             {data.brandVoice.signaturePhrases.length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Signature phrases</p>
+                <p className="text-[11px] font-semibold text-muted-foreground mb-1.5">Signature phrases</p>
                 <div className="flex flex-wrap gap-1.5">
                   {data.brandVoice.signaturePhrases.map(p => (
-                    <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium italic">{p}</span>
+                    <span key={p} className="text-xs px-2 py-0.5 rounded-sm bg-primary/10 text-primary border border-primary/20 font-medium">{p}</span>
                   ))}
                 </div>
               </div>

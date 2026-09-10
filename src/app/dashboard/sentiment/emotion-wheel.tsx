@@ -1,16 +1,17 @@
 'use client'
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { ChartState } from '@/components/brand/chart-states'
 
 const PLUTCHIK: Record<string, { color: string; label: string }> = {
-  joy:          { color: '#FBBF24', label: 'Joy'          },
-  trust:        { color: '#34D399', label: 'Trust'        },
-  fear:         { color: '#84CC16', label: 'Fear'         },
-  surprise:     { color: '#22D3EE', label: 'Surprise'     },
-  sadness:      { color: '#60A5FA', label: 'Sadness'      },
-  disgust:      { color: '#A78BFA', label: 'Disgust'      },
-  anger:        { color: '#F87171', label: 'Anger'        },
-  anticipation: { color: '#FB923C', label: 'Anticipation' },
+  joy:          { color: 'var(--danfo)', label: 'Joy'          },
+  trust:        { color: 'var(--pos)', label: 'Trust'        },
+  fear:         { color: 'var(--pos)', label: 'Fear'         },
+  surprise:     { color: 'var(--neu)', label: 'Surprise'     },
+  sadness:      { color: 'var(--ember)', label: 'Sadness'      },
+  disgust:      { color: 'var(--neu)', label: 'Disgust'      },
+  anger:        { color: 'var(--flare)', label: 'Anger'        },
+  anticipation: { color: 'var(--danfo)', label: 'Anticipation' },
 }
 
 interface Props {
@@ -24,7 +25,7 @@ function CustomTooltip({ active, payload }: {
   if (!active || !payload?.length) return null
   const { name, value, payload: p } = payload[0]
   return (
-    <div className="bg-card border rounded-lg shadow px-3 py-1.5 text-xs">
+    <div className="bg-card border rounded-lg px-3 py-1.5 text-xs">
       <span className="font-semibold capitalize" style={{ color: p.color }}>{name}</span>
       <span className="text-muted-foreground ml-2">{value} mention{value !== 1 ? 's' : ''}</span>
     </div>
@@ -41,37 +42,39 @@ export function EmotionWheel({ distribution }: Props) {
     .map(([key, value]) => ({
       name:  PLUTCHIK[key]?.label ?? key,
       value,
-      color: PLUTCHIK[key]?.color ?? '#94a3b8',
+      color: PLUTCHIK[key]?.color ?? 'var(--tx-3)',
     }))
 
   return (
     <div className="space-y-3">
-      <ResponsiveContainer width="100%" height={180}>
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={50}
-            outerRadius={80}
-            paddingAngle={2}
-            dataKey="value"
-          >
-            {data.map((entry, i) => (
-              <Cell key={i} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip content={<CustomTooltip />} />
-        </PieChart>
-      </ResponsiveContainer>
+      <ChartState rows={data} height={180} empty="Connect a social account to read how people feel.">
+              <ResponsiveContainer width="100%" height={180}>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              innerRadius={50}
+              outerRadius={80}
+              paddingAngle={2}
+              dataKey="value"
+            >
+              {data.map((entry, i) => (
+                <Cell key={i} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+          </PieChart>
+        </ResponsiveContainer>
+      </ChartState>
 
       {/* Legend */}
       <div className="flex flex-wrap gap-x-3 gap-y-1.5 justify-center">
         {data.map(d => (
           <span key={d.name} className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+            <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] shrink-0" style={{ backgroundColor: d.color }} />
             {d.name}
-            <span className="text-muted-foreground/60">
+            <span className="text-muted-foreground/60 bg-num">
               {Math.round((d.value / total) * 100)}%
             </span>
           </span>

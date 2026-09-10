@@ -1,5 +1,7 @@
 'use client'
 
+import { Crescendo } from '@/components/brand/crescendo'
+import { ChartState } from '@/components/brand/chart-states'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, BarChart, Bar, Cell, ReferenceLine,
@@ -61,35 +63,37 @@ export function DigitalSpendChart({ data, demo }: SpendChartProps) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <AreaChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-        <defs>
-          <linearGradient id="spendGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%"  stopColor="#6366f1" stopOpacity={0.25} />
-            <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-          </linearGradient>
-          <linearGradient id="imprGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%"  stopColor="#10b981" stopOpacity={0.2} />
-            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
-        <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-        <YAxis yAxisId="spend" tickFormatter={fmtNGN} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={56} />
-        <YAxis yAxisId="impr" orientation="right" tickFormatter={fmtImpr} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={52} />
-        <Tooltip
-          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
-          formatter={(val, name) =>
-            name === 'spend'
-              ? [typeof val === 'number' ? fmtNGN(val) : val, 'Spend']
-              : [typeof val === 'number' ? fmtImpr(val) : val, 'Impressions']
-          }
-        />
-        <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-        <Area yAxisId="spend" type="monotone" dataKey="spend"       stroke="#6366f1" strokeWidth={2} fill="url(#spendGrad)" name="spend"       dot={false} />
-        <Area yAxisId="impr"  type="monotone" dataKey="impressions" stroke="#10b981" strokeWidth={2} fill="url(#imprGrad)"  name="impressions" dot={false} />
-      </AreaChart>
-    </ResponsiveContainer>
+    <ChartState rows={chartData} height={260} empty="Connect an ad account to see spend against results.">
+          <ResponsiveContainer width="100%" height={260}>
+        <AreaChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id="spendGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%"  stopColor="var(--neu)" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="var(--neu)" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="imprGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%"  stopColor="var(--pos)" stopOpacity={0.2} />
+              <stop offset="95%" stopColor="var(--pos)" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
+          <XAxis dataKey="label" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+          <YAxis yAxisId="spend" tickFormatter={fmtNGN} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={56} />
+          <YAxis yAxisId="impr" orientation="right" tickFormatter={fmtImpr} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={52} />
+          <Tooltip
+            contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
+            formatter={(val, name) =>
+              name === 'spend'
+                ? [typeof val === 'number' ? fmtNGN(val) : val, 'Spend']
+                : [typeof val === 'number' ? fmtImpr(val) : val, 'Impressions']
+            }
+          />
+          <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+          <Area yAxisId="spend" type="monotone" dataKey="spend"       stroke="var(--chart-2)" strokeWidth={2} strokeDasharray="4 3" fill="url(#spendGrad)" name="spend"       dot={false} />
+          <Area yAxisId="impr"  type="monotone" dataKey="impressions" stroke="var(--chart-1)" strokeWidth={2} fill="url(#imprGrad)"  name="impressions" dot={false} />
+        </AreaChart>
+      </ResponsiveContainer>
+    </ChartState>
   )
 }
 
@@ -133,22 +137,22 @@ export function ConversionFunnelChart({ data, demo }: { data?: FunnelData; demo?
       label:  'Impressions',
       value:  d.impressions,
       barPct: 100,
-      color:  '#6366f1',
+      color:  'var(--neu)',
       rate:   null as string | null,
     },
     {
       label:  'Clicks',
       value:  d.clicks,
       barPct: logBarPct(d.clicks, d.impressions),
-      color:  '#8b5cf6',
-      rate:   `↓ ${ctr.toFixed(2)}% CTR`,
+      color:  'var(--neu)',
+      rate:   `− ${ctr.toFixed(2)}% CTR`,
     },
     {
       label:  'Conversions',
       value:  d.conversions,
       barPct: logBarPct(d.conversions, d.impressions),
-      color:  '#10b981',
-      rate:   `↓ ${cvr.toFixed(2)}% CVR`,
+      color:  'var(--pos)',
+      rate:   `− ${cvr.toFixed(2)}% CVR`,
     },
   ]
 
@@ -165,14 +169,9 @@ export function ConversionFunnelChart({ data, demo }: { data?: FunnelData; demo?
                 </span>
               )}
             </div>
-            <span className="text-sm font-bold tabular-nums shrink-0">{fmtNum(step.value)}</span>
+            <span className="text-sm font-bold bg-num shrink-0">{fmtNum(step.value)}</span>
           </div>
-          <div className="h-5 bg-muted/50 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${step.barPct}%`, backgroundColor: step.color, opacity: 0.82 }}
-            />
-          </div>
+          <Crescendo value={step.barPct} height={20} />
         </div>
       ))}
       <p className="text-[10px] text-muted-foreground text-right">
@@ -195,9 +194,9 @@ const DEMO_FREQUENCY: FrequencyPoint[] = [
 ]
 
 function freqColor(f: number): string {
-  if (f >= 7) return '#ef4444'
-  if (f >= 4) return '#f59e0b'
-  return '#10b981'
+  if (f >= 7) return 'var(--flare)'
+  if (f >= 4) return 'var(--ember)'
+  return 'var(--pos)'
 }
 
 interface FreqProps {
@@ -221,35 +220,37 @@ export function FrequencyBarChart({ data, demo }: FreqProps) {
 
   return (
     <div className="space-y-3">
-      <ResponsiveContainer width="100%" height={160}>
-        <BarChart data={chartData} margin={{ top: 8, right: 48, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} vertical={false} />
-          <XAxis dataKey="platform" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-          <YAxis domain={[0, domainMax]} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={24} />
-          <Tooltip
-            contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
-            formatter={(val) => [typeof val === 'number' ? val.toFixed(2) : String(val), 'Avg Frequency']}
-          />
-          <ReferenceLine y={7} stroke="#ef4444" strokeDasharray="4 2" />
-          <ReferenceLine y={4} stroke="#f59e0b" strokeDasharray="4 2" />
-          <Bar dataKey="frequency" radius={[4, 4, 0, 0]} maxBarSize={56}>
-            {chartData.map((entry, i) => (
-              <Cell key={i} fill={freqColor(entry.frequency)} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      <ChartState rows={chartData} height={160} empty="Connect an ad account to see spend against results.">
+              <ResponsiveContainer width="100%" height={160}>
+          <BarChart data={chartData} margin={{ top: 8, right: 48, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} vertical={false} />
+            <XAxis dataKey="platform" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+            <YAxis domain={[0, domainMax]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={24} />
+            <Tooltip
+              contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
+              formatter={(val) => [typeof val === 'number' ? val.toFixed(2) : String(val), 'Avg Frequency']}
+            />
+            <ReferenceLine y={7} stroke="var(--line-strong)" strokeDasharray="4 2" />
+            <ReferenceLine y={4} stroke="var(--line-strong)" strokeDasharray="4 2" />
+            <Bar dataKey="frequency" radius={[4, 4, 0, 0]} maxBarSize={56}>
+              {chartData.map((entry, i) => (
+                <Cell key={i} fill={freqColor(entry.frequency)} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartState>
       <div className="flex items-center gap-5 text-[10px] text-muted-foreground">
         <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-emerald-500 inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-pos inline-block" />
           {'<4 Healthy'}
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-amber-500 inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-ember inline-block" />
           {'4–7 Watch'}
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-rose-500 inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-flare inline-block" />
           {'>7 Fatigue'}
         </div>
       </div>

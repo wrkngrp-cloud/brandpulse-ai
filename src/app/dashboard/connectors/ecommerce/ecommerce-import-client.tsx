@@ -4,7 +4,9 @@ import { useState, useRef, useCallback } from 'react'
 import { toast }    from 'sonner'
 import { Button }   from '@/components/ui/button'
 import { cn }       from '@/lib/utils'
-import { Upload, FileText, CheckCircle, AlertCircle, ShoppingCart, Truck, Package } from 'lucide-react'
+import { TruckIcon as Truck } from '@/components/brand/icon'
+import { ExportIcon as Upload, FileIcon as FileText, CheckIcon as CheckCircle, BriefcaseIcon as ShoppingCart, BriefcaseIcon as Package } from '@/components/brand/icon'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 type Source = 'jumia' | 'konga' | 'manual'
 
@@ -163,13 +165,13 @@ export function EcommerceImportClient({ campaigns }: Props) {
             isDragging
               ? 'border-primary bg-primary/5'
               : file
-                ? 'border-green-400 bg-green-50/50 dark:border-green-700 dark:bg-green-950/20'
+                ? 'border-line bg-shell/50 dark:border-line dark:bg-shell/20'
                 : 'border-border hover:border-muted-foreground/40',
           )}
         >
           {file ? (
             <>
-              <FileText className="h-8 w-8 text-green-600 dark:text-green-400" />
+              <FileText className="h-8 w-8 text-pos dark:text-pos" />
               <div className="text-center">
                 <p className="text-sm font-medium">{file.name}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -209,30 +211,30 @@ export function EcommerceImportClient({ campaigns }: Props) {
       {result && (
         <div className={cn(
           'border rounded-xl p-5 space-y-4',
-          result.imported > 0 ? 'border-green-200 bg-green-50/40 dark:border-green-900/40 dark:bg-green-950/10' : 'border-amber-200 bg-amber-50/40 dark:border-amber-900/40 dark:bg-amber-950/10',
+          result.imported > 0 ? 'border-line bg-shell/40 dark:border-line dark:bg-shell/10' : 'border-line bg-shell/40 dark:border-line dark:bg-shell/10',
         )}>
           <div className="flex items-center gap-2">
             {result.imported > 0
-              ? <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
-              : <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />}
+              ? <CheckCircle className="h-5 w-5 text-pos dark:text-pos shrink-0" />
+              : <AlertCircle className="h-5 w-5 text-tx-2 dark:text-tx-2 shrink-0" />}
             <h2 className="text-sm font-semibold">Import complete</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="bg-white/60 dark:bg-background/40 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold tabular-nums text-green-700 dark:text-green-400">
+            <div className="bg-card/60 dark:bg-background/40 rounded-lg p-3 text-center">
+              <p className="text-2xl font-bold bg-num text-pos dark:text-pos">
                 {result.imported.toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">Imported</p>
             </div>
-            <div className="bg-white/60 dark:bg-background/40 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold tabular-nums text-muted-foreground">
+            <div className="bg-card/60 dark:bg-background/40 rounded-lg p-3 text-center">
+              <p className="text-2xl font-bold bg-num text-muted-foreground">
                 {result.skipped.toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">Skipped</p>
             </div>
-            <div className="bg-white/60 dark:bg-background/40 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold tabular-nums text-amber-700 dark:text-amber-400">
+            <div className="bg-card/60 dark:bg-background/40 rounded-lg p-3 text-center">
+              <p className="text-2xl font-bold bg-num text-tx-2 dark:text-tx-2">
                 {result.errors.length}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">Errors</p>
@@ -241,7 +243,7 @@ export function EcommerceImportClient({ campaigns }: Props) {
 
           {result.errors.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Row errors</p>
+              <p className="text-xs font-semibold text-muted-foreground">Row errors</p>
               <ul className="space-y-1 max-h-40 overflow-y-auto">
                 {result.errors.map((e, i) => (
                   <li key={i} className="text-xs text-destructive">{e}</li>

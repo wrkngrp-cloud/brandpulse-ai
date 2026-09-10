@@ -1,4 +1,5 @@
 'use client'
+import { ChartState } from '@/components/brand/chart-states'
 
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -17,14 +18,14 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-[#14182B] border border-white/10 rounded-xl shadow-2xl px-3.5 py-2.5">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-white/40 mb-1.5">
+    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5">
+      <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-1.5">
         {label ? new Date(label).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'Africa/Lagos' }) : ''}
       </p>
-      <p className="text-[15px] font-bold tabular-nums" style={{ color: '#2B59FF' }}>
+      <p className="text-[15px] font-bold bg-num" style={{ color: 'var(--tx-inv)' }}>
         {payload[0].value.toFixed(1)}%
       </p>
-      <p className="text-[10px] text-white/40 mt-0.5">Share of Voice</p>
+      <p className="text-[10px] text-tx-inv/40 mt-0.5">Share of Voice</p>
     </div>
   )
 }
@@ -42,50 +43,52 @@ export function SovHistoryChart({ data, days }: { data: SovPoint[]; days?: numbe
       <div>
         <p className="text-sm font-semibold">SOV Over Time</p>
         <p className="text-xs text-muted-foreground">
-          {rangeLabel} · {data.length} snapshots
+          {rangeLabel}, <span className="bg-num">{data.length}</span> snapshots
         </p>
       </div>
-      <ResponsiveContainer width="100%" height={180}>
-        <AreaChart data={data} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
-          <defs>
-            <linearGradient id="sovGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#2B59FF" stopOpacity={0.28} />
-              <stop offset="60%"  stopColor="#2B59FF" stopOpacity={0.06} />
-              <stop offset="100%" stopColor="#2B59FF" stopOpacity={0}    />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
-          <XAxis
-            dataKey="date"
-            tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
-            tickLine={false}
-            axisLine={false}
-            interval="preserveStartEnd"
-            tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
-            fontFamily="var(--font-sans)"
-          />
-          <YAxis
-            domain={[min, max]}
-            tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }}
-            tickLine={false}
-            axisLine={false}
-            tickCount={4}
-            tickFormatter={(v: number) => `${v.toFixed(0)}%`}
-            fontFamily="var(--font-sans)"
-          />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }} />
-          <Area
-            type="monotone"
-            dataKey="sov_pct"
-            stroke="#2B59FF"
-            strokeWidth={2}
-            fill="url(#sovGrad)"
-            dot={false}
-            activeDot={{ r: 4.5, fill: '#2B59FF', strokeWidth: 2, stroke: '#fff' }}
-            connectNulls={false}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      <ChartState rows={data} height={180} empty="Add a competitor to see share of voice over time.">
+              <ResponsiveContainer width="100%" height={180}>
+          <AreaChart data={data} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
+            <defs>
+              <linearGradient id="sovGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.28} />
+                <stop offset="60%"  stopColor="var(--flare)" stopOpacity={0.06} />
+                <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
+            <XAxis
+              dataKey="date"
+              tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
+              tickLine={false}
+              axisLine={false}
+              interval="preserveStartEnd"
+              tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
+              fontFamily="var(--font-num)"
+            />
+            <YAxis
+              domain={[min, max]}
+              tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'currentColor', opacity: 0.35 }}
+              tickLine={false}
+              axisLine={false}
+              tickCount={4}
+              tickFormatter={(v: number) => `${v.toFixed(0)}%`}
+              fontFamily="var(--font-num)"
+            />
+            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }} />
+            <Area
+              type="monotone"
+              dataKey="sov_pct"
+              stroke="var(--flare)"
+              strokeWidth={2}
+              fill="url(#sovGrad)"
+              dot={false}
+              activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+              connectNulls={false}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartState>
     </div>
   )
 }

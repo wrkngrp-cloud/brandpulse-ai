@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams }              from 'next/navigation'
-import { CheckCircle2, Unplug, Zap }   from 'lucide-react'
+import { CheckIcon as CheckCircle2, WifiOffIcon as Unplug, AskIcon as Zap } from '@/components/brand/icon'
 import { toast }                        from 'sonner'
 import { buttonVariants }               from '@/components/ui/button'
 import { cn }                           from '@/lib/utils'
@@ -23,7 +23,7 @@ function MetaIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M16 2.667C8.636 2.667 2.667 8.636 2.667 16S8.636 29.333 16 29.333 29.333 23.364 29.333 16 23.364 2.667 16 2.667z" fill="#1877F2"/>
-      <path d="M21.76 13.04c-.12-1.52-1.12-2.72-2.56-2.72-1.04 0-1.84.56-2.24 1.36-.4-.8-1.2-1.36-2.24-1.36-1.44 0-2.44 1.2-2.56 2.72L11.6 20h2.08l.48-4.64c.08-.8.56-1.28 1.12-1.28.64 0 1.04.56 1.04 1.28V20h2.08v-4.64c0-.72.4-1.28 1.04-1.28.56 0 1.04.48 1.12 1.28L20.96 20h2.08l-.56-6.96z" fill="white"/>
+      <path d="M21.76 13.04c-.12-1.52-1.12-2.72-2.56-2.72-1.04 0-1.84.56-2.24 1.36-.4-.8-1.2-1.36-2.24-1.36-1.44 0-2.44 1.2-2.56 2.72L11.6 20h2.08l.48-4.64c.08-.8.56-1.28 1.12-1.28.64 0 1.04.56 1.04 1.28V20h2.08v-4.64c0-.72.4-1.28 1.04-1.28.56 0 1.04.48 1.12 1.28L20.96 20h2.08l-.56-6.96z" fill="var(--bg-paper)"/>
     </svg>
   )
 }
@@ -87,11 +87,11 @@ export function MetaAdsConnectCard({ account: initialAccount }: Props) {
             <p className="text-sm font-semibold">Meta Ads</p>
             {account ? (
               <div className="flex items-center gap-1.5 mt-0.5">
-                <CheckCircle2 className="h-3 w-3 text-green-500" />
+                <CheckCircle2 className="h-3 w-3 text-pos" />
                 <p className="text-xs text-muted-foreground">
                   {account.account_name ?? 'Connected'}
                   {account.ad_account_id && (
-                    <span className="text-muted-foreground/50 ml-1">· {account.ad_account_id}</span>
+                    <span className="text-muted-foreground/50 ml-1 bg-num">· {account.ad_account_id}</span>
                   )}
                 </p>
               </div>

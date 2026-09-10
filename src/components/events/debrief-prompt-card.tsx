@@ -7,7 +7,7 @@ import { useRouter }               from 'next/navigation'
 import { skipDebriefAndGenerate }  from '@/app/dashboard/events/actions'
 import { Button }                  from '@/components/ui/button'
 import { buttonVariants }          from '@/components/ui/button'
-import { ClipboardList }           from 'lucide-react'
+import { SurveyIcon as ClipboardList } from '@/components/brand/icon'
 import { cn }                      from '@/lib/utils'
 
 export function DebriefPromptCard({ eventId }: { eventId: string }) {

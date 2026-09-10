@@ -6,7 +6,7 @@ import { toast }     from 'sonner'
 import Link          from 'next/link'
 import { ItemActions, type ItemAction } from '@/components/ui/item-actions'
 import { updateSurveyStatus, deleteSurvey } from '@/app/dashboard/surveys/actions'
-import { Link2, Play, PauseCircle, RotateCcw, Trash2, ExternalLink } from 'lucide-react'
+import { LinkIcon as Link2, PlayIcon as Play, PauseIcon as PauseCircle, RefreshIcon as RotateCcw, TrashIcon as Trash2, ExternalLinkIcon as ExternalLink } from '@/components/brand/icon'
 import { getTemplateLabel } from '@/lib/survey-templates'
 
 interface Survey {
@@ -20,7 +20,7 @@ interface Survey {
 
 const STATUS_STYLES: Record<string, string> = {
   draft:  'bg-muted text-muted-foreground',
-  live:   'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400',
+  live:   'bg-shell text-pos dark:bg-pos dark:text-pos',
   closed: 'bg-muted text-muted-foreground',
 }
 
@@ -106,7 +106,7 @@ function SurveyRow({ survey, appUrl }: { survey: Survey; appUrl: string }) {
           </p>
         </div>
         <div className="flex items-center gap-3 ml-4 shrink-0">
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground bg-num">
             {survey.responseCount} {survey.responseCount === 1 ? 'response' : 'responses'}
           </span>
           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[survey.status] ?? ''}`}>

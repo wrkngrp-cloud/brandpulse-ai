@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter }     from 'next/navigation'
-import { Search, ArrowRight, LayoutDashboard, Plus, Settings2, X, ChevronRight } from 'lucide-react'
+import { ArrowRightIcon as ArrowRight, LayoutGridIcon as LayoutDashboard, PlusIcon as Plus, SettingsIcon as Settings2, XIcon as X, ChevronRightIcon as ChevronRight } from '@/components/brand/icon'
+import { SearchIcon as Search } from '@/components/brand/icon'
 import { Button }        from '@/components/ui/button'
 import { cn }            from '@/lib/utils'
 import { WIDGET_CATALOG, WIDGET_BY_ID, DASHBOARD_TEMPLATES, DEFAULT_WIDGET_IDS, type WidgetDef } from '@/lib/widget-catalog'
@@ -123,18 +124,18 @@ function WidgetPanel({ currentIds, onUpdate, onClose }: {
 
   return (
     <div className="fixed inset-0 z-[9985] bg-foreground/20 backdrop-blur-[2px]" onClick={onClose}>
-      <div className="absolute right-0 top-0 bottom-0 w-full max-w-xs bg-card border-l shadow-2xl flex flex-col"
+      <div className="absolute right-0 top-0 bottom-0 w-full max-w-xs bg-card border-l flex flex-col"
         onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <span className="text-sm font-semibold">Manage widgets</span>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground bg-press">
             <X className="h-4 w-4" />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-4">
           {categories.map(cat => (
             <div key={cat.label}>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">{cat.label}</p>
+              <p className="text-[11px] font-semibold text-muted-foreground mb-2">{cat.label}</p>
               <div className="space-y-1">
                 {cat.ids.map(id => {
                   const w = WIDGET_BY_ID[id]
@@ -169,7 +170,7 @@ function WidgetPanel({ currentIds, onUpdate, onClose }: {
 function KpiTile({ label, value, sub, href }: { label: string; value: string | null; sub?: string; href?: string }) {
   const content = (
     <div className="border rounded-xl p-4 bg-card space-y-1 hover:border-foreground/30 transition-colors cursor-pointer">
-      <p className={cn('text-xl font-bold tabular-nums', !value && 'text-muted-foreground/40')}>
+      <p className={cn('text-xl font-bold bg-num', !value && 'text-muted-foreground/40')}>
         {value ?? 'N/A'}
       </p>
       <p className="text-xs text-muted-foreground font-medium">{label}</p>
@@ -265,7 +266,7 @@ export function DashboardHero({
               'w-full h-12 pl-10 pr-32 rounded-xl border bg-card text-sm outline-none',
               'placeholder:text-muted-foreground/50',
               'focus:ring-2 focus:ring-foreground/10 focus:border-foreground/30',
-              'transition-all duration-150',
+              'transition-colors duration-150',
             )}
           />
           {!query && (
@@ -290,7 +291,7 @@ export function DashboardHero({
               key={p}
               type="button"
               onClick={() => handlePromptClick(p)}
-              className="shrink-0 text-xs border rounded-full px-3 py-1.5 bg-card hover:bg-muted hover:border-foreground/30 transition-colors text-muted-foreground hover:text-foreground truncate max-w-[200px]"
+              className="shrink-0 text-xs border rounded-sm px-3 py-1.5 bg-card hover:bg-muted hover:border-foreground/30 transition-colors text-muted-foreground hover:text-foreground truncate max-w-[200px] bg-press"
             >
               {p}
             </button>
@@ -310,7 +311,7 @@ export function DashboardHero({
           <div className="flex items-center gap-2">
             <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Your dashboard</span>
-            <span className="text-xs text-muted-foreground">{widgetIds.length} widgets</span>
+            <span className="text-xs text-muted-foreground"><span className="bg-num">{widgetIds.length}</span> widgets</span>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" className="h-7 text-xs gap-1.5" onClick={() => setShowMetrics(true)}>

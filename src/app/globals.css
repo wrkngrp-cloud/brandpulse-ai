@@ -1,18 +1,29 @@
+/* BrandGauge v3.4 brand system. These come first, in this order, before
+   anything else. Every colour, type, space and motion value lives in them. */
+@import "../../brand/fonts.css";
+@import "../../public/fonts/plex.css";  /* IBM Plex Mono, the fall-through in --font-num */
+@import "../../brand/tokens.css";
+@import "../../brand/gradients.css";
+@import "../../brand/motion.css";
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
-/* ── Font: Satoshi (all weights 300–900) ─────────────────────────────────── */
-/* Loaded via fontshare CDN in layout.tsx head                                */
+/* ── Type: Nohemi for everything, Disket Mono for numerals ─────────────── */
+/* Both self-hosted from /public/fonts via brand/fonts.css                  */
 
 @theme inline {
   --color-background:            var(--background);
   --color-foreground:            var(--foreground);
-  --font-sans:                   var(--font-sans);
-  --font-mono:                   var(--font-mono);
-  --font-display:                var(--font-display);
+  /* Type. Nohemi for everything, Disket Mono for numerals only. Pointed at
+     the token stacks directly — naming them after themselves resolves to
+     nothing and the whole app silently falls back to a serif. */
+  --font-sans:                   var(--font);
+  --font-mono:                   var(--font-num);
+  --font-display:                var(--font);
   --color-sidebar-ring:          var(--sidebar-ring);
   --color-sidebar-border:        var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -42,162 +53,161 @@
   --color-popover:               var(--popover);
   --color-card-foreground:       var(--card-foreground);
   --color-card:                  var(--card);
-  --radius-sm:  calc(var(--radius) * 0.6);
-  --radius-md:  calc(var(--radius) * 0.8);
-  --radius-lg:  var(--radius);
-  --radius-xl:  calc(var(--radius) * 1.5);
-  --radius-2xl: calc(var(--radius) * 2);
-  --radius-3xl: calc(var(--radius) * 2.6);
-  --radius-4xl: calc(var(--radius) * 3.2);
+
+  /* ── The ramp, the grounds and the polarity axis, as utilities ──────────
+     Every one of these is a variable in brand/tokens.css. Nothing new is
+     defined here; this only makes bg-flare / text-tx-2 / border-line resolve. */
+  --color-paper:        var(--bg-paper);
+  --color-shell:        var(--bg-shell);
+  --color-ink:          var(--bg-ink);
+  --color-ink-raised:   var(--bg-ink-raised);
+
+  --color-char:         var(--char);
+  --color-danfo:        var(--danfo);
+  --color-ember:        var(--ember);
+  --color-flare:        var(--flare);
+  --color-flare-press:  var(--flare-press);
+  --color-flare-wash:   var(--flare-wash);
+  --color-on-hot:       var(--on-hot);
+
+  --color-tick-1:       var(--tick-1);
+  --color-tick-2:       var(--tick-2);
+  --color-tick-3:       var(--tick-3);
+  --color-tick-4:       var(--tick-4);
+  --color-tick-5:       var(--tick-5);
+
+  --color-pos:          var(--pos);
+  --color-neu:          var(--neu);
+  --color-neg:          var(--neg);
+
+  --color-tx:           var(--tx);
+  --color-tx-2:         var(--tx-2);
+  --color-tx-3:         var(--tx-3);
+  --color-tx-inv:       var(--tx-inv);
+  --color-tx-inv-2:     var(--tx-inv-2);
+  --color-tx-flare:     var(--tx-flare);
+
+  --color-line:         var(--line);
+  --color-line-strong:  var(--line-strong);
+  --color-line-inv:     var(--line-inv);
+
+  /* ── Type scale, from the tokens ─────────────────────────────────────── */
+  --text-display:  var(--t-display);
+  --text-h1:       var(--t-h1);
+  --text-h2:       var(--t-h2);
+  --text-h3:       var(--t-h3);
+  --text-body:     var(--t-body);
+  --text-small:    var(--t-small);
+  --text-micro:    var(--t-micro);
+  --text-readout:  var(--t-readout);
+
+  /* ── Radius discipline. Cards 4, controls 3, ticks 2.5, pills round.
+     Nothing else is rounded, so every rounded-* utility lands on one of
+     those four rather than on its own scale. ───────────────────────────── */
+  --radius-xs:  var(--r-tick);
+  --radius-sm:  var(--r-control);
+  --radius-md:  var(--r-control);
+  --radius-lg:  var(--r-card);
+  --radius-xl:  var(--r-card);
+  --radius-2xl: var(--r-card);
+  --radius-3xl: var(--r-card);
+  --radius-4xl: var(--r-card);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   COLOR PHILOSOPHY
+   COLOUR
    ─────────────────────────────────────────────────────────────────────────────
-   Five colors. Four from the brand, one new:
+   There is one source of colour in this app and it is brand/tokens.css.
+   Nothing below invents a value; every line points at a token.
 
-   1. WHITE   #FFFFFF  — The canvas. Cards, content surfaces, clarity.
-   2. NAVY    #14182B  — The chrome. Sidebar (ALWAYS), dark backgrounds, authority.
-   3. BLUE    #2B59FF  — The signal. Charts, data, interactive, links, primary.
-   4. CLAY    #D4602A  — The brand. CTAs, active nav, notifications, signature.
-   5. SAND    #EDE6D8  — The warmth. Muted surfaces, subtlety, African heritage.
+   Ground carries about 75% of a surface: paper, shell, card, ink.
+   Hero is Flare, applied to whole planes, once per frame. It fills, it never
+   outlines, and it is never body text — Char (--tx-flare) is Flare as text.
+   Ramp and polarity carry data only, never chrome.
 
-   HIERARCHY:
-   - Primary   → Blue  (interactive actions, trust layer)
-   - Accent    → Clay  (brand identity, the ONE warm moment per screen)
-   - Chrome    → Navy  (sidebar is permanently navy — never switches to light)
-   - Canvas    → White (content area cards, maximum clarity)
-   - Warmth    → Sand  (muted surfaces, empty states, breathing room)
+   There is no blue and there is no green. Polarity runs ink to flare:
+   nominal is ink, neutral is ash, alert is flare. Success is an ink tick plus
+   the word, which survives every form of colour blindness.
 
-   SIDEBAR RULE: --sidebar is ALWAYS navy (#14182B) in both light AND dark mode.
-   This creates a permanent branded shell — the product has an identity.
-   ───────────────────────────────────────────────────────────────────────────── */
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   LIGHT MODE
-   Canvas: pure white  |  Chrome: navy  |  Signal: blue  |  Brand: clay
+   Dark is a mode, not a theme. brand/tokens.css flips the ground tokens under
+   [data-mode="dark"], so every alias below follows without a second block.
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Font family — Satoshi for everything; weight does the hierarchy work */
-  --font-sans:    'Satoshi', system-ui, -apple-system, sans-serif;
-  --font-display: 'Satoshi', system-ui, -apple-system, sans-serif;
-  --font-mono:    var(--font-mono, 'Geist Mono', monospace);
+  /* Ground */
+  --background:         var(--bg-paper);
+  --foreground:         var(--tx);
+  --card:               var(--bg-card);
+  --card-foreground:    var(--tx);
+  --popover:            var(--bg-card);
+  --popover-foreground: var(--tx);
 
-  /* Content backgrounds — WHITE is the canvas */
-  --background:         #FFFFFF;
-  --foreground:         #14182B;   /* NAVY */
-  --card:               #FFFFFF;
-  --card-foreground:    #14182B;
-  --popover:            #FFFFFF;
-  --popover-foreground: #14182B;
+  /* Primary action — Flare, on a plane. Ink sits on top of it: ink on Flare
+     reads 5.3:1 where paper reads 3.3:1, and the audit's bar for UI is 4.5. */
+  --primary:            var(--flare);
+  --primary-foreground: var(--on-hot);
 
-  /* Primary — BLUE (interactive, trust, data) */
-  --primary:            #2B59FF;
-  --primary-foreground: #FFFFFF;
+  /* Secondary and muted surfaces — the shell */
+  --secondary:            var(--bg-shell);
+  --secondary-foreground: var(--tx);
+  --muted:                var(--bg-shell);
+  --muted-foreground:     var(--tx-3);
 
-  /* Secondary — warm SAND (muted surfaces) */
-  --secondary:          #EDE6D8;
-  --secondary-foreground: #14182B;
-
-  /* Muted — lighter sand */
-  --muted:              oklch(0.95 0.016 75);
-  --muted-foreground:   oklch(0.50 0.022 264);
-
-  /* Accent — CLAY (the brand, CTAs, signature moments) */
-  --accent:             #D4602A;
-  --accent-foreground:  #FFFFFF;
+  /* Accent — the tinted surface, used for hover and selected rows */
+  --accent:             var(--flare-wash);
+  --accent-foreground:  var(--tx);
 
   /* Semantic */
-  --destructive:        oklch(0.577 0.245 27.325);
-  --border:             oklch(0.895 0.012 75);
-  --input:              oklch(0.895 0.012 75);
-  --ring:               #2B59FF;
+  --destructive:        var(--neg);
+  --border:             var(--line);
+  --input:              var(--line-strong);
+  --ring:               var(--flare);
 
-  /* Radius */
-  --radius: 0.75rem;
+  /* Radius. Cards 4px. The scale in @theme derives the rest. */
+  --radius: var(--r-card);
 
-  /* Chart palette
-     chart-1: Blue  (primary data, BHI)
-     chart-2: Clay  (secondary data, campaign)
-     chart-3: Green (positive sentiment)
-     chart-4: Violet (SOV, reach)
-     chart-5: Amber (neutral, pending) */
-  --chart-1: #2B59FF;
-  --chart-2: #D4602A;
-  --chart-3: oklch(0.65 0.18 142);
-  --chart-4: oklch(0.65 0.2 300);
-  --chart-5: oklch(0.75 0.17 75);
+  /* Charts. Only the subject series carries heat; everything it is compared
+     against is neutral ink, stepping down so a four-series panel still reads
+     without a legend and without turning into a rainbow. A sequential scale
+     is a different thing and reads the ramp tokens directly. */
+  --chart-1: var(--flare);              /* the subject */
+  --chart-2: rgba(22,18,14,.55);        /* comparison, nearest */
+  --chart-3: rgba(22,18,14,.38);
+  --chart-4: rgba(22,18,14,.26);
+  --chart-5: rgba(22,18,14,.16);        /* comparison, furthest */
 
-  /* ─── SIDEBAR: ALWAYS NAVY ─── (never light, never white)
-     The sidebar is permanently navy in BOTH light and dark mode.
-     It is the branded chrome shell. */
-  --sidebar:                    #14182B;
-  --sidebar-foreground:         oklch(0.82 0.018 75);    /* warm off-white */
-  --sidebar-primary:            #2B59FF;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent:             oklch(0.165 0.032 264);  /* slightly lighter navy */
-  --sidebar-accent-foreground:  oklch(0.85 0.016 75);
-  --sidebar-border:             oklch(1 0 0 / 8%);
-  --sidebar-ring:               #2B59FF;
+  /* Sidebar. The branded shell, and the one permanent ink plane. */
+  --sidebar:                    var(--bg-ink);
+  --sidebar-foreground:         var(--tx-inv-2);
+  --sidebar-primary:            var(--flare);
+  --sidebar-primary-foreground: var(--on-hot);
+  --sidebar-accent:             var(--bg-ink-raised);
+  --sidebar-accent-foreground:  var(--tx-inv);
+  --sidebar-border:             var(--line-inv);
+  --sidebar-ring:               var(--flare);
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   DARK MODE
-   Canvas: deep navy  |  Text: warm sand  |  Cards: slightly lifted
-   Sidebar stays the same navy — barely noticeable in dark mode (intentional)
-   ───────────────────────────────────────────────────────────────────────────── */
-.dark {
-  --background:         oklch(0.105 0.038 264);   /* deep navy */
-  --foreground:         #EDE6D8;                  /* warm SAND as text */
-  --card:               oklch(0.145 0.032 264);   /* slightly lifted */
-  --card-foreground:    #EDE6D8;
-  --popover:            oklch(0.135 0.032 264);
-  --popover-foreground: #EDE6D8;
+/* next-themes writes .dark and data-mode="dark" together. The tokens flip on
+   data-mode; this keeps the sidebar readable, since it is ink in both, and
+   inverts the neutral comparison series so they read on an ink ground. */
+.dark,
+[data-mode="dark"] {
+  --sidebar-foreground: var(--tx-inv-2);
+  --sidebar-accent-foreground: var(--tx-inv);
 
-  --primary:            oklch(0.60 0.24 258);     /* blue, +L for dark legibility */
-  --primary-foreground: #FFFFFF;
-
-  --secondary:          oklch(0.195 0.028 264);
-  --secondary-foreground: #EDE6D8;
-
-  --muted:              oklch(0.195 0.028 264);
-  --muted-foreground:   oklch(0.58 0.022 264);
-
-  --accent:             #D4602A;                  /* clay unchanged */
-  --accent-foreground:  #FFFFFF;
-
-  --destructive:        oklch(0.65 0.22 22.216);
-  --border:             oklch(1 0 0 / 8%);
-  --input:              oklch(1 0 0 / 10%);
-  --ring:               oklch(0.60 0.24 258);
-
-  --chart-1: oklch(0.62 0.24 258);
-  --chart-2: #D4602A;
-  --chart-3: oklch(0.68 0.18 142);
-  --chart-4: oklch(0.68 0.2 300);
-  --chart-5: oklch(0.78 0.17 75);
-
-  /* Sidebar in dark mode — same navy, barely perceptible depth difference */
-  --sidebar:                    oklch(0.085 0.038 264);
-  --sidebar-foreground:         oklch(0.80 0.016 75);
-  --sidebar-primary:            oklch(0.60 0.24 258);
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent:             oklch(0.155 0.030 264);
-  --sidebar-accent-foreground:  oklch(0.82 0.016 75);
-  --sidebar-border:             oklch(1 0 0 / 7%);
-  --sidebar-ring:               oklch(0.60 0.24 258);
+  --chart-2: rgba(250,246,239,.55);
+  --chart-3: rgba(250,246,239,.38);
+  --chart-4: rgba(250,246,239,.26);
+  --chart-5: rgba(250,246,239,.16);
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   BASE
-   ───────────────────────────────────────────────────────────────────────────── */
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-sans);
+    font-family: var(--font);
     font-size: 14px;
     font-weight: 400;
     line-height: 1.57;
@@ -206,10 +216,20 @@
     -moz-osx-font-smoothing: grayscale;
   }
   html {
-    font-family: var(--font-sans);
+    font-family: var(--font);
+  }
+  /* Links are Char, which is Flare as text and clears 7:1. Never #FF3D14. */
+  a {
+    color: var(--tx-flare);
+  }
+  /* The one shadow this system keeps: a 2px Flare ring at 2px offset, on
+     every interactive element. Everything else is drawn with a hairline. */
+  :focus-visible {
+    outline: 2px solid var(--flare);
+    outline-offset: 2px;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
+    font-family: var(--font);
     font-weight: 700;
     letter-spacing: -0.028em;
     line-height: 1.1;
@@ -221,257 +241,187 @@
    ───────────────────────────────────────────────────────────────────────────── */
 @layer utilities {
 
-  /* ── Typography ─────────────────────────────────────────────────────────── */
-
-  /* Display: Satoshi Bold for page titles */
-  .h-display {
-    font-family: var(--font-display);
+  /* ── The two classes brand/components.tsx expects ──────────────────────── */
+  /* .bg-num — every number in the app. Disket Mono, tabular so digits do not
+     jitter as data updates. .bg-label — the ONLY place capitals are allowed:
+     Disket 700 at .20em tracking. Nohemi is never set in caps. */
+  .bg-num {
+    font-family: var(--font-num);
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+    font-weight: 400;
+  }
+  .bg-label {
+    font-family: var(--font-num);
     font-weight: 700;
-    letter-spacing: -0.030em;
-    line-height: 1.0;
+    font-size: var(--t-micro);
+    letter-spacing: .20em;
+    text-transform: uppercase;
+    line-height: 1.45;
+    color: var(--tx-3);
   }
 
-  /* Metric: Satoshi Bold/Black for KPI numbers — weight 700 is the key
-     Satoshi 700 at large sizes has geometric confidence; tight tracking
-     makes multi-digit numbers read as a single unit */
+  /* ── Work in progress. The atom, pulsing on the skeleton's own curve.
+     There is no spinner in this system and nothing rotates. ───────────── */
+  .bg-working {
+    animation: bg-pulse 1.25s var(--ease-snap) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bg-working { animation: none; opacity: .55 }
+  }
+
+  /* ── The tick rule. The one piece of decoration in the system, and it
+     earns its place because it is the logo's own material. ─────────────── */
+  .rule-tick {
+    height: 16px;
+    background-image: repeating-linear-gradient(
+      to right, var(--tick-1) 0 7px, transparent 7px 22px);
+    border-radius: 0;
+  }
+
+  /* ── Typography ─────────────────────────────────────────────────────────── */
+
+  /* Display: page titles. Nohemi 800, tight. Never set in caps. */
+  .h-display {
+    font-family: var(--font);
+    font-weight: 800;
+    letter-spacing: var(--ls-display);
+    line-height: var(--lh-tight);
+  }
+
+  /* Metric: every KPI number. Disket Mono, tabular, so digits hold their
+     column as the data updates. */
   .metric {
-    font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: -0.035em;
+    font-family: var(--font-num);
+    font-weight: 400;
+    letter-spacing: -0.03em;
     font-variant-numeric: lining-nums tabular-nums;
     font-feature-settings: "tnum" 1, "lnum" 1;
     line-height: 1.0;
   }
 
-  /* Eyebrow / section label */
+  /* Eyebrow / section marker. Sentence case, 12px, ash. A label that needs
+     to recede uses --tx-3, not capitals and not a monospace face. */
   .eyebrow {
-    font-family: var(--font-sans);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: oklch(0.50 0.022 264 / 0.55);
-    line-height: 1;
-  }
-  .dark .eyebrow {
-    color: oklch(0.65 0.018 264 / 0.60);
+    font-family: var(--font);
+    font-size: var(--t-micro);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    color: var(--tx-3);
+    line-height: 1.45;
   }
 
-  /* ── Gradient text ──────────────────────────────────────────────────────── */
+  /* ── Surfaces. Elevation is drawn, not shadowed. One hairline. ─────────── */
 
-  .text-gradient-blue {
-    background: linear-gradient(135deg, #6B8FFF 0%, #2B59FF 60%, #1A3FCC 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .text-gradient-clay {
-    background: linear-gradient(135deg, #E8763E 0%, #D4602A 60%, #B84D1F 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .card-e1,
+  .card-e2,
+  .card-shadow {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    box-shadow: none;
+    border-radius: var(--r-card);
   }
 
-  .text-gradient-sand {
-    background: linear-gradient(135deg, #F5EFE4 0%, #EDE6D8 60%, #D6CDB8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  /* Interactive card. Nothing floats here, so the hairline darkens and that
+     is the whole affordance. Only colour changes, never position. */
+  .card-hover {
+    transition: border-color var(--d-ui) var(--ease-snap);
+  }
+  .card-hover:hover {
+    border-color: var(--line-strong);
   }
 
-  /* BrandGauge brand gradient — blue melts into clay (signature) */
-  .text-gradient-brand {
-    background: linear-gradient(135deg, #4F79FF 0%, #3D6AFF 40%, #C05525 80%, #D4602A 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  /* A card whose subject is the hero gets the tinted surface, not a tint of
+     some other hue. One hero plane per frame. */
+  .tone-surface,
+  .tone-surface-blue,
+  .tone-surface-green,
+  .tone-surface-amber,
+  .tone-surface-clay,
+  .tone-surface-violet {
+    background-color: var(--bg-card);
   }
 
-  /* ── Glow effects ───────────────────────────────────────────────────────── */
-
-  .glow-blue  { box-shadow: 0 0 40px -8px rgba(43, 89, 255, 0.40); }
-  .glow-clay  { box-shadow: 0 0 40px -8px rgba(212, 96, 42, 0.40); }
-  .glow-green { box-shadow: 0 0 40px -8px rgba(34, 197, 94, 0.30); }
-
-  /* ── Gradient icon boxes (stat cards, Vuexy/Apex pattern) ──────────────── */
-
-  .icon-box-blue {
-    background: linear-gradient(135deg, #6B8FFF 0%, #2B59FF 100%);
-    box-shadow: 0 8px 20px -6px rgba(43, 89, 255, 0.55);
-  }
-  .icon-box-clay {
-    background: linear-gradient(135deg, #E8763E 0%, #C4501D 100%);
-    box-shadow: 0 8px 20px -6px rgba(212, 96, 42, 0.52);
-  }
-  .icon-box-green {
-    background: linear-gradient(135deg, #34D17F 0%, #16A34A 100%);
-    box-shadow: 0 8px 20px -6px rgba(22, 163, 74, 0.45);
-  }
-  .icon-box-amber {
-    background: linear-gradient(135deg, #F5B544 0%, #D97706 100%);
-    box-shadow: 0 8px 20px -6px rgba(217, 119, 6, 0.45);
-  }
-  .icon-box-violet {
-    background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%);
-    box-shadow: 0 8px 20px -6px rgba(124, 58, 237, 0.45);
-  }
+  /* Icon plate. Ink on shell; the icon is Flare only when it is the single
+     hero element of the card. No gradient fills, no coloured shadow. */
+  .icon-plate,
+  .icon-box-blue,
+  .icon-box-clay,
+  .icon-box-green,
+  .icon-box-amber,
+  .icon-box-violet,
   .icon-box-navy {
-    background: linear-gradient(135deg, #2A3458 0%, #14182B 100%);
-    box-shadow: 0 8px 20px -6px rgba(20, 24, 43, 0.45);
-  }
-
-  /* ── Card system (3-tier elevation) ─────────────────────────────────────── */
-
-  .card-e1 {
-    background: #FFFFFF;
-    border: 1px solid oklch(0.895 0.012 75);
-    box-shadow: 0 1px 3px rgba(20, 24, 43, 0.06), 0 2px 8px rgba(20, 24, 43, 0.04);
-  }
-  .dark .card-e1 {
-    background: oklch(0.145 0.032 264);
-    border-color: oklch(1 0 0 / 8%);
+    background: var(--bg-shell);
+    color: var(--tx);
+    border: 1px solid var(--line);
+    border-radius: var(--r-control);
     box-shadow: none;
   }
 
-  .card-e2 {
-    background: #FFFFFF;
-    border: 1px solid oklch(0.895 0.012 75);
-    box-shadow: 0 2px 8px rgba(20, 24, 43, 0.07), 0 6px 24px rgba(20, 24, 43, 0.05);
-  }
-  .dark .card-e2 {
-    background: oklch(0.145 0.032 264);
-    border-color: oklch(1 0 0 / 8%);
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.28);
-  }
-
-  /* Interactive card hover */
-  .card-hover {
-    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
-  }
-  .card-hover:hover {
-    border-color: rgba(43, 89, 255, 0.22);
-    box-shadow: 0 4px 16px rgba(20, 24, 43, 0.10), 0 12px 40px rgba(20, 24, 43, 0.08);
-    transform: translateY(-2px);
-  }
-  .dark .card-hover:hover {
-    border-color: rgba(255, 255, 255, 0.14);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.38);
-    transform: translateY(-2px);
-  }
-
-  /* Legacy compat */
-  .card-shadow {
-    box-shadow: 0 1px 2px rgba(20, 24, 43, 0.05), 0 2px 8px rgba(20, 24, 43, 0.04);
-  }
-  .dark .card-shadow { box-shadow: 0 1px 16px rgba(0,0,0,0.24); }
-
-  /* ── Tone surface backgrounds (subtle radial per-tone tint) ─────────────── */
-  /* Applied to stat cards. Faint "whisper of color" at top-right — barely
-     there but creates intentionality. Apple uses this in dark mode cards. */
-  .tone-surface-blue   { background-image: radial-gradient(ellipse 160px 120px at 90% 0%, rgba(43,89,255,0.055) 0%, transparent 100%); }
-  .tone-surface-green  { background-image: radial-gradient(ellipse 160px 120px at 90% 0%, rgba(34,197,94,0.055) 0%, transparent 100%); }
-  .tone-surface-amber  { background-image: radial-gradient(ellipse 160px 120px at 90% 0%, rgba(245,158,11,0.055) 0%, transparent 100%); }
-  .tone-surface-clay   { background-image: radial-gradient(ellipse 160px 120px at 90% 0%, rgba(212,96,42,0.055) 0%, transparent 100%); }
-  .tone-surface-violet { background-image: radial-gradient(ellipse 160px 120px at 90% 0%, rgba(124,58,237,0.055) 0%, transparent 100%); }
-
-  /* Card accent stripes */
-  .card-accent-blue  { box-shadow: inset 0 2px 0 0 #2B59FF; }
-  .card-accent-green { box-shadow: inset 0 2px 0 0 oklch(0.65 0.18 142); }
-  .card-accent-amber { box-shadow: inset 0 2px 0 0 oklch(0.75 0.17 75);  }
-  .card-accent-clay  { box-shadow: inset 0 2px 0 0 #D4602A; }
-  .card-accent-red   { box-shadow: inset 0 2px 0 0 oklch(0.65 0.22 22);  }
-
   /* ── Navigation ─────────────────────────────────────────────────────────── */
 
-  /* Active nav pill: CLAY on NAVY — the BrandGauge signature
-     No other analytics tool does warm burnt orange on deep navy.
-     This is the one design choice that makes the entire product memorable. */
+  /* Active nav item: a Flare plane on the ink shell. It fills, it does not
+     outline, and it does not glow. */
   .nav-pill-active {
-    background: linear-gradient(135deg, #E8763E 0%, #D4602A 100%);
-    color: #FFFFFF;
-    box-shadow: 0 4px 16px -4px rgba(212, 96, 42, 0.65);
+    background: var(--flare);
+    color: var(--on-hot);
+    box-shadow: none;
+    border-radius: var(--r-control);
   }
 
-  /* Ask AI button — blue→clay gradient border */
+  /* Ask AI trigger — the command layer entry point */
   .ask-ai-btn {
-    background: linear-gradient(135deg,
-      rgba(43, 89, 255, 0.14) 0%,
-      rgba(212, 96, 42, 0.08) 100%
-    );
-    border: 1px solid rgba(43, 89, 255, 0.25);
-    color: rgba(107, 143, 255, 1);
-    transition: background 150ms ease, border-color 150ms ease;
+    background: var(--bg-ink-raised);
+    border: 1px solid var(--line-inv);
+    color: var(--tx-inv);
+    transition: background-color var(--d-ui) var(--ease-snap),
+                border-color var(--d-ui) var(--ease-snap);
   }
   .ask-ai-btn:hover {
-    background: linear-gradient(135deg,
-      rgba(43, 89, 255, 0.20) 0%,
-      rgba(212, 96, 42, 0.12) 100%
-    );
-    border-color: rgba(43, 89, 255, 0.38);
+    background: var(--bg-ink);
+    border-color: var(--line-strong);
   }
 
   /* Topbar search trigger */
   .search-trigger {
-    background: oklch(0.96 0.010 75 / 0.9);
-    border: 1px solid oklch(0.895 0.012 75);
-    transition: background 150ms ease, border-color 150ms ease;
-  }
-  .dark .search-trigger {
-    background: oklch(0.175 0.028 264 / 0.9);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--bg-shell);
+    border: 1px solid var(--line);
+    transition: background-color var(--d-ui) var(--ease-snap),
+                border-color var(--d-ui) var(--ease-snap);
   }
   .search-trigger:hover {
-    background: oklch(0.94 0.014 75);
-    border-color: oklch(0.875 0.016 75);
-  }
-  .dark .search-trigger:hover {
-    background: oklch(0.20 0.027 264);
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: var(--line-strong);
   }
 
-  /* ── Trend badges ────────────────────────────────────────────────────────── */
+  /* ── Trend badges ────────────────────────────────────────────────────────
+     Direction is carried by the glyph, never by hue. Both directions read the
+     same because good and bad are not a colour decision. */
 
-  .trend-up   { background: rgba(34, 197, 94, 0.12);  color: oklch(0.55 0.18 142); }
-  .trend-down { background: rgba(239, 68, 68, 0.12);  color: oklch(0.60 0.22 22);  }
-  .dark .trend-up   { background: rgba(34, 197, 94, 0.18);  color: oklch(0.70 0.18 142); }
-  .dark .trend-down { background: rgba(239, 68, 68, 0.18);  color: oklch(0.70 0.22 22);  }
+  .trend-up,
+  .trend-down {
+    background: var(--bg-shell);
+    color: var(--tx-2);
+  }
 
   /* ── Surface utilities ───────────────────────────────────────────────────── */
 
   .surface-sand {
-    background: #EDE6D8;
-    color: #14182B;
-  }
-  .dark .surface-sand {
-    background: oklch(0.175 0.03 264);
-    color: #EDE6D8;
+    background: var(--bg-shell);
+    color: var(--tx);
   }
 
   .glass {
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(120%);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
   }
 
-  /* ── Status dots ─────────────────────────────────────────────────────────── */
+  /* ── Status ticks. The atom, not a dot, and never a hue pair. ──────────── */
 
-  .status-dot-blue  { background: #2B59FF; box-shadow: 0 0 0 3px rgba(43, 89, 255, 0.25); }
-  .status-dot-clay  { background: #D4602A; box-shadow: 0 0 0 3px rgba(212, 96, 42, 0.25); }
-  .status-dot-green { background: oklch(0.65 0.18 142); box-shadow: 0 0 0 3px oklch(0.65 0.18 142 / 0.25); }
-  .status-dot-amber { background: oklch(0.75 0.17 75);  box-shadow: 0 0 0 3px oklch(0.75 0.17 75  / 0.25); }
-
-  /* ── Chart gradient fills — standardized for Recharts <Area> ─────────────── */
-
-  :root {
-    --chart-blue-0: rgba(43,89,255,0.30);
-    --chart-blue-1: rgba(43,89,255,0.00);
-    --chart-clay-0: rgba(212,96,42,0.28);
-    --chart-clay-1: rgba(212,96,42,0.00);
-    --chart-green-0: rgba(34,197,94,0.25);
-    --chart-green-1: rgba(34,197,94,0.00);
-    --chart-violet-0: rgba(124,58,237,0.25);
-    --chart-violet-1: rgba(124,58,237,0.00);
-  }
+  .status-dot-blue,
+  .status-dot-clay { background: var(--flare); box-shadow: none; }
+  .status-dot-green { background: var(--pos); box-shadow: none; }
+  .status-dot-amber { background: var(--neu); box-shadow: none; }
 
   /* ── Bento grid (overview layout) ───────────────────────────────────────── */
 

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Mail, Send, CheckCircle2, Loader2 } from 'lucide-react'
+import { MailIcon as Mail, SendIcon as Send, CheckIcon as CheckCircle2 } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
@@ -49,7 +50,7 @@ export function SendSurvey({ surveyId, surveyName: _surveyName, shareUrl: _share
         </div>
 
         {emailsSent && (
-          <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+          <div className="flex items-center gap-2 text-sm text-pos bg-shell border border-line rounded-lg px-3 py-2">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
             Emails sent. Add more recipients below to send again.
           </div>
@@ -72,7 +73,7 @@ export function SendSurvey({ surveyId, surveyName: _surveyName, shareUrl: _share
           disabled={isPending || !emails.trim()}
         >
           {isPending
-            ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Sending...</>
+            ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Sending...</>
             : <><Send className="h-3.5 w-3.5 mr-1.5" />Send emails</>}
         </Button>
       </div>

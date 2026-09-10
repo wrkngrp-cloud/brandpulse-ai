@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { AlertCircle } from 'lucide-react'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 export default function SettingsError({
   error,

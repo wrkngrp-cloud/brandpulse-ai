@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { MoreHorizontal } from 'lucide-react'
+import { MoreIcon as MoreHorizontal } from '@/components/brand/icon'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
   DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -100,7 +100,7 @@ export function ItemActions({ actions, className }: Props) {
           </DialogHeader>
           <DialogFooter>
             <DialogClose
-              render={<button type="button" />}
+              render={<button type="button" className="bg-press" />}
               className="inline-flex items-center justify-center h-8 px-3 rounded-lg border border-input bg-background text-sm font-medium hover:bg-muted transition-colors"
               disabled={pending}
             >

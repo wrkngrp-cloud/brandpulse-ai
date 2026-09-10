@@ -3,7 +3,7 @@
 import { useState }   from 'react'
 import { toast }      from 'sonner'
 import { QRCodeSVG } from 'qrcode.react'
-import { Copy, Link2, QrCode, ChevronDown, ChevronUp, Zap } from 'lucide-react'
+import { CopyIcon as Copy, LinkIcon as Link2, QrIcon as QrCode, ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp, AskIcon as Zap } from '@/components/brand/icon'
 import { Button }     from '@/components/ui/button'
 
 interface OohVanityCardProps {
@@ -28,7 +28,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
       <div className="flex items-center gap-2">
         <Link2 className="h-4 w-4 text-muted-foreground" />
         <h3 className="text-sm font-semibold">Attribution Links</h3>
-        <span className="ml-auto text-xs text-muted-foreground tabular-nums">
+        <span className="ml-auto text-xs text-muted-foreground bg-num">
           {totalVisits.toLocaleString()} tracked visits
         </span>
       </div>
@@ -41,7 +41,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
             Short link — print on billboard
           </div>
           <div className="rounded-lg bg-primary/5 border border-primary/20 px-3 py-2.5 flex items-center justify-between gap-3">
-            <p className="text-sm font-mono font-semibold break-all flex-1 text-foreground">{shortLink}</p>
+            <p className="text-sm bg-num font-semibold break-all flex-1 text-foreground">{shortLink}</p>
             <Button
               type="button" variant="ghost" size="sm"
               className="h-7 px-2 shrink-0"
@@ -62,7 +62,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
             </div>
           )}
           <div className="rounded-lg bg-muted/50 border px-3 py-2.5 flex items-center justify-between gap-3">
-            <p className="text-sm font-mono break-all flex-1">{vanityLink}</p>
+            <p className="text-sm bg-num break-all flex-1">{vanityLink}</p>
             <Button
               type="button" variant="ghost" size="sm"
               className="h-7 px-2 shrink-0"
@@ -78,7 +78,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
         <div>
           <button
             onClick={() => setShowQr(v => !v)}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
           >
             <QrCode className="h-3.5 w-3.5" />
             {showQr ? 'Hide QR code' : 'Show QR code'}
@@ -87,12 +87,12 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
 
           {showQr && (
             <div className="mt-3 flex flex-col sm:flex-row items-start gap-4">
-              <div className="p-3 bg-white rounded-lg border">
+              <div className="p-3 bg-card rounded-lg border">
                 <QRCodeSVG value={qrLink} size={120} />
               </div>
               <div className="space-y-2 text-xs text-muted-foreground">
                 <p>Right-click the QR code to save as image.</p>
-                <p className="font-mono break-all">{qrLink}</p>
+                <p className="bg-num break-all">{qrLink}</p>
                 <Button
                   type="button" variant="outline" size="sm"
                   className="h-7 px-2 text-xs"

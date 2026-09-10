@@ -1,6 +1,8 @@
 import { createClient }        from '@/lib/supabase/server'
 import { redirect }            from 'next/navigation'
-import { TrendingUp, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react'
+import { CheckIcon as CheckCircle2, ClockIcon as Clock } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { GeoLiftStartForm }    from './geo-lift-start-form'
 import { getActiveBrand }      from '@/lib/active-brand'
 import { TourTrigger }         from '@/components/tours/tour-trigger'
@@ -36,13 +38,13 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_STYLE: Record<string, string> = {
   pending:           'bg-muted text-muted-foreground',
-  running:           'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  complete:          'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  insufficient_data: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+  running:           'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
+  complete:          'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  insufficient_data: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
 }
 
 function StatusIcon({ status }: { status: string }) {
-  if (status === 'running')           return <Loader2 className="h-3.5 w-3.5 animate-spin" />
+  if (status === 'running')           return <Loader2 className="h-3.5 w-3.5" />
   if (status === 'complete')          return <CheckCircle2 className="h-3.5 w-3.5" />
   if (status === 'insufficient_data') return <AlertCircle className="h-3.5 w-3.5" />
   return <Clock className="h-3.5 w-3.5" />
@@ -78,19 +80,19 @@ function StudyCard({ study }: { study: GeoLiftStudy }) {
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
             <p className="text-xs text-muted-foreground">Search Lift</p>
-            <p className={`text-lg font-bold tabular-nums ${(study.lift_pct ?? 0) > 0 ? 'text-green-700 dark:text-green-400' : 'text-red-600'}`}>
+            <p className={`text-lg font-bold bg-num ${(study.lift_pct ?? 0) > 0 ? 'text-pos dark:text-pos' : 'text-tx-flare'}`}>
               {study.lift_pct !== null ? `${study.lift_pct > 0 ? '+' : ''}${study.lift_pct.toFixed(1)}%` : '—'}
             </p>
           </div>
           <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
             <p className="text-xs text-muted-foreground">Correlation</p>
-            <p className="text-lg font-bold tabular-nums">
+            <p className="text-lg font-bold bg-num">
               {study.correlation !== null ? study.correlation.toFixed(2) : '—'}
             </p>
           </div>
           <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
             <p className="text-xs text-muted-foreground">Confidence</p>
-            <p className="text-lg font-bold tabular-nums">
+            <p className="text-lg font-bold bg-num">
               {study.confidence !== null ? `${study.confidence.toFixed(0)}%` : '—'}
             </p>
           </div>
@@ -123,7 +125,7 @@ function StudyCard({ study }: { study: GeoLiftStudy }) {
             </div>
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span>{study.weekly_data.length} weeks of data</span>
+            <span className="bg-num">{study.weekly_data.length} weeks of data</span>
             <span className="flex items-center gap-1">
               <span className="inline-block w-2 h-2 rounded-sm bg-primary/70" />{study.treatment_city}
             </span>
@@ -141,7 +143,7 @@ function StudyCard({ study }: { study: GeoLiftStudy }) {
       )}
 
       {study.status === 'insufficient_data' && (
-        <p className="text-xs text-amber-700 dark:text-amber-400">
+        <p className="text-xs text-tx-2 dark:text-tx-2">
           Not enough weekly data points to calculate lift with confidence. Try extending the study period or choosing a broader keyword.
         </p>
       )}

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition }  from 'react'
-import { X, ChevronDown, Loader2, CheckCircle2, Plus } from 'lucide-react'
+import { XIcon as X, ChevronDownIcon as ChevronDown, CheckIcon as CheckCircle2, PlusIcon as Plus } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button }   from '@/components/ui/button'
 import { Input }    from '@/components/ui/input'
 import { Label }    from '@/components/ui/label'
@@ -63,7 +64,7 @@ export function MetricEntryDrawer({ industry, onClose, onSaved }: Props) {
       <div className="fixed inset-0 z-[9990] bg-foreground/20 backdrop-blur-[2px]" onClick={onClose} />
       <div
         ref={drawerRef}
-        className="fixed inset-y-0 right-0 z-[9991] w-full max-w-sm bg-card border-l shadow-2xl flex flex-col"
+        className="fixed inset-y-0 right-0 z-[9991] w-full max-w-sm bg-card border-l flex flex-col"
       >
         <div className="flex items-center justify-between px-5 py-4 border-b">
           <div>
@@ -72,7 +73,7 @@ export function MetricEntryDrawer({ industry, onClose, onSaved }: Props) {
               {today.toLocaleString('en-NG', { month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}
             </p>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors bg-press">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -87,7 +88,7 @@ export function MetricEntryDrawer({ industry, onClose, onSaved }: Props) {
             <div key={m.metricKey} className="space-y-1.5">
               <Label className="text-sm font-medium flex items-center gap-2">
                 {m.label}
-                {saved[m.metricKey] && <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />}
+                {saved[m.metricKey] && <CheckCircle2 className="h-3.5 w-3.5 text-pos" />}
               </Label>
               <p className="text-xs text-muted-foreground">{m.description}</p>
               <div className="flex gap-2">
@@ -121,7 +122,7 @@ export function MetricEntryDrawer({ industry, onClose, onSaved }: Props) {
         <div className="p-4 border-t">
           <Button className="w-full" onClick={saveAll} disabled={isPending || Object.keys(values).length === 0}>
             {isPending
-              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
+              ? <><Loader2 className="h-4 w-4 mr-2" /> Saving...</>
               : 'Save all'
             }
           </Button>

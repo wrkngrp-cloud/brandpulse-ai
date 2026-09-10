@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getActiveBrandId } from '@/lib/active-brand'
 import { redirect }     from 'next/navigation'
 import Link             from 'next/link'
-import { ArrowLeft }    from 'lucide-react'
+import { ArrowLeftIcon as ArrowLeft } from '@/components/brand/icon'
 import { NpsClient, type WeeklyNps, type NpsCohort } from './nps-client'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 

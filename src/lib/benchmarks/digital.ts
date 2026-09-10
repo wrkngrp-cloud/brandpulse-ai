@@ -89,58 +89,58 @@ export function getBenchmarks(industry?: string | null): MetricBenchmarks {
 }
 
 export function benchCTR(v: number, b: MetricBenchmarks): BenchLabel {
-  if (v >= b.ctr.strong) return { label: 'Strong',  cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v >= b.ctr.good)   return { label: 'Good',    cls: 'text-emerald-500' }
-  if (v >= b.ctr.good / 2) return { label: 'Average', cls: 'text-amber-500' }
-  return                        { label: 'Low',     cls: 'text-rose-500' }
+  if (v >= b.ctr.strong) return { label: 'Strong',  cls: 'text-pos dark:text-pos' }
+  if (v >= b.ctr.good)   return { label: 'Good',    cls: 'text-pos' }
+  if (v >= b.ctr.good / 2) return { label: 'Average', cls: 'text-tx-2' }
+  return                        { label: 'Low',     cls: 'text-tx-flare' }
 }
 
 export function benchCPC(v: number, b: MetricBenchmarks): BenchLabel {
-  if (v > 0 && v <= b.cpc.great) return { label: 'Great',   cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v <= b.cpc.good)           return { label: 'Good',    cls: 'text-emerald-500' }
-  if (v <= b.cpc.avg)            return { label: 'Average', cls: 'text-amber-500' }
-  return                               { label: 'High',     cls: 'text-rose-500' }
+  if (v > 0 && v <= b.cpc.great) return { label: 'Great',   cls: 'text-pos dark:text-pos' }
+  if (v <= b.cpc.good)           return { label: 'Good',    cls: 'text-pos' }
+  if (v <= b.cpc.avg)            return { label: 'Average', cls: 'text-tx-2' }
+  return                               { label: 'High',     cls: 'text-tx-flare' }
 }
 
 export function benchCPM(v: number, b: MetricBenchmarks): BenchLabel {
-  if (v > 0 && v <= b.cpm.great) return { label: 'Great',   cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v <= b.cpm.good)           return { label: 'Good',    cls: 'text-emerald-500' }
-  if (v <= b.cpm.avg)            return { label: 'Average', cls: 'text-amber-500' }
-  return                               { label: 'High',     cls: 'text-rose-500' }
+  if (v > 0 && v <= b.cpm.great) return { label: 'Great',   cls: 'text-pos dark:text-pos' }
+  if (v <= b.cpm.good)           return { label: 'Good',    cls: 'text-pos' }
+  if (v <= b.cpm.avg)            return { label: 'Average', cls: 'text-tx-2' }
+  return                               { label: 'High',     cls: 'text-tx-flare' }
 }
 
 export function benchROAS(v: number, b: MetricBenchmarks): BenchLabel {
-  if (v >= b.roas.excellent) return { label: 'Excellent',   cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v >= b.roas.good)      return { label: 'Good',        cls: 'text-emerald-500' }
-  if (v >= b.roas.marginal)  return { label: 'Marginal',    cls: 'text-amber-500' }
-  return                            { label: 'Below target', cls: 'text-rose-500' }
+  if (v >= b.roas.excellent) return { label: 'Excellent',   cls: 'text-pos dark:text-pos' }
+  if (v >= b.roas.good)      return { label: 'Good',        cls: 'text-pos' }
+  if (v >= b.roas.marginal)  return { label: 'Marginal',    cls: 'text-tx-2' }
+  return                            { label: 'Below target', cls: 'text-tx-flare' }
 }
 
 export function benchFreq(v: number, b: MetricBenchmarks): BenchLabel {
-  if (v <= b.freq.healthy) return { label: 'Healthy',     cls: 'text-emerald-500' }
-  if (v <= b.freq.watch)   return { label: 'Watch',       cls: 'text-amber-500' }
-  return                          { label: 'Fatigue risk', cls: 'text-rose-500' }
+  if (v <= b.freq.healthy) return { label: 'Healthy',     cls: 'text-pos' }
+  if (v <= b.freq.watch)   return { label: 'Watch',       cls: 'text-tx-2' }
+  return                          { label: 'Fatigue risk', cls: 'text-tx-flare' }
 }
 
 export function benchCVR(v: number, b: MetricBenchmarks): BenchLabel {
-  if (v >= b.cvr.strong) return { label: 'Strong',  cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v >= b.cvr.good)   return { label: 'Good',    cls: 'text-emerald-500' }
-  if (v >= b.cvr.avg)    return { label: 'Average', cls: 'text-amber-500' }
-  return                        { label: 'Low',      cls: 'text-rose-500' }
+  if (v >= b.cvr.strong) return { label: 'Strong',  cls: 'text-pos dark:text-pos' }
+  if (v >= b.cvr.good)   return { label: 'Good',    cls: 'text-pos' }
+  if (v >= b.cvr.avg)    return { label: 'Average', cls: 'text-tx-2' }
+  return                        { label: 'Low',      cls: 'text-tx-flare' }
 }
 
 export function benchCPL(v: number, b: MetricBenchmarks): BenchLabel {
-  if (v > 0 && v <= b.cpl.great) return { label: 'Great',   cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v <= b.cpl.good)           return { label: 'Good',    cls: 'text-emerald-500' }
-  if (v <= b.cpl.avg)            return { label: 'Average', cls: 'text-amber-500' }
-  return                               { label: 'High',     cls: 'text-rose-500' }
+  if (v > 0 && v <= b.cpl.great) return { label: 'Great',   cls: 'text-pos dark:text-pos' }
+  if (v <= b.cpl.good)           return { label: 'Good',    cls: 'text-pos' }
+  if (v <= b.cpl.avg)            return { label: 'Average', cls: 'text-tx-2' }
+  return                               { label: 'High',     cls: 'text-tx-flare' }
 }
 
 export function benchCPI(v: number, b: MetricBenchmarks): BenchLabel {
-  if (v > 0 && v <= b.cpi.great) return { label: 'Great',   cls: 'text-emerald-600 dark:text-emerald-400' }
-  if (v <= b.cpi.good)           return { label: 'Good',    cls: 'text-emerald-500' }
-  if (v <= b.cpi.avg)            return { label: 'Average', cls: 'text-amber-500' }
-  return                               { label: 'High',     cls: 'text-rose-500' }
+  if (v > 0 && v <= b.cpi.great) return { label: 'Great',   cls: 'text-pos dark:text-pos' }
+  if (v <= b.cpi.good)           return { label: 'Good',    cls: 'text-pos' }
+  if (v <= b.cpi.avg)            return { label: 'Average', cls: 'text-tx-2' }
+  return                               { label: 'High',     cls: 'text-tx-flare' }
 }
 
 /** Metric display config per campaign objective */

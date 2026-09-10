@@ -14,7 +14,8 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ArrowUpDown, TrendingUp } from 'lucide-react'
+import { ChevronsUpdownIcon as ArrowUpDown } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { toast } from 'sonner'
 
 function IgIcon({ className }: { className?: string }) {
@@ -58,12 +59,12 @@ export interface SocialPost {
 const FUNNEL_STAGES = ['awareness', 'consideration', 'preference', 'action', 'loyalty', 'advocacy']
 
 const FUNNEL_COLOURS: Record<string, string> = {
-  awareness: 'bg-blue-100 text-blue-800',
-  consideration: 'bg-purple-100 text-purple-800',
-  preference: 'bg-indigo-100 text-indigo-800',
-  action: 'bg-green-100 text-green-800',
-  loyalty: 'bg-amber-100 text-amber-800',
-  advocacy: 'bg-rose-100 text-rose-800',
+  awareness: 'bg-flare-wash text-tx-flare',
+  consideration: 'bg-shell text-tx-2',
+  preference: 'bg-flare-wash text-tx-flare',
+  action: 'bg-shell text-pos',
+  loyalty: 'bg-shell text-tx-2',
+  advocacy: 'bg-flare-wash text-tx-flare',
 }
 
 function PlatformIcon({ platform }: { platform: string }) {
@@ -76,8 +77,8 @@ function PlatformIcon({ platform }: { platform: string }) {
 
 function ScoreBadge({ score }: { score: number | null }) {
   if (score === null) return <span className="text-xs text-muted-foreground">—</span>
-  const colour = score >= 70 ? 'text-green-700' : score >= 40 ? 'text-amber-700' : 'text-red-700'
-  return <span className={`text-sm font-semibold ${colour}`}>{score.toFixed(0)}</span>
+  const colour = score >= 70 ? 'text-pos' : score >= 40 ? 'text-tx-2' : 'text-tx-flare'
+  return <span className={`text-sm font-semibold bg-num ${colour}`}>{score.toFixed(0)}</span>
 }
 
 export function ContentTable({
@@ -142,7 +143,7 @@ export function ContentTable({
       ),
       accessorKey: 'reach',
       cell: ({ row }) => (
-        <span className="text-sm tabular-nums">{row.original.reach.toLocaleString()}</span>
+        <span className="text-sm bg-num">{row.original.reach.toLocaleString()}</span>
       ),
       size: 90,
     },
@@ -156,7 +157,7 @@ export function ContentTable({
       ),
       accessorKey: 'engagement_rate',
       cell: ({ row }) => (
-        <span className="text-sm tabular-nums">
+        <span className="text-sm bg-num">
           {row.original.engagement_rate !== null
             ? `${Number(row.original.engagement_rate).toFixed(2)}%`
             : '—'}

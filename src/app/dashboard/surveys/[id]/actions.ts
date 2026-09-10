@@ -2,6 +2,7 @@
 
 import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
+import { TOKENS } from '@/lib/brand-tokens'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -33,23 +34,23 @@ export async function sendSurveyEmails(
 
   const subject = `${brandName} would love your feedback — 2 minutes`
   const html = `
-    <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; color: #1a1a1a;">
+    <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; color: var(--tx);">
       <p style="font-size: 16px; line-height: 1.6;">Hi there,</p>
-      <p style="font-size: 15px; line-height: 1.6; color: #444;">
+      <p style="font-size: 15px; line-height: 1.6; color: var(--tx-2);">
         ${brandName} is running a quick survey to understand how we can serve you better.
         It takes less than 2 minutes.
       </p>
       <p style="margin: 28px 0;">
         <a href="${surveyUrl}"
-           style="display: inline-block; background: #1a1a1a; color: #fff; text-decoration: none;
+           style="display: inline-block; background: ${TOKENS.ink}; color: ${TOKENS.paper}; text-decoration: none;
                   padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 600;">
           Take the survey
         </a>
       </p>
-      <p style="font-size: 13px; color: #888; line-height: 1.5;">
-        Or copy this link: <a href="${surveyUrl}" style="color: #555;">${surveyUrl}</a>
+      <p style="font-size: 13px; color: var(--tx-3); line-height: 1.5;">
+        Or copy this link: <a href="${surveyUrl}" style="color: var(--tx-2);">${surveyUrl}</a>
       </p>
-      <p style="font-size: 13px; color: #aaa; margin-top: 32px; border-top: 1px solid #eee; padding-top: 16px;">
+      <p style="font-size: 13px; color: var(--tx-3); margin-top: 32px; border-top: 1px solid var(--bg-shell); padding-top: 16px;">
         You received this because ${brandName} invited your feedback.
         This survey is powered by BrandGauge.
       </p>

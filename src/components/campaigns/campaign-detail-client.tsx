@@ -5,13 +5,17 @@ import { useRouter }       from 'next/navigation'
 import { useState, useTransition, useRef } from 'react'
 import { cn, formatPlatformLabel } from '@/lib/utils'
 import { buttonVariants, Button } from '@/components/ui/button'
-import { MapPin, CalendarDays, DollarSign, BarChart2, Plus, ExternalLink, TrendingUp, Users, Eye, Percent, Sparkles, RefreshCw, Upload, X, Loader2, ImageIcon, ShoppingCart } from 'lucide-react'
+import { MapIcon as MapPin, CalendarIcon as CalendarDays, CurrencyIcon as DollarSign, TrendIcon as BarChart2, PlusIcon as Plus, ExternalLinkIcon as ExternalLink, UsersIcon as Users, EyeIcon as Eye, CurrencyIcon as Percent, RefreshIcon as RefreshCw, ExportIcon as Upload, XIcon as X, ImageIcon, BriefcaseIcon as ShoppingCart } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { TrendIcon as TrendingUp, AskIcon as Sparkles } from '@/components/brand/icon'
 import { CampaignOverview } from './campaign-overview'
 import { LinkOohSiteDialog, LinkEventDialog } from './link-existing-dialog'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { toast } from 'sonner'
 import { linkInfluencerToCampaign } from '@/app/dashboard/campaigns/[id]/link-influencer-action'
 import { PostTracker } from '@/components/influencers/post-tracker'
+import { Crescendo } from '@/components/brand/crescendo'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface Channel {
   id: string
@@ -131,33 +135,33 @@ const OBJECTIVE_LABELS: Record<string, string> = {
 }
 
 const OBJECTIVE_COLOR: Record<string, string> = {
-  awareness:     'bg-blue-500',
-  consideration: 'bg-purple-500',
-  conversion:    'bg-green-500',
-  retention:     'bg-amber-500',
+  awareness:     'bg-flare',
+  consideration: 'bg-neu',
+  conversion:    'bg-pos',
+  retention:     'bg-ember',
 }
 
 const CHANNEL_META: Record<string, { label: string; color: string }> = {
-  ooh:     { label: 'OOH / Outdoor',        color: 'bg-blue-400'    },
-  events:  { label: 'Events & Activations',  color: 'bg-emerald-400' },
-  digital: { label: 'Digital',              color: 'bg-violet-400'  },
-  radio:   { label: 'Radio',                color: 'bg-orange-400'  },
-  tv:      { label: 'TV',                   color: 'bg-red-400'     },
-  print:   { label: 'Print',                color: 'bg-stone-400'   },
+  ooh:     { label: 'OOH / Outdoor',        color: 'bg-flare'    },
+  events:  { label: 'Events & Activations',  color: 'bg-pos' },
+  digital: { label: 'Digital',              color: 'bg-neu'  },
+  radio:   { label: 'Radio',                color: 'bg-ember'  },
+  tv:      { label: 'TV',                   color: 'bg-flare'     },
+  print:   { label: 'Print',                color: 'bg-neu'   },
 }
 
 const STATUS_STYLES: Record<string, string> = {
   draft:     'bg-muted text-muted-foreground',
-  active:    'bg-green-100 text-green-800',
-  paused:    'bg-amber-100 text-amber-800',
-  completed: 'bg-blue-100 text-blue-800',
+  active:    'bg-shell text-pos',
+  paused:    'bg-shell text-tx-2',
+  completed: 'bg-flare-wash text-tx-flare',
 }
 
 const EVENT_STATUS: Record<string, string> = {
-  planned:  'bg-blue-100 text-blue-800',
-  live:     'bg-green-100 text-green-800',
+  planned:  'bg-flare-wash text-tx-flare',
+  live:     'bg-shell text-pos',
   closed:   'bg-muted text-muted-foreground',
-  reported: 'bg-purple-100 text-purple-800',
+  reported: 'bg-shell text-tx-2',
 }
 
 function fmtDate(d: string | null) {
@@ -178,26 +182,26 @@ function formatFollowers(n: number | null): string {
 }
 
 const PLATFORM_COLORS: Record<string, string> = {
-  instagram: 'bg-pink-100 text-pink-800',
-  tiktok:    'bg-black/10 text-black dark:bg-white/10 dark:text-white',
-  youtube:   'bg-red-100 text-red-800',
-  twitter:   'bg-sky-100 text-sky-800',
-  facebook:  'bg-blue-100 text-blue-800',
+  instagram: 'bg-shell text-tx-2',
+  tiktok:    'bg-ink/10 text-tx dark:bg-card/10 dark:text-tx-inv',
+  youtube:   'bg-flare-wash text-tx-flare',
+  twitter:   'bg-flare-wash text-tx-flare',
+  facebook:  'bg-flare-wash text-tx-flare',
 }
 
 const INF_STATUS_STYLES: Record<string, string> = {
-  active:   'bg-green-100 text-green-800',
-  paused:   'bg-amber-100 text-amber-800',
+  active:   'bg-shell text-pos',
+  paused:   'bg-shell text-tx-2',
   prospect: 'bg-muted text-muted-foreground',
-  rejected: 'bg-red-100 text-red-800',
+  rejected: 'bg-flare-wash text-tx-flare',
 }
 
 function CulturalIQBadge({ score }: { score: number | null }) {
   if (score === null) return <span className="text-xs text-muted-foreground">—</span>
-  const color = score >= 70 ? 'text-green-700 bg-green-100'
-    : score >= 50 ? 'text-amber-700 bg-amber-100'
-    : 'text-red-700 bg-red-100'
-  return <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold', color)}>{score}</span>
+  const color = score >= 70 ? 'text-pos bg-shell'
+    : score >= 50 ? 'text-tx-2 bg-shell'
+    : 'text-tx-flare bg-flare-wash'
+  return <span className={cn('text-xs px-2 py-0.5 rounded-sm font-semibold bg-num', color)}>{score}</span>
 }
 
 function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; campaignId: string }) {
@@ -210,14 +214,14 @@ function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; 
           <p className="text-xs text-muted-foreground truncate">@{inf.handle}</p>
         </div>
         <span className={cn(
-          'text-xs px-2 py-0.5 rounded-full font-medium shrink-0 capitalize',
+          'text-xs px-2 py-0.5 rounded-sm font-medium shrink-0 capitalize',
           INF_STATUS_STYLES[inf.status] ?? 'bg-muted text-muted-foreground',
         )}>
           {inf.status}
         </span>
       </div>
       <div className="flex items-center gap-2 flex-wrap">
-        <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', PLATFORM_COLORS[inf.platform] ?? 'bg-muted text-muted-foreground')}>
+        <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium capitalize', PLATFORM_COLORS[inf.platform] ?? 'bg-muted text-muted-foreground')}>
           {formatPlatformLabel(inf.platform)}
         </span>
         {inf.category && (
@@ -227,7 +231,7 @@ function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; 
       <div className="grid grid-cols-2 gap-2">
         <div className="bg-muted/40 rounded-lg p-2 space-y-0.5">
           <p className="text-xs text-muted-foreground">Followers</p>
-          <p className="text-sm font-semibold tabular-nums">{formatFollowers(inf.followers)}</p>
+          <p className="text-sm font-semibold bg-num">{formatFollowers(inf.followers)}</p>
         </div>
         <div className="bg-muted/40 rounded-lg p-2 space-y-0.5">
           <p className="text-xs text-muted-foreground">Cultural IQ</p>
@@ -239,7 +243,7 @@ function CampaignInfluencerCard({ inf, campaignId }: { inf: CampaignInfluencer; 
       <div className="border-t pt-2">
         <button
           onClick={() => setShowTracker(v => !v)}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors bg-press"
         >
           {showTracker ? 'Hide post tracker' : 'Track posts for this influencer'}
         </button>
@@ -381,7 +385,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
       {/* Status + objectives pills + AI Analyse button */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', STATUS_STYLES[campaign.status] ?? STATUS_STYLES.draft)}>
+          <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium', STATUS_STYLES[campaign.status] ?? STATUS_STYLES.draft)}>
             {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
           </span>
           {objectives.map(obj => (
@@ -405,7 +409,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
           disabled={analysing}
         >
           {analysing
-            ? <><RefreshCw className="h-3 w-3 animate-spin" /> Analysing…</>
+            ? <><RefreshCw className="h-3 w-3" /> Analysing…</>
             : <><Sparkles className="h-3 w-3" /> {headerSummary ? 'Re-analyse' : 'AI Analysis'}</>
           }
         </Button>
@@ -488,7 +492,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                   <Icon className="h-3.5 w-3.5" />
                   {label}
                 </div>
-                <p className="text-2xl font-bold tabular-nums">{value}</p>
+                <p className="text-2xl font-bold bg-num">{value}</p>
                 <p className="text-xs text-muted-foreground">{sub}</p>
               </div>
             ))}
@@ -502,7 +506,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
             </div>
             {attributedRevenue > 0 ? (
               <>
-                <p className="text-2xl font-bold tabular-nums">
+                <p className="text-2xl font-bold bg-num">
                   {attributedRevenue >= 1_000_000
                     ? `₦${(attributedRevenue / 1_000_000).toFixed(1)}M`
                     : `₦${attributedRevenue.toLocaleString('en-NG')}`}
@@ -511,7 +515,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               </>
             ) : (
               <>
-                <p className="text-2xl font-bold tabular-nums">—</p>
+                <p className="text-2xl font-bold bg-num">—</p>
                 <p className="text-xs text-muted-foreground">
                   Link a sales import to track revenue ·{' '}
                   <Link href="/dashboard/connectors/ecommerce" className="underline hover:text-foreground transition-colors">
@@ -531,7 +535,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <Percent className="h-3.5 w-3.5" />
                     Cost per OOH visit
                   </div>
-                  <p className="text-xl font-bold tabular-nums">{fmtMoney(cpv, campaign.currency)}</p>
+                  <p className="text-xl font-bold bg-num">{fmtMoney(cpv, campaign.currency)}</p>
                   <p className="text-xs text-muted-foreground">OOH spend ÷ vanity-link visits</p>
                 </div>
               )}
@@ -541,7 +545,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <TrendingUp className="h-3.5 w-3.5" />
                     Total engaged
                   </div>
-                  <p className="text-xl font-bold tabular-nums">{totalEngaged.toLocaleString()}</p>
+                  <p className="text-xl font-bold bg-num">{totalEngaged.toLocaleString()}</p>
                   <p className="text-xs text-muted-foreground">leads + customers + engaged across events</p>
                 </div>
               )}
@@ -582,13 +586,13 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                             <td className="py-2 pr-4 text-muted-foreground">
                               {[site.lga, site.city, site.state].filter(Boolean).join(', ') || '—'}
                             </td>
-                            <td className="py-2 pr-4 text-right tabular-nums">
+                            <td className="py-2 pr-4 text-right bg-num">
                               {site.visits != null ? site.visits.toLocaleString() : '—'}
                             </td>
-                            <td className="py-2 pr-4 text-right tabular-nums font-medium">
+                            <td className="py-2 pr-4 text-right bg-num font-medium">
                               {logVisits.toLocaleString()}
                             </td>
-                            <td className="py-2 text-right tabular-nums text-muted-foreground">
+                            <td className="py-2 text-right bg-num text-muted-foreground">
                               {fmtMoney(site.monthly_cost, site.currency ?? 'NGN')}/mo
                             </td>
                           </tr>
@@ -599,10 +603,10 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <tfoot>
                       <tr className="border-t">
                         <td colSpan={3} className="pt-2 text-muted-foreground font-medium">Total</td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">
+                        <td className="pt-2 text-right bg-num font-semibold">
                           {totalOohVisits.toLocaleString()}
                         </td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">
+                        <td className="pt-2 text-right bg-num font-semibold">
                           {fmtMoney(totalOohSpend, campaign.currency)}/mo
                         </td>
                       </tr>
@@ -640,13 +644,13 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               {ev.city}{ev.state ? `, ${ev.state}` : ''} · {fmtDate(ev.date_start)}
                             </span>
                           </td>
-                          <td className="py-2 pr-4 text-right tabular-nums font-medium">
+                          <td className="py-2 pr-4 text-right bg-num font-medium">
                             {leads > 0 ? leads.toLocaleString() : <span className="text-muted-foreground">—</span>}
                           </td>
-                          <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">
+                          <td className="py-2 pr-4 text-right bg-num text-muted-foreground">
                             {ev.expected_attendance != null ? ev.expected_attendance.toLocaleString() : '—'}
                           </td>
-                          <td className="py-2 text-right tabular-nums">
+                          <td className="py-2 text-right bg-num">
                             <span className="text-muted-foreground">—</span>
                           </td>
                         </tr>
@@ -657,9 +661,9 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <tfoot>
                       <tr className="border-t">
                         <td className="pt-2 text-muted-foreground font-medium">Total</td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">{totalLeads.toLocaleString()}</td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">{totalEventAttendance > 0 ? totalEventAttendance.toLocaleString() : '—'}</td>
-                        <td className="pt-2 text-right tabular-nums font-semibold">—</td>
+                        <td className="pt-2 text-right bg-num font-semibold">{totalLeads.toLocaleString()}</td>
+                        <td className="pt-2 text-right bg-num font-semibold">{totalEventAttendance > 0 ? totalEventAttendance.toLocaleString() : '—'}</td>
+                        <td className="pt-2 text-right bg-num font-semibold">—</td>
                       </tr>
                     </tfoot>
                   )}
@@ -673,7 +677,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
             <div className="border rounded-xl p-5 bg-card space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">Social performance</p>
-                <span className="text-xs text-muted-foreground">{socialPosts.length} post{socialPosts.length !== 1 ? 's' : ''}</span>
+                <span className="text-xs text-muted-foreground bg-num">{socialPosts.length} post{socialPosts.length !== 1 ? 's' : ''}</span>
               </div>
 
               {/* Social KPI row */}
@@ -685,7 +689,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                 ].map(({ label, value }) => (
                   <div key={label} className="bg-muted/40 rounded-lg p-3 space-y-0.5">
                     <p className="text-xs text-muted-foreground">{label}</p>
-                    <p className="text-lg font-bold tabular-nums">{value}</p>
+                    <p className="text-lg font-bold bg-num">{value}</p>
                   </div>
                 ))}
               </div>
@@ -694,36 +698,38 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               {weeklyChartData.length > 1 && (
                 <div>
                   <p className="text-xs text-muted-foreground mb-2">Impressions by week</p>
-                  <ResponsiveContainer width="100%" height={180}>
-                    <BarChart data={weeklyChartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                      <XAxis
-                        dataKey="week"
-                        tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis
-                        tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font-sans)' }}
-                        axisLine={false}
-                        tickLine={false}
-                        width={36}
-                        tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          background: '#14182B',
-                          border: '1px solid rgba(255,255,255,0.10)',
-                          borderRadius: 12,
-                          fontSize: 12,
-                          color: '#fff',
-                        }}
-                        labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
-                        formatter={(value) => [Number(value).toLocaleString(), 'Impressions']}
-                        cursor={{ fill: 'currentColor', opacity: 0.05 }}
-                      />
-                      <Bar dataKey="impressions" fill="#2B59FF" radius={[4, 4, 0, 0]} opacity={0.85} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <ChartState rows={weeklyChartData} height={180} empty="Link a channel to this campaign to see weekly performance.">
+                                      <ResponsiveContainer width="100%" height={180}>
+                      <BarChart data={weeklyChartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                        <XAxis
+                          dataKey="week"
+                          tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4, fontFamily: 'var(--font)' }}
+                          axisLine={false}
+                          tickLine={false}
+                          width={36}
+                          tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            background: 'var(--bg-ink)',
+                            border: 'var(--line)',
+                            borderRadius: 'var(--r-card)',
+                            fontSize: 12,
+                            color: 'var(--bg-card)',
+                          }}
+                          labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10.5, textTransform: '', letterSpacing: '0.10em', marginBottom: 4 }}
+                          formatter={(value) => [Number(value).toLocaleString(), 'Impressions']}
+                          cursor={{ fill: 'currentColor', opacity: 0.05 }}
+                        />
+                        <Bar dataKey="impressions" fill="var(--flare)" radius={[4, 4, 0, 0]} opacity={0.85} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartState>
                 </div>
               )}
             </div>
@@ -752,11 +758,9 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           <div key={type} className="space-y-1">
                             <div className="flex justify-between text-xs">
                               <span className="text-muted-foreground">{labels[type] ?? type}</span>
-                              <span className="font-medium">{count.toLocaleString()} ({pct}%)</span>
+                              <span className="font-medium bg-num">{count.toLocaleString()} ({pct}%)</span>
                             </div>
-                            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                              <div className="h-full bg-foreground rounded-full" style={{ width: `${pct}%` }} />
-                            </div>
+                            <Crescendo value={pct} height={6} />
                           </div>
                         )
                       })}
@@ -834,7 +838,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="text-sm font-semibold tabular-nums">{(site.visits ?? 0).toLocaleString()}</p>
+                    <p className="text-sm font-semibold bg-num">{(site.visits ?? 0).toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">visits</p>
                   </div>
                   <Link href={`/dashboard/ooh/${site.id}`} className="shrink-0 text-muted-foreground hover:text-foreground">
@@ -897,7 +901,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           <Link href={`/dashboard/events/${ev.id}`} className="text-sm font-medium hover:underline truncate">
                             {ev.name}
                           </Link>
-                          <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0', EVENT_STATUS[ev.status] ?? 'bg-muted text-muted-foreground')}>
+                          <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium shrink-0', EVENT_STATUS[ev.status] ?? 'bg-muted text-muted-foreground')}>
                             {ev.status.charAt(0).toUpperCase() + ev.status.slice(1)}
                           </span>
                         </div>
@@ -909,7 +913,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                       <div className="shrink-0 text-right space-y-0.5">
                         {ev.expected_attendance != null && (
                           <>
-                            <p className="text-sm tabular-nums">{ev.expected_attendance.toLocaleString()}</p>
+                            <p className="text-sm bg-num">{ev.expected_attendance.toLocaleString()}</p>
                             <p className="text-xs text-muted-foreground">est. attendance</p>
                           </>
                         )}
@@ -937,19 +941,19 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                     <p className="text-sm font-semibold">BTL activations</p>
                     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
-                        <p className="text-lg font-bold tabular-nums">{btlEvents.length}</p>
+                        <p className="text-lg font-bold bg-num">{btlEvents.length}</p>
                         <p className="text-xs text-muted-foreground">Activations</p>
                       </div>
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
-                        <p className="text-lg font-bold tabular-nums">{btlTotalAttendance > 0 ? btlTotalAttendance.toLocaleString() : '—'}</p>
+                        <p className="text-lg font-bold bg-num">{btlTotalAttendance > 0 ? btlTotalAttendance.toLocaleString() : '—'}</p>
                         <p className="text-xs text-muted-foreground">Est. attendance</p>
                       </div>
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
-                        <p className="text-lg font-bold tabular-nums">{btlTotalLeads.toLocaleString()}</p>
+                        <p className="text-lg font-bold bg-num">{btlTotalLeads.toLocaleString()}</p>
                         <p className="text-xs text-muted-foreground">Total leads</p>
                       </div>
                       <div className="bg-muted/30 rounded-xl p-3 space-y-0.5">
-                        <p className="text-lg font-bold tabular-nums">{btlBlendedCpl != null ? fmtMoney(btlBlendedCpl, campaign.currency) : '—'}</p>
+                        <p className="text-lg font-bold bg-num">{btlBlendedCpl != null ? fmtMoney(btlBlendedCpl, campaign.currency) : '—'}</p>
                         <p className="text-xs text-muted-foreground">Blended CPL</p>
                       </div>
                     </div>
@@ -978,7 +982,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                                   {(ev.activation_type ?? '').replace(/_/g, ' ')}
                                 </td>
                                 <td className="py-2 pr-4 text-muted-foreground">{ev.city}</td>
-                                <td className="py-2 pr-4 text-muted-foreground">{fmtDate(ev.date_start)}</td>
+                                <td className="py-2 pr-4 text-muted-foreground bg-num">{fmtDate(ev.date_start)}</td>
                                 <td className="py-2 text-right">
                                   {evLeads > 0 ? evLeads : '—'}
                                 </td>
@@ -1036,11 +1040,11 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
 
           {/* Link influencer dialog */}
           {linkingOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setLinkingOpen(false)}>
-              <div className="bg-background border rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" onClick={() => setLinkingOpen(false)}>
+              <div className="bg-background border rounded-2xl w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between">
                   <p className="font-semibold">Link influencer to campaign</p>
-                  <button onClick={() => setLinkingOpen(false)} className="text-muted-foreground hover:text-foreground">
+                  <button onClick={() => setLinkingOpen(false)} className="text-muted-foreground hover:text-foreground bg-press">
                     <span className="sr-only">Close</span>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                   </button>
@@ -1062,7 +1066,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{inf.name}</p>
-                        <p className="text-xs text-muted-foreground">@{inf.handle} · {formatPlatformLabel(inf.platform)} · {formatFollowers(inf.followers)}</p>
+                        <p className="text-xs text-muted-foreground bg-num">@{inf.handle} · {formatPlatformLabel(inf.platform)} · {formatFollowers(inf.followers)}</p>
                       </div>
                       <CulturalIQBadge score={inf.cultural_iq} />
                     </label>
@@ -1113,7 +1117,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
             <div className="space-y-2">
               <div className="flex justify-between text-sm border-b pb-3">
                 <span className="text-muted-foreground">Total campaign budget</span>
-                <span className="font-semibold">{fmtMoney(campaign.total_budget, campaign.currency)}</span>
+                <span className="font-semibold bg-num">{fmtMoney(campaign.total_budget, campaign.currency)}</span>
               </div>
 
               {channelAlloc.length > 0 && channelAlloc.map(ch => {
@@ -1145,7 +1149,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
               {totalAllocated > 0 && (
                 <div className="flex justify-between text-sm border-t pt-3">
                   <span className="text-muted-foreground">Total allocated</span>
-                  <span className="font-semibold">{fmtMoney(totalAllocated, campaign.currency)}</span>
+                  <span className="font-semibold bg-num">{fmtMoney(totalAllocated, campaign.currency)}</span>
                 </div>
               )}
 
@@ -1199,7 +1203,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               }
                             </td>
                           ))}
-                          <td className="text-right py-2 pl-4 tabular-nums">
+                          <td className="text-right py-2 pl-4 bg-num">
                             {ch.budget_allocation ? fmtMoney(ch.budget_allocation, campaign.currency) : <span className="text-muted-foreground">—</span>}
                           </td>
                         </tr>
@@ -1240,17 +1244,17 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                           <span className={cn('h-2 w-2 rounded-full shrink-0', meta?.color ?? 'bg-muted-foreground')} />
                           <span className="font-medium">{meta?.label ?? ch.channel}</span>
                           {urls.length > 0 && (
-                            <span className="text-xs text-muted-foreground">· {urls.length} asset{urls.length !== 1 ? 's' : ''}</span>
+                            <span className="text-xs text-muted-foreground bg-num">· {urls.length} asset{urls.length !== 1 ? 's' : ''}</span>
                           )}
                         </div>
                         <button
                           type="button"
                           onClick={() => triggerCreativeUpload(ch.id)}
                           disabled={loading || uploadingChannel !== null}
-                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 bg-press"
                         >
                           {loading
-                            ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />Uploading…</>
+                            ? <><Loader2 className="h-3.5 w-3.5" />Uploading…</>
                             : <><Upload className="h-3.5 w-3.5" />Add creative</>}
                         </button>
                       </div>
@@ -1263,9 +1267,9 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                               <button
                                 type="button"
                                 onClick={() => handleCreativeDelete(ch.id, url)}
-                                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                                className="absolute inset-0 bg-ink/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity bg-press"
                               >
-                                <X className="h-4 w-4 text-white" />
+                                <X className="h-4 w-4 text-tx-inv" />
                               </button>
                             </div>
                           ))}
@@ -1294,12 +1298,12 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                 {oohSites.map(site => (
                   <div key={site.id} className="flex justify-between text-sm">
                     <span className="truncate mr-4">{site.site_name}</span>
-                    <span className="shrink-0 text-muted-foreground">{fmtMoney(site.monthly_cost, site.currency ?? 'NGN')}/mo</span>
+                    <span className="shrink-0 text-muted-foreground bg-num">{fmtMoney(site.monthly_cost, site.currency ?? 'NGN')}/mo</span>
                   </div>
                 ))}
                 <div className="border-t pt-2 flex justify-between text-sm font-medium">
                   <span>Total OOH monthly</span>
-                  <span>{fmtMoney(totalOohSpend, campaign.currency)}</span>
+                  <span className="bg-num">{fmtMoney(totalOohSpend, campaign.currency)}</span>
                 </div>
               </div>
             </div>
