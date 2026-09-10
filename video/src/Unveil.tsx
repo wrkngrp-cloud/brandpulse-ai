@@ -28,13 +28,14 @@ export const FPS = 30
  * the landing page tour, so the film is the product, not a mockup.
  */
 
-/* brand/tokens.json v3.4. The film renders outside the app's cascade, so it
-   carries the values by name rather than as var(). */
-const FLARE = '#FF3D14'
-const CHAR = '#5A1E0C'
-const INK = '#16120E'
-const PAPER = '#FAF6EF'
-const ASH = '#8C877E'
+/* The film's own chrome — interstitials, backdrop, outro — reads the tokens
+   through var() now that style.css imports brand/tokens.css. The scenes were
+   always written that way; this is the film's chrome catching up. */
+const FLARE = 'var(--flare)'
+const CHAR = 'var(--char)'
+const INK = 'var(--tx)'
+const PAPER = 'var(--bg-paper)'
+const ASH = 'var(--tx-3)'
 
 type Beat =
   | { kind: 'logo'; dur: number }
@@ -62,12 +63,24 @@ export const UNVEIL_DURATION = BEATS.reduce((s, b) => s + b.dur, 0) // 1800 = 60
 const IN = 12   // whip-in frames
 const OUT = 10  // whip-out frames
 
+/** Both faces, every weight the scenes use. Disket carries the numerals: when
+ *  it was missing, every reading in the film fell back to Nohemi and the
+ *  product screens stopped matching the app, where they are tabular Disket. */
+const FACES = [
+  ['Nohemi', 400, 'Nohemi-400'],
+  ['Nohemi', 500, 'Nohemi-500'],
+  ['Nohemi', 700, 'Nohemi-700'],
+  ['Nohemi', 800, 'Nohemi-800'],
+  ['Disket Mono', 400, 'DisketMono-400'],
+  ['Disket Mono', 700, 'DisketMono-700'],
+] as const
+
 function useFontsReady() {
   const [handle] = useState(() => delayRender('brand-fonts'))
   useEffect(() => {
     Promise.all(
-      ([[500, 'Nohemi-500'], [700, 'Nohemi-700'], [800, 'Nohemi-800']] as const).map(async ([weight, file]) => {
-        const font = new FontFace('Nohemi', `url(${staticFile(`fonts/${file}.woff2`)})`, { weight: String(weight) })
+      FACES.map(async ([family, weight, file]) => {
+        const font = new FontFace(family, `url(${staticFile(`fonts/${file}.woff2`)})`, { weight: String(weight) })
         await font.load()
         document.fonts.add(font)
       }),
@@ -91,7 +104,7 @@ function Backdrop() {
       {/* A tick field, quantised: the ground is made of the mark's own
           material rather than of soft coloured blooms. */}
       <AbsoluteFill style={{
-        backgroundImage: `radial-gradient(rgba(255,61,20,0.16) 1.2px, transparent 1.2px)`,
+        backgroundImage: 'radial-gradient(var(--tick-1) 1.2px, transparent 1.2px)',
         backgroundSize: '30px 30px',
         maskImage: 'radial-gradient(75% 60% at 50% 40%, black, transparent)',
       }} />
@@ -116,7 +129,7 @@ function LogoIntro({ dur }: { dur: number }) {
         </div>
       </div>
       <p style={{
-        marginTop: 34, fontFamily: 'Nohemi', fontWeight: 500, fontSize: 24, color: ASH, opacity: tag,
+        marginTop: 34, fontFamily: 'var(--font)', fontWeight: 500, fontSize: 24, color: ASH, opacity: tag,
       }}>
         Brand intelligence built in Lagos, for West Africa
       </p>
@@ -133,16 +146,15 @@ function WordCard({ word, dot, dur }: { word: string; dot: string; dur: number }
   return (
     <AbsoluteFill className="items-center justify-center" style={style}>
       <span aria-hidden style={{
-        position: 'absolute', fontFamily: 'Nohemi', fontWeight: 800, fontSize: 430, letterSpacing: '-0.02em',
-        color: 'transparent', WebkitTextStroke: `2px rgba(20,24,43,0.10)`, whiteSpace: 'nowrap',
+        position: 'absolute', fontFamily: 'var(--font)', fontWeight: 800, fontSize: 430, letterSpacing: '-0.02em',
+        color: 'transparent', WebkitTextStroke: '2px var(--line-strong)', whiteSpace: 'nowrap',
         transform: `translateX(${drift}px)`,
       }}>
         {word}.{word}.
       </span>
       <span style={{
-        fontFamily: 'Nohemi', fontWeight: 800, fontSize: 240, letterSpacing: '-0.03em', color: INK,
+        fontFamily: 'var(--font)', fontWeight: 800, fontSize: 240, letterSpacing: '-0.03em', color: INK,
         transform: `translateY(${(1 - inP) * 60}px) scale(${0.96 + inP * 0.04})`, opacity: inP,
-        textShadow: '0 0 80px rgba(212,96,42,0.25)',
       }}>
         {word}<span style={{ color: dot }}>.</span>
       </span>
@@ -168,8 +180,8 @@ function Chapter({ beat, dur }: { beat: Extract<Beat, { kind: 'chapter' }>; dur:
   )
   const copy = (
     <div style={{ width: 480 }}>
-      <div style={{ width: 46, height: 7, background: FLARE, marginBottom: 26, borderRadius: 4 }} />
-      <h2 style={{ fontFamily: 'Nohemi', fontWeight: 800, fontSize: 62, lineHeight: 1.06, letterSpacing: '-0.015em', color: INK }}>
+      <div style={{ width: 46, height: 7, background: FLARE, marginBottom: 26, borderRadius: 'var(--r-card)' }} />
+      <h2 style={{ fontFamily: 'var(--font)', fontWeight: 800, fontSize: 62, lineHeight: 1.06, letterSpacing: '-0.015em', color: INK }}>
         {words.map((w, i) => {
           const p = ease((frame - IN - i * 2.2) / 14)
           return (
@@ -199,13 +211,13 @@ function Outro({ dur }: { dur: number }) {
       <div className="flex items-center gap-6" style={{ opacity: p1, transform: `scale(${0.94 + p1 * 0.06})` }}>
         <Lockup height={92} />
       </div>
-      <p style={{ marginTop: 26, fontFamily: 'Nohemi', fontWeight: 500, fontSize: 30, color: ASH, opacity: p2 }}>
+      <p style={{ marginTop: 26, fontFamily: 'var(--font)', fontWeight: 500, fontSize: 30, color: ASH, opacity: p2 }}>
         Brand intelligence that speaks your market’s language.
       </p>
       <div style={{ marginTop: 44, opacity: p3, transform: `translateY(${(1 - p3) * 16}px)` }}>
         <span style={{
-          fontFamily: 'Nohemi', fontWeight: 700, fontSize: 27, color: INK, background: FLARE,
-          padding: '20px 44px', borderRadius: 4,
+          fontFamily: 'var(--font)', fontWeight: 700, fontSize: 27, color: 'var(--on-hot)', background: FLARE,
+          padding: '20px 44px', borderRadius: 'var(--r-card)',
         }}>
           Start free at brandgauge.app
         </span>
@@ -220,8 +232,6 @@ export function Unveil() {
   return (
     <AbsoluteFill style={{
       background: PAPER, color: INK, ...lightSceneVars,
-      ['--font' as never]: 'Nohemi, system-ui, sans-serif',
-      ['--font-num' as never]: '"Disket Mono", ui-monospace, monospace',
       ['--s-map' as never]: `url(${staticFile('landing/ooh-map-light.png')})`,
     }}>
       <Backdrop />

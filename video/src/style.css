@@ -1,5 +1,19 @@
 @import 'tailwindcss';
+
+/* The film is the product, so it carries the product's brand layer.
+   brand/tokens.css is pure custom properties (no url(), no @font-face), so it
+   imports cleanly into the Remotion bundle; brand-theme.css turns those into
+   the same Tailwind utilities the app uses. Without these two the scene
+   components still render, but every var(--flare) / bg-shell / rounded-lg
+   resolves to nothing and the screens look like a different product. */
+@import '../../brand/tokens.css';
+@import '../../src/brand-theme.css';
+
+/* Tailwind scans the sources it is pointed at. The scenes live in the app and
+   pull in the brand primitives, so both trees have to be in scope or their
+   utility classes are never generated. */
 @source "../../src/components/landing";
+@source "../../src/components/brand";
 @source "./";
 
 /* Nohemi and Disket Mono load at runtime via FontFace + staticFile in Unveil.tsx —
