@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
@@ -8,6 +8,7 @@ import { VideoHero } from './video-hero'
 import { HorizontalTour } from './horizontal-tour'
 import { AiScene, CompetitiveScene, darkSceneVars, lightSceneVars } from './scenes'
 import { BrandLockup } from '@/components/brand/logo'
+import { useDarkGround, useMode } from './use-mode'
 
 // Fade-and-slide-up on every element is banned: one reveal group per section,
 // maximum, and it is the section's own .bg-reveal group in motion.css. What is
@@ -16,23 +17,42 @@ const rise = {
   transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
 }
 
-// ————— theme palettes —————
-export const LIGHT = {
-  '--lp-bg': 'var(--bg-paper)', '--lp-ink': 'var(--bg-ink)', '--lp-mut': 'var(--tx-3)',
-  '--lp-line': 'var(--line)', '--lp-card': 'var(--bg-card)', '--lp-glass': 'var(--bg-card)',
-  '--lp-chip': 'var(--bg-shell)', '--lp-clay': 'var(--flare)', '--lp-band': 'var(--bg-ink)', '--lp-band-ink': 'var(--bg-shell)',
+// ————— theme —————
+/**
+ * One palette. The `--lp-*` variables map onto the tokens, and the tokens flip
+ * under [data-mode="dark"], so the page cannot disagree with the app's mode.
+ * Two hand-kept copies is how the headline ended up ink on ink.
+ *
+ * `--lp-band` is the raised ink plane, one value in both modes: on Paper it
+ * reads as the ink band, and on Ink it still stands off the ground instead of
+ * collapsing into it. Its type is therefore fixed Paper.
+ */
+export const LP_VARS = {
+  '--lp-bg': 'var(--bg-paper)',
+  '--lp-ink': 'var(--tx)',
+  '--lp-mut': 'var(--tx-3)',
+  '--lp-line': 'var(--line)',
+  '--lp-card': 'var(--bg-card)',
+  '--lp-glass': 'var(--bg-paper)',   /* the nav bar: the ground plane, so the supplied lockup's own ground matches it */
+  '--lp-chip': 'var(--bg-shell)',
+  '--lp-clay': 'var(--flare)',
+  '--lp-band': 'var(--bg-ink-raised)',
+  '--lp-band-ink': 'var(--tx-inv)',
   '--lp-dot': 'var(--tick-1)',
 } as React.CSSProperties
 
-export const DARK = {
-  '--lp-bg': 'var(--bg-ink)', '--lp-ink': 'var(--bg-shell)', '--lp-mut': 'var(--tx-3)',
-  '--lp-line': 'var(--line)', '--lp-card': 'var(--bg-ink)', '--lp-glass': 'var(--bg-ink-raised)',
-  '--lp-chip': 'var(--bg-shell)', '--lp-clay': 'var(--flare)', '--lp-band': 'var(--bg-ink)', '--lp-band-ink': 'var(--bg-shell)',
-  '--lp-dot': 'var(--tick-1)',
-} as React.CSSProperties
+/** Kept for the film, which renders these scenes outside the app. */
+export const LIGHT = LP_VARS
+export const DARK = LP_VARS
 
-/** The lockup as supplied. The wordmark is not set in type here. */
-export function Wordmark({ height = 22, dark = false }: { height?: number; dark?: boolean }) {
+/**
+ * The lockup as supplied. The wordmark is not set in type here.
+ *
+ * Ground follows the document mode: each supplied file carries its own
+ * full-bleed ground rect, so the Paper lockup draws a Paper box on ink.
+ */
+export function Wordmark({ height = 22 }: { height?: number }) {
+  const dark = useDarkGround()
   return <BrandLockup height={height} ground={dark ? 'ink' : 'paper'} />
 }
 
@@ -58,7 +78,7 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
           </button>
           <Link href="/auth/login" className="hidden text-[13px] font-medium transition-opacity hover:opacity-70 sm:block" style={{ color: 'var(--lp-ink)' }}>Sign in</Link>
           <Link href="/auth/signup"
-            className="whitespace-nowrap rounded-sm px-4 py-2 text-[13px] font-bold text-tx-inv transition-transform border border-line" style={{ background: 'var(--bg-ink)', color: 'var(--tx-inv)' }}>
+            className="whitespace-nowrap rounded-sm px-4 py-2 text-[13px] font-bold transition-transform border border-line" style={{ background: 'var(--tx)', color: 'var(--bg-paper)' }}>
             Start free
           </Link>
         </div>
@@ -328,7 +348,7 @@ function Industries() {
             <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
               className="rounded-sm border px-5 py-2.5 text-[13px] transition-colors duration-200 bg-press"
               style={active === i
-                ? { borderColor: 'var(--bg-ink)', color: 'var(--tx-inv)', background: 'var(--bg-ink)' }
+                ? { borderColor: 'var(--tx)', color: 'var(--bg-paper)', background: 'var(--tx)' }
                 : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
               {v.name}
             </button>
@@ -352,7 +372,7 @@ function FinalCta() {
           maskImage: 'radial-gradient(70% 80% at 50% 50%, black, transparent)',
         }} />
         <div className="pointer-events-none absolute -right-16 -top-16">
-          <div><GaugeArcMotif size={300} color="var(--bg-shell)" opacity={0.2} /></div>
+          <div><GaugeArcMotif size={300} color="var(--tx-inv)" opacity={0.2} /></div>
         </div>
         <motion.h2 {...rise} className="relative mx-auto max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
@@ -408,25 +428,14 @@ export function Footer() {
 // static tick field behind the hero.
 
 export function LandingPage() {
-  const [dark, setDark] = useState(false)
+  const { dark, toggle } = useMode()
   const rootRef = useRef<HTMLElement>(null)
-  useEffect(() => {
-    const id = requestAnimationFrame(() => {
-      if (window.localStorage.getItem('bg-landing-theme') === 'dark') setDark(true)
-    })
-    return () => cancelAnimationFrame(id)
-  }, [])
-  function toggle() {
-    setDark(d => {
-      window.localStorage.setItem('bg-landing-theme', d ? 'light' : 'dark')
-      return !d
-    })
-  }
+
   return (
     <main
       ref={rootRef}
       className="min-h-screen antialiased transition-colors duration-500"
-      style={{ ...(dark ? DARK : LIGHT), ...(dark ? darkSceneVars : lightSceneVars), background: 'var(--lp-bg)', color: 'var(--lp-ink)', isolation: 'isolate' }}
+      style={{ ...LP_VARS, ...(dark ? darkSceneVars : lightSceneVars), background: 'var(--lp-bg)', color: 'var(--lp-ink)', isolation: 'isolate' }}
     >
       <Nav dark={dark} onToggle={toggle} />
       <Hero />

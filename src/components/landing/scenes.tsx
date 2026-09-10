@@ -13,6 +13,7 @@
 import type { CSSProperties } from 'react'
 import { Crescendo } from '@/components/brand/crescendo'
 import { BrandLockup } from '@/components/brand/logo'
+import { useDarkGround } from './use-mode'
 
 // ————— timing helpers —————
 export function clamp01(v: number) { return Math.min(1, Math.max(0, v)) }
@@ -26,28 +27,29 @@ export function pop(v: number) { const x = clamp01(v); return 1 + 2.70158 * Math
 export const HERO = 'var(--flare)'
 export const NEUTRAL = 'var(--neu)'
 
+/**
+ * The scene variables, mapped onto the tokens once.
+ *
+ * The tokens already flip under [data-mode="dark"], so there is no second
+ * palette to keep in step — a light and a dark copy is how the headline ended
+ * up ink on ink when the app's mode and the page's own toggle disagreed.
+ * `--s-map` is the one value that genuinely differs, so it is the one thing
+ * the dark variant still overrides.
+ */
 export const lightSceneVars: CSSProperties = {
   '--s-map':    "url('/landing/ooh-map-light.png')",
   '--s-panel':  'var(--bg-card)',
-  '--s-line': 'var(--line)',
-  '--s-strong': 'var(--bg-ink)',
-  '--s-body': 'var(--tx-2)',
-  '--s-mut': 'var(--tx-3)',
-  '--s-chip': 'var(--bg-shell)',
-  '--s-track': 'var(--tick-1)',
-  '--s-shadow': '0 18px 60px -22px rgba(20,24,43,0.18)',
+  '--s-line':   'var(--line)',
+  '--s-strong': 'var(--tx)',
+  '--s-body':   'var(--tx-2)',
+  '--s-mut':    'var(--tx-3)',
+  '--s-chip':   'var(--bg-shell)',
+  '--s-track':  'var(--tick-1)',
 } as CSSProperties
 
 export const darkSceneVars: CSSProperties = {
-  '--s-map':    "url('/landing/ooh-map-dark.png')",
-  '--s-panel': 'var(--bg-ink)',
-  '--s-line': 'var(--line)',
-  '--s-strong': 'var(--bg-shell)',
-  '--s-body': 'var(--tx-2)',
-  '--s-mut': 'var(--tx-3)',
-  '--s-chip': 'var(--bg-shell)',
-  '--s-track': 'var(--tick-1)',
-  '--s-shadow': '0 24px 80px -24px rgba(0,0,0,0.8)',
+  ...lightSceneVars,
+  '--s-map': "url('/landing/ooh-map-dark.png')",
 } as CSSProperties
 
 // ————— shared chrome —————
@@ -520,12 +522,13 @@ export function CompetitiveScene({ t }: { t: number }) {
 
 // ————— Scene 8: outro —————
 export function OutroScene({ t }: { t: number }) {
+  const dark = useDarkGround()
   const p1 = easeOut(win(t, 0.05, 0.35))
   const p2 = easeOut(win(t, 0.3, 0.55))
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-5" style={{ color: 'var(--s-strong)' }}>
       <div style={{ opacity: p1, transform: `scale(${0.92 + p1 * 0.08})` }} className="flex items-center gap-3">
-        <BrandLockup height={40} />
+        <BrandLockup height={40} ground={dark ? 'ink' : 'paper'} />
       </div>
       <p className="max-w-md text-center text-[15px] leading-relaxed text-[var(--s-mut)]" style={{ opacity: p2 }}>
         Brand intelligence that speaks your market&apos;s language.
