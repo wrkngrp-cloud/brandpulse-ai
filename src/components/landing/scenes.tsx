@@ -13,6 +13,8 @@
 import type { CSSProperties } from 'react'
 import { Crescendo } from '@/components/brand/crescendo'
 import { BrandLockup } from '@/components/brand/logo'
+import { funnelChart } from '@brand/engine.js'
+import { TOKENS } from '@/lib/brand-tokens'
 import { useDarkGround } from './use-mode'
 
 // ————— timing helpers —————
@@ -233,7 +235,15 @@ export function SentimentScene({ t }: { t: number }) {
 }
 
 // ————— Scene 3: funnel + money metrics —————
+/* The generator lays the rows out in its own box; the svg scales it. Height
+   is four band rows' worth, and the gutter is where the captions go. */
+const FUNNEL_W = 620
+const FUNNEL_H = 140
+const FUNNEL_GUTTER = 112
+
 export function FunnelScene({ t }: { t: number }) {
+  const dark = useDarkGround()
+  const ink = dark ? TOKENS.paper : TOKENS.ink
   const stages = [
     { label: 'Aware',    v: 1.0,  n: '2.4M' },
     { label: 'Consider', v: 0.62, n: '486k' },
@@ -256,21 +266,30 @@ export function FunnelScene({ t }: { t: number }) {
           ))}
         </div>
       </div>
-      <div className="flex flex-1 items-end gap-3">
-        {stages.map((s, i) => {
-          const p = easeOut(win(t, 0.12 + i * 0.1, 0.42 + i * 0.1))
-          return (
-            <div key={s.label} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
-              <span className="bg-num text-[11px] text-[var(--s-body)]" style={{ opacity: p }}>{s.n}</span>
-              <div className="w-full rounded-t-lg" style={{
-                height: `${8 + s.v * 80 * p}%`,
-                background: `var(--bg-shell)`,
-                opacity: 0.9,
-              }} />
-              <span className="text-[9px] text-[var(--s-mut)]">{s.label}</span>
-            </div>
-          )
-        })}
+      {/* Stacked bands, made of atoms, straight out of brand/engine.js. The
+          drop-off is countable rather than a tapering block, each row's atoms
+          crescendo in size across it, and the grade puts Flare on the widest
+          stage so heat still means value. None of this geometry is redrawn
+          here. The wipe reveals it left to right, the way the rows fill. */}
+      <div className="flex flex-1 items-center">
+        {/* The svg sets the height; the label column is overlaid in the gutter
+            it leaves, on the same row grid, so each caption sits on its band. */}
+        <div className="relative w-full" style={{ paddingRight: FUNNEL_GUTTER }}>
+          {/* The bands. width="100%" with no height keeps the atoms round. */}
+          <svg viewBox={`0 0 ${FUNNEL_W} ${FUNNEL_H}`} width="100%" aria-hidden
+            style={{ clipPath: `inset(0 ${(1 - easeOut(win(t, 0.12, 0.6))) * 100}% 0 0)` }}
+            dangerouslySetInnerHTML={{ __html: funnelChart(stages.map(s => ({ label: s.label, value: s.v })), FUNNEL_W, FUNNEL_H, ink) }} />
+          <div className="absolute inset-y-0 right-0 grid"
+            style={{ width: FUNNEL_GUTTER - 8, gridTemplateRows: `repeat(${stages.length}, 1fr)` }}>
+            {stages.map((s, i) => (
+              <div key={s.label} className="flex items-center justify-between gap-2 whitespace-nowrap"
+                style={{ opacity: easeOut(win(t, 0.2 + i * 0.08, 0.45 + i * 0.08)) }}>
+                <span className="text-[9px] text-[var(--s-mut)]">{s.label}</span>
+                <span className="bg-num text-[11px] text-[var(--s-body)]">{s.n}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
         {tiles.map((m, i) => {

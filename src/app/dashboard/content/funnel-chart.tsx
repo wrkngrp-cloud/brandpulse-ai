@@ -1,5 +1,6 @@
 'use client'
 import { ChartState } from '@/components/brand/chart-states'
+import { heat } from '@/lib/brand-tokens'
 
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -17,12 +18,17 @@ interface Props {
   data: FunnelData[]
 }
 
-const STAGE_COLOURS: Record<string, string> = {
-  Awareness:     'var(--flare)',
-  Consideration: 'var(--neu)',
-  Conversion:    'var(--pos)',
-  Loyalty:       'var(--ember)',
-  'Re-engagement': 'var(--flare)',
+/**
+ * The ramp grades, it never mixes.
+ *
+ * These stages used to be Flare, ash, ink, Ember, Flare — five colours in no
+ * order, Flare twice, so the heat said "which stage" instead of "how much".
+ * They grade along the ramp in stage order now, the same way brand/engine.js
+ * grades its funnel: hottest on the widest stage at the top, coldest at the
+ * bottom, so heat still means value here as it does on the gauge.
+ */
+function stageHeat(index: number, count: number): string {
+  return heat(1 - index / Math.max(count - 1, 1))
 }
 
 function CustomTooltip({ active, payload, label }: {
@@ -65,8 +71,8 @@ export function FunnelChart({ data }: Props) {
                 <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 9, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="posts" radius={[4, 4, 0, 0]}>
-                  {data.map(entry => (
-                    <Cell key={entry.stage} fill={STAGE_COLOURS[entry.stage] ?? 'var(--tx-3)'} />
+                  {data.map((entry, i) => (
+                    <Cell key={entry.stage} fill={stageHeat(i, data.length)} />
                   ))}
                 </Bar>
               </BarChart>
@@ -85,8 +91,8 @@ export function FunnelChart({ data }: Props) {
                 <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 9, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="avg_engagement" radius={[4, 4, 0, 0]}>
-                  {data.map(entry => (
-                    <Cell key={entry.stage} fill={STAGE_COLOURS[entry.stage] ?? 'var(--tx-3)'} opacity={0.7} />
+                  {data.map((entry, i) => (
+                    <Cell key={entry.stage} fill={stageHeat(i, data.length)} opacity={0.7} />
                   ))}
                 </Bar>
               </BarChart>
@@ -97,9 +103,9 @@ export function FunnelChart({ data }: Props) {
 
       {/* Stage legend */}
       <div className="flex flex-wrap gap-3">
-        {data.map(d => (
+        {data.map((d, i) => (
           <div key={d.stage} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="h-2.5 w-2.5 rounded-sm shrink-0" style={{ background: STAGE_COLOURS[d.stage] ?? 'var(--tx-3)' }} />
+            <span className="h-2.5 w-2.5 rounded-[var(--r-tick)] shrink-0" style={{ background: stageHeat(i, data.length) }} />
             {d.stage}
           </div>
         ))}
