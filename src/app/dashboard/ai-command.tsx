@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { CloseIcon as X, SendIcon as Send, DownIcon as ChevronDown, ForwardIcon as ArrowRight } from '@/components/brand/icon'
+import { XIcon as X, SendIcon as Send, ChevronDownIcon as ChevronDown, ArrowRightIcon as ArrowRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { MentionsIcon as MessageSquare } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

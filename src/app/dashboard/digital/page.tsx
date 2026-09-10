@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { cn, formatNGN } from '@/lib/utils'
-import { ScreenIcon as Monitor, ViewIcon as Eye, TargetIcon as MousePointerClick, MoneyIcon as Coins, PeopleIcon as Users, TargetIcon as Target, ConfirmedIcon as CheckCircle, LinkIcon, NextIcon as ChevronRight } from '@/components/brand/icon'
+import { PanelIcon as Monitor, EyeIcon as Eye, CircleDotIcon as MousePointerClick, CurrencyIcon as Coins, UsersIcon as Users, CircleDotIcon as Target, CheckIcon as CheckCircle, LinkIcon, ChevronRightIcon as ChevronRight } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import {
   DigitalSpendChart,

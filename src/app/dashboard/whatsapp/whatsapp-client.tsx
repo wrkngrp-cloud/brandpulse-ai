@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { PeopleIcon as Users, SendIcon as Send, BarsIcon as BarChart2, ConfirmedIcon as CheckCircle2, AddIcon as Plus, NextIcon as ChevronRight, ClockIcon as Clock, TickMarkIcon as CheckCheck } from '@/components/brand/icon'
+import { UsersIcon as Users, SendIcon as Send, TrendIcon as BarChart2, CheckIcon as CheckCircle2, PlusIcon as Plus, ChevronRightIcon as ChevronRight, ClockIcon as Clock, CheckIcon as CheckCheck } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { MentionsIcon as MessageCircle, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

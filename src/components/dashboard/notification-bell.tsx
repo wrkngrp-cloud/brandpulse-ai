@@ -1,6 +1,6 @@
 'use client'
 
-import { BellIcon as Bell } from '@/components/brand/icon'
+import { AlertIcon as Bell } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
 export function NotificationBell({

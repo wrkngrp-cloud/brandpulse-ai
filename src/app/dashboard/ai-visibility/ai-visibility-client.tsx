@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { IdeaIcon as Bot, RefreshIcon as RefreshCw, ConfirmedIcon as CheckCircle2, BlockedIcon as XCircle, RemoveIcon as MinusCircle, AwardIcon as Trophy } from '@/components/brand/icon'
+import { LightbulbIcon as Bot, RefreshIcon as RefreshCw, CheckIcon as CheckCircle2, XCircleIcon as XCircle, MinusIcon as MinusCircle, StarIcon as Trophy } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
@@ -208,8 +208,8 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
                       <ResponsiveContainer width="100%" height={180}>
               <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border/40" />
-                <XAxis dataKey="week" tick={{ fontSize: 11 }} tickLine={false} />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickLine={false} />
+                <XAxis dataKey="week" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} tickLine={false} />
+                <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} tickLine={false} />
                 <Tooltip
                   contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)', border: '1px solid hsl(var(--border))' }}
                   formatter={(value, name) => [

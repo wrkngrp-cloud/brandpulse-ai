@@ -5,7 +5,7 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip as RechartTooltip,
   LineChart, Line, XAxis, YAxis, CartesianGrid, ReferenceLine,
 } from 'recharts'
-import { InfoIcon as Info, LinkIcon, DownIcon as ChevronDown } from '@/components/brand/icon'
+import { InfoIcon as Info, LinkIcon, ChevronDownIcon as ChevronDown } from '@/components/brand/icon'
 import Link from 'next/link'
 import { BHIGauge } from '@/components/dashboard/bhi-gauge'
 import { cn, formatNGN } from '@/lib/utils'
@@ -447,14 +447,14 @@ export function BrandEquityClient({
                 <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
+                  tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
                   tickLine={false}
                   axisLine={false}
                   interval="preserveStartEnd"
                   tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
-                  fontFamily="var(--font)"
+                  fontFamily="var(--font-num)"
                 />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }} tickLine={false} axisLine={false} tickCount={5} fontFamily="var(--font)" />
+                <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'currentColor', opacity: 0.35 }} tickLine={false} axisLine={false} tickCount={5} fontFamily="var(--font-num)" />
                 <ReferenceLine y={80} stroke="var(--line-strong)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Leading', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.5 }} />
                 <ReferenceLine y={65} stroke="var(--line-strong)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Healthy', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.5 }} />
                 <ReferenceLine y={40} stroke="var(--line-strong)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Building', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.5 }} />
@@ -627,7 +627,7 @@ export function BrandEquityClient({
                 <PolarGrid className="stroke-border" />
                 <PolarAngleAxis
                   dataKey="dimension"
-                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
                 />
                 <Radar
                   name={brandName}

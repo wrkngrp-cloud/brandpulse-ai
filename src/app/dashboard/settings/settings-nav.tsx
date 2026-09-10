@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ShareIcon as Share2 } from '@/components/brand/icon'
-import { PersonIcon as User, VenueIcon as Building2, LinkIcon as Link2, PlaceIcon as MapPin, AwardIcon as Swords, GridIcon as Layers, OpenIcon as ExternalLink, SurveyIcon as ClipboardList, CodeIcon as Code2 } from '@/components/brand/icon'
+import { UsersIcon as User, VenueIcon as Building2, LinkIcon as Link2, MapIcon as MapPin, StarIcon as Swords, LayoutGridIcon as Layers, ExternalLinkIcon as ExternalLink, SurveyIcon as ClipboardList, CodeIcon as Code2 } from '@/components/brand/icon'
 import { ConnectIcon as Plug } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 

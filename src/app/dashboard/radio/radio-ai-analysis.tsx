@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { DownIcon as ChevronDown, UpIcon as ChevronUp } from '@/components/brand/icon'
+import { ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { toast } from 'sonner'

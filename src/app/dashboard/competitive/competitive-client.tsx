@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { AwardIcon as Trophy, FallingIcon as TrendingDown, PlaceIcon as MapPin, AddIcon as Plus, RefreshIcon as RefreshCw, DownIcon as ChevronDown, UpIcon as ChevronUp, IdeaIcon as Lightbulb, ViewIcon as Eye, ConfirmedIcon as CheckCircle2, ForwardIcon as ArrowRight } from '@/components/brand/icon'
+import { StarIcon as Trophy, TrendDownIcon as TrendingDown, MapIcon as MapPin, PlusIcon as Plus, RefreshIcon as RefreshCw, ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp, LightbulbIcon as Lightbulb, EyeIcon as Eye, CheckIcon as CheckCircle2, ArrowRightIcon as ArrowRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

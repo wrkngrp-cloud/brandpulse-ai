@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FallingIcon as TrendingDown, AddIcon as Plus, MoneyIcon as DollarSign, ViewIcon as Eye, HeartIcon as Heart, TargetIcon as MousePointerClick, ShopIcon as ShoppingBag, DownIcon as ChevronDown, UpIcon as ChevronUp, InfoIcon as Info } from '@/components/brand/icon'
+import { TrendDownIcon as TrendingDown, PlusIcon as Plus, CurrencyIcon as DollarSign, EyeIcon as Eye, HeartIcon as Heart, CircleDotIcon as MousePointerClick, MarketIcon as ShoppingBag, ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp, InfoIcon as Info } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input }  from '@/components/ui/input'

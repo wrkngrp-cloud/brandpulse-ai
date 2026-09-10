@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { LockIcon as Key, AddIcon as Plus, DeleteIcon as Trash2, CopyIcon as Copy, TickMarkIcon as Check, DownIcon as ChevronDown, NextIcon as ChevronRight } from '@/components/brand/icon'
+import { LockIcon as Key, PlusIcon as Plus, TrashIcon as Trash2, CopyIcon as Copy, CheckIcon as Check, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight } from '@/components/brand/icon'
 
 interface ApiKey {
   id: string

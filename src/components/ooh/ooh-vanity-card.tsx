@@ -3,7 +3,7 @@
 import { useState }   from 'react'
 import { toast }      from 'sonner'
 import { QRCodeSVG } from 'qrcode.react'
-import { CopyIcon as Copy, LinkIcon as Link2, QrIcon as QrCode, DownIcon as ChevronDown, UpIcon as ChevronUp, SparkIcon as Zap } from '@/components/brand/icon'
+import { CopyIcon as Copy, LinkIcon as Link2, QrIcon as QrCode, ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp, AskIcon as Zap } from '@/components/brand/icon'
 import { Button }     from '@/components/ui/button'
 
 interface OohVanityCardProps {

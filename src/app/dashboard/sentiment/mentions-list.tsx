@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { FlagIcon as Flag, ConfirmedIcon as CheckCircle, DownIcon as ChevronDown } from '@/components/brand/icon'
+import { FlagIcon as Flag, CheckIcon as CheckCircle, ChevronDownIcon as ChevronDown } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import {
   DropdownMenu,

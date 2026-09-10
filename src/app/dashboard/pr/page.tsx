@@ -1,6 +1,6 @@
 import { createClient }         from '@/lib/supabase/server'
 import { redirect }             from 'next/navigation'
-import { GlobeIcon as Globe, DocIcon as FileSearch, BarsIcon as BarChart2, OpenIcon as ExternalLink, ClockIcon as Clock, BroadcastIcon as Rss } from '@/components/brand/icon'
+import { GlobeIcon as Globe, FileIcon as FileSearch, TrendIcon as BarChart2, ExternalLinkIcon as ExternalLink, ClockIcon as Clock, MusicIcon as Rss } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { getActiveBrand }       from '@/lib/active-brand'
 import { PrMentionsChart }      from './pr-mentions-chart'

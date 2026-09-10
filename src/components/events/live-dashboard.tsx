@@ -8,7 +8,7 @@ import { goLive, closeEvent } from '@/app/dashboard/events/actions'
 import { Button }       from '@/components/ui/button'
 import { Badge }        from '@/components/ui/badge'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { BroadcastIcon as Radio, GridIcon as Square, PeopleIcon as Users, TargetIcon as Target, HandshakeIcon as Handshake, GiftIcon as Gift, CameraIcon as Camera } from '@/components/brand/icon'
+import { MusicIcon as Radio, LayoutGridIcon as Square, UsersIcon as Users, CircleDotIcon as Target, UsersIcon as Handshake, GiftIcon as Gift, CameraIcon as Camera } from '@/components/brand/icon'
 import { ChartState } from '@/components/brand/chart-states'
 
 interface Interaction {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { RefreshIcon as RefreshCw, ConfirmedIcon as CheckCircle2 } from '@/components/brand/icon'
+import { RefreshIcon as RefreshCw, CheckIcon as CheckCircle2 } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 export function TriggerPrCrawlButton() {

@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter }          from 'next/navigation'
 import { toast }              from 'sonner'
-import { ImageIcon, CameraIcon as Video, DocIcon as FileText, GridIcon as LayoutGrid, FilterIcon as Filter, ConfirmedIcon as CheckSquare, GridIcon as Square, SparkIcon as Zap, OpenIcon as ExternalLink, FlagIcon as Tag, DocIcon as BookOpen, CopyIcon as Copy, StarIcon as Star, ViewIcon as Eye } from '@/components/brand/icon'
+import { ImageIcon, CameraIcon as Video, FileIcon as FileText, LayoutGridIcon as LayoutGrid, FilterIcon as Filter, CheckIcon as CheckSquare, LayoutGridIcon as Square, AskIcon as Zap, ExternalLinkIcon as ExternalLink, FlagIcon as Tag, FileIcon as BookOpen, CopyIcon as Copy, StarIcon as Star, EyeIcon as Eye } from '@/components/brand/icon'
 import { AskIcon as Sparkles, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button }  from '@/components/ui/button'
 import { Badge }   from '@/components/ui/badge'

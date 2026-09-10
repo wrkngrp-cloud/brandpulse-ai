@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { ConfirmedIcon as CheckCircle2, BackIcon as ChevronLeft } from '@/components/brand/icon'
+import { CheckIcon as CheckCircle2, ChevronLeftIcon as ChevronLeft } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 
 export interface SurveyQuestion {

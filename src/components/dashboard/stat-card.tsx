@@ -3,8 +3,6 @@
 import { useId } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { FallingIcon as TrendingDown } from '@/components/brand/icon'
-import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { fadeUp } from '@/lib/motion'
 
@@ -140,7 +138,6 @@ export function StatCard({
 }: StatCardProps) {
   const uid    = useId()
   const isUp   = delta != null && delta >= 0
-  const isDown = delta != null && delta < 0
 
   const inner = (
     <motion.div
@@ -164,11 +161,9 @@ export function StatCard({
             'text-[10.5px] font-semibold leading-none',
             isUp ? 'trend-up' : 'trend-down',
           )}>
-            {isUp
-              ? <TrendingUp  className="h-2.5 w-2.5" />
-              : <TrendingDown className="h-2.5 w-2.5" />
-            }
-            {Math.abs(delta).toFixed(1)}%
+            <span className="bg-num">
+              {isUp ? '+' : '−'}{Math.abs(delta).toFixed(1)}%
+            </span>
           </span>
         )}
       </div>

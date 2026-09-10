@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { NextIcon as ChevronRight, BackIcon as ChevronLeft, AddIcon as Plus, TickMarkIcon as Check, PlaceIcon as MapPin, PackageIcon as Package } from '@/components/brand/icon'
+import { ChevronRightIcon as ChevronRight, ChevronLeftIcon as ChevronLeft, PlusIcon as Plus, CheckIcon as Check, MapIcon as MapPin, BriefcaseIcon as Package } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 // ── Types ─────────────────────────────────────────────────────────────────────

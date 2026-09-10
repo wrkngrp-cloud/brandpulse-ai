@@ -1,7 +1,7 @@
 import { createClient }  from '@/lib/supabase/server'
 import { notFound }       from 'next/navigation'
 import Link               from 'next/link'
-import { ReturnIcon as ArrowLeft } from '@/components/brand/icon'
+import { ArrowLeftIcon as ArrowLeft } from '@/components/brand/icon'
 import { StatusToggle }   from './status-toggle'
 import { CopyLinkButton } from './copy-link-button'
 import { SurveyAiAnalysis } from './ai-analysis'

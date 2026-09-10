@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { FallingIcon as TrendingDown, SparkIcon as Zap, RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { TrendDownIcon as TrendingDown, AskIcon as Zap, RefreshIcon as RefreshCw } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

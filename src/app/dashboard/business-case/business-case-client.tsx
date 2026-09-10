@@ -4,7 +4,7 @@ import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
-import { FallingIcon as TrendingDown, TargetIcon as Target, MoneyIcon as DollarSign, AwardIcon as Award, ConfirmedIcon as CheckCircle2, NextIcon as ChevronRight, BarsIcon as BarChart3, ForwardIcon as ArrowUpRight, RemoveIcon as Minus } from '@/components/brand/icon'
+import { TrendDownIcon as TrendingDown, CircleDotIcon as Target, CurrencyIcon as DollarSign, StarIcon as Award, CheckIcon as CheckCircle2, ChevronRightIcon as ChevronRight, TrendIcon as BarChart3, ArrowRightIcon as ArrowUpRight, MinusIcon as Minus } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
@@ -303,8 +303,8 @@ export function BusinessCaseClient({
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
+                  <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
                   <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                   <Area type="monotone" dataKey="bhi" stroke="var(--flare)" strokeWidth={2.5} fill="url(#bhiGradBC)" dot={false} />
                 </AreaChart>
@@ -338,7 +338,7 @@ export function BusinessCaseClient({
                               <ResponsiveContainer width="100%" height={channelRows.length * 44 + 20}>
                   <BarChart data={channelRows} layout="vertical" margin={{ left: 8 }}>
                     <XAxis type="number" hide />
-                    <YAxis type="category" dataKey="channel" tick={{ fontSize: 12 }} width={80} tickLine={false} axisLine={false} />
+                    <YAxis type="category" dataKey="channel" tick={{ fontFamily: 'var(--font-num)',  fontSize: 12 }} width={80} tickLine={false} axisLine={false} />
                     <Tooltip formatter={(v) => [fmtNGN(Number(v)), 'Spend']} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                     <Bar dataKey="spend" radius={[0, 6, 6, 0]} barSize={22}>
                       {channelRows.map((r) => (

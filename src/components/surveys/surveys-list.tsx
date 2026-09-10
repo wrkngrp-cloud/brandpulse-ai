@@ -6,7 +6,7 @@ import { toast }     from 'sonner'
 import Link          from 'next/link'
 import { ItemActions, type ItemAction } from '@/components/ui/item-actions'
 import { updateSurveyStatus, deleteSurvey } from '@/app/dashboard/surveys/actions'
-import { LinkIcon as Link2, PlayIcon as Play, PauseIcon as PauseCircle, RefreshIcon as RotateCcw, DeleteIcon as Trash2, OpenIcon as ExternalLink } from '@/components/brand/icon'
+import { LinkIcon as Link2, PlayIcon as Play, PauseIcon as PauseCircle, RefreshIcon as RotateCcw, TrashIcon as Trash2, ExternalLinkIcon as ExternalLink } from '@/components/brand/icon'
 import { getTemplateLabel } from '@/lib/survey-templates'
 
 interface Survey {

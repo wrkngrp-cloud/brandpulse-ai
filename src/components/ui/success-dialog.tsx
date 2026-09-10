@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ConfirmedIcon as CheckCircle2 } from '@/components/brand/icon'
+import { CheckIcon as CheckCircle2 } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

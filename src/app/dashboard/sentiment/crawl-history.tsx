@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
 } from '@/components/ui/sheet'
-import { RefreshIcon as History, RefreshIcon as RefreshCw, ConfirmedIcon as CheckCircle2, ClockIcon as Clock } from '@/components/brand/icon'
+import { RefreshIcon as History, RefreshIcon as RefreshCw, CheckIcon as CheckCircle2, ClockIcon as Clock } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 interface CrawlRun {

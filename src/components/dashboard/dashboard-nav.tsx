@@ -4,13 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion, LayoutGroup } from 'framer-motion'
-import { LayoutIcon as LayoutDashboard, CalendarIcon as CalendarDays, BroadcastIcon as Megaphone, SparkIcon as Zap, AwardIcon as Trophy, DownIcon as ChevronDown, ScreenIcon as Monitor, BroadcastIcon as Radio, ScreenIcon as Tv, PrintIcon as Newspaper, PeopleIcon as Users, GlobeIcon as Globe, TargetIcon as Target, DocIcon as FileSearch, DocIcon as BookOpen, ConfirmedIcon as ClipboardCheck, BarsIcon as BarChart3, HeartIcon as Heart, DatabaseIcon as Database, MoneyIcon as DollarSign, LabIcon as FlaskConical, GiftIcon as Gift, DocIcon as FileText, CameraIcon as Video, ViewIcon as Eye } from '@/components/brand/icon'
-import {
-  AskIcon as Sparkles, ConnectIcon as Plug, AlertIcon as AlertTriangle,
-  TrendIcon as TrendingUp, ExportIcon as FileDown, MentionsIcon as MessageCircle,
-  GaugeIcon, MentionsIcon, FunnelIcon, OohIcon, SurveyIcon, ShareIcon,
-  FieldIcon, CreativeIcon, MarketIcon,
-} from '@/components/brand/icon'
+import { LayoutGridIcon as LayoutDashboard, CalendarIcon as CalendarDays, MusicIcon as Megaphone, AskIcon as Zap, StarIcon as Trophy, ChevronDownIcon as ChevronDown, PanelIcon as Monitor, MusicIcon as Radio, PanelIcon as Tv, PrinterIcon as Newspaper, UsersIcon as Users, GlobeIcon as Globe, CircleDotIcon as Target, FileIcon as FileSearch, FileIcon as BookOpen, CheckIcon as ClipboardCheck, TrendIcon as BarChart3, HeartIcon as Heart, DatabaseIcon as Database, CurrencyIcon as DollarSign, FlaskIcon as FlaskConical, GiftIcon as Gift, FileIcon as FileText, CameraIcon as Video, EyeIcon as Eye } from '@/components/brand/icon'
+import { AskIcon as Sparkles, ConnectIcon as Plug, AlertIcon as AlertTriangle, TrendIcon as TrendingUp, ExportIcon as FileDown, MentionsIcon as MessageCircle, GaugeIcon, MentionsIcon, FunnelIcon, OohIcon, SurveyIcon, ShareIcon, FieldIcon, CreativeIcon, MarketIcon } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { isPathHidden, type IndustryId } from '@/lib/industry-config'
 

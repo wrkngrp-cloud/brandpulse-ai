@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter }     from 'next/navigation'
-import { ForwardIcon as ArrowRight, LayoutIcon as LayoutDashboard, AddIcon as Plus, SettingsIcon as Settings2, CloseIcon as X, NextIcon as ChevronRight } from '@/components/brand/icon'
+import { ArrowRightIcon as ArrowRight, LayoutGridIcon as LayoutDashboard, PlusIcon as Plus, SettingsIcon as Settings2, XIcon as X, ChevronRightIcon as ChevronRight } from '@/components/brand/icon'
 import { SearchIcon as Search } from '@/components/brand/icon'
 import { Button }        from '@/components/ui/button'
 import { cn }            from '@/lib/utils'
@@ -311,7 +311,7 @@ export function DashboardHero({
           <div className="flex items-center gap-2">
             <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Your dashboard</span>
-            <span className="text-xs text-muted-foreground bg-num">{widgetIds.length} widgets</span>
+            <span className="text-xs text-muted-foreground"><span className="bg-num">{widgetIds.length}</span> widgets</span>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" className="h-7 text-xs gap-1.5" onClick={() => setShowMetrics(true)}>

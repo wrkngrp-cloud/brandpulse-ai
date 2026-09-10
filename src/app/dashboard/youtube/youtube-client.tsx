@@ -12,7 +12,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
-import { PlayIcon as PlayCircle, OpenIcon as ExternalLink, ViewIcon as Eye, TickMarkIcon as ThumbsUp, RefreshIcon as RefreshCw, AddIcon as Plus, SettingsIcon as Settings, ConfirmedIcon as CheckCircle2 } from '@/components/brand/icon'
+import { PlayIcon as PlayCircle, ExternalLinkIcon as ExternalLink, EyeIcon as Eye, CheckIcon as ThumbsUp, RefreshIcon as RefreshCw, PlusIcon as Plus, SettingsIcon as Settings, CheckIcon as CheckCircle2 } from '@/components/brand/icon'
 import { MentionsIcon as MessageSquare, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 

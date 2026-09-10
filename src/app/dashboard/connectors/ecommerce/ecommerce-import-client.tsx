@@ -5,7 +5,7 @@ import { toast }    from 'sonner'
 import { Button }   from '@/components/ui/button'
 import { cn }       from '@/lib/utils'
 import { TruckIcon as Truck } from '@/components/brand/icon'
-import { UploadIcon as Upload, DocIcon as FileText, ConfirmedIcon as CheckCircle, PackageIcon as ShoppingCart, PackageIcon as Package } from '@/components/brand/icon'
+import { ExportIcon as Upload, FileIcon as FileText, CheckIcon as CheckCircle, BriefcaseIcon as ShoppingCart, BriefcaseIcon as Package } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 type Source = 'jumia' | 'konga' | 'manual'

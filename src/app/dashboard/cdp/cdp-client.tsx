@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { DatabaseIcon as Database, RefreshIcon as RefreshCw, PeopleIcon as Users, StarIcon as Star, RemoveIcon as Minus, BlockedIcon as ThumbsDown, ShieldIcon as ShieldCheck, PulseIcon as Activity, MailIcon as Mail, PhoneIcon as Phone, CalendarIcon as Calendar } from '@/components/brand/icon'
+import { DatabaseIcon as Database, RefreshIcon as RefreshCw, UsersIcon as Users, StarIcon as Star, MinusIcon as Minus, XCircleIcon as ThumbsDown, ShieldIcon as ShieldCheck, TrendIcon as Activity, MailIcon as Mail, PhoneIcon as Phone, CalendarIcon as Calendar } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { SearchIcon as Search } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

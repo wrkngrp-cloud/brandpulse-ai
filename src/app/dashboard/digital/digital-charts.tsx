@@ -77,9 +77,9 @@ export function DigitalSpendChart({ data, demo }: SpendChartProps) {
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
-          <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-          <YAxis yAxisId="spend" tickFormatter={fmtNGN} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={56} />
-          <YAxis yAxisId="impr" orientation="right" tickFormatter={fmtImpr} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={52} />
+          <XAxis dataKey="label" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+          <YAxis yAxisId="spend" tickFormatter={fmtNGN} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={56} />
+          <YAxis yAxisId="impr" orientation="right" tickFormatter={fmtImpr} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={52} />
           <Tooltip
             contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
             formatter={(val, name) =>
@@ -224,8 +224,8 @@ export function FrequencyBarChart({ data, demo }: FreqProps) {
               <ResponsiveContainer width="100%" height={160}>
           <BarChart data={chartData} margin={{ top: 8, right: 48, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} vertical={false} />
-            <XAxis dataKey="platform" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-            <YAxis domain={[0, domainMax]} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={24} />
+            <XAxis dataKey="platform" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+            <YAxis domain={[0, domainMax]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={24} />
             <Tooltip
               contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
               formatter={(val) => [typeof val === 'number' ? val.toFixed(2) : String(val), 'Avg Frequency']}

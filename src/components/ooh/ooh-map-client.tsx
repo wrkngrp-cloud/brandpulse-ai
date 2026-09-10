@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Map, { Marker, Popup, NavigationControl, type MapRef } from 'react-map-gl/mapbox'
-import { PlaceIcon as MapPin } from '@/components/brand/icon'
+import { MapIcon as MapPin } from '@/components/brand/icon'
 import { TOKENS } from '@/lib/brand-tokens'
 
 interface Site {

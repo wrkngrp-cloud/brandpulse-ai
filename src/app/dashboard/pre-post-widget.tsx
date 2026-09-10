@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { SparkIcon as Zap, CloseIcon as X, DownIcon as ChevronDown, SendIcon as Send, CopyIcon as Copy, TickMarkIcon as Check, UploadIcon as ImagePlus, CameraIcon as Video, BlockedIcon as XCircle } from '@/components/brand/icon'
+import { AskIcon as Zap, XIcon as X, ChevronDownIcon as ChevronDown, SendIcon as Send, CopyIcon as Copy, CheckIcon as Check, ExportIcon as ImagePlus, CameraIcon as Video, XCircleIcon as XCircle } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

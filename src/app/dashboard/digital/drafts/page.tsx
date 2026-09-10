@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { ReturnIcon as ArrowLeft, AddIcon as Plus, DeleteIcon as Trash2, DocIcon as FileText, ClockIcon as Clock, OpenIcon as ExternalLink } from '@/components/brand/icon'
+import { ArrowLeftIcon as ArrowLeft, PlusIcon as Plus, TrashIcon as Trash2, FileIcon as FileText, ClockIcon as Clock, ExternalLinkIcon as ExternalLink } from '@/components/brand/icon'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

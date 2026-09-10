@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { SparkIcon as Zap, PulseIcon as Activity, GlobeIcon as Globe, CalendarIcon as CalendarDays, BarsIcon as BarChart2, ShopIcon as ShoppingBag, ReturnIcon as ArrowLeft, AddIcon as Plus } from '@/components/brand/icon'
+import { AskIcon as Zap, TrendIcon as Activity, GlobeIcon as Globe, CalendarIcon as CalendarDays, TrendIcon as BarChart2, MarketIcon as ShoppingBag, ArrowLeftIcon as ArrowLeft, PlusIcon as Plus } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Input }  from '@/components/ui/input'

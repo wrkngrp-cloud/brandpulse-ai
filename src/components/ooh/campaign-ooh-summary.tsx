@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { PlaceIcon as MapPin, MoneyIcon as DollarSign, LinkIcon as Link2, BarsIcon as BarChart2 } from '@/components/brand/icon'
+import { MapIcon as MapPin, CurrencyIcon as DollarSign, LinkIcon as Link2, TrendIcon as BarChart2 } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import Link from 'next/link'
 

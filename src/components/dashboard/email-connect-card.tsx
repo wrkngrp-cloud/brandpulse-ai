@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ConfirmedIcon as CheckCircle2, MailIcon as Mail, RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { CheckIcon as CheckCircle2, MailIcon as Mail, RefreshIcon as RefreshCw } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AddIcon as Plus, CalendarIcon as Calendar, MailIcon as Mail, PhoneIcon as Phone, PlayIcon as Play, DeleteIcon as Trash2, ToggleIcon as ToggleLeft, ToggleIcon as ToggleRight } from '@/components/brand/icon'
+import { PlusIcon as Plus, CalendarIcon as Calendar, MailIcon as Mail, PhoneIcon as Phone, PlayIcon as Play, TrashIcon as Trash2, ToggleIcon as ToggleLeft, ToggleIcon as ToggleRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'

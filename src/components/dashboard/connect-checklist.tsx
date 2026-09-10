@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
-import { TickMarkIcon as Check, ForwardIcon as ArrowRight, CloseIcon as X } from '@/components/brand/icon'
+import { CheckIcon as Check, ArrowRightIcon as ArrowRight, XIcon as X } from '@/components/brand/icon'
 import { ConnectIcon as Plug } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { markTourStatus } from '@/app/dashboard/tours/actions'

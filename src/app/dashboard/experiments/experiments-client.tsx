@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { LabIcon as FlaskConical, AddIcon as Plus, PlayIcon as Play, PauseIcon as Pause, ConfirmedIcon as CheckSquare, RefreshIcon as RefreshCw, CloseIcon as X, PeopleIcon as Users, BarsIcon as BarChart3, AwardIcon as Trophy } from '@/components/brand/icon'
+import { FlaskIcon as FlaskConical, PlusIcon as Plus, PlayIcon as Play, PauseIcon as Pause, CheckIcon as CheckSquare, RefreshIcon as RefreshCw, XIcon as X, UsersIcon as Users, TrendIcon as BarChart3, StarIcon as Trophy } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

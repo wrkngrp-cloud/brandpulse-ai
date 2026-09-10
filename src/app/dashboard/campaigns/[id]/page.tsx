@@ -1,7 +1,7 @@
 import { createClient }    from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link                  from 'next/link'
-import { ReturnIcon as ArrowLeft } from '@/components/brand/icon'
+import { ArrowLeftIcon as ArrowLeft } from '@/components/brand/icon'
 import { CampaignDetailClient } from '@/components/campaigns/campaign-detail-client'
 
 export default async function CampaignDetailPage({

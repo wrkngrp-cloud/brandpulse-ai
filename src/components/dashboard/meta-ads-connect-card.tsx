@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams }              from 'next/navigation'
-import { ConfirmedIcon as CheckCircle2, OfflineIcon as Unplug, SparkIcon as Zap } from '@/components/brand/icon'
+import { CheckIcon as CheckCircle2, WifiOffIcon as Unplug, AskIcon as Zap } from '@/components/brand/icon'
 import { toast }                        from 'sonner'
 import { buttonVariants }               from '@/components/ui/button'
 import { cn }                           from '@/lib/utils'

@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { AddIcon as Plus, EditIcon as Pencil, DeleteIcon as Trash2, TickMarkIcon as Check, ForwardIcon as ArrowRight, VenueIcon as Building2 } from '@/components/brand/icon'
+import { PlusIcon as Plus, EditIcon as Pencil, TrashIcon as Trash2, CheckIcon as Check, ArrowRightIcon as ArrowRight, VenueIcon as Building2 } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'

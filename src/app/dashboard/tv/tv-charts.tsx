@@ -30,8 +30,8 @@ export function TVGRPChart() {
           <ResponsiveContainer width="100%" height={260}>
         <LineChart data={weeklyGRP} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
-          <XAxis dataKey="week" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={36} />
+          <XAxis dataKey="week" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={36} />
           <Tooltip
             contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
           />
@@ -51,8 +51,8 @@ export function TVDaypartChart() {
           <ResponsiveContainer width="100%" height={220}>
         <BarChart data={daypartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} vertical={false} />
-          <XAxis dataKey="part" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={36} />
+          <XAxis dataKey="part" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={36} />
           <Tooltip
             contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
           />

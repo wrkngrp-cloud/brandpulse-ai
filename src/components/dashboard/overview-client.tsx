@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { FallingIcon as TrendingDown, RemoveIcon as Minus, BroadcastIcon as Megaphone, CalendarIcon as CalendarDays, PlaceIcon as MapPin, SurveyIcon as ClipboardList, AddIcon as Plus, ForwardIcon as ArrowRight, SparkIcon as Zap, ForwardIcon as ArrowUpRight, PulseIcon as Activity, BarsIcon as BarChart2, BroadcastIcon as Radio } from '@/components/brand/icon'
+import { TrendDownIcon as TrendingDown, MinusIcon as Minus, MusicIcon as Megaphone, CalendarIcon as CalendarDays, MapIcon as MapPin, SurveyIcon as ClipboardList, PlusIcon as Plus, ArrowRightIcon as ArrowRight, AskIcon as Zap, ArrowRightIcon as ArrowUpRight, TrendIcon as Activity, TrendIcon as BarChart2, MusicIcon as Radio } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp, MentionsIcon as MessageSquare } from '@/components/brand/icon'
 import { BHIGauge }         from '@/components/dashboard/bhi-gauge'
 import { StatCard }         from '@/components/dashboard/stat-card'
@@ -410,7 +410,7 @@ export function OverviewClient({
                     ? <TrendingDown className="h-3.5 w-3.5 text-tx-flare" />
                     : <Minus className="h-3.5 w-3.5 text-muted-foreground/40" />
                   }
-                  <span className="text-[11px] font-medium text-muted-foreground/45">/ 100</span>
+                  <span className="text-[11px] font-medium text-muted-foreground/45 bg-num">/ 100</span>
                 </div>
               </div>
 

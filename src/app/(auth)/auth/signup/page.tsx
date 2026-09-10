@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button'
-import { BarsIcon as BarChart2 } from '@/components/brand/icon'
+import { TrendIcon as BarChart2 } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 
 export default function SignupPage() {

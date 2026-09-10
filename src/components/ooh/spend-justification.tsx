@@ -109,10 +109,10 @@ export function SpendJustification({
                 margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
                 layout="vertical"
               >
-                <XAxis type="number" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                <XAxis type="number" tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
                 <YAxis
                   dataKey="channel" type="category"
-                  tick={{ fontSize: 10 }} tickLine={false} axisLine={false}
+                  tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false}
                   width={80}
                 />
                 <Tooltip

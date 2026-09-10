@@ -22,8 +22,8 @@ export function CampaignConversionsChart() {
           <ResponsiveContainer width="100%" height={200}>
         <LineChart data={WEEKLY_DATA} margin={{ top: 4, right: 12, left: -16, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-          <XAxis dataKey="week" tick={{ fontSize: 11 }} className="text-muted-foreground" />
-          <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" />
+          <XAxis dataKey="week" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} className="text-muted-foreground" />
+          <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} className="text-muted-foreground" />
           <Tooltip
             contentStyle={{
               fontSize: 12,

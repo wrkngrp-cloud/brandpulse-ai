@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { FallingIcon as TrendingDown, RefreshIcon as RefreshCw, ConfirmedIcon as CheckCircle, BlockedIcon as XCircle, InfoIcon as Info, PeopleIcon as Users, BlockedIcon as ThumbsDown, PulseIcon as Activity } from '@/components/brand/icon'
+import { TrendDownIcon as TrendingDown, RefreshIcon as RefreshCw, CheckIcon as CheckCircle, XCircleIcon as XCircle, InfoIcon as Info, UsersIcon as Users, XCircleIcon as ThumbsDown, TrendIcon as Activity } from '@/components/brand/icon'
 import { AlertIcon as AlertTriangle, MentionsIcon as MessageSquare, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

@@ -12,7 +12,7 @@ import { AppStoreConnectCard, type AppStoreConfigData }     from '@/components/d
 import { EmailConnectCard, type EmailConnectorStatus }      from '@/components/dashboard/email-connect-card'
 // WhatsAppConnectCard hidden until dedicated number is configured
 import { PixelCard } from './pixel-card'
-import { Icon, type BrandIconName, PackageIcon as ShoppingCart, ForwardIcon as ArrowRight, PeopleIcon as Users, BroadcastIcon as Music2 } from '@/components/brand/icon'
+import { Icon, type BrandIconName, BriefcaseIcon as ShoppingCart, ArrowRightIcon as ArrowRight, UsersIcon as Users, MusicIcon as Music2 } from '@/components/brand/icon'
 import { SearchIcon as Search } from '@/components/brand/icon'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'

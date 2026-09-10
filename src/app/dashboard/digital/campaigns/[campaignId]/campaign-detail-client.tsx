@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { ReturnIcon as ArrowLeft, TargetIcon as Target, AddIcon as Plus, DeleteIcon as Trash2, DownIcon as ChevronDown } from '@/components/brand/icon'
+import { ArrowLeftIcon as ArrowLeft, CircleDotIcon as Target, PlusIcon as Plus, TrashIcon as Trash2, ChevronDownIcon as ChevronDown } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'

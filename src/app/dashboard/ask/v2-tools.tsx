@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { DocIcon as FileText, FilterIcon as Filter, ConfirmedIcon as CheckCircle2, SendIcon as Send, PrintIcon as Printer, CopyIcon as Copy, ForwardIcon as ArrowRight } from '@/components/brand/icon'
+import { FileIcon as FileText, FilterIcon as Filter, CheckIcon as CheckCircle2, SendIcon as Send, PrinterIcon as Printer, CopyIcon as Copy, ArrowRightIcon as ArrowRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

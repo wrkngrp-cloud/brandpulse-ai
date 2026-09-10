@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { PeopleIcon as Users, StarIcon as Star, AddIcon as Plus, CloseIcon as X, GlobeIcon as Globe, DownIcon as ChevronDown, ViewIcon as Eye, BroadcastIcon as Megaphone, FilterIcon as Filter } from '@/components/brand/icon'
+import { UsersIcon as Users, StarIcon as Star, PlusIcon as Plus, XIcon as X, GlobeIcon as Globe, ChevronDownIcon as ChevronDown, EyeIcon as Eye, MusicIcon as Megaphone, FilterIcon as Filter } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn, formatNGN } from '@/lib/utils'

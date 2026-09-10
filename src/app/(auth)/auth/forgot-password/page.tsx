@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { ConfirmedIcon as CheckCircle2 } from '@/components/brand/icon'
+import { CheckIcon as CheckCircle2 } from '@/components/brand/icon'
 
 export default function ForgotPasswordPage() {
   const [state, action, pending] = useActionState(forgotPassword, null)

@@ -5,7 +5,7 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, AreaChart, Area, BarChart, Bar, Legend,
 } from 'recharts'
-import { FallingIcon as TrendingDown, PulseIcon as Activity, BroadcastIcon as Radio, MoneyIcon as DollarSign, TargetIcon as Target, AwardIcon as Award, ConfirmedIcon as CheckCircle2, NextIcon as ChevronRight, RefreshIcon as RefreshCw, CalendarIcon as Calendar, BarsIcon as BarChart3, ViewIcon as Eye, PrintIcon as Newspaper } from '@/components/brand/icon'
+import { TrendDownIcon as TrendingDown, TrendIcon as Activity, MusicIcon as Radio, CurrencyIcon as DollarSign, CircleDotIcon as Target, StarIcon as Award, CheckIcon as CheckCircle2, ChevronRightIcon as ChevronRight, RefreshIcon as RefreshCw, CalendarIcon as Calendar, TrendIcon as BarChart3, EyeIcon as Eye, PrinterIcon as Newspaper } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp, MentionsIcon as MessageSquare, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn, formatNGN } from '@/lib/utils'
 import { Crescendo } from '@/components/brand/crescendo'
@@ -358,8 +358,8 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                    <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
+                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
                     <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                     <Area type="monotone" dataKey="bhi" stroke="var(--flare)" strokeWidth={2.5} fill="url(#bhiGrad)" dot={false} />
                   </AreaChart>
@@ -378,8 +378,8 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                               <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={sentimentChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                    <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
+                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
                     <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, '']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                     <Legend wrapperStyle={{ fontSize: 11 }} />
                     <Line type="monotone" dataKey="score" name="Overall" stroke="var(--tx)" strokeWidth={2.5} dot={false} />
@@ -407,8 +407,8 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                    <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10 }} width={32} tickLine={false} axisLine={false} />
+                    <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={32} tickLine={false} axisLine={false} />
                     <Tooltip formatter={(v) => [typeof v === 'number' ? `${v.toFixed(1)}%` : v, 'SOV']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                     <Area type="monotone" dataKey="sov" stroke="var(--chart-1)" strokeWidth={2.5} fill="url(#sovGrad)" dot={false} />
                   </AreaChart>
@@ -498,8 +498,8 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                                   <ResponsiveContainer width="100%" height={160}>
                     <BarChart data={npsWeeks} barSize={24}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                      <XAxis dataKey="week" tickFormatter={fmtDate} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                      <YAxis domain={[0, 10]} tick={{ fontSize: 10 }} width={24} tickLine={false} axisLine={false} />
+                      <XAxis dataKey="week" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
+                      <YAxis domain={[0, 10]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={24} tickLine={false} axisLine={false} />
                       <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'NPS']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
                       <Bar dataKey="score" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
                     </BarChart>

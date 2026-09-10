@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { UploadIcon as Upload, DocIcon as FileSpreadsheet, ConfirmedIcon as CheckCircle2, BlockedIcon as XCircle } from '@/components/brand/icon'
+import { ExportIcon as Upload, FileIcon as FileSpreadsheet, CheckIcon as CheckCircle2, XCircleIcon as XCircle } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'

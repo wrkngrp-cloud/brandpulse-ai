@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button'
 import { cn } from '@/lib/utils'
-import { ForwardIcon as ArrowRight, BarsIcon as BarChart2, GlobeIcon as Globe2, PeopleIcon as Users2, SparkIcon as Zap } from '@/components/brand/icon'
+import { ArrowRightIcon as ArrowRight, TrendIcon as BarChart2, GlobeIcon as Globe2, UsersIcon as Users2, AskIcon as Zap } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 
 // ── Demo accounts ──────────────────────────────────────────────────────────────

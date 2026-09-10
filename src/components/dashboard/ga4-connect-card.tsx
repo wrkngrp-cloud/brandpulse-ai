@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams }              from 'next/navigation'
-import { ConfirmedIcon as CheckCircle2, RefreshIcon as RefreshCw, OfflineIcon as Unplug, BarsIcon as BarChart3 } from '@/components/brand/icon'
+import { CheckIcon as CheckCircle2, RefreshIcon as RefreshCw, WifiOffIcon as Unplug, TrendIcon as BarChart3 } from '@/components/brand/icon'
 import { toast }                        from 'sonner'
 import { buttonVariants }               from '@/components/ui/button'
 import { cn }                           from '@/lib/utils'

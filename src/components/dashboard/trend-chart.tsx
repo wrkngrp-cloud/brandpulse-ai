@@ -66,7 +66,7 @@ function DateTick({ x, y, payload }: { x?: number; y?: number; payload?: { value
   if (!payload?.value) return null
   const label = new Date(payload.value).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
   return (
-    <text x={x} y={(y ?? 0) + 12} textAnchor="middle" fontSize={10} fill="currentColor" className="text-muted-foreground opacity-40" fontFamily="var(--font)">
+    <text x={x} y={(y ?? 0) + 12} textAnchor="middle" fontSize={10} fill="currentColor" className="text-muted-foreground opacity-40" fontFamily="var(--font-num)">
       {label}
     </text>
   )
@@ -153,11 +153,11 @@ export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day
   
             <YAxis
               domain={[0, 100]}
-              tick={{ fontSize: 10, fill: 'currentColor', className: 'opacity-35' }}
+              tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'currentColor', className: 'opacity-35' }}
               tickLine={false}
               axisLine={false}
               tickCount={5}
-              fontFamily="var(--font)"
+              fontFamily="var(--font-num)"
             />
   
             {/* 50% reference line — neutral threshold */}

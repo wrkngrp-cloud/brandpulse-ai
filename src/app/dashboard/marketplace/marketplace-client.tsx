@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { ShopIcon as ShoppingBag, AddIcon as Plus, StarIcon as Star, PackageIcon as Package, FallingIcon as TrendingDown, RemoveIcon as Minus, CloseIcon as X, RefreshIcon as RefreshCw, OpenIcon as ExternalLink, DownIcon as ChevronDown, NextIcon as ChevronRight } from '@/components/brand/icon'
+import { MarketIcon as ShoppingBag, PlusIcon as Plus, StarIcon as Star, BriefcaseIcon as Package, TrendDownIcon as TrendingDown, MinusIcon as Minus, XIcon as X, RefreshIcon as RefreshCw, ExternalLinkIcon as ExternalLink, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

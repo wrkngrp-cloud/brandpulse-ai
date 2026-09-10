@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast }    from 'sonner'
-import { CopyIcon as Copy, AddIcon as Plus, ToggleIcon as ToggleLeft, ToggleIcon as ToggleRight } from '@/components/brand/icon'
+import { CopyIcon as Copy, PlusIcon as Plus, ToggleIcon as ToggleLeft, ToggleIcon as ToggleRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 
 interface FsoTeam {

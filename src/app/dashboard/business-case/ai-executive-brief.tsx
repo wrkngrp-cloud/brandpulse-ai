@@ -1,4 +1,4 @@
-import { ConfirmedIcon as CheckCircle2, PackageIcon as Briefcase } from '@/components/brand/icon'
+import { CheckIcon as CheckCircle2, BriefcaseIcon as Briefcase } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { callAi } from '@/lib/ai/client'
 

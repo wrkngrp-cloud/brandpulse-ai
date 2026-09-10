@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { TickMarkIcon as Check, ForwardIcon as ArrowRight } from '@/components/brand/icon'
+import { CheckIcon as Check, ArrowRightIcon as ArrowRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'

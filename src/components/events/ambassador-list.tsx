@@ -7,7 +7,7 @@ import { Button }   from '@/components/ui/button'
 import { Input }    from '@/components/ui/input'
 import { Label }    from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { CopyIcon as Copy, QrIcon as QrCode, AddIcon as Plus, TickMarkIcon as Check } from '@/components/brand/icon'
+import { CopyIcon as Copy, QrIcon as QrCode, PlusIcon as Plus, CheckIcon as Check } from '@/components/brand/icon'
 import { addAmbassador } from '@/app/dashboard/events/actions'
 
 interface Ambassador {

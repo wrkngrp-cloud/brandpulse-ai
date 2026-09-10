@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { PanelIcon as PanelLeftClose, PanelIcon as PanelLeft, SettingsIcon as Settings, ExitIcon as LogOut, SortIcon as ChevronsUpDown } from '@/components/brand/icon'
+import { PanelIcon as PanelLeftClose, PanelIcon as PanelLeft, SettingsIcon as Settings, LogoutIcon as LogOut, ChevronsUpdownIcon as ChevronsUpDown } from '@/components/brand/icon'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'

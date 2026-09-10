@@ -1,6 +1,6 @@
 'use client'
 
-import { StarIcon as Star, BranchIcon as GitFork, TargetIcon as CircleDot, HelpIcon as MessageCircleQuestion, BranchIcon as GitBranch, CodeIcon as Code2, PackageIcon as Package, FallingIcon as TrendingDown } from '@/components/brand/icon'
+import { StarIcon as Star, GitBranchIcon as GitFork, CircleDotIcon as CircleDot, HelpIcon as MessageCircleQuestion, GitBranchIcon as GitBranch, CodeIcon as Code2, BriefcaseIcon as Package, TrendDownIcon as TrendingDown } from '@/components/brand/icon'
 import { ExportIcon as Download, TrendIcon as TrendingUp } from '@/components/brand/icon'
 
 interface Snapshot {

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { SendIcon as Send, AddIcon as Plus, DocIcon as FileText, FilterIcon as Filter, ForwardIcon as ArrowRight } from '@/components/brand/icon'
+import { SendIcon as Send, PlusIcon as Plus, FileIcon as FileText, FilterIcon as Filter, ArrowRightIcon as ArrowRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles, MentionsIcon as MessageSquare, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

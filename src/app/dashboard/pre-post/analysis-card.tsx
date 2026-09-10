@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CameraIcon as Camera, DownIcon as ChevronDown, UpIcon as ChevronUp } from '@/components/brand/icon'
+import { CameraIcon as Camera, ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp } from '@/components/brand/icon'
 import { AlertIcon as AlertTriangle, AskIcon as Sparkles } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'
 import { Crescendo } from '@/components/brand/crescendo'

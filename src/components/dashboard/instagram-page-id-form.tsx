@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { OpenIcon as ExternalLink } from '@/components/brand/icon'
+import { ExternalLinkIcon as ExternalLink } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 

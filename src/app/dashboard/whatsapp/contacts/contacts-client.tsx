@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { ReturnIcon as ArrowLeft, UploadIcon as Upload, PeopleIcon as Users, PeopleIcon as UserCheck, PersonIcon as UserX, ConfirmedIcon as CheckCircle2 } from '@/components/brand/icon'
+import { ArrowLeftIcon as ArrowLeft, ExportIcon as Upload, UsersIcon as Users, UsersIcon as UserCheck, UsersIcon as UserX, CheckIcon as CheckCircle2 } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'

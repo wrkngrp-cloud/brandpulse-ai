@@ -8,7 +8,7 @@ import {
   DropdownMenuLabel, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { SettingsIcon as Settings, ExitIcon as LogOut, DownIcon as ChevronDown } from '@/components/brand/icon'
+import { SettingsIcon as Settings, LogoutIcon as LogOut, ChevronDownIcon as ChevronDown } from '@/components/brand/icon'
 
 interface Props {
   name: string

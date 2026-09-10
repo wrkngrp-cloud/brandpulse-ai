@@ -7,7 +7,7 @@ import Link           from 'next/link'
 import { Badge }      from '@/components/ui/badge'
 import { ItemActions, type ItemAction } from '@/components/ui/item-actions'
 import { goLive, closeEvent, deleteEvent } from '@/app/dashboard/events/actions'
-import { CalendarIcon as CalendarDays, PlaceIcon as MapPin, BroadcastIcon as Radio, GridIcon as Square, EditIcon as ClipboardEdit, DeleteIcon as Trash2, OpenIcon as ExternalLink } from '@/components/brand/icon'
+import { CalendarIcon as CalendarDays, MapIcon as MapPin, MusicIcon as Radio, LayoutGridIcon as Square, EditIcon as ClipboardEdit, TrashIcon as Trash2, ExternalLinkIcon as ExternalLink } from '@/components/brand/icon'
 import { formatNGN, cn } from '@/lib/utils'
 
 interface Event {

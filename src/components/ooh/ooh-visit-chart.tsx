@@ -4,7 +4,7 @@ import {
   AreaChart, Area, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { PulseIcon as Activity } from '@/components/brand/icon'
+import { TrendIcon as Activity } from '@/components/brand/icon'
 import { ChartState } from '@/components/brand/chart-states'
 
 interface Visit {
@@ -86,12 +86,12 @@ export function OohVisitChart({ visits }: OohVisitChartProps) {
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
                     tickLine={false} axisLine={false}
                     interval="preserveStartEnd"
                   />
                   <YAxis
-                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
                     tickLine={false} axisLine={false}
                     allowDecimals={false}
                   />

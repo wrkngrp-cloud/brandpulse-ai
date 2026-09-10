@@ -22,7 +22,7 @@ function CustomTooltip({ active, payload, label }: {
       <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-1.5">
         {label ? new Date(label).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'Africa/Lagos' }) : ''}
       </p>
-      <p className="text-[15px] font-bold bg-num" style={{ color: 'var(--flare)' }}>
+      <p className="text-[15px] font-bold bg-num" style={{ color: 'var(--tx-inv)' }}>
         {payload[0].value.toFixed(1)}%
       </p>
       <p className="text-[10px] text-tx-inv/40 mt-0.5">Share of Voice</p>
@@ -42,8 +42,8 @@ export function SovHistoryChart({ data, days }: { data: SovPoint[]; days?: numbe
     <div className="border rounded-xl p-5 bg-card space-y-3">
       <div>
         <p className="text-sm font-semibold">SOV Over Time</p>
-        <p className="text-xs text-muted-foreground bg-num">
-          {rangeLabel} · {data.length} snapshots
+        <p className="text-xs text-muted-foreground">
+          {rangeLabel}, <span className="bg-num">{data.length}</span> snapshots
         </p>
       </div>
       <ChartState rows={data} height={180} empty="Add a competitor to see share of voice over time.">
@@ -59,21 +59,21 @@ export function SovHistoryChart({ data, days }: { data: SovPoint[]; days?: numbe
             <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
             <XAxis
               dataKey="date"
-              tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
+              tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
               tickLine={false}
               axisLine={false}
               interval="preserveStartEnd"
               tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
-              fontFamily="var(--font)"
+              fontFamily="var(--font-num)"
             />
             <YAxis
               domain={[min, max]}
-              tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }}
+              tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'currentColor', opacity: 0.35 }}
               tickLine={false}
               axisLine={false}
               tickCount={4}
               tickFormatter={(v: number) => `${v.toFixed(0)}%`}
-              fontFamily="var(--font)"
+              fontFamily="var(--font-num)"
             />
             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }} />
             <Area

@@ -290,7 +290,7 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
               <>
                 <p className="text-[13px] font-semibold text-tx-inv bg-num">
                   Score: {Math.round(tooltip.score)}
-                  <span className="text-tx-inv/40 text-[11px] font-normal ml-1">/ 100</span>
+                  <span className="text-tx-inv/40 text-[11px] font-normal ml-1 bg-num">/ 100</span>
                 </p>
                 <p className="text-[10.5px] text-tx-inv/50 mt-0.5 bg-num">{cellLabel(tooltip.score)}</p>
                 {tooltip.positive_pct != null && (

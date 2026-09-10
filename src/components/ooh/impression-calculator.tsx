@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { MoneyIcon as Calculator } from '@/components/brand/icon'
+import { CurrencyIcon as Calculator } from '@/components/brand/icon'
 
 interface ImpressionCalculatorProps {
   dailyTraffic:    number | null

@@ -15,7 +15,7 @@ import {
   InputGroup,
   InputGroupAddon,
 } from "@/components/ui/input-group"
-import { SearchIcon, TickMarkIcon as CheckIcon } from "@/components/brand/icon"
+import { SearchIcon, CheckIcon as CheckIcon } from "@/components/brand/icon"
 
 function Command({
   className,

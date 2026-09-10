@@ -9,13 +9,11 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
 import { FieldTip } from '@/components/ui/field-tip'
-import { UploadIcon as Upload, CloseIcon as X, ImageIcon, ForwardIcon as ArrowRight } from '@/components/brand/icon'
+import { ExportIcon as Upload, XIcon as X, ImageIcon, ArrowRightIcon as ArrowRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import Link from 'next/link'
-import {
-  ShelfIcon, CardIcon, VenueIcon, SaasIcon, MarketIcon, BottleIcon, TruckIcon,
-} from '@/components/brand/icon'
+import { ShelfIcon, CardIcon, VenueIcon, SaasIcon, MarketIcon, BottleIcon, TruckIcon } from '@/components/brand/icon'
 
 type CulturalKey = 'community_corporate' | 'traditional_modern' | 'religious_secular' | 'mass_premium' | 'local_global'
 

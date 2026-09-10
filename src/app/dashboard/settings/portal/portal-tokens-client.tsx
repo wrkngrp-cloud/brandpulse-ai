@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { CopyIcon as Copy, DeleteIcon as Trash2, AddIcon as Plus, OpenIcon as ExternalLink, LinkIcon as Link2 } from '@/components/brand/icon'
+import { CopyIcon as Copy, TrashIcon as Trash2, PlusIcon as Plus, ExternalLinkIcon as ExternalLink, LinkIcon as Link2 } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

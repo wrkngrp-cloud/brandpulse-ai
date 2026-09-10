@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ForwardIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
+import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
 import { VideoHero } from './video-hero'
 import { HorizontalTour } from './horizontal-tour'
 import { AiScene, CompetitiveScene, darkSceneVars, lightSceneVars } from './scenes'

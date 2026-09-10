@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { MoneyIcon as DollarSign, AddIcon as Plus, RefreshIcon as RefreshCw, CloseIcon as X, DownIcon as ChevronDown, NextIcon as ChevronRight, ConfirmedIcon as CheckCircle } from '@/components/brand/icon'
+import { CurrencyIcon as DollarSign, PlusIcon as Plus, RefreshIcon as RefreshCw, XIcon as X, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight, CheckIcon as CheckCircle } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

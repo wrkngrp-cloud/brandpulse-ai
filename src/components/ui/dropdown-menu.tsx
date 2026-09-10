@@ -4,7 +4,7 @@ import * as React from "react"
 import { Menu as MenuPrimitive } from "@base-ui/react/menu"
 
 import { cn } from "@/lib/utils"
-import { NextIcon as ChevronRightIcon, TickMarkIcon as CheckIcon } from "@/components/brand/icon"
+import { ChevronIcon as ChevronRightIcon, CheckIcon as CheckIcon } from "@/components/brand/icon"
 
 function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
   return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />

@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ReturnIcon as ArrowLeft, ForwardIcon as ArrowRight, TickMarkIcon as Check, BroadcastIcon as Megaphone, UploadIcon as Upload, CloseIcon as X, ImageIcon, AddIcon as Plus, GlobeIcon as Globe, PeopleIcon as Users, BarsIcon as BarChart2, PackageIcon as ShoppingCart, TargetIcon as MousePointer, PhoneIcon as Smartphone } from '@/components/brand/icon'
+import { ArrowLeftIcon as ArrowLeft, ArrowRightIcon as ArrowRight, CheckIcon as Check, MusicIcon as Megaphone, ExportIcon as Upload, XIcon as X, ImageIcon, PlusIcon as Plus, GlobeIcon as Globe, UsersIcon as Users, TrendIcon as BarChart2, BriefcaseIcon as ShoppingCart, CircleDotIcon as MousePointer, PhoneIcon as Smartphone } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 

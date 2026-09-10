@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ForwardIcon as ArrowRight, TickMarkIcon as Check } from '@/components/brand/icon'
+import { ArrowRightIcon as ArrowRight, CheckIcon as Check } from '@/components/brand/icon'
 import { MarketingShell } from './marketing-shell'
 
 // One reveal group per section. See landing-page.tsx.

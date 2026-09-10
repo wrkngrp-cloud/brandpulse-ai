@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { MailIcon as Mail, SendIcon as Send, ConfirmedIcon as CheckCircle2 } from '@/components/brand/icon'
+import { MailIcon as Mail, SendIcon as Send, CheckIcon as CheckCircle2 } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'

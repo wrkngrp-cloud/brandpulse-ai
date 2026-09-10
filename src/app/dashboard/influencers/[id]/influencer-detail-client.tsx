@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ReturnIcon as ArrowLeft, StarIcon as Star, GlobeIcon as Globe, ConfirmedIcon as CheckCircle, BlockedIcon as XCircle, OpenIcon as ExternalLink, PeopleIcon as Users, BarsIcon as BarChart2, PulseIcon as Activity, CalendarIcon as Calendar, RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { ArrowLeftIcon as ArrowLeft, StarIcon as Star, GlobeIcon as Globe, CheckIcon as CheckCircle, XCircleIcon as XCircle, ExternalLinkIcon as ExternalLink, UsersIcon as Users, TrendIcon as BarChart2, TrendIcon as Activity, CalendarIcon as Calendar, RefreshIcon as RefreshCw } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'

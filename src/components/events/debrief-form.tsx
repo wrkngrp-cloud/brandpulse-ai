@@ -7,7 +7,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { Input }                  from '@/components/ui/input'
 import { Label }                  from '@/components/ui/label'
 import { Textarea }               from '@/components/ui/textarea'
-import { ConfirmedIcon as CheckCircle2, DocIcon as FileText, ReturnIcon as ArrowLeft } from '@/components/brand/icon'
+import { CheckIcon as CheckCircle2, FileIcon as FileText, ArrowLeftIcon as ArrowLeft } from '@/components/brand/icon'
 import Link                       from 'next/link'
 import { cn }                     from '@/lib/utils'
 

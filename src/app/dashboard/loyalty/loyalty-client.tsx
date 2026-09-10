@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { AwardIcon as Award, AddIcon as Plus, PeopleIcon as Users, StarIcon as Star, RefreshIcon as RefreshCw, CloseIcon as X, GiftIcon as Gift, MoneyIcon as Coins } from '@/components/brand/icon'
+import { StarIcon as Award, PlusIcon as Plus, UsersIcon as Users, StarIcon as Star, RefreshIcon as RefreshCw, XIcon as X, GiftIcon as Gift, CurrencyIcon as Coins } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

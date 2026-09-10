@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { ShareIcon as Share2 } from '@/components/brand/icon'
-import { GlobeIcon as Globe, ViewIcon as Eye, HeartIcon as Heart, SparkIcon as Zap, ShieldIcon as Shield, DownIcon as ChevronDown, NextIcon as ChevronRight, InfoIcon as Info } from '@/components/brand/icon'
+import { GlobeIcon as Globe, EyeIcon as Eye, HeartIcon as Heart, AskIcon as Zap, ShieldIcon as Shield, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight, InfoIcon as Info } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'

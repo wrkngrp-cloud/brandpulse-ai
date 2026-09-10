@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition }  from 'react'
-import { CloseIcon as X, DownIcon as ChevronDown, ConfirmedIcon as CheckCircle2, AddIcon as Plus } from '@/components/brand/icon'
+import { XIcon as X, ChevronDownIcon as ChevronDown, CheckIcon as CheckCircle2, PlusIcon as Plus } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button }   from '@/components/ui/button'
 import { Input }    from '@/components/ui/input'

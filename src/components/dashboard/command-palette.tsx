@@ -6,7 +6,7 @@ import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput,
   CommandItem, CommandList, CommandSeparator,
 } from '@/components/ui/command'
-import { LayoutIcon as LayoutDashboard, DocIcon as FileText, BarsIcon as BarChart2, SurveyIcon as ClipboardList, CalendarIcon as CalendarDays, PlaceIcon as MapPin, BroadcastIcon as Megaphone, SparkIcon as Zap, AwardIcon as Trophy, FilterIcon as Filter, AwardIcon as Award, PeopleIcon as Users, CreativeIcon as Palette, GlobeIcon as Globe, AddIcon as Plus, SettingsIcon as Settings, BroadcastIcon as Radio, ForwardIcon as ArrowRight, ScreenIcon as Monitor, ScreenIcon as Tv, PrintIcon as Newspaper } from '@/components/brand/icon'
+import { LayoutGridIcon as LayoutDashboard, FileIcon as FileText, TrendIcon as BarChart2, SurveyIcon as ClipboardList, CalendarIcon as CalendarDays, MapIcon as MapPin, MusicIcon as Megaphone, AskIcon as Zap, StarIcon as Trophy, FilterIcon as Filter, StarIcon as Award, UsersIcon as Users, CreativeIcon as Palette, GlobeIcon as Globe, PlusIcon as Plus, SettingsIcon as Settings, MusicIcon as Radio, ArrowRightIcon as ArrowRight, PanelIcon as Monitor, PanelIcon as Tv, PrinterIcon as Newspaper } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp, AskIcon as Sparkles, SearchIcon as Search } from '@/components/brand/icon'
 
 // ── Nav items ──────────────────────────────────────────────────────────────

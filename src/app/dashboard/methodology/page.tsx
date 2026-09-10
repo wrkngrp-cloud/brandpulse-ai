@@ -1,4 +1,4 @@
-import { DocIcon as BookOpen, BarsIcon as BarChart2, TargetIcon as Target, PeopleIcon as Users, CreativeIcon as Palette, BroadcastIcon as Radio, ScreenIcon as Tv, PrintIcon as Newspaper, PlaceIcon as MapPin, SparkIcon as Zap, AwardIcon as Award, GlobeIcon as Globe, FilterIcon as Filter, AwardIcon as Trophy } from '@/components/brand/icon'
+import { FileIcon as BookOpen, TrendIcon as BarChart2, CircleDotIcon as Target, UsersIcon as Users, CreativeIcon as Palette, MusicIcon as Radio, PanelIcon as Tv, PrinterIcon as Newspaper, MapIcon as MapPin, AskIcon as Zap, StarIcon as Award, GlobeIcon as Globe, FilterIcon as Filter, StarIcon as Trophy } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 

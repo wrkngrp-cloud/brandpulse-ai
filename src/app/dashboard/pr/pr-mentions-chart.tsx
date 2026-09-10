@@ -31,8 +31,8 @@ export function PrMentionsChart({ data }: Props) {
           <ResponsiveContainer width="100%" height={200}>
         <BarChart data={chartData} margin={{ top: 4, right: 12, left: -16, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-          <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
-          <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" allowDecimals={false} />
+          <XAxis dataKey="month" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} className="text-muted-foreground" />
+          <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} className="text-muted-foreground" allowDecimals={false} />
           <Tooltip
             contentStyle={{
               fontSize: 12,

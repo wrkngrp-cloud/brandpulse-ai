@@ -5,7 +5,7 @@ import Link               from 'next/link'
 import { cn }             from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { ItemActions }    from '@/components/ui/item-actions'
-import { PlaceIcon as MapPin, CopyIcon as Copy, TargetIcon as Crosshair, ViewIcon as Eye, EditIcon as Pencil, DeleteIcon as Trash2, BarsIcon as BarChart2, BroadcastIcon as Megaphone } from '@/components/brand/icon'
+import { MapIcon as MapPin, CopyIcon as Copy, CircleDotIcon as Crosshair, EyeIcon as Eye, EditIcon as Pencil, TrashIcon as Trash2, TrendIcon as BarChart2, MusicIcon as Megaphone } from '@/components/brand/icon'
 import { toast }          from 'sonner'
 import { deleteSite }     from '@/app/dashboard/ooh/actions'
 
