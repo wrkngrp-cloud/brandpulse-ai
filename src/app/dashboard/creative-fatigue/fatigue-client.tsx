@@ -4,13 +4,15 @@ import { useRouter }    from 'next/navigation'
 import { Badge }        from '@/components/ui/badge'
 import { Button }       from '@/components/ui/button'
 import { Card }         from '@/components/ui/card'
-import { Progress }     from '@/components/ui/progress'
+import {  }     from '@/components/ui/progress'
 import { cn, formatPlatformLabel } from '@/lib/utils'
 import { EyeIcon as Eye, RefreshIcon as RefreshCw, LightbulbIcon as Wand2, FlaskIcon as FlaskConical, ImageIcon as Images, TrendDownIcon as TrendingDown, CheckIcon as CheckCircle2 } from '@/components/brand/icon'
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import type { FatiguedAsset } from './page'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 import { Crescendo } from '@/components/brand/crescendo'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface Props {
   brandName:   string
@@ -21,12 +23,10 @@ interface Props {
 const LEVEL_META = {
   critical: { label: 'Critical',       color: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',    border: 'border-line-strong dark:border-line-strong',    icon: AlertTriangle },
   watch:    { label: 'Watch',          color: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2', border: 'border-line dark:border-line', icon: Eye },
-  refresh:  { label: 'Refresh Soon',   color: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',  border: 'border-line-strong dark:border-line-strong',  icon: RefreshCw },
-}
+  refresh:  { label: 'Refresh Soon',   color: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',  border: 'border-line-strong dark:border-line-strong',  icon: RefreshCw } }
 
 const ASSET_TYPE_LABELS: Record<string, string> = {
-  image: 'Image', video: 'Video', copy: 'Copy', carousel: 'Carousel', audio: 'Audio',
-}
+  image: 'Image', video: 'Video', copy: 'Copy', carousel: 'Carousel', audio: 'Audio' }
 
 function fmtPct(n: number | null | undefined) {
   return n == null ? '—' : `${n.toFixed(2)}%`
@@ -141,15 +141,12 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
   return (
     <div className="max-w-5xl space-y-8">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Creative Fatigue Monitor</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Active creatives for {brandName} showing frequency, CTR, and age signals. Refresh before they hurt performance.
-          </p>
-        </div>
-        <TourTrigger module="creative_fatigue" autoStart />
-      </div>
+      <PageHeader
+        {...PAGE_META['/dashboard/creative-fatigue']}
+        title="Creative Fatigue Monitor"
+        subtitle={<>Active creatives for {brandName} showing frequency, CTR, and age signals. Refresh before they hurt performance.</>}
+        actions={<TourTrigger module="creative_fatigue" autoStart />}
+      />
 
       <div data-tour="fatigue-main">
       {/* Summary tiles */}

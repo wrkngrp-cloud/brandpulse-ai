@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge'
 import { cn, formatNGN } from '@/lib/utils'
 import { toast } from 'sonner'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -85,21 +87,18 @@ export function AdvocacyClient() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">Advocacy</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Activate your promoters and track referral performance
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/advocacy']}
+        title="Advocacy"
+        subtitle="Activate your promoters and track referral performance"
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="advocacy" autoStart />
           <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
             <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="advocacy-main">
       {/* Tabs */}

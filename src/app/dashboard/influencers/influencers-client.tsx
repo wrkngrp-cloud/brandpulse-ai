@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { UsersIcon as Users, StarIcon as Star, PlusIcon as Plus, XIcon as X, GlobeIcon as Globe, ChevronDownIcon as ChevronDown, EyeIcon as Eye, MusicIcon as Megaphone, FilterIcon as Filter } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
-import { cn, formatNGN } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,13 +15,14 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  SelectValue } from '@/components/ui/select'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { PostTracker } from '@/components/influencers/post-tracker'
 import { InfluencerRoiTracker, type InfluencerCampaign } from '@/components/influencers/roi-tracker'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export interface Influencer {
   id: string
@@ -160,8 +161,7 @@ function StatusBadge({ status }: { status: string }) {
     prospect: 'bg-muted text-muted-foreground',
     active:   'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
     paused:   'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
-    rejected: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
-  }
+    rejected: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare' }
   return (
     <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
       {status}
@@ -174,8 +174,7 @@ function RecommendationBadge({ recommendation }: { recommendation: string | unde
   const map: Record<string, { label: string; className: string }> = {
     strong_fit:    { label: 'Strong fit',    className: 'bg-shell text-pos dark:bg-shell/30 dark:text-pos' },
     potential_fit: { label: 'Potential fit', className: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2' },
-    poor_fit:      { label: 'Poor fit',      className: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare' },
-  }
+    poor_fit:      { label: 'Poor fit',      className: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare' } }
   const config = map[recommendation]
   if (!config) return null
   return (
@@ -310,8 +309,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
       .map(e => ({
         platform: e.platform || 'instagram',
         handle:   parseHandle(e.input),
-        url:      e.input.startsWith('http') || e.input.includes('.com') ? e.input : undefined,
-      }))
+        url:      e.input.startsWith('http') || e.input.includes('.com') ? e.input : undefined }))
   }
 
   async function handleAnalyse() {
@@ -331,8 +329,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
       const res = await fetch('/api/influencers/analyse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ handles }),
-      })
+        body: JSON.stringify({ handles }) })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error ?? 'Analysis failed.')
@@ -373,9 +370,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
           followers:    totalFollowers ?? undefined,
           social_urls:  handles,
           profile_data: analysis?.profile_data ?? undefined,
-          brand_fit:    analysis?.brand_fit ?? undefined,
-        }),
-      })
+          brand_fit:    analysis?.brand_fit ?? undefined }) })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error ?? 'Failed to add influencer.')
@@ -446,8 +441,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
       followers:    i.followers,
       cultural_iq:  i.cultural_iq,
       campaign_id:  i.campaign_id!,
-      campaignName: campaignMap.get(i.campaign_id!) ?? 'Campaign',
-    }))
+      campaignName: campaignMap.get(i.campaign_id!) ?? 'Campaign' }))
 
   const uniqueCampaigns = Array.from(new Set(linkedInfluencers.map(i => i.campaignName)))
 
@@ -461,14 +455,11 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">Influencer Intelligence</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Discover, score, and track creators for your brand.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/influencers']}
+        title="Influencer Intelligence"
+        subtitle="Discover, score, and track creators for your brand."
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="influencers" autoStart />
           {activeTab === 'intelligence' && (
             <Button
@@ -483,8 +474,8 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
               )}
             </Button>
           )}
-        </div>
-      </div>
+        </div></>}
+      />
 
       {/* Tabs */}
       <div className="flex gap-1 border-b">
@@ -706,8 +697,7 @@ function CampaignsTab({
   campaignFilter,
   onCampaignFilter,
   totalPotentialReach,
-  totalLinked,
-}: {
+  totalLinked }: {
   linked: LinkedInfluencer[]
   uniqueCampaigns: string[]
   campaignFilter: string
@@ -970,8 +960,7 @@ function InfluencerCard({
   reanalysingId,
   onReanalyse,
   availableCampaigns = [],
-  onLinked,
-}: {
+  onLinked }: {
   inf: Influencer
   scoringId: string | null
   onScore: (id: string) => void
@@ -1137,8 +1126,7 @@ function InfluencerCard({
                   const res = await fetch(`/api/influencers/${inf.id}/link-campaign`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ campaign_id: newCampaignId }),
-                  })
+                    body: JSON.stringify({ campaign_id: newCampaignId }) })
                   if (!res.ok) throw new Error('Failed to link')
                   onLinked?.(inf.id, newCampaignId)
                   toast.success(newCampaignId ? 'Linked to campaign.' : 'Removed from campaign.')

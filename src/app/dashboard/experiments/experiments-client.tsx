@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { FlaskIcon as FlaskConical, PlusIcon as Plus, PlayIcon as Play, PauseIcon as Pause, CheckIcon as CheckSquare, RefreshIcon as RefreshCw, XIcon as X, UsersIcon as Users, TrendIcon as BarChart3, StarIcon as Trophy } from '@/components/brand/icon'
+import { FlaskIcon as FlaskConical, PlusIcon as Plus, PlayIcon as Play, PauseIcon as Pause, CheckIcon as CheckSquare, RefreshIcon as RefreshCw, XIcon as X, StarIcon as Trophy } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
-import { TrendIcon as TrendingUp } from '@/components/brand/icon'
+import {  } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface Variant {
   id:          string
@@ -43,8 +45,7 @@ const STATUS_COLOR: Record<string, string> = {
   draft:     'bg-shell text-tx-2 border-line',
   running:   'bg-shell text-pos border-line',
   paused:    'bg-shell text-tx-2 border-line',
-  concluded: 'bg-flare-wash text-tx-flare border-line-strong',
-}
+  concluded: 'bg-flare-wash text-tx-flare border-line-strong' }
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   message:      <span className="text-xs">✉️</span>,
@@ -53,8 +54,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   offer:        <span className="text-xs">🏷️</span>,
   landing_page: <span className="text-xs">🖥️</span>,
   email:        <span className="text-xs">📧</span>,
-  other:        <span className="text-xs">🧪</span>,
-}
+  other:        <span className="text-xs">🧪</span> }
 
 // Two-proportion z-test for significance
 function calcSignificance(control: Variant, variant: Variant, confidenceTarget = 95): { pValue: number; significant: boolean; winner: 'control' | 'variant' | null; liftPct: number } {
@@ -73,8 +73,7 @@ function calcSignificance(control: Variant, variant: Variant, confidenceTarget =
     pValue,
     significant: pValue < alpha,
     winner: pValue < alpha ? (p2 > p1 ? 'variant' : 'control') : null,
-    liftPct,
-  }
+    liftPct }
 }
 function normalCDF(z: number): number {
   const t = 1 / (1 + 0.2316419 * z)
@@ -99,8 +98,7 @@ export function ExperimentsClient() {
 
   const setStatus = async (id: string, status: string) => {
     const res = await fetch(`/api/experiments/${id}`, {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }),
-    })
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
     if (!res.ok) { toast.error('Failed to update status'); return }
     toast.success(`Experiment ${status}`)
     load()
@@ -111,12 +109,11 @@ export function ExperimentsClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">A/B Testing</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Structured experiments with statistical significance tracking</p>
-        </div>
-        <div className="flex gap-2">
+      <PageHeader
+        {...PAGE_META['/dashboard/experiments']}
+        title="A/B Testing"
+        subtitle="Structured experiments with statistical significance tracking"
+        actions={<><div className="flex gap-2">
           <TourTrigger module="experiments" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
@@ -126,8 +123,8 @@ export function ExperimentsClient() {
             <Plus className="h-4 w-4 mr-2" />
             New experiment
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="experiments-main">
       {experiments.length > 0 && (
@@ -143,8 +140,7 @@ export function ExperimentsClient() {
         <NewExperimentForm
           onSave={async (data) => {
             const res = await fetch('/api/experiments', {
-              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
-            })
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
             if (!res.ok) { toast.error('Failed to create experiment'); return }
             toast.success('Experiment created')
             setShowForm(false)
@@ -307,8 +303,7 @@ function NewExperimentForm({ onSave, onCancel }: { onSave: (d: Record<string, un
       variants: [
         { name: variantA, is_control: true },
         { name: variantB, is_control: false },
-      ],
-    })
+      ] })
     setSaving(false)
   }
 

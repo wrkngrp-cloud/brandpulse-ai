@@ -9,6 +9,9 @@ import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 import { LaunchPerceptionAuditButton } from './launch-perception-audit-button'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
+import { Crescendo } from '@/components/brand/crescendo'
 
 const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -30,14 +33,9 @@ function dimScoreColor(score: number) {
   return 'text-tx-flare'
 }
 
-function dimBarWidth(score: number) {
-  return `${((score - 1) / 4) * 100}%`  // 1-5 → 0-100%
-}
-
-function dimBarColor(score: number) {
-  if (score >= 4)   return 'bg-pos'
-  if (score >= 3)   return 'bg-ember'
-  return 'bg-flare'
+/** The survey dimensions are answered 1-5; the Crescendo reads 0-100. */
+function dimScorePct(score: number) {
+  return ((score - 1) / 4) * 100
 }
 
 // ── Perception Audit Section ─────────────────────────────────────────────────
@@ -128,13 +126,8 @@ async function PerceptionAuditSection() {
               {dimensionScores.map(dim => (
                 <div key={dim.key} className="flex items-center gap-3 px-4 sm:px-5 py-3">
                   <p className="text-xs sm:text-sm w-24 sm:w-36 shrink-0">{dim.label}</p>
-                  <div className="flex-1 h-1.5 bg-muted rounded-sm overflow-hidden">
-                    {dim.avg != null && (
-                      <div
-                        className={`h-full rounded-full ${dimBarColor(dim.avg)}`}
-                        style={{ width: dimBarWidth(dim.avg) }}
-                      />
-                    )}
+                  <div className="flex-1">
+                    <Crescendo value={dim.avg != null ? dimScorePct(dim.avg) : 0} />
                   </div>
                   <span className={`text-sm font-semibold bg-num w-8 text-right shrink-0 ${dim.avg != null ? dimScoreColor(dim.avg) : 'text-muted-foreground/40'}`}>
                     {dim.avg != null ? dim.avg.toFixed(1) : '—'}
@@ -242,14 +235,11 @@ async function SurveyListServer() {
 export default function SurveysPage() {
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Surveys</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Collect direct feedback from your audience
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+      <PageHeader
+        {...PAGE_META['/dashboard/surveys']}
+        title="Surveys"
+        subtitle="Collect direct feedback from your audience"
+        actions={<><div className="flex items-center gap-2">
           <TourTrigger module="surveys" autoStart />
           <Link
             href="/dashboard/surveys/nps"
@@ -259,8 +249,8 @@ export default function SurveysPage() {
             NPS Tracker
           </Link>
           <NewSurveyDialog />
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div className="space-y-8" data-tour="surveys-main">
         {/* Perception Audit section */}

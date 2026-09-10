@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { MarketIcon as ShoppingBag, PlusIcon as Plus, StarIcon as Star, BriefcaseIcon as Package, TrendDownIcon as TrendingDown, MinusIcon as Minus, XIcon as X, RefreshIcon as RefreshCw, ExternalLinkIcon as ExternalLink, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight } from '@/components/brand/icon'
+import { MarketIcon as ShoppingBag, PlusIcon as Plus, StarIcon as Star, BriefcaseIcon as Package, XIcon as X, RefreshIcon as RefreshCw, ExternalLinkIcon as ExternalLink, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge'
 import { cn, formatNGN } from '@/lib/utils'
 import { toast } from 'sonner'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface MarketplaceProduct {
   id:             string
@@ -34,8 +36,7 @@ const PLATFORM_COLOR: Record<string, string> = {
   jumia:  'bg-shell text-tx-2 border-line',
   konga:  'bg-flare-wash text-tx-flare border-line-strong',
   amazon: 'bg-flare-wash text-tx-flare border-line-strong',
-  other:  'bg-shell text-tx border-line',
-}
+  other:  'bg-shell text-tx border-line' }
 
 export function MarketplaceClient() {
   const [products, setProducts]     = useState<MarketplaceProduct[]>([])
@@ -64,14 +65,11 @@ export function MarketplaceClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Marketplace Intelligence</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Track your products on Jumia, Konga, and other platforms
-          </p>
-        </div>
-        <div className="flex gap-2">
+      <PageHeader
+        {...PAGE_META['/dashboard/marketplace']}
+        title="Marketplace Intelligence"
+        subtitle="Track your products on Jumia, Konga, and other platforms"
+        actions={<><div className="flex gap-2">
           <TourTrigger module="marketplace" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
@@ -81,8 +79,8 @@ export function MarketplaceClient() {
             <Plus className="h-4 w-4 mr-2" />
             Add product
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       {/* KPI row */}
       {ownProducts.length > 0 && (
@@ -115,8 +113,7 @@ export function MarketplaceClient() {
         <AddProductForm
           onSave={async (data) => {
             const res = await fetch('/api/marketplace/products', {
-              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
-            })
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
             if (!res.ok) { toast.error('Failed to add product'); return }
             toast.success('Product added')
             setShowForm(false)
@@ -153,8 +150,7 @@ export function MarketplaceClient() {
             onAddSnapshot={async (data) => {
               const res = await fetch('/api/marketplace/snapshots', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ product_id: p.id, ...data }),
-              })
+                body: JSON.stringify({ product_id: p.id, ...data }) })
               if (!res.ok) { toast.error('Failed to save snapshot'); return }
               toast.success('Snapshot saved')
               setShowSnap(null)
@@ -189,8 +185,7 @@ function productSummary(product: MarketplaceProduct): string {
 }
 
 function ProductRow({
-  product, showSnap, onToggleSnap, onAddSnapshot,
-}: {
+  product, showSnap, onToggleSnap, onAddSnapshot }: {
   product: MarketplaceProduct
   showSnap: boolean
   onToggleSnap: () => void
@@ -314,8 +309,7 @@ function AddSnapshotForm({ onSave, onCancel }: { onSave: (d: Record<string, unkn
       rating:         rating ? parseFloat(rating) : undefined,
       review_count:   reviews ? parseInt(reviews) : undefined,
       shelf_position: position ? parseInt(position) : undefined,
-      in_stock:       inStock,
-    })
+      in_stock:       inStock })
     setSaving(false)
   }
 

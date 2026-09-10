@@ -17,6 +17,8 @@ import { SearchIcon as Search } from '@/components/brand/icon'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export const dynamic = 'force-dynamic'
 
@@ -109,17 +111,12 @@ export default async function ConnectorsPage() {
     <div className="max-w-3xl space-y-8 pb-12">
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="eyebrow mb-1">Platform</p>
-          <h1 className="h-display text-[26px] leading-none">All Connectors</h1>
-          <p className="mt-2 text-[13px] text-muted-foreground/70 max-w-xl">
-            Connect your data sources here. Every module in BrandGauge reads from these connections automatically.
-            Connect once. Every module updates automatically.
-          </p>
-        </div>
-        <TourTrigger module="connectors" autoStart />
-      </div>
+      <PageHeader
+        {...PAGE_META['/dashboard/connectors']}
+        title="All Connectors"
+        subtitle="Connect your data sources here. Every module in BrandGauge reads from these connections automatically. Connect once. Every module updates automatically."
+        actions={<TourTrigger module="connectors" autoStart />}
+      />
 
       {/* Context note */}
       <div className="rounded-xl border bg-muted/20 px-4 py-3 text-[12.5px] text-muted-foreground leading-relaxed">

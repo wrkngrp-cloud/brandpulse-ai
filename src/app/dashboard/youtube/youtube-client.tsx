@@ -15,6 +15,7 @@ import {
 import { PlayIcon as PlayCircle, ExternalLinkIcon as ExternalLink, EyeIcon as Eye, CheckIcon as ThumbsUp, RefreshIcon as RefreshCw, PlusIcon as Plus, SettingsIcon as Settings, CheckIcon as CheckCircle2 } from '@/components/brand/icon'
 import { MentionsIcon as MessageSquare, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface YtMention {
   id: string
@@ -545,17 +546,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                           </span>
                         </div>
                         {deal.actual_views != null && (
-                          <div className="h-1.5 w-full rounded-sm bg-muted overflow-hidden">
-                            <div
-                              className={cn(
-                                'h-full rounded-sm transition-colors',
-                                (delivPct ?? 0) >= 100 ? 'bg-pos'
-                                  : (delivPct ?? 0) >= 70 ? 'bg-ember'
-                                  : 'bg-flare',
-                              )}
-                              style={{ width: `${Math.min(delivPct ?? 0, 100)}%` }}
-                            />
-                          </div>
+                          <Crescendo value={Math.min(delivPct ?? 0, 100)} />
                         )}
                       </div>
                     )}

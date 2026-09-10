@@ -11,6 +11,8 @@ import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { VisibilityScore, VisibilityCheck } from './page'
 import { ChartState } from '@/components/brand/chart-states'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface Props {
   brandName: string
@@ -126,20 +128,16 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
   return (
     <div className="max-w-4xl space-y-8 pb-12">
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="eyebrow mb-1">Intelligence</p>
-          <h1 className="h-display text-[26px] leading-none">AI Visibility Tracker</h1>
-          <p className="mt-2 text-[13px] text-muted-foreground/70 max-w-xl">
-            How often does {brandName} appear when consumers ask ChatGPT, Gemini, or Perplexity for a recommendation?
-          </p>
-        </div>
-        <Button onClick={runCheck} disabled={running || noKeys} size="sm" className="shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/ai-visibility']}
+        title="AI Visibility Tracker"
+        subtitle={<>How often does {brandName} appear when consumers ask ChatGPT, Gemini, or Perplexity for a recommendation?</>}
+        actions={<><Button onClick={runCheck} disabled={running || noKeys} size="sm" className="shrink-0">
           {running
             ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Running...</>
             : <><RefreshCw className="h-3.5 w-3.5 mr-1.5" />Run check now</>}
-        </Button>
-      </div>
+        </Button></>}
+      />
 
       {/* No API keys warning */}
       {noKeys && (

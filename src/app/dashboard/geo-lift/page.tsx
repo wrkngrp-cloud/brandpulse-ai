@@ -6,6 +6,8 @@ import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/
 import { GeoLiftStartForm }    from './geo-lift-start-form'
 import { getActiveBrand }      from '@/lib/active-brand'
 import { TourTrigger }         from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface GeoLiftStudy {
   id:                 string
@@ -177,15 +179,12 @@ export default async function GeoLiftPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">Geo-Lift Studies</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Measure true incremental brand search uplift by city
-          </p>
-        </div>
-        <TourTrigger module="geo_lift" autoStart />
-      </div>
+      <PageHeader
+        {...PAGE_META['/dashboard/geo-lift']}
+        title="Geo-Lift Studies"
+        subtitle="Measure true incremental brand search uplift by city"
+        actions={<TourTrigger module="geo_lift" autoStart />}
+      />
 
       {hasStudies && (
         <div className="space-y-4" data-tour="geolift-main">

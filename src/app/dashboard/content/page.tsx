@@ -13,6 +13,8 @@ import { SovHistoryChart } from '@/components/dashboard/sov-history-chart'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { rangeLabelLong } from '@/lib/range-label'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 async function ContentData({ days }: { days: number }) {
   const supabase = await createClient()
@@ -195,16 +197,15 @@ export default async function ContentPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Owned Performance</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Your content, reach, and share of voice</p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/content']}
+        title="Owned Performance"
+        subtitle="Your content, reach, and share of voice"
+        actions={<>
           <TourTrigger module="content" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={30} />
-        </div>
-      </div>
+        </>}
+      />
 
       {/* Success banner */}
       {connected && (

@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { ShareIcon as Share2 } from '@/components/brand/icon'
 import { GlobeIcon as Globe, EyeIcon as Eye, HeartIcon as Heart, AskIcon as Zap, ShieldIcon as Shield, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight, InfoIcon as Info } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
+import { Crescendo } from '@/components/brand/crescendo'
 import { AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -246,12 +247,11 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       </div>
                     </div>
 
-                    {/* Progress bar */}
-                    <div className="mt-2 h-1.5 w-full rounded-sm bg-muted overflow-hidden">
-                      <div
-                        className="h-full rounded-sm bg-foreground transition-colors duration-700"
-                        style={{ width: score != null ? `${score}%` : '0%' }}
-                      />
+                    {/* The score bar is a Crescendo: ticks growing in size and
+                        heat toward the reading, the arc unrolled. A plain filled
+                        div says nothing about how far along the scale it sits. */}
+                    <div className="mt-2">
+                      <Crescendo value={score ?? 0} />
                     </div>
 
                     <div className="flex flex-wrap items-center justify-between gap-1.5 mt-1.5">

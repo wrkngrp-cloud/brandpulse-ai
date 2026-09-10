@@ -8,6 +8,8 @@ import { DateRangeFilter }      from '@/components/dashboard/date-range-filter'
 import { TriggerPrCrawlButton } from './trigger-pr-crawl-button'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 import { Crescendo } from '@/components/brand/crescendo'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface PressMention {
   id:              string
@@ -116,19 +118,15 @@ export default async function PRTrackingPage({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-xl font-semibold">PR &amp; Earned Media Tracking</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Monitor press coverage and understand how earned media shapes your brand health.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/pr']}
+        title="PR & Earned Media Tracking"
+        subtitle="Monitor press coverage and understand how earned media shapes your brand health."
+        actions={<>
           <TourTrigger module="pr" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={30} />
-        </div>
-      </div>
+        </>}
+      />
 
       <div data-tour="pr-main">
       {!hasData ? (

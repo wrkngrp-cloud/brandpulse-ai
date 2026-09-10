@@ -8,9 +8,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { cn, formatNGN } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface LoyaltyTier {
   id:          string
@@ -76,19 +78,18 @@ export function LoyaltyClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">Loyalty Engine</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Manage points programs, tiers, and member rewards</p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/loyalty']}
+        title="Loyalty Engine"
+        subtitle="Manage points programs, tiers, and member rewards"
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="loyalty" autoStart />
           <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
             <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       {/* KPIs */}
       {totalMembers > 0 && (
@@ -137,8 +138,7 @@ export function LoyaltyClient() {
             <NewProgramForm
               onSave={async (data) => {
                 const res = await fetch('/api/loyalty/programs', {
-                  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
-                })
+                  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
                 if (!res.ok) { toast.error('Failed to create program'); return }
                 toast.success('Program created')
                 setShowNewProg(false)
@@ -179,8 +179,7 @@ export function LoyaltyClient() {
               programs={programs}
               onSave={async (data) => {
                 const res = await fetch('/api/loyalty/members', {
-                  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
-                })
+                  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
                 if (!res.ok) { toast.error('Failed to add member'); return }
                 toast.success('Member added')
                 setShowNewMember(false)
@@ -252,8 +251,7 @@ export function LoyaltyClient() {
               memberName={members.find(m => m.id === awardFor)?.name ?? ''}
               onSave={async (data) => {
                 const res = await fetch('/api/loyalty/transactions', {
-                  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
-                })
+                  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
                 if (!res.ok) { toast.error('Failed to award points'); return }
                 const d = await res.json()
                 toast.success(`Points awarded. New balance: ${d.new_balance}`)
@@ -471,8 +469,7 @@ function AwardPointsForm({ memberId, memberName, onSave, onCancel }: { memberId:
       member_id:        memberId,
       transaction_type: type,
       points:           type === 'redeem' ? -Math.abs(pts) : pts,
-      description:      desc,
-    })
+      description:      desc })
     setSave(false)
   }
 

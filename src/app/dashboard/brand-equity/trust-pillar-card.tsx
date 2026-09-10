@@ -2,6 +2,7 @@
 
 import type { TrustScore } from '@/lib/bhi'
 import { ShieldIcon as Shield, ShieldIcon as ShieldCheck, ShieldIcon as ShieldAlert, ShieldIcon as ShieldX } from '@/components/brand/icon'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface Props {
   trust: TrustScore
@@ -56,17 +57,7 @@ export function TrustPillarCard({ trust }: Props) {
                   {dim.display && <span className="ml-1.5 opacity-70">{dim.display}</span>}
                 </span>
               </div>
-              <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-colors ${
-                    dim.score == null   ? 'w-0' :
-                    dim.score >= 80     ? 'bg-pos' :
-                    dim.score >= 60     ? 'bg-flare' :
-                    dim.score >= 40     ? 'bg-ember' : 'bg-flare'
-                  }`}
-                  style={{ width: dim.score != null ? `${dim.score}%` : '0%' }}
-                />
-              </div>
+              <Crescendo value={dim.score ?? 0} />
             </div>
           )
         })}

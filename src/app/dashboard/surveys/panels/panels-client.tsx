@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface Panel {
   id:               string
@@ -112,22 +114,18 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
   return (
     <div className="space-y-6 max-w-[900px]">
 
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow mb-1.5">Surveys</p>
-          <h1 className="h-display text-[28px] sm:text-[32px] leading-none">Brand Tracking Panels</h1>
-          <p className="mt-1.5 text-[13px] text-muted-foreground/60">
-            Auto-dispatch recurring surveys monthly or quarterly — with full distribution to emails and WhatsApp.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/surveys/panels']}
+        title="Brand Tracking Panels"
+        subtitle="Auto-dispatch recurring surveys monthly or quarterly — with full distribution to emails and WhatsApp."
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="survey_panels" autoStart />
           <Button size="sm" onClick={() => setShowForm(v => !v)}>
             <Plus className="h-3.5 w-3.5 mr-1.5" />
             New panel
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="panels-main">
       {/* Create form */}

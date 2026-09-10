@@ -1,12 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { AskIcon as Flame, TrendDownIcon as TrendingDown, CalendarIcon as Calendar, ChevronRightIcon as ChevronRight, ChevronDownIcon as ChevronDown, StarIcon as Star, GlobeIcon as Globe } from '@/components/brand/icon'
+import {  TrendDownIcon as TrendingDown, CalendarIcon as Calendar, ChevronRightIcon as ChevronRight, ChevronDownIcon as ChevronDown, StarIcon as Star, GlobeIcon as Globe } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { TrendIcon as TrendingUp, AskIcon as Sparkles, AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
+import { Crescendo } from '@/components/brand/crescendo'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -87,250 +90,205 @@ const BASE_CALENDAR: BaseMoment[] = [
     name: 'FIFA World Cup 2026 — Kickoff', mmdd: '06-11', type: 'Sports',
     brandRelevance: 'Biggest sporting event on earth — 48 teams including Nigeria. Watch parties, street activations, and themed content across all demographics',
     tags: ['sports', 'youth', 'male', 'all', 'food', 'beverage', 'entertainment'],
-    floatingDates: { '2026': '2026-06-11' },
-  },
+    floatingDates: { '2026': '2026-06-11' } },
   {
     name: 'FIFA World Cup 2026 — Final', mmdd: '07-19', type: 'Sports',
     brandRelevance: 'World Cup Final watch parties drive peak F&B and lifestyle spend. Nigeria fans celebrate regardless of who plays',
     tags: ['sports', 'youth', 'male', 'all', 'food', 'beverage'],
-    floatingDates: { '2026': '2026-07-19' },
-  },
+    floatingDates: { '2026': '2026-07-19' } },
   {
     name: 'Premier League Season Start', mmdd: '08-16', type: 'Sports',
     brandRelevance: 'EPL is Nigeria\'s second religion — viewing parties and fan activations from August through May',
-    tags: ['sports', 'youth', 'male', 'urban', 'food', 'beverage'],
-  },
+    tags: ['sports', 'youth', 'male', 'urban', 'food', 'beverage'] },
   {
     name: 'UEFA Champions League Final', mmdd: '05-30', type: 'Sports',
     brandRelevance: 'UCL Final unites football fans across Nigeria — screen-viewing events in Lagos, Abuja, and PH',
-    tags: ['sports', 'youth', 'male', 'urban', 'food', 'beverage'],
-  },
+    tags: ['sports', 'youth', 'male', 'urban', 'food', 'beverage'] },
   {
     name: 'Lagos Marathon', mmdd: '02-07', type: 'Sports',
     brandRelevance: 'Nigeria\'s largest road race — 50,000+ participants. Health, fitness, hydration, and apparel brands take centre stage',
-    tags: ['sports', 'health', 'fitness', 'female', 'urban', 'lagos', 'fmcg'],
-  },
+    tags: ['sports', 'health', 'fitness', 'female', 'urban', 'lagos', 'fmcg'] },
   {
     name: 'NBA Africa Game', mmdd: '08-08', type: 'Sports',
     brandRelevance: 'Growing NBA × Afrobeats × Nigerian identity crossover — powerful youth and fashion activation',
-    tags: ['sports', 'youth', 'male', 'fashion', 'culture', 'urban'],
-  },
+    tags: ['sports', 'youth', 'male', 'fashion', 'culture', 'urban'] },
   {
     name: 'AFCON 2027', mmdd: '01-10', type: 'Sports',
     brandRelevance: 'Africa Cup of Nations — peak Super Eagles patriotism. Brands that show up for Nigeria during AFCON earn lasting loyalty',
     tags: ['sports', 'all', 'patriotic', 'community', 'male', 'youth'],
-    floatingDates: { '2027': '2027-01-10' },
-  },
+    floatingDates: { '2027': '2027-01-10' } },
 
   // ── Nigerian Cultural ────────────────────────────────────────────────────
   {
     name: 'Ojude Oba Festival', mmdd: '05-30', type: 'Cultural',
     brandRelevance: 'Ijebu-Ode\'s royal durbar — spectacular fashion, horsemanship, and Yoruba heritage. Premium brand and influencer moment',
     tags: ['culture', 'fashion', 'premium', 'southwest', 'muslim', 'yoruba', 'food'],
-    floatingDates: { '2026': '2026-05-30', '2027': '2027-05-19', '2028': '2028-05-07' },
-  },
+    floatingDates: { '2026': '2026-05-30', '2027': '2027-05-19', '2028': '2028-05-07' } },
   {
     name: 'New Yam Festival (Iriji)', mmdd: '08-20', type: 'Cultural',
     brandRelevance: 'Igbo harvest celebration — food, music, and community across Southeast Nigeria and diaspora',
-    tags: ['culture', 'food', 'community', 'southeast', 'igbo', 'traditional', 'fmcg'],
-  },
+    tags: ['culture', 'food', 'community', 'southeast', 'igbo', 'traditional', 'fmcg'] },
   {
     name: 'Eyo Festival', mmdd: '05-02', type: 'Cultural',
     brandRelevance: 'Lagos Island\'s iconic masquerade — white-clad Eyo fill Lagos streets. Tourism, fashion, and premium brands resonate',
-    tags: ['culture', 'fashion', 'premium', 'lagos', 'yoruba', 'tourism'],
-  },
+    tags: ['culture', 'fashion', 'premium', 'lagos', 'yoruba', 'tourism'] },
   {
     name: 'Argungu Fishing Festival', mmdd: '03-14', type: 'Cultural',
     brandRelevance: 'Kebbi State\'s centuries-old fishing festival — powerful northern Nigeria mass-market moment',
-    tags: ['culture', 'north', 'hausa', 'community', 'rural', 'mass', 'fmcg'],
-  },
+    tags: ['culture', 'north', 'hausa', 'community', 'rural', 'mass', 'fmcg'] },
   {
     name: 'Durbar Festival', mmdd: '03-20', type: 'Cultural',
     brandRelevance: 'Royal Durbar at Eid — thousands of horsemen in ceremonial dress across Kano, Zaria, Sokoto. Premium northern storytelling moment',
     tags: ['culture', 'fashion', 'premium', 'north', 'hausa', 'muslim', 'traditional'],
-    floatingDates: { '2026': '2026-03-20', '2027': '2027-03-09', '2028': '2028-02-27' },
-  },
+    floatingDates: { '2026': '2026-03-20', '2027': '2027-03-09', '2028': '2028-02-27' } },
   {
     name: 'Calabar Carnival', mmdd: '12-01', type: 'Cultural',
     brandRelevance: 'Africa\'s biggest street party — one month of parades, floats, and colour in Cross River State. Huge youth activation window',
-    tags: ['culture', 'youth', 'entertainment', 'south', 'tourism', 'fashion', 'food'],
-  },
+    tags: ['culture', 'youth', 'entertainment', 'south', 'tourism', 'fashion', 'food'] },
   {
     name: 'Ake Arts and Book Festival', mmdd: '10-27', type: 'Cultural',
     brandRelevance: 'West Africa\'s premier literary festival in Abeokuta — premium, educated, diaspora audience',
-    tags: ['culture', 'premium', 'educated', 'diaspora', 'female', 'southwest'],
-  },
+    tags: ['culture', 'premium', 'educated', 'diaspora', 'female', 'southwest'] },
   {
     name: 'Felabration', mmdd: '10-15', type: 'Entertainment',
     brandRelevance: 'Week-long Fela anniversary at Afrika Shrine — counterculture, Afrobeats, and progressive Nigerian identity',
-    tags: ['music', 'youth', 'culture', 'afrobeats', 'urban', 'activist', 'lagos'],
-  },
+    tags: ['music', 'youth', 'culture', 'afrobeats', 'urban', 'activist', 'lagos'] },
   {
     name: 'Gidi Culture Festival', mmdd: '04-18', type: 'Entertainment',
     brandRelevance: 'Lagos\'s outdoor festival of music, art, and culture — premium youth activation in Eko Atlantic area',
-    tags: ['music', 'youth', 'fashion', 'urban', 'premium', 'lagos', 'entertainment'],
-  },
+    tags: ['music', 'youth', 'fashion', 'urban', 'premium', 'lagos', 'entertainment'] },
 
   // ── Entertainment / Awards ───────────────────────────────────────────────
   {
     name: 'AMVCA (Africa Magic Viewers\' Choice)', mmdd: '03-22', type: 'Entertainment',
     brandRelevance: 'Nigeria\'s biggest TV awards night — Nollywood fans, premium lifestyle consumers, and fashion moment',
-    tags: ['entertainment', 'fashion', 'premium', 'female', 'nollywood', 'urban'],
-  },
+    tags: ['entertainment', 'fashion', 'premium', 'female', 'nollywood', 'urban'] },
   {
     name: 'Headies Awards', mmdd: '10-25', type: 'Entertainment',
     brandRelevance: 'Afrobeats\' biggest night — massive youth engagement and influencer amplification',
-    tags: ['music', 'afrobeats', 'youth', 'fashion', 'urban', 'entertainment'],
-  },
+    tags: ['music', 'afrobeats', 'youth', 'fashion', 'urban', 'entertainment'] },
   {
     name: 'Afro Nation Portugal', mmdd: '07-03', type: 'Entertainment',
     brandRelevance: 'World\'s largest Afrobeats festival — strong diaspora and international audience for premium Nigerian brands',
-    tags: ['music', 'afrobeats', 'diaspora', 'youth', 'premium', 'fashion'],
-  },
+    tags: ['music', 'afrobeats', 'diaspora', 'youth', 'premium', 'fashion'] },
   {
     name: 'ONE Africa Music Fest', mmdd: '11-07', type: 'Entertainment',
     brandRelevance: 'Pan-African music festival spotlighting Afropop — high-income urban youth audience',
-    tags: ['music', 'youth', 'premium', 'urban', 'afrobeats', 'entertainment'],
-  },
+    tags: ['music', 'youth', 'premium', 'urban', 'afrobeats', 'entertainment'] },
 
   // ── Global Cultural ──────────────────────────────────────────────────────
   {
     name: "International Women's Day", mmdd: '03-08', type: 'Cultural',
     brandRelevance: 'Powerful moment for brands to celebrate female consumers and gender equity — campaigns that feel genuine earn high loyalty',
-    tags: ['female', 'urban', 'educated', 'premium', 'all', 'health'],
-  },
+    tags: ['female', 'urban', 'educated', 'premium', 'all', 'health'] },
   {
     name: 'World Music Day', mmdd: '06-21', type: 'Cultural',
     brandRelevance: 'Global celebration of music — especially resonant for youth-facing, entertainment, and F&B brands in Nigeria',
-    tags: ['music', 'youth', 'urban', 'afrobeats', 'entertainment', 'food'],
-  },
+    tags: ['music', 'youth', 'urban', 'afrobeats', 'entertainment', 'food'] },
   {
     name: 'World Jollof Day', mmdd: '08-22', type: 'Cultural',
     brandRelevance: 'Created to celebrate West African jollof rice — massive organic social moment. Direct brand moment for food companies',
-    tags: ['food', 'fmcg', 'all', 'diaspora', 'culture', 'social_media'],
-  },
+    tags: ['food', 'fmcg', 'all', 'diaspora', 'culture', 'social_media'] },
   {
     name: 'Earth Day', mmdd: '04-22', type: 'Cultural',
     brandRelevance: 'Sustainability storytelling — growing relevance with educated urban Nigerian millennials and premium consumers',
-    tags: ['educated', 'premium', 'urban', 'youth', 'health', 'tech'],
-  },
+    tags: ['educated', 'premium', 'urban', 'youth', 'health', 'tech'] },
   {
     name: 'World Food Day', mmdd: '10-16', type: 'Health',
     brandRelevance: 'UN-backed day on food security — natural platform for FMCG and food brands to lead conversations in Nigeria',
-    tags: ['food', 'fmcg', 'health', 'community', 'educated'],
-  },
+    tags: ['food', 'fmcg', 'health', 'community', 'educated'] },
   {
     name: "Mother's Day", mmdd: '05-11', type: 'Cultural',
     brandRelevance: 'Strong gifting and celebration moment across all demographics — one of Nigeria\'s highest-engagement social media dates',
-    tags: ['female', 'family', 'all', 'premium', 'gifting', 'fmcg', 'food'],
-  },
+    tags: ['female', 'family', 'all', 'premium', 'gifting', 'fmcg', 'food'] },
   {
     name: "Father's Day", mmdd: '06-22', type: 'Cultural',
     brandRelevance: 'Growing occasion in urban Nigeria — fashion, electronics, and F&B brands activate strongly',
-    tags: ['male', 'family', 'urban', 'premium', 'gifting', 'fashion', 'food'],
-  },
+    tags: ['male', 'family', 'urban', 'premium', 'gifting', 'fashion', 'food'] },
   {
     name: "Valentine's Day", mmdd: '02-14', type: 'Cultural',
     brandRelevance: 'High gifting and affinity moment — restaurants, fashion, FMCG, and experience brands all activate',
-    tags: ['youth', 'urban', 'couple', 'gifting', 'food', 'fashion', 'premium'],
-  },
+    tags: ['youth', 'urban', 'couple', 'gifting', 'food', 'fashion', 'premium'] },
   {
     name: 'World Environment Day', mmdd: '06-05', type: 'Cultural',
     brandRelevance: 'Brands with a sustainability or community angle can lead conversations and earn goodwill',
-    tags: ['educated', 'premium', 'youth', 'urban', 'community', 'health'],
-  },
+    tags: ['educated', 'premium', 'youth', 'urban', 'community', 'health'] },
 
   // ── Religious ───────────────────────────────────────────────────────────
   {
     name: 'Ramadan Start', mmdd: '02-18', type: 'Religious',
     brandRelevance: 'Reach Muslim consumers with values-led, community, and Sahur/Iftar-themed content',
     tags: ['muslim', 'north', 'hausa', 'yoruba', 'community', 'food', 'fmcg', 'religious'],
-    floatingDates: { '2026': '2026-02-18', '2027': '2027-02-08', '2028': '2028-01-28' },
-  },
+    floatingDates: { '2026': '2026-02-18', '2027': '2027-02-08', '2028': '2028-01-28' } },
   {
     name: 'Easter', mmdd: '04-05', type: 'Religious',
     brandRelevance: 'Family gatherings drive food and gifting spend — strong moment for FMCG, travel, and celebration brands',
     tags: ['christian', 'south', 'east', 'family', 'food', 'gifting', 'all'],
-    floatingDates: { '2026': '2026-04-05', '2027': '2027-03-28', '2028': '2028-04-16' },
-  },
+    floatingDates: { '2026': '2026-04-05', '2027': '2027-03-28', '2028': '2028-04-16' } },
   {
     name: 'Eid al-Fitr', mmdd: '03-20', type: 'Religious',
     brandRelevance: 'End of Ramadan celebration — gifting, fashion, and premium experiences resonate with Muslim consumers',
     tags: ['muslim', 'north', 'hausa', 'yoruba', 'family', 'fashion', 'food', 'premium', 'gifting'],
-    floatingDates: { '2026': '2026-03-20', '2027': '2027-03-09', '2028': '2028-02-27' },
-  },
+    floatingDates: { '2026': '2026-03-20', '2027': '2027-03-09', '2028': '2028-02-27' } },
   {
     name: 'Eid al-Adha (Sallah)', mmdd: '05-27', type: 'Religious',
     brandRelevance: 'Themes of sacrifice, generosity, and community — food and lifestyle brands create lasting impressions',
     tags: ['muslim', 'north', 'hausa', 'community', 'food', 'family', 'religious'],
-    floatingDates: { '2026': '2026-05-27', '2027': '2027-05-16', '2028': '2028-05-05' },
-  },
+    floatingDates: { '2026': '2026-05-27', '2027': '2027-05-16', '2028': '2028-05-05' } },
   {
     name: 'Christmas', mmdd: '12-25', type: 'Religious',
     brandRelevance: 'Peak gifting, family, and celebration campaigns — Nigeria\'s biggest commercial season alongside Detty December',
-    tags: ['christian', 'family', 'all', 'gifting', 'food', 'fashion', 'premium'],
-  },
+    tags: ['christian', 'family', 'all', 'gifting', 'food', 'fashion', 'premium'] },
 
   // ── National ─────────────────────────────────────────────────────────────
   {
     name: "Workers' Day", mmdd: '05-01', type: 'National',
     brandRelevance: 'Opportunity to celebrate your workforce, community, and everyday Nigerians',
-    tags: ['all', 'community', 'mass', 'family'],
-  },
+    tags: ['all', 'community', 'mass', 'family'] },
   {
     name: 'Democracy Day', mmdd: '06-12', type: 'National',
     brandRelevance: 'June 12 marks Nigerian democracy — growing civic pride moment among urban educated millennials',
-    tags: ['youth', 'urban', 'educated', 'community', 'patriotic'],
-  },
+    tags: ['youth', 'urban', 'educated', 'community', 'patriotic'] },
   {
     name: 'Africa Day', mmdd: '05-25', type: 'National',
     brandRelevance: 'Pan-African identity and pride — strong cultural storytelling for youth-facing and premium brands',
-    tags: ['pan_african', 'diaspora', 'educated', 'youth', 'culture', 'premium'],
-  },
+    tags: ['pan_african', 'diaspora', 'educated', 'youth', 'culture', 'premium'] },
   {
     name: 'Independence Day', mmdd: '10-01', type: 'National',
     brandRelevance: 'National pride moment — connect brand to Nigerian identity and community values',
-    tags: ['all', 'patriotic', 'community', 'national', 'family', 'food'],
-  },
+    tags: ['all', 'patriotic', 'community', 'national', 'family', 'food'] },
 
   // ── Seasonal / Commerce ─────────────────────────────────────────────────
   {
     name: 'Back to School', mmdd: '09-07', type: 'Commerce',
     brandRelevance: 'Nigeria\'s biggest retail surge outside Q4 — stationery, uniforms, food, and tech brands all compete for family spend',
-    tags: ['family', 'parent', 'youth', 'fmcg', 'food', 'tech', 'education'],
-  },
+    tags: ['family', 'parent', 'youth', 'fmcg', 'food', 'tech', 'education'] },
   {
     name: 'Black Friday', mmdd: '11-27', type: 'Commerce',
     brandRelevance: 'Nigeria\'s fastest-growing commerce day — digital and physical retail see massive conversion uplift',
-    tags: ['youth', 'urban', 'value_seeker', 'fmcg', 'fashion', 'tech', 'all'],
-  },
+    tags: ['youth', 'urban', 'value_seeker', 'fmcg', 'fashion', 'tech', 'all'] },
   {
     name: 'Detty December', mmdd: '12-01', type: 'Seasonal',
     brandRelevance: 'Biggest entertainment and spending season in West Africa — diaspora returns, budgets loosen, every brand competes for share of wallet',
-    tags: ['entertainment', 'diaspora', 'youth', 'premium', 'music', 'food', 'fashion', 'lagos'],
-  },
+    tags: ['entertainment', 'diaspora', 'youth', 'premium', 'music', 'food', 'fashion', 'lagos'] },
   {
     name: 'End of Year Campaign Season', mmdd: '11-01', type: 'Commerce',
     brandRelevance: 'Brands that launch November 1 own the full holiday season — budget-setting and gifting decisions start here',
-    tags: ['all', 'fmcg', 'premium', 'fashion', 'food', 'gifting'],
-  },
+    tags: ['all', 'fmcg', 'premium', 'fashion', 'food', 'gifting'] },
 
   // ── Health ───────────────────────────────────────────────────────────────
   {
     name: 'Breast Cancer Awareness Month', mmdd: '10-01', type: 'Health',
     brandRelevance: 'Pink October drives deep engagement with female consumers — brands that show up authentically earn long-term loyalty',
-    tags: ['female', 'health', 'educated', 'premium', 'urban', 'community'],
-  },
+    tags: ['female', 'health', 'educated', 'premium', 'urban', 'community'] },
   {
     name: 'World Diabetes Day', mmdd: '11-14', type: 'Health',
     brandRelevance: 'Rising diabetes rates in Nigeria make this a high-value health education moment — food and FMCG brands can lead',
-    tags: ['health', 'food', 'fmcg', 'educated', 'older', 'family'],
-  },
+    tags: ['health', 'food', 'fmcg', 'educated', 'older', 'family'] },
   {
     name: 'World Mental Health Day', mmdd: '10-10', type: 'Health',
     brandRelevance: 'Growing mental health conversation in Nigeria — brands that acknowledge it authentically build deep loyalty with millennials',
-    tags: ['youth', 'urban', 'educated', 'health', 'premium', 'female'],
-  },
+    tags: ['youth', 'urban', 'educated', 'health', 'premium', 'female'] },
 ]
 
 // ---------------------------------------------------------------------------
@@ -368,8 +326,7 @@ const CATEGORY_TAGS: Record<string, string[]> = {
   'Automotive':      ['premium', 'male', 'urban'],
   'Telecom':         ['all', 'tech', 'urban'],
   'Hospitality':     ['premium', 'tourism', 'food'],
-  'Media':           ['entertainment', 'youth', 'urban'],
-}
+  'Media':           ['entertainment', 'youth', 'urban'] }
 
 function extractAudienceTags(segments: TargetSegment[], culturalProfile: CulturalProfile): Set<string> {
   const tags = new Set<string>()
@@ -451,20 +408,17 @@ const TYPE_BADGE: Record<MomentType, string> = {
   Sports:        'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
   Entertainment: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
   Health:        'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
-  Commerce:      'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
-}
+  Commerce:      'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2' }
 
 const FIT_BADGE: Record<string, string> = {
   'High fit':  'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
   'Good fit':  'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
-  'Monitor':   'bg-muted text-muted-foreground',
-}
+  'Monitor':   'bg-muted text-muted-foreground' }
 
 const EFFORT_BADGE: Record<string, string> = {
   Low:    'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
   Medium: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
-  High:   'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
-}
+  High:   'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare' }
 
 function daysUntil(dateStr: string, todayStr: string): number {
   const diffMs = new Date(dateStr).getTime() - new Date(todayStr).getTime()
@@ -535,11 +489,7 @@ function EmotionBar({ value }: { value: number | null }) {
         <span className="text-sm text-muted-foreground">Audience emotional positivity</span>
         <span className="text-sm font-semibold bg-num">{value !== null ? `${Math.round(value)}%` : '—'}</span>
       </div>
-      <div className="h-2.5 bg-muted rounded-sm overflow-hidden">
-        <div className={cn('h-full rounded-sm transition-colors duration-700',
-          value === null ? 'w-0' : value >= 60 ? 'bg-pos' : value >= 40 ? 'bg-ember' : 'bg-flare'
-        )} style={{ width: value !== null ? `${Math.min(100, value)}%` : '0%' }} />
-      </div>
+      <Crescendo value={value === null ? 0 : Math.min(100, value)} />
       <p className="text-xs text-muted-foreground">Based on joy, trust and anticipation signals in recent posts</p>
     </div>
   )
@@ -547,8 +497,7 @@ function EmotionBar({ value }: { value: number | null }) {
 
 // Full calendar row (compact)
 function CalendarRow({
-  moment, daysAway, fit,
-}: {
+  moment, daysAway, fit }: {
   moment: CulturalMoment; daysAway: number; fit: ReturnType<typeof fitLabel>
 }) {
   return (
@@ -588,8 +537,7 @@ function CalendarRow({
 
 // Top-pick card with on-demand activation ideas
 function TopPickCard({
-  moment, daysAway, fit, relevanceReason, brandName, category, brandValues, targetSegments,
-}: {
+  moment, daysAway, fit, relevanceReason, brandName, category, brandValues, targetSegments }: {
   moment:          CulturalMoment
   daysAway:        number
   fit:             ReturnType<typeof fitLabel>
@@ -616,9 +564,7 @@ function TopPickCard({
           brandName,
           category:       category ?? undefined,
           brandValues:    brandValues.length ? brandValues : undefined,
-          targetSegments: targetSegments.length ? targetSegments : undefined,
-        }),
-      })
+          targetSegments: targetSegments.length ? targetSegments : undefined }) })
       if (!res.ok) throw new Error('Failed to generate ideas')
       const data = (await res.json()) as { ideas: ActivationIdea[] }
       setIdeas(data.ideas)
@@ -696,8 +642,7 @@ function TopPickCard({
 export function CulturalClient({
   brandName, category, crsScore, drift, emotionResonance,
   today, analysisCount, brandValues, analyses,
-  targetSegments, culturalProfile,
-}: Props) {
+  targetSegments, culturalProfile }: Props) {
   const [crsOpen, setCrsOpen] = useState(false)
   const [showAllCalendar, setShowAllCalendar] = useState(false)
 
@@ -715,8 +660,7 @@ export function CulturalClient({
   const scoredMoments = allUpcoming.map(m => ({
     moment: m,
     score:  scoreMoment(m, category, audienceTags, categoryTagSet),
-    days:   daysUntil(m.date, today),
-  }))
+    days:   daysUntil(m.date, today) }))
 
   // Top picks: highest relevance score within next 180 days
   const topPicks = [...scoredMoments]
@@ -771,19 +715,12 @@ export function CulturalClient({
   return (
     <div className="max-w-3xl mx-auto space-y-6 p-4 sm:p-6">
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Flame className="h-5 w-5 text-tx-2" />
-            <h1 className="text-2xl font-semibold tracking-tight">Cultural Intelligence</h1>
-          </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            How well {brandName} resonates with Nigerian and West African audiences
-          </p>
-        </div>
-        <TourTrigger module="cultural" autoStart />
-      </div>
+      <PageHeader
+        {...PAGE_META['/dashboard/cultural']}
+        title="Cultural Intelligence"
+        subtitle={<>How well {brandName} resonates with Nigerian and West African audiences</>}
+        actions={<TourTrigger module="cultural" autoStart />}
+      />
 
       <div data-tour="cultural-main" className="space-y-6">
       {/* Drift alert */}
