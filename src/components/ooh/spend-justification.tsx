@@ -125,14 +125,14 @@ export function SpendJustification({
                     fontSize: 11,
                     color: 'var(--bg-card)',
                   }}
-                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10 }}
                   cursor={{ fill: 'currentColor', opacity: 0.05 }}
                 />
                 <Bar dataKey="cpm" radius={[0, 4, 4, 0]}>
                   {[{ channel: 'This OOH' }, ...DIGITAL_BENCHMARKS].map((entry, i) => (
                     <Cell
                       key={entry.channel}
-                      fill={i === 0 ? 'var(--flare)' : 'rgba(43,89,255,0.18)'}
+                      fill={i === 0 ? 'var(--chart-1)' : 'var(--chart-4)'}
                     />
                   ))}
                 </Bar>

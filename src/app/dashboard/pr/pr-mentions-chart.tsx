@@ -36,16 +36,16 @@ export function PrMentionsChart({ data }: Props) {
           <Tooltip
             contentStyle={{
               fontSize: 12,
-              border: '1px solid hsl(var(--border))',
+              border: '1px solid var(--border)',
               borderRadius: 'var(--r-card)',
-              background: 'hsl(var(--card))',
+              background: 'var(--card)',
             }}
             labelStyle={{ fontWeight: 600 }}
             formatter={(value) => [value, 'Press mentions']}
           />
           <Bar
             dataKey="mentions"
-            fill="hsl(var(--primary))"
+            fill="var(--primary)"
             radius={[4, 4, 0, 0]}
           />
         </BarChart>

@@ -357,7 +357,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                         <stop offset="95%" stopColor="var(--flare)" stopOpacity={0.02} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                     <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
                     <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
                     <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'BHI']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
@@ -377,7 +377,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               <ChartState rows={sentimentChartData} height={220} empty="No reading for this period yet.">
                               <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={sentimentChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                     <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
                     <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={28} tickLine={false} axisLine={false} />
                     <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, '']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
@@ -406,7 +406,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                         <stop offset="95%" stopColor="var(--neu)" stopOpacity={0.02} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                     <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
                     <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={32} tickLine={false} axisLine={false} />
                     <Tooltip formatter={(v) => [typeof v === 'number' ? `${v.toFixed(1)}%` : v, 'SOV']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />
@@ -497,7 +497,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                 <ChartState rows={npsWeeks} height={160} empty="No reading for this period yet.">
                                   <ResponsiveContainer width="100%" height={160}>
                     <BarChart data={npsWeeks} barSize={24}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="week" tickFormatter={fmtDate} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
                       <YAxis domain={[0, 10]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} width={24} tickLine={false} axisLine={false} />
                       <Tooltip formatter={(v) => [typeof v === 'number' ? v.toFixed(1) : v, 'NPS']} labelFormatter={(d) => fmtDate(String(d))} contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }} />

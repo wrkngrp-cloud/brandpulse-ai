@@ -211,7 +211,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
                 <XAxis dataKey="week" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} tickLine={false} />
                 <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)', border: '1px solid hsl(var(--border))' }}
+                  contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)', border: '1px solid var(--border)' }}
                   formatter={(value, name) => [
                     String(value ?? 0) + '/100',
                     PLATFORM_LABELS[String(name)] ?? String(name),

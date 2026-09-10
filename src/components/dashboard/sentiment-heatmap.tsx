@@ -20,22 +20,20 @@ interface TooltipState {
   y:   number
 }
 
-// ── Color logic ───────────────────────────────────────────────────────────
-// Centred on 50 (neutral). Distance from neutral drives opacity.
-// Below 50: red family. Above 50: green family. No data: transparent grid.
+// ── Colour ────────────────────────────────────────────────────────────────
+// The polarity axis, not a red-to-green scale. There is no green in this
+// system: positive reads as ink, neutral as ash, negative as Flare, and
+// distance from 50 drives how much of the cell the colour fills. Heat here
+// means "further from neutral", which is what the reader is scanning for.
+const NEUTRAL_CELL = 'color-mix(in srgb, var(--neu) 18%, transparent)'
 
 function cellColor(score: number | null): string {
   if (score === null) return 'transparent'
   const dist = score - 50
-  if (dist === 0) return 'rgba(100,116,139,0.18)'  // slate-500 barely visible
-  if (dist > 0) {
-    const t = Math.min(dist / 50, 1)
-    const opacity = 0.18 + t * 0.78
-    return `rgba(34,197,94,${opacity.toFixed(3)})`  // green-500
-  }
-  const t = Math.min(-dist / 50, 1)
-  const opacity = 0.18 + t * 0.78
-  return `rgba(239,68,68,${opacity.toFixed(3)})`    // red-500
+  if (dist === 0) return NEUTRAL_CELL
+  const t = Math.min(Math.abs(dist) / 50, 1)
+  const pct = Math.round((0.18 + t * 0.78) * 100)
+  return `color-mix(in srgb, var(${dist > 0 ? '--pos' : '--neg'}) ${pct}%, transparent)`
 }
 
 function cellLabel(score: number | null): string {
@@ -270,7 +268,7 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
           <div
             key={s}
             className="h-3 w-3 rounded-[2px]"
-            style={{ backgroundColor: s === 50 ? 'rgba(100,116,139,0.18)' : cellColor(s) }}
+            style={{ backgroundColor: cellColor(s) }}
           />
         ))}
         <span>More positive</span>

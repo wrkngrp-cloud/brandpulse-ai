@@ -76,12 +76,12 @@ export function DigitalSpendChart({ data, demo }: SpendChartProps) {
               <stop offset="95%" stopColor="var(--pos)" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
-          <XAxis dataKey="label" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-          <YAxis yAxisId="spend" tickFormatter={fmtNGN} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={56} />
-          <YAxis yAxisId="impr" orientation="right" tickFormatter={fmtImpr} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={52} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.4} />
+          <XAxis dataKey="label" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
+          <YAxis yAxisId="spend" tickFormatter={fmtNGN} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} width={56} />
+          <YAxis yAxisId="impr" orientation="right" tickFormatter={fmtImpr} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} width={52} />
           <Tooltip
-            contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
+            contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-card)', fontSize: 12 }}
             formatter={(val, name) =>
               name === 'spend'
                 ? [typeof val === 'number' ? fmtNGN(val) : val, 'Spend']
@@ -223,11 +223,11 @@ export function FrequencyBarChart({ data, demo }: FreqProps) {
       <ChartState rows={chartData} height={160} empty="Connect an ad account to see spend against results.">
               <ResponsiveContainer width="100%" height={160}>
           <BarChart data={chartData} margin={{ top: 8, right: 48, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} vertical={false} />
-            <XAxis dataKey="platform" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-            <YAxis domain={[0, domainMax]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={24} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.4} vertical={false} />
+            <XAxis dataKey="platform" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
+            <YAxis domain={[0, domainMax]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} width={24} />
             <Tooltip
-              contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
+              contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-card)', fontSize: 12 }}
               formatter={(val) => [typeof val === 'number' ? val.toFixed(2) : String(val), 'Avg Frequency']}
             />
             <ReferenceLine y={7} stroke="var(--line-strong)" strokeDasharray="4 2" />

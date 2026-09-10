@@ -23,11 +23,11 @@ export function PrintReadershipChart() {
     <ChartState rows={readership} height={200} empty="Add a print insertion to see readership.">
           <ResponsiveContainer width="100%" height={200}>
         <BarChart data={readership} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} horizontal={false} />
-          <XAxis type="number" tickFormatter={formatNum} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-          <YAxis type="category" dataKey="pub" tick={{ fontFamily: 'var(--font-num)',  fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={88} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.4} horizontal={false} />
+          <XAxis type="number" tickFormatter={formatNum} tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
+          <YAxis type="category" dataKey="pub" tick={{ fontFamily: 'var(--font-num)',  fontSize: 12, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} width={88} />
           <Tooltip
-            contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--r-card)', fontSize: 12 }}
+            contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-card)', fontSize: 12 }}
             formatter={(val) => [typeof val === 'number' ? formatNum(val) : val, 'Readership']}
           />
           <Bar dataKey="readers" name="Readership" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
