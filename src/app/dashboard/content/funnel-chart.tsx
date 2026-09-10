@@ -61,8 +61,8 @@ export function FunnelChart({ data }: Props) {
                       <ResponsiveContainer width="100%" height={140}>
               <BarChart data={data} margin={{ top: 0, right: 0, left: -28, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
-                <XAxis dataKey="stage" tick={{ fontFamily: 'var(--font-num)',  fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="stage" tick={{ fontFamily: 'var(--font-num)',  fontSize: 9, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 9, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="posts" radius={[4, 4, 0, 0]}>
                   {data.map(entry => (
@@ -81,8 +81,8 @@ export function FunnelChart({ data }: Props) {
                       <ResponsiveContainer width="100%" height={140}>
               <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="0" horizontal vertical={false} stroke="currentColor" className="text-border opacity-35" />
-                <XAxis dataKey="stage" tick={{ fontFamily: 'var(--font-num)',  fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="stage" tick={{ fontFamily: 'var(--font-num)',  fontSize: 9, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 9, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="avg_engagement" radius={[4, 4, 0, 0]}>
                   {data.map(entry => (

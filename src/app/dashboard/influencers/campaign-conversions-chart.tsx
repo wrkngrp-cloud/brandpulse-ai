@@ -27,18 +27,18 @@ export function CampaignConversionsChart() {
           <Tooltip
             contentStyle={{
               fontSize: 12,
-              border: '1px solid hsl(var(--border))',
+              border: '1px solid var(--border)',
               borderRadius: 'var(--r-card)',
-              background: 'hsl(var(--card))',
+              background: 'var(--card)',
             }}
             labelStyle={{ fontWeight: 600 }}
           />
           <Line
             type="monotone"
             dataKey="conversions"
-            stroke="hsl(var(--primary))"
+            stroke="var(--primary)"
             strokeWidth={2}
-            dot={{ r: 3, fill: 'hsl(var(--primary))' }}
+            dot={{ r: 3, fill: 'var(--primary)' }}
             activeDot={{ r: 5 }}
           />
         </LineChart>

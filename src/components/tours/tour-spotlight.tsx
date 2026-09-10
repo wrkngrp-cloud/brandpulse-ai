@@ -254,7 +254,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
               borderRadius: 'var(--r-card)',
               /* The spotlight is a ring and a scrim, not a glow: 2px Flare at
                  2px offset, which is the focus ring this system uses. */
-              boxShadow:    '0 0 0 2px var(--bg-paper), 0 0 0 4px var(--flare), 0 0 0 9999px rgba(22,18,14,.72)',
+              boxShadow:    '0 0 0 2px var(--bg-paper), 0 0 0 4px var(--flare), 0 0 0 9999px color-mix(in srgb, var(--bg-ink) 72%, transparent)',
               zIndex:       9992,
               pointerEvents: 'none',
             }}

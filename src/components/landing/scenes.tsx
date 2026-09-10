@@ -123,24 +123,24 @@ export function GaugeScene({ t }: { t: number }) {
             <linearGradient id="lg-bhi" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="var(--pos)" /><stop offset="100%" stopColor="var(--pos)" />
             </linearGradient>
-            <filter id="lg-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" /><feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
           </defs>
           <path d={TRACK_D} fill="none" stroke="var(--s-track)" strokeWidth={14} strokeLinecap="round" />
           {[40, 65, 80].map(pct => {
             const p = ptOnArc(225 - (pct / 100) * 270)
             return <circle key={pct} cx={p.x} cy={p.y} r={2.5} fill="var(--s-panel)" opacity={0.9} />
           })}
-          <path d={TRACK_D} fill="none" stroke="url(#lg-bhi)" strokeWidth={14} strokeLinecap="round" filter="url(#lg-glow)"
+          <path d={TRACK_D} fill="none" stroke="url(#lg-bhi)" strokeWidth={14} strokeLinecap="round"
             strokeDasharray={ARC_LEN} strokeDashoffset={ARC_LEN * (1 - (SCORE / 100) * sweep)} opacity={win(t, 0.02, 0.1)} />
-          <circle cx={dotP.x} cy={dotP.y} r={7 * dotIn} fill="var(--pos)" style={{ filter: 'drop-shadow(0 0 6px rgba(34,197,94,0.4))' }} />
+          <circle cx={dotP.x} cy={dotP.y} r={7 * dotIn} fill="var(--pos)" />
           <circle cx={dotP.x} cy={dotP.y} r={3.5 * dotIn} fill="var(--bg-paper)" />
           <text x={CX} y={CY - 14} textAnchor="middle" fontSize="48" fontWeight="700" letterSpacing="-2"
-            fontFamily="var(--font-num)" fill="var(--s-strong)">{score}</text>
+            fontFamily="var(--font-num)" fill="var(--s-strong)"
+            style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}>{score}</text>
           <text x={CX} y={CY + 10} textAnchor="middle" fontSize="11" fill="var(--s-mut)">out of 100</text>
-          <text x={START.x - 2} y={START.y + 18} textAnchor="middle" fontSize="9" fontFamily="var(--font-num)" fill="var(--s-mut)">0</text>
-          <text x={END.x + 2} y={END.y + 18} textAnchor="middle" fontSize="9" fontFamily="var(--font-num)" fill="var(--s-mut)">100</text>
+          <text x={START.x - 2} y={START.y + 18} textAnchor="middle" fontSize="9" fontFamily="var(--font-num)" fill="var(--s-mut)"
+            style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}>0</text>
+          <text x={END.x + 2} y={END.y + 18} textAnchor="middle" fontSize="9" fontFamily="var(--font-num)" fill="var(--s-mut)"
+            style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}>100</text>
         </svg>
         <span className="inline-flex items-center gap-1.5 rounded-sm border px-3 py-1 text-xs font-semibold"
           style={{ color: 'var(--pos)', backgroundColor: 'var(--bg-shell)', borderColor: 'var(--bg-shell)', opacity: win(t, 0.5, 0.62) }}>
@@ -497,7 +497,11 @@ export function CompetitiveScene({ t }: { t: number }) {
           })}
         </svg>
         <div className="flex flex-wrap justify-center gap-1.5">
-          {share.map(s => <Tag key={s.name} tone={s.name === 'You' ? 'hero' : 'quiet'}>{s.name} {Math.round(s.v * sweep)}%</Tag>)}
+          {share.map(s => (
+            <Tag key={s.name} tone={s.name === 'You' ? 'hero' : 'quiet'}>
+              {s.name}&nbsp;<span className="bg-num">{Math.round(s.v * sweep)}%</span>
+            </Tag>
+          ))}
         </div>
       </div>
       <div className="flex flex-1 flex-col justify-center gap-3">

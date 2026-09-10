@@ -79,33 +79,33 @@ export function OohVisitChart({ visits }: OohVisitChartProps) {
                 <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
                   <defs>
                     <linearGradient id="visitGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"   stopColor="hsl(var(--primary))" stopOpacity={0.25} />
-                      <stop offset="95%"  stopColor="hsl(var(--primary))" stopOpacity={0} />
+                      <stop offset="5%"   stopColor="var(--primary)" stopOpacity={0.25} />
+                      <stop offset="95%"  stopColor="var(--primary)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'var(--muted-foreground)' }}
                     tickLine={false} axisLine={false}
                     interval="preserveStartEnd"
                   />
                   <YAxis
-                    tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'var(--muted-foreground)' }}
                     tickLine={false} axisLine={false}
                     allowDecimals={false}
                   />
                   <Tooltip
                     contentStyle={{
                       fontSize: 12,
-                      border: '1px solid hsl(var(--border))',
-                      background: 'hsl(var(--card))',
+                      border: '1px solid var(--border)',
+                      background: 'var(--card)',
                       borderRadius: 'var(--r-card)',
                     }}
                   />
                   <Area
                     type="monotone" dataKey="visits"
-                    stroke="hsl(var(--primary))" strokeWidth={2}
+                    stroke="var(--primary)" strokeWidth={2}
                     fill="url(#visitGradient)"
                     dot={false}
                   />

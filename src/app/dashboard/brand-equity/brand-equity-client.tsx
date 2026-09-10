@@ -627,7 +627,7 @@ export function BrandEquityClient({
                 <PolarGrid className="stroke-border" />
                 <PolarAngleAxis
                   dataKey="dimension"
-                  tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'var(--muted-foreground)' }}
                 />
                 <Radar
                   name={brandName}
