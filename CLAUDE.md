@@ -40,7 +40,8 @@ flow (see Definition of done).
 
 ## Stack (do not deviate without asking)
 Next.js 16 App Router + TypeScript + Turbopack (default) · Supabase (Postgres + Auth +
-Realtime + Storage) · Tailwind + shadcn/ui · Recharts (+ D3 for Sankey/connectors) ·
+Realtime + Storage) · Tailwind + shadcn/ui on the BrandGauge token layer · Recharts
+(+ D3 for Sankey/connectors) ·
 Zustand · React Hook Form + Zod · Anthropic Claude · Inngest for ALL background jobs ·
 Upstash Redis for cache / rate-limit / OAuth state.
 
@@ -61,8 +62,8 @@ Upstash Redis for cache / rate-limit / OAuth state.
 - OOH attribution = branded vanity link + UTM (primary), search-uplift (corroboration).
   Event attribution = ambassador-captured leads via the PWA. QR is a secondary toggle,
   off by default.
-- Errors surface as sonner toasts. Loading uses shadcn skeletons. Everything is responsive
-  from iPhone SE width up.
+- Errors surface as sonner toasts. Loading uses a skeleton shaped like the thing that is
+  coming, never a spinner. Everything is responsive from iPhone SE width up.
 - Public endpoints (`/survey/[id]`, `/ambassador/[token]`, `/go/[slug]`) post/redirect via a
   service-role API route that validates the token/slug. NEVER open anon RLS on those tables.
 - Brands carry a `brand_type` (fmcg | fintech | venue | b2b_saas | marketplace |
@@ -198,6 +199,46 @@ Free-tier mention sources (no paid API): X via `GET /2/users/:id/mentions` with 
 OAuth token (direct @handle mentions only; app-only bearer search is NOT used, 402). Instagram
 via `ig_hashtags`/`recent_media` (hashtag search, 30/week free) and `/tags` (tagged media);
 both require a connected Instagram Business account.
+
+## The brand system (BrandGauge v3.4) — read before writing any UI
+The system lives in `brand/` at the repo root and `brand/DESIGN-SYSTEM.md` is the contract.
+Every colour, type, space and motion value comes from `brand/tokens.css`; the shadcn token
+layer in `src/app/globals.css` only aliases it. Do not invent a value, and do not reach for
+a hex, an `rgb()`, an `oklch()` or a Tailwind palette class — there are none left in `src`.
+
+- **Colour.** Ground (paper, shell, card, ink) carries about 75% of a surface. Flare is the
+  hero, applied to whole planes, once per frame; it fills, it never outlines, and it is
+  never text — `--tx-flare` (Char) is Flare as type. Type on a hot plane is `--on-hot`
+  (ink), because paper on Flare reads 3.3:1 and ink reads 5.3:1. There is no blue and no
+  green: polarity runs `--pos` (ink), `--neu` (ash), `--neg` (flare), and success is a
+  filled ink tick plus the word. Ash is not a text colour; use `--tx-2` or `--tx-3`, which
+  both clear 7:1 on every ground.
+- **Type.** Nohemi for everything, Disket Mono (`--font-num`, or the `.bg-num` class) for
+  numerals only, always tabular. Nothing else is monospace — not eyebrows, nav, captions or
+  chips. Capitals belong to `.bg-label` alone. Deltas read `+` and `−`; Disket has no
+  triangles and the licence forbids adding them.
+- **Surfaces.** Elevation is a one-pixel hairline at `--line`, never a shadow. The only
+  shadow is the focus ring: 2px `--flare` at 2px offset. Radius is cards 4px, controls 3px,
+  ticks 2.5px, status pills round. Nothing else is rounded.
+- **Icons.** The 107 supplied glyphs in `brand/icons/`, via `src/components/brand/icon.tsx`.
+  No icon library — do not add one. A missing glyph gets drawn on the construction grid in
+  section 7 of the design system. See `docs/brand-icons.md`.
+- **Components.** Use the primitives: `Gauge` (the BHI), `Crescendo` (every progress or
+  score bar), `Meter` (every metric row), `Readout`, `Delta`, `StatusPill`, `MentionCard`,
+  `ReadingStrip`, `AskBar`, `Label`, `Icon`, `Pattern`. Mention text stays verbatim,
+  unglossed and unitalicised in every language.
+- **Charts.** Only the subject series carries heat (`--chart-1`); comparisons are the
+  neutral ink steps `--chart-2` to `--chart-5`, dashed for lines. Threshold and benchmark
+  lines are hairlines, not ramp colours. Every chart goes through `ChartState`, so it ships
+  a chart-shaped skeleton and an empty state that names the next action.
+- **Motion.** The needle settles and nothing bounces. `.bg-press` on everything pressable,
+  the needle transition on a value change, and the gauge's first-paint sequence once per
+  session. Banned outright: `window.addEventListener('scroll')`, parallax, marquees,
+  spinners and anything that loops, numbers counting up, hover lift, per-element
+  fade-and-slide-up, and animating top, left, width or height.
+- **Logo.** Use the SVGs in `brand/logo/` through `src/components/brand/logo.tsx`. Never
+  redraw the mark, simplify it, or rebuild the needle from ratios.
+- Ship a screen only when it passes the audit in section 12 of the design system.
 
 ## Voice for any user-facing copy (hard rule)
 Warm, confident, plain English. Active voice. Connection before sales. No jargon. No em dashes.
