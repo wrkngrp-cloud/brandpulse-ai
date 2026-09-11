@@ -413,7 +413,7 @@ export function PrePostWidget() {
                   }
                 </Button>
                 {loading && (
-                  <p className="text-center text-[11px] text-muted-foreground animate-pulse">
+                  <p className="text-center text-[11px] text-muted-foreground">
                     {image ? (image.isVideo ? 'Analysing video frame and content...' : 'Reading image and cultural context, scoring your content...') : 'Reading cultural context and scoring your content...'}
                   </p>
                 )}

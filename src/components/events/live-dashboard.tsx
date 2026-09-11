@@ -96,7 +96,7 @@ export function LiveDashboard({ eventId, status, budget, ambassadors, initialInt
         <div className="flex items-center gap-2">
           {status === 'live' && (
             <span className="flex items-center gap-1.5 text-sm font-medium text-pos">
-              <Radio className="h-4 w-4 animate-pulse" />
+              <Radio className="h-4 w-4" />
               Live
             </span>
           )}

@@ -53,9 +53,9 @@ export function CampaignAiSummary({ campaignId, initialSummary }: CampaignAiSumm
 
       {pending ? (
         <div className="space-y-2 pt-1">
-          <div className="h-3 bg-muted animate-pulse rounded w-full" />
-          <div className="h-3 bg-muted animate-pulse rounded w-4/5" />
-          <div className="h-3 bg-muted animate-pulse rounded w-3/5" />
+          <div className="bg-skeleton-block h-3 w-full" />
+          <div className="bg-skeleton-block h-3 w-4/5" />
+          <div className="bg-skeleton-block h-3 w-3/5" />
         </div>
       ) : summary ? (
         <p className="text-sm text-muted-foreground leading-relaxed">{summary}</p>

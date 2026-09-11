@@ -437,13 +437,13 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
       {/* Draft resume banner */}
       {showDraftBanner && draft && !defaultValues && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20 px-4 py-3 flex items-center justify-between gap-3 text-xs">
-          <p className="text-amber-800 dark:text-amber-300">
+        <div className="flex items-center justify-between gap-3 rounded-sm border border-line-strong bg-flare-wash px-4 py-3 text-xs">
+          <p className="text-tx-flare">
             You have an unsaved draft: <strong>{draft.site_name || 'Untitled'}</strong>. We&apos;ve pre-filled the form for you.
           </p>
           <button
             type="button"
-            className="shrink-0 text-amber-700 dark:text-amber-400 underline bg-press"
+            className="shrink-0 underline text-tx-flare bg-press"
             onClick={async () => {
               const { discardDraft } = await import('@/app/dashboard/ooh/actions')
               if (draft.id) await discardDraft(draft.id)
@@ -537,7 +537,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           {!isFleet && (
             <div className="flex items-center justify-between mt-1.5">
               {lat !== '' && lng !== '' ? (
-                <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                <p className="flex items-center gap-1 text-xs text-pos">
                   <MapPin className="h-3 w-3" />
                   {Number(lat).toFixed(5)}, {Number(lng).toFixed(5)}
                 </p>
@@ -672,8 +672,8 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
         {/* Keke Fleet: fleet size + routes */}
         {isKeke && (
-          <div className="space-y-4 rounded-lg border border-orange-200 bg-orange-50/40 dark:border-orange-900/40 dark:bg-orange-950/10 p-4">
-            <p className="text-xs font-semibold text-orange-700 dark:text-orange-400">Keke Fleet Details</p>
+          <div className="space-y-4 rounded-sm border border-line bg-shell p-4">
+            <p className="text-xs font-semibold text-tx-2">Keke Fleet Details</p>
             <div className="space-y-1.5">
               <Label htmlFor="fleet_size">Number of keke units <FieldTip tip="How many tricycles carry your branding. Total impressions are multiplied by units × daily routes covered." /></Label>
               <Input
@@ -699,8 +699,8 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
         {/* Wall Painting: dimensions + classification */}
         {isMural && (
-          <div className="space-y-4 rounded-lg border border-green-200 bg-green-50/40 dark:border-green-900/40 dark:bg-green-950/10 p-4">
-            <p className="text-xs font-semibold text-green-700 dark:text-green-400">Wall Painting Details</p>
+          <div className="space-y-4 rounded-sm border border-line bg-shell p-4">
+            <p className="text-xs font-semibold text-tx-2">Wall Painting Details</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="surface_width_m">Width (metres) <FieldTip tip="Used to calculate surface area and estimate impressions (width × height × 150/day). Ask your vendor for the exact dimensions." /></Label>
@@ -744,8 +744,8 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
         {/* Branded Vehicle: fleet size + vehicle type + routes */}
         {isVehicle && (
-          <div className="space-y-4 rounded-lg border border-blue-200 bg-blue-50/40 dark:border-blue-900/40 dark:bg-blue-950/10 p-4">
-            <p className="text-xs font-semibold text-blue-700 dark:text-blue-400">Branded Vehicle Details</p>
+          <div className="space-y-4 rounded-sm border border-line bg-shell p-4">
+            <p className="text-xs font-semibold text-tx-2">Branded Vehicle Details</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="fleet_size_v">Number of vehicles <FieldTip tip="Impressions are calculated as vehicles × 2,000 unique views per vehicle per day across all routes." /></Label>

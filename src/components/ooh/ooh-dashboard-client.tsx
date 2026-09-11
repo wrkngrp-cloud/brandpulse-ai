@@ -6,7 +6,7 @@ import { OohSitesList } from '@/components/ooh/ooh-sites-list'
 
 const OohMapClient = dynamic(
   () => import('@/components/ooh/ooh-map-client').then(m => m.OohMapClient),
-  { ssr: false, loading: () => <div className="h-72 rounded-xl bg-muted animate-pulse" /> },
+  { ssr: false, loading: () => <div className="bg-skeleton-block h-72" /> },
 )
 
 interface Site {

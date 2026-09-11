@@ -410,7 +410,7 @@ export function OohScene({ t }: { t: number }) {
         </div>
         <div className="hidden items-center gap-2 rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2.5 @xl:flex">
           <span className="h-[11px] w-[5px] rounded-[var(--r-tick)]" style={{ background: HERO }} />
-          <span className="bg-num text-[11px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: 'var(--tx-flare)' }}>▍</span></span>
+          <span className="bg-num text-[11px] text-[var(--s-body)]">{typed}<span style={{ color: 'var(--tx-flare)' }}>▍</span></span>
         </div>
       </div>
       <div className="flex flex-1 flex-col justify-center gap-4">
@@ -455,7 +455,7 @@ export function AiScene({ t }: { t: number }) {
     <Panel className="flex h-full w-full flex-col gap-3 p-4 @xl:gap-4 @xl:p-6">
       <div className="flex items-center gap-2 rounded-xl border px-4 py-3" style={{ borderColor: 'var(--line)', background: 'var(--bg-shell)' }}>
         <span className="text-[13px]" style={{ color: 'var(--tx-flare)' }}>✦</span>
-        <span className="text-[12.5px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: 'var(--tx-flare)' }}>▍</span></span>
+        <span className="text-[12.5px] text-[var(--s-body)]">{typed}<span style={{ color: 'var(--tx-flare)' }}>▍</span></span>
       </div>
       <div className="flex flex-1 flex-col gap-2">
         {answers.map((a, i) => {
