@@ -11,6 +11,8 @@ import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { RadioAiAnalysis } from './radio-ai-analysis'
 import { getActiveBrand }  from '@/lib/active-brand'
 import { TourTrigger }     from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export const dynamic = 'force-dynamic'
 
@@ -124,20 +126,11 @@ export default async function RadioPage({
   return (
     <div className="max-w-5xl space-y-6">
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-xl bg-neu/10 flex items-center justify-center shrink-0 mt-0.5">
-            <Radio className="h-5 w-5 text-tx-2" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Radio Intelligence</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Log your agency buy plan and post-buy report to reconcile airtime delivery and spend across Nigerian stations.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+        <PageHeader
+          {...PAGE_META['/dashboard/radio']}
+          title="Radio Intelligence"
+          subtitle={<>Log your agency buy plan and post-buy report to reconcile airtime delivery and spend across Nigerian stations.</>}
+          actions={<>
           <TourTrigger module="radio" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={30} />
           <a
@@ -149,8 +142,8 @@ export default async function RadioPage({
             Template
           </a>
           <MediaPlanUploadDialog type="radio" templateUrl="/api/templates/radio" />
-        </div>
-      </div>
+          </>}
+        />
 
       <div data-tour="radio-main">
       {!hasData ? (

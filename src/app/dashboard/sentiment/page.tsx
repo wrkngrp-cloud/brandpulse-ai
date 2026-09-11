@@ -16,6 +16,8 @@ import { SentimentHeatmap } from '@/components/dashboard/sentiment-heatmap'
 import { MentionsList } from './mentions-list'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 import { Crescendo } from '@/components/brand/crescendo'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 const PLATFORM_LABEL: Record<string, string> = {
   twitter:   'X',
@@ -467,19 +469,16 @@ export default async function SentimentPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Sentiment</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Public perception · X and Instagram · {days <= 7 ? 'last 7 days' : days <= 30 ? 'last 30 days' : days <= 84 ? 'last 12 weeks' : 'last 6 months'} · nightly at 4 AM Lagos time
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
+      <PageHeader
+        {...PAGE_META['/dashboard/sentiment']}
+        title="Sentiment"
+        subtitle={<>Public perception · X and Instagram · {days <= 7 ? 'last 7 days' : days <= 30 ? 'last 30 days' : days <= 84 ? 'last 12 weeks' : 'last 6 months'} · nightly at 4 AM Lagos time</>}
+        actions={<>
           <TourTrigger module="sentiment" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={84} />
           <CrawlHistory />
-        </div>
-      </div>
+        </>}
+      />
 
       <Suspense fallback={
         <div className="space-y-4">

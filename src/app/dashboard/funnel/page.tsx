@@ -4,6 +4,8 @@ import { FunnelClient } from './funnel-client'
 import { getActiveBrandId } from '@/lib/active-brand'
 import { computeStageComposite, resolveBrandType, type StageSignal } from '@/lib/bhi'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export const dynamic = 'force-dynamic'
 
@@ -605,16 +607,12 @@ export default async function FunnelPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">Brand Funnel</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            How your audience moves from discovering{' '}
-            {brand?.name ?? 'your brand'} to advocating for it.
-          </p>
-        </div>
-        <TourTrigger module="funnel" autoStart />
-      </div>
+      <PageHeader
+        {...PAGE_META['/dashboard/funnel']}
+        title="Brand Funnel"
+        subtitle={<>How your audience moves from discovering {brand?.name ?? 'your brand'} to advocating for it.</>}
+        actions={<TourTrigger module="funnel" autoStart />}
+      />
 
       <FunnelClient
         scores={scores}

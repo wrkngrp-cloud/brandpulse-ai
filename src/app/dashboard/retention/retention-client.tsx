@@ -2,34 +2,33 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { TrendDownIcon as TrendingDown, RefreshIcon as RefreshCw, CheckIcon as CheckCircle, XCircleIcon as XCircle, InfoIcon as Info, UsersIcon as Users, XCircleIcon as ThumbsDown, TrendIcon as Activity } from '@/components/brand/icon'
-import { AlertIcon as AlertTriangle, MentionsIcon as MessageSquare, AlertIcon as AlertCircle } from '@/components/brand/icon'
+import { AlertIcon as AlertTriangle, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import type { RetentionRiskData, RetentionSignal } from '@/app/api/retention/risk/route'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 import { Crescendo } from '@/components/brand/crescendo'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 const RISK_COLOR = {
   low:      'text-pos bg-shell border-line',
   medium:   'text-tx-2 bg-shell border-line',
   high:     'text-tx-2 bg-shell border-line',
-  critical: 'text-tx-flare bg-flare-wash border-line-strong',
-} as const
+  critical: 'text-tx-flare bg-flare-wash border-line-strong' } as const
 
 const RISK_LABEL = {
   low:      'Low Risk',
   medium:   'Medium Risk',
   high:     'High Risk',
-  critical: 'Critical',
-} as const
+  critical: 'Critical' } as const
 
 const SEVERITY_ICON = {
   low:      <Info className="h-4 w-4 text-tx-2" />,
   medium:   <AlertCircle className="h-4 w-4 text-tx-2" />,
   high:     <AlertTriangle className="h-4 w-4 text-tx-2" />,
-  critical: <XCircle className="h-4 w-4 text-tx-flare" />,
-}
+  critical: <XCircle className="h-4 w-4 text-tx-flare" /> }
 
 export function RetentionClient() {
   const [data, setData]       = useState<RetentionRiskData | null>(null)
@@ -59,21 +58,18 @@ export function RetentionClient() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">Retention Risk</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Early warning signals based on sentiment, NPS, and brand health trends
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/retention']}
+        title="Retention Risk"
+        subtitle="Early warning signals based on sentiment, NPS, and brand health trends"
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="retention" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="retention-main">
       {error && (
@@ -281,8 +277,7 @@ function SignalRow({ signal }: { signal: RetentionSignal }) {
     low:      'bg-flare-wash',
     medium:   'bg-shell',
     high:     'bg-shell',
-    critical: 'bg-flare-wash',
-  }[signal.severity]
+    critical: 'bg-flare-wash' }[signal.severity]
 
   return (
     <div className={cn('px-5 py-3 flex items-start gap-3', severityBg)}>

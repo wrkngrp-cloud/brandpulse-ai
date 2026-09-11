@@ -19,6 +19,8 @@ import {
   benchCTR, benchCPC, benchCPM, benchROAS, benchFreq, benchCVR,
   OBJECTIVE_METRIC_LABELS,
 } from '@/lib/benchmarks/digital'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export const dynamic = 'force-dynamic'
 
@@ -484,20 +486,11 @@ export default async function DigitalPage({
   return (
     <div className="max-w-5xl space-y-8">
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-xl bg-flare/10 flex items-center justify-center shrink-0 mt-0.5">
-            <Monitor className="h-5 w-5 text-tx-2" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Digital Campaigns</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Track your paid media performance across all connected ad platforms.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
+      <PageHeader
+        {...PAGE_META['/dashboard/digital']}
+        title="Digital Campaigns"
+        subtitle="Track your paid media performance across all connected ad platforms."
+        actions={<>
           <TourTrigger module="digital" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={30} />
           <Link
@@ -512,8 +505,10 @@ export default async function DigitalPage({
           >
             Create Ad
           </Link>
-        </div>
-      </div>
+        
+        </>}
+      />
+
 
       {/* Banners */}
       {connected && (

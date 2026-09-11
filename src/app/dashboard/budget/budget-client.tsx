@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge'
 import { cn, formatNGN } from '@/lib/utils'
 import { toast } from 'sonner'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface LineItem {
   id:             string
@@ -66,14 +68,11 @@ export function BudgetClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Budget & Pacing</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Track planned vs. actual spend across channels
-          </p>
-        </div>
-        <div className="flex gap-2">
+      <PageHeader
+        {...PAGE_META['/dashboard/budget']}
+        title="Budget & Pacing"
+        subtitle="Track planned vs. actual spend across channels"
+        actions={<><div className="flex gap-2">
           <TourTrigger module="budget" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
@@ -83,8 +82,8 @@ export function BudgetClient() {
             <Plus className="h-4 w-4 mr-2" />
             New plan
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="budget-main">
       {/* Active plan summary */}

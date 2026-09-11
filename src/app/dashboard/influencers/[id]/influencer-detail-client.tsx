@@ -373,12 +373,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
                 </div>
               </div>
 
-              <div className="h-2 bg-muted rounded-sm overflow-hidden">
-                <div
-                  className={cn('h-full rounded-sm', bf.score >= 70 ? 'bg-pos' : bf.score >= 40 ? 'bg-ember' : 'bg-flare')}
-                  style={{ width: `${bf.score}%` }}
-                />
-              </div>
+              <Crescendo value={bf.score} />
 
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="space-y-0.5">

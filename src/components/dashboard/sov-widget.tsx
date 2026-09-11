@@ -59,12 +59,7 @@ export function SovWidget({
             {sovPct !== null ? `${sovPct.toFixed(1)}%` : '—'}
           </span>
         </div>
-        <div className="h-2 bg-muted rounded-sm overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-sm transition-colors duration-500"
-            style={{ width: sovPct !== null ? `${sovPct}%` : '0%' }}
-          />
-        </div>
+        <Crescendo value={sovPct ?? 0} />
         <p className="text-xs text-muted-foreground bg-num">
           {sov.brand_mentions.toLocaleString()} mentions of {total.toLocaleString()} total
         </p>
@@ -123,12 +118,7 @@ export function SovWidget({
                       </Button>
                     </div>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
-                    <div
-                      className="h-full bg-muted-foreground/40 rounded-sm transition-colors duration-500"
-                      style={{ width: count > 0 ? `${pct}%` : '0%' }}
-                    />
-                  </div>
+                  <Crescendo value={count > 0 ? pct : 0} />
                 </div>
               )
             })}

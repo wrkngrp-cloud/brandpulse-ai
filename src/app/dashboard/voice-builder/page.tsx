@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -169,16 +171,12 @@ export default function VoiceBuilderPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="eyebrow mb-1">Creative Intelligence</p>
-          <h1 className="h-display text-[26px] leading-none">Voice Builder</h1>
-          <p className="mt-1.5 text-[13px] text-muted-foreground/70 max-w-xl">
-            Extract your brand voice from existing content, then use it to retune captions or generate on-brand copy from any idea.
-          </p>
-        </div>
-        <TourTrigger module="voice_builder" autoStart />
-      </div>
+      <PageHeader
+        {...PAGE_META['/dashboard/voice-builder']}
+        title="Voice Builder"
+        subtitle="Extract your brand voice from existing content, then use it to retune captions or generate on-brand copy from any idea."
+        actions={<TourTrigger module="voice_builder" autoStart />}
+      />
 
       <div data-tour="voice-main">
       {/* Tab bar */}

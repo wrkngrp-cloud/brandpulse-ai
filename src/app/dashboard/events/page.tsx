@@ -7,6 +7,8 @@ import { CalendarIcon as CalendarDays, PlusIcon as Plus } from '@/components/bra
 import { cn }            from '@/lib/utils'
 import { getActiveBrand } from '@/lib/active-brand'
 import { TourTrigger }   from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export default async function EventsPage() {
   const supabase = await createClient()
@@ -24,19 +26,18 @@ export default async function EventsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">Events & Activations</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Track ROI from field activations, sponsorships, and events.</p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/events']}
+        title="Events & Activations"
+        subtitle="Track ROI from field activations, sponsorships, and events."
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="events" autoStart />
           <Link href="/dashboard/events/new" data-tour="create-event" className={cn(buttonVariants({ size: 'sm' }), 'inline-flex items-center')}>
             <Plus className="h-4 w-4 mr-1.5" />
             Create event
           </Link>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="event-list">
       {!events?.length ? (

@@ -11,6 +11,8 @@ import {
   type CommercialMetricId,
 } from '@/lib/commercial-metrics'
 import type { BrandType } from '@/lib/bhi'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -267,15 +269,12 @@ export function BoardPackClient({
         <div className="mx-auto max-w-3xl px-4 py-8">
 
           {/* Page title */}
-          <div className="mb-6 no-print flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-xl font-semibold text-tx">Board Pack</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                A one-page performance report ready for board or CFO review. Download as PDF or share directly.
-              </p>
-            </div>
-            <TourTrigger module="board_pack" autoStart />
-          </div>
+          <PageHeader
+        {...PAGE_META['/dashboard/board-pack']}
+        title="Board Pack"
+        subtitle="A one-page performance report ready for board or CFO review. Download as PDF or share directly."
+        actions={<TourTrigger module="board_pack" autoStart />}
+      />
 
           {/* ── Print preview pane ─────────────────────────────────────────────── */}
           <div

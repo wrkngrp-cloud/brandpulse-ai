@@ -154,12 +154,7 @@ function ScoreTile({ label, score, icon: Icon }: { label: string; score: number;
         <span className="text-[10px] font-semibold text-muted-foreground">{label}</span>
       </div>
       <p className={cn('text-xl font-bold bg-num', scoreColor(score))}>{score}</p>
-      <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
-        <div
-          className={cn('h-full rounded-sm transition-colors', score >= 75 ? 'bg-pos' : score >= 55 ? 'bg-ember' : 'bg-flare')}
-          style={{ width: `${score}%` }}
-        />
-      </div>
+      <Crescendo value={score} />
     </div>
   )
 }

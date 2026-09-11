@@ -10,6 +10,8 @@ import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 import { ChartState } from '@/components/brand/chart-states'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface MmmRun {
   id: string
@@ -108,15 +110,11 @@ export function MmmClient({ brandName, lastRun }: Props) {
     <div className="space-y-6 max-w-[1200px]">
 
       {/* Header */}
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow mb-1.5">Attribution</p>
-          <h1 className="h-display text-[28px] sm:text-[32px] leading-none">Media Mix</h1>
-          <p className="mt-1.5 text-[13px] text-muted-foreground/60">
-            Activity-weighted channel attribution — estimated contribution based on media activity levels
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/mmm']}
+        title="Media Mix"
+        subtitle="Activity-weighted channel attribution — estimated contribution based on media activity levels"
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="mmm" autoStart />
           <div className="flex rounded-xl border border-border overflow-hidden">
             {DAYS_OPTIONS.map(opt => (
@@ -139,8 +137,8 @@ export function MmmClient({ brandName, lastRun }: Props) {
               ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Analysing...</>
               : <><RefreshCw className="h-3.5 w-3.5 mr-1.5" />Run analysis</>}
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="mmm-main">
       {result === null ? (

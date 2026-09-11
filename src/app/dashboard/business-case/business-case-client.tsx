@@ -2,19 +2,19 @@
 
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Cell,
-} from 'recharts'
-import { TrendDownIcon as TrendingDown, CircleDotIcon as Target, CurrencyIcon as DollarSign, StarIcon as Award, CheckIcon as CheckCircle2, ChevronRightIcon as ChevronRight, TrendIcon as BarChart3, ArrowRightIcon as ArrowUpRight, MinusIcon as Minus } from '@/components/brand/icon'
+  Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { TrendDownIcon as TrendingDown, CircleDotIcon as Target, CurrencyIcon as DollarSign, StarIcon as Award, CheckIcon as CheckCircle2, TrendIcon as BarChart3, ArrowRightIcon as ArrowUpRight, MinusIcon as Minus } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 import {
   visibleCommercialMetrics,
   type CommercialMetrics,
-  type CommercialMetricId,
-} from '@/lib/commercial-metrics'
+  type CommercialMetricId } from '@/lib/commercial-metrics'
 import type { BrandType } from '@/lib/bhi'
 import { ChartState } from '@/components/brand/chart-states'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -61,8 +61,7 @@ const ESOV_POSTURE: Record<string, { label: string; color: string; bg: string; t
   mild:     { label: 'Mild Growth',     color: 'text-pos',    bg: 'bg-shell dark:bg-shell/30 border-line',         text: 'Slight share-of-voice advantage. Incremental budget can tip this into strong growth mode.' },
   parity:   { label: 'Parity',          color: 'text-tx-2',   bg: 'bg-shell dark:bg-shell/30 border-line',       text: 'You are matching your share with spending. No net gain or loss in market share expected at this rate.' },
   decline:  { label: 'Decline Risk',    color: 'text-tx-2',  bg: 'bg-shell dark:bg-shell/30 border-line',    text: 'You are underspending relative to market share. Competitors with positive ESOV will take share from you.' },
-  critical: { label: 'Critical',        color: 'text-tx-flare',     bg: 'bg-flare-wash dark:bg-shell/30 border-line-strong',            text: 'Significant underinvestment. Without correction, market share loss is statistically likely within 6–12 months.' },
-}
+  critical: { label: 'Critical',        color: 'text-tx-flare',     bg: 'bg-flare-wash dark:bg-shell/30 border-line-strong',            text: 'Significant underinvestment. Without correction, market share loss is statistically likely within 6–12 months.' } }
 
 function esovPosture(esov: number | null) {
   if (esov == null) return null
@@ -121,8 +120,7 @@ const COMMERCIAL_DEFS: Record<CommercialMetricId, {
   cpl:       { label: 'Cost per Lead',   icon: Target,     iconColor: 'text-tx-2',  fmt: fmtNGN, goodWhenDown: true },
   mql:       { label: 'MQLs',            icon: ArrowUpRight, iconColor: 'text-tx-2', fmt: v => v.toLocaleString('en-NG') },
   churnRate: { label: 'Churn Rate',      icon: TrendingDown, iconColor: 'text-tx-flare',   fmt: v => `${(v * 100).toFixed(1)}%`, goodWhenDown: true },
-  ltvToCac:  { label: 'LTV : CAC',       icon: Award,      iconColor: 'text-pos',    fmt: v => `${v.toFixed(1)}x` },
-}
+  ltvToCac:  { label: 'LTV : CAC',       icon: Award,      iconColor: 'text-pos',    fmt: v => `${v.toFixed(1)}x` } }
 
 function periodDelta(trend: { date: string; value: number }[]): number | null {
   if (trend.length < 2) return null
@@ -183,8 +181,7 @@ const BCG_CHANNELS: Record<string, { quadrant: string; color: string }> = {
   radio:      { quadrant: 'Cash Cow',    color: 'var(--pos)' },
   ooh:        { quadrant: 'Question',    color: 'var(--neu)' },
   print:      { quadrant: 'Dog',         color: 'var(--tx-2)' },
-  event:      { quadrant: 'Question',    color: 'var(--ember)' },
-}
+  event:      { quadrant: 'Question',    color: 'var(--ember)' } }
 
 // ── Main ───────────────────────────────────────────────────────────────────
 
@@ -192,8 +189,7 @@ export function BusinessCaseClient({
   brand, currentBhi, bhiChange, bhiTrend, sov, marketShare, esov,
   totalSpend, totalBudget, activeCampaigns, campaigns, channelSpend,
   avgNps, npsCount, avgSentiment, mentions30d, spendEfficiency,
-  competitors, commercial, brandType, children,
-}: Props) {
+  competitors, commercial, brandType, children }: Props) {
   const posture = esovPosture(esov)
   const commercialIds = visibleCommercialMetrics(brandType)
 
@@ -203,8 +199,7 @@ export function BusinessCaseClient({
       channel,
       spend,
       share: totalSpend > 0 ? Math.round((spend / totalSpend) * 100) : 0,
-      bcg:   BCG_CHANNELS[channel] ?? { quadrant: 'Other', color: 'var(--tx-3)' },
-    }))
+      bcg:   BCG_CHANNELS[channel] ?? { quadrant: 'Other', color: 'var(--tx-3)' } }))
 
   const bhiZone = currentBhi == null ? null
     : currentBhi >= 80 ? 'Leading' : currentBhi >= 65 ? 'Healthy' : currentBhi >= 40 ? 'Building' : 'At Risk'
@@ -213,17 +208,12 @@ export function BusinessCaseClient({
     <div className="max-w-4xl space-y-10 pb-16">
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="eyebrow mb-1">Reporting</p>
-          <h1 className="h-display text-[26px] leading-none">Marketing Business Case</h1>
-          <p className="mt-2 text-[13px] text-muted-foreground/70 max-w-xl">
-            Data-backed justification for your marketing investment — from brand health trends to channel ROI.
-            Use this to defend budget with finance and present to the board.
-          </p>
-        </div>
-        <TourTrigger module="business_case" autoStart />
-      </div>
+      <PageHeader
+        {...PAGE_META['/dashboard/business-case']}
+        title="Marketing Business Case"
+        subtitle="Data-backed justification for your marketing investment — from brand health trends to channel ROI. Use this to defend budget with finance and present to the board."
+        actions={<TourTrigger module="business_case" autoStart />}
+      />
 
       <div data-tour="bizcase-main">
       {/* AI Executive Case — streamed in separately via Suspense so the

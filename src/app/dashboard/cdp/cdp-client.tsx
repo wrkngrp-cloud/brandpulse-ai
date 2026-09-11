@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { DatabaseIcon as Database, RefreshIcon as RefreshCw, UsersIcon as Users, StarIcon as Star, MinusIcon as Minus, XCircleIcon as ThumbsDown, ShieldIcon as ShieldCheck, TrendIcon as Activity, MailIcon as Mail, PhoneIcon as Phone, CalendarIcon as Calendar } from '@/components/brand/icon'
+import { DatabaseIcon as Database, RefreshIcon as RefreshCw, UsersIcon as Users, StarIcon as Star, MinusIcon as Minus, XCircleIcon as ThumbsDown, TrendIcon as Activity, MailIcon as Mail, PhoneIcon as Phone, CalendarIcon as Calendar } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { SearchIcon as Search } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge'
 import { cn, formatNGN } from '@/lib/utils'
 import { toast } from 'sonner'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface CustomerProfile {
   id:                   string
@@ -33,15 +35,13 @@ interface CustomerProfile {
 const NPS_ICON = {
   promoter:  <Star className="h-3 w-3 text-pos" />,
   passive:   <Minus className="h-3 w-3 text-tx-2" />,
-  detractor: <ThumbsDown className="h-3 w-3 text-tx-flare" />,
-}
+  detractor: <ThumbsDown className="h-3 w-3 text-tx-flare" /> }
 
 const SOURCE_LABEL: Record<string, string> = {
   survey:     'Survey',
   whatsapp:   'WhatsApp',
   app_review: 'App Review',
-  ecommerce:  'Ecommerce',
-}
+  ecommerce:  'Ecommerce' }
 
 export function CdpClient() {
   const [profiles, setProfiles] = useState<CustomerProfile[]>([])
@@ -101,22 +101,19 @@ export function CdpClient() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Customer Data Platform</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Unified profiles merged from surveys, WhatsApp, and reviews
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/cdp']}
+        title="Customer Data Platform"
+        subtitle="Unified profiles merged from surveys, WhatsApp, and reviews"
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="cdp" autoStart />
           <Button onClick={handleSync} disabled={syncing} size="sm">
             {syncing
               ? <><Loader2 className="h-4 w-4 mr-2" />Syncing...</>
               : <><RefreshCw className="h-4 w-4 mr-2" />Sync data</>}
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       {/* KPI chips */}
       <div className="flex flex-wrap gap-2" data-tour="cdp-main">
