@@ -158,8 +158,13 @@ function LoginContent() {
       </div>
 
       {/* ── Right panel: form + demos ──────────────────────────── */}
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center gap-8 p-6 sm:p-10 lg:flex-row lg:items-center lg:p-12">
+      {/* One element cannot do both jobs. On lg this row is flex-row, so
+          justify-center centres horizontally and the cross axis decides the
+          vertical: items-center put the two columns' headings on different
+          baselines, items-start pinned the pair to the top of a 950px panel.
+          The outer column centres the block; the inner row shares a top edge. */}
+      <div className="flex flex-1 flex-col justify-center overflow-y-auto">
+        <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 p-6 sm:p-10 lg:flex-row lg:items-start lg:p-12">
 
           {/* Sign-in form */}
           <div className="flex-1 max-w-sm">
