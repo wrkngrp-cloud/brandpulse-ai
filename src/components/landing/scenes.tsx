@@ -444,7 +444,7 @@ export function AiScene({ t }: { t: number }) {
   const q = 'Why did sentiment dip in Kano last week?'
   const typed = q.slice(0, Math.floor(q.length * win(t, 0.05, 0.3)))
   const answers = [
-    'Negative spike traces to a 14-hour USSD outage on Tuesday.',
+    'Negative spike traces to a 14-hour app outage on Tuesday.',
     '62% of negative mentions were in Hausa. Top phrase: "ba ya aiki" (it is not working).',
     'Recommend: service-status notice to northern segments + in-app banner.',
   ]

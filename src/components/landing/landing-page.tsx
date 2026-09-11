@@ -6,8 +6,8 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
 import { VideoHero } from './video-hero'
-import { HorizontalTour } from './horizontal-tour'
-import { AiScene, CompetitiveScene, GaugeScene, darkSceneVars, lightSceneVars } from './scenes'
+import { ProductCards } from './product-cards'
+import { AiScene, CompetitiveScene, darkSceneVars, lightSceneVars } from './scenes'
 import { BrandLockup } from '@/components/brand/logo'
 import { useDarkGround, useMode } from './use-mode'
 import { HERO_PHOTOS } from './photo-frame'
@@ -58,74 +58,41 @@ export function Wordmark({ height = 22 }: { height?: number }) {
   return <BrandLockup height={height} ground={dark ? 'ink' : 'paper'} />
 }
 
+/**
+ * The masthead.
+ *
+ * It was a floating pill: `rounded-2xl` on a system with four radii, none of
+ * them 16px, and it landed in the middle of the hero photograph like a sticker.
+ * A full-width bar closed by a hairline is both the correct radius (none) and
+ * the right shape for a page whose hero now runs edge to edge.
+ */
 export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
-      <div className="mx-4 mt-4 flex max-w-6xl items-center justify-between rounded-2xl border px-4 py-3 backdrop-blur-xl sm:mx-6 sm:px-5 lg:mx-auto"
-        style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-glass)' }}>
+    <header className="fixed inset-x-0 top-0 z-50 border-b" style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-glass)' }}>
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
         <Link href="/" className="flex items-center gap-2.5" style={{ color: 'var(--lp-ink)' }}>
           <Wordmark />
         </Link>
         <nav className="hidden items-center gap-7 text-[11px] md:flex" style={{ color: 'var(--lp-mut)' }}>
-          <a href="/#tour" className="transition-opacity hover:opacity-60">Product</a>
+          <Link href="/#tour" className="transition-opacity hover:opacity-60">Product</Link>
           <Link href="/features" className="transition-opacity hover:opacity-60">Features</Link>
           <Link href="/use-cases" className="transition-opacity hover:opacity-60">Industries</Link>
-          <a href="/#builtforhere" className="transition-opacity hover:opacity-60">Why us</a>
+          <Link href="/#builtforhere" className="transition-opacity hover:opacity-60">Why us</Link>
         </nav>
         <div className="flex items-center gap-2.5">
           <button onClick={onToggle} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="flex h-9 w-9 items-center justify-center rounded-full border transition-transform hover:rotate-12 bg-press"
+            className="flex h-9 w-9 items-center justify-center rounded-sm border bg-press"
             style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)' }}>
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
           <Link href="/auth/login" className="hidden text-[13px] font-medium transition-opacity hover:opacity-70 sm:block" style={{ color: 'var(--lp-ink)' }}>Sign in</Link>
           <Link href="/auth/signup"
-            className="whitespace-nowrap rounded-sm px-4 py-2 text-[13px] font-bold transition-transform border border-line" style={{ background: 'var(--tx)', color: 'var(--bg-paper)' }}>
+            className="whitespace-nowrap rounded-sm border border-line px-4 py-2 text-[13px] font-bold bg-press" style={{ background: 'var(--tx)', color: 'var(--bg-paper)' }}>
             Start free
           </Link>
         </div>
       </div>
     </header>
-  )
-}
-
-/** Mouse-follow tilt wrapper: the "hold the product in your hand" delighter. */
-/** The demo sits flat. Nothing in this brand tilts toward the cursor. */
-function Tilt({ children }: { children: React.ReactNode }) {
-  return <div>{children}</div>
-}
-
-/** Adire-inspired concentric circle motif, kept faint. */
-function CircleMotif({ className = '', size = 320 }: { className?: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 200 200" className={className} aria-hidden>
-      {[86, 68, 50, 32, 14].map(r => (
-        <circle key={r} cx="100" cy="100" r={r} fill="none" stroke="var(--lp-clay)" strokeOpacity="0.12" strokeWidth="1.2" strokeDasharray={r % 28 === 0 ? '3 6' : undefined} />
-      ))}
-      <circle cx="100" cy="100" r="4" fill="var(--lp-clay)" fillOpacity="0.25" />
-    </svg>
-  )
-}
-
-/** Faint decorative echo of the BHI gauge arc (225°→315°, ticks at 40/65/80) —
- *  ties "we measure it" into the page's negative space instead of a generic pattern. */
-function GaugeArcMotif({ className = '', size = 520, color = 'var(--lp-clay)', opacity = 0.1 }:
-  { className?: string; size?: number; color?: string; opacity?: number }) {
-  const R = 92
-  const toXY = (deg: number) => {
-    const r = (deg * Math.PI) / 180
-    return { x: (100 + R * Math.cos(r)).toFixed(2), y: (100 - R * Math.sin(r)).toFixed(2) }
-  }
-  const start = toXY(225), end = toXY(315)
-  const d = `M ${start.x} ${start.y} A ${R} ${R} 0 1 1 ${end.x} ${end.y}`
-  return (
-    <svg width={size} height={size} viewBox="0 0 200 200" className={className} aria-hidden>
-      <path d={d} fill="none" stroke={color} strokeOpacity={opacity} strokeWidth="1.4" strokeLinecap="round" strokeDasharray="1 8" />
-      {[40, 65, 80].map(pct => {
-        const p = toXY(225 - (pct / 100) * 270)
-        return <circle key={pct} cx={p.x} cy={p.y} r="2.2" fill={color} fillOpacity={opacity * 1.4} />
-      })}
-    </svg>
   )
 }
 
@@ -135,98 +102,164 @@ function Reading({ to, suffix = '' }: { to: number; suffix?: string }) {
 }
 
 /**
- * The hero: the street, full bleed, with the claim over it.
+ * The hero.
  *
- * The headline says the street sees your brand, so the street is the plane
- * and the type sits on it. Ink rules apply over the photograph: the copy is
- * Paper, the accent word is Danfo, because Char inverts to Danfo on Ink and
- * Flare is never type. Flare stays where it belongs, filling the one CTA.
+ * Two earlier attempts failed for the same reason: a widget sat in it. First a
+ * drawn dashboard, then the gauge on a card in the bottom-right corner. A gauge
+ * reading 95 that belongs to nobody is a decoration of a number, and putting it
+ * beside the headline asks the reader to trust a figure before they know what it
+ * measures. The real gauge is a scroll away, attached to a real workspace.
  *
- * With no photograph in the slot yet this renders as an ink plane carrying
- * the mark's own tick field, which is a finished-looking hero rather than a
- * hole. It is still a placeholder: the section is built for a picture.
- *
- * Two things the old hero did that this system bans, gone: the headline
- * revealed a word at a time, and it sat on two 130px blur blooms.
+ * What replaces it is a split: type on the ink plane, photograph flush to the
+ * right edge and bleeding off it, a hairline between them, and a rule of four
+ * readouts closing the block. The photograph is the subject — the street the
+ * brand is being judged on — so it gets its own plane rather than being buried
+ * under a scrim so the type can survive on top of it.
  */
 function Hero() {
   const street = HERO_PHOTOS.street
   return (
-    <section className="relative isolate overflow-hidden">
-      {/* ── The plane ─────────────────────────────────────────────────── */}
-      <div className="absolute inset-0 -z-10" style={{ background: 'var(--bg-ink)' }}>
-        {street.src ? (
-          <Image src={street.src} alt={street.brief} fill priority sizes="100vw" className="object-cover" />
-        ) : (
-          <div className="absolute inset-0" style={{
+    <section className="relative isolate" style={{ background: 'var(--bg-ink)' }}>
+      <div className="mx-auto grid w-full grid-cols-1 lg:grid-cols-12">
+        {/* ── Type ─────────────────────────────────────────────────────── */}
+        <div className="relative order-2 flex flex-col justify-center px-6 pb-16 pt-14 sm:px-10 lg:order-1 lg:col-span-7 lg:min-h-[86vh] lg:py-40 lg:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pr-16">
+          {/* The mark's own material, held well behind the type. */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{
             backgroundImage: 'radial-gradient(var(--tick-1) 1.4px, transparent 1.4px)',
             backgroundSize: '30px 30px',
-            maskImage: 'radial-gradient(85% 70% at 30% 45%, black, transparent)',
+            maskImage: 'radial-gradient(70% 60% at 20% 40%, black, transparent)',
+            WebkitMaskImage: 'radial-gradient(70% 60% at 20% 40%, black, transparent)',
           }} />
-        )}
-        {/* The scrim. A plane over a plane, so the type has a ground to sit
-            on whatever the photograph turns out to be. */}
-        <div className="absolute inset-0" style={{
-          // Holds across the copy column, then releases the photograph. Measured
-          // against the rendered pixels, not against a flat token.
-          background: 'linear-gradient(100deg, color-mix(in srgb, var(--bg-ink) 94%, transparent) 0%, color-mix(in srgb, var(--bg-ink) 90%, transparent) 48%, color-mix(in srgb, var(--bg-ink) 74%, transparent) 66%, color-mix(in srgb, var(--bg-ink) 34%, transparent) 100%)',
-        }} />
-      </div>
 
-      <div className="mx-auto flex min-h-[78vh] max-w-6xl flex-col justify-center px-6 pb-20 pt-40 sm:pt-44">
-        <motion.div {...rise} className="max-w-3xl">
-          <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>
-            Brand intelligence built in Lagos, for West Africa
-          </p>
-          <h1 className="mt-5 text-5xl font-black leading-[1.02] tracking-[-0.03em] sm:text-7xl"
-            style={{ fontFamily: 'var(--font)', color: 'var(--tx-inv)' }}>
-            See your brand the way the{' '}
-            <span style={{ color: 'var(--danfo)' }}>street</span> sees it.
-          </h1>
-          <p className="mt-6 max-w-xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--tx-inv-2)' }}>
-            BrandGauge reads sentiment in Pidgin, Yoruba, Igbo and Hausa. It measures every
-            channel, from Instagram to a billboard on the expressway. Then it turns it all
-            into numbers your board will trust.
-          </p>
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link href="/auth/signup"
-              className="flex items-center justify-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-on-hot bg-press"
-              style={{ background: 'var(--flare)' }}>
-              Start free in beta
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <a href="#demo" className="rounded-sm border px-6 py-3.5 text-center text-[14px] font-medium"
-              style={{ borderColor: 'var(--line-inv)', color: 'var(--tx-inv)' }}>
-              Watch the demo
-            </a>
-          </div>
-          <div className="mt-12 flex max-w-xl flex-wrap gap-x-6 gap-y-2 text-[10px]" style={{ color: 'var(--tx-inv-2)' }}>
-            {['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
-              <span key={c}>{c}</span>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* The reading taken off that street, held on Paper against the ink. */}
-      <motion.div {...rise} transition={{ ...rise.transition, delay: 0.15 }}
-        className="pointer-events-none absolute bottom-10 right-6 hidden w-[300px] lg:block">
-        <div className="@container overflow-hidden rounded-sm border border-line"
-          style={{ background: 'var(--bg-card)', height: 360 }}>
-          <GaugeScene t={0.95} />
+          <motion.div {...rise}>
+            <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>
+              Brand intelligence built in Lagos, for West Africa
+            </p>
+            <h1 className="mt-5 text-5xl font-black leading-[1.02] tracking-[-0.03em] sm:text-6xl xl:text-7xl"
+              style={{ fontFamily: 'var(--font)', color: 'var(--tx-inv)' }}>
+              See your brand the way the{' '}
+              <span style={{ color: 'var(--danfo)' }}>street</span> sees it.
+            </h1>
+            <p className="mt-6 max-w-xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--tx-inv-2)' }}>
+              BrandGauge reads sentiment in Pidgin, Yoruba, Igbo and Hausa. It measures every
+              channel, from Instagram to a billboard on the expressway. Then it turns it all
+              into numbers your board will trust.
+            </p>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
+              <Link href="/auth/signup"
+                className="flex items-center justify-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-on-hot bg-press"
+                style={{ background: 'var(--flare)' }}>
+                Start free in beta
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a href="#demo" className="rounded-sm border px-6 py-3.5 text-center text-[14px] font-medium"
+                style={{ borderColor: 'var(--line-inv)', color: 'var(--tx-inv)' }}>
+                Watch the demo
+              </a>
+            </div>
+            <div className="mt-12 flex max-w-xl flex-wrap gap-x-6 gap-y-2 text-[10px]" style={{ color: 'var(--tx-inv-2)' }}>
+              {['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
+                <span key={c}>{c}</span>
+              ))}
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
+
+        {/* ── The street ───────────────────────────────────────────────── */}
+        <div className="relative order-1 min-h-[46vh] border-line-inv pt-16 lg:order-2 lg:col-span-5 lg:min-h-0 lg:border-l lg:pt-0">
+          {street.src && (
+            <Image src={street.src} alt={street.brief} fill priority
+              sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover" />
+          )}
+          {/* A short hold at the foot of the frame so the caption has a ground. */}
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-32" style={{
+            background: 'linear-gradient(to top, color-mix(in srgb, var(--bg-ink) 82%, transparent), transparent)',
+          }} />
+          <span className="bg-label absolute bottom-5 left-5" style={{ color: 'var(--tx-inv)' }}>
+            The market, 07:40
+          </span>
+        </div>
+      </div>
+
+      {/* ── The rule that closes the block ───────────────────────────── */}
+      <div className="border-t border-line-inv">
+        <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-px px-6 sm:grid-cols-4">
+          {HERO_READINGS.map(r => (
+            <div key={r.label} className="py-7 sm:py-8">
+              <dt className="text-[10px]" style={{ color: 'var(--tx-inv-2)' }}>{r.label}</dt>
+              <dd className="bg-num mt-2 text-3xl leading-none" style={{ color: 'var(--tx-inv)' }}>{r.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
     </section>
   )
 }
 
-/** The film, on Paper, directly under the hero. */
+const HERO_READINGS = [
+  { value: '7', label: 'Industries the index reshapes for' },
+  { value: '4', label: 'Nigerian languages read natively' },
+  { value: '04:00', label: 'Nightly refresh, Lagos time' },
+  { value: '1', label: 'Number your board asks about' },
+]
+
+/**
+ * The rest of the photography, under the film.
+ *
+ * Three frames, hairlined, each labelled with what it is. The page argues that
+ * a brand is judged out on the road, so the road belongs on the page more than
+ * once.
+ */
+function StreetStrip() {
+  const shots = [HERO_PHOTOS.aerial, HERO_PHOTOS.billboard, HERO_PHOTOS.roundabout]
+  return (
+    <section aria-label="Where the brand is judged" className="px-6 pb-8 pt-20">
+      <div className="mx-auto max-w-6xl">
+        <p className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Where the brand is judged</p>
+        <h2 className="mt-3 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
+          Your budget goes out here. So should your measurement.
+        </h2>
+        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
+          {shots.map((photo, i) => (
+            <figure key={photo.slot} className={i === 1 ? 'sm:mt-12' : undefined}>
+              <div className="relative w-full overflow-hidden rounded-sm border border-line"
+                style={{ aspectRatio: i === 1 ? '4 / 5' : '4 / 3' }}>
+                {photo.src && (
+                  <Image src={photo.src} alt={photo.brief} fill
+                    sizes="(max-width: 640px) 100vw, 31vw" className="object-cover" />
+                )}
+              </div>
+              <figcaption className="bg-label mt-2.5" style={{ color: 'var(--lp-mut)' }}>{photo.slot}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/**
+ * The film, on Paper, directly under the hero.
+ *
+ * It used to float at `max-w-4xl` while every section around it ran to
+ * `max-w-6xl`, so it sat narrower and centred against left-aligned headings —
+ * the page looked like two pages. Same column, same left edge, with a heading
+ * of its own so it reads as a section instead of an orphaned box.
+ */
 function HeroFilm() {
   return (
-    <section className="relative px-6 pb-4 pt-16">
-      <motion.div id="demo" {...rise} className="mx-auto max-w-4xl scroll-mt-28">
-        <VideoHero />
-      </motion.div>
+    <section className="px-6 pb-4 pt-24">
+      <div className="mx-auto max-w-6xl">
+        <p className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Ninety seconds</p>
+        <h2 className="mt-3 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
+          The whole thing, start to finish.
+        </h2>
+        <motion.div id="demo" {...rise} className="mt-10 scroll-mt-28">
+          <VideoHero />
+        </motion.div>
+      </div>
     </section>
   )
 }
@@ -243,19 +276,13 @@ const DIFFS = [
 function Differentiators() {
   return (
     <section id="builtforhere" className="relative overflow-hidden scroll-mt-24 py-28">
-      {/* patterned backdrop: dot grid + adire motif + gauge echo + washes */}
+      {/* The tick field, and nothing else. */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0" style={{
           backgroundImage: 'radial-gradient(var(--lp-dot) 1px, transparent 1px)',
           backgroundSize: '26px 26px',
           maskImage: 'radial-gradient(65% 70% at 50% 0%, black, transparent)',
         }} />
-        <div className="absolute -left-20 -top-16 opacity-40"><div><CircleMotif size={200} /></div></div>
-        <div className="absolute -bottom-32 -right-24"><div><GaugeArcMotif size={560} opacity={0.24} /></div></div>
-        <div className="absolute right-0 top-0 h-[360px] w-[560px] rounded-sm blur-[130px]"
-          style={{ background: 'var(--bg-shell)' }} />
-        <div className="absolute -bottom-40 left-0 h-[340px] w-[600px] rounded-sm blur-[130px]"
-          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
@@ -267,11 +294,8 @@ function Differentiators() {
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {DIFFS.map((d, i) => (
             <motion.div key={d.n} {...rise} transition={{ ...rise.transition, delay: i * 0.05 }}
-              className="group relative overflow-hidden rounded-2xl border p-7 transition-colors duration-300"
+              className="relative overflow-hidden rounded-sm border p-7"
               style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
-              {/* clay corner sweep on hover */}
-              <div className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                style={{ background: 'var(--bg-shell)' }} />
               <span className="bg-num text-[11px]" style={{ color: 'var(--tx-flare)' }}>{d.n}</span>
               <h3 className="mt-3 text-[17px] font-bold leading-snug" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{d.title}</h3>
               <p className="mt-2.5 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{d.body}</p>
@@ -280,16 +304,15 @@ function Differentiators() {
         </div>
 
         {/* stats band */}
-        <motion.div {...rise} className="relative mt-16 grid grid-cols-2 gap-4 rounded-2xl border p-8 text-center sm:grid-cols-4"
+        <motion.div {...rise} className="relative mt-16 grid grid-cols-2 divide-y divide-line rounded-sm border sm:grid-cols-4 sm:divide-x sm:divide-y-0"
           style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-chip)' }}>
-          <div className="pointer-events-none absolute -bottom-16 -right-10"><div><GaugeArcMotif size={220} opacity={0.3} /></div></div>
           {[
             { v: 4,  s: '',  label: 'languages read natively' },
             { v: 7,  s: '',  label: 'industry playbooks' },
             { v: 10, s: '+', label: 'live connectors' },
             { v: 5,  s: '',  label: 'offline channels measured' },
           ].map(st => (
-            <div key={st.label} className="relative">
+            <div key={st.label} className="relative p-7">
               <p className="text-4xl font-black bg-num" style={{ fontFamily: 'var(--font-num)', color: 'var(--tx-flare)' }}>
                 <Reading to={st.v} suffix={st.s} />
               </p>
@@ -305,14 +328,6 @@ function Differentiators() {
 function DeepDives() {
   return (
     <section className="relative overflow-hidden py-16">
-      {/* patterned backdrop: diagonal wash pair + a faint circle motif cropped at the edge */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 top-1/4 opacity-30"><div><CircleMotif size={380} /></div></div>
-        <div className="absolute -right-20 top-0 h-[360px] w-[520px] rounded-sm blur-[140px]"
-          style={{ background: 'var(--bg-shell)' }} />
-        <div className="absolute -left-10 bottom-0 h-[320px] w-[480px] rounded-sm blur-[140px]"
-          style={{ background: 'var(--bg-shell)' }} />
-      </div>
 
       <div className="relative mx-auto max-w-6xl space-y-24 px-6">
         {[
@@ -348,31 +363,26 @@ function Industries() {
   ]
   const [active, setActive] = useState(1)
   return (
-    <section id="industries" className="relative overflow-hidden scroll-mt-24 py-24 text-center">
-      {/* patterned backdrop: radial dot grid bookending the hero + a large centred gauge echo
-          ("one gauge" made literal in the negative space) */}
+    <section id="industries" className="relative overflow-hidden scroll-mt-24 py-24">
+      {/* The tick field, bookending the hero's. */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0" style={{
           backgroundImage: 'radial-gradient(var(--lp-dot) 1px, transparent 1px)',
           backgroundSize: '26px 26px',
           maskImage: 'radial-gradient(60% 65% at 50% 50%, black, transparent)',
         }} />
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div><GaugeArcMotif size={620} opacity={0.22} /></div>
-        </div>
-        <div className="absolute left-1/2 top-0 h-[300px] w-[560px] -translate-x-1/2 rounded-sm blur-[130px]"
-          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
-        <motion.h2 {...rise} className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
+        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Seven verticals</motion.p>
+        <motion.h2 {...rise} className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           One gauge. Seven industries.
         </motion.h2>
-        <motion.p {...rise} className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
+        <motion.p {...rise} className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
           Pick your industry once. The health index, funnel signals and connector
           recommendations reshape themselves around how your business actually works.
         </motion.p>
-        <motion.div {...rise} className="mt-10 flex flex-wrap justify-center gap-3">
+        <motion.div {...rise} className="mt-10 flex flex-wrap gap-3">
           {list.map((v, i) => (
             <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
               className="rounded-sm border px-5 py-2.5 text-[13px] transition-colors duration-200 bg-press"
@@ -383,7 +393,7 @@ function Industries() {
             </button>
           ))}
         </motion.div>
-        <p className="mx-auto mt-6 h-6 max-w-md text-[11px]" style={{ color: 'var(--lp-mut)' }}>
+        <p className="mt-6 h-6 max-w-md text-[11px]" style={{ color: 'var(--lp-mut)' }}>
           {list[active].hint}
         </p>
       </div>
@@ -394,15 +404,12 @@ function Industries() {
 function FinalCta() {
   return (
     <section className="px-6 pb-24 pt-8">
-      <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl px-6 py-24 text-center"
+      <div className="relative mx-auto max-w-6xl overflow-hidden rounded-sm px-6 py-24 text-center"
         style={{ background: 'var(--lp-band)' }}>
         <div className="pointer-events-none absolute inset-0" style={{
           backgroundImage: 'radial-gradient(var(--tick-1) 1px, transparent 1px)', backgroundSize: '22px 22px',
           maskImage: 'radial-gradient(70% 80% at 50% 50%, black, transparent)',
         }} />
-        <div className="pointer-events-none absolute -right-16 -top-16">
-          <div><GaugeArcMotif size={300} color="var(--tx-inv)" opacity={0.2} /></div>
-        </div>
         <motion.h2 {...rise} className="relative mx-auto max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
           Your brand already has a reputation. Start measuring it.
@@ -469,7 +476,8 @@ export function LandingPage() {
       <Nav dark={dark} onToggle={toggle} />
       <Hero />
       <HeroFilm />
-      <div id="tour" className="scroll-mt-20"><HorizontalTour /></div>
+      <ProductCards />
+      <StreetStrip />
       <Differentiators />
       <DeepDives />
       <Industries />

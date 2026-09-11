@@ -36,7 +36,7 @@ const INDUSTRIES: Industry[] = [
     who: 'For growth and brand teams at banks, wallets and payment apps, where trust is the product.',
     jobs: [
       { title: 'Measure trust where it actually forms', how: 'Trust is not an app-store rating. It is what people write under your posts, what they tell each other in the market and at work, and what your own customers score you. BrandGauge blends social comments, street-level discourse picked up in mentions and surveys, and NPS into a trust pillar inside your Brand Health Index.' },
-      { title: 'Catch a trust wobble before it spreads', how: 'A 14-hour USSD outage shows up as a Hausa-language negative spike the same day. Ask the AI why sentiment dipped and get an answer with the receipts.' },
+      { title: 'Catch a trust wobble before it spreads', how: 'A 14-hour app outage shows up as a Hausa-language negative spike the same day. Ask the AI why sentiment dipped and get an answer with the receipts.' },
       { title: 'Defend CAC and ROI to the board', how: 'Meta Ads, GA4, Paystack and your site pixel feed live CAC, ROI and funnel lift, with an AI-written business case for the budget meeting.' },
     ],
     modules: ['Trust pillar in BHI', 'Cultural sentiment', 'Surveys + NPS', 'Commercial proof', 'Competitive briefing', 'AI command layer'],
