@@ -102,7 +102,7 @@ export function BillingClient({
       <div>
         <p className="eyebrow mb-1">Settings</p>
         <h1 className="h-display text-[26px] leading-none">Billing & Plan</h1>
-        <p className="mt-1.5 text-[13px] text-muted-foreground/70">Manage your subscription and track usage.</p>
+        <p className="mt-1.5 text-[13px] text-tx-2">Manage your subscription and track usage.</p>
       </div>
 
       {/* Current plan summary */}

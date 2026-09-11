@@ -146,7 +146,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
         <div>
           <p className="eyebrow mb-1">Messaging</p>
           <h1 className="h-display text-[26px] leading-none">WhatsApp</h1>
-          <p className="mt-2 text-[13px] text-muted-foreground/70 max-w-xl">
+          <p className="mt-2 text-[13px] text-tx-2 max-w-xl">
             Send broadcast campaigns, surveys, and NPS follow-ups to your opted-in contacts.
           </p>
         </div>

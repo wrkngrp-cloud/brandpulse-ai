@@ -302,7 +302,7 @@ export function FsoFormClient({
                   placeholder="e.g. Emeka Okafor"
                   value={fsoName}
                   onChange={e => setFsoName(e.target.value)}
-                  className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm placeholder:text-tx-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
 
@@ -313,7 +313,7 @@ export function FsoFormClient({
                   placeholder="e.g. FSO-042"
                   value={fsoCode}
                   onChange={e => setFsoCode(e.target.value)}
-                  className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm placeholder:text-tx-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
 
@@ -348,7 +348,7 @@ export function FsoFormClient({
                   placeholder="e.g. Surulere"
                   value={lga}
                   onChange={e => setLga(e.target.value)}
-                  className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm placeholder:text-tx-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
             </div>
@@ -395,7 +395,7 @@ export function FsoFormClient({
                   placeholder="e.g. Mama Cynthia Stores"
                   value={outlet.outlet_name}
                   onChange={e => updateOutlet({ outlet_name: e.target.value })}
-                  className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm placeholder:text-tx-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
 
@@ -470,7 +470,7 @@ export function FsoFormClient({
                     placeholder="0.00"
                     value={outlet.observed_price_ngn}
                     onChange={e => updateOutlet({ observed_price_ngn: e.target.value })}
-                    className="w-full h-12 pl-8 pr-4 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    className="w-full h-12 pl-8 pr-4 rounded-xl border border-border bg-background text-sm placeholder:text-tx-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
               </div>
@@ -510,7 +510,7 @@ export function FsoFormClient({
                       placeholder="e.g. Peak Milk"
                       value={outlet.competitor_name}
                       onChange={e => updateOutlet({ competitor_name: e.target.value })}
-                      className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm placeholder:text-tx-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -520,7 +520,7 @@ export function FsoFormClient({
                       value={outlet.competitor_what}
                       onChange={e => updateOutlet({ competitor_what: e.target.value })}
                       rows={3}
-                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-sm placeholder:text-tx-3 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
                     />
                   </div>
                 </div>
@@ -612,7 +612,7 @@ export function FsoFormClient({
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-border bg-background text-sm placeholder:text-tx-3 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
               />
             </div>
 

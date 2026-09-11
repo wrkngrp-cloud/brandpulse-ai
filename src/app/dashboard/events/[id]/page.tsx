@@ -116,7 +116,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           </Link>
           {(event.campaigns as { id: string; name: string } | null) && (
             <>
-              <span className="text-muted-foreground/40">·</span>
+              <span className="text-tx-3">·</span>
               <Link
                 href={`/dashboard/campaigns/${(event.campaigns as { id: string; name: string }).id}?tab=events`}
                 className="inline-flex items-center gap-1 text-sm text-tx-flare dark:text-tx-2 hover:underline"

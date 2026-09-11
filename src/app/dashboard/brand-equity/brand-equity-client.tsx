@@ -140,7 +140,7 @@ export function BrandEquityClient({
             <p className="text-sm font-semibold">
               Brand Health Index
               {brandType && (
-                <span className="text-xs text-muted-foreground/60 font-normal ml-2 capitalize">
+                <span className="text-xs text-tx-2 font-normal ml-2 capitalize">
                   {brandType.replace('_', ' ')} weights
                 </span>
               )}
@@ -228,7 +228,7 @@ export function BrandEquityClient({
                       )} />
                     </div>
                     <ChevronDown className={cn(
-                      'h-3 w-3 shrink-0 text-muted-foreground/30 transition-transform duration-200 sm:hidden',
+                      'h-3 w-3 shrink-0 text-tx-3 transition-transform duration-200 sm:hidden',
                       isOpen && 'rotate-180',
                     )} />
                   </button>
@@ -247,13 +247,13 @@ export function BrandEquityClient({
                               <div key={source.label} className="space-y-1">
                                 <div className="flex items-center justify-between gap-2">
                                   <div className="flex items-center gap-2 min-w-0">
-                                    <span className="text-[11px] text-foreground/80 font-medium truncate">{source.label}</span>
+                                    <span className="text-[11px] text-tx-2 font-medium truncate">{source.label}</span>
                                     {source.rawDisplay && (
-                                      <span className="text-[10px] text-muted-foreground/60 bg-num shrink-0">{source.rawDisplay}</span>
+                                      <span className="text-[10px] text-tx-2 bg-num shrink-0">{source.rawDisplay}</span>
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2 shrink-0">
-                                    <span className="text-[10px] text-muted-foreground/50 bg-num">
+                                    <span className="text-[10px] text-tx-3 bg-num">
                                       {source.weight > 0 ? `${source.weight}% wt` : 'no data'}
                                     </span>
                                     <span className={cn(
@@ -262,7 +262,7 @@ export function BrandEquityClient({
                                         ? source.score >= 70 ? 'text-pos'
                                           : source.score >= 45 ? 'text-tx-2'
                                           : 'text-tx-flare'
-                                        : 'text-muted-foreground/30',
+                                        : 'text-tx-3',
                                     )}>
                                       {source.score !== null ? `${source.score}/100` : '—'}
                                     </span>
@@ -293,7 +293,7 @@ export function BrandEquityClient({
                           {/* Sources with no data */}
                           {breakdown.sources.filter(s => s.score === null && s.weight === 0).length > 0 && (
                             <div className="pt-1 border-t border-border/30">
-                              <p className="text-[10px] text-muted-foreground/40">
+                              <p className="text-[10px] text-tx-3">
                                 No data yet:{' '}
                                 {breakdown.sources
                                   .filter(s => s.score === null && s.weight === 0)
@@ -321,7 +321,7 @@ export function BrandEquityClient({
       <div className="border rounded-xl p-5 bg-card space-y-3">
         <div className="flex items-center gap-1.5">
           <p className="text-sm font-semibold">Brand Health Zones</p>
-          <Info className="h-3.5 w-3.5 text-muted-foreground/40" />
+          <Info className="h-3.5 w-3.5 text-tx-3" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {ZONE_GUIDE.map(({ zone, range, description }) => {
@@ -344,7 +344,7 @@ export function BrandEquityClient({
                     <span className="h-[11px] w-[5px] rounded-[var(--r-tick)]" style={{ backgroundColor: meta.color }} />
                     <span className="text-xs font-semibold" style={{ color: meta.color }}>{meta.label}</span>
                   </div>
-                  <span className="text-[10px] bg-num text-muted-foreground/50 bg-num">{range}</span>
+                  <span className="text-[10px] bg-num text-tx-3 bg-num">{range}</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
                 {bhi.zone === zone && (
@@ -419,7 +419,7 @@ export function BrandEquityClient({
                       )
                     })()}
                   </div>
-                  <div className="flex justify-between text-[10px] text-muted-foreground/50">
+                  <div className="flex justify-between text-[10px] text-tx-3">
                     <span className="bg-num">P25: {Math.round(b.p25)}</span>
                     <span className="bg-num">P50: {Math.round(b.p50)}</span>
                     <span className="bg-num">P75: {Math.round(b.p75)}</span>
@@ -545,7 +545,7 @@ export function BrandEquityClient({
               />
               <span className="text-xl font-bold">%</span>
             </div>
-            <p className="text-[10px] text-muted-foreground/60 mt-0.5">click to edit</p>
+            <p className="text-[10px] text-tx-2 mt-0.5">click to edit</p>
           </div>
           <div className={cn('border rounded-lg p-3 text-center', posture?.bg ?? 'bg-muted border-border')}>
             <p className="text-xs text-muted-foreground">ESOV</p>
@@ -656,7 +656,7 @@ export function BrandEquityClient({
           <div className="h-48 flex items-center justify-center border rounded-lg border-dashed">
             <div className="text-center space-y-1.5">
               <p className="text-sm text-muted-foreground">No Perception Audit responses yet</p>
-              <p className="text-xs text-muted-foreground/60">
+              <p className="text-xs text-tx-2">
                 Create and publish a Perception Audit survey to populate this chart.
               </p>
             </div>
@@ -674,7 +674,7 @@ export function BrandEquityClient({
             {rlShort} · based on organic social impressions, reach, and engagements
             using Nigerian market CPM (₦500/K) and CPE (₦50) benchmarks.
           </p>
-          <p className="text-[10px] text-muted-foreground/60">
+          <p className="text-[10px] text-tx-2">
             Benchmarks are adjustable in Settings → Brand in a future update.
           </p>
         </div>
@@ -690,7 +690,7 @@ export function BrandEquityClient({
               Full tracker <LinkIcon className="h-3 w-3" />
             </Link>
           </div>
-          <p className={cn('text-3xl font-bold', currentNps == null ? 'text-muted-foreground/40' :
+          <p className={cn('text-3xl font-bold', currentNps == null ? 'text-tx-3' :
             currentNps >= 50 ? 'text-pos' : currentNps >= 30 ? 'text-foreground' :
             currentNps >= 0 ? 'text-tx-2' : 'text-tx-flare')}>
             {currentNps != null ? `${currentNps >= 0 ? '+' : ''}${currentNps}` : '—'}

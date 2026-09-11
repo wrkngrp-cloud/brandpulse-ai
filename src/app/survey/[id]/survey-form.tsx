@@ -189,7 +189,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
             onChange={e => setAnswers(a => ({ ...a, [question.id]: e.target.value }))}
             placeholder="Type your answer here…"
             rows={4}
-            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-foreground/20 placeholder:text-muted-foreground/50"
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-foreground/20 placeholder:text-tx-3"
           />
         )}
       </div>

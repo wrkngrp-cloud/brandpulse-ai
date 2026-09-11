@@ -9,7 +9,7 @@ export function FieldTip({ tip }: { tip: string }) {
       <Tooltip>
         <TooltipTrigger
           tabIndex={-1}
-          className="inline-flex items-center text-muted-foreground/50 hover:text-muted-foreground transition-colors ml-1 align-middle"
+          className="inline-flex items-center text-tx-3 hover:text-muted-foreground transition-colors ml-1 align-middle"
         >
           <HelpCircle className="h-3.5 w-3.5" />
         </TooltipTrigger>

@@ -144,7 +144,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
       {result === null ? (
         <div className="rounded-2xl border bg-card p-12 flex flex-col items-center gap-4 text-center">
           <div className="h-14 w-14 rounded-full bg-muted/40 flex items-center justify-center">
-            <Zap className="h-6 w-6 text-muted-foreground/25" />
+            <Zap className="h-6 w-6 text-tx-3" />
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">No analysis yet</p>
@@ -277,7 +277,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
               <p className="text-[13px] font-medium eyebrow">Recommendations</p>
               {result.recommendations.map((r, i) => (
                 <div key={i} className="flex gap-3 py-3 border-b border-border/40 last:border-0">
-                  <span className="text-[11px] font-bold text-muted-foreground/60 w-14 shrink-0 pt-0.5 capitalize">{r.channel}</span>
+                  <span className="text-[11px] font-bold text-tx-2 w-14 shrink-0 pt-0.5 capitalize">{r.channel}</span>
                   <div>
                     <p className="text-[13px] font-medium">{r.action}</p>
                     <p className="text-[12px] text-muted-foreground mt-0.5 leading-relaxed">{r.rationale}</p>

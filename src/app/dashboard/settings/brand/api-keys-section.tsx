@@ -176,8 +176,8 @@ export function ApiKeysSection() {
         {keys.map(k => (
           <div key={k.id} className="flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm">
             <code className="flex-1 bg-num text-xs text-muted-foreground">{k.key_prefix}</code>
-            <span className="text-xs text-muted-foreground/70 shrink-0">{k.name}</span>
-            <span className="text-xs text-muted-foreground/50 shrink-0">
+            <span className="text-xs text-tx-2 shrink-0">{k.name}</span>
+            <span className="text-xs text-tx-3 shrink-0">
               {k.last_used_at
                 ? `Last used ${new Date(k.last_used_at).toLocaleDateString('en-NG', { timeZone: 'Africa/Lagos' })}`
                 : 'Never used'}

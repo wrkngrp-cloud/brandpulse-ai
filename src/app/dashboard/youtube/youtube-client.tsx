@@ -443,7 +443,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                         <p key={i} className="text-xs text-muted-foreground line-clamp-2 pl-2 border-l-2 border-border">
                           {c.text}
                           {c.like_count > 0 && (
-                            <span className="ml-2 text-muted-foreground/60 bg-num">· {c.like_count} likes</span>
+                            <span className="ml-2 text-tx-2 bg-num">· {c.like_count} likes</span>
                           )}
                         </p>
                       ))}

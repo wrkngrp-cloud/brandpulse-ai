@@ -51,7 +51,7 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
           </div>
           <button
             onClick={() => setOpen(false)}
-            className="p-1.5 rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer bg-press"
+            className="p-1.5 rounded-lg text-sidebar-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors cursor-pointer bg-press"
             aria-label="Close navigation"
           >
             <X className="h-4 w-4" />

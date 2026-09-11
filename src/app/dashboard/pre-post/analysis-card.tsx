@@ -94,7 +94,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
         {a.content_text ? (
           <p className="text-sm line-clamp-2 leading-snug">{a.content_text}</p>
         ) : (
-          <div className="flex items-center gap-1.5 text-muted-foreground/70">
+          <div className="flex items-center gap-1.5 text-tx-2">
             <Camera className="h-3.5 w-3.5 shrink-0" />
             <span className="text-sm">Image/video analyzed</span>
           </div>

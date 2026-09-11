@@ -104,7 +104,7 @@ function StatCard({
         {value}{suffix}
       </p>
       <p className="text-xs text-muted-foreground font-medium">{label}</p>
-      {note && <p className="text-[10px] text-muted-foreground/60">{note}</p>}
+      {note && <p className="text-[10px] text-tx-2">{note}</p>}
     </div>
   )
 }

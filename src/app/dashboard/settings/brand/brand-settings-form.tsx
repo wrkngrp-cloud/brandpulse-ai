@@ -143,8 +143,8 @@ export function BrandSettingsForm({ initial, logoUrl: initialLogoUrl, brandColor
                 </div>
               ) : (
                 <div className="h-20 w-20 rounded-xl border border-dashed bg-muted/30 flex flex-col items-center justify-center gap-1 shrink-0">
-                  <ImageIcon className="h-6 w-6 text-muted-foreground/50" />
-                  <p className="text-[10px] text-muted-foreground/50">No logo</p>
+                  <ImageIcon className="h-6 w-6 text-tx-3" />
+                  <p className="text-[10px] text-tx-3">No logo</p>
                 </div>
               )}
               <div className="space-y-2">

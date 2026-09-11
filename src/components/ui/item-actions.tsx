@@ -56,7 +56,7 @@ export function ItemActions({ actions, className }: Props) {
       <DropdownMenu>
         <DropdownMenuTrigger
           onClick={e => { e.preventDefault(); e.stopPropagation() }}
-          className={`h-7 w-7 inline-flex items-center justify-center rounded-md text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted transition-colors outline-none ${className ?? ''}`}
+          className={`h-7 w-7 inline-flex items-center justify-center rounded-md text-tx-3 hover:text-muted-foreground hover:bg-muted transition-colors outline-none ${className ?? ''}`}
           aria-label="More options"
         >
           <MoreHorizontal className="h-4 w-4" />

@@ -236,7 +236,7 @@ export default async function PRTrackingPage({
                         <span className="text-xs font-semibold">{mention.publication}</span>
                         <span className="text-xs text-muted-foreground bg-num">{fmtDate(mention.published_at)}</span>
                       </div>
-                      <p className="text-sm text-foreground/90 leading-snug line-clamp-2">{mention.headline}</p>
+                      <p className="text-sm text-tx-2 leading-snug line-clamp-2">{mention.headline}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {mention.sentiment_label && (
@@ -291,7 +291,7 @@ export default async function PRTrackingPage({
                           </span>
                           <span className="text-xs text-muted-foreground bg-num">{fmtDate(mention.published_at)}</span>
                         </div>
-                        <p className="text-sm text-foreground/80 leading-snug line-clamp-2">{mention.headline}</p>
+                        <p className="text-sm text-tx-2 leading-snug line-clamp-2">{mention.headline}</p>
                       </div>
                       {mention.url && (
                         <a href={mention.url} target="_blank" rel="noopener noreferrer"

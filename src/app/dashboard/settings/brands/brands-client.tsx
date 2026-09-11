@@ -119,7 +119,7 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
       <div>
         <p className="eyebrow mb-1">Settings</p>
         <h1 className="h-display text-[26px] leading-none">Brands</h1>
-        <p className="mt-1.5 text-[13px] text-muted-foreground/70">
+        <p className="mt-1.5 text-[13px] text-tx-2">
           Manage the brands in your workspace. Your {plan} plan supports{' '}
           {brandLimit === -1 ? 'unlimited brands' : `up to ${brandLimit} brand${brandLimit === 1 ? '' : 's'}`}.
         </p>
@@ -130,7 +130,7 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
         <div className="rounded-2xl border border-dashed border-line bg-shell/60 dark:bg-shell/20 p-4 flex items-center gap-3 flex-wrap">
           <div className="flex-1 min-w-0">
             <p className="text-[13px] font-semibold text-tx-2 dark:text-tx-2">Demo Mode</p>
-            <p className="text-[12px] text-tx-2/80 dark:text-tx-2/70">
+            <p className="text-[12px] text-tx-3 dark:text-tx-3">
               Seed a second brand (Jara Express) with 90 days of BHI, sentiment, SOV, and competitive intelligence data.
             </p>
           </div>
@@ -148,7 +148,7 @@ export function BrandsClient({ brands: initial, activeBrandId: initialActive, pl
             <div className="h-9 w-9 rounded-xl bg-muted/60 flex items-center justify-center shrink-0 overflow-hidden">
               {brand.logo_url
                 ? <img src={brand.logo_url} alt="" className="h-full w-full object-contain" />
-                : <Building2 className="h-4 w-4 text-muted-foreground/50" />}
+                : <Building2 className="h-4 w-4 text-tx-3" />}
             </div>
 
             {/* Name + category */}

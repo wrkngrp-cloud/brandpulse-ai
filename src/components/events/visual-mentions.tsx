@@ -56,7 +56,7 @@ function MentionCard({ m }: { m: VisualMention }) {
         <div className="absolute top-2 left-2">
           {m.brand_visible
             ? <CheckCircle2 className="h-5 w-5 text-pos drop-shadow" />
-            : <XCircle      className="h-5 w-5 text-muted-foreground/60 drop-shadow" />}
+            : <XCircle      className="h-5 w-5 text-tx-2 drop-shadow" />}
         </div>
         {/* Confidence */}
         {m.confidence && (
@@ -93,7 +93,7 @@ function MentionCard({ m }: { m: VisualMention }) {
               <span className={`inline-block h-1.5 w-1.5 rounded-full ${SENTIMENT_DOT[m.visual_sentiment] ?? 'bg-muted'}`} />
             )}
             {m.creator_username && <span>@{m.creator_username}</span>}
-            {m.hashtag && <span className="text-muted-foreground/50">#{m.hashtag}</span>}
+            {m.hashtag && <span className="text-tx-3">#{m.hashtag}</span>}
           </div>
           {m.post_url && (
             <a

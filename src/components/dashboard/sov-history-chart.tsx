@@ -19,13 +19,13 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5">
-      <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-1.5">
+      <p className="text-[10.5px] font-semibold text-tx-inv-2 mb-1.5">
         {label ? new Date(label).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'Africa/Lagos' }) : ''}
       </p>
       <p className="text-[15px] font-bold bg-num" style={{ color: 'var(--tx-inv)' }}>
         {payload[0].value.toFixed(1)}%
       </p>
-      <p className="text-[10px] text-tx-inv/40 mt-0.5">Share of Voice</p>
+      <p className="text-[10px] text-tx-inv-2 mt-0.5">Share of Voice</p>
     </div>
   )
 }

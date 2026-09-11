@@ -172,11 +172,11 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
           <div className="hidden sm:flex items-center gap-5 text-right">
             <div>
               <p className="metric text-[22px] text-pos">{pctPositive}%</p>
-              <p className="text-[10px] text-muted-foreground/50 mt-0.5">Positive days</p>
+              <p className="text-[10px] text-tx-3 mt-0.5">Positive days</p>
             </div>
             <div>
               <p className="metric text-[22px] text-tx-flare">{pctNegative}%</p>
-              <p className="text-[10px] text-muted-foreground/50 mt-0.5">Negative days</p>
+              <p className="text-[10px] text-tx-3 mt-0.5">Negative days</p>
             </div>
           </div>
         )}
@@ -190,7 +190,7 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
             {months.map(m => (
               <span
                 key={`${m.label}-${m.col}`}
-                className="absolute text-[10px] text-muted-foreground/45 font-medium"
+                className="absolute text-[10px] text-tx-3 font-medium"
                 style={{ left: m.col * STEP }}
               >
                 {m.label}
@@ -204,7 +204,7 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
               label ? (
                 <span
                   key={i}
-                  className="absolute text-[9px] text-muted-foreground/40 font-medium"
+                  className="absolute text-[9px] text-tx-3 font-medium"
                   style={{ top: i * STEP + 1, right: 6 }}
                 >
                   {label}
@@ -262,7 +262,7 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-3 text-[10px] text-muted-foreground/50">
+      <div className="flex items-center gap-3 text-[10px] text-tx-3">
         <span>Less</span>
         {[0, 25, 50, 62, 75, 88, 100].map(s => (
           <div
@@ -281,16 +281,16 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
           style={{ left: tooltip.x, top: tooltip.y - 8, transform: 'translate(-50%, -100%)' }}
         >
           <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5 min-w-[170px]">
-            <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-1.5 bg-num">
+            <p className="text-[10.5px] font-semibold text-tx-inv-2 mb-1.5 bg-num">
               {fmt(tooltip.date)}
             </p>
             {tooltip.score !== null ? (
               <>
                 <p className="text-[13px] font-semibold text-tx-inv bg-num">
                   Score: {Math.round(tooltip.score)}
-                  <span className="text-tx-inv/40 text-[11px] font-normal ml-1 bg-num">/ 100</span>
+                  <span className="text-tx-inv-2 text-[11px] font-normal ml-1 bg-num">/ 100</span>
                 </p>
-                <p className="text-[10.5px] text-tx-inv/50 mt-0.5 bg-num">{cellLabel(tooltip.score)}</p>
+                <p className="text-[10.5px] text-tx-inv-2 mt-0.5 bg-num">{cellLabel(tooltip.score)}</p>
                 {tooltip.positive_pct != null && (
                   <div className="flex gap-3 mt-1.5 pt-1.5 border-t border-line-inv">
                     <span className="text-[10.5px] text-pos bg-num">{Math.round(tooltip.positive_pct)}% positive</span>
@@ -299,7 +299,7 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
                 )}
               </>
             ) : (
-              <p className="text-[12px] text-tx-inv/30">No crawl data</p>
+              <p className="text-[12px] text-tx-inv-2">No crawl data</p>
             )}
           </div>
         </div>

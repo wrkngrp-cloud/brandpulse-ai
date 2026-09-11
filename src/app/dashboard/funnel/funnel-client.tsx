@@ -93,7 +93,7 @@ function scoreColor(score: number) {
 
 function dropOffMeta(from: number | null, to: number | null) {
   if (from == null || to == null || from === 0)
-    return { pct: null, isLift: false, colorClass: 'text-muted-foreground/40', urgent: false }
+    return { pct: null, isLift: false, colorClass: 'text-tx-3', urgent: false }
   const pct = Math.round(((from - to) / from) * 100)
   const isLift = pct < 0
   const urgent = pct > 30
@@ -242,7 +242,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                             {score}
                           </span>
                         ) : (
-                          <span className="text-xs text-muted-foreground/50">No data</span>
+                          <span className="text-xs text-tx-3">No data</span>
                         )}
                       </div>
                     </div>
@@ -322,7 +322,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                         <div key={item.label} className="space-y-1">
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2 min-w-0">
-                              <span className="text-xs font-medium text-foreground/80 truncate">{item.label}</span>
+                              <span className="text-xs font-medium text-tx-2 truncate">{item.label}</span>
                               {item.rawDisplay && (
                                 <span className="text-[10px] text-muted-foreground bg-num shrink-0">{item.rawDisplay}</span>
                               )}
@@ -449,7 +449,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
               {/* Drop-off connector */}
               {!isLast && (
                 <div className="px-5 py-2 bg-muted/25 border-t border-dashed border-border flex items-center gap-2">
-                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
+                  <ChevronDown className="h-3.5 w-3.5 text-tx-3 shrink-0" />
                   {drop.pct != null ? (
                     <>
                       <span className={cn('text-xs font-semibold bg-num', drop.colorClass)}>
@@ -463,7 +463,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       )}
                     </>
                   ) : (
-                    <span className="text-[11px] text-muted-foreground/40">
+                    <span className="text-[11px] text-tx-3">
                       Need scores for both stages to compute drop-off
                     </span>
                   )}

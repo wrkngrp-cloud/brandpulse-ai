@@ -266,7 +266,7 @@ export function OverviewClient({
             className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 hover:bg-muted/40 hover:border-border transition-colors card-hover"
           >
             <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center shrink-0">
-              <Icon className="h-3.5 w-3.5 text-muted-foreground/70" />
+              <Icon className="h-3.5 w-3.5 text-tx-2" />
             </div>
             <div className="min-w-0">
               <p className="text-[12.5px] font-semibold leading-tight truncate">{label}</p>
@@ -347,7 +347,7 @@ export function OverviewClient({
         <Card accent="hero" className="bento-bhi p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <Label>Brand Health Index</Label>
-            <Link href="/dashboard/brand-equity" className="text-muted-foreground/40 hover:text-foreground transition-colors">
+            <Link href="/dashboard/brand-equity" className="text-tx-3 hover:text-foreground transition-colors">
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -359,11 +359,11 @@ export function OverviewClient({
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 py-8">
               <div className="h-14 w-14 rounded-full bg-muted/40 flex items-center justify-center">
-                <Activity className="h-6 w-6 text-muted-foreground/25" />
+                <Activity className="h-6 w-6 text-tx-3" />
               </div>
               <div className="text-center space-y-1">
                 <p className="text-xs font-medium text-muted-foreground">No data yet</p>
-                <p className="text-[11px] text-muted-foreground/55 max-w-[160px] leading-relaxed">
+                <p className="text-[11px] text-tx-2 max-w-[160px] leading-relaxed">
                   Connect social accounts and run a survey to see your BHI.
                 </p>
               </div>
@@ -383,7 +383,7 @@ export function OverviewClient({
         >
           <div className="flex items-center justify-between mb-4">
             <Label>Sentiment Score</Label>
-            <Link href="/dashboard/sentiment" className="text-muted-foreground/40 hover:text-foreground transition-colors">
+            <Link href="/dashboard/sentiment" className="text-tx-3 hover:text-foreground transition-colors">
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -403,9 +403,9 @@ export function OverviewClient({
                     ? <TrendingUp className="h-3.5 w-3.5 text-pos" />
                     : sentiment.social_score <= 40
                     ? <TrendingDown className="h-3.5 w-3.5 text-tx-flare" />
-                    : <Minus className="h-3.5 w-3.5 text-muted-foreground/40" />
+                    : <Minus className="h-3.5 w-3.5 text-tx-3" />
                   }
-                  <span className="text-[11px] font-medium text-muted-foreground/45 bg-num">/ 100</span>
+                  <span className="text-[11px] font-medium text-tx-3 bg-num">/ 100</span>
                 </div>
               </div>
 
@@ -416,7 +416,7 @@ export function OverviewClient({
                 ].map(row => (
                   <div key={row.label} className="space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <span className="text-[12px] text-muted-foreground/65">{row.label}</span>
+                      <span className="text-[12px] text-tx-2">{row.label}</span>
                       <span className={cn('text-[12px] font-semibold bg-num', row.text)}>
                         {Math.round(row.pct)}%
                       </span>
@@ -431,15 +431,15 @@ export function OverviewClient({
                     </div>
                   </div>
                 ))}
-                <p className="text-[10px] text-muted-foreground/38 pt-0.5 bg-num">
+                <p className="text-[10px] text-tx-3 pt-0.5 bg-num">
                   {fmtDate(sentiment.day)}
                 </p>
               </div>
             </div>
           ) : (
             <div className="flex flex-col justify-center gap-1.5 py-3">
-              <span className="metric text-[58px] leading-none text-muted-foreground/10">—</span>
-              <p className="text-[12px] text-muted-foreground/60 mt-1">No crawl data yet. Run a crawl from Sentiment.</p>
+              <span className="metric text-[58px] leading-none text-tx-3">—</span>
+              <p className="text-[12px] text-tx-2 mt-1">No crawl data yet. Run a crawl from Sentiment.</p>
             </div>
           )}
         </Card>
@@ -448,7 +448,7 @@ export function OverviewClient({
         <Card accent="hero" className="bento-sov p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <Label>Share of Voice</Label>
-            <Link href="/dashboard/content" className="text-muted-foreground/40 hover:text-foreground transition-colors">
+            <Link href="/dashboard/content" className="text-tx-3 hover:text-foreground transition-colors">
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -458,7 +458,7 @@ export function OverviewClient({
               <div className="mt-2">
                 <div className="flex items-baseline gap-1">
                   <span className="metric text-[52px] leading-none">{Math.round(sovScore)}</span>
-                  <span className="metric text-[24px] text-muted-foreground/40 pb-1">%</span>
+                  <span className="metric text-[24px] text-tx-3 pb-1">%</span>
                 </div>
                 <p className="text-[11.5px] text-muted-foreground mt-1.5">
                   Social share of voice{sovDate ? ` · ${fmtDate(sovDate)}` : ''}
@@ -476,7 +476,7 @@ export function OverviewClient({
             </>
           ) : (
             <>
-              <span className="metric text-[52px] leading-none text-muted-foreground/12 mt-2">—</span>
+              <span className="metric text-[52px] leading-none text-tx-3 mt-2">—</span>
               <p className="text-[12px] text-muted-foreground mt-2">
                 SOV populates after first mention crawl.
               </p>
@@ -488,14 +488,14 @@ export function OverviewClient({
         <Card className="bento-events p-5 flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <Label>Upcoming Events</Label>
-            <Link href="/dashboard/events" className="text-muted-foreground/40 hover:text-foreground transition-colors">
+            <Link href="/dashboard/events" className="text-tx-3 hover:text-foreground transition-colors">
               <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
           {upcomingEvents.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center py-4">
-              <CalendarDays className="h-7 w-7 text-muted-foreground/18" />
+              <CalendarDays className="h-7 w-7 text-tx-3" />
               <p className="text-[12.5px] text-muted-foreground">No planned or live events.</p>
               <Link
                 href="/dashboard/events/new"
@@ -529,7 +529,7 @@ export function OverviewClient({
         <Card accent="hero" className="bento-campaigns p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Megaphone className="h-3.5 w-3.5 text-muted-foreground/50" />
+              <Megaphone className="h-3.5 w-3.5 text-tx-3" />
               <Label>Active Campaigns</Label>
             </div>
             <Link href="/dashboard/campaigns" className="flex items-center gap-0.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors">
@@ -567,11 +567,11 @@ export function OverviewClient({
                     </p>
                   </div>
                   {c.total_budget !== null && c.total_budget > 0 && (
-                    <span className="metric text-[14px] text-muted-foreground/70 shrink-0">
+                    <span className="metric text-[14px] text-tx-2 shrink-0">
                       {fmtCompact(c.total_budget, c.currency ?? 'NGN')}
                     </span>
                   )}
-                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/25 group-hover:text-muted-foreground transition-colors shrink-0" />
+                  <ArrowRight className="h-3.5 w-3.5 text-tx-3 group-hover:text-muted-foreground transition-colors shrink-0" />
                 </Link>
               ))}
             </div>
@@ -594,10 +594,10 @@ export function OverviewClient({
                   className="group rounded-xl border border-border/40 bg-muted/15 px-3.5 py-3.5 space-y-2.5 hover:bg-muted/30 hover:border-border/70 transition-colors duration-200 cursor-default"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-foreground/8 text-foreground/50 shrink-0">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-foreground/8 text-tx-2 shrink-0">
                       {PLATFORM_LABEL[m.platform] ?? m.platform}
                     </span>
-                    <span className="text-[11px] text-muted-foreground/65 truncate font-medium">
+                    <span className="text-[11px] text-tx-2 truncate font-medium">
                       {m.author_handle ? `@${m.author_handle}` : '—'}
                     </span>
                     {m.sentiment_label && (
@@ -611,7 +611,7 @@ export function OverviewClient({
                       </span>
                     )}
                   </div>
-                  <p className="text-[12.5px] leading-[1.55] line-clamp-2 text-foreground/65">{m.content}</p>
+                  <p className="text-[12.5px] leading-[1.55] line-clamp-2 text-tx-2">{m.content}</p>
                 </div>
               ))}
             </div>

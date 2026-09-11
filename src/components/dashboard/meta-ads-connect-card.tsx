@@ -91,7 +91,7 @@ export function MetaAdsConnectCard({ account: initialAccount }: Props) {
                 <p className="text-xs text-muted-foreground">
                   {account.account_name ?? 'Connected'}
                   {account.ad_account_id && (
-                    <span className="text-muted-foreground/50 ml-1 bg-num">· {account.ad_account_id}</span>
+                    <span className="text-tx-3 ml-1 bg-num">· {account.ad_account_id}</span>
                   )}
                 </p>
               </div>
@@ -130,7 +130,7 @@ export function MetaAdsConnectCard({ account: initialAccount }: Props) {
       </div>
 
       {account?.last_synced_at && (
-        <p className="text-[11px] text-muted-foreground/50 mt-3 pl-12">
+        <p className="text-[11px] text-tx-3 mt-3 pl-12">
           Last synced {new Date(account.last_synced_at).toLocaleDateString('en-NG', {
             day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lagos'
           })}

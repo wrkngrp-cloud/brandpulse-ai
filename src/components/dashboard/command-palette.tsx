@@ -98,7 +98,7 @@ export function CommandPalette() {
       <CommandList>
         <CommandEmpty>
           <div className="py-6 text-center space-y-3">
-            <Search className="h-8 w-8 text-muted-foreground/25 mx-auto" />
+            <Search className="h-8 w-8 text-tx-3 mx-auto" />
             <p className="text-sm text-muted-foreground">No pages found.</p>
             {query.trim() && (
               <button
@@ -124,7 +124,7 @@ export function CommandPalette() {
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
               </div>
               <span className="truncate">Ask AI: &ldquo;{query.trim()}&rdquo;</span>
-              <ArrowRight className="ml-auto h-3 w-3 text-muted-foreground/30 shrink-0" />
+              <ArrowRight className="ml-auto h-3 w-3 text-tx-3 shrink-0" />
             </CommandItem>
           </CommandGroup>
         )}
@@ -144,7 +144,7 @@ export function CommandPalette() {
                 <a.icon className="h-3.5 w-3.5 text-primary" />
               </div>
               <span>{a.label}</span>
-              <ArrowRight className="ml-auto h-3 w-3 text-muted-foreground/30" />
+              <ArrowRight className="ml-auto h-3 w-3 text-tx-3" />
             </CommandItem>
           ))}
         </CommandGroup>
@@ -164,7 +164,7 @@ export function CommandPalette() {
                   onSelect={() => go(p.href)}
                   className="gap-3 cursor-pointer"
                 >
-                  <p.icon className="h-4 w-4 text-muted-foreground/60 shrink-0" />
+                  <p.icon className="h-4 w-4 text-tx-2 shrink-0" />
                   <span>{p.label}</span>
                 </CommandItem>
               ))}

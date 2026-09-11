@@ -170,11 +170,11 @@ function WidgetPanel({ currentIds, onUpdate, onClose }: {
 function KpiTile({ label, value, sub, href }: { label: string; value: string | null; sub?: string; href?: string }) {
   const content = (
     <div className="border rounded-xl p-4 bg-card space-y-1 hover:border-foreground/30 transition-colors cursor-pointer">
-      <p className={cn('text-xl font-bold bg-num', !value && 'text-muted-foreground/40')}>
+      <p className={cn('text-xl font-bold bg-num', !value && 'text-tx-3')}>
         {value ?? 'N/A'}
       </p>
       <p className="text-xs text-muted-foreground font-medium">{label}</p>
-      {sub && <p className="text-[11px] text-muted-foreground/60">{sub}</p>}
+      {sub && <p className="text-[11px] text-tx-2">{sub}</p>}
     </div>
   )
   if (href) return <a href={href}>{content}</a>
@@ -264,13 +264,13 @@ export function DashboardHero({
             placeholder=""
             className={cn(
               'w-full h-12 pl-10 pr-32 rounded-xl border bg-card text-sm outline-none',
-              'placeholder:text-muted-foreground/50',
+              'placeholder:text-tx-3',
               'focus:ring-2 focus:ring-foreground/10 focus:border-foreground/30',
               'transition-colors duration-150',
             )}
           />
           {!query && (
-            <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-muted-foreground/50 pointer-events-none">
+            <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-tx-3 pointer-events-none">
               <RotatingPrompt prompts={prompts} />
             </span>
           )}

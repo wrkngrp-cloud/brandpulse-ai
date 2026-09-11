@@ -197,7 +197,7 @@ export default function VoiceBuilderPage() {
             >
               <t.icon className="h-3.5 w-3.5" />
               {t.label}
-              {locked && <span className="text-[10px] ml-1 text-muted-foreground/60">Build voice first</span>}
+              {locked && <span className="text-[10px] ml-1 text-tx-2">Build voice first</span>}
             </button>
           )
         })}
@@ -206,7 +206,7 @@ export default function VoiceBuilderPage() {
       {/* ── BUILD VOICE TAB ── */}
       {tab === 'build' && (
         <div className="space-y-5">
-          <p className="text-[13px] text-muted-foreground/80">
+          <p className="text-[13px] text-tx-2">
             Paste 3–10 samples of your brand&apos;s existing content — social posts, ads, press releases, email copy. The AI applies Kapferer&apos;s Brand Identity Prism to extract and save your voice pattern.
           </p>
 
@@ -341,7 +341,7 @@ export default function VoiceBuilderPage() {
       {/* ── RETUNE CAPTION TAB ── */}
       {tab === 'retune' && (
         <div className="space-y-5">
-          <p className="text-[13px] text-muted-foreground/80">
+          <p className="text-[13px] text-tx-2">
             Paste any caption — from an agency draft, a team member, or an AI tool. The AI rewrites it to sound exactly like {brandName || 'your brand'}, preserving the message and CTA.
           </p>
           <div className="space-y-3">
@@ -422,7 +422,7 @@ export default function VoiceBuilderPage() {
       {/* ── GENERATE CAPTIONS TAB ── */}
       {tab === 'generate' && (
         <div className="space-y-5">
-          <p className="text-[13px] text-muted-foreground/80">
+          <p className="text-[13px] text-tx-2">
             Describe a campaign idea, product moment, or message you want to land. The AI generates multiple caption variations — each in {brandName || 'your brand'}&apos;s voice, with different angles and hooks.
           </p>
           <div className="space-y-3">

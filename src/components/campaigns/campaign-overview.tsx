@@ -330,7 +330,7 @@ export function CampaignOverview({ campaign, oohSites, events, influencers = [] 
                         <td key={obj} className="text-center py-2 px-2">
                           {linked.includes(obj)
                             ? <span className={cn('inline-block h-3 w-3 rounded-full', OBJECTIVE_META[obj]?.color ?? 'bg-foreground')} />
-                            : <span className="text-muted-foreground/30">·</span>
+                            : <span className="text-tx-3">·</span>
                           }
                         </td>
                       ))}

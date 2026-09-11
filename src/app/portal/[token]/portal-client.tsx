@@ -629,7 +629,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                           {s.description && (
                             <p className="text-[12.5px] text-muted-foreground leading-snug">{s.description}</p>
                           )}
-                          <p className="text-[11px] text-muted-foreground/60 mt-1">{new Date(s.spotted_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}</p>
+                          <p className="text-[11px] text-tx-2 mt-1">{new Date(s.spotted_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}</p>
                         </div>
                       </li>
                     ))}
@@ -659,7 +659,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
                           <p className="text-[13px] font-medium leading-snug">{m.headline}</p>
                           <div className="flex items-center gap-2 mt-0.5">
                             <span className="text-[11px] text-muted-foreground">{m.publication}</span>
-                            <span className="text-muted-foreground/30">·</span>
+                            <span className="text-tx-3">·</span>
                             <span className="text-[11px] text-muted-foreground">{new Date(m.published_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}</span>
                             {m.competitor_name && <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded font-medium text-muted-foreground">{m.competitor_name}</span>}
                           </div>
@@ -808,7 +808,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
               Generated {new Date(data.asOf).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Lagos' })}
             </p>
           </div>
-          <p className="text-[10px] text-muted-foreground/50 mt-2">
+          <p className="text-[10px] text-tx-3 mt-2">
             Powered by BrandGauge · Data sourced from connected social, campaign, and survey platforms.
             Figures represent the selected period and may not reflect full historical performance.
           </p>

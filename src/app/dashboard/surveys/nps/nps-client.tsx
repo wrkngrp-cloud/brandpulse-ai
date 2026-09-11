@@ -64,11 +64,11 @@ const CUSTOM_TOOLTIP = ({ active, payload, label }: {
   const isPositive = val >= 0
   return (
     <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5 min-w-[148px]">
-      <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-2">{label}</p>
+      <p className="text-[10.5px] font-semibold text-tx-inv-2 mb-2">{label}</p>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-1.5">
           <span className="h-[3px] w-3 rounded-sm shrink-0" style={{ background: isPositive ? 'var(--pos)' : 'var(--flare)' }} />
-          <span className="text-[11.5px] text-tx-inv/55">NPS Score</span>
+          <span className="text-[11.5px] text-tx-inv-2">NPS Score</span>
         </div>
         <span className={cn('text-[13px] font-semibold bg-num', isPositive ? 'text-pos' : 'text-tx-flare')}>
           {isPositive ? '+' : ''}{Math.round(val)}
@@ -149,7 +149,7 @@ export function NpsClient({
               </div>
             </div>
           ) : (
-            <p className="metric text-[38px] text-muted-foreground/40 mt-1">—</p>
+            <p className="metric text-[38px] text-tx-3 mt-1">—</p>
           )}
           <p className="text-xs text-muted-foreground mt-1"><span className="bg-num">{totalResponses}</span> total responses</p>
         </div>
@@ -293,7 +293,7 @@ export function NpsClient({
         ) : (
           <div className="h-48 flex items-center justify-center">
             <div className="text-center space-y-2">
-              <Users className="h-7 w-7 text-muted-foreground/30 mx-auto" />
+              <Users className="h-7 w-7 text-tx-3 mx-auto" />
               <p className="text-sm text-muted-foreground max-w-[280px]">
                 {totalResponses === 0
                   ? 'No responses yet — publish a survey with an NPS question to start tracking.'
@@ -326,7 +326,7 @@ export function NpsClient({
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {cohorts.map(c => {
               const color =
-                c.nps == null  ? 'text-muted-foreground/40' :
+                c.nps == null  ? 'text-tx-3' :
                 c.nps >= 50    ? 'text-pos'  :
                 c.nps >= 30    ? 'text-foreground'  :
                 c.nps >= 0     ? 'text-tx-2'   :

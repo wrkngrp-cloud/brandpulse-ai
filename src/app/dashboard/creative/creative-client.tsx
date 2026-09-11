@@ -686,7 +686,7 @@ export function CreativeClient({
               value={competitorName}
               onChange={e => setCompetitorName(e.target.value)}
               placeholder="e.g. Pepsi Nigeria"
-              className="w-full text-sm border rounded-md px-3 py-2 bg-background placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring"
+              className="w-full text-sm border rounded-md px-3 py-2 bg-background placeholder:text-tx-2 focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </div>
 

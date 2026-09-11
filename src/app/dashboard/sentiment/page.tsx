@@ -188,7 +188,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
   if (!latest && !mentions?.length) {
     return (
       <div className="border rounded-xl p-12 text-center space-y-4">
-        <MessageCircle className="h-8 w-8 text-muted-foreground/40 mx-auto" />
+        <MessageCircle className="h-8 w-8 text-tx-3 mx-auto" />
         <div className="space-y-1">
           <p className="text-sm font-medium">No mentions crawled yet</p>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
@@ -286,7 +286,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
             <p className={`metric text-[34px] ${latest
               ? latest.social_score >= 60 ? 'text-pos'
                 : latest.social_score <= 40 ? 'text-tx-flare' : 'text-tx-2'
-              : 'text-muted-foreground/30'}`}>
+              : 'text-tx-3'}`}>
               {latest ? Math.round(latest.social_score) : '—'}
             </p>
             {latest && (
@@ -294,7 +294,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
                 ? <TrendingUp   className="h-4 w-4 text-pos mb-1" />
                 : latest.social_score <= 40
                   ? <TrendingDown className="h-4 w-4 text-tx-flare mb-1" />
-                  : <Minus        className="h-4 w-4 text-muted-foreground/40 mb-1" />
+                  : <Minus        className="h-4 w-4 text-tx-3 mb-1" />
             )}
           </div>
           {platformEntries.length > 0 && (
@@ -314,7 +314,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
           <p className="metric text-[34px] text-pos">
             {latest ? `${Math.round(latest.positive_pct)}%` : '—'}
           </p>
-          <p className="text-[11px] text-muted-foreground/50">of mentions</p>
+          <p className="text-[11px] text-tx-3">of mentions</p>
         </div>
 
         <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
@@ -322,13 +322,13 @@ async function SentimentData({ days = 84 }: { days: number }) {
           <p className="metric text-[34px] text-tx-flare">
             {latest ? `${Math.round(latest.negative_pct)}%` : '—'}
           </p>
-          <p className="text-[11px] text-muted-foreground/50">of mentions</p>
+          <p className="text-[11px] text-tx-3">of mentions</p>
         </div>
 
         <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
           <p className="eyebrow">Mentions</p>
           <p className="metric text-[34px]">{mentions?.length ?? 0}</p>
-          <p className="text-[11px] text-muted-foreground/50">latest 50 shown</p>
+          <p className="text-[11px] text-tx-3">latest 50 shown</p>
         </div>
       </div>
 
@@ -348,7 +348,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
               ].map(l => (
                 <div key={l.label} className="hidden sm:flex items-center gap-1.5">
                   <span className="h-[3px] w-4 rounded-sm" style={{ background: l.color }} />
-                  <span className="text-[11px] text-muted-foreground/55 font-medium">{l.label}</span>
+                  <span className="text-[11px] text-tx-2 font-medium">{l.label}</span>
                 </div>
               ))}
             </div>

@@ -99,7 +99,7 @@ function BrandAvatar({ brand, size }: { brand: BrandOption | undefined; size: 'x
     <div className={cn(dim, 'rounded-md bg-muted/60 flex items-center justify-center shrink-0 overflow-hidden border border-border/30')}>
       {brand?.logo_url
         ? <img src={brand.logo_url} alt="" className="h-full w-full object-contain" />
-        : <Building2 className={cn(iconDim, 'text-muted-foreground/60')} />}
+        : <Building2 className={cn(iconDim, 'text-tx-2')} />}
     </div>
   )
 }
