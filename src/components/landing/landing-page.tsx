@@ -118,7 +118,7 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
  * how a reading rises. By the time the last tick opens on the right, the
  * picture is densest exactly where the gauge would be hottest.
  */
-function Hero() {
+export function Hero() {
   const street = HERO_PHOTOS.street
   const [shown, setShown] = useState(false)
   const reveal = useArcReveal({ start: shown })
