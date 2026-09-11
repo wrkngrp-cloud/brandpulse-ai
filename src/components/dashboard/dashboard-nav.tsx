@@ -114,7 +114,7 @@ const REPORTS: NavEntry[] = [
 function SectionLabel({ children, expanded }: { children: React.ReactNode; expanded: boolean }) {
   if (expanded) {
     return (
-      <p className="px-3 pt-5 pb-1.5 text-[9.5px] font-bold text-sidebar-foreground/35 select-none whitespace-nowrap">
+      <p className="px-3 pt-5 pb-1.5 text-[9.5px] font-bold text-sidebar-foreground select-none whitespace-nowrap">
         {children}
       </p>
     )
@@ -146,7 +146,10 @@ function NavItem({
         className={cn(
           'relative flex items-center gap-3 h-[38px] rounded-xl cursor-default select-none',
           expanded ? 'px-3' : 'px-0 justify-center',
-          'text-sidebar-foreground/30',
+          // Readable, not dimmed into the ground: the "Soon" badge and the
+          // absent hover already say it is not clickable, so knocking the
+          // label back to 3:1 only made it hard to read.
+          'text-sidebar-foreground',
         )}
         title={`${label} — coming soon`}
       >
@@ -170,7 +173,7 @@ function NavItem({
         expanded ? 'px-3' : 'px-0 justify-center',
         active
           ? 'nav-pill-active text-tx-inv'
-          : 'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+          : 'text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent',
       )}
     >
       {active && (
@@ -245,7 +248,7 @@ function CollapsibleSection({
           expanded ? 'px-3' : 'px-0 justify-center',
           isOnSection
             ? 'text-sidebar-foreground bg-sidebar-accent font-medium'
-            : 'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+            : 'text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent',
         )}
       >
         <Icon className={cn('shrink-0 opacity-65', expanded ? 'h-[15px] w-[15px]' : 'h-[16px] w-[16px]')} />
@@ -269,7 +272,7 @@ function CollapsibleSection({
                   'flex items-center gap-2 h-8 px-2.5 rounded-lg text-[12.5px] font-medium transition-colors duration-150',
                   active
                     ? 'text-primary bg-primary/10'
-                    : 'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+                    : 'text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent',
                 )}
               >
                 <SubIcon className="h-3.5 w-3.5 shrink-0 opacity-70" />

@@ -2,7 +2,7 @@
 
 import { Suspense, useActionState, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { login } from '@/app/auth/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,7 @@ import { GoogleSignInButton } from '@/components/auth/google-sign-in-button'
 import { cn } from '@/lib/utils'
 import { ArrowRightIcon as ArrowRight, TrendIcon as BarChart2, GlobeIcon as Globe2, UsersIcon as Users2, AskIcon as Zap } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
+import { BrandLockup } from '@/components/brand/logo'
 
 // ── Demo accounts ──────────────────────────────────────────────────────────────
 
@@ -125,11 +126,8 @@ function LoginContent() {
       {/* ── Left panel: branding ───────────────────────────────── */}
       <div className="hidden lg:flex flex-col justify-between w-[420px] shrink-0 bg-foreground text-background p-10">
         <div>
-          <div className="flex items-center gap-2.5 mb-12">
-            <div className="h-8 w-8 rounded-lg bg-background/10 flex items-center justify-center">
-              <BarChart2 className="h-4 w-4 text-background" />
-            </div>
-            <span className="font-bold text-[15px] tracking-tight">BrandGauge</span>
+          <div className="mb-12">
+            <BrandLockup height={22} ground="ink" />
           </div>
 
           <h2 className="text-[28px] font-bold leading-tight mb-4">
@@ -163,11 +161,8 @@ function LoginContent() {
           {/* Sign-in form */}
           <div className="flex-1 max-w-sm">
             {/* Mobile logo */}
-            <div className="flex items-center gap-2 mb-8 lg:hidden">
-              <div className="h-7 w-7 rounded-lg bg-foreground flex items-center justify-center">
-                <BarChart2 className="h-3.5 w-3.5 text-background" />
-              </div>
-              <span className="font-bold text-[14px]">BrandGauge</span>
+            <div className="mb-8 lg:hidden">
+              <BrandLockup height={20} />
             </div>
 
             <h1 className="text-2xl font-bold mb-1">Welcome back</h1>
