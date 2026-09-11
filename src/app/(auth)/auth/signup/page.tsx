@@ -14,7 +14,7 @@ export default function SignupPage() {
   const [state, action, pending] = useActionState(signup, null)
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-sm">
 
         <div className="mb-8">
@@ -33,7 +33,7 @@ export default function SignupPage() {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="bg-muted/40 px-2 text-muted-foreground">or sign up with email</span>
+            <span className="bg-background px-2 text-tx-3">or sign up with email</span>
           </div>
         </div>
 
