@@ -105,15 +105,34 @@ Grading a seven-tick arc, tail to head: `#FFC12E #FFB528 #FFAA21 #FF9E1B #FF7E19
 
 ### Polarity, and the green question
 
-There is no green in this system, so sentiment and status run on an ink-to-flare axis instead:
+v3.4 ran polarity on an ink-to-flare axis because a green-red sentiment chart
+is unreadable for roughly 1 in 12 Nigerian men. That reasoning was sound about
+green-versus-red; it was wrong about this product. Ink as "positive" reads as
+absence rather than approval, and a sentiment score in black beside a score in
+orange tells a marketer nothing at a glance. Positive is green again, chosen so
+the accessibility argument still holds:
 
 ```
-positive / nominal   --pos   #16120E   solid ink
+positive / nominal   --pos   #345C2C   forest, hue 110      light
+                             #9BC98A   the same hue on Ink  dark
 neutral              --neu   #8C877E   ash
 negative / alert     --neg   #FF3D14   flare
 ```
 
-This is how a real instrument behaves. Nominal is black, deviation is red. It also happens to solve a problem the product already has: a green-red sentiment chart is unreadable for roughly 1 in 12 Nigerian men. Ink-versus-flare survives every form of colour blindness.
+**Hue 110, not 140.** It leans olive rather than emerald, so it sits with the
+warm ramp instead of fighting it. 7.2:1 on Paper, 7.7:1 on a white card,
+9.9:1 on Ink.
+
+**Why this survives colour blindness.** The green is dark (relative luminance
+0.086) and Flare is bright (0.246). Positive and negative are therefore 2.2:1
+apart in lightness alone, and stay 2.3:1 apart under a deuteranope simulation.
+The pair is separable without hue, which is the property that mattered — not
+the absence of green itself.
+
+**The weak pair is neutral against negative,** not positive against negative:
+ash sits at 0.244 and Flare at 0.246, near-identical in lightness, so those two
+are told apart by hue alone. Where that distinction carries meaning, give it a
+glyph or a label as well.
 
 **Direction is carried by glyph, not colour.** `CAC ₦412 ▼ 9%` is good news and the arrow says so. Never colour a delta green to mean good.
 
@@ -440,7 +459,7 @@ For the agent doing the pass, in this order. Do not skip ahead, because each ste
 
 1. **Drop in `brandgauge-tokens.css`, delete every hardcoded colour** in the codebase. Grep for `#`, `rgb(`, `hsl(`. Zero exceptions.
 2. **Kill the blue.** `#2B59FF` and every tint of it. Semantic replacements: primary action → `--flare`, link → `--tx-flare`, info → `--tx-2`.
-3. **Kill the green.** Success → ink tick. Positive sentiment → `--pos`.
+3. **Green is `--pos` only.** Success → a filled tick plus the word. Positive sentiment → `--pos`. Never a second green, and never green as a chart series.
 4. **Strip mono off every non-numeric string.** Eyebrows, nav, captions, section markers, chips.
 5. **Remove all-caps and letter-spacing from labels.** Sentence case, 12px, `--tx-3`.
 6. **Replace every shadow with a hairline.** Search `box-shadow`, keep only focus rings.

@@ -167,7 +167,9 @@ function Hero() {
         {/* The scrim. A plane over a plane, so the type has a ground to sit
             on whatever the photograph turns out to be. */}
         <div className="absolute inset-0" style={{
-          background: 'linear-gradient(100deg, color-mix(in srgb, var(--bg-ink) 88%, transparent) 0%, color-mix(in srgb, var(--bg-ink) 72%, transparent) 45%, color-mix(in srgb, var(--bg-ink) 30%, transparent) 100%)',
+          // Holds across the copy column, then releases the photograph. Measured
+          // against the rendered pixels, not against a flat token.
+          background: 'linear-gradient(100deg, color-mix(in srgb, var(--bg-ink) 94%, transparent) 0%, color-mix(in srgb, var(--bg-ink) 90%, transparent) 48%, color-mix(in srgb, var(--bg-ink) 74%, transparent) 66%, color-mix(in srgb, var(--bg-ink) 34%, transparent) 100%)',
         }} />
       </div>
 
@@ -198,7 +200,7 @@ function Hero() {
               Watch the demo
             </a>
           </div>
-          <div className="mt-12 flex flex-wrap gap-x-6 gap-y-2 text-[10px]" style={{ color: 'var(--tx-inv-2)' }}>
+          <div className="mt-12 flex max-w-xl flex-wrap gap-x-6 gap-y-2 text-[10px]" style={{ color: 'var(--tx-inv-2)' }}>
             {['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
               <span key={c}>{c}</span>
             ))}

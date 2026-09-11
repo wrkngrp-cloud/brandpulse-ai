@@ -34,24 +34,29 @@ export interface Photo {
  */
 export const HERO_PHOTOS: Record<string, Photo> = {
   street: {
-    src: null,
+    src: '/landing/photos/lagos-market-crowd.jpg',
     slot: 'The street',
-    brief: 'A Lagos street at eye level — danfo buses, hawkers, a billboard visible above the traffic. Shot wide, warm light.',
+    brief: 'A Lagos market street at rush hour — danfo buses, traders, umbrellas, the crowd the brand is being judged by.',
   },
-  market: {
-    src: null,
-    slot: 'The shelf',
-    brief: 'A market stall with branded FMCG stock on the shelf, shot close enough to read a label.',
-  },
-  phone: {
-    src: null,
-    slot: 'The customer',
-    brief: 'Someone reading their phone in a Lagos setting — the customer whose sentiment the product is measuring.',
+  aerial: {
+    src: '/landing/photos/lagos-market-aerial.jpg',
+    slot: 'The market',
+    brief: 'A Lagos market from above: stalls, umbrellas and traffic threading between them.',
   },
   billboard: {
-    src: null,
+    src: '/landing/photos/expressway-billboard.jpg',
     slot: 'The billboard',
-    brief: 'A large-format billboard on an expressway, shot from the road.',
+    brief: 'A large-format billboard over a Lagos expressway, shot from the bridge.',
+  },
+  highway: {
+    src: '/landing/photos/highway-billboard.jpg',
+    slot: 'The expressway',
+    brief: 'An expressway billboard against the city skyline.',
+  },
+  roundabout: {
+    src: '/landing/photos/roundabout-billboard.jpg',
+    slot: 'The junction',
+    brief: 'A roundabout billboard at a busy junction, shot from the air.',
   },
 }
 
