@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform,
 } from 'framer-motion'
@@ -73,7 +73,21 @@ const RAIL_TICKS = 28
  */
 export function ReadingRail() {
   const reduce = useReducedMotion()
-  const { scrollYProgress } = useScroll()
+  const { scrollY, scrollYProgress } = useScroll()
+  // The rail is fixed in the gutter, and the gutter is Paper for all of the
+  // page except the hero, which is an ink plane. An ink track on ink is
+  // invisible, so at scroll 0 the rail's top half vanished into the hero and
+  // its bottom half showed against Paper. Rather than fight that with a second
+  // track colour, the rail arrives once the hero is behind you: there is no
+  // reading to show until the page has started.
+  const [vh, setVh] = useState(900)
+  useEffect(() => {
+    const read = () => setVh(window.innerHeight)
+    read()
+    window.addEventListener('resize', read)
+    return () => window.removeEventListener('resize', read)
+  }, [])
+  const appear = useTransform(scrollY, [vh * 0.55, vh * 0.95], [0, 1])
   // The needle settles. A spring on the raw progress stops the rail juddering
   // one tick back and forth on a trackpad.
   const smooth = useSpring(scrollYProgress, { stiffness: 260, damping: 40, mass: 0.4 })
@@ -83,8 +97,9 @@ export function ReadingRail() {
   const reading = reduce ? RAIL_TICKS : lit
 
   return (
-    <div
+    <motion.div
       aria-hidden
+      style={{ opacity: reduce ? 1 : appear }}
       className="pointer-events-none fixed left-0 top-0 z-40 hidden h-screen w-[max(1.5rem,calc((100vw-72rem)/2))] flex-col items-center justify-center gap-[6px] lg:flex"
     >
       {Array.from({ length: RAIL_TICKS }, (_, i) => {
@@ -107,7 +122,7 @@ export function ReadingRail() {
           />
         )
       })}
-    </div>
+    </motion.div>
   )
 }
 
