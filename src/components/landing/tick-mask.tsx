@@ -16,11 +16,22 @@ import { ATOM, GEOM } from '@brand/engine.js'
  * same event as the gauge filling, the rail in the gutter, and a HeatRow rule,
  * at a fourth scale.
  *
- * One deliberate departure from the engine. `GEOM.fill` is 0.80, which leaves
- * air between ticks on a 7-tick gauge and reads as a dial. At the densities a
- * photograph needs (18 to 28) that same value shreds the picture into slivers,
- * so `fill` is a prop here and the masks run it above 1 to let neighbours meet.
- * The shape, the sweep and the growth curve are untouched.
+ * Tick count is the mark's own seven. The first cut of this used 22 to 28 on
+ * the theory that a photograph needs more apertures, which is backwards: more
+ * ticks makes each window smaller, and at 22 the street came out as confetti.
+ * Seven gives a head aperture about a fifth of the frame, which holds a
+ * readable slice of a market.
+ *
+ * The one real departure is `fill`, and the reason is worth keeping. The
+ * engine runs 0.80, which stands the ticks apart and reads as a dial. Above 1
+ * the neighbours meet, and because tick size already grows toward the head,
+ * they meet *unevenly*: the cold end stays discrete while the hot end
+ * coalesces into one mass. So the density of the picture is itself the
+ * reading. That is not a workaround for slivers, which is what an earlier
+ * version of this comment claimed. It is the crescendo performed by the
+ * photograph instead of drawn beside it.
+ *
+ * Shape, sweep and growth curve are the engine's, untouched.
  */
 
 /** One tick, placed and scaled exactly as `at()` does inside the engine. */
@@ -73,9 +84,9 @@ interface MaskProps {
   /** How much of the run is revealed, 0 to 1. */
   reveal?: number
   className?: string
-  /** Tick count. Higher reads as a photograph, lower reads as a dial. */
+  /** Tick count. The mark's seven by default; more makes each window smaller. */
   ticks?: number
-  /** Overlap. Above 1 the neighbours meet, which a photograph needs. */
+  /** Overlap. Above 1 the hot end coalesces while the cold end stays discrete. */
   fill?: number
 }
 
@@ -86,7 +97,7 @@ interface MaskProps {
  * colour. The mask is the arc; everything outside a tick is cut away.
  */
 export function TickArcMask({
-  id, children, reveal = 1, className = '', ticks = 22, fill = 1.22,
+  id, children, reveal = 1, className = '', ticks = GEOM.ticks, fill = 1.35,
 }: MaskProps) {
   const W = 1000, H = 560
   const arc = arcTicks(ticks, 430, W / 2, H * 0.94, fill)
@@ -120,7 +131,7 @@ export function TickArcMask({
  * rather than curve. Same ticks, unrolled.
  */
 export function TickRowMask({
-  id, children, reveal = 1, className = '', ticks = 26, fill = 1.18,
+  id, children, reveal = 1, className = '', ticks = 6, fill = 1.3,
 }: MaskProps) {
   const W = 1000, H = 320
   const row = rowTicks(ticks, W, H, fill)
