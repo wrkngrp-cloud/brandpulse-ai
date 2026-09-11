@@ -5,7 +5,23 @@ type Datum = Record<string, unknown>
 
 export const ATOM: string
 export const NEEDLE: { paths: string[]; nativeBearing: number; unitRadius: number; [k: string]: unknown }
-export const GEOM: Record<string, unknown>
+/* The mark's construction, as the engine declares it. Typed to its real shape
+   rather than Record<string, unknown> so the arc can be rebuilt as a mask
+   without casting every field at the call site. */
+export const GEOM: {
+  /** Pivot in the mark's own 1000-unit box. */
+  pivot: [number, number]
+  radius: number
+  /** Start and end bearing in degrees, y-up. The mark sweeps 163.3 to 2.4. */
+  sweep: [number, number]
+  ticks: number
+  step: number
+  /** Tick scale at the cold tail and at the head. */
+  growth: [number, number]
+  /** Share of the chord a tick occupies. Below 1 the ticks stand apart. */
+  fill: number
+  markOwnReading: number
+}
 export const RAMP: string[]
 export const PRESETS: Record<string, Opts>
 
