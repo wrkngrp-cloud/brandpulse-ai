@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion, useInView } from 'framer-motion'
+import { useInView } from 'framer-motion'
 import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
 import { VideoHero } from './video-hero'
 import { ProductCards } from './product-cards'
@@ -16,13 +16,6 @@ import { ARC_ASPECT, TickArcMask, TickRowMask, rowAspect, useArcReveal } from '.
 
 /** The unrolled run's proportion, measured once. */
 const ROW_ASPECT = rowAspect(6, 1.7)
-
-// Fade-and-slide-up on every element is banned: one reveal group per section,
-// maximum, and it is the section's own .bg-reveal group in motion.css. What is
-// left here is the shared easing, so the call sites keep reading the same.
-const rise = {
-  transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
-}
 
 // ————— theme —————
 /**
@@ -136,9 +129,9 @@ export function Hero() {
       }} />
 
       <div className="mx-auto w-full max-w-6xl px-6 pb-14 pt-24 sm:pt-28 lg:pb-20 lg:pt-32">
-        <motion.p {...rise} className="text-center text-[11px]" style={{ color: 'var(--danfo)' }}>
+        <p className="text-center text-[11px]" style={{ color: 'var(--danfo)' }}>
           Brand intelligence built in Lagos, for West Africa
-        </motion.p>
+        </p>
 
         {/* ── The arc ────────────────────────────────────────────────
             The frame is the arc's own measured proportion, so the head tick
@@ -277,9 +270,11 @@ function HeroFilm() {
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           The whole thing, start to finish.
         </h2>
-        <motion.div id="demo" {...rise} className="mt-10 scroll-mt-28">
-          <VideoHero />
-        </motion.div>
+        <div id="demo" className="scroll-mt-28">
+          <TickReveal className="mt-10">
+            <Tick><VideoHero /></Tick>
+          </TickReveal>
+        </div>
       </div>
     </section>
   )
@@ -383,14 +378,14 @@ function DeepDives() {
           { Comp: AiScene, kicker: 'AI command layer', title: 'Ask your data anything',
             body: 'Plain questions, straight answers, sourced from your own numbers. And once a week, BrandGauge asks the big AI assistants about your category. It scores how you show up.' },
         ].map((s, i) => (
-          <motion.div key={s.kicker} {...rise}
+          <TickReveal key={s.kicker}
             className={`flex flex-col gap-10 lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
-            <div className="lg:w-[38%]">
+            <Tick className="lg:w-[38%]">
               <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{s.title}</h3>
               <p className="mt-4 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{s.body}</p>
-            </div>
-            <div className="@container h-[430px] flex-1 sm:h-[360px]"><s.Comp t={1} /></div>
-          </motion.div>
+            </Tick>
+            <Tick className="@container h-[430px] flex-1 sm:h-[360px]"><s.Comp t={1} /></Tick>
+          </TickReveal>
         ))}
       </div>
     </section>
@@ -420,14 +415,15 @@ function Industries() {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
-        <motion.h2 {...rise} className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
+        <TickReveal>
+        <Tick as="div"><h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           One gauge. Seven industries.
-        </motion.h2>
-        <motion.p {...rise} className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
+        </h2></Tick>
+        <Tick as="p" className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
           Pick your industry once. The health index, funnel signals and connector
           recommendations reshape themselves around how your business actually works.
-        </motion.p>
-        <motion.div {...rise} className="mt-10 flex flex-wrap gap-3">
+        </Tick>
+        <Tick className="mt-10 flex flex-wrap gap-3">
           {list.map((v, i) => (
             <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
               className="rounded-sm border px-5 py-2.5 text-[13px] transition-colors duration-200 bg-press"
@@ -437,7 +433,8 @@ function Industries() {
               {v.name}
             </button>
           ))}
-        </motion.div>
+        </Tick>
+        </TickReveal>
         <p className="mt-6 h-6 max-w-md text-[11px]" style={{ color: 'var(--lp-mut)' }}>
           {list[active].hint}
         </p>
@@ -455,20 +452,22 @@ function FinalCta() {
           backgroundImage: 'radial-gradient(var(--tick-1) 1px, transparent 1px)', backgroundSize: '22px 22px',
           maskImage: 'radial-gradient(70% 80% at 50% 50%, black, transparent)',
         }} />
-        <motion.h2 {...rise} className="relative mx-auto max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
+        <TickReveal>
+        <Tick as="div"><h2 className="relative mx-auto max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
           Your brand already has a reputation. Start measuring it.
-        </motion.h2>
-        <motion.p {...rise} className="relative mx-auto mt-6 max-w-xl text-[15px]" style={{ color: 'var(--tx-inv-2)' }}>
+        </h2></Tick>
+        <Tick as="p" className="relative mx-auto mt-6 max-w-xl text-[15px]" style={{ color: 'var(--tx-inv-2)' }}>
           Free while in beta. Connect a social account and see your first Brand Health Index in minutes.
-        </motion.p>
-        <motion.div {...rise} className="relative mt-10">
+        </Tick>
+        <Tick className="relative mt-10">
           <Link href="/auth/signup"
             className="inline-flex items-center gap-2 rounded-sm px-8 py-4 text-[15px] font-bold border border-line"
             style={{ background: 'var(--flare)', color: 'var(--on-hot)' }}>
             Create your workspace <ArrowRight className="h-4 w-4" />
           </Link>
-        </motion.div>
+        </Tick>
+        </TickReveal>
       </div>
     </section>
   )
