@@ -2,7 +2,8 @@ import { inngest } from '@/lib/inngest/client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { runCrawl } from '@/lib/crawl/run-crawl'
 import { crawlCompetitorVolumes } from '@/lib/crawl/crawl-competitors'
-import { computeBHI } from '@/lib/bhi'
+import { computeFullBHI } from '@/lib/bhi'
+import { loadBHIInputs, BHI_FORMULA_VERSION } from '@/lib/bhi-inputs'
 
 export const crawlMentions = inngest.createFunction(
   {
@@ -103,41 +104,12 @@ export const crawlMentions = inngest.createFunction(
 
       await step.run(`bhi-snapshot-${brand.id}`, async () => {
         const today = new Date().toISOString().slice(0, 10)
-        const [{ data: sentRow }, { data: sovRow }, { data: surveyRows }] = await Promise.all([
-          supabase.from('sentiment_daily')
-            .select('social_score')
-            .eq('brand_id', brand.id)
-            .order('day', { ascending: false })
-            .limit(1)
-            .maybeSingle(),
-          supabase.from('sov_snapshots')
-            .select('social_sov')
-            .eq('brand_id', brand.id)
-            .order('snapshot_date', { ascending: false })
-            .limit(1)
-            .maybeSingle(),
-          supabase.from('survey_responses')
-            .select('answers')
-            .eq('quality_flag', 'ok')
-            .in('survey_id',
-              (await supabase.from('surveys').select('id').eq('brand_id', brand.id)).data?.map(s => s.id) ?? []
-            )
-            .order('collected_at', { ascending: false })
-            .limit(100),
-        ])
 
-        const npsScores = (surveyRows ?? [])
-          .map(r => (r.answers as Record<string, unknown>)?.q2 as number | undefined)
-          .filter((s): s is number => typeof s === 'number' && s >= 0 && s <= 10)
-        const avgNps = npsScores.length
-          ? npsScores.reduce((a, b) => a + b, 0) / npsScores.length
-          : null
-
-        const bhi = computeBHI({
-          sentimentScore: sentRow?.social_score ?? null,
-          sovScore:       sovRow?.social_sov ?? null,
-          surveyScore:    avgNps !== null ? avgNps * 10 : null,
-        })
+        // Same seven components, same formula, same inputs the Overview and
+        // Brand Equity pages use. This used to compute its own 3-component
+        // score, which is why the stored history disagreed with the dashboard.
+        const { components, breakdowns, brandType } = await loadBHIInputs(supabase, brand.id)
+        const bhi = computeFullBHI(components, breakdowns, brandType)
 
         if (bhi.score !== null) {
           await supabase.from('brand_health_snapshots').upsert({
@@ -145,11 +117,8 @@ export const crawlMentions = inngest.createFunction(
             snapshot_date:     today,
             bhi:               bhi.score,
             data_coverage_pct: bhi.coverage,
-            components: {
-              sentiment: bhi.components.sentiment,
-              sov:       bhi.components.sov,
-              survey:    bhi.components.survey,
-            },
+            formula_version:   BHI_FORMULA_VERSION,
+            components:        bhi.components,
           }, { onConflict: 'brand_id,snapshot_date' })
         }
 

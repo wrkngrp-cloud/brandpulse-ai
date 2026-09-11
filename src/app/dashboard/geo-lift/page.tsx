@@ -79,25 +79,26 @@ function StudyCard({ study }: { study: GeoLiftStudy }) {
       </div>
 
       {study.status === 'complete' && (
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
-            <p className="text-xs text-muted-foreground">Search Lift</p>
-            <p className={`text-lg font-bold bg-num ${(study.lift_pct ?? 0) > 0 ? 'text-pos dark:text-pos' : 'text-tx-flare'}`}>
-              {study.lift_pct !== null ? `${study.lift_pct > 0 ? '+' : ''}${study.lift_pct.toFixed(1)}%` : '—'}
-            </p>
+        <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
+              <p className="text-xs text-muted-foreground">Search difference</p>
+              <p className={`text-lg font-bold bg-num ${(study.lift_pct ?? 0) > 0 ? 'text-pos dark:text-pos' : 'text-tx-flare'}`}>
+                {study.lift_pct !== null ? `${study.lift_pct > 0 ? '+' : ''}${study.lift_pct.toFixed(1)}%` : '—'}
+              </p>
+            </div>
+            <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
+              <p className="text-xs text-muted-foreground">Correlation</p>
+              <p className="text-lg font-bold bg-num">
+                {study.correlation !== null ? study.correlation.toFixed(2) : '—'}
+              </p>
+            </div>
           </div>
-          <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
-            <p className="text-xs text-muted-foreground">Correlation</p>
-            <p className="text-lg font-bold bg-num">
-              {study.correlation !== null ? study.correlation.toFixed(2) : '—'}
-            </p>
-          </div>
-          <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
-            <p className="text-xs text-muted-foreground">Confidence</p>
-            <p className="text-lg font-bold bg-num">
-              {study.confidence !== null ? `${study.confidence.toFixed(0)}%` : '—'}
-            </p>
-          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            This compares average search interest between your test city and your control city over the study window.
+            It is a corroborating signal, not a measure of causation, and it does not isolate the campaign from
+            everything else happening in either city. Read it alongside your vanity link visits rather than on its own.
+          </p>
         </div>
       )}
 

@@ -3,7 +3,13 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Constructed lazily: the Resend SDK throws when the key is absent, and building
+// the app should not require a mail credential.
+let resendClient: Resend | null = null
+function getResend() {
+  resendClient ??= new Resend(process.env.RESEND_API_KEY)
+  return resendClient
+}
 
 export const competitiveWeeklyBriefing = inngest.createFunction(
   {
@@ -218,7 +224,7 @@ Return ONLY valid JSON — no markdown fences — in this exact shape:
           'BrandGauge | View full briefing at your dashboard',
         ].join('\n')
 
-        await resend.emails.send({
+        await getResend().emails.send({
           from:    'BrandGauge <briefings@brandgauge.app>',
           to:      userRecord.email,
           subject: `Your weekly competitive briefing — ${brand.name}`,

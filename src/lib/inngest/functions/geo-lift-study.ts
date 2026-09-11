@@ -54,24 +54,17 @@ function pearsonR(x: number[], y: number[]): number | null {
   return Math.max(-1, Math.min(1, num / denom))
 }
 
-// Bootstrap approximation of confidence (simple variance-based estimate)
-function bootstrapConfidence(treatment: number[], control: number[]): number {
-  if (treatment.length < 3 || control.length < 3) return 0
-
-  const meanT = treatment.reduce((a, b) => a + b, 0) / treatment.length
-  const meanC = control.reduce((a, b)   => a + b, 0) / control.length
-
-  const varT = treatment.reduce((s, v) => s + (v - meanT) ** 2, 0) / treatment.length
-  const varC = control.reduce((s, v)   => s + (v - meanC) ** 2, 0) / control.length
-
-  const sePooled = Math.sqrt((varT / treatment.length) + (varC / control.length))
-  if (sePooled === 0) return 95
-
-  const tStat  = Math.abs((meanT - meanC) / sePooled)
-  // Rough approximation: map t-stat to confidence
-  const conf   = Math.min(99, Math.max(0, 50 + (tStat * 25)))
-  return Math.round(conf * 100) / 100
-}
+// A confidence percentage used to be computed here as 50 + (tStat * 25), capped
+// at 99, and returned 95 whenever variance was zero. That is not a confidence
+// level: it has no distributional basis and ignores sample size entirely, so
+// three weeks and thirty weeks of data could report the same number. It was
+// removed on 2026-09-02 rather than corrected, because the study design cannot
+// support one yet.
+//
+// This study compares average search levels between two cities. Measuring lift
+// properly needs a difference-in-differences: the change in the test city before
+// versus after, against the same change in the control city. Until the job does
+// that, correlation is the only honest statistic it can report.
 
 async function fetchCityTrends(
   keyword: string,
@@ -212,13 +205,12 @@ export const geoLiftStudy = inngest.createFunction(
 
       const liftPct    = meanC > 0 ? ((meanT - meanC) / meanC) * 100 : null
       const correlation = pearsonR(treatmentVals, controlVals)
-      const confidence  = bootstrapConfidence(treatmentVals, controlVals)
 
       return {
         weeklyData,
         liftPct:     liftPct !== null ? Math.round(liftPct * 100) / 100 : null,
         correlation: correlation !== null ? Math.round(correlation * 10000) / 10000 : null,
-        confidence:  Math.round(confidence * 100) / 100,
+        confidence:  null,
         status:      'complete' as const,
       }
     })
@@ -233,6 +225,11 @@ export const geoLiftStudy = inngest.createFunction(
         tier:   'structural',
         system: `You are a Nigerian brand marketing analyst specialising in geo-lift studies.
 Respond in 2–3 clear sentences. Be specific and actionable.
+This study compares average search interest between two cities. It does not isolate
+the campaign from other activity, so treat it as a corroborating signal only. Never
+state or imply that the campaign caused the difference, and never claim a confidence
+or significance level, because neither is calculated. If the number of weeks is small,
+say the reading is early rather than drawing a conclusion from it.
 Do not use em dashes, jargon, or banned words (robust, vibrant, leverage, seamless).`,
         messages: [{
           role:    'user',
@@ -242,7 +239,6 @@ Do not use em dashes, jargon, or banned words (robust, vibrant, leverage, seamle
 - Study period: ${studyStart} to ${studyEnd}
 - Lift: ${analysis.liftPct !== null ? `${analysis.liftPct.toFixed(1)}%` : 'insufficient data'}
 - Correlation (treatment vs control): ${analysis.correlation !== null ? analysis.correlation.toFixed(2) : 'n/a'}
-- Statistical confidence: ${analysis.confidence !== null ? `${analysis.confidence.toFixed(0)}%` : 'n/a'}
 - Weeks of data: ${analysis.weeklyData.length}
 
 What does this mean for the brand manager and what should they do next?`,

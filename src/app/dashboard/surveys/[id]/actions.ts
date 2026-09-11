@@ -4,7 +4,13 @@ import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 import { TOKENS } from '@/lib/brand-tokens'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Constructed lazily: the Resend SDK throws when the key is absent, and building
+// the app should not require a mail credential.
+let resendClient: Resend | null = null
+function getResend() {
+  resendClient ??= new Resend(process.env.RESEND_API_KEY)
+  return resendClient
+}
 
 const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
 
@@ -65,7 +71,7 @@ export async function sendSurveyEmails(
 
   let sent = 0
   for (const batch of batches) {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: `${brandName} <surveys@brandgauge.app>`,
       to:   batch,
       subject,

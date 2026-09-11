@@ -13,17 +13,23 @@ const sections = [
     color: 'text-tx-flare',
     bg: 'bg-flare-wash dark:bg-shell/30',
     title: 'Brand Health Index (BHI)',
-    subtitle: 'A composite score that tracks the overall health of your brand across three live data signals.',
+    subtitle: 'A composite score that tracks the overall health of your brand across seven live data signals.',
     body: [
       {
         heading: 'How it is calculated',
-        text: 'BHI is a weighted average of three components: Social Sentiment (40%), Share of Voice (30%), and Survey Score (30%). Each component is scored 0–100. Where a data source is not yet connected, its weight is redistributed proportionally across the remaining components so the score always reflects real data — never a default zero.' },
+        text: 'BHI is a weighted average of seven components, each scored 0–100: Awareness (20%), Salience (15%), Sentiment (20%), Perception (15%), Cultural Resonance (15%), Blended Share of Voice (10%), and Earned Media Value (5%). Where a data source is not yet connected, its weight is redistributed proportionally across the remaining components, so the score always reflects real data rather than a default zero. The percentage of the total weight that is actually running on live data is reported alongside the score as your data coverage. Every screen that shows a BHI, including the Overview, Brand Equity, Ask AI and the Board Pack, runs this one calculation on the same inputs.',
+      },
       {
         heading: 'What each zone means',
         text: 'At Risk (below 40) — significant brand challenges require urgent attention. Building (40–64) — positive momentum but measurable gaps remain. Healthy (65–79) — strong brand fundamentals with room for optimisation. Leading (80+) — above-market brand equity position.' },
       {
-        heading: 'Industry grounding',
-        text: 'The 40/30/30 weight split reflects the Millward Brown BrandZ framework, adapted for African emerging markets where earned media (social sentiment) carries higher purchase-decision weight than in established markets. Survey anchoring at 30% aligns with the GfK Brand Health Tracking methodology used by FMCG, telco, and financial brands across West Africa.' },
+        heading: 'Where the score is calculated, and what changed in September 2026',
+        text: 'Until 2 September 2026 BrandGauge calculated BHI two different ways. The nightly job that stores your history used an older three-component formula of Sentiment at 40%, Share of Voice at 30% and Survey Score at 30%, while the Overview and Brand Equity pages calculated the seven-component score live. The two did not agree, which meant the figure in a Board Pack could differ from the figure on the dashboard for the same brand on the same day. The three-component formula has been removed. Every surface now runs the seven-component calculation on one shared set of inputs. Snapshots stored before that date are marked as version 1 and are not directly comparable with later ones, so a trend line that spans the change is comparing two different measures across that boundary.',
+      },
+      {
+        heading: 'Industry grounding and per-vertical weights',
+        text: 'The component set follows the Millward Brown BrandZ framework, adapted for African emerging markets where earned media carries higher purchase-decision weight than in established markets. Survey-anchored components, Salience and Perception, together carry 30%, which aligns with the GfK Brand Health Tracking methodology used by FMCG, telco and financial brands across West Africa. The weights above are the default. Each of the seven verticals BrandGauge supports carries its own preset, so a fintech brand weights Sentiment at 25% and Cultural Resonance at 5%, while a venue weights Perception at 25%. The preset applied to your brand is named in the header of the Brand Equity page.',
+      },
     ] },
   {
     id: 'brand-equity',
@@ -187,17 +193,23 @@ const sections = [
     color: 'text-tx-2',
     bg: 'bg-shell dark:bg-shell/30',
     title: 'OOH Intelligence',
-    subtitle: 'Out-of-home attribution and performance tracking using branded vanity links and search uplift correlation.',
+    subtitle: 'Out-of-home attribution using branded vanity links as the primary measure, with search uplift correlation as corroboration.',
     body: [
       {
         heading: 'Primary attribution: vanity links',
         text: 'Every OOH placement can be assigned a branded vanity URL (e.g. brand.com/go/ikeja-junction). When an audience member scans or types that URL, BrandGauge logs the visit, timestamps it, and links it to the specific billboard. This is the primary attribution method because it produces deterministic, one-to-one conversion data with no modelling assumptions.' },
       {
         heading: 'Secondary corroboration: search uplift',
-        text: 'BrandGauge computes a Pearson correlation coefficient between weekly billboard visit counts and weekly Google branded search volume (via Google Trends) for the same time period. A correlation above 0.6 is interpreted as meaningful evidence that OOH exposure is driving branded search behaviour — a standard corroboration methodology used by GroupM and Kinetic Worldwide.' },
+        text: 'BrandGauge computes a Pearson correlation coefficient between weekly billboard visit counts and weekly Google branded search volume (via Google Trends) for the same period. A correlation above 0.6 means the two move together closely. It does not establish that the billboard caused the searches, because correlation cannot separate your OOH from anything else running at the same time, including seasonality, paid media and news coverage. Treat it as corroboration for your vanity link data, which is deterministic, rather than as evidence on its own. This is the same corroboration role the metric plays at GroupM and Kinetic Worldwide.',
+      },
       {
         heading: 'GeoLift studies',
-        text: 'For brands running OOH in multiple cities, BrandGauge can run a GeoLift study: a treatment city (where OOH is active) is compared against a control city (no OOH) and Pearson correlation is computed between the two cities\' sentiment or sales-proxy signals. This isolates the incremental effect of the OOH spend from organic brand momentum.' },
+        text: 'For brands running OOH in multiple cities, BrandGauge can run a GeoLift study. A treatment city where OOH is active is compared against a control city where it is not, using weekly Google Trends search interest for your chosen keyword. The study reports two things: the percentage difference in average search interest between the two cities, and the Pearson correlation between their weekly series. Read the difference as a directional signal and the correlation as a measure of how closely the cities track each other.',
+      },
+      {
+        heading: 'What GeoLift does not tell you, and why there is no confidence figure',
+        text: 'The study compares the level of search interest in two cities. It does not compare how each city changed from before the campaign to after, which is what a difference-in-differences design does and what a true lift measurement requires. A city that simply searches for your brand more often than the control city will therefore look like a successful campaign even when nothing ran. Until the study is rebuilt on a before-and-after design, treat the difference as directional only. BrandGauge used to display a confidence percentage next to these results. It was removed in September 2026 because the number was not derived from any statistical test: it ignored sample size, so three weeks and thirty weeks of data could report the same figure. Rather than show a figure that reads as more precise than the method supports, the product now shows no confidence value at all.',
+      },
     ] },
   {
     id: 'radio',

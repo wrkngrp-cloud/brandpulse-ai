@@ -1,6 +1,7 @@
 import { createServiceClient } from '@/lib/supabase/server'
 import { buildBrandContext, formatBrandContextBlock } from './brand-context'
-import { computeBHI, ZONE_META } from '@/lib/bhi'
+import { computeFullBHI, ZONE_META } from '@/lib/bhi'
+import { loadBHIInputs } from '@/lib/bhi-inputs'
 
 export interface AskSource {
   label: string
@@ -99,14 +100,12 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
   const avgNPS = npsScores.length
     ? Number((npsScores.reduce((a, b) => a + b, 0) / npsScores.length).toFixed(1))
     : null
-  const surveyScore = avgNPS !== null ? Math.min(100, Math.max(0, (avgNPS + 100) / 2)) : null
 
-  // Compute BHI
-  const bhi = computeBHI({
-    sentimentScore: latestSentiment?.social_score ?? null,
-    sovScore: sovRow?.social_sov ?? null,
-    surveyScore,
-  })
+  // BHI — same seven components the dashboard and the nightly snapshot use.
+  // This previously ran its own 3-component calculation, so Ask AI could quote
+  // a different score than the page the user was looking at.
+  const { components: bhiComponents, breakdowns: bhiBreakdowns, brandType } = await loadBHIInputs(supabase, brandId)
+  const bhi = computeFullBHI(bhiComponents, bhiBreakdowns, brandType)
 
   // ── Build data snapshot string ────────────────────────────────────────────
   const parts: string[] = []
@@ -115,13 +114,16 @@ export async function buildAskSystemPrompt(brandId: string): Promise<{
   // BHI
   if (bhi.score !== null) {
     const zone = bhi.zone ? ZONE_META[bhi.zone].label : '—'
-    parts.push(`BHI: ${bhi.score}/100 (${zone} zone, ${bhi.coverage}% data coverage — ${
-      [
-        bhi.components.sentiment !== null ? 'Sentiment' : null,
-        bhi.components.sov       !== null ? 'SOV'       : null,
-        bhi.components.survey    !== null ? 'Survey NPS' : null,
-      ].filter(Boolean).join(' + ')
-    } feeding it)`)
+    const COMPONENT_LABELS: Record<string, string> = {
+      awareness: 'Awareness', salience: 'Salience', sentiment: 'Sentiment',
+      perception: 'Perception', culturalResonance: 'Cultural Resonance',
+      blendedSov: 'Blended SOV', emv: 'Earned Media Value',
+    }
+    const feeding = Object.entries(bhi.components)
+      .filter(([, v]) => v !== null)
+      .map(([k]) => COMPONENT_LABELS[k] ?? k)
+      .join(' + ')
+    parts.push(`BHI: ${bhi.score}/100 (${zone} zone, ${bhi.coverage}% data coverage — ${feeding} feeding it)`)
     availableSources.push({ label: 'Brand Health Index', detail: `${bhi.score}/100, ${zone}` })
   }
 
