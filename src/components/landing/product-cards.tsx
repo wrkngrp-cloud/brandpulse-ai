@@ -1,4 +1,5 @@
 import { SHOTS, ProductShotFrame, type ProductShot } from './product-shots'
+import { Tick, TickReveal } from './reading'
 
 /**
  * The product section, as cards.
@@ -15,7 +16,6 @@ import { SHOTS, ProductShotFrame, type ProductShot } from './product-shots'
  */
 interface Card {
   shot: ProductShot
-  kicker: string
   title: string
   body: string
   /** Tailwind column span at lg. */
@@ -25,35 +25,30 @@ interface Card {
 const CARDS: Card[] = [
   {
     shot: SHOTS.commercial,
-    kicker: 'Commercial proof',
     title: 'Marketing you can defend in money',
     body: 'Revenue, spend, CAC, ROI and ROAS on one row, pulled from Meta Ads, GA4, Paystack and your site pixel. Every figure carries its change since last month, so the budget conversation starts with evidence.',
     span: 'lg:col-span-7',
   },
   {
     shot: SHOTS.zones,
-    kicker: 'Brand Health Index',
     title: 'One score, and what it means',
     body: 'Five signals weighted for your industry, landing in one of four zones. The score tells you where you are. The zone tells you what to do about it.',
     span: 'lg:col-span-5',
   },
   {
     shot: SHOTS.sentiment,
-    kicker: 'Cultural sentiment',
     title: 'Sentiment with street sense',
     body: 'Pidgin, Yoruba, Igbo and Hausa read the way a Lagos marketer would read them, across X and Instagram, refreshed nightly at 4 AM Lagos time.',
     span: 'lg:col-span-5',
   },
   {
     shot: SHOTS.trend,
-    kicker: 'Ninety days',
     title: 'Watch the number move',
     body: 'The index plotted daily, so a campaign, a crisis or a price change shows up as a shape you can point at in a meeting.',
     span: 'lg:col-span-7',
   },
   {
     shot: SHOTS.briefing,
-    kicker: 'Competitive intelligence',
     title: 'A briefing written every Monday',
     body: 'Your position, your blind spots and the two things to fix this week, written from live connector data and named competitors. Not a chart you have to interpret. A paragraph you can forward.',
     span: 'lg:col-span-12',
@@ -85,17 +80,16 @@ export function ProductCards() {
           Screenshots, taken from a live workspace. Nothing here is drawn for the website.
         </p>
 
-        <div className="mt-12 grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
+        <TickReveal className="mt-12 grid grid-cols-1 items-start gap-5 lg:grid-cols-12" amount={0.12}>
           {CARDS.map(card => (
-            <article
+            <Tick
               key={card.shot.src}
               className={`flex flex-col overflow-hidden rounded-sm border border-line-inv ${card.span}`}
             >
               <ProductShotFrame shot={card.shot} className="border-b border-line-inv" />
               <div className="flex flex-1 flex-col p-6">
-                <p className="text-[10px]" style={{ color: 'var(--danfo)' }}>{card.kicker}</p>
                 <h3
-                  className="mt-2 text-xl font-extrabold tracking-tight"
+                  className="text-xl font-extrabold tracking-tight"
                   style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}
                 >
                   {card.title}
@@ -104,9 +98,9 @@ export function ProductCards() {
                   {card.body}
                 </p>
               </div>
-            </article>
+            </Tick>
           ))}
-        </div>
+        </TickReveal>
       </div>
     </section>
   )

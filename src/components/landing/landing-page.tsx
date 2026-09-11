@@ -11,6 +11,7 @@ import { AiScene, darkSceneVars, lightSceneVars } from './scenes'
 import { BrandLockup } from '@/components/brand/logo'
 import { useDarkGround, useMode } from './use-mode'
 import { HERO_PHOTOS } from './photo-frame'
+import { HeatRow, ReadingLine, ReadingRail, Tick, TickReveal } from './reading'
 
 // Fade-and-slide-up on every element is banned: one reveal group per section,
 // maximum, and it is the section's own .bg-reveal group in motion.css. What is
@@ -96,11 +97,6 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
   )
 }
 
-/** A reading is printed, not counted up to. The reading is not a slot machine. */
-function Reading({ to, suffix = '' }: { to: number; suffix?: string }) {
-  return <span>{to}{suffix}</span>
-}
-
 /**
  * The hero.
  *
@@ -135,11 +131,16 @@ function Hero() {
             <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>
               Brand intelligence built in Lagos, for West Africa
             </p>
-            <h1 className="mt-5 text-5xl font-black leading-[1.02] tracking-[-0.03em] sm:text-6xl xl:text-7xl"
-              style={{ fontFamily: 'var(--font)', color: 'var(--tx-inv)' }}>
-              See your brand the way the{' '}
-              <span style={{ color: 'var(--danfo)' }}>street</span> sees it.
-            </h1>
+            {/* The claim arrives a word at a time, once, on first paint. Words
+                rather than letters: letter-by-letter is a typewriter, and this
+                is a reading being taken. */}
+            <ReadingLine
+              text="See your brand the way the street sees it."
+              accent="street"
+              accentStyle={{ color: 'var(--danfo)' }}
+              className="mt-5 text-5xl font-black leading-[1.02] tracking-[-0.03em] sm:text-6xl xl:text-7xl"
+              style={{ fontFamily: 'var(--font)', color: 'var(--tx-inv)' }}
+            />
             <p className="mt-6 max-w-xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--tx-inv-2)' }}>
               BrandGauge reads sentiment in Pidgin, Yoruba, Igbo and Hausa. It measures every
               channel, from Instagram to a billboard on the expressway. Then it turns it all
@@ -215,14 +216,14 @@ function StreetStrip() {
   return (
     <section aria-label="Where the brand is judged" className="px-6 pb-8 pt-20">
       <div className="mx-auto max-w-6xl">
-        <p className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Where the brand is judged</p>
-        <h2 className="mt-3 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
+        <h2 className="max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Your budget goes out here. So should your measurement.
         </h2>
-        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <TickReveal className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3" amount={0.2}>
           {shots.map((photo, i) => (
-            <figure key={photo.slot} className={i === 1 ? 'sm:mt-12' : undefined}>
+            <Tick key={photo.slot} as="div" className={i === 1 ? 'sm:mt-12' : undefined}>
+              <figure>
               <div className="relative w-full overflow-hidden rounded-sm border border-line"
                 style={{ aspectRatio: i === 1 ? '4 / 5' : '4 / 3' }}>
                 {photo.src && (
@@ -231,9 +232,10 @@ function StreetStrip() {
                 )}
               </div>
               <figcaption className="bg-label mt-2.5" style={{ color: 'var(--lp-mut)' }}>{photo.slot}</figcaption>
-            </figure>
+              </figure>
+            </Tick>
           ))}
-        </div>
+        </TickReveal>
       </div>
     </section>
   )
@@ -251,8 +253,7 @@ function HeroFilm() {
   return (
     <section className="px-6 pb-4 pt-24">
       <div className="mx-auto max-w-6xl">
-        <p className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Ninety seconds</p>
-        <h2 className="mt-3 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
+        <h2 className="max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           The whole thing, start to finish.
         </h2>
@@ -273,53 +274,73 @@ const DIFFS = [
   { n: '06', title: 'Built for seven industries', body: 'FMCG, fintech, venues, B2B SaaS, marketplaces, beverages and distribution. The index, funnel and recommendations reshape for each.' },
 ]
 
+/**
+ * Why this, and not a global tool.
+ *
+ * This was six identical cards in a three-column grid, which is the single
+ * most templated shape on the web and the reason the page read as generated.
+ * Six equal boxes also say the six things carry equal weight, and they do not.
+ *
+ * It is a numbered column now: one claim per row, the rule under each row
+ * filling as the row arrives, and each row's rule sitting a step further up
+ * the ramp than the one above it. Read top to bottom it is a crescendo, which
+ * is the same graphic as the gauge and the same graphic as the rail in the
+ * gutter. The numbers are Disket, tabular, because they are numerals.
+ */
 function Differentiators() {
   return (
-    <section id="builtforhere" className="relative overflow-hidden scroll-mt-24 py-28">
-      {/* The tick field, and nothing else. */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'radial-gradient(var(--lp-dot) 1px, transparent 1px)',
-          backgroundSize: '26px 26px',
-          maskImage: 'radial-gradient(65% 70% at 50% 0%, black, transparent)',
-        }} />
-      </div>
-
+    <section id="builtforhere" className="relative scroll-mt-24 py-28">
       <div className="relative mx-auto max-w-6xl px-6">
-        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Why BrandGauge</motion.p>
-        <motion.h2 {...rise} className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl"
-          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
-          Built for here. Not adapted for here.
-        </motion.h2>
-        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <TickReveal className="max-w-3xl">
+          <Tick as="p" className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Why BrandGauge</Tick>
+          <Tick>
+            <h2 className="mt-4 text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl"
+              style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
+              Built for here. Not adapted for here.
+            </h2>
+          </Tick>
+        </TickReveal>
+
+        <div className="mt-16">
           {DIFFS.map((d, i) => (
-            <motion.div key={d.n} {...rise} transition={{ ...rise.transition, delay: i * 0.05 }}
-              className="relative overflow-hidden rounded-sm border p-7"
-              style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
-              <span className="bg-num text-[11px]" style={{ color: 'var(--tx-flare)' }}>{d.n}</span>
-              <h3 className="mt-3 text-[17px] font-bold leading-snug" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{d.title}</h3>
-              <p className="mt-2.5 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{d.body}</p>
-            </motion.div>
+            <HeatRow key={d.n} index={i} total={DIFFS.length}>
+              <TickReveal className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 py-8 sm:grid-cols-[4rem_1fr_minmax(0,24rem)] sm:gap-x-10">
+                <Tick as="span" className="bg-num text-[13px] leading-none" style={{ color: 'var(--tx-flare)' }}>
+                  {d.n}
+                </Tick>
+                <Tick>
+                  <h3 className="text-[19px] font-bold leading-snug sm:text-[22px]"
+                    style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
+                    {d.title}
+                  </h3>
+                </Tick>
+                <Tick as="p"
+                  className="col-start-2 text-[13.5px] leading-relaxed sm:col-start-3 sm:pt-1"
+                  style={{ color: 'var(--lp-mut)' }}>
+                  {d.body}
+                </Tick>
+              </TickReveal>
+            </HeatRow>
           ))}
+          <span aria-hidden className="block h-px" style={{ background: 'var(--line)' }} />
         </div>
 
-        {/* stats band */}
-        <motion.div {...rise} className="relative mt-16 grid grid-cols-2 divide-y divide-line rounded-sm border sm:grid-cols-4 sm:divide-x sm:divide-y-0"
-          style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-chip)' }}>
+        {/* The four readings that close the section. Type, not cards. */}
+        <TickReveal className="mt-20 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4">
           {[
-            { v: 4,  s: '',  label: 'languages read natively' },
-            { v: 7,  s: '',  label: 'industry playbooks' },
-            { v: 10, s: '+', label: 'live connectors' },
-            { v: 5,  s: '',  label: 'offline channels measured' },
+            { v: '4',   label: 'languages read natively' },
+            { v: '7',   label: 'industry playbooks' },
+            { v: '10+', label: 'live connectors' },
+            { v: '5',   label: 'offline channels measured' },
           ].map(st => (
-            <div key={st.label} className="relative p-7">
-              <p className="text-4xl font-black bg-num" style={{ fontFamily: 'var(--font-num)', color: 'var(--tx-flare)' }}>
-                <Reading to={st.v} suffix={st.s} />
+            <Tick key={st.label}>
+              <p className="bg-num text-[40px] leading-none" style={{ color: 'var(--lp-ink)' }}>{st.v}</p>
+              <p className="mt-2.5 max-w-[18ch] text-[12.5px] leading-snug" style={{ color: 'var(--lp-mut)' }}>
+                {st.label}
               </p>
-              <p className="mt-1 text-[12px]" style={{ color: 'var(--lp-mut)' }}>{st.label}</p>
-            </div>
+            </Tick>
           ))}
-        </motion.div>
+        </TickReveal>
       </div>
     </section>
   )
@@ -345,7 +366,6 @@ function DeepDives() {
           <motion.div key={s.kicker} {...rise}
             className={`flex flex-col gap-10 lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
             <div className="lg:w-[38%]">
-              <p className="text-[10px]" style={{ color: 'var(--tx-flare)' }}>{s.kicker}</p>
               <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{s.title}</h3>
               <p className="mt-4 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{s.body}</p>
             </div>
@@ -380,8 +400,7 @@ function Industries() {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
-        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Seven verticals</motion.p>
-        <motion.h2 {...rise} className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
+        <motion.h2 {...rise} className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           One gauge. Seven industries.
         </motion.h2>
         <motion.p {...rise} className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
@@ -479,6 +498,7 @@ export function LandingPage() {
       className="min-h-screen antialiased transition-colors duration-500"
       style={{ ...LP_VARS, ...(dark ? darkSceneVars : lightSceneVars), background: 'var(--lp-bg)', color: 'var(--lp-ink)', isolation: 'isolate' }}
     >
+      <ReadingRail />
       <Nav dark={dark} onToggle={toggle} />
       <Hero />
       <HeroFilm />
