@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
 import { VideoHero } from './video-hero'
 import { ProductCards } from './product-cards'
-import { AiScene, CompetitiveScene, darkSceneVars, lightSceneVars } from './scenes'
+import { AiScene, darkSceneVars, lightSceneVars } from './scenes'
 import { BrandLockup } from '@/components/brand/logo'
 import { useDarkGround, useMode } from './use-mode'
 import { HERO_PHOTOS } from './photo-frame'
@@ -325,6 +325,14 @@ function Differentiators() {
   )
 }
 
+/**
+ * The AI command layer.
+ *
+ * This was two panels. The second one, Competitive intelligence, said the same
+ * thing as the Monday-briefing card in the product grid above it — and said it
+ * with a drawing, on a page that has just promised the screens are real. The
+ * card with the actual screenshot wins.
+ */
 function DeepDives() {
   return (
     <section className="relative overflow-hidden py-16">
@@ -333,8 +341,6 @@ function DeepDives() {
         {[
           { Comp: AiScene, kicker: 'AI command layer', title: 'Ask your data anything',
             body: 'Plain questions, straight answers, sourced from your own numbers. And once a week, BrandGauge asks the big AI assistants about your category. It scores how you show up.' },
-          { Comp: CompetitiveScene, kicker: 'Competitive intelligence', title: 'Know their moves before Monday',
-            body: 'Share of voice, competitor sightings and an auto-written briefing at the start of every week. When a rival cuts prices, you hear it from us first.' },
         ].map((s, i) => (
           <motion.div key={s.kicker} {...rise}
             className={`flex flex-col gap-10 lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>

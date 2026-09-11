@@ -475,12 +475,15 @@ export function OverviewClient({
               </div>
             </>
           ) : (
-            <>
-              <span className="metric text-[52px] leading-none text-tx-3 mt-2">—</span>
-              <p className="text-[12px] text-muted-foreground mt-2">
+            /* The card is justify-between, so an empty state written as two
+               loose children pinned the dash to the middle and the sentence to
+               the floor with a hole between them. Its own centred column. */
+            <div className="flex flex-1 flex-col justify-center gap-1.5 py-3">
+              <span className="metric text-[52px] leading-none text-tx-3">—</span>
+              <p className="mt-1 text-[12px] text-tx-2">
                 SOV populates after first mention crawl.
               </p>
-            </>
+            </div>
           )}
         </Card>
 

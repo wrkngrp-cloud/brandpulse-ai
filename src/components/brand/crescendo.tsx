@@ -29,7 +29,10 @@ export function Crescendo(props: { value: number; segments?: number; height?: nu
  */
 export function Meter({ label, value }: { label: React.ReactNode; value: number }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '112px 1fr 40px', gap: 'var(--s-3)', alignItems: 'center' }}>
+    /* 112px wrapped SHARE OF VOICE and 30-DAY TREND onto two lines in the
+       narrow BHI column, which pushed the crescendo out of line with the rows
+       above it. The widest label in this system fits in 132. */
+    <div style={{ display: 'grid', gridTemplateColumns: '132px 1fr 40px', gap: 'var(--s-3)', alignItems: 'center' }}>
       <Label>{label}</Label>
       <Crescendo value={value} />
       <span className="bg-num" style={{ fontSize: 'var(--t-small)', textAlign: 'right' }}>{value}</span>
