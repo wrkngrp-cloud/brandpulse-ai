@@ -29,7 +29,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="font/woff2"
           crossOrigin="anonymous"
         />
-        <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.css" />
       </head>
       <body className="min-h-full flex flex-col">
         {/* brand/icons.svg, mounted once so <use href="#bg-gauge" /> resolves everywhere */}

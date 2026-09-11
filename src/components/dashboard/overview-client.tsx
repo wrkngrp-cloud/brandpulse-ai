@@ -17,6 +17,7 @@ import { fadeUp, stagger }  from '@/lib/motion'
 import { rangeLabelShort }  from '@/lib/range-label'
 import type { BHIResult }   from '@/lib/bhi'
 import { DEFAULT_WIDGET_IDS } from '@/lib/widget-catalog'
+import { PageHeader } from '@/components/dashboard/page-header'
 
 const TourTrigger = dynamic(
   () => import('@/components/tours/tour-trigger').then(m => m.TourTrigger),
@@ -194,43 +195,37 @@ export function OverviewClient({
   return (
     <div className="space-y-6 max-w-[1400px]">
 
-      {/* ── Page header — greeting comes first, always ───────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: -6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-wrap items-end justify-between gap-4"
-      >
-        <div>
-          <p className="eyebrow mb-1.5">{getGreeting()}</p>
-          <h1 className="h-display text-[30px] sm:text-[34px] leading-none">{brandName}</h1>
-          {category && (
-            <p className="mt-2 text-[13px] text-muted-foreground/60">{category}</p>
-          )}
-        </div>
-
-        {/* Tour trigger always reachable, date filter + CTA on wider screens */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
-          <TourTrigger module="overview" autoStart={!pickerOpen} />
-          <div className="hidden sm:flex items-center gap-3">
-            <DateRangeFilter currentDays={days ?? 30} defaultDays={30} />
-            <Link
-              href="/dashboard/campaigns"
-              className="text-[12.5px] text-muted-foreground hover:text-foreground border border-border rounded-xl px-3.5 py-2 transition-colors hover:bg-muted/50"
-            >
-              View all
-            </Link>
-            <Link
-              href="/dashboard/campaigns/new"
-              className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-tx-inv rounded-xl px-4 py-2 transition-colors hover:opacity-90 active:scale-[0.98]"
-              style={{ background: 'var(--char)' }}
-            >
-              <Plus className="h-3.5 w-3.5" />
-              Campaign
-            </Link>
-          </div>
-        </div>
-      </motion.div>
+      {/* ── Page header ──────────────────────────────────────────
+          The greeting and the brand name still lead, but through the same
+          PageHeader as every other screen, so the rule under the title and the
+          spacing below it do not change when you move between pages. */}
+      <PageHeader
+        eyebrow={getGreeting()}
+        title={brandName}
+        subtitle={category || undefined}
+        actions={
+          <>
+            <TourTrigger module="overview" autoStart={!pickerOpen} />
+            <div className="hidden items-center gap-3 sm:flex">
+              <DateRangeFilter currentDays={days ?? 30} defaultDays={30} />
+              <Link
+                href="/dashboard/campaigns"
+                className="rounded-sm border border-border px-3.5 py-2 text-[12.5px] text-tx-2 transition-colors hover:bg-muted/50 hover:text-foreground bg-press"
+              >
+                View all
+              </Link>
+              <Link
+                href="/dashboard/campaigns/new"
+                className="inline-flex items-center gap-1.5 rounded-sm px-4 py-2 text-[12.5px] font-semibold text-tx-inv bg-press"
+                style={{ background: 'var(--char)' }}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Campaign
+              </Link>
+            </div>
+          </>
+        }
+      />
 
       {/* ── First-run setup checklist ────────────────────────────── */}
       <ConnectChecklist items={checklistItems} serverDismissed={checklistDismissed} />

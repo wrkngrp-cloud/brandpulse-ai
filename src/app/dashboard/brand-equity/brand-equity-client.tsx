@@ -12,6 +12,7 @@ import { cn, formatNGN } from '@/lib/utils'
 import { computeFullBHI, ZONE_META, type FullBHIComponents, type FullBHIResult, type BHIZone } from '@/lib/bhi'
 import { rangeLabelShort, rangeLabelLong } from '@/lib/range-label'
 import { ChartState } from '@/components/brand/chart-states'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface PerceptionDimension {
   dimension: string
@@ -165,7 +166,6 @@ export function BrandEquityClient({
             {COMPONENT_META.map(meta => {
               const score     = bhi.components[meta.key]
               const available = score != null
-              const zone      = bhi.zone ? ZONE_META[bhi.zone] : null
               const isOpen    = expandedKey === meta.key
               const breakdown = bhi.breakdowns?.[meta.key]
 
@@ -194,38 +194,36 @@ export function BrandEquityClient({
                     onClick={() => setExpandedKey(isOpen ? null : meta.key)}
                     className="w-full flex items-center gap-3 py-1.5 px-1 rounded-lg hover:bg-muted/40 transition-colors group text-left bg-press"
                   >
-                    <div className="w-24 shrink-0">
-                      <p className="text-xs font-medium truncate">{meta.label}</p>
-                      <p className="text-[10px] text-muted-foreground/60">{meta.weight}% weight</p>
+                    {/* The names are Brand Awareness, Brand Sentiment, Brand
+                        Perception and Cultural Resonance. At w-24 every one of
+                        them truncated to an ellipsis, so the breakdown read as
+                        four rows called "Brand …". */}
+                    <div className="w-36 shrink-0 sm:w-44">
+                      <p className="text-xs font-medium leading-snug">{meta.label}</p>
+                      <p className="text-[10px] text-tx-3">{meta.weight}% weight</p>
                     </div>
                     <div className="flex-1">
-                      <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
-                        <div
-                          className="h-full rounded-sm transition-colors duration-700"
-                          style={{
-                            width: available ? `${score}%` : '0%',
-                            backgroundColor: available ? (zone?.color ?? 'var(--tx-3)') : undefined,
-                            opacity: available ? 1 : 0,
-                          }}
-                        />
-                      </div>
+                      {/* Every score bar in this system is a Crescendo: heat
+                          grows toward the head, so the reading is legible
+                          without reading the number beside it. */}
+                      <Crescendo value={available ? Math.round(score as number) : 0} height={8} />
                     </div>
                     <div className="w-12 text-right shrink-0">
                       {available ? (
                         <span className="text-sm font-semibold bg-num">{Math.round(score as number)}</span>
                       ) : meta.phase ? (
-                        <span className="text-[10px] text-muted-foreground/40 bg-muted rounded px-1">{meta.phase}</span>
+                        <span className="text-[10px] text-tx-3 bg-muted rounded-sm px-1">{meta.phase}</span>
                       ) : (
-                        <span className="text-xs text-muted-foreground/40">—</span>
+                        <span className="text-xs text-tx-3">—</span>
                       )}
                       {pctile && (
                         <p className={cn('text-[9px] font-semibold leading-none mt-0.5', pctileColor)}>{pctile}</p>
                       )}
                     </div>
-                    <div className="w-20 shrink-0 hidden sm:flex items-center justify-between gap-1">
-                      <p className="text-[10px] text-muted-foreground/60 truncate flex-1">{meta.source}</p>
+                    <div className="w-28 shrink-0 hidden sm:flex items-center justify-between gap-1 lg:w-36">
+                      <p className="text-[10px] text-tx-3 truncate flex-1" title={meta.source}>{meta.source}</p>
                       <ChevronDown className={cn(
-                        'h-3 w-3 shrink-0 text-muted-foreground/30 transition-transform duration-200 group-hover:text-muted-foreground/60',
+                        'h-3 w-3 shrink-0 text-tx-3 transition-transform duration-200',
                         isOpen && 'rotate-180',
                       )} />
                     </div>
