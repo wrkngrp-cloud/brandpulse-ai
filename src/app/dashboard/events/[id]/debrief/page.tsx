@@ -1,7 +1,7 @@
 import { createClient }       from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link                   from 'next/link'
-import { ArrowLeft }          from 'lucide-react'
+import { ArrowLeftIcon as ArrowLeft } from '@/components/brand/icon'
 import { DebriefForm }        from '@/components/events/debrief-form'
 
 export default async function DebriefPage({ params }: { params: Promise<{ id: string }> }) {

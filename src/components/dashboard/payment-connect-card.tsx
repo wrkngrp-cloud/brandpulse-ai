@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Copy, Check } from 'lucide-react'
+import { CheckIcon as CheckCircle2, CopyIcon as Copy, CheckIcon as Check } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -69,7 +69,7 @@ function PaymentProviderCard({
           </p>
         </div>
         {configured && (
-          <span className="flex items-center gap-1 text-xs text-green-600">
+          <span className="flex items-center gap-1 text-xs text-pos">
             <CheckCircle2 className="h-3.5 w-3.5" /> Configured
           </span>
         )}
@@ -79,7 +79,7 @@ function PaymentProviderCard({
       <div className="space-y-1.5">
         <p className="text-xs font-medium">Webhook URL</p>
         <div className="flex items-center gap-2">
-          <code className="flex-1 rounded-md bg-muted/50 border border-input px-3 py-1.5 text-[11px] font-mono truncate">
+          <code className="flex-1 rounded-md bg-muted/50 border border-input px-3 py-1.5 text-[11px] bg-num truncate">
             {webhookUrl}
           </code>
           <button
@@ -91,7 +91,7 @@ function PaymentProviderCard({
               'shrink-0 gap-1.5 text-xs px-2.5'
             )}
           >
-            {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? <Check className="h-3.5 w-3.5 text-pos" /> : <Copy className="h-3.5 w-3.5" />}
             {copied ? 'Copied' : 'Copy'}
           </button>
         </div>

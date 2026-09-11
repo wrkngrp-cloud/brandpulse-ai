@@ -2,7 +2,8 @@ import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getActiveBrandId } from '@/lib/active-brand'
-import { TrendingUp, TrendingDown, Minus, MessageCircle, AlertTriangle, Info, Search } from 'lucide-react'
+import { TrendDownIcon as TrendingDown, MinusIcon as Minus, InfoIcon as Info } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp, MentionsIcon as MessageCircle, AlertIcon as AlertTriangle, SearchIcon as Search } from '@/components/brand/icon'
 import Link from 'next/link'
 import { DateRangeFilter }             from '@/components/dashboard/date-range-filter'
 import { rangeLabelShort, rangeLabelLong } from '@/lib/range-label'
@@ -14,12 +15,9 @@ import { TopicClusters } from './topic-clusters'
 import { SentimentHeatmap } from '@/components/dashboard/sentiment-heatmap'
 import { MentionsList } from './mentions-list'
 import { TourTrigger } from '@/components/tours/tour-trigger'
-
-const SENTIMENT_BAR: Record<string, string> = {
-  positive: 'bg-green-500',
-  neutral:  'bg-muted-foreground/40',
-  negative: 'bg-red-400',
-}
+import { Crescendo } from '@/components/brand/crescendo'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 const PLATFORM_LABEL: Record<string, string> = {
   twitter:   'X',
@@ -36,11 +34,11 @@ const AUDIENCE_LABEL: Record<string, string> = {
 }
 
 const AUDIENCE_BAR: Record<string, string> = {
-  consumer:  'bg-blue-500',
-  creator:   'bg-fuchsia-500',
-  developer: 'bg-violet-500',
-  retailer:  'bg-emerald-500',
-  media:     'bg-amber-500',
+  consumer:  'bg-flare',
+  creator:   'bg-neu',
+  developer: 'bg-neu',
+  retailer:  'bg-pos',
+  media:     'bg-ember',
   general:   'bg-muted-foreground/40',
 }
 
@@ -252,9 +250,9 @@ async function SentimentData({ days = 84 }: { days: number }) {
           {alerts.map((a, i) => {
             const Icon      = a.severity === 'critical' ? AlertTriangle : a.type === 'spike' ? TrendingUp : Info
             const colorClass =
-              a.severity === 'critical' ? 'border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400' :
-              a.severity === 'warning'  ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-400' :
-              'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-400'
+              a.severity === 'critical' ? 'border-line-strong bg-flare-wash text-tx-flare dark:border-line-strong dark:bg-shell/40 dark:text-tx-flare' :
+              a.severity === 'warning'  ? 'border-line bg-shell text-tx-2 dark:border-line dark:bg-shell/40 dark:text-tx-2' :
+              'border-line-strong bg-flare-wash text-tx-flare dark:border-line-strong dark:bg-shell/40 dark:text-tx-2'
             const aiQuestion =
               a.type === 'spike'
                 ? `What drove the positive sentiment surge on ${new Date(a.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}? What can we do to sustain it?`
@@ -269,7 +267,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
                 </div>
                 <Link
                   href={`/dashboard/ask?q=${encodeURIComponent(aiQuestion)}`}
-                  className="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border border-current/20 bg-white/30 hover:bg-white/50 dark:bg-black/20 dark:hover:bg-black/30 transition-colors whitespace-nowrap"
+                  className="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border border-current/20 bg-card/30 hover:bg-card/50 dark:bg-ink/20 dark:hover:bg-ink/30 transition-colors whitespace-nowrap"
                 >
                   <Search className="h-3 w-3" />
                   Find out why
@@ -286,25 +284,25 @@ async function SentimentData({ days = 84 }: { days: number }) {
           <p className="eyebrow">Sentiment score</p>
           <div className="flex items-baseline gap-1.5">
             <p className={`metric text-[34px] ${latest
-              ? latest.social_score >= 60 ? 'text-green-500'
-                : latest.social_score <= 40 ? 'text-red-500' : 'text-amber-500'
+              ? latest.social_score >= 60 ? 'text-pos'
+                : latest.social_score <= 40 ? 'text-tx-flare' : 'text-tx-2'
               : 'text-muted-foreground/30'}`}>
               {latest ? Math.round(latest.social_score) : '—'}
             </p>
             {latest && (
               latest.social_score >= 60
-                ? <TrendingUp   className="h-4 w-4 text-green-500 mb-1" />
+                ? <TrendingUp   className="h-4 w-4 text-pos mb-1" />
                 : latest.social_score <= 40
-                  ? <TrendingDown className="h-4 w-4 text-red-500 mb-1" />
+                  ? <TrendingDown className="h-4 w-4 text-tx-flare mb-1" />
                   : <Minus        className="h-4 w-4 text-muted-foreground/40 mb-1" />
             )}
           </div>
           {platformEntries.length > 0 && (
             <div className="flex flex-wrap gap-1 pt-0.5">
               {platformEntries.map(([p, s]) => (
-                <span key={p} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border bg-muted/40 text-muted-foreground">
+                <span key={p} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-[10px] font-semibold border bg-muted/40 text-muted-foreground">
                   {PLATFORM_LABEL[p] ?? p}
-                  <span className="font-bold text-foreground">{Math.round(s.score)}</span>
+                  <span className="font-bold text-foreground bg-num">{Math.round(s.score)}</span>
                 </span>
               ))}
             </div>
@@ -313,7 +311,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
 
         <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
           <p className="eyebrow">Positive</p>
-          <p className="metric text-[34px] text-green-500">
+          <p className="metric text-[34px] text-pos">
             {latest ? `${Math.round(latest.positive_pct)}%` : '—'}
           </p>
           <p className="text-[11px] text-muted-foreground/50">of mentions</p>
@@ -321,7 +319,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
 
         <div className="border rounded-2xl p-5 bg-card card-shadow space-y-1.5">
           <p className="eyebrow">Negative</p>
-          <p className="metric text-[34px] text-red-500">
+          <p className="metric text-[34px] text-tx-flare">
             {latest ? `${Math.round(latest.negative_pct)}%` : '—'}
           </p>
           <p className="text-[11px] text-muted-foreground/50">of mentions</p>
@@ -344,12 +342,12 @@ async function SentimentData({ days = 84 }: { days: number }) {
             </div>
             <div className="flex items-center gap-4">
               {[
-                { label: 'Score', color: '#2B59FF' },
-                { label: 'Positive', color: '#22c55e' },
-                { label: 'Negative', color: '#f87171' },
+                { label: 'Score', color: 'var(--flare)' },
+                { label: 'Positive', color: 'var(--pos)' },
+                { label: 'Negative', color: 'var(--flare)' },
               ].map(l => (
                 <div key={l.label} className="hidden sm:flex items-center gap-1.5">
-                  <span className="h-[3px] w-4 rounded-full" style={{ background: l.color }} />
+                  <span className="h-[3px] w-4 rounded-sm" style={{ background: l.color }} />
                   <span className="text-[11px] text-muted-foreground/55 font-medium">{l.label}</span>
                 </div>
               ))}
@@ -389,11 +387,9 @@ async function SentimentData({ days = 84 }: { days: number }) {
                     <div key={label} className="space-y-0.5">
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span className="capitalize">{label}</span>
-                        <span>{Math.round(pct)}%</span>
+                        <span className="bg-num">{Math.round(pct)}%</span>
                       </div>
-                      <div className="h-1 bg-muted rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${SENTIMENT_BAR[label]}`} style={{ width: `${pct}%` }} />
-                      </div>
+                      <Crescendo value={pct} height={6} />
                     </div>
                   )
                 })}
@@ -423,7 +419,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
             </p>
           </div>
           {/* Stacked bar */}
-          <div className="h-2.5 w-full rounded-full overflow-hidden flex bg-muted">
+          <div className="h-2.5 w-full rounded-sm overflow-hidden flex bg-muted">
             {audienceEntries.map(a => (
               <div
                 key={a.type}
@@ -439,7 +435,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
               <div key={a.type} className="flex items-center gap-1.5">
                 <span className={`h-2 w-2 rounded-full ${AUDIENCE_BAR[a.type] ?? 'bg-muted-foreground/40'}`} />
                 <span className="text-xs font-medium">{AUDIENCE_LABEL[a.type] ?? a.type}</span>
-                <span className="text-xs text-muted-foreground tabular-nums">{Math.round(a.pct)}%</span>
+                <span className="text-xs text-muted-foreground bg-num">{Math.round(a.pct)}%</span>
               </div>
             ))}
           </div>
@@ -473,19 +469,16 @@ export default async function SentimentPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Sentiment</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Public perception · X and Instagram · {days <= 7 ? 'last 7 days' : days <= 30 ? 'last 30 days' : days <= 84 ? 'last 12 weeks' : 'last 6 months'} · nightly at 4 AM Lagos time
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
+      <PageHeader
+        {...PAGE_META['/dashboard/sentiment']}
+        title="Sentiment"
+        subtitle={<>Public perception · X and Instagram · {days <= 7 ? 'last 7 days' : days <= 30 ? 'last 30 days' : days <= 84 ? 'last 12 weeks' : 'last 6 months'} · nightly at 4 AM Lagos time</>}
+        actions={<>
           <TourTrigger module="sentiment" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={84} />
           <CrawlHistory />
-        </div>
-      </div>
+        </>}
+      />
 
       <Suspense fallback={
         <div className="space-y-4">

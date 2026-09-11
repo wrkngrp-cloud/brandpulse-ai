@@ -1,7 +1,7 @@
 'use client'
 
 import { useTheme } from 'next-themes'
-import { Sun, Moon } from 'lucide-react'
+import { SunIcon as Sun, MoonIcon as Moon } from '@/components/brand/icon'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 

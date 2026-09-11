@@ -9,7 +9,7 @@ import { Input }    from '@/components/ui/input'
 import { Label }    from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput } from '@/components/onboarding/brand-profile-fields'
-import { ArrowLeft, ArrowRight, CalendarDays, Check, Plus, Trash2, Upload, X, ImageIcon } from 'lucide-react'
+import { ArrowLeftIcon as ArrowLeft, ArrowRightIcon as ArrowRight, CalendarIcon as CalendarDays, CheckIcon as Check, PlusIcon as Plus, TrashIcon as Trash2, ExportIcon as Upload, XIcon as X, ImageIcon } from '@/components/brand/icon'
 import { FieldTip } from '@/components/ui/field-tip'
 import { cn } from '@/lib/utils'
 import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
@@ -378,7 +378,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                   <button
                     type="button"
                     onClick={() => set('creative_url', '')}
-                    className="absolute top-2 right-2 h-6 w-6 rounded-full bg-background/80 border flex items-center justify-center hover:bg-background transition-colors"
+                    className="absolute top-2 right-2 h-6 w-6 rounded-full bg-background/80 border flex items-center justify-center hover:bg-background transition-colors bg-press"
                     aria-label="Remove creative"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -468,7 +468,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                 </div>
               </div>
               {(parseFloat(data.spend_breakdown.agency) || parseFloat(data.spend_breakdown.materials) || parseFloat(data.spend_breakdown.sampling) || parseFloat(data.spend_breakdown.logistics)) ? (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground bg-num">
                   Total spend: ₦{(
                     (parseFloat(data.spend_breakdown.agency)    || 0) +
                     (parseFloat(data.spend_breakdown.materials) || 0) +

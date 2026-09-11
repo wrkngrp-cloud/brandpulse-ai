@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
+import { TOKENS } from '@/lib/brand-tokens'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Jara Foods Ltd — Nigerian FMCG brand
@@ -103,8 +104,8 @@ export async function POST(req: NextRequest) {
     workspace_id:    wsId,
     name:            'Jara Foods Ltd',
     category:        'FMCG',
-    primary_color:   '#E8763E',
-    secondary_color: '#2B4D24',
+    primary_color:   TOKENS.ember,
+    secondary_color: TOKENS.pos,
     market_share_pct: 14.7,
     brand_values:    ['Nourishment', 'Authenticity', 'Community', 'Quality'],
     cultural_profile: {
@@ -2384,9 +2385,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
 
   let bronze: { id: string } | null = null, silver: { id: string } | null = null, gold: { id: string } | null = null
   if (lp?.id) {
-    const { data: t1 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: lp.id, name: 'Bronze', min_points: 0, color: '#cd7f32', perks: ['5% discount on Jara Rice', 'Birthday bonus points', 'Early access to new products'], sort_order: 1 }).select('id').single()
-    const { data: t2 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: lp.id, name: 'Silver', min_points: 5_000, color: '#aaa9ad', perks: ['8% discount on all products', 'Double points Fridays', 'Free shipping on Jumia/Konga', 'Quarterly mystery box'], sort_order: 2 }).select('id').single()
-    const { data: t3 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: lp.id, name: 'Gold', min_points: 20_000, color: '#ffd700', perks: ['12% lifetime discount', 'Monthly chef masterclass invite', 'Personalised gifting', 'Priority CS hotline', 'Exclusive community kitchen invites'], sort_order: 3 }).select('id').single()
+    const { data: t1 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: lp.id, name: 'Bronze', min_points: 0, color: TOKENS.char, perks: ['5% discount on Jara Rice', 'Birthday bonus points', 'Early access to new products'], sort_order: 1 }).select('id').single()
+    const { data: t2 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: lp.id, name: 'Silver', min_points: 5_000, color: TOKENS.tx3, perks: ['8% discount on all products', 'Double points Fridays', 'Free shipping on Jumia/Konga', 'Quarterly mystery box'], sort_order: 2 }).select('id').single()
+    const { data: t3 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: lp.id, name: 'Gold', min_points: 20_000, color: TOKENS.danfo, perks: ['12% lifetime discount', 'Monthly chef masterclass invite', 'Personalised gifting', 'Priority CS hotline', 'Exclusive community kitchen invites'], sort_order: 3 }).select('id').single()
     bronze = t1; silver = t2; gold = t3
 
     // Rewards
@@ -2468,8 +2469,8 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
   }).select('id').single()
 
   if (exp1?.id) {
-    const { data: ev1c } = await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: exp1.id, name: 'Control — Learn More', is_control: true, impressions: 2840, conversions: 142, revenue: 0, sort_order: 1, content: { cta_text: 'Learn more', cta_color: '#666666' } }).select('id').single()
-    const { data: ev1v } = await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: exp1.id, name: 'Variant — Grab Yours Now', is_control: false, impressions: 2861, conversions: 218, revenue: 0, sort_order: 2, content: { cta_text: 'Grab yours now', cta_color: '#E8763E' } }).select('id').single()
+    const { data: ev1c } = await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: exp1.id, name: 'Control — Learn More', is_control: true, impressions: 2840, conversions: 142, revenue: 0, sort_order: 1, content: { cta_text: 'Learn more', cta_color: TOKENS.tx2 } }).select('id').single()
+    const { data: ev1v } = await sb.from('ab_variants').insert({ brand_id: brandId, experiment_id: exp1.id, name: 'Variant — Grab Yours Now', is_control: false, impressions: 2861, conversions: 218, revenue: 0, sort_order: 2, content: { cta_text: 'Grab yours now', cta_color: TOKENS.ember } }).select('id').single()
     if (ev1v?.id) await sb.from('ab_experiments').update({ winner_variant_id: ev1v.id }).eq('id', exp1.id)
     void ev1c
   }

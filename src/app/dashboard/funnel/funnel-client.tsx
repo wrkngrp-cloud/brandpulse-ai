@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import {
-  Globe, Eye, Heart, Zap, Shield, Share2,
-  ChevronDown, Sparkles, Loader2, AlertCircle, ChevronRight, Info,
-} from 'lucide-react'
+import { ShareIcon as Share2 } from '@/components/brand/icon'
+import { GlobeIcon as Globe, EyeIcon as Eye, HeartIcon as Heart, AskIcon as Zap, ShieldIcon as Shield, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight, InfoIcon as Info } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { Crescendo } from '@/components/brand/crescendo'
+import { AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -86,8 +87,8 @@ const STAGE_EMPTY: Record<StageKey, { text: string; linkLabel?: string; linkHref
 
 function scoreColor(score: number) {
   if (score >= 65) return 'text-foreground'
-  if (score >= 40) return 'text-amber-500'
-  return 'text-red-500'
+  if (score >= 40) return 'text-tx-2'
+  return 'text-tx-flare'
 }
 
 function dropOffMeta(from: number | null, to: number | null) {
@@ -96,15 +97,15 @@ function dropOffMeta(from: number | null, to: number | null) {
   const pct = Math.round(((from - to) / from) * 100)
   const isLift = pct < 0
   const urgent = pct > 30
-  const colorClass = isLift ? 'text-green-600' : pct <= 15 ? 'text-green-600' : pct <= 30 ? 'text-amber-500' : 'text-red-500'
+  const colorClass = isLift ? 'text-pos' : pct <= 15 ? 'text-pos' : pct <= 30 ? 'text-tx-2' : 'text-tx-flare'
   return { pct: Math.abs(pct), isLift, colorClass, urgent }
 }
 
 function scoreBarColor(score: number | null) {
-  if (score == null) return '#94a3b8'
-  if (score >= 65)   return '#22c55e'
-  if (score >= 40)   return '#f59e0b'
-  return '#ef4444'
+  if (score == null) return 'var(--tx-3)'
+  if (score >= 65)   return 'var(--pos)'
+  if (score >= 40)   return 'var(--ember)'
+  return 'var(--flare)'
 }
 
 export function FunnelClient({ scores, brandName, industry }: Props) {
@@ -201,7 +202,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
           disabled={isPending}
         >
           {isPending ? (
-            <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Analysing…</>
+            <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Analysing…</>
           ) : (
             <><Sparkles className="h-3.5 w-3.5 mr-1.5" />Diagnose with AI</>
           )}
@@ -237,7 +238,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       </div>
                       <div className="text-right shrink-0">
                         {score != null ? (
-                          <span className={cn('text-2xl font-bold tabular-nums', scoreColor(score))}>
+                          <span className={cn('text-2xl font-bold bg-num', scoreColor(score))}>
                             {score}
                           </span>
                         ) : (
@@ -246,12 +247,11 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       </div>
                     </div>
 
-                    {/* Progress bar */}
-                    <div className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-foreground transition-all duration-700"
-                        style={{ width: score != null ? `${score}%` : '0%' }}
-                      />
+                    {/* The score bar is a Crescendo: ticks growing in size and
+                        heat toward the reading, the arc unrolled. A plain filled
+                        div says nothing about how far along the scale it sits. */}
+                    <div className="mt-2">
+                      <Crescendo value={score ?? 0} />
                     </div>
 
                     <div className="flex flex-wrap items-center justify-between gap-1.5 mt-1.5">
@@ -259,7 +259,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       <button
                         type="button"
                         onClick={() => toggleData(stage.key)}
-                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                       >
                         <span>{source}</span>
                         <span className="opacity-60">
@@ -273,10 +273,10 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                         type="button"
                         onClick={() => handleStageAI(stage.key, score)}
                         disabled={isLoading && loadingStage !== stage.key}
-                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                        className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors bg-press"
                       >
                         {isLoading ? (
-                          <><Loader2 className="h-3 w-3 animate-spin" />Analysing…</>
+                          <><Loader2 className="h-3 w-3" />Analysing…</>
                         ) : (
                           <>
                             <Sparkles className="h-3 w-3" />
@@ -313,7 +313,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
               {/* Data points breakdown panel */}
               {isDataOpen && (
                 <div className="border-t border-border bg-muted px-5 py-4 space-y-3">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  <p className="text-[10px] font-semibold text-muted-foreground">
                     Data points &amp; weightings
                   </p>
                   {breakdown.length > 0 ? (
@@ -324,7 +324,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                             <div className="flex items-center gap-2 min-w-0">
                               <span className="text-xs font-medium text-foreground/80 truncate">{item.label}</span>
                               {item.rawDisplay && (
-                                <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{item.rawDisplay}</span>
+                                <span className="text-[10px] text-muted-foreground bg-num shrink-0">{item.rawDisplay}</span>
                               )}
                             </div>
                             <div className="flex items-center gap-3 shrink-0">
@@ -332,7 +332,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                                 {item.weight > 0 ? `${item.weight}% weight` : 'no data'}
                               </span>
                               <span
-                                className="text-xs font-bold tabular-nums w-12 text-right"
+                                className="text-xs font-bold bg-num w-12 text-right"
                                 style={{ color: scoreBarColor(item.score) }}
                               >
                                 {item.score !== null ? `${item.score}/100` : '—'}
@@ -340,14 +340,14 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                             </div>
                           </div>
                           {/* Two-layer bar: weight track + score fill */}
-                          <div className="relative h-1.5 bg-muted-foreground/10 rounded-full overflow-hidden">
+                          <div className="relative h-1.5 bg-muted-foreground/10 rounded-sm overflow-hidden">
                             <div
-                              className="absolute inset-y-0 left-0 rounded-full bg-muted-foreground/20"
+                              className="absolute inset-y-0 left-0 rounded-sm bg-muted-foreground/20"
                               style={{ width: `${item.weight}%` }}
                             />
                             {item.score !== null && item.weight > 0 && (
                               <div
-                                className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                                className="absolute inset-y-0 left-0 rounded-sm transition-colors duration-700"
                                 style={{
                                   width: `${(item.weight / 100) * item.score}%`,
                                   backgroundColor: scoreBarColor(item.score),
@@ -360,7 +360,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-muted-foreground italic">No source data yet for this stage.</p>
+                    <p className="text-xs text-muted-foreground">No source data yet for this stage.</p>
                   )}
                 </div>
               )}
@@ -370,14 +370,14 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                 <div className="border-t border-dashed border-border bg-muted/20 px-5 py-4 space-y-4">
                   {/* Channels */}
                   <div className="space-y-2">
-                    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    <p className="text-[11px] font-semibold text-muted-foreground">
                       Channels informing this stage
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       {analysis.channels.map(ch => (
                         <span
                           key={ch}
-                          className="text-xs px-2 py-0.5 rounded-full bg-foreground/8 border border-border font-medium"
+                          className="text-xs px-2 py-0.5 rounded-sm bg-foreground/8 border border-border font-medium"
                         >
                           {ch}
                         </span>
@@ -388,14 +388,14 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                   {/* Initiatives */}
                   {analysis.initiatives.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <p className="text-[11px] font-semibold text-muted-foreground">
                         Initiatives powering it
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {analysis.initiatives.map(init => (
                           <span
                             key={init}
-                            className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40"
+                            className="text-xs px-2 py-0.5 rounded-sm bg-flare/10 text-tx-flare dark:text-tx-2 border border-line-strong dark:border-line-strong"
                           >
                             {init}
                           </span>
@@ -410,7 +410,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                       <div className="h-4 w-4 rounded-full bg-foreground flex items-center justify-center shrink-0">
                         <Sparkles className="h-2.5 w-2.5 text-background" />
                       </div>
-                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <p className="text-[11px] font-semibold text-muted-foreground">
                         Why this score
                       </p>
                     </div>
@@ -420,7 +420,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                   {/* Top actions */}
                   {analysis.topActions.length > 0 && (
                     <div className="space-y-2 pt-1 border-t border-border/50">
-                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <p className="text-[11px] font-semibold text-muted-foreground">
                         Top actions to improve this stage
                       </p>
                       <ol className="space-y-2">
@@ -441,7 +441,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
               {/* Loading state for AI analysis */}
               {isAIOpen && isLoading && (
                 <div className="border-t border-dashed border-border bg-muted/20 px-5 py-6 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                  <Loader2 className="h-4 w-4 shrink-0" />
                   Fetching signals and generating analysis…
                 </div>
               )}
@@ -452,11 +452,11 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                   <ChevronDown className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
                   {drop.pct != null ? (
                     <>
-                      <span className={cn('text-xs font-semibold tabular-nums', drop.colorClass)}>
+                      <span className={cn('text-xs font-semibold bg-num', drop.colorClass)}>
                         {drop.pct}% {drop.isLift ? 'lift' : 'drop-off'}
                       </span>
                       {drop.urgent && (
-                        <span className="flex items-center gap-0.5 text-[10px] font-medium text-red-500 ml-1">
+                        <span className="flex items-center gap-0.5 text-[10px] font-medium text-tx-flare ml-1">
                           <AlertCircle className="h-3 w-3" />
                           Priority gap
                         </span>
@@ -496,7 +496,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
           <p className="text-sm leading-relaxed">{diagnosis.diagnosis}</p>
 
           <div className="space-y-2">
-            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            <p className="text-[11px] font-semibold text-muted-foreground">
               Recommended actions
             </p>
             <ul className="space-y-2">
@@ -516,21 +516,21 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-foreground inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-foreground inline-block" />
           65–100 Healthy
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-amber-500 inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-ember inline-block" />
           40–64 Building
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-red-500 inline-block" />
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-flare inline-block" />
           0–39 At risk
         </span>
         <span className="ml-auto flex flex-wrap gap-x-2">
-          <span className="text-green-600 font-medium">≤15% drop good</span>
-          <span className="text-amber-500 font-medium">16–30% watch</span>
-          <span className="text-red-500 font-medium">&gt;30% urgent</span>
+          <span className="text-pos font-medium">≤15% drop good</span>
+          <span className="text-tx-2 font-medium">16–30% watch</span>
+          <span className="text-tx-flare font-medium">&gt;30% urgent</span>
         </span>
       </div>
     </div>

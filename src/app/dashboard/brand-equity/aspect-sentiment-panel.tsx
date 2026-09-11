@@ -1,7 +1,8 @@
 'use client'
 
-import { MessageSquareText } from 'lucide-react'
+import { MentionsIcon as MessageSquareText } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface AspectScore {
   aspect: string
@@ -36,9 +37,9 @@ const PLATFORM_LABELS: Record<string, string> = {
 }
 
 const SENTIMENT_STYLES: Record<AspectScore['sentiment'], { badge: string; bar: string; label: string }> = {
-  positive: { badge: 'bg-green-100 text-green-700', bar: 'bg-green-500',  label: 'Positive' },
-  neutral:  { badge: 'bg-amber-100 text-amber-700', bar: 'bg-amber-400',  label: 'Neutral'  },
-  negative: { badge: 'bg-red-100 text-red-700',     bar: 'bg-red-500',    label: 'Negative' },
+  positive: { badge: 'bg-shell text-pos', bar: 'bg-pos',  label: 'Positive' },
+  neutral:  { badge: 'bg-shell text-tx-2', bar: 'bg-ember',  label: 'Neutral'  },
+  negative: { badge: 'bg-flare-wash text-tx-flare',     bar: 'bg-flare',    label: 'Negative' },
 }
 
 export function AspectSentimentPanel({ aspects, platform }: Props) {
@@ -56,7 +57,7 @@ export function AspectSentimentPanel({ aspects, platform }: Props) {
             <p className="text-xs text-muted-foreground">What people praise and complain about</p>
           </div>
         </div>
-        <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+        <span className="text-[11px] font-medium px-2 py-0.5 rounded-sm bg-muted text-muted-foreground">
           {PLATFORM_LABELS[platform] ?? platform}
         </span>
       </div>
@@ -76,23 +77,18 @@ export function AspectSentimentPanel({ aspects, platform }: Props) {
                     <span className="text-sm font-medium truncate">
                       {ASPECT_LABELS[a.aspect] ?? a.aspect}
                     </span>
-                    <span className={cn('text-[11px] font-medium px-1.5 py-0.5 rounded-full shrink-0', styles.badge)}>
+                    <span className={cn('text-[11px] font-medium px-1.5 py-0.5 rounded-sm shrink-0', styles.badge)}>
                       {styles.label}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-sm font-semibold tabular-nums">{a.score}</span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
+                    <span className="text-sm font-semibold bg-num">{a.score}</span>
+                    <span className="text-xs text-muted-foreground bg-num">
                       {a.mention_count} {a.mention_count === 1 ? 'mention' : 'mentions'}
                     </span>
                   </div>
                 </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className={cn('h-full rounded-full transition-all', styles.bar)}
-                    style={{ width: `${Math.max(0, Math.min(100, a.score))}%` }}
-                  />
-                </div>
+                <Crescendo value={Math.max(0, Math.min(100, a.score))} height={8} />
               </div>
             )
           })}

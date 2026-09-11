@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
-import { Check, ArrowRight, X, Plug } from 'lucide-react'
+import { CheckIcon as Check, ArrowRightIcon as ArrowRight, XIcon as X } from '@/components/brand/icon'
+import { ConnectIcon as Plug } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { markTourStatus } from '@/app/dashboard/tours/actions'
 
@@ -73,14 +74,14 @@ export function ConnectChecklist({ items, serverDismissed }: {
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <span className="text-[11px] font-semibold tabular-nums text-muted-foreground rounded-full border border-border px-2.5 py-1">
+          <span className="text-[11px] font-semibold bg-num text-muted-foreground rounded-sm border border-border px-2.5 py-1">
             {doneCount} of {items.length} done
           </span>
           <button
             type="button"
             onClick={dismiss}
             aria-label="Hide this checklist"
-            className="text-muted-foreground/50 hover:text-foreground transition-colors"
+            className="text-muted-foreground/50 hover:text-foreground transition-colors bg-press"
           >
             <X className="h-4 w-4" />
           </button>
@@ -101,11 +102,11 @@ export function ConnectChecklist({ items, serverDismissed }: {
               className={cn(
                 'h-5 w-5 rounded-full flex items-center justify-center shrink-0 border',
                 item.done
-                  ? 'bg-green-500 border-green-500'
+                  ? 'bg-pos border-line'
                   : 'border-border bg-background',
               )}
             >
-              {item.done && <Check className="h-3 w-3 text-white" />}
+              {item.done && <Check className="h-3 w-3 text-tx-inv" />}
             </span>
             <span className="flex-1 min-w-0">
               <span className={cn('block text-[13px] font-medium truncate', item.done && 'line-through decoration-muted-foreground/40')}>
@@ -116,7 +117,7 @@ export function ConnectChecklist({ items, serverDismissed }: {
               </span>
             </span>
             {item.done ? (
-              <span className="text-[11px] font-medium text-green-600 shrink-0">Connected</span>
+              <span className="text-[11px] font-medium text-pos shrink-0">Connected</span>
             ) : (
               <span className="inline-flex items-center gap-1 text-[11.5px] font-medium text-muted-foreground group-hover:text-foreground transition-colors shrink-0">
                 Set up

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
+import { TOKENS } from '@/lib/brand-tokens'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Pinnacle Media Group — full-service Lagos marketing agency
@@ -79,8 +80,8 @@ export async function POST(req: NextRequest) {
     category:        'Agency',
     industry:        'agency',
     brand_type:      'agency',
-    primary_color:   '#1A1A2E',
-    secondary_color: '#E94560',
+    primary_color:   TOKENS.inkRaised,
+    secondary_color: TOKENS.flare,
     brand_values:    ['Creativity', 'Results', 'Cultural Intelligence', 'Transparency'],
     cultural_profile: { community_corporate: 60, traditional_modern: 55, religious_secular: 50, mass_premium: 65, local_global: 50 },
     target_segments: [

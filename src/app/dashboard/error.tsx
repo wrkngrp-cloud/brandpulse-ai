@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { AlertCircle, RefreshCw } from 'lucide-react'
+import { RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 export default function DashboardError({
   error,
@@ -26,7 +27,7 @@ export default function DashboardError({
           {error.message || 'An unexpected error occurred while loading this page.'}
         </p>
         {error.digest && (
-          <p className="text-[10px] font-mono text-muted-foreground/50 mt-2">ref: {error.digest}</p>
+          <p className="text-[10px] bg-num text-muted-foreground/50 mt-2">ref: {error.digest}</p>
         )}
       </div>
       <div className="flex gap-2">

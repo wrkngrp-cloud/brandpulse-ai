@@ -6,6 +6,7 @@ import {
 } from 'recharts'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { ChartState } from '@/components/brand/chart-states'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -36,19 +37,19 @@ function CustomTooltip({ active, payload, label }: {
     : ''
 
   return (
-    <div className="bg-[#14182B] border border-white/10 rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[150px]">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-white/40 mb-2">{date}</p>
+    <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5 min-w-[150px]">
+      <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-2">{date}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center justify-between gap-4 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
             <span
-              className="h-1.5 w-3 rounded-full shrink-0"
+              className="h-1.5 w-3 rounded-sm shrink-0"
               style={{ background: p.color }}
             />
-            <span className="text-[11.5px] text-white/60 capitalize">{p.name}</span>
+            <span className="text-[11.5px] text-tx-inv/60 capitalize">{p.name}</span>
           </div>
           <span
-            className="text-[13px] font-semibold tabular-nums"
+            className="text-[13px] font-semibold bg-num"
             style={{ color: p.color }}
           >
             {Math.round(p.value)}
@@ -65,7 +66,7 @@ function DateTick({ x, y, payload }: { x?: number; y?: number; payload?: { value
   if (!payload?.value) return null
   const label = new Date(payload.value).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
   return (
-    <text x={x} y={(y ?? 0) + 12} textAnchor="middle" fontSize={10} fill="currentColor" className="text-muted-foreground opacity-40" fontFamily="var(--font-sans)">
+    <text x={x} y={(y ?? 0) + 12} textAnchor="middle" fontSize={10} fill="currentColor" className="text-muted-foreground opacity-40" fontFamily="var(--font-num)">
       {label}
     </text>
   )
@@ -78,7 +79,7 @@ function Legend({ items }: { items: { label: string; color: string }[] }) {
     <div className="flex items-center gap-5">
       {items.map(item => (
         <div key={item.label} className="flex items-center gap-1.5">
-          <span className="h-[3px] w-4 rounded-full" style={{ background: item.color }} />
+          <span className="h-[3px] w-4 rounded-sm" style={{ background: item.color }} />
           <span className="text-[11px] text-muted-foreground/60 font-medium">{item.label}</span>
         </div>
       ))}
@@ -95,8 +96,8 @@ export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day
   if (!data.length || (!hasBHI && !hasSentiment)) return null
 
   const legendItems = [
-    hasBHI       && { label: 'Brand Health',    color: '#2B59FF' },
-    hasSentiment && { label: 'Sentiment Score', color: '#22c55e'  },
+    hasBHI       && { label: 'Brand Health',    color: 'var(--flare)' },
+    hasSentiment && { label: 'Sentiment Score', color: 'var(--pos)'  },
   ].filter(Boolean) as { label: string; color: string }[]
 
   return (
@@ -116,90 +117,93 @@ export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day
       </div>
 
       {/* Chart */}
-      <ResponsiveContainer width="100%" height={height}>
-        <AreaChart data={data} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
-          <defs>
-            {/* Blue gradient — BHI */}
-            <linearGradient id="gradBHI" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#2B59FF" stopOpacity={0.30} />
-              <stop offset="40%"  stopColor="#2B59FF" stopOpacity={0.12} />
-              <stop offset="100%" stopColor="#2B59FF" stopOpacity={0}    />
-            </linearGradient>
-            {/* Green gradient — Sentiment */}
-            <linearGradient id="gradSentiment" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#22c55e" stopOpacity={0.28} />
-              <stop offset="40%"  stopColor="#22c55e" stopOpacity={0.10} />
-              <stop offset="100%" stopColor="#22c55e" stopOpacity={0}    />
-            </linearGradient>
-          </defs>
-
-          <CartesianGrid
-            strokeDasharray="0"
-            horizontal={true}
-            vertical={false}
-            stroke="currentColor"
-            className="text-border opacity-40"
-          />
-
-          <XAxis
-            dataKey="date"
-            tick={<DateTick />}
-            tickLine={false}
-            axisLine={false}
-            interval="preserveStartEnd"
-          />
-
-          <YAxis
-            domain={[0, 100]}
-            tick={{ fontSize: 10, fill: 'currentColor', className: 'opacity-35' }}
-            tickLine={false}
-            axisLine={false}
-            tickCount={5}
-            fontFamily="var(--font-sans)"
-          />
-
-          {/* 50% reference line — neutral threshold */}
-          <ReferenceLine
-            y={50}
-            stroke="currentColor"
-            strokeDasharray="4 4"
-            strokeOpacity={0.20}
-          />
-
-          <Tooltip
-            content={<CustomTooltip />}
-            cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }}
-          />
-
-          {hasSentiment && (
-            <Area
-              type="monotone"
-              dataKey="sentiment"
-              name="Sentiment"
-              stroke="#22c55e"
-              strokeWidth={2}
-              fill="url(#gradSentiment)"
-              dot={false}
-              activeDot={{ r: 4, fill: '#22c55e', strokeWidth: 2, stroke: '#fff' }}
-              connectNulls={false}
+      <ChartState rows={data} height={220} empty="Connect a source to start the trend.">
+              <ResponsiveContainer width="100%" height={height}>
+          <AreaChart data={data} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
+            <defs>
+              {/* Blue gradient — BHI */}
+              <linearGradient id="gradBHI" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="var(--flare)" stopOpacity={0.30} />
+                <stop offset="40%"  stopColor="var(--flare)" stopOpacity={0.12} />
+                <stop offset="100%" stopColor="var(--flare)" stopOpacity={0}    />
+              </linearGradient>
+              {/* Green gradient — Sentiment */}
+              <linearGradient id="gradSentiment" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="var(--pos)" stopOpacity={0.28} />
+                <stop offset="40%"  stopColor="var(--pos)" stopOpacity={0.10} />
+                <stop offset="100%" stopColor="var(--pos)" stopOpacity={0}    />
+              </linearGradient>
+            </defs>
+  
+            <CartesianGrid
+              strokeDasharray="0"
+              horizontal={true}
+              vertical={false}
+              stroke="currentColor"
+              className="text-border opacity-40"
             />
-          )}
-
-          {hasBHI && (
-            <Area
-              type="monotone"
-              dataKey="bhi"
-              name="Brand Health"
-              stroke="#2B59FF"
-              strokeWidth={2.5}
-              fill="url(#gradBHI)"
-              dot={false}
-              activeDot={{ r: 4.5, fill: '#2B59FF', strokeWidth: 2, stroke: '#fff' }}
-              connectNulls={false}
+  
+            <XAxis
+              dataKey="date"
+              tick={<DateTick />}
+              tickLine={false}
+              axisLine={false}
+              interval="preserveStartEnd"
             />
-          )}
-        </AreaChart>
-      </ResponsiveContainer>
+  
+            <YAxis
+              domain={[0, 100]}
+              tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'currentColor', className: 'opacity-35' }}
+              tickLine={false}
+              axisLine={false}
+              tickCount={5}
+              fontFamily="var(--font-num)"
+            />
+  
+            {/* 50% reference line — neutral threshold */}
+            <ReferenceLine
+              y={50}
+              stroke="currentColor"
+              strokeDasharray="4 4"
+              strokeOpacity={0.20}
+            />
+  
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 1 }}
+            />
+  
+            {hasSentiment && (
+              <Area
+                type="monotone"
+                dataKey="sentiment"
+                name="Sentiment"
+                stroke="var(--chart-2)"
+                strokeWidth={2}
+                strokeDasharray="4 3"
+                fill="url(#gradSentiment)"
+                dot={false}
+                activeDot={{ r: 4, fill: 'var(--chart-2)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+                connectNulls={false}
+              />
+            )}
+  
+            {hasBHI && (
+              <Area
+                type="monotone"
+                dataKey="bhi"
+                name="Brand Health"
+                stroke="var(--flare)"
+                strokeWidth={2.5}
+                fill="url(#gradBHI)"
+                dot={false}
+                activeDot={{ r: 4.5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+                connectNulls={false}
+              />
+            )}
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartState>
     </motion.div>
   )
 }

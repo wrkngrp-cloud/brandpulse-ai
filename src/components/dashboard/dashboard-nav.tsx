@@ -4,15 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion, LayoutGroup } from 'framer-motion'
-import {
-  LayoutDashboard, BarChart2, ClipboardList, CalendarDays,
-  MapPin, Megaphone, Zap, Trophy, ChevronDown, Monitor, Radio,
-  Tv, Newspaper, Filter, Users, Palette, Globe, Target,
-  FileSearch, BookOpen, PieChart, Sparkles, ClipboardCheck,
-  Plug, BarChart3, Clipboard, AlertTriangle, Heart, Database,
-  ShoppingBag, DollarSign, FlaskConical, Activity, Gift,
-  FileText, TrendingUp, FileDown, MessageCircle, Video, Eye,
-} from 'lucide-react'
+import { LayoutGridIcon as LayoutDashboard, CalendarIcon as CalendarDays, MusicIcon as Megaphone, AskIcon as Zap, StarIcon as Trophy, ChevronDownIcon as ChevronDown, PanelIcon as Monitor, MusicIcon as Radio, PanelIcon as Tv, PrinterIcon as Newspaper, UsersIcon as Users, GlobeIcon as Globe, CircleDotIcon as Target, FileIcon as FileSearch, FileIcon as BookOpen, CheckIcon as ClipboardCheck, TrendIcon as BarChart3, HeartIcon as Heart, DatabaseIcon as Database, CurrencyIcon as DollarSign, FlaskIcon as FlaskConical, GiftIcon as Gift, FileIcon as FileText, CameraIcon as Video, EyeIcon as Eye } from '@/components/brand/icon'
+import { AskIcon as Sparkles, ConnectIcon as Plug, AlertIcon as AlertTriangle, TrendIcon as TrendingUp, ExportIcon as FileDown, MentionsIcon as MessageCircle, GaugeIcon, MentionsIcon, FunnelIcon, OohIcon, SurveyIcon, ShareIcon, FieldIcon, CreativeIcon, MarketIcon } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { isPathHidden, type IndustryId } from '@/lib/industry-config'
 
@@ -43,17 +36,17 @@ type NavEntry =
 // ── Section data ──────────────────────────────────────────────────────────────
 
 const BRAND_HEALTH: NavEntry[] = [
-  { label: 'Sentiment',    href: '/dashboard/sentiment',    icon: BarChart2 },
-  { label: 'Brand Health', href: '/dashboard/brand-equity', icon: Activity  },
+  { label: 'Sentiment',    href: '/dashboard/sentiment',    icon: MentionsIcon },
+  { label: 'Brand Health', href: '/dashboard/brand-equity', icon: GaugeIcon },
   { label: 'Content',      href: '/dashboard/content',      icon: FileText  },
-  { label: 'Funnel',       href: '/dashboard/funnel',       icon: Filter    },
+  { label: 'Funnel',       href: '/dashboard/funnel',       icon: FunnelIcon },
 ]
 
 const INTELLIGENCE: NavEntry[] = [
   { label: 'Competitive',        href: '/dashboard/competitive',        icon: Trophy      },
-  { label: 'Marketplace',        href: '/dashboard/marketplace',        icon: ShoppingBag },
+  { label: 'Marketplace',        href: '/dashboard/marketplace',        icon: MarketIcon },
   { label: 'Cultural Insights',  href: '/dashboard/cultural',           icon: Globe       },
-  { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: Clipboard   },
+  { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: FieldIcon   },
   { label: 'PR Tracking',        href: '/dashboard/pr',                 icon: FileSearch  },
   { label: 'YouTube',            href: '/dashboard/youtube',            icon: Video,      comingSoon: true },
   { label: 'AI Visibility',      href: '/dashboard/ai-visibility',      icon: Eye        },
@@ -67,7 +60,7 @@ const CAMPAIGNS: NavEntry[] = [
   { label: 'Digital Ads',         href: '/dashboard/digital',     icon: Monitor     },
   { label: 'Influencers',         href: '/dashboard/influencers', icon: Users       },
   { divider: true },
-  { label: 'Out of Home',         href: '/dashboard/ooh',         icon: MapPin      },
+  { label: 'Out of Home',         href: '/dashboard/ooh',         icon: OohIcon     },
   { label: 'Events & Activation', href: '/dashboard/events',      icon: CalendarDays },
   { divider: true },
   { label: 'Radio',               href: '/dashboard/radio',       icon: Radio       },
@@ -80,18 +73,18 @@ const CREATIVE_LAB_PATHS = ['/dashboard/voice-builder', '/dashboard/pre-post', '
 const CREATIVE_LAB_SUB = [
   { label: 'Voice Builder',    href: '/dashboard/voice-builder', icon: Sparkles },
   { label: 'Pre-Post Intel',   href: '/dashboard/pre-post',      icon: Zap      },
-  { label: 'Creative Analysis',href: '/dashboard/creative',      icon: Palette  },
+  { label: 'Creative Analysis',href: '/dashboard/creative',      icon: CreativeIcon },
 ]
 
 const SURVEY_PATHS = ['/dashboard/surveys']
 const SURVEY_SUB = [
-  { label: 'All Surveys',     href: '/dashboard/surveys',        icon: ClipboardList  },
+  { label: 'All Surveys',     href: '/dashboard/surveys',        icon: SurveyIcon     },
   { label: 'NPS Tracker',     href: '/dashboard/surveys/nps',    icon: TrendingUp     },
   { label: 'Tracking Panels', href: '/dashboard/surveys/panels', icon: ClipboardCheck },
 ]
 
 const MEASUREMENT: NavEntry[] = [
-  { label: 'Media Mix',       href: '/dashboard/mmm',      icon: PieChart   },
+  { label: 'Media Mix',       href: '/dashboard/mmm',      icon: ShareIcon  },
   { label: 'Geo-Lift',        href: '/dashboard/geo-lift', icon: Target     },
   { label: 'Budget & Pacing', href: '/dashboard/budget',   icon: DollarSign },
 ]
@@ -121,7 +114,7 @@ const REPORTS: NavEntry[] = [
 function SectionLabel({ children, expanded }: { children: React.ReactNode; expanded: boolean }) {
   if (expanded) {
     return (
-      <p className="px-3 pt-5 pb-1.5 text-[9.5px] font-bold uppercase tracking-[0.13em] text-sidebar-foreground/35 select-none whitespace-nowrap">
+      <p className="px-3 pt-5 pb-1.5 text-[9.5px] font-bold text-sidebar-foreground/35 select-none whitespace-nowrap">
         {children}
       </p>
     )
@@ -136,7 +129,7 @@ function InSectionDivider({ expanded }: { expanded: boolean }) {
 
 function ComingSoonBadge() {
   return (
-    <span className="text-[9px] font-bold uppercase tracking-wide bg-primary/15 text-primary rounded px-1 py-0.5 leading-none shrink-0">
+    <span className="text-[9px] font-bold bg-primary/15 text-primary rounded px-1 py-0.5 leading-none shrink-0">
       Soon
     </span>
   )
@@ -176,19 +169,19 @@ function NavItem({
         'relative flex items-center gap-3 h-[38px] rounded-xl transition-colors duration-150 group',
         expanded ? 'px-3' : 'px-0 justify-center',
         active
-          ? 'nav-pill-active text-white'
+          ? 'nav-pill-active text-tx-inv'
           : 'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent',
       )}
     >
       {active && (
         <motion.span
           layoutId="nav-rail"
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-white/80"
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-card/80"
           transition={{ type: 'spring', stiffness: 500, damping: 40 }}
         />
       )}
       <Icon className={cn(
-        'shrink-0 transition-all duration-150',
+        'shrink-0 transition-colors duration-150',
         expanded ? 'h-[15px] w-[15px]' : 'h-[16px] w-[16px]',
         active ? 'opacity-100' : 'opacity-65 group-hover:opacity-100',
       )} />
@@ -282,7 +275,7 @@ function CollapsibleSection({
                 <SubIcon className="h-3.5 w-3.5 shrink-0 opacity-70" />
                 <span className="flex-1">{l}</span>
                 {badge && (
-                  <span className="text-[9px] font-bold uppercase tracking-wide bg-primary/15 text-primary rounded px-1 py-0.5 leading-none">{badge}</span>
+                  <span className="text-[9px] font-bold bg-primary/15 text-primary rounded px-1 py-0.5 leading-none">{badge}</span>
                 )}
               </Link>
             )
@@ -322,7 +315,7 @@ export function DashboardNav({ expanded = true, industry = null }: { expanded?: 
           label="Surveys"
           paths={SURVEY_PATHS}
           sub={SURVEY_SUB}
-          icon={ClipboardList}
+          icon={SurveyIcon}
           expanded={expanded}
           pathname={pathname}
         />
@@ -340,7 +333,7 @@ export function DashboardNav({ expanded = true, industry = null }: { expanded?: 
           label="Creative Lab"
           paths={CREATIVE_LAB_PATHS}
           sub={CREATIVE_LAB_SUB}
-          icon={Palette}
+          icon={CreativeIcon}
           expanded={expanded}
           pathname={pathname}
         />

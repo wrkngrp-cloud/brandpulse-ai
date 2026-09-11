@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Check, ChevronsUpDown, Building2, Plus } from 'lucide-react'
+import { CheckIcon as Check, ChevronsUpdownIcon as ChevronsUpDown, VenueIcon as Building2, PlusIcon as Plus } from '@/components/brand/icon'
 import {
   DropdownMenu,
   DropdownMenuContent,

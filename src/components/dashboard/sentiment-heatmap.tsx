@@ -20,22 +20,20 @@ interface TooltipState {
   y:   number
 }
 
-// ── Color logic ───────────────────────────────────────────────────────────
-// Centred on 50 (neutral). Distance from neutral drives opacity.
-// Below 50: red family. Above 50: green family. No data: transparent grid.
+// ── Colour ────────────────────────────────────────────────────────────────
+// The polarity axis, not a red-to-green scale. There is no green in this
+// system: positive reads as ink, neutral as ash, negative as Flare, and
+// distance from 50 drives how much of the cell the colour fills. Heat here
+// means "further from neutral", which is what the reader is scanning for.
+const NEUTRAL_CELL = 'color-mix(in srgb, var(--neu) 18%, transparent)'
 
 function cellColor(score: number | null): string {
   if (score === null) return 'transparent'
   const dist = score - 50
-  if (dist === 0) return 'rgba(100,116,139,0.18)'  // slate-500 barely visible
-  if (dist > 0) {
-    const t = Math.min(dist / 50, 1)
-    const opacity = 0.18 + t * 0.78
-    return `rgba(34,197,94,${opacity.toFixed(3)})`  // green-500
-  }
-  const t = Math.min(-dist / 50, 1)
-  const opacity = 0.18 + t * 0.78
-  return `rgba(239,68,68,${opacity.toFixed(3)})`    // red-500
+  if (dist === 0) return NEUTRAL_CELL
+  const t = Math.min(Math.abs(dist) / 50, 1)
+  const pct = Math.round((0.18 + t * 0.78) * 100)
+  return `color-mix(in srgb, var(${dist > 0 ? '--pos' : '--neg'}) ${pct}%, transparent)`
 }
 
 function cellLabel(score: number | null): string {
@@ -173,12 +171,12 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
         {pctPositive !== null && (
           <div className="hidden sm:flex items-center gap-5 text-right">
             <div>
-              <p className="metric text-[22px] text-green-500">{pctPositive}%</p>
-              <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wide mt-0.5">Positive days</p>
+              <p className="metric text-[22px] text-pos">{pctPositive}%</p>
+              <p className="text-[10px] text-muted-foreground/50 mt-0.5">Positive days</p>
             </div>
             <div>
-              <p className="metric text-[22px] text-red-500">{pctNegative}%</p>
-              <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wide mt-0.5">Negative days</p>
+              <p className="metric text-[22px] text-tx-flare">{pctNegative}%</p>
+              <p className="text-[10px] text-muted-foreground/50 mt-0.5">Negative days</p>
             </div>
           </div>
         )}
@@ -270,7 +268,7 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
           <div
             key={s}
             className="h-3 w-3 rounded-[2px]"
-            style={{ backgroundColor: s === 50 ? 'rgba(100,116,139,0.18)' : cellColor(s) }}
+            style={{ backgroundColor: cellColor(s) }}
           />
         ))}
         <span>More positive</span>
@@ -282,26 +280,26 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
           className="fixed z-50 pointer-events-none"
           style={{ left: tooltip.x, top: tooltip.y - 8, transform: 'translate(-50%, -100%)' }}
         >
-          <div className="bg-[#14182B] border border-white/10 rounded-xl shadow-2xl px-3.5 py-2.5 min-w-[170px]">
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.10em] text-white/40 mb-1.5">
+          <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5 min-w-[170px]">
+            <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-1.5 bg-num">
               {fmt(tooltip.date)}
             </p>
             {tooltip.score !== null ? (
               <>
-                <p className="text-[13px] font-semibold text-white tabular-nums">
+                <p className="text-[13px] font-semibold text-tx-inv bg-num">
                   Score: {Math.round(tooltip.score)}
-                  <span className="text-white/40 text-[11px] font-normal ml-1">/ 100</span>
+                  <span className="text-tx-inv/40 text-[11px] font-normal ml-1 bg-num">/ 100</span>
                 </p>
-                <p className="text-[10.5px] text-white/50 mt-0.5">{cellLabel(tooltip.score)}</p>
+                <p className="text-[10.5px] text-tx-inv/50 mt-0.5 bg-num">{cellLabel(tooltip.score)}</p>
                 {tooltip.positive_pct != null && (
-                  <div className="flex gap-3 mt-1.5 pt-1.5 border-t border-white/10">
-                    <span className="text-[10.5px] text-green-400">{Math.round(tooltip.positive_pct)}% positive</span>
-                    <span className="text-[10.5px] text-red-400">{Math.round(tooltip.negative_pct ?? 0)}% negative</span>
+                  <div className="flex gap-3 mt-1.5 pt-1.5 border-t border-line-inv">
+                    <span className="text-[10.5px] text-pos bg-num">{Math.round(tooltip.positive_pct)}% positive</span>
+                    <span className="text-[10.5px] text-tx-flare bg-num">{Math.round(tooltip.negative_pct ?? 0)}% negative</span>
                   </div>
                 )}
               </>
             ) : (
-              <p className="text-[12px] text-white/30 italic">No crawl data</p>
+              <p className="text-[12px] text-tx-inv/30">No crawl data</p>
             )}
           </div>
         </div>

@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Star, MapPin, RefreshCw, TrendingUp, Loader2, Sparkles } from 'lucide-react'
+import { StarIcon as Star, MapIcon as MapPin, RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { TrendIcon as TrendingUp, AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -34,9 +36,9 @@ function Stars({ rating }: { rating: number }) {
         const fill = Math.max(0, Math.min(1, rating - (i - 1)))
         return (
           <div key={i} className="relative h-5 w-5">
-            <Star className="absolute inset-0 h-5 w-5 text-amber-300/40" />
+            <Star className="absolute inset-0 h-5 w-5 text-tx-2/40" />
             <div className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
-              <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+              <Star className="h-5 w-5 fill-tx-2 text-tx-2" />
             </div>
           </div>
         )
@@ -123,13 +125,13 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={handleAnalyseAspects} disabled={analysing}>
             {analysing
-              ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              ? <Loader2 className="h-3.5 w-3.5 mr-1.5" />
               : <Sparkles className="h-3.5 w-3.5 mr-1.5" />}
             Analyse aspects
           </Button>
           <Button size="sm" variant="outline" onClick={handleSync} disabled={syncing}>
             {syncing
-              ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+              ? <Loader2 className="h-3.5 w-3.5 mr-1.5" />
               : <RefreshCw className="h-3.5 w-3.5 mr-1.5" />}
             Sync now
           </Button>
@@ -145,14 +147,14 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
           <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
             <div>
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold tabular-nums">{rating.toFixed(1)}</span>
+                <span className="text-4xl font-bold bg-num">{rating.toFixed(1)}</span>
                 <span className="text-sm text-muted-foreground">/ 5</span>
               </div>
               <div className="mt-1.5"><Stars rating={rating} /></div>
             </div>
 
             <div>
-              <p className="text-2xl font-semibold tabular-nums">
+              <p className="text-2xl font-semibold bg-num">
                 {count != null ? count.toLocaleString('en-NG') : '—'}
               </p>
               <p className="text-xs text-muted-foreground">total reviews</p>
@@ -160,8 +162,8 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
 
             <div>
               <p className={cn(
-                'text-2xl font-semibold tabular-nums flex items-center gap-1',
-                velocity && velocity > 0 ? 'text-green-600' : 'text-muted-foreground',
+                'text-2xl font-semibold bg-num flex items-center gap-1',
+                velocity && velocity > 0 ? 'text-pos' : 'text-muted-foreground',
               )}>
                 {velocity && velocity > 0 && <TrendingUp className="h-4 w-4" />}
                 {velocity != null ? `+${velocity}` : '—'}
@@ -172,14 +174,14 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
 
           {reviews.length > 0 && (
             <div className="space-y-2.5 border-t pt-4">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <p className="text-[11px] font-semibold text-muted-foreground">
                 Recent reviews
               </p>
               {reviews.map((r, i) => (
                 <div key={i} className="flex items-start gap-2.5">
                   {r.rating != null && (
-                    <span className="shrink-0 mt-0.5 inline-flex items-center gap-0.5 text-xs font-medium text-amber-600">
-                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                    <span className="shrink-0 mt-0.5 inline-flex items-center gap-0.5 text-xs font-medium text-tx-2">
+                      <Star className="h-3 w-3 fill-tx-2 text-tx-2" />
                       {r.rating}
                     </span>
                   )}

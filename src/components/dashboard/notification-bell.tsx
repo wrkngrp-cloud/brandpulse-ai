@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell } from 'lucide-react'
+import { AlertIcon as Bell } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
 export function NotificationBell({
@@ -23,8 +23,8 @@ export function NotificationBell({
       <Bell className="h-[17px] w-[17px]" />
       {hasUnread && (
         <span
-          className="absolute top-[7px] right-[7px] h-[7px] w-[7px] rounded-full ring-[1.5px] ring-background"
-          style={{ background: 'oklch(0.585 0.163 37)' }}
+          className="absolute top-[7px] right-[7px] h-[7px] w-[7px] rounded-sm ring-[1.5px] ring-background"
+          style={{ background: 'var(--bg-shell)' }}
         />
       )}
     </button>

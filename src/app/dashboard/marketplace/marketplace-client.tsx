@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  ShoppingBag, Plus, Star, Package, TrendingUp,
-  TrendingDown, Minus, Loader2, X, RefreshCw,
-  ExternalLink, ChevronDown, ChevronRight,
-} from 'lucide-react'
+import { MarketIcon as ShoppingBag, PlusIcon as Plus, StarIcon as Star, BriefcaseIcon as Package, XIcon as X, RefreshIcon as RefreshCw, ExternalLinkIcon as ExternalLink, ChevronDownIcon as ChevronDown, ChevronRightIcon as ChevronRight } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,6 +11,8 @@ import { Badge } from '@/components/ui/badge'
 import { cn, formatNGN } from '@/lib/utils'
 import { toast } from 'sonner'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface MarketplaceProduct {
   id:             string
@@ -33,11 +33,10 @@ interface MarketplaceProduct {
 }
 
 const PLATFORM_COLOR: Record<string, string> = {
-  jumia:  'bg-orange-100 text-orange-800 border-orange-200',
-  konga:  'bg-red-100 text-red-800 border-red-200',
-  amazon: 'bg-blue-100 text-blue-800 border-blue-200',
-  other:  'bg-gray-100 text-gray-800 border-gray-200',
-}
+  jumia:  'bg-shell text-tx-2 border-line',
+  konga:  'bg-flare-wash text-tx-flare border-line-strong',
+  amazon: 'bg-flare-wash text-tx-flare border-line-strong',
+  other:  'bg-shell text-tx border-line' }
 
 export function MarketplaceClient() {
   const [products, setProducts]     = useState<MarketplaceProduct[]>([])
@@ -66,25 +65,22 @@ export function MarketplaceClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Marketplace Intelligence</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Track your products on Jumia, Konga, and other platforms
-          </p>
-        </div>
-        <div className="flex gap-2">
+      <PageHeader
+        {...PAGE_META['/dashboard/marketplace']}
+        title="Marketplace Intelligence"
+        subtitle="Track your products on Jumia, Konga, and other platforms"
+        actions={<><div className="flex gap-2">
           <TourTrigger module="marketplace" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
           <Button size="sm" onClick={() => setShowForm(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add product
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       {/* KPI row */}
       {ownProducts.length > 0 && (
@@ -103,7 +99,7 @@ export function MarketplaceClient() {
             key={f}
             onClick={() => setFilter(f)}
             className={cn(
-              'px-3 py-1.5 rounded-full border text-xs font-medium capitalize transition-colors',
+              'px-3 py-1.5 rounded-sm border text-xs font-medium capitalize transition-colors',
               filter === f ? 'bg-foreground text-background border-foreground' : 'hover:bg-muted border-border'
             )}
           >
@@ -117,8 +113,7 @@ export function MarketplaceClient() {
         <AddProductForm
           onSave={async (data) => {
             const res = await fetch('/api/marketplace/products', {
-              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
-            })
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
             if (!res.ok) { toast.error('Failed to add product'); return }
             toast.success('Product added')
             setShowForm(false)
@@ -130,7 +125,7 @@ export function MarketplaceClient() {
 
       {loading && products.length === 0 && (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loader2 className="h-6 w-6 text-muted-foreground" />
         </div>
       )}
 
@@ -155,8 +150,7 @@ export function MarketplaceClient() {
             onAddSnapshot={async (data) => {
               const res = await fetch('/api/marketplace/snapshots', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ product_id: p.id, ...data }),
-              })
+                body: JSON.stringify({ product_id: p.id, ...data }) })
               if (!res.ok) { toast.error('Failed to save snapshot'); return }
               toast.success('Snapshot saved')
               setShowSnap(null)
@@ -173,7 +167,7 @@ function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">{icon} {label}</div>
-      <p className="text-xl font-bold">{value}</p>
+      <p className="text-xl font-bold"><span className="bg-num">{value}</span></p>
     </div>
   )
 }
@@ -191,8 +185,7 @@ function productSummary(product: MarketplaceProduct): string {
 }
 
 function ProductRow({
-  product, showSnap, onToggleSnap, onAddSnapshot,
-}: {
+  product, showSnap, onToggleSnap, onAddSnapshot }: {
   product: MarketplaceProduct
   showSnap: boolean
   onToggleSnap: () => void
@@ -204,21 +197,21 @@ function ProductRow({
     <div className="rounded-xl border bg-card overflow-hidden">
       <div className="flex items-center gap-3 px-4 py-3">
         {showSnap ? <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />}
-        <button onClick={onToggleSnap} className="flex-1 text-left min-w-0">
+        <button onClick={onToggleSnap} className="flex-1 text-left min-w-0 bg-press">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium text-sm">{product.product_name}</span>
             <Badge variant="outline" className={cn('text-xs capitalize', PLATFORM_COLOR[product.platform] ?? '')}>
               {product.platform}
             </Badge>
             {!product.is_own_product && (
-              <Badge variant="outline" className="text-xs text-purple-700 border-purple-200">Competitor</Badge>
+              <Badge variant="outline" className="text-xs text-tx-2 border-line">Competitor</Badge>
             )}
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">{productSummary(product)}</p>
         </button>
         <div className="flex items-center gap-4 shrink-0 text-sm">
-          {snap?.price    != null && <span className="font-semibold">{formatNGN(snap.price)}</span>}
-          {snap?.rating   != null && <span className="text-yellow-500 font-medium">★ {snap.rating.toFixed(1)}</span>}
+          {snap?.price    != null && <span className="font-semibold bg-num">{formatNGN(snap.price)}</span>}
+          {snap?.rating   != null && <span className="text-tx-2 font-medium bg-num">★ {snap.rating.toFixed(1)}</span>}
           {snap?.in_stock === false && <Badge variant="destructive" className="text-xs">Out of stock</Badge>}
           {snap?.shelf_position != null && <span className="text-muted-foreground text-xs">#{snap.shelf_position}</span>}
           {product.product_url && (
@@ -258,7 +251,7 @@ function AddProductForm({ onSave, onCancel }: { onSave: (d: Record<string, unkno
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">Add product</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -290,7 +283,7 @@ function AddProductForm({ onSave, onCancel }: { onSave: (d: Record<string, unkno
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Add product
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
@@ -316,8 +309,7 @@ function AddSnapshotForm({ onSave, onCancel }: { onSave: (d: Record<string, unkn
       rating:         rating ? parseFloat(rating) : undefined,
       review_count:   reviews ? parseInt(reviews) : undefined,
       shelf_position: position ? parseInt(position) : undefined,
-      in_stock:       inStock,
-    })
+      in_stock:       inStock })
     setSaving(false)
   }
 
@@ -354,7 +346,7 @@ function AddSnapshotForm({ onSave, onCancel }: { onSave: (d: Record<string, unkn
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Save snapshot
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>

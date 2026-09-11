@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
 } from '@/components/ui/sheet'
-import { History, RefreshCw, CheckCircle2, AlertCircle, Clock } from 'lucide-react'
+import { RefreshIcon as History, RefreshIcon as RefreshCw, CheckIcon as CheckCircle2, ClockIcon as Clock } from '@/components/brand/icon'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 interface CrawlRun {
   id: string
@@ -27,17 +28,17 @@ function duration(start: string, end: string | null) {
 
 function StatusBadge({ status }: { status: string }) {
   if (status === 'done') return (
-    <span className="inline-flex items-center gap-1 text-xs text-green-600">
+    <span className="inline-flex items-center gap-1 text-xs text-pos">
       <CheckCircle2 className="h-3 w-3" /> Done
     </span>
   )
   if (status === 'error') return (
-    <span className="inline-flex items-center gap-1 text-xs text-red-500">
+    <span className="inline-flex items-center gap-1 text-xs text-tx-flare">
       <AlertCircle className="h-3 w-3" /> Error
     </span>
   )
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-amber-500">
+    <span className="inline-flex items-center gap-1 text-xs text-tx-2">
       <Clock className="h-3 w-3" /> Running
     </span>
   )
@@ -71,7 +72,7 @@ export function CrawlHistory() {
         <div className="mt-4 space-y-3">
           <div className="flex justify-end">
             <Button size="sm" variant="ghost" onClick={load} disabled={loading}>
-              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${loading ? '' : ''}`} />
               Refresh
             </Button>
           </div>
@@ -99,7 +100,7 @@ export function CrawlHistory() {
                       <StatusBadge status={run.status} />
                       <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
                         run.trigger_type === 'manual'
-                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400'
+                          ? 'bg-flare-wash text-tx-flare dark:bg-flare dark:text-tx-2'
                           : 'bg-muted text-muted-foreground'
                       }`}>
                         {run.trigger_type === 'manual' ? 'Manual' : 'Scheduled'}
@@ -119,7 +120,7 @@ export function CrawlHistory() {
                   </div>
 
                   {run.error_message && (
-                    <p className="text-xs text-red-500 truncate">{run.error_message}</p>
+                    <p className="text-xs text-tx-flare truncate">{run.error_message}</p>
                   )}
                 </div>
               ))}

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { X, Plus } from 'lucide-react'
+import { XIcon as X, PlusIcon as Plus } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
 export const CATEGORIES = [
@@ -50,7 +50,7 @@ export function TagInput({ label, placeholder, values, onChange, hint }: {
           {values.map(v => (
             <Badge key={v} variant="secondary" className="gap-1 pr-1 text-xs">
               {v}
-              <button type="button" onClick={() => onChange(values.filter(x => x !== v))} className="hover:text-destructive ml-0.5">
+              <button type="button" onClick={() => onChange(values.filter(x => x !== v))} className="hover:text-destructive ml-0.5 bg-press">
                 <X className="h-3 w-3" />
               </button>
             </Badge>
@@ -76,7 +76,7 @@ export function CulturalSlider({ left, right, hint, value, onChange }: {
     <div className="space-y-1.5">
       <div className="flex items-center justify-between gap-2 text-xs font-medium">
         <span className={cn(leansLeft ? 'text-foreground' : 'text-muted-foreground')}>{left}</span>
-        <span className="shrink-0 rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10.5px] font-semibold tabular-nums text-muted-foreground">
+        <span className="shrink-0 rounded-sm border border-border bg-muted/50 px-2 py-0.5 text-[10.5px] font-semibold bg-num text-muted-foreground">
           {value} / 100 · {scoreLabel}
         </span>
         <span className={cn(leansRight ? 'text-foreground' : 'text-muted-foreground')}>{right}</span>
@@ -102,7 +102,7 @@ export function SectionCard({ title, children, className, badge }: {
       <div className="flex items-center gap-2">
         <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         {badge && (
-          <span className="text-[10px] font-semibold uppercase tracking-wide rounded-full border border-border bg-muted/50 text-muted-foreground px-2 py-0.5">
+          <span className="text-[10px] font-semibold rounded-sm border border-border bg-muted/50 text-muted-foreground px-2 py-0.5">
             {badge}
           </span>
         )}

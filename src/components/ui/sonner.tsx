@@ -2,7 +2,27 @@
 
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { Working } from "@/components/brand/working"
+
+/**
+ * Polarity runs ink to flare, so a toast says which it is with a filled tick
+ * and the word rather than with a hue. Success is an ink tick: there is no
+ * green in this system, and ink-versus-flare survives colour blindness.
+ */
+function Tick({ tone }: { tone: "pos" | "neu" | "neg" }) {
+  return (
+    <i
+      aria-hidden="true"
+      style={{
+        width: 6,
+        height: 14,
+        borderRadius: "var(--r-tick)",
+        background: `var(--${tone})`,
+        display: "block",
+      }}
+    />
+  )
+}
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme()
@@ -12,20 +32,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       icons={{
-        success: (
-          <CircleCheckIcon className="size-4" />
-        ),
-        info: (
-          <InfoIcon className="size-4" />
-        ),
-        warning: (
-          <TriangleAlertIcon className="size-4" />
-        ),
-        error: (
-          <OctagonXIcon className="size-4" />
-        ),
+        success: <Tick tone="pos" />,
+        info:    <Tick tone="neu" />,
+        warning: <Tick tone="neu" />,
+        error:   <Tick tone="neg" />,
         loading: (
-          <Loader2Icon className="size-4 animate-spin" />
+          <Working className="size-4" />
         ),
       }}
       style={

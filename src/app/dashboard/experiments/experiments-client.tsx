@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import {
-  FlaskConical, Plus, Play, Pause, CheckSquare,
-  RefreshCw, Loader2, X, TrendingUp, Users,
-  BarChart3, Trophy,
-} from 'lucide-react'
+import { FlaskIcon as FlaskConical, PlusIcon as Plus, PlayIcon as Play, PauseIcon as Pause, CheckIcon as CheckSquare, RefreshIcon as RefreshCw, XIcon as X, StarIcon as Trophy } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import {  } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,6 +11,8 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface Variant {
   id:          string
@@ -42,11 +42,10 @@ interface Experiment {
 }
 
 const STATUS_COLOR: Record<string, string> = {
-  draft:     'bg-gray-100 text-gray-700 border-gray-200',
-  running:   'bg-green-100 text-green-700 border-green-200',
-  paused:    'bg-yellow-100 text-yellow-700 border-yellow-200',
-  concluded: 'bg-blue-100 text-blue-700 border-blue-200',
-}
+  draft:     'bg-shell text-tx-2 border-line',
+  running:   'bg-shell text-pos border-line',
+  paused:    'bg-shell text-tx-2 border-line',
+  concluded: 'bg-flare-wash text-tx-flare border-line-strong' }
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   message:      <span className="text-xs">✉️</span>,
@@ -55,8 +54,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   offer:        <span className="text-xs">🏷️</span>,
   landing_page: <span className="text-xs">🖥️</span>,
   email:        <span className="text-xs">📧</span>,
-  other:        <span className="text-xs">🧪</span>,
-}
+  other:        <span className="text-xs">🧪</span> }
 
 // Two-proportion z-test for significance
 function calcSignificance(control: Variant, variant: Variant, confidenceTarget = 95): { pValue: number; significant: boolean; winner: 'control' | 'variant' | null; liftPct: number } {
@@ -75,8 +73,7 @@ function calcSignificance(control: Variant, variant: Variant, confidenceTarget =
     pValue,
     significant: pValue < alpha,
     winner: pValue < alpha ? (p2 > p1 ? 'variant' : 'control') : null,
-    liftPct,
-  }
+    liftPct }
 }
 function normalCDF(z: number): number {
   const t = 1 / (1 + 0.2316419 * z)
@@ -101,8 +98,7 @@ export function ExperimentsClient() {
 
   const setStatus = async (id: string, status: string) => {
     const res = await fetch(`/api/experiments/${id}`, {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }),
-    })
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
     if (!res.ok) { toast.error('Failed to update status'); return }
     toast.success(`Experiment ${status}`)
     load()
@@ -113,23 +109,22 @@ export function ExperimentsClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">A/B Testing</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Structured experiments with statistical significance tracking</p>
-        </div>
-        <div className="flex gap-2">
+      <PageHeader
+        {...PAGE_META['/dashboard/experiments']}
+        title="A/B Testing"
+        subtitle="Structured experiments with statistical significance tracking"
+        actions={<><div className="flex gap-2">
           <TourTrigger module="experiments" autoStart />
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-4 w-4 mr-2', loading && '')} />
             Refresh
           </Button>
           <Button size="sm" onClick={() => setShowForm(true)}>
             <Plus className="h-4 w-4 mr-2" />
             New experiment
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="experiments-main">
       {experiments.length > 0 && (
@@ -145,8 +140,7 @@ export function ExperimentsClient() {
         <NewExperimentForm
           onSave={async (data) => {
             const res = await fetch('/api/experiments', {
-              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
-            })
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
             if (!res.ok) { toast.error('Failed to create experiment'); return }
             toast.success('Experiment created')
             setShowForm(false)
@@ -158,7 +152,7 @@ export function ExperimentsClient() {
 
       {loading && experiments.length === 0 && (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <Loader2 className="h-6 w-6 text-muted-foreground" />
         </div>
       )}
 
@@ -176,11 +170,11 @@ export function ExperimentsClient() {
         {experiments.map(exp => (
           <div key={exp.id} className="rounded-xl border bg-card overflow-hidden">
             <div className="flex items-start gap-3 px-4 py-3">
-              <button onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)} className="mt-0.5 shrink-0">
+              <button onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)} className="mt-0.5 shrink-0 bg-press">
                 {TYPE_ICON[exp.experiment_type] ?? TYPE_ICON.other}
               </button>
               <div className="flex-1 min-w-0">
-                <button onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)} className="text-left">
+                <button onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)} className="text-left bg-press">
                   <p className="font-semibold text-sm">{exp.name}</p>
                   <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{exp.hypothesis}</p>
                 </button>
@@ -240,28 +234,28 @@ export function ExperimentsClient() {
                             const sig       = v.is_control ? null : calcSignificance(control, v, exp.confidence_target)
                             const isWinner  = exp.winner_variant_id === v.id
                             return (
-                              <tr key={v.id} className={cn('hover:bg-muted/20', isWinner && 'bg-green-50/50')}>
+                              <tr key={v.id} className={cn('hover:bg-muted/20', isWinner && 'bg-shell/50')}>
                                 <td className="px-3 py-2">
                                   <div className="flex items-center gap-1.5">
-                                    {isWinner && <Trophy className="h-3 w-3 text-yellow-500" />}
+                                    {isWinner && <Trophy className="h-3 w-3 text-tx-2" />}
                                     <span className="font-medium">{v.name}</span>
                                     {v.is_control && <Badge variant="outline" className="text-[10px] py-0">Control</Badge>}
                                   </div>
                                 </td>
-                                <td className="px-3 py-2">{v.impressions.toLocaleString()}</td>
-                                <td className="px-3 py-2">{v.conversions.toLocaleString()}</td>
-                                <td className="px-3 py-2 font-medium">{convRate.toFixed(2)}%</td>
-                                <td className="px-3 py-2">₦{v.revenue.toLocaleString()}</td>
+                                <td className="px-3 py-2 bg-num">{v.impressions.toLocaleString()}</td>
+                                <td className="px-3 py-2 bg-num">{v.conversions.toLocaleString()}</td>
+                                <td className="px-3 py-2 font-medium bg-num">{convRate.toFixed(2)}%</td>
+                                <td className="px-3 py-2 bg-num">₦{v.revenue.toLocaleString()}</td>
                                 <td className="px-3 py-2">
                                   {sig ? (
-                                    <span className={cn('font-medium', sig.liftPct > 0 ? 'text-green-600' : 'text-red-600')}>
+                                    <span className={cn('font-medium', sig.liftPct > 0 ? 'text-pos' : 'text-tx-flare')}>
                                       {sig.liftPct > 0 ? '+' : ''}{sig.liftPct.toFixed(1)}%
                                     </span>
                                   ) : '—'}
                                 </td>
                                 <td className="px-3 py-2">
                                   {sig ? (
-                                    <Badge variant="outline" className={cn('text-xs', sig.significant ? 'border-green-300 text-green-700' : 'border-gray-300 text-gray-500')}>
+                                    <Badge variant="outline" className={cn('text-xs', sig.significant ? 'border-line text-pos' : 'border-line text-tx-3')}>
                                       {sig.significant ? '✓ Sig.' : `p=${sig.pValue.toFixed(2)}`}
                                     </Badge>
                                   ) : '—'}
@@ -287,7 +281,7 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">{icon} {label}</div>
-      <p className="text-xl font-bold">{value}</p>
+      <p className="text-xl font-bold"><span className="bg-num">{value}</span></p>
     </div>
   )
 }
@@ -309,8 +303,7 @@ function NewExperimentForm({ onSave, onCancel }: { onSave: (d: Record<string, un
       variants: [
         { name: variantA, is_control: true },
         { name: variantB, is_control: false },
-      ],
-    })
+      ] })
     setSaving(false)
   }
 
@@ -318,7 +311,7 @@ function NewExperimentForm({ onSave, onCancel }: { onSave: (d: Record<string, un
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">New experiment</p>
-        <button onClick={onCancel}><X className="h-4 w-4 text-muted-foreground" /></button>
+        <button onClick={onCancel} className="bg-press"><X className="h-4 w-4 text-muted-foreground" /></button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -354,7 +347,7 @@ function NewExperimentForm({ onSave, onCancel }: { onSave: (d: Record<string, un
       </div>
       <div className="flex gap-2">
         <Button size="sm" onClick={handle} disabled={saving}>
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+          {saving && <Loader2 className="h-3 w-3 mr-1" />}
           Create experiment
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>

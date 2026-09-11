@@ -1,4 +1,5 @@
 'use client'
+import { ChartState } from '@/components/brand/chart-states'
 
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -25,35 +26,39 @@ const daypartData = [
 
 export function TVGRPChart() {
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <LineChart data={weeklyGRP} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
-        <XAxis dataKey="week" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-        <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={36} />
-        <Tooltip
-          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
-        />
-        <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-        <Line type="monotone" dataKey="nta"      name="NTA"          stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} />
-        <Line type="monotone" dataKey="channels" name="Channels TV"  stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} />
-        <Line type="monotone" dataKey="tvc"      name="TVC News"     stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
-      </LineChart>
-    </ResponsiveContainer>
+    <ChartState rows={weeklyGRP} height={260} empty="Add a TV buy to see weekly GRP.">
+          <ResponsiveContainer width="100%" height={260}>
+        <LineChart data={weeklyGRP} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.4} />
+          <XAxis dataKey="week" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} width={36} />
+          <Tooltip
+            contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-card)', fontSize: 12 }}
+          />
+          <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+          <Line type="monotone" dataKey="nta"      name="NTA"          stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
+          <Line type="monotone" dataKey="channels" name="Channels TV"  stroke="var(--chart-2)" strokeWidth={2} strokeDasharray="4 3" dot={{ r: 3 }} />
+          <Line type="monotone" dataKey="tvc"      name="TVC News"     stroke="var(--chart-3)" strokeWidth={2} strokeDasharray="4 3" dot={{ r: 3 }} />
+        </LineChart>
+      </ResponsiveContainer>
+    </ChartState>
   )
 }
 
 export function TVDaypartChart() {
   return (
-    <ResponsiveContainer width="100%" height={220}>
-      <BarChart data={daypartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} vertical={false} />
-        <XAxis dataKey="part" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-        <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={36} />
-        <Tooltip
-          contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
-        />
-        <Bar dataKey="grp" name="GRP" fill="#6366f1" radius={[4, 4, 0, 0]} />
-      </BarChart>
-    </ResponsiveContainer>
+    <ChartState rows={daypartData} height={220} empty="Add a TV buy to see weekly GRP.">
+          <ResponsiveContainer width="100%" height={220}>
+        <BarChart data={daypartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.4} vertical={false} />
+          <XAxis dataKey="part" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 11, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} width={36} />
+          <Tooltip
+            contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-card)', fontSize: 12 }}
+          />
+          <Bar dataKey="grp" name="GRP" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartState>
   )
 }

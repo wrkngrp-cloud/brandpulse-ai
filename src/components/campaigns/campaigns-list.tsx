@@ -4,7 +4,7 @@ import Link             from 'next/link'
 import { useRouter }    from 'next/navigation'
 import { cn }           from '@/lib/utils'
 import { ItemActions }  from '@/components/ui/item-actions'
-import { Eye, Trash2, PauseCircle, PlayCircle } from 'lucide-react'
+import { EyeIcon as Eye, TrashIcon as Trash2, PauseIcon as PauseCircle, PlayIcon as PlayCircle } from '@/components/brand/icon'
 import { deleteCampaign, updateCampaignStatus } from '@/app/dashboard/campaigns/actions'
 
 interface Channel {
@@ -48,9 +48,9 @@ const CHANNEL_LABELS: Record<string, string> = {
 
 const STATUS_STYLES: Record<string, string> = {
   draft:     'bg-muted text-muted-foreground',
-  active:    'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300',
-  paused:    'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300',
-  completed: 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300',
+  active:    'bg-shell text-pos dark:bg-shell/50 dark:text-pos',
+  paused:    'bg-shell text-tx-2 dark:bg-shell/50 dark:text-tx-2',
+  completed: 'bg-flare-wash text-tx-flare dark:bg-shell/50 dark:text-tx-2',
 }
 
 function fmtDate(d: string | null) {
@@ -89,7 +89,7 @@ export function CampaignsList({ campaigns }: CampaignsListProps) {
                 <span className="text-sm font-medium truncate">
                   {c.name}
                 </span>
-                <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', STATUS_STYLES[c.status] ?? STATUS_STYLES.draft)}>
+                <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium', STATUS_STYLES[c.status] ?? STATUS_STYLES.draft)}>
                   {c.status.charAt(0).toUpperCase() + c.status.slice(1)}
                 </span>
                 {c.objective && (

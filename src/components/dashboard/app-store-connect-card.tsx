@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, RefreshCw, Smartphone, Star } from 'lucide-react'
+import { CheckIcon as CheckCircle2, RefreshIcon as RefreshCw, PhoneIcon as Smartphone, StarIcon as Star } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -83,7 +83,7 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <Smartphone className="h-4 w-4 text-blue-500" />
+          <Smartphone className="h-4 w-4 text-tx-2" />
           <div>
             <h3 className="text-sm font-semibold">App Store Reviews</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -92,7 +92,7 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
           </div>
         </div>
         {isConfigured && (
-          <span className="flex items-center gap-1 text-xs text-green-600">
+          <span className="flex items-center gap-1 text-xs text-pos">
             <CheckCircle2 className="h-3.5 w-3.5" /> Configured
           </span>
         )}
@@ -104,20 +104,20 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
             {config.apple_app_id && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Apple App ID</span>
-                <span className="font-mono">{config.apple_app_id}</span>
+                <span className="bg-num">{config.apple_app_id}</span>
               </div>
             )}
             {config.google_pkg_name && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Android package</span>
-                <span className="font-mono">{config.google_pkg_name}</span>
+                <span className="bg-num">{config.google_pkg_name}</span>
               </div>
             )}
             {config.avg_rating !== null && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Avg rating (last 30 reviews)</span>
                 <span className="flex items-center gap-1">
-                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                  <Star className="h-3 w-3 fill-tx-2 text-tx-2" />
                   {config.avg_rating.toFixed(1)}
                 </span>
               </div>
@@ -125,11 +125,11 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
             {config.review_count > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Reviews collected</span>
-                <span>{config.review_count}</span>
+                <span className="bg-num">{config.review_count}</span>
               </div>
             )}
             {config.google_pkg_name && (
-              <p className="text-[11px] text-amber-600 pt-1">
+              <p className="text-[11px] text-tx-2 pt-1">
                 Google Play reviews need the official Publisher API. Apple reviews sync automatically.
               </p>
             )}
@@ -144,7 +144,7 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
               'gap-1.5 text-xs'
             )}
           >
-            <RefreshCw className={cn('h-3.5 w-3.5', loading === 'sync' && 'animate-spin')} />
+            <RefreshCw className={cn('h-3.5 w-3.5', loading === 'sync' && '')} />
             {loading === 'sync' ? 'Queuing...' : 'Sync now'}
           </button>
         </div>

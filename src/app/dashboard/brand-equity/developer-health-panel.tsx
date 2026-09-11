@@ -1,6 +1,7 @@
 'use client'
 
-import { Star, GitFork, CircleDot, Download, MessageCircleQuestion, GitBranch, Code2, Package, TrendingUp, TrendingDown } from 'lucide-react'
+import { StarIcon as Star, GitBranchIcon as GitFork, CircleDotIcon as CircleDot, HelpIcon as MessageCircleQuestion, GitBranchIcon as GitBranch, CodeIcon as Code2, BriefcaseIcon as Package, TrendDownIcon as TrendingDown } from '@/components/brand/icon'
+import { ExportIcon as Download, TrendIcon as TrendingUp } from '@/components/brand/icon'
 
 interface Snapshot {
   platform:         string
@@ -31,7 +32,7 @@ function Delta({ current, previous }: { current: number | null; previous: number
   if (diff === 0) return null
   const up = diff > 0
   return (
-    <span className={`ml-1.5 inline-flex items-center gap-0.5 text-xs font-medium ${up ? 'text-green-600' : 'text-red-500'}`}>
+    <span className={`ml-1.5 inline-flex items-center gap-0.5 text-xs font-medium ${up ? 'text-pos' : 'text-tx-flare'}`}>
       {up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
       {up ? '+' : ''}{diff.toLocaleString('en-NG')}
     </span>
@@ -52,7 +53,7 @@ function Metric({
         {icon}
         {label}
       </div>
-      <p className="text-2xl font-semibold tabular-nums flex items-baseline">
+      <p className="text-2xl font-semibold bg-num flex items-baseline">
         {value}
         {delta}
       </p>
@@ -80,7 +81,7 @@ export function DeveloperHealthPanel({ github, githubPrev, npm, npmPrev, stackov
 
       {github && (
         <div className="space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+          <p className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
             <GitBranch className="h-3.5 w-3.5" /> GitHub
           </p>
           <div className="flex flex-wrap gap-x-10 gap-y-4">
@@ -96,7 +97,7 @@ export function DeveloperHealthPanel({ github, githubPrev, npm, npmPrev, stackov
 
       {npm && (
         <div className="space-y-3 border-t pt-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+          <p className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
             <Package className="h-3.5 w-3.5" /> npm
           </p>
           <Metric icon={<Download className="h-3 w-3" />} label="Weekly downloads" value={fmt(npm.downloads_weekly)}
@@ -106,7 +107,7 @@ export function DeveloperHealthPanel({ github, githubPrev, npm, npmPrev, stackov
 
       {stackoverflow && (
         <div className="space-y-3 border-t pt-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+          <p className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
             <MessageCircleQuestion className="h-3.5 w-3.5" /> Stack Overflow
           </p>
           <Metric icon={<MessageCircleQuestion className="h-3 w-3" />} label="Tagged questions" value={fmt(stackoverflow.question_count)} />

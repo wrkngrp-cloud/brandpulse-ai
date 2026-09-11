@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl/mapbox'
-import { MapPin } from 'lucide-react'
+import { MapIcon as MapPin } from '@/components/brand/icon'
+import { TOKENS } from '@/lib/brand-tokens'
 
 interface OohSiteMapClientProps {
   lat: number
@@ -63,7 +64,7 @@ export function OohSiteMapClient({
           <MapPin className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">Location</span>
         </div>
-        <span className="text-xs text-muted-foreground font-mono">
+        <span className="text-xs text-muted-foreground bg-num">
           {lat.toFixed(5)}, {lng.toFixed(5)}
         </span>
       </div>
@@ -86,7 +87,7 @@ export function OohSiteMapClient({
           <Marker
             longitude={lng}
             latitude={lat}
-            color="#2563eb"
+            color={TOKENS.flare}
             onClick={(e) => { e.originalEvent.stopPropagation(); setShowPopup(v => !v) }}
           />
           {showPopup && (
@@ -100,11 +101,11 @@ export function OohSiteMapClient({
             >
               <div style={{ fontSize: '12px', lineHeight: 1.7, padding: '2px 0' }}>
                 <strong style={{ fontSize: '13px', display: 'block', marginBottom: '3px' }}>{siteName}</strong>
-                {formatType  && <span style={{ color: '#6b7280' }}>{formatType}<br /></span>}
+                {formatType  && <span style={{ color: 'var(--tx-2)' }}>{formatType}<br /></span>}
                 {address     && <span>{address}<br /></span>}
-                {locationLine && <span style={{ color: '#6b7280' }}>{locationLine}<br /></span>}
-                {campaignLine && <span style={{ color: '#6b7280', fontSize: '11px' }}>Campaign: {campaignLine}<br /></span>}
-                <span style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px', display: 'block' }}>
+                {locationLine && <span style={{ color: 'var(--tx-2)' }}>{locationLine}<br /></span>}
+                {campaignLine && <span style={{ color: 'var(--tx-2)', fontSize: '11px' }}>Campaign: {campaignLine}<br /></span>}
+                <span style={{ fontSize: '11px', color: 'var(--tx-2)', marginTop: '2px', display: 'block' }} className="bg-num">
                   {lat.toFixed(5)}, {lng.toFixed(5)}
                 </span>
               </div>

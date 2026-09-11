@@ -7,7 +7,7 @@ import { Label }          from '@/components/ui/label'
 import { Textarea }       from '@/components/ui/textarea'
 import { SuccessDialog }  from '@/components/ui/success-dialog'
 import { cn, formatNGN }  from '@/lib/utils'
-import { ChevronRight, ChevronLeft, Lock, Check } from 'lucide-react'
+import { ChevronRightIcon as ChevronRight, ChevronLeftIcon as ChevronLeft, LockIcon as Lock, CheckIcon as Check } from '@/components/brand/icon'
 import { FieldTip } from '@/components/ui/field-tip'
 import type { CampaignFormState } from '@/app/dashboard/campaigns/actions'
 
@@ -176,7 +176,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="currency">Currency</Label>
-              <Input id="currency" name="currency" defaultValue="NGN" maxLength={3} className="uppercase" />
+              <Input id="currency" name="currency" defaultValue="NGN" maxLength={3} className="" />
             </div>
           </div>
 
@@ -257,7 +257,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
                                     type="button"
                                     onClick={() => toggleChannelObjective(ch.value, o.value)}
                                     className={cn(
-                                      'text-xs px-2.5 py-1 rounded-full border transition-colors',
+                                      'text-xs px-2.5 py-1 rounded-sm border transition-colors',
                                       linked
                                         ? 'bg-foreground text-background border-foreground'
                                         : 'border-muted-foreground/40 text-muted-foreground hover:border-foreground hover:text-foreground',
@@ -282,7 +282,7 @@ export function CampaignForm({ action }: CampaignFormProps) {
           {selectedChannels.length > 0 && totalAllocated > 0 && (
             <div className="border rounded-xl p-3 bg-muted/30 text-sm flex justify-between">
               <span className="text-muted-foreground">Total allocated</span>
-              <span className="font-medium tabular-nums">{formatNGN(totalAllocated)}</span>
+              <span className="font-medium bg-num">{formatNGN(totalAllocated)}</span>
             </div>
           )}
 

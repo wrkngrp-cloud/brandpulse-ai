@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Flag, Plus, Trash2, ChevronDown } from 'lucide-react'
+import { FlagIcon as Flag, PlusIcon as Plus, TrashIcon as Trash2, ChevronDownIcon as ChevronDown } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
 interface BhiDelta {
@@ -38,12 +38,12 @@ const MARKER_TYPE_OPTIONS: { value: string; label: string }[] = [
 ]
 
 const TYPE_BADGE: Record<string, string> = {
-  product_launch:  'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900',
-  campaign_launch: 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-900',
-  partnership:     'bg-teal-50 text-teal-600 border-teal-200 dark:bg-teal-950/40 dark:text-teal-400 dark:border-teal-900',
-  crisis:          'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900',
-  rebrand:         'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-900',
-  event:           'bg-green-50 text-green-600 border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900',
+  product_launch:  'bg-flare-wash text-tx-flare border-line-strong dark:bg-shell/40 dark:text-tx-2 dark:border-line-strong',
+  campaign_launch: 'bg-shell text-tx-2 border-line dark:bg-shell/40 dark:text-tx-2 dark:border-line',
+  partnership:     'bg-shell text-pos border-line dark:bg-shell/40 dark:text-pos dark:border-line',
+  crisis:          'bg-flare-wash text-tx-flare border-line-strong dark:bg-shell/40 dark:text-tx-flare dark:border-line-strong',
+  rebrand:         'bg-shell text-tx-2 border-line dark:bg-shell/40 dark:text-tx-2 dark:border-line',
+  event:           'bg-shell text-pos border-line dark:bg-shell/40 dark:text-pos dark:border-line',
   other:           'bg-muted text-muted-foreground border-border',
 }
 
@@ -244,11 +244,11 @@ export function LaunchMarkersPanel() {
                 key={m.id}
                 className="flex items-center gap-3 rounded-lg border border-border/60 px-3 py-2 group"
               >
-                <span className="text-xs text-muted-foreground tabular-nums w-24 shrink-0">
+                <span className="text-xs text-muted-foreground bg-num w-24 shrink-0">
                   {formatDate(m.marker_date)}
                 </span>
                 <span className={cn(
-                  'text-[10px] font-semibold uppercase tracking-wide rounded px-1.5 py-0.5 border shrink-0',
+                  'text-[10px] font-semibold rounded px-1.5 py-0.5 border shrink-0',
                   TYPE_BADGE[m.marker_type] ?? TYPE_BADGE.other,
                 )}>
                   {TYPE_LABEL[m.marker_type] ?? m.marker_type}
@@ -257,10 +257,10 @@ export function LaunchMarkersPanel() {
                   {m.label}
                 </span>
                 <span className={cn(
-                  'hidden sm:inline text-xs font-semibold tabular-nums shrink-0',
+                  'hidden sm:inline text-xs font-semibold bg-num shrink-0',
                   delta == null ? 'text-muted-foreground/50'
-                    : delta > 0 ? 'text-green-600'
-                    : delta < 0 ? 'text-red-500'
+                    : delta > 0 ? 'text-pos'
+                    : delta < 0 ? 'text-tx-flare'
                     : 'text-muted-foreground',
                 )}>
                   {delta == null
@@ -269,7 +269,7 @@ export function LaunchMarkersPanel() {
                 </span>
                 <button
                   onClick={() => handleDelete(m.id, m.label)}
-                  className="text-muted-foreground/40 hover:text-red-500 transition-colors shrink-0 opacity-0 group-hover:opacity-100"
+                  className="text-muted-foreground/40 hover:text-tx-flare transition-colors shrink-0 opacity-0 group-hover:opacity-100 bg-press"
                   aria-label="Delete marker"
                 >
                   <Trash2 className="h-3.5 w-3.5" />

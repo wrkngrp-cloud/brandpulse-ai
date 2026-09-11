@@ -1,0 +1,8 @@
+/* Put the woff2 files from brand/fonts/ wherever your app serves static assets,
+   then fix these paths. Without them the app substitutes and the system drifts. */
+@font-face{font-family:'Nohemi';font-weight:400;font-display:swap;src:url('/fonts/Nohemi-400.woff2') format('woff2')}
+@font-face{font-family:'Nohemi';font-weight:500;font-display:swap;src:url('/fonts/Nohemi-500.woff2') format('woff2')}
+@font-face{font-family:'Nohemi';font-weight:700;font-display:swap;src:url('/fonts/Nohemi-700.woff2') format('woff2')}
+@font-face{font-family:'Nohemi';font-weight:800;font-display:swap;src:url('/fonts/Nohemi-800.woff2') format('woff2')}
+@font-face{font-family:'Disket Mono';font-weight:400;font-display:swap;src:url('/fonts/DisketMono-400.woff2') format('woff2')}
+@font-face{font-family:'Disket Mono';font-weight:700;font-display:swap;src:url('/fonts/DisketMono-700.woff2') format('woff2')}

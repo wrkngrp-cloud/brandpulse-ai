@@ -12,12 +12,10 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
-import {
-  PlayCircle, ExternalLink, Eye, ThumbsUp, MessageSquare,
-  RefreshCw, Plus, Settings, CheckCircle2,
-  TrendingUp,
-} from 'lucide-react'
+import { PlayIcon as PlayCircle, ExternalLinkIcon as ExternalLink, EyeIcon as Eye, CheckIcon as ThumbsUp, RefreshIcon as RefreshCw, PlusIcon as Plus, SettingsIcon as Settings, CheckIcon as CheckCircle2 } from '@/components/brand/icon'
+import { MentionsIcon as MessageSquare, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface YtMention {
   id: string
@@ -84,12 +82,12 @@ function SentimentBadge({ score }: { score: number | null }) {
   if (score == null) return <span className="text-xs text-muted-foreground">—</span>
   const label = score >= 65 ? 'Positive' : score >= 40 ? 'Mixed' : 'Negative'
   const cls   = score >= 65
-    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+    ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos'
     : score >= 40
-    ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+    ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
+    : 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', cls)}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium bg-num', cls)}>
       {label} ({score})
     </span>
   )
@@ -120,8 +118,8 @@ function SetupPrompt({ onSaved }: { onSaved: () => void }) {
   return (
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center gap-3">
-        <div className="h-9 w-9 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
-          <PlayCircle className="h-4 w-4 text-red-600" />
+        <div className="h-9 w-9 rounded-lg bg-flare-wash flex items-center justify-center shrink-0">
+          <PlayCircle className="h-4 w-4 text-tx-flare" />
         </div>
         <div>
           <p className="text-sm font-semibold">Connect YouTube Data API</p>
@@ -338,13 +336,13 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
           ) : (
             <div className="border rounded-xl p-4 bg-card flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                <div className="h-8 w-8 rounded-lg bg-shell flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="h-4 w-4 text-pos" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">YouTube monitoring active</p>
                   {lastSyncedAt && (
-                    <p className="text-xs text-muted-foreground">Last sync: {fmtDate(lastSyncedAt)}</p>
+                    <p className="text-xs text-muted-foreground bg-num">Last sync: {fmtDate(lastSyncedAt)}</p>
                   )}
                 </div>
               </div>
@@ -355,7 +353,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                 </Link>
                 <Button size="sm" variant="outline" onClick={handleRunMonitor} disabled={running}>
                   {running
-                    ? <><RefreshCw className="h-3.5 w-3.5 mr-1.5 animate-spin" />Running…</>
+                    ? <><RefreshCw className="h-3.5 w-3.5 mr-1.5" />Running…</>
                     : <><RefreshCw className="h-3.5 w-3.5 mr-1.5" />Run monitor</>
                   }
                 </Button>
@@ -428,7 +426,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                           {m.comment_count.toLocaleString()}
                         </span>
                         {m.published_at && (
-                          <span>{fmtDate(m.published_at)}</span>
+                          <span className="bg-num">{fmtDate(m.published_at)}</span>
                         )}
                         <SentimentBadge score={m.sentiment_score} />
                       </div>
@@ -438,14 +436,14 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                   {/* Comment snippets */}
                   {m.comment_sample && m.comment_sample.length > 0 && (
                     <div className="border-t pt-3 space-y-2">
-                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <p className="text-[11px] font-semibold text-muted-foreground">
                         Top comments
                       </p>
                       {m.comment_sample.slice(0, 3).map((c, i) => (
                         <p key={i} className="text-xs text-muted-foreground line-clamp-2 pl-2 border-l-2 border-border">
                           {c.text}
                           {c.like_count > 0 && (
-                            <span className="ml-2 text-muted-foreground/60">· {c.like_count} likes</span>
+                            <span className="ml-2 text-muted-foreground/60 bg-num">· {c.like_count} likes</span>
                           )}
                         </p>
                       ))}
@@ -462,7 +460,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
       {tab === 'deals' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground bg-num">
               {localDeals.length} deal{localDeals.length !== 1 ? 's' : ''} logged
             </p>
             <AddDealDialog
@@ -501,9 +499,9 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                         )}
                       </div>
                       <div className="text-right shrink-0 space-y-0.5">
-                        <p className="text-sm font-semibold">{fmtNGN(deal.fee_ngn)}</p>
+                        <p className="text-sm font-semibold bg-num">{fmtNGN(deal.fee_ngn)}</p>
                         {deal.deal_date && (
-                          <p className="text-xs text-muted-foreground">{fmtDate(deal.deal_date)}</p>
+                          <p className="text-xs text-muted-foreground bg-num">{fmtDate(deal.deal_date)}</p>
                         )}
                       </div>
                     </div>
@@ -521,7 +519,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                         </a>
                       )}
                       {deal.promo_code && (
-                        <span className="bg-muted px-2 py-0.5 rounded font-mono">{deal.promo_code}</span>
+                        <span className="bg-muted px-2 py-0.5 rounded bg-num">{deal.promo_code}</span>
                       )}
                       {deal.view_guarantee && (
                         <span className="flex items-center gap-1">
@@ -538,9 +536,9 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                           <span className={cn(
                             'font-medium',
                             delivPct == null ? 'text-muted-foreground'
-                              : delivPct >= 100 ? 'text-green-600'
-                              : delivPct >= 70 ? 'text-amber-500'
-                              : 'text-red-500',
+                              : delivPct >= 100 ? 'text-pos'
+                              : delivPct >= 70 ? 'text-tx-2'
+                              : 'text-tx-flare',
                           )}>
                             {deal.actual_views != null
                               ? `${deal.actual_views.toLocaleString()} / ${deal.view_guarantee.toLocaleString()} (${delivPct ?? 0}%)`
@@ -548,17 +546,7 @@ export function YoutubeClient({ mentions, deals, campaigns, isConnected, lastSyn
                           </span>
                         </div>
                         {deal.actual_views != null && (
-                          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-                            <div
-                              className={cn(
-                                'h-full rounded-full transition-all',
-                                (delivPct ?? 0) >= 100 ? 'bg-green-500'
-                                  : (delivPct ?? 0) >= 70 ? 'bg-amber-500'
-                                  : 'bg-red-500',
-                              )}
-                              style={{ width: `${Math.min(delivPct ?? 0, 100)}%` }}
-                            />
-                          </div>
+                          <Crescendo value={Math.min(delivPct ?? 0, 100)} />
                         )}
                       </div>
                     )}

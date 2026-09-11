@@ -3,10 +3,12 @@ import { redirect }      from 'next/navigation'
 import Link              from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 import { EventsList }    from '@/components/events/events-list'
-import { CalendarDays, Plus } from 'lucide-react'
+import { CalendarIcon as CalendarDays, PlusIcon as Plus } from '@/components/brand/icon'
 import { cn }            from '@/lib/utils'
 import { getActiveBrand } from '@/lib/active-brand'
 import { TourTrigger }   from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export default async function EventsPage() {
   const supabase = await createClient()
@@ -24,19 +26,18 @@ export default async function EventsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">Events & Activations</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Track ROI from field activations, sponsorships, and events.</p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/events']}
+        title="Events & Activations"
+        subtitle="Track ROI from field activations, sponsorships, and events."
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="events" autoStart />
           <Link href="/dashboard/events/new" data-tour="create-event" className={cn(buttonVariants({ size: 'sm' }), 'inline-flex items-center')}>
             <Plus className="h-4 w-4 mr-1.5" />
             Create event
           </Link>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="event-list">
       {!events?.length ? (
@@ -44,7 +45,7 @@ export default async function EventsPage() {
           {/* Demo preview card */}
           <div className="border rounded-xl p-5 bg-card space-y-4">
             <div className="flex items-center gap-2">
-              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+              <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">
                 Demo preview
               </span>
               <p className="text-xs text-muted-foreground">
@@ -61,7 +62,7 @@ export default async function EventsPage() {
                     <span>Product Activation</span>
                   </div>
                 </div>
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 shrink-0">
+                <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-pos dark:bg-shell/30 dark:text-pos shrink-0">
                   Live
                 </span>
               </div>

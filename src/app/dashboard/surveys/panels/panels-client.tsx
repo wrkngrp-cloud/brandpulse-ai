@@ -1,11 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Calendar, Mail, Phone, Play, Trash2, Loader2, ToggleLeft, ToggleRight } from 'lucide-react'
+import { PlusIcon as Plus, CalendarIcon as Calendar, MailIcon as Mail, PhoneIcon as Phone, PlayIcon as Play, TrashIcon as Trash2, ToggleIcon as ToggleLeft, ToggleIcon as ToggleRight } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface Panel {
   id:               string
@@ -111,22 +114,18 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
   return (
     <div className="space-y-6 max-w-[900px]">
 
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow mb-1.5">Surveys</p>
-          <h1 className="h-display text-[28px] sm:text-[32px] leading-none">Brand Tracking Panels</h1>
-          <p className="mt-1.5 text-[13px] text-muted-foreground/60">
-            Auto-dispatch recurring surveys monthly or quarterly — with full distribution to emails and WhatsApp.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/surveys/panels']}
+        title="Brand Tracking Panels"
+        subtitle="Auto-dispatch recurring surveys monthly or quarterly — with full distribution to emails and WhatsApp."
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="survey_panels" autoStart />
           <Button size="sm" onClick={() => setShowForm(v => !v)}>
             <Plus className="h-3.5 w-3.5 mr-1.5" />
             New panel
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="panels-main">
       {/* Create form */}
@@ -189,14 +188,14 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                 onChange={e => setPhonesRaw(e.target.value)}
                 rows={3}
                 placeholder="+2348012345678&#10;+2349098765432"
-                className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-background focus:outline-none resize-none font-mono"
+                className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-background focus:outline-none resize-none bg-num"
               />
             </div>
           </div>
 
           <div className="flex gap-2">
             <Button size="sm" onClick={createPanel} disabled={saving}>
-              {saving ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : null}
+              {saving ? <Loader2 className="h-3.5 w-3.5 mr-1.5" /> : null}
               Create panel
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
@@ -222,9 +221,9 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                   <div className="flex items-center gap-2 mb-0.5">
                     <p className="text-[14px] font-semibold truncate">{panel.name}</p>
                     <span className={cn(
-                      'text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wide',
+                      'text-[10px] font-bold px-1.5 py-0.5 rounded-md',
                       panel.active
-                        ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                        ? 'bg-pos/10 text-pos dark:text-pos'
                         : 'bg-muted text-muted-foreground'
                     )}>
                       {panel.active ? 'active' : 'paused'}
@@ -244,7 +243,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                     title={panel.active ? 'Pause panel' : 'Resume panel'}
                   >
                     {panel.active
-                      ? <ToggleRight className="h-4 w-4 text-green-500" />
+                      ? <ToggleRight className="h-4 w-4 text-pos" />
                       : <ToggleLeft className="h-4 w-4 text-muted-foreground" />}
                   </Button>
                   <Button
@@ -255,13 +254,13 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                     disabled={dispatching === panel.id}
                   >
                     {dispatching === panel.id
-                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ? <Loader2 className="h-3.5 w-3.5" />
                       : <><Play className="h-3 w-3 mr-1" />Send now</>}
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500"
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-tx-flare"
                     onClick={() => deletePanel(panel.id)}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -274,28 +273,28 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                   <Calendar className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">Next run</p>
-                    <p className="text-[12px] font-medium">{fmtDate(panel.next_run_at)}</p>
+                    <p className="text-[12px] font-medium bg-num">{fmtDate(panel.next_run_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">Last run</p>
-                    <p className="text-[12px] font-medium">{fmtDate(panel.last_run_at)}</p>
+                    <p className="text-[12px] font-medium bg-num">{fmtDate(panel.last_run_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">Emails</p>
-                    <p className="text-[12px] font-medium">{panel.recipient_emails?.length ?? 0}</p>
+                    <p className="text-[12px] font-medium bg-num">{panel.recipient_emails?.length ?? 0}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">WhatsApp</p>
-                    <p className="text-[12px] font-medium">{panel.recipient_phones?.length ?? 0}</p>
+                    <p className="text-[12px] font-medium bg-num">{panel.recipient_phones?.length ?? 0}</p>
                   </div>
                 </div>
               </div>

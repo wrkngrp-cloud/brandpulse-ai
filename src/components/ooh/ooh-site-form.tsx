@@ -7,13 +7,17 @@ import { Button }             from '@/components/ui/button'
 import { Input }              from '@/components/ui/input'
 import { Label }              from '@/components/ui/label'
 import { Textarea }           from '@/components/ui/textarea'
-import { Copy, RefreshCw, Link2, QrCode, MapPin, Sparkles, Loader2, Settings, Zap, Map, X, Users } from 'lucide-react'
+import { CopyIcon as Copy, RefreshIcon as RefreshCw, LinkIcon as Link2, QrIcon as QrCode, MapIcon as MapPin, SettingsIcon as Settings, AskIcon as Zap, MapIcon as Map, XIcon as X, UsersIcon as Users } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { FieldTip } from '@/components/ui/field-tip'
 import { estimateTraffic, inferSiteDemographics } from '@/app/dashboard/ooh/actions'
 import { UrlLengthAdvisor }   from '@/components/ooh/url-length-advisor'
 import Link                   from 'next/link'
 import type { PlaceDemographics } from '@/lib/ooh/places-demographics'
 import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
+import { TOKENS } from '@/lib/brand-tokens'
+import { Crescendo } from '@/components/brand/crescendo'
 
 const FORMAT_TYPES = [
   'Billboard', 'Unipole', 'Bridge Panel', 'Transit Shelter',
@@ -221,7 +225,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         'top-right',
       )
 
-      const marker = new mapboxgl.Marker({ color: '#2563eb', draggable: true })
+      const marker = new mapboxgl.Marker({ color: TOKENS.flare, draggable: true })
 
       if (hasCoords) {
         marker.setLngLat([Number(lng), Number(lat)]).addTo(map)
@@ -437,7 +441,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
           </p>
           <button
             type="button"
-            className="shrink-0 text-amber-700 dark:text-amber-400 underline"
+            className="shrink-0 text-amber-700 dark:text-amber-400 underline bg-press"
             onClick={async () => {
               const { discardDraft } = await import('@/app/dashboard/ooh/actions')
               if (draft.id) await discardDraft(draft.id)
@@ -462,7 +466,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         <div className="flex items-center gap-2 text-muted-foreground">
           <Link2 className="h-3.5 w-3.5 shrink-0" />
           {customDomain
-            ? <span>Links use your custom domain: <strong className="text-foreground font-mono">{customDomain}</strong></span>
+            ? <span>Links use your custom domain: <strong className="text-foreground bg-num">{customDomain}</strong></span>
             : <span>Links use the BrandGauge platform domain. Want to use your own?</span>}
         </div>
         <Link
@@ -503,12 +507,12 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                 autoComplete="off"
               />
               {geocoding && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               )}
             </div>
 
             {showSuggestions && suggestions.length > 0 && (
-              <ul className="absolute z-50 mt-1 w-full rounded-lg border bg-popover shadow-lg overflow-hidden">
+              <ul className="absolute z-50 mt-1 w-full rounded-lg border bg-popover overflow-hidden">
                 {suggestions.map((f, i) => {
                   const label = f.properties.full_address ?? f.properties.place_formatted ?? f.properties.name ?? ''
                   return (
@@ -516,7 +520,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                       <button
                         type="button"
                         onMouseDown={e => { e.preventDefault(); selectSuggestion(f) }}
-                        className="w-full text-left px-3 py-2.5 text-xs hover:bg-accent transition-colors flex items-start gap-2"
+                        className="w-full text-left px-3 py-2.5 text-xs hover:bg-accent transition-colors flex items-start gap-2 bg-press"
                       >
                         <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground" />
                         <span className="leading-snug">{label}</span>
@@ -574,21 +578,21 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Audience of Place</span>
-              {inferringDemogs && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground ml-auto" />}
+              {inferringDemogs && <Loader2 className="h-3.5 w-3.5 text-muted-foreground ml-auto" />}
             </div>
             {demographics && !inferringDemogs && (
               <div className="space-y-3">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-semibold">
+                  <span className="text-xs px-2.5 py-1 rounded-sm bg-primary/10 text-primary font-semibold">
                     {demographics.primary_audience}
                   </span>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium capitalize">
+                  <span className="text-xs px-2.5 py-1 rounded-sm bg-muted text-muted-foreground font-medium capitalize">
                     {demographics.income_tier.replace('_', ' ')} income
                   </span>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium">
+                  <span className="text-xs px-2.5 py-1 rounded-sm bg-muted text-muted-foreground font-medium">
                     {demographics.age_skew}
                   </span>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground font-medium capitalize">
+                  <span className="text-xs px-2.5 py-1 rounded-sm bg-muted text-muted-foreground font-medium capitalize">
                     {demographics.gender_split.replace('_', ' ')}
                   </span>
                 </div>
@@ -605,13 +609,8 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                   </div>
                 )}
                 <div className="flex items-center gap-1.5">
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden flex-1">
-                    <div
-                      className="h-full bg-primary/60 rounded-full"
-                      style={{ width: `${Math.round(demographics.confidence * 100)}%` }}
-                    />
-                  </div>
-                  <span className="text-xs text-muted-foreground shrink-0">
+                  <Crescendo value={Math.round(demographics.confidence * 100)} height={6} />
+                  <span className="text-xs text-muted-foreground shrink-0 bg-num">
                     {Math.round(demographics.confidence * 100)}% confidence
                   </span>
                 </div>
@@ -672,7 +671,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         {/* Keke Fleet: fleet size + routes */}
         {isKeke && (
           <div className="space-y-4 rounded-lg border border-orange-200 bg-orange-50/40 dark:border-orange-900/40 dark:bg-orange-950/10 p-4">
-            <p className="text-xs font-semibold text-orange-700 dark:text-orange-400 uppercase tracking-wider">Keke Fleet Details</p>
+            <p className="text-xs font-semibold text-orange-700 dark:text-orange-400">Keke Fleet Details</p>
             <div className="space-y-1.5">
               <Label htmlFor="fleet_size">Number of keke units <FieldTip tip="How many tricycles carry your branding. Total impressions are multiplied by units × daily routes covered." /></Label>
               <Input
@@ -699,7 +698,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         {/* Wall Painting: dimensions + classification */}
         {isMural && (
           <div className="space-y-4 rounded-lg border border-green-200 bg-green-50/40 dark:border-green-900/40 dark:bg-green-950/10 p-4">
-            <p className="text-xs font-semibold text-green-700 dark:text-green-400 uppercase tracking-wider">Wall Painting Details</p>
+            <p className="text-xs font-semibold text-green-700 dark:text-green-400">Wall Painting Details</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="surface_width_m">Width (metres) <FieldTip tip="Used to calculate surface area and estimate impressions (width × height × 150/day). Ask your vendor for the exact dimensions." /></Label>
@@ -744,7 +743,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
         {/* Branded Vehicle: fleet size + vehicle type + routes */}
         {isVehicle && (
           <div className="space-y-4 rounded-lg border border-blue-200 bg-blue-50/40 dark:border-blue-900/40 dark:bg-blue-950/10 p-4">
-            <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Branded Vehicle Details</p>
+            <p className="text-xs font-semibold text-blue-700 dark:text-blue-400">Branded Vehicle Details</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="fleet_size_v">Number of vehicles <FieldTip tip="Impressions are calculated as vehicles × 2,000 unique views per vehicle per day across all routes." /></Label>
@@ -842,7 +841,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
               disabled={estimating || !city}
               title="AI estimate based on format, LGA, address, and city"
             >
-              {estimating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+              {estimating ? <Loader2 className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
               {estimating ? 'Estimating…' : 'AI estimate'}
             </Button>
           </div>
@@ -932,7 +931,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
               placeholder="k3d9x"
               value={shortCode}
               onChange={e => setShortCode(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10))}
-              className="flex-1 font-mono"
+              className="flex-1 bg-num"
               maxLength={10}
             />
             <Button type="button" variant="outline" size="icon" onClick={regenerateShortCode} title="Regenerate">
@@ -975,7 +974,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
                     <Copy className="h-3 w-3 mr-1" /> Copy
                   </Button>
                 </div>
-                <p className="text-sm font-mono font-semibold break-all text-foreground">{shortLink}</p>
+                <p className="text-sm bg-num font-semibold break-all text-foreground">{shortLink}</p>
                 {formatType && (
                   <UrlLengthAdvisor url={shortLink} formatType={formatType} />
                 )}
@@ -986,14 +985,14 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             {vanityLink && (
               <div className={`space-y-1 ${shortLink ? 'pt-2 border-t' : ''}`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                  <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                     <Link2 className="h-3 w-3" /> Vanity link — QR codes &amp; digital
                   </span>
                   <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => copyLink(vanityLink)}>
                     <Copy className="h-3 w-3 mr-1" /> Copy
                   </Button>
                 </div>
-                <p className="text-xs font-mono break-all text-foreground">{vanityLink}</p>
+                <p className="text-xs bg-num break-all text-foreground">{vanityLink}</p>
               </div>
             )}
 
@@ -1001,12 +1000,12 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
             {utmLink && (
               <div className="space-y-1 pt-2 border-t">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Full UTM destination</span>
+                  <span className="text-xs font-medium text-muted-foreground">Full UTM destination</span>
                   <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => copyLink(utmLink)}>
                     <Copy className="h-3 w-3 mr-1" /> Copy
                   </Button>
                 </div>
-                <p className="text-xs font-mono break-all text-muted-foreground">{utmLink}</p>
+                <p className="text-xs bg-num break-all text-muted-foreground">{utmLink}</p>
               </div>
             )}
           </div>

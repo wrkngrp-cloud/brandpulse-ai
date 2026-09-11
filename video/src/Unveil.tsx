@@ -3,9 +3,20 @@ import {
   AbsoluteFill, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame,
 } from 'remotion'
 import {
-  AiScene, CompetitiveScene, FunnelScene, GaugeMark, GaugeScene, OohScene,
+  AiScene, CompetitiveScene, FunnelScene, GaugeScene, OohScene,
   SentimentScene, SurveyScene, lightSceneVars,
 } from '../../src/components/landing/scenes'
+
+/** The lockup as supplied in brand/logo, drawn at the size the beat needs. */
+function Lockup({ height }: { height: number }) {
+  return (
+    <img
+      src={staticFile('brand/brandgauge-lockup-duotone-paper.svg')}
+      alt="BrandGauge"
+      style={{ height, width: height * (1300 / 200) }}
+    />
+  )
+}
 
 export const FPS = 30
 
@@ -17,10 +28,14 @@ export const FPS = 30
  * the landing page tour, so the film is the product, not a mockup.
  */
 
-const CLAY = '#D4602A'
-const BLUE = '#2B59FF'
-const INK = '#14182B'
-const CREAM = '#FBF9F5'
+/* The film's own chrome — interstitials, backdrop, outro — reads the tokens
+   through var() now that style.css imports brand/tokens.css. The scenes were
+   always written that way; this is the film's chrome catching up. */
+const FLARE = 'var(--flare)'
+const CHAR = 'var(--char)'
+const INK = 'var(--tx)'
+const PAPER = 'var(--bg-paper)'
+const ASH = 'var(--tx-3)'
 
 type Beat =
   | { kind: 'logo'; dur: number }
@@ -30,13 +45,13 @@ type Beat =
 
 const BEATS: Beat[] = [
   { kind: 'logo', dur: 105 },
-  { kind: 'word', dur: 66, word: 'KNOW', dot: CLAY },
+  { kind: 'word', dur: 66, word: 'KNOW', dot: FLARE },
   { kind: 'chapter', dur: 195, Comp: GaugeScene, headline: 'See how your brand is really performing', side: 'right' },
   { kind: 'chapter', dur: 195, Comp: SentimentScene, headline: 'Understand the street, in its own words', side: 'left' },
-  { kind: 'word', dur: 66, word: 'MEASURE', dot: BLUE },
+  { kind: 'word', dur: 66, word: 'MEASURE', dot: CHAR },
   { kind: 'chapter', dur: 195, Comp: FunnelScene, headline: 'Defend your marketing spend to the CEO', side: 'left' },
   { kind: 'chapter', dur: 180, Comp: SurveyScene, headline: 'Hear from customers, scored as replies land', side: 'right' },
-  { kind: 'word', dur: 66, word: 'PROVE', dot: CLAY },
+  { kind: 'word', dur: 66, word: 'PROVE', dot: FLARE },
   { kind: 'chapter', dur: 210, Comp: OohScene, headline: 'Prove the billboard on the expressway worked', side: 'right' },
   { kind: 'chapter', dur: 180, Comp: AiScene, headline: 'Know what AI tells customers about you', side: 'left' },
   { kind: 'chapter', dur: 180, Comp: CompetitiveScene, headline: 'Catch competitors’ moves before they land', side: 'right' },
@@ -48,12 +63,24 @@ export const UNVEIL_DURATION = BEATS.reduce((s, b) => s + b.dur, 0) // 1800 = 60
 const IN = 12   // whip-in frames
 const OUT = 10  // whip-out frames
 
+/** Both faces, every weight the scenes use. Disket carries the numerals: when
+ *  it was missing, every reading in the film fell back to Nohemi and the
+ *  product screens stopped matching the app, where they are tabular Disket. */
+const FACES = [
+  ['Nohemi', 400, 'Nohemi-400'],
+  ['Nohemi', 500, 'Nohemi-500'],
+  ['Nohemi', 700, 'Nohemi-700'],
+  ['Nohemi', 800, 'Nohemi-800'],
+  ['Disket Mono', 400, 'DisketMono-400'],
+  ['Disket Mono', 700, 'DisketMono-700'],
+] as const
+
 function useFontsReady() {
-  const [handle] = useState(() => delayRender('satoshi'))
+  const [handle] = useState(() => delayRender('brand-fonts'))
   useEffect(() => {
     Promise.all(
-      ([[500, 'satoshi-500'], [700, 'satoshi-700'], [900, 'satoshi-900']] as const).map(async ([weight, file]) => {
-        const font = new FontFace('Satoshi', `url(${staticFile(`fonts/${file}.woff2`)})`, { weight: String(weight) })
+      FACES.map(async ([family, weight, file]) => {
+        const font = new FontFace(family, `url(${staticFile(`fonts/${file}.woff2`)})`, { weight: String(weight) })
         await font.load()
         document.fonts.add(font)
       }),
@@ -74,22 +101,14 @@ function whip(frame: number, dur: number, dir: 1 | -1) {
 function Backdrop() {
   return (
     <>
+      {/* A tick field, quantised: the ground is made of the mark's own
+          material rather than of soft coloured blooms. */}
       <AbsoluteFill style={{
-        backgroundImage: `radial-gradient(rgba(20,24,43,0.07) 1.2px, transparent 1.2px)`,
+        backgroundImage: 'radial-gradient(var(--tick-1) 1.2px, transparent 1.2px)',
         backgroundSize: '30px 30px',
         maskImage: 'radial-gradient(75% 60% at 50% 40%, black, transparent)',
       }} />
-      <div style={{
-        position: 'absolute', left: '50%', top: -260, width: 1100, height: 560,
-        transform: 'translateX(-50%)', borderRadius: '50%', filter: 'blur(150px)',
-        background: 'rgba(43,89,255,0.09)',
-      }} />
-      <div style={{
-        position: 'absolute', left: '50%', bottom: -300, width: 950, height: 520,
-        transform: 'translateX(-50%)', borderRadius: '50%', filter: 'blur(150px)',
-        background: 'rgba(212,96,42,0.10)',
-      }} />
-      <div style={{ position: 'absolute', insetInline: 0, bottom: 0, height: 6, background: CLAY, opacity: 0.85 }} />
+      <div style={{ position: 'absolute', insetInline: 0, bottom: 0, height: 6, background: FLARE, opacity: 0.85 }} />
     </>
   )
 }
@@ -105,19 +124,14 @@ function LogoIntro({ dur }: { dur: number }) {
   return (
     <AbsoluteFill className="items-center justify-center" style={{ filter: `blur(${exit * 14}px)`, opacity: 1 - exit * 0.35 }}>
       <div className="flex items-center gap-7" style={{ transform: `scale(${0.94 + draw * 0.06})` }}>
-        <div style={{ opacity: draw }}><GaugeMark className="h-24 w-24" /></div>
-        <span style={{
-          fontFamily: 'Satoshi', fontWeight: 900, fontSize: 110, letterSpacing: '-0.03em', color: INK,
-          opacity: word, transform: `translateY(${(1 - word) * 30}px)`, display: 'inline-block',
-        }}>
-          Brand<span style={{ color: CLAY }}>Gauge</span>
-        </span>
+        <div style={{ opacity: draw, transform: `translateY(${(1 - word) * 30}px)` }}>
+          <Lockup height={120} />
+        </div>
       </div>
       <p style={{
-        marginTop: 34, fontFamily: 'ui-monospace, monospace', fontSize: 21, letterSpacing: '0.34em',
-        textTransform: 'uppercase', color: 'rgba(20,24,43,0.45)', opacity: tag,
+        marginTop: 34, fontFamily: 'var(--font)', fontWeight: 500, fontSize: 24, color: ASH, opacity: tag,
       }}>
-        Brand intelligence · built for here
+        Brand intelligence built in Lagos, for West Africa
       </p>
     </AbsoluteFill>
   )
@@ -132,16 +146,15 @@ function WordCard({ word, dot, dur }: { word: string; dot: string; dur: number }
   return (
     <AbsoluteFill className="items-center justify-center" style={style}>
       <span aria-hidden style={{
-        position: 'absolute', fontFamily: 'Satoshi', fontWeight: 900, fontSize: 430, letterSpacing: '-0.02em',
-        color: 'transparent', WebkitTextStroke: `2px rgba(20,24,43,0.10)`, whiteSpace: 'nowrap',
+        position: 'absolute', fontFamily: 'var(--font)', fontWeight: 800, fontSize: 430, letterSpacing: '-0.02em',
+        color: 'transparent', WebkitTextStroke: '2px var(--line-strong)', whiteSpace: 'nowrap',
         transform: `translateX(${drift}px)`,
       }}>
         {word}.{word}.
       </span>
       <span style={{
-        fontFamily: 'Satoshi', fontWeight: 900, fontSize: 240, letterSpacing: '-0.03em', color: INK,
+        fontFamily: 'var(--font)', fontWeight: 800, fontSize: 240, letterSpacing: '-0.03em', color: INK,
         transform: `translateY(${(1 - inP) * 60}px) scale(${0.96 + inP * 0.04})`, opacity: inP,
-        textShadow: '0 0 80px rgba(212,96,42,0.25)',
       }}>
         {word}<span style={{ color: dot }}>.</span>
       </span>
@@ -167,8 +180,8 @@ function Chapter({ beat, dur }: { beat: Extract<Beat, { kind: 'chapter' }>; dur:
   )
   const copy = (
     <div style={{ width: 480 }}>
-      <div style={{ width: 46, height: 7, background: CLAY, marginBottom: 26, borderRadius: 4 }} />
-      <h2 style={{ fontFamily: 'Satoshi', fontWeight: 900, fontSize: 62, lineHeight: 1.06, letterSpacing: '-0.015em', color: INK }}>
+      <div style={{ width: 46, height: 7, background: FLARE, marginBottom: 26, borderRadius: 'var(--r-card)' }} />
+      <h2 style={{ fontFamily: 'var(--font)', fontWeight: 800, fontSize: 62, lineHeight: 1.06, letterSpacing: '-0.015em', color: INK }}>
         {words.map((w, i) => {
           const p = ease((frame - IN - i * 2.2) / 14)
           return (
@@ -196,18 +209,15 @@ function Outro({ dur }: { dur: number }) {
   return (
     <AbsoluteFill className="items-center justify-center" style={{ opacity: 1 - fade }}>
       <div className="flex items-center gap-6" style={{ opacity: p1, transform: `scale(${0.94 + p1 * 0.06})` }}>
-        <GaugeMark className="h-16 w-16" />
-        <span style={{ fontFamily: 'Satoshi', fontWeight: 900, fontSize: 84, letterSpacing: '-0.03em', color: INK }}>
-          Brand<span style={{ color: CLAY }}>Gauge</span>
-        </span>
+        <Lockup height={92} />
       </div>
-      <p style={{ marginTop: 26, fontFamily: 'Satoshi', fontWeight: 500, fontSize: 30, color: 'rgba(20,24,43,0.55)', opacity: p2 }}>
+      <p style={{ marginTop: 26, fontFamily: 'var(--font)', fontWeight: 500, fontSize: 30, color: ASH, opacity: p2 }}>
         Brand intelligence that speaks your market’s language.
       </p>
       <div style={{ marginTop: 44, opacity: p3, transform: `translateY(${(1 - p3) * 16}px)` }}>
         <span style={{
-          fontFamily: 'Satoshi', fontWeight: 700, fontSize: 27, color: 'white', background: CLAY,
-          padding: '20px 44px', borderRadius: 999, boxShadow: '0 18px 60px rgba(212,96,42,0.4)',
+          fontFamily: 'var(--font)', fontWeight: 700, fontSize: 27, color: 'var(--on-hot)', background: FLARE,
+          padding: '20px 44px', borderRadius: 'var(--r-card)',
         }}>
           Start free at brandgauge.app
         </span>
@@ -221,8 +231,7 @@ export function Unveil() {
   let acc = 0
   return (
     <AbsoluteFill style={{
-      background: CREAM, color: INK, ...lightSceneVars,
-      ['--font-display' as never]: 'Satoshi',
+      background: PAPER, color: INK, ...lightSceneVars,
       ['--s-map' as never]: `url(${staticFile('landing/ooh-map-light.png')})`,
     }}>
       <Backdrop />

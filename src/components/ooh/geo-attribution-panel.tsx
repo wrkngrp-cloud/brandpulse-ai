@@ -9,12 +9,10 @@ import { Label }      from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator }  from '@/components/ui/separator'
 import { cn }         from '@/lib/utils'
-import {
-  MapPin, TrendingUp, Target, Zap, Globe, Smartphone,
-  Monitor, ExternalLink, Plus, ChevronRight, Radio,
-  AlertCircle, CheckCircle2, Clock, Users,
-} from 'lucide-react'
+import { MapIcon as MapPin, CircleDotIcon as Target, AskIcon as Zap, GlobeIcon as Globe, PhoneIcon as Smartphone, PanelIcon as Monitor, ExternalLinkIcon as ExternalLink, PlusIcon as Plus, ChevronRightIcon as ChevronRight, MusicIcon as Radio, CheckIcon as CheckCircle2, ClockIcon as Clock, UsersIcon as Users } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { toast } from 'sonner'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface GeoVisit {
   id:                    string
@@ -55,14 +53,14 @@ const METHOD_LABELS: Record<string, string> = {
 }
 
 const CONFIDENCE_COLOR = (c: number) =>
-  c >= 0.85 ? 'text-emerald-600' : c >= 0.65 ? 'text-amber-600' : 'text-slate-500'
+  c >= 0.85 ? 'text-pos' : c >= 0.65 ? 'text-tx-2' : 'text-tx-3'
 
 const STATUS_META: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  draft:    { label: 'Draft',    color: 'bg-slate-100 text-slate-600',   icon: Clock },
-  syncing:  { label: 'Syncing',  color: 'bg-blue-100 text-blue-600',     icon: Zap },
-  active:   { label: 'Active',   color: 'bg-emerald-100 text-emerald-700', icon: CheckCircle2 },
-  paused:   { label: 'Paused',   color: 'bg-amber-100 text-amber-700',   icon: AlertCircle },
-  error:    { label: 'Error',    color: 'bg-red-100 text-red-700',       icon: AlertCircle },
+  draft:    { label: 'Draft',    color: 'bg-shell text-tx-2',   icon: Clock },
+  syncing:  { label: 'Syncing',  color: 'bg-flare-wash text-tx-flare',     icon: Zap },
+  active:   { label: 'Active',   color: 'bg-shell text-pos', icon: CheckCircle2 },
+  paused:   { label: 'Paused',   color: 'bg-shell text-tx-2',   icon: AlertCircle },
+  error:    { label: 'Error',    color: 'bg-flare-wash text-tx-flare',       icon: AlertCircle },
 }
 
 function fmtDate(d: string) {
@@ -163,7 +161,7 @@ export function GeoAttributionPanel({
           { label: 'Unique cities',    value: byCity.length.toString() },
         ].map(s => (
           <Card key={s.label} className="p-4 text-center">
-            <div className="text-2xl font-bold tabular-nums">{s.value}</div>
+            <div className="text-2xl font-bold bg-num">{s.value}</div>
             <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
           </Card>
         ))}
@@ -191,14 +189,9 @@ export function GeoAttributionPanel({
               <div key={city} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="truncate">{city}</span>
-                  <span className="font-medium tabular-nums">{count}</span>
+                  <span className="font-medium bg-num">{count}</span>
                 </div>
-                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-[var(--brand-primary,#E8763E)]"
-                    style={{ width: `${(count / byCity[0][1]) * 100}%` }}
-                  />
-                </div>
+                <Crescendo value={(count / byCity[0][1]) * 100} height={6} />
               </div>
             ))}
           </Card>
@@ -215,18 +208,16 @@ export function GeoAttributionPanel({
                 <div key={method} className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span>{label}</span>
-                    <span className="text-muted-foreground tabular-nums">{count} ({pct}%)</span>
+                    <span className="text-muted-foreground bg-num">{count} ({pct}%)</span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                    <div className="h-full rounded-full bg-blue-500" style={{ width: `${pct}%` }} />
-                  </div>
+                  <Crescendo value={pct} height={6} />
                 </div>
               )
             })}
             {geoVisits.length > 0 && (
               <p className="text-xs text-muted-foreground pt-1">
                 Avg attribution confidence: {' '}
-                <span className={cn('font-medium', CONFIDENCE_COLOR(avgConf))}>
+                <span className={cn('font-medium bg-num', CONFIDENCE_COLOR(avgConf))}>
                   {(avgConf * 100).toFixed(0)}%
                 </span>
               </p>
@@ -255,7 +246,7 @@ export function GeoAttributionPanel({
                     </Badge>
                   )}
                 </div>
-                <span className="text-xs text-muted-foreground shrink-0">{fmtDate(v.visited_at)}</span>
+                <span className="text-xs text-muted-foreground shrink-0 bg-num">{fmtDate(v.visited_at)}</span>
               </div>
             ))}
           </div>
@@ -282,15 +273,15 @@ export function GeoAttributionPanel({
         </div>
 
         {/* How it works */}
-        <Card className="p-4 bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800">
-          <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">How it works</h4>
-          <ol className="text-xs text-blue-700 dark:text-blue-400 space-y-1 list-decimal list-inside">
+        <Card className="p-4 bg-flare-wash dark:bg-shell/10 border-line-strong dark:border-line-strong">
+          <h4 className="text-sm font-medium text-tx-flare dark:text-tx-2 mb-2">How it works</h4>
+          <ol className="text-xs text-tx-flare dark:text-tx-2 space-y-1 list-decimal list-inside">
             <li>Define a geo-fence radius around this OOH site (e.g., 500m)</li>
             <li>BrandGauge builds an audience of people who visited that area</li>
             <li>The audience syncs to Meta Ads or Google Ads</li>
             <li>Anyone who saw your billboard then sees the matching ad in their feed — the same creative, closing the loop</li>
           </ol>
-          <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">
+          <p className="text-xs text-tx-flare dark:text-tx-2 mt-2 font-medium">
             Requires Meta Ads Manager connection with ads_management permission.
           </p>
         </Card>
@@ -373,7 +364,7 @@ export function GeoAttributionPanel({
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-sm truncate">{aud.audience_name}</span>
-                      <span className={cn('inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium', meta.color)}>
+                      <span className={cn('inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-sm font-medium', meta.color)}>
                         <StatusIcon className="h-3 w-3" />
                         {meta.label}
                       </span>
@@ -381,8 +372,8 @@ export function GeoAttributionPanel({
                     </div>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span>{aud.fence_radius_m}m fence</span>
-                      {aud.estimated_reach && <span>~{aud.estimated_reach.toLocaleString()} reach</span>}
-                      {aud.creative_headline && <span className="italic truncate">"{aud.creative_headline}"</span>}
+                      {aud.estimated_reach && <span className="bg-num">~{aud.estimated_reach.toLocaleString()} reach</span>}
+                      {aud.creative_headline && <span className="truncate">"{aud.creative_headline}"</span>}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -438,13 +429,13 @@ export function GeoAttributionPanel({
                       </Button>
                     )}
                     {aud.status === 'active' && (
-                      <div className="flex items-center gap-1 text-xs text-emerald-600">
+                      <div className="flex items-center gap-1 text-xs text-pos">
                         <Users className="h-3.5 w-3.5" />
                         Live
                       </div>
                     )}
                     {aud.status === 'syncing' && (
-                      <div className="flex items-center gap-1 text-xs text-blue-600">
+                      <div className="flex items-center gap-1 text-xs text-tx-flare">
                         <Zap className="h-3.5 w-3.5 animate-pulse" />
                         Syncing
                       </div>

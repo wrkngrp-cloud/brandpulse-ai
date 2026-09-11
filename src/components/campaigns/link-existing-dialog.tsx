@@ -3,7 +3,8 @@
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn, toSentenceCase } from '@/lib/utils'
-import { Link2, X, Loader2, MapPin, CalendarDays, Check } from 'lucide-react'
+import { LinkIcon as Link2, XIcon as X, MapIcon as MapPin, CalendarIcon as CalendarDays, CheckIcon as Check } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 import { linkOohSiteToCampaign, linkEventToCampaign } from '@/app/dashboard/campaigns/actions'
 
 interface OohSiteOption {
@@ -63,18 +64,18 @@ export function LinkOohSiteDialog({ campaignId, availableSites }: LinkOohDialogP
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border rounded-lg px-2.5 py-1.5 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border rounded-lg px-2.5 py-1.5 transition-colors bg-press"
       >
         <Link2 className="h-3.5 w-3.5" />
         Link existing site
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-          <div className="bg-background border rounded-2xl shadow-xl w-full max-w-md space-y-4 p-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40">
+          <div className="bg-background border rounded-2xl w-full max-w-md space-y-4 p-5">
             <div className="flex items-center justify-between">
               <p className="font-semibold text-sm">Link an OOH site to this campaign</p>
-              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground bg-press">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -108,7 +109,7 @@ export function LinkOohSiteDialog({ campaignId, availableSites }: LinkOohDialogP
               <Button variant="outline" size="sm" onClick={() => setOpen(false)} className="flex-1">Cancel</Button>
               <Button size="sm" onClick={handleLink} disabled={!selected || pending || done} className="flex-1">
                 {done ? <><Check className="h-3.5 w-3.5 mr-1.5" /> Linked</> :
-                 pending ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Linking…</> :
+                 pending ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" /> Linking…</> :
                  'Link site'}
               </Button>
             </div>
@@ -139,28 +140,28 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
   if (availableEvents.length === 0) return null
 
   const STATUS_COLOURS: Record<string, string> = {
-    planned:  'bg-blue-100 text-blue-800',
-    live:     'bg-green-100 text-green-800',
+    planned:  'bg-flare-wash text-tx-flare',
+    live:     'bg-shell text-pos',
     closed:   'bg-muted text-muted-foreground',
-    reported: 'bg-purple-100 text-purple-800',
+    reported: 'bg-shell text-tx-2',
   }
 
   return (
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border rounded-lg px-2.5 py-1.5 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border rounded-lg px-2.5 py-1.5 transition-colors bg-press"
       >
         <Link2 className="h-3.5 w-3.5" />
         Link existing event
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-          <div className="bg-background border rounded-2xl shadow-xl w-full max-w-md space-y-4 p-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40">
+          <div className="bg-background border rounded-2xl w-full max-w-md space-y-4 p-5">
             <div className="flex items-center justify-between">
               <p className="font-semibold text-sm">Link an event to this campaign</p>
-              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground bg-press">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -181,7 +182,7 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium truncate">{ev.name}</p>
-                      <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0 capitalize', STATUS_COLOURS[ev.status] ?? 'bg-muted text-muted-foreground')}>
+                      <span className={cn('text-xs px-1.5 py-0.5 rounded-sm font-medium shrink-0 capitalize', STATUS_COLOURS[ev.status] ?? 'bg-muted text-muted-foreground')}>
                         {ev.status}
                       </span>
                     </div>
@@ -199,7 +200,7 @@ export function LinkEventDialog({ campaignId, availableEvents }: LinkEventDialog
               <Button variant="outline" size="sm" onClick={() => setOpen(false)} className="flex-1">Cancel</Button>
               <Button size="sm" onClick={handleLink} disabled={!selected || pending || done} className="flex-1">
                 {done ? <><Check className="h-3.5 w-3.5 mr-1.5" /> Linked</> :
-                 pending ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Linking…</> :
+                 pending ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" /> Linking…</> :
                  'Link event'}
               </Button>
             </div>

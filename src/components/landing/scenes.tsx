@@ -11,6 +11,11 @@
  */
 
 import type { CSSProperties } from 'react'
+import { Crescendo } from '@/components/brand/crescendo'
+import { BrandLockup } from '@/components/brand/logo'
+import { funnelChart } from '@brand/engine.js'
+import { TOKENS } from '@/lib/brand-tokens'
+import { useDarkGround } from './use-mode'
 
 // ————— timing helpers —————
 export function clamp01(v: number) { return Math.min(1, Math.max(0, v)) }
@@ -20,31 +25,33 @@ export function easeInOut(v: number) { const x = clamp01(v); return x < 0.5 ? 4 
 /** ease-out-back: small overshoot for pop-ins */
 export function pop(v: number) { const x = clamp01(v); return 1 + 2.70158 * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2) }
 
-export const CLAY = '#D4602A'
-export const BLUE = '#2B59FF'
+// The hero. One Flare plane per frame; everything compared against it is ash.
+export const HERO = 'var(--flare)'
+export const NEUTRAL = 'var(--neu)'
 
+/**
+ * The scene variables, mapped onto the tokens once.
+ *
+ * The tokens already flip under [data-mode="dark"], so there is no second
+ * palette to keep in step — a light and a dark copy is how the headline ended
+ * up ink on ink when the app's mode and the page's own toggle disagreed.
+ * `--s-map` is the one value that genuinely differs, so it is the one thing
+ * the dark variant still overrides.
+ */
 export const lightSceneVars: CSSProperties = {
   '--s-map':    "url('/landing/ooh-map-light.png')",
-  '--s-panel':  '#FFFFFF',
-  '--s-line':   'rgba(20,24,43,0.10)',
-  '--s-strong': '#14182B',
-  '--s-body':   'rgba(20,24,43,0.78)',
-  '--s-mut':    'rgba(20,24,43,0.45)',
-  '--s-chip':   'rgba(20,24,43,0.035)',
-  '--s-track':  'rgba(20,24,43,0.08)',
-  '--s-shadow': '0 18px 60px -22px rgba(20,24,43,0.18)',
+  '--s-panel':  'var(--bg-card)',
+  '--s-line':   'var(--line)',
+  '--s-strong': 'var(--tx)',
+  '--s-body':   'var(--tx-2)',
+  '--s-mut':    'var(--tx-3)',
+  '--s-chip':   'var(--bg-shell)',
+  '--s-track':  'var(--tick-1)',
 } as CSSProperties
 
 export const darkSceneVars: CSSProperties = {
-  '--s-map':    "url('/landing/ooh-map-dark.png')",
-  '--s-panel':  'rgba(17,24,48,0.92)',
-  '--s-line':   'rgba(255,255,255,0.09)',
-  '--s-strong': '#F4EDE4',
-  '--s-body':   'rgba(244,237,228,0.80)',
-  '--s-mut':    'rgba(244,237,228,0.42)',
-  '--s-chip':   'rgba(255,255,255,0.04)',
-  '--s-track':  'rgba(255,255,255,0.09)',
-  '--s-shadow': '0 24px 80px -24px rgba(0,0,0,0.8)',
+  ...lightSceneVars,
+  '--s-map': "url('/landing/ooh-map-dark.png')",
 } as CSSProperties
 
 // ————— shared chrome —————
@@ -52,31 +59,28 @@ function Panel({ children, className = '' }: { children: React.ReactNode; classN
   return (
     <div
       className={`rounded-2xl border border-[var(--s-line)] bg-[var(--s-panel)] ${className}`}
-      style={{ boxShadow: 'var(--s-shadow)' }}
     >
       {children}
     </div>
   )
 }
 
-function Tag({ children, tone = 'dim' }: { children: React.ReactNode; tone?: 'dim' | 'clay' | 'blue' | 'green' | 'red' | 'teal' }) {
+function Tag({ children, tone = 'quiet' }: { children: React.ReactNode; tone?: 'quiet' | 'hero' | 'nominal' | 'alert' }) {
   const tones: Record<string, CSSProperties> = {
-    dim:   { color: 'var(--s-mut)', borderColor: 'var(--s-line)' },
-    clay:  { color: CLAY, borderColor: 'rgba(212,96,42,0.35)', background: 'rgba(212,96,42,0.08)' },
-    blue:  { color: BLUE, borderColor: 'rgba(43,89,255,0.30)', background: 'rgba(43,89,255,0.07)' },
-    green: { color: '#16a34a', borderColor: 'rgba(34,197,94,0.35)', background: 'rgba(34,197,94,0.08)' },
-    red:   { color: '#dc2626', borderColor: 'rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.07)' },
-    teal:  { color: '#0d9488', borderColor: 'rgba(20,184,166,0.35)', background: 'rgba(20,184,166,0.08)' },
+    quiet:   { color: 'var(--s-mut)', borderColor: 'var(--s-line)' },
+    hero:    { color: 'var(--tx-flare)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
+    nominal: { color: 'var(--pos)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
+    alert:   { color: 'var(--tx-flare)', borderColor: 'var(--line)', background: 'var(--bg-shell)' },
   }
   return (
-    <span className="inline-flex items-center whitespace-nowrap rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em]" style={tones[tone]}>
+    <span className="inline-flex items-center whitespace-nowrap rounded-sm border px-2 py-0.5 text-[9px]" style={tones[tone]}>
       {children}
     </span>
   )
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--s-mut)]">{children}</p>
+  return <p className="text-[9px] text-[var(--s-mut)]">{children}</p>
 }
 
 // ————— Scene 1: Brand Health Index — faithful to src/components/dashboard/bhi-gauge.tsx —————
@@ -119,30 +123,30 @@ export function GaugeScene({ t }: { t: number }) {
         <svg width="220" height="138" viewBox="0 0 200 138" className="overflow-visible">
           <defs>
             <linearGradient id="lg-bhi" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#22c55e" /><stop offset="100%" stopColor="#4ade80" />
+              <stop offset="0%" stopColor="var(--pos)" /><stop offset="100%" stopColor="var(--pos)" />
             </linearGradient>
-            <filter id="lg-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" /><feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
           </defs>
           <path d={TRACK_D} fill="none" stroke="var(--s-track)" strokeWidth={14} strokeLinecap="round" />
           {[40, 65, 80].map(pct => {
             const p = ptOnArc(225 - (pct / 100) * 270)
             return <circle key={pct} cx={p.x} cy={p.y} r={2.5} fill="var(--s-panel)" opacity={0.9} />
           })}
-          <path d={TRACK_D} fill="none" stroke="url(#lg-bhi)" strokeWidth={14} strokeLinecap="round" filter="url(#lg-glow)"
+          <path d={TRACK_D} fill="none" stroke="url(#lg-bhi)" strokeWidth={14} strokeLinecap="round"
             strokeDasharray={ARC_LEN} strokeDashoffset={ARC_LEN * (1 - (SCORE / 100) * sweep)} opacity={win(t, 0.02, 0.1)} />
-          <circle cx={dotP.x} cy={dotP.y} r={7 * dotIn} fill="#4ade80" style={{ filter: 'drop-shadow(0 0 6px rgba(34,197,94,0.4))' }} />
-          <circle cx={dotP.x} cy={dotP.y} r={3.5 * dotIn} fill="white" />
+          <circle cx={dotP.x} cy={dotP.y} r={7 * dotIn} fill="var(--pos)" />
+          <circle cx={dotP.x} cy={dotP.y} r={3.5 * dotIn} fill="var(--bg-paper)" />
           <text x={CX} y={CY - 14} textAnchor="middle" fontSize="48" fontWeight="700" letterSpacing="-2"
-            fontFamily="var(--font-display), system-ui, sans-serif" fill="var(--s-strong)">{score}</text>
+            fontFamily="var(--font-num)" fill="var(--s-strong)"
+            style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}>{score}</text>
           <text x={CX} y={CY + 10} textAnchor="middle" fontSize="11" fill="var(--s-mut)">out of 100</text>
-          <text x={START.x - 2} y={START.y + 18} textAnchor="middle" fontSize="9" fill="var(--s-mut)">0</text>
-          <text x={END.x + 2} y={END.y + 18} textAnchor="middle" fontSize="9" fill="var(--s-mut)">100</text>
+          <text x={START.x - 2} y={START.y + 18} textAnchor="middle" fontSize="9" fontFamily="var(--font-num)" fill="var(--s-mut)"
+            style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}>0</text>
+          <text x={END.x + 2} y={END.y + 18} textAnchor="middle" fontSize="9" fontFamily="var(--font-num)" fill="var(--s-mut)"
+            style={{ fontVariantNumeric: 'tabular-nums lining-nums' }}>100</text>
         </svg>
-        <span className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold"
-          style={{ color: '#22c55e', backgroundColor: '#22c55e15', borderColor: '#22c55e30', opacity: win(t, 0.5, 0.62) }}>
-          <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" /> Healthy
+        <span className="inline-flex items-center gap-1.5 rounded-sm border px-3 py-1 text-xs font-semibold"
+          style={{ color: 'var(--pos)', backgroundColor: 'var(--bg-shell)', borderColor: 'var(--bg-shell)', opacity: win(t, 0.5, 0.62) }}>
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-[var(--pos)]" /> Healthy
         </span>
       </div>
       <div className="flex w-full max-w-[280px] flex-col gap-3 @xl:w-[240px]">
@@ -152,7 +156,7 @@ export function GaugeScene({ t }: { t: number }) {
             return (
               <div key={c.label} className="space-y-0.5 rounded-lg border border-[var(--s-line)] bg-[var(--s-chip)] py-2.5"
                 style={{ opacity: p, transform: `translateY(${(1 - p) * 8}px)` }}>
-                <p className="text-sm font-semibold tabular-nums text-[var(--s-strong)]">{Math.round(c.value * p)}</p>
+                <p className="text-sm font-semibold bg-num text-[var(--s-strong)]">{Math.round(c.value * p)}</p>
                 <p className="text-[10px] text-[var(--s-mut)]">{c.label}</p>
               </div>
             )
@@ -163,11 +167,11 @@ export function GaugeScene({ t }: { t: number }) {
           <svg width="100%" height={SH} viewBox={`0 0 ${SW} ${SH}`} preserveAspectRatio="none" className="overflow-visible">
             <defs>
               <linearGradient id="lg-area" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#22c55e" stopOpacity="0.22" /><stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
+                <stop offset="0%" stopColor="var(--pos)" stopOpacity="0.22" /><stop offset="100%" stopColor="var(--pos)" stopOpacity="0" />
               </linearGradient>
             </defs>
             <polygon points={`0,${SH} ${sparkPts} ${SW},${SH}`} fill="url(#lg-area)" opacity={sparkDraw} />
-            <polyline points={sparkPts} fill="none" stroke="#22c55e" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round"
+            <polyline points={sparkPts} fill="none" stroke="var(--pos)" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round"
               strokeDasharray={300} strokeDashoffset={300 * (1 - sparkDraw)} />
           </svg>
         </div>
@@ -180,11 +184,11 @@ export function GaugeScene({ t }: { t: number }) {
 }
 
 // ————— Scene 2: sentiment with street sense —————
-const MENTIONS: { text: string; lang: string; tone: 'green' | 'red' }[] = [
-  { text: 'This app no dey fall my hand at all 🙌', lang: 'Pidgin',  tone: 'green' },
-  { text: 'Ẹ jọ̀wọ́, transfer ti stuck since morning', lang: 'Yoruba', tone: 'red' },
-  { text: 'Their customer care sabi wetin dem dey do', lang: 'Pidgin', tone: 'green' },
-  { text: 'Onye ọ bụla kwesịrị ịnwale ya. Solid app!', lang: 'Igbo',   tone: 'green' },
+const MENTIONS: { text: string; lang: string; tone: 'nominal' | 'alert' }[] = [
+  { text: 'This app no dey fall my hand at all 🙌', lang: 'Pidgin',  tone: 'nominal' },
+  { text: 'Ẹ jọ̀wọ́, transfer ti stuck since morning', lang: 'Yoruba', tone: 'alert' },
+  { text: 'Their customer care sabi wetin dem dey do', lang: 'Pidgin', tone: 'nominal' },
+  { text: 'Onye ọ bụla kwesịrị ịnwale ya. Solid app!', lang: 'Igbo',   tone: 'nominal' },
 ]
 export function SentimentScene({ t }: { t: number }) {
   const line = easeInOut(win(t, 0.1, 0.9))
@@ -195,7 +199,7 @@ export function SentimentScene({ t }: { t: number }) {
       <div className="flex w-full flex-col gap-2.5 @xl:w-[52%]">
         <div className="flex items-center justify-between">
           <Label>Live mentions</Label>
-          <div className="flex gap-1.5"><Tag tone="blue">X</Tag><Tag tone="clay">Instagram</Tag></div>
+          <div className="flex gap-1.5"><Tag tone="hero">X</Tag><Tag tone="hero">Instagram</Tag></div>
         </div>
         {MENTIONS.map((m, i) => {
           const p = easeOut(win(t, 0.08 + i * 0.16, 0.24 + i * 0.16))
@@ -206,21 +210,21 @@ export function SentimentScene({ t }: { t: number }) {
               <p className="flex-1 text-[11.5px] leading-snug text-[var(--s-body)]">{m.text}</p>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <Tag>{m.lang}</Tag>
-                {tagged && <Tag tone={m.tone}>{m.tone === 'green' ? 'Positive' : 'Negative'}</Tag>}
+                {tagged && <Tag tone={m.tone}>{m.tone === 'nominal' ? 'Positive' : 'Negative'}</Tag>}
               </div>
             </div>
           )
         })}
       </div>
       <div className="flex flex-1 flex-col justify-center gap-3">
-        <Label>Social score · 30 days</Label>
+        <Label>Social score over 30 days</Label>
         <svg viewBox="0 0 280 88" className="w-full">
-          <path d={path} fill="none" stroke={CLAY} strokeWidth="2.5" strokeLinecap="round"
+          <path d={path} fill="none" stroke={HERO} strokeWidth="2.5" strokeLinecap="round"
             strokeDasharray={400} strokeDashoffset={400 * (1 - line)} />
-          {line > 0.97 && <circle cx={280} cy={80 - 0.68 * 72} r="4" fill={CLAY} />}
+          {line > 0.97 && <circle cx={280} cy={80 - 0.68 * 72} r="4" fill={HERO} />}
         </svg>
         <div className="flex gap-2" style={{ opacity: win(t, 0.55, 0.7) }}>
-          <Tag tone="green">68 positive</Tag><Tag>21 neutral</Tag><Tag tone="red">11 negative</Tag>
+          <Tag tone="nominal"><span className="bg-num">68</span>&nbsp;positive</Tag><Tag><span className="bg-num">21</span>&nbsp;neutral</Tag><Tag tone="alert"><span className="bg-num">11</span>&nbsp;negative</Tag>
         </div>
         <p className="hidden text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.65, 0.8) }}>
           Pidgin, Yoruba, Igbo and Hausa classified correctly. No lost-in-translation scores.
@@ -231,7 +235,15 @@ export function SentimentScene({ t }: { t: number }) {
 }
 
 // ————— Scene 3: funnel + money metrics —————
+/* The generator lays the rows out in its own box; the svg scales it. Height
+   is four band rows' worth, and the gutter is where the captions go. */
+const FUNNEL_W = 620
+const FUNNEL_H = 140
+const FUNNEL_GUTTER = 112
+
 export function FunnelScene({ t }: { t: number }) {
+  const dark = useDarkGround()
+  const ink = dark ? TOKENS.paper : TOKENS.ink
   const stages = [
     { label: 'Aware',    v: 1.0,  n: '2.4M' },
     { label: 'Consider', v: 0.62, n: '486k' },
@@ -239,36 +251,45 @@ export function FunnelScene({ t }: { t: number }) {
     { label: 'Advocate', v: 0.14, n: '18k'  },
   ]
   const tiles = [
-    { label: 'CAC',  value: '₦412',  delta: '▼ 9%'  },
-    { label: 'ROI',  value: '3.8x',  delta: '▲ 0.4' },
-    { label: 'MQLs', value: '1,204', delta: '▲ 22%' },
+    { label: 'CAC',  value: '₦412',  delta: '− 9%'  },
+    { label: 'ROI',  value: '3.8x',  delta: '+ 0.4' },
+    { label: 'MQLs', value: '1,204', delta: '+ 22%' },
   ]
   const srcs = ['Meta Ads', 'GA4', 'Paystack', 'Pixel']
   return (
     <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:gap-5 @xl:p-6">
       <div className="flex flex-col gap-2 @xl:flex-row @xl:items-center @xl:justify-between">
-        <Label>Funnel · live connector data</Label>
+        <Label>Funnel, from live connector data</Label>
         <div className="flex flex-wrap gap-1.5">
           {srcs.map((s, i) => (
-            <span key={s} style={{ opacity: win(t, 0.05 + i * 0.06, 0.15 + i * 0.06) }}><Tag tone="blue">{s}</Tag></span>
+            <span key={s} style={{ opacity: win(t, 0.05 + i * 0.06, 0.15 + i * 0.06) }}><Tag tone="hero">{s}</Tag></span>
           ))}
         </div>
       </div>
-      <div className="flex flex-1 items-end gap-3">
-        {stages.map((s, i) => {
-          const p = easeOut(win(t, 0.12 + i * 0.1, 0.42 + i * 0.1))
-          return (
-            <div key={s.label} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
-              <span className="font-mono text-[11px] text-[var(--s-body)]" style={{ opacity: p }}>{s.n}</span>
-              <div className="w-full rounded-t-lg" style={{
-                height: `${8 + s.v * 80 * p}%`,
-                background: `linear-gradient(180deg, ${i === 2 ? CLAY : BLUE} 0%, transparent 160%)`,
-                opacity: 0.9,
-              }} />
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--s-mut)]">{s.label}</span>
-            </div>
-          )
-        })}
+      {/* Stacked bands, made of atoms, straight out of brand/engine.js. The
+          drop-off is countable rather than a tapering block, each row's atoms
+          crescendo in size across it, and the grade puts Flare on the widest
+          stage so heat still means value. None of this geometry is redrawn
+          here. The wipe reveals it left to right, the way the rows fill. */}
+      <div className="flex flex-1 items-center">
+        {/* The svg sets the height; the label column is overlaid in the gutter
+            it leaves, on the same row grid, so each caption sits on its band. */}
+        <div className="relative w-full" style={{ paddingRight: FUNNEL_GUTTER }}>
+          {/* The bands. width="100%" with no height keeps the atoms round. */}
+          <svg viewBox={`0 0 ${FUNNEL_W} ${FUNNEL_H}`} width="100%" aria-hidden
+            style={{ clipPath: `inset(0 ${(1 - easeOut(win(t, 0.12, 0.6))) * 100}% 0 0)` }}
+            dangerouslySetInnerHTML={{ __html: funnelChart(stages.map(s => ({ label: s.label, value: s.v })), FUNNEL_W, FUNNEL_H, ink) }} />
+          <div className="absolute inset-y-0 right-0 grid"
+            style={{ width: FUNNEL_GUTTER - 8, gridTemplateRows: `repeat(${stages.length}, 1fr)` }}>
+            {stages.map((s, i) => (
+              <div key={s.label} className="flex items-center justify-between gap-2 whitespace-nowrap"
+                style={{ opacity: easeOut(win(t, 0.2 + i * 0.08, 0.45 + i * 0.08)) }}>
+                <span className="text-[9px] text-[var(--s-mut)]">{s.label}</span>
+                <span className="bg-num text-[11px] text-[var(--s-body)]">{s.n}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
         {tiles.map((m, i) => {
@@ -278,8 +299,8 @@ export function FunnelScene({ t }: { t: number }) {
               style={{ opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
               <Label>{m.label}</Label>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-xl font-extrabold text-[var(--s-strong)]" style={{ fontFamily: 'var(--font-display)' }}>{m.value}</span>
-                <span className="font-mono text-[10px] text-emerald-600">{m.delta}</span>
+                <span className="text-xl font-extrabold text-[var(--s-strong)]" style={{ fontFamily: 'var(--font)' }}><span className="bg-num">{m.value}</span></span>
+                <span className="bg-num text-[10px] text-pos">{m.delta}</span>
               </div>
             </div>
           )
@@ -301,11 +322,11 @@ export function SurveyScene({ t }: { t: number }) {
     <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:flex-row @xl:gap-6 @xl:p-6">
       <div className="flex w-full flex-col gap-2.5 @xl:w-1/2">
         <div className="flex items-center justify-between">
-          <Label>NPS survey · wave 4</Label>
-          <Tag tone="green">Opt-in only</Tag>
+          <Label>NPS survey, wave 4</Label>
+          <Tag tone="nominal">Opt-in only</Tag>
         </div>
         <div className="flex gap-1.5" style={{ opacity: easeOut(win(t, 0.03, 0.14)) }}>
-          <Tag tone="blue">Email</Tag><Tag tone="blue">In-app</Tag><Tag tone="blue">Share link</Tag>
+          <Tag tone="hero">Email</Tag><Tag tone="hero">In-app</Tag><Tag tone="hero">Share link</Tag>
         </div>
         <div className="rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2 text-[11.5px] leading-snug text-[var(--s-body)]"
           style={{ opacity: easeOut(win(t, 0.08, 0.2)) }}>
@@ -315,19 +336,19 @@ export function SurveyScene({ t }: { t: number }) {
           const p = easeOut(win(t, 0.22 + i * 0.14, 0.36 + i * 0.14))
           return (
             <div key={i} className="flex items-center gap-2 self-start rounded-xl border border-[var(--s-line)] bg-[var(--s-panel)] px-3 py-2 @xl:mr-10"
-              style={{ opacity: p, transform: `translateX(${(1 - p) * -16}px)`, boxShadow: '0 1px 3px rgba(20,24,43,0.05)' }}>
+              style={{ opacity: p, transform: `translateX(${(1 - p) * -16}px)` }}>
               <p className="text-[11.5px] text-[var(--s-body)]">{r.text}</p>
               <Tag>{r.via}</Tag>
-              <Tag tone={r.score >= 9 ? 'green' : r.score >= 7 ? 'dim' : 'red'}>{r.score}</Tag>
+              <Tag tone={r.score >= 9 ? 'nominal' : r.score >= 7 ? 'quiet' : 'alert'}><span className="bg-num">{r.score}</span></Tag>
             </div>
           )
         })}
       </div>
       <div className="flex flex-1 flex-col items-center justify-center gap-3">
         <Label>Net Promoter Score</Label>
-        <span className="text-5xl font-extrabold text-[var(--s-strong)] @xl:text-6xl" style={{ fontFamily: 'var(--font-display)' }}>+{nps}</span>
+        <span className="text-5xl font-extrabold text-[var(--s-strong)] @xl:text-6xl bg-num" style={{ fontFamily: 'var(--font-num)' }}>+{nps}</span>
         <div className="flex gap-2" style={{ opacity: win(t, 0.7, 0.85) }}>
-          <Tag tone="green">61% promoters</Tag><Tag tone="red">3% detractors</Tag>
+          <Tag tone="nominal"><span className="bg-num">61%</span>&nbsp;promoters</Tag><Tag tone="alert"><span className="bg-num">3%</span>&nbsp;detractors</Tag>
         </div>
         <p className="hidden max-w-[220px] text-center text-[11px] leading-relaxed text-[var(--s-mut)] @xl:block" style={{ opacity: win(t, 0.78, 0.92) }}>
           Email, in-app and shareable-link surveys, with every reply scored as it lands.
@@ -357,8 +378,8 @@ export function OohScene({ t }: { t: number }) {
     <Panel className="flex h-full w-full flex-col gap-4 p-4 @xl:flex-row @xl:gap-6 @xl:p-6">
       <div className="flex w-full flex-col justify-center gap-3 @xl:w-[55%]">
         <div className="flex items-center justify-between">
-          <Label>OOH sites · Lagos</Label>
-          <Tag tone="clay">5 live</Tag>
+          <Label>OOH sites in Lagos</Label>
+          <Tag tone="hero">5 live</Tag>
         </div>
         <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[var(--s-line)]"
           style={{ opacity: easeOut(win(t, 0.02, 0.18)) }}>
@@ -370,16 +391,16 @@ export function OohScene({ t }: { t: number }) {
             return (
               <div key={s.name} className="absolute" style={{ left: `${s.left}%`, top: `${s.top}%`, transform: 'translate(-50%, -100%)', zIndex: s.hero ? 10 : 1 }}>
                 <div className="absolute left-1/2 top-full h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border"
-                  style={{ borderColor: CLAY, opacity: drop * 0.5 * (1 - phase), transform: `translate(-50%,-50%) scale(${0.3 + phase * 0.9})` }} />
+                  style={{ borderColor: HERO, opacity: drop * 0.5 * (1 - phase), transform: `translate(-50%,-50%) scale(${0.3 + phase * 0.9})` }} />
                 <svg viewBox="0 0 24 24" className="h-5 w-5" style={{ opacity: Math.min(1, drop), transform: `scale(${drop})`, transformOrigin: 'bottom center' }}>
-                  <path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Z" fill={s.hero ? CLAY : BLUE} stroke="white" strokeWidth="1.5" />
-                  <circle cx="12" cy="9" r="2.6" fill="white" />
+                  <path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Z" fill={s.hero ? HERO : NEUTRAL} stroke="var(--bg-paper)" strokeWidth="1.5" />
+                  <circle cx="12" cy="9" r="2.6" fill="var(--bg-paper)" />
                 </svg>
                 {s.hero && (
                   <div className="absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded-md border border-[var(--s-line)] bg-[var(--s-panel)] px-2 py-1"
-                    style={{ opacity: easeOut(win(t, 0.5, 0.62)), boxShadow: 'var(--s-shadow)' }}>
+                    style={{ opacity: easeOut(win(t, 0.5, 0.62)) }}>
                     <p className="text-[10px] font-bold text-[var(--s-strong)]">Lekki–Epe Expressway</p>
-                    <p className="font-mono text-[8.5px] text-[var(--s-mut)]">48-sheet · 3,412 visits</p>
+                    <p className="text-[8.5px] text-[var(--s-mut)]">48-sheet, <span className="bg-num">3,412</span> visits</p>
                   </div>
                 )}
               </div>
@@ -388,8 +409,8 @@ export function OohScene({ t }: { t: number }) {
           <span className="absolute bottom-1 right-1.5 text-[7px] text-[var(--s-mut)]">© OpenStreetMap · © CARTO</span>
         </div>
         <div className="hidden items-center gap-2 rounded-xl border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2.5 @xl:flex">
-          <span className="h-2 w-2 rounded-full" style={{ background: CLAY }} />
-          <span className="font-mono text-[11px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: CLAY }}>▍</span></span>
+          <span className="h-[11px] w-[5px] rounded-[var(--r-tick)]" style={{ background: HERO }} />
+          <span className="bg-num text-[11px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: 'var(--tx-flare)' }}>▍</span></span>
         </div>
       </div>
       <div className="flex flex-1 flex-col justify-center gap-4">
@@ -404,11 +425,9 @@ export function OohScene({ t }: { t: number }) {
             <div key={row.label} style={{ opacity: p }}>
               <div className="mb-1.5 flex justify-between">
                 <span className="text-[11px] text-[var(--s-body)]">{row.label}</span>
-                <span className="font-mono text-[12px] font-bold text-[var(--s-strong)]">{row.value}</span>
+                <span className="bg-num text-[12px] font-bold text-[var(--s-strong)]">{row.value}</span>
               </div>
-              <div className="h-1.5 rounded-full bg-[var(--s-track)]">
-                <div className="h-full rounded-full" style={{ width: `${row.p * 100 * p}%`, background: row.clay ? CLAY : BLUE, opacity: row.clay ? 1 : 0.6 }} />
-              </div>
+              <Crescendo value={row.p * 100 * p} height={6} />
             </div>
           )
         })}
@@ -434,9 +453,9 @@ export function AiScene({ t }: { t: number }) {
   ]
   return (
     <Panel className="flex h-full w-full flex-col gap-3 p-4 @xl:gap-4 @xl:p-6">
-      <div className="flex items-center gap-2 rounded-xl border px-4 py-3" style={{ borderColor: 'rgba(212,96,42,0.35)', background: 'rgba(212,96,42,0.05)' }}>
-        <span className="text-[13px]" style={{ color: CLAY }}>✦</span>
-        <span className="text-[12.5px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: CLAY }}>▍</span></span>
+      <div className="flex items-center gap-2 rounded-xl border px-4 py-3" style={{ borderColor: 'var(--line)', background: 'var(--bg-shell)' }}>
+        <span className="text-[13px]" style={{ color: 'var(--tx-flare)' }}>✦</span>
+        <span className="text-[12.5px] text-[var(--s-body)]">{typed}<span className="animate-pulse" style={{ color: 'var(--tx-flare)' }}>▍</span></span>
       </div>
       <div className="flex flex-1 flex-col gap-2">
         {answers.map((a, i) => {
@@ -444,7 +463,7 @@ export function AiScene({ t }: { t: number }) {
           return (
             <div key={i} className="flex items-start gap-2.5 rounded-lg bg-[var(--s-chip)] px-3 py-2"
               style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
-              <span className="mt-0.5 font-mono text-[10px]" style={{ color: CLAY }}>{String(i + 1).padStart(2, '0')}</span>
+              <span className="mt-0.5 bg-num text-[10px]" style={{ color: 'var(--tx-flare)' }}>{String(i + 1).padStart(2, '0')}</span>
               <p className="text-[11.5px] leading-relaxed text-[var(--s-body)]">{a}</p>
             </div>
           )
@@ -453,15 +472,15 @@ export function AiScene({ t }: { t: number }) {
       <div className="border-t border-[var(--s-line)] pt-3">
         <div className="mb-2 flex items-center justify-between">
           <Label>How AI answers about your brand</Label>
-          <Tag tone="clay">Weekly check</Tag>
+          <Tag tone="hero">Weekly check</Tag>
         </div>
         <div className="grid grid-cols-3 gap-3">
           {platforms.map((pl, i) => {
             const p = easeOut(win(t, 0.68 + i * 0.08, 0.82 + i * 0.08))
             return (
               <div key={pl.name} className="rounded-lg border border-[var(--s-line)] bg-[var(--s-chip)] px-3 py-2" style={{ opacity: p }}>
-                <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--s-mut)]">{pl.name}</p>
-                <p className="text-lg font-extrabold text-[var(--s-strong)]" style={{ fontFamily: 'var(--font-display)' }}>{Math.round(pl.score * p)}</p>
+                <p className="text-[9px] text-[var(--s-mut)]">{pl.name}</p>
+                <p className="text-lg font-extrabold text-[var(--s-strong)] bg-num" style={{ fontFamily: 'var(--font-num)' }}>{Math.round(pl.score * p)}</p>
               </div>
             )
           })}
@@ -474,8 +493,8 @@ export function AiScene({ t }: { t: number }) {
 // ————— Scene 7: competitive —————
 export function CompetitiveScene({ t }: { t: number }) {
   const share = [
-    { name: 'You',          v: 46, color: CLAY },
-    { name: 'Competitor A', v: 32, color: BLUE },
+    { name: 'You',          v: 46, color: HERO },
+    { name: 'Competitor A', v: 32, color: NEUTRAL },
     { name: 'Competitor B', v: 22, color: 'var(--s-track)' },
   ]
   const sweep = easeInOut(win(t, 0.08, 0.55))
@@ -497,7 +516,11 @@ export function CompetitiveScene({ t }: { t: number }) {
           })}
         </svg>
         <div className="flex flex-wrap justify-center gap-1.5">
-          {share.map(s => <Tag key={s.name} tone={s.name === 'You' ? 'clay' : 'dim'}>{s.name} {Math.round(s.v * sweep)}%</Tag>)}
+          {share.map(s => (
+            <Tag key={s.name} tone={s.name === 'You' ? 'hero' : 'quiet'}>
+              {s.name}&nbsp;<span className="bg-num">{Math.round(s.v * sweep)}%</span>
+            </Tag>
+          ))}
         </div>
       </div>
       <div className="flex flex-1 flex-col justify-center gap-3">
@@ -522,34 +545,23 @@ export function CompetitiveScene({ t }: { t: number }) {
 
 // ————— Scene 8: outro —————
 export function OutroScene({ t }: { t: number }) {
+  const dark = useDarkGround()
   const p1 = easeOut(win(t, 0.05, 0.35))
   const p2 = easeOut(win(t, 0.3, 0.55))
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-5" style={{ color: 'var(--s-strong)' }}>
       <div style={{ opacity: p1, transform: `scale(${0.92 + p1 * 0.08})` }} className="flex items-center gap-3">
-        <GaugeMark className="h-10 w-10" />
-        <span className="text-4xl font-extrabold tracking-tight text-[var(--s-strong)]" style={{ fontFamily: 'var(--font-display)' }}>
-          Brand<span style={{ color: CLAY }}>Gauge</span>
-        </span>
+        <BrandLockup height={40} ground={dark ? 'ink' : 'paper'} />
       </div>
       <p className="max-w-md text-center text-[15px] leading-relaxed text-[var(--s-mut)]" style={{ opacity: p2 }}>
         Brand intelligence that speaks your market&apos;s language.
       </p>
       <div style={{ opacity: p2 }}>
-        <span className="rounded-full px-5 py-2.5 text-[13px] font-bold text-white" style={{ background: CLAY }}>Start free at brandgauge.app</span>
+        <span className="rounded-sm px-5 py-2.5 text-[13px] font-bold text-tx-inv" style={{ background: HERO }}>Start free at brandgauge.app</span>
       </div>
     </div>
   )
 }
 
-// ————— logo mark —————
-export function GaugeMark({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden>
-      <path d="M 8 30 A 16 16 0 1 1 32 30" fill="none" stroke="var(--s-track, rgba(20,24,43,0.2))" strokeWidth="4" strokeLinecap="round" />
-      <path d="M 8 30 A 16 16 0 0 1 20 4" fill="none" stroke={CLAY} strokeWidth="4" strokeLinecap="round" />
-      <line x1="20" y1="24" x2="28" y2="13" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="20" cy="24" r="3" fill="currentColor" />
-    </svg>
-  )
-}
+// The mark is supplied in brand/logo and used as drawn. Nothing here
+// approximates it with an arc, a line and a circle.

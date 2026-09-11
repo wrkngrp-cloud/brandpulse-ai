@@ -2,13 +2,11 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowRight, Check } from 'lucide-react'
+import { ArrowRightIcon as ArrowRight, CheckIcon as Check } from '@/components/brand/icon'
 import { MarketingShell } from './marketing-shell'
 
+// One reveal group per section. See landing-page.tsx.
 const rise = {
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-60px' },
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
 }
 
@@ -99,11 +97,11 @@ export function UseCasesPage() {
   return (
     <MarketingShell>
       <section className="mx-auto max-w-6xl px-6 pb-8 pt-36 sm:pt-44">
-        <motion.p {...rise} className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>
+        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>
           Use cases
         </motion.p>
         <motion.h1 {...rise} className="mt-4 max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           One gauge, tuned to your industry.
         </motion.h1>
         <motion.p {...rise} className="mt-5 max-w-2xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--lp-mut)' }}>
@@ -114,7 +112,7 @@ export function UseCasesPage() {
         <motion.div {...rise} className="mt-8 flex flex-wrap gap-2.5">
           {INDUSTRIES.map(ind => (
             <a key={ind.id} href={`#${ind.id}`}
-              className="rounded-full border px-4 py-2 text-[12px] transition-colors hover:border-[var(--lp-clay)]"
+              className="rounded-sm border px-4 py-2 text-[12px] transition-colors hover:border-[var(--lp-clay)]"
               style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
               {ind.name}
             </a>
@@ -126,16 +124,16 @@ export function UseCasesPage() {
         {INDUSTRIES.map(ind => (
           <motion.div key={ind.id} id={ind.id} {...rise}
             className="scroll-mt-28 rounded-2xl border p-7 sm:p-10"
-            style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', boxShadow: '0 1px 2px rgba(20,24,43,0.04)' }}>
+            style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
             <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl"
-              style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+              style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
               {ind.name}
             </h2>
             <p className="mt-2 max-w-2xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{ind.who}</p>
             <div className="mt-8 grid gap-6 md:grid-cols-3">
               {ind.jobs.map(job => (
                 <div key={job.title}>
-                  <h3 className="text-[15px] font-bold leading-snug" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+                  <h3 className="text-[15px] font-bold leading-snug" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
                     {job.title}
                   </h3>
                   <p className="mt-2 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{job.how}</p>
@@ -144,9 +142,9 @@ export function UseCasesPage() {
             </div>
             <div className="mt-8 flex flex-wrap gap-2 border-t pt-6" style={{ borderColor: 'var(--lp-line)' }}>
               {ind.modules.map(m => (
-                <span key={m} className="flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em]"
+                <span key={m} className="flex items-center gap-1.5 rounded-sm border px-3 py-1 text-[10px]"
                   style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-mut)', background: 'var(--lp-chip)' }}>
-                  <Check className="h-3 w-3" style={{ color: 'var(--lp-clay)' }} /> {m}
+                  <Check className="h-3 w-3" style={{ color: 'var(--tx-flare)' }} /> {m}
                 </span>
               ))}
             </div>
@@ -156,7 +154,7 @@ export function UseCasesPage() {
 
       <section className="px-6 py-20 text-center">
         <motion.h2 {...rise} className="mx-auto max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Your industry is already set up.
         </motion.h2>
         <motion.p {...rise} className="mx-auto mt-4 max-w-xl text-[14px]" style={{ color: 'var(--lp-mut)' }}>
@@ -164,8 +162,8 @@ export function UseCasesPage() {
         </motion.p>
         <motion.div {...rise} className="mt-8">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-bold text-white shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
-            style={{ background: 'var(--lp-clay)' }}>
+            className="inline-flex items-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-bold text-on-hot border border-line bg-press"
+            style={{ background: 'var(--flare)' }}>
             Start free in beta <ArrowRight className="h-4 w-4" />
           </Link>
         </motion.div>

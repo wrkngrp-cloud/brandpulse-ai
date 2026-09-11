@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckIcon as CheckCircle2 } from '@/components/brand/icon'
 
 export default function ForgotPasswordPage() {
   const [state, action, pending] = useActionState(forgotPassword, null)
@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
     return shell(
       <Card>
         <CardContent className="pt-8 pb-6 text-center space-y-4">
-          <CheckCircle2 className="h-10 w-10 text-green-500 mx-auto" />
+          <CheckCircle2 className="h-10 w-10 text-pos mx-auto" />
           <div className="space-y-1">
             <p className="font-semibold">Check your inbox</p>
             <p className="text-sm text-muted-foreground">

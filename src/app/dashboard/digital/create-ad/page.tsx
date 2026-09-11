@@ -15,11 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  ArrowLeft, ArrowRight, Check, Loader2, Megaphone, Upload, X,
-  ImageIcon, Plus, AlertCircle, Globe, Users, BarChart2, ShoppingCart,
-  MousePointer, Smartphone,
-} from 'lucide-react'
+import { ArrowLeftIcon as ArrowLeft, ArrowRightIcon as ArrowRight, CheckIcon as Check, MusicIcon as Megaphone, ExportIcon as Upload, XIcon as X, ImageIcon, PlusIcon as Plus, GlobeIcon as Globe, UsersIcon as Users, TrendIcon as BarChart2, BriefcaseIcon as ShoppingCart, CircleDotIcon as MousePointer, PhoneIcon as Smartphone } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -305,9 +303,9 @@ function ImageUploadZone({
           <button
             type="button"
             onClick={onRemove}
-            className="absolute top-2 right-2 bg-black/60 rounded-full p-1 hover:bg-black/80 transition-colors"
+            className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1 hover:bg-ink/80 transition-colors bg-press"
           >
-            <X className="h-3.5 w-3.5 text-white" />
+            <X className="h-3.5 w-3.5 text-tx-inv" />
           </button>
         )}
       </div>
@@ -335,7 +333,7 @@ function ImageUploadZone({
         onChange={e => handleFiles(e.target.files)}
       />
       {uploading
-        ? <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        ? <Loader2 className="h-6 w-6 text-muted-foreground" />
         : <Upload className="h-6 w-6 text-muted-foreground" />
       }
       <div className="text-center">
@@ -384,14 +382,14 @@ function VideoUploadZone({
   if (url) {
     return (
       <div className="border rounded-xl overflow-hidden relative">
-        <video src={url} controls className="w-full max-h-56 bg-black" />
+        <video src={url} controls className="w-full max-h-56 bg-ink" />
         {onRemove && (
           <button
             type="button"
             onClick={onRemove}
-            className="absolute top-2 right-2 bg-black/60 rounded-full p-1 hover:bg-black/80 transition-colors"
+            className="absolute top-2 right-2 bg-ink/60 rounded-sm p-1 hover:bg-ink/80 transition-colors bg-press"
           >
-            <X className="h-3.5 w-3.5 text-white" />
+            <X className="h-3.5 w-3.5 text-tx-inv" />
           </button>
         )}
       </div>
@@ -402,7 +400,7 @@ function VideoUploadZone({
     <button
       type="button"
       onClick={() => inputRef.current?.click()}
-      className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 py-10 px-4 transition-colors cursor-pointer hover:border-primary/50 hover:bg-muted/30 w-full"
+      className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 py-10 px-4 transition-colors cursor-pointer hover:border-primary/50 hover:bg-muted/30 w-full bg-press"
     >
       <input
         ref={inputRef}
@@ -412,7 +410,7 @@ function VideoUploadZone({
         onChange={e => { if (e.target.files?.[0]) void uploadFile(e.target.files[0]) }}
       />
       {uploading
-        ? <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
+        ? <Loader2 className="h-7 w-7 text-muted-foreground" />
         : <Upload className="h-7 w-7 text-muted-foreground" />
       }
       <div className="text-center">
@@ -461,13 +459,13 @@ function TagInput({
           {tags.map(t => (
             <span
               key={t}
-              className="inline-flex items-center gap-1 text-xs bg-muted px-2 py-0.5 rounded-full"
+              className="inline-flex items-center gap-1 text-xs bg-muted px-2 py-0.5 rounded-sm"
             >
               {t}
               <button
                 type="button"
                 onClick={() => onRemove(t)}
-                className="text-muted-foreground hover:text-foreground ml-0.5"
+                className="text-muted-foreground hover:text-foreground ml-0.5 bg-press"
               >
                 <X className="h-2.5 w-2.5" />
               </button>
@@ -674,7 +672,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
 
         {/* Image upload */}
         <div className="space-y-1.5">
-          <Label>Image <span className="text-rose-500">*</span></Label>
+          <Label>Image <span className="text-tx-flare">*</span></Label>
           <ImageUploadZone
             url={state.media_urls[0]}
             onUpload={url => set('media_urls', [url])}
@@ -721,9 +719,9 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
           {cards.map((card, idx) => (
             <div key={idx} className="border rounded-xl p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Card {idx + 1}</span>
+                <span className="text-xs font-semibold text-muted-foreground">Card {idx + 1}</span>
                 {cards.length > 2 && (
-                  <button type="button" onClick={() => removeCard(idx)} className="text-muted-foreground hover:text-destructive transition-colors">
+                  <button type="button" onClick={() => removeCard(idx)} className="text-muted-foreground hover:text-destructive transition-colors bg-press">
                     <X className="h-3.5 w-3.5" />
                   </button>
                 )}
@@ -775,7 +773,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
             </Button>
           )}
           {cards.length < 2 && (
-            <p className="text-xs text-amber-600 flex items-center gap-1.5">
+            <p className="text-xs text-tx-2 flex items-center gap-1.5">
               <AlertCircle className="h-3.5 w-3.5" />
               At least 2 cards are required for a carousel.
             </p>
@@ -813,7 +811,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
                   maxLength={30}
                   className="h-8 text-sm"
                 />
-                <span className="text-xs text-muted-foreground w-6 tabular-nums shrink-0">{h.length}/30</span>
+                <span className="text-xs text-muted-foreground w-6 bg-num shrink-0">{h.length}/30</span>
               </div>
             ))}
           </div>
@@ -838,7 +836,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
                   maxLength={90}
                   className="h-8 text-sm"
                 />
-                <span className="text-xs text-muted-foreground w-6 tabular-nums shrink-0">{d.length}/90</span>
+                <span className="text-xs text-muted-foreground w-6 bg-num shrink-0">{d.length}/90</span>
               </div>
             ))}
           </div>
@@ -852,7 +850,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
         {/* Final URL + Display URL */}
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label>Final URL <span className="text-rose-500">*</span></Label>
+            <Label>Final URL <span className="text-tx-flare">*</span></Label>
             <Input
               placeholder="https://yourbrand.com/page"
               value={state.destination_url}
@@ -890,7 +888,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label>Main image <span className="text-rose-500">*</span></Label>
+            <Label>Main image <span className="text-tx-flare">*</span></Label>
             <ImageUploadZone
               url={state.media_urls[0]}
               onUpload={url => set('media_urls', [url])}
@@ -952,7 +950,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
         </div>
 
         <div className="space-y-1.5">
-          <Label>Video file <span className="text-rose-500">*</span></Label>
+          <Label>Video file <span className="text-tx-flare">*</span></Label>
           <VideoUploadZone
             url={state.media_urls[0]}
             onUpload={url => set('media_urls', [url])}
@@ -987,7 +985,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
                 maxLength={150}
                 className="text-sm resize-none"
               />
-              <p className="text-xs text-muted-foreground text-right tabular-nums">{state.body.length}/150</p>
+              <p className="text-xs text-muted-foreground text-right bg-num">{state.body.length}/150</p>
             </div>
             <div className="space-y-1.5">
               <Label>Display name / Brand name</Label>
@@ -1064,7 +1062,7 @@ function AdCopyFields({
           maxLength={headlineMax}
           className="text-sm"
         />
-        <p className="text-xs text-muted-foreground text-right tabular-nums">{state.headline.length}/{headlineMax}</p>
+        <p className="text-xs text-muted-foreground text-right bg-num">{state.headline.length}/{headlineMax}</p>
       </div>
 
       {showLongHeadline && (
@@ -1105,7 +1103,7 @@ function AdCopyFields({
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Destination URL <span className="text-rose-500">*</span></Label>
+          <Label>Destination URL <span className="text-tx-flare">*</span></Label>
           <Input
             type="url"
             placeholder="https://yourbrand.com/promo"
@@ -1154,7 +1152,7 @@ function StepAudience({ state, setState }: { state: WizardState; setState: React
               type="button"
               onClick={() => toggleLocation(loc)}
               className={cn(
-                'text-xs px-2.5 py-1 rounded-full border transition-colors',
+                'text-xs px-2.5 py-1 rounded-sm border transition-colors',
                 aud.locations.includes(loc)
                   ? 'border-primary bg-primary/10 text-primary font-medium'
                   : 'border-border text-muted-foreground hover:border-primary/40',
@@ -1164,7 +1162,7 @@ function StepAudience({ state, setState }: { state: WizardState; setState: React
             </button>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground">{aud.locations.length} location{aud.locations.length !== 1 ? 's' : ''} selected</p>
+        <p className="text-xs text-muted-foreground bg-num">{aud.locations.length} location{aud.locations.length !== 1 ? 's' : ''} selected</p>
       </div>
 
       {/* Age + gender */}
@@ -1252,7 +1250,7 @@ function StepAudience({ state, setState }: { state: WizardState; setState: React
       {isGoogle && state.ad_format === 'responsive_search' && (
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Keywords <span className="text-rose-500">*</span></Label>
+            <Label>Keywords <span className="text-tx-flare">*</span></Label>
             <p className="text-xs text-muted-foreground">
               Words or phrases your customers search for. Use broad, phrase, or exact match (wrap in quotes or brackets).
             </p>
@@ -1396,7 +1394,7 @@ function StepBudget({ state, setState }: { state: WizardState; setState: React.D
           <p className="text-xs text-muted-foreground">Leave blank to start when approved.</p>
         </div>
         <div className="space-y-1.5">
-          <Label>End date {state.budget_type === 'lifetime' && <span className="text-rose-500">*</span>}</Label>
+          <Label>End date {state.budget_type === 'lifetime' && <span className="text-tx-flare">*</span>}</Label>
           <Input
             type="date"
             value={state.end_date}
@@ -1597,8 +1595,8 @@ function StepReview({ state }: { state: WizardState }) {
         </Section>
       </div>
 
-      <div className="border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/30 rounded-xl px-4 py-3">
-        <p className="text-xs text-amber-800 dark:text-amber-300">
+      <div className="border border-line bg-shell dark:border-line dark:bg-shell/30 rounded-xl px-4 py-3">
+        <p className="text-xs text-tx-2 dark:text-tx-2">
           This draft will be saved with status <strong>Draft</strong>. It will not go live until reviewed and pushed from the Ads Drafts panel.
         </p>
       </div>
@@ -1610,7 +1608,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div className="border rounded-xl overflow-hidden">
       <div className="bg-muted/40 px-4 py-2 border-b">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
+        <p className="text-xs font-semibold text-muted-foreground">{title}</p>
       </div>
       <div className="px-4 py-3 space-y-1.5">{children}</div>
     </div>
@@ -1621,7 +1619,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-4">
       <span className="w-28 shrink-0 text-xs font-medium text-muted-foreground pt-0.5">{label}</span>
-      <span className="text-sm flex-1 break-all">{value}</span>
+      <span className="text-sm flex-1 break-all"><span className="bg-num">{value}</span></span>
     </div>
   )
 }
@@ -1775,8 +1773,8 @@ export default function CreateAdPage() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0">
-            <Megaphone className="h-5 w-5 text-indigo-500" />
+          <div className="h-10 w-10 rounded-xl bg-flare/10 flex items-center justify-center shrink-0">
+            <Megaphone className="h-5 w-5 text-tx-2" />
           </div>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Create Ad</h1>
@@ -1791,7 +1789,7 @@ export default function CreateAdPage() {
           <div key={s.id} className="flex items-center gap-1 shrink-0">
             <div className={cn(
               'h-7 w-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors',
-              step > s.id  ? 'bg-emerald-500 text-white'
+              step > s.id  ? 'bg-pos text-tx-inv'
               : step === s.id ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-muted-foreground'
             )}>
@@ -1802,7 +1800,7 @@ export default function CreateAdPage() {
               step === s.id ? 'text-foreground' : 'text-muted-foreground'
             )}>{s.label}</span>
             {i < STEPS.length - 1 && (
-              <div className={cn('h-px w-5 mx-1 transition-colors', step > s.id ? 'bg-emerald-500' : 'bg-border')} />
+              <div className={cn('h-px w-5 mx-1 transition-colors', step > s.id ? 'bg-pos' : 'bg-border')} />
             )}
           </div>
         ))}
@@ -1837,7 +1835,7 @@ export default function CreateAdPage() {
         ) : (
           <Button onClick={() => void handleSubmit()} disabled={saving}>
             {saving ? (
-              <><Loader2 className="mr-1.5 h-4 w-4 animate-spin" />Saving…</>
+              <><Loader2 className="mr-1.5 h-4 w-4" />Saving…</>
             ) : (
               <><Check className="mr-1.5 h-4 w-4" />Save draft</>
             )}

@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { toast }    from 'sonner'
-import { Copy, Plus, Loader2, ToggleLeft, ToggleRight } from 'lucide-react'
+import { CopyIcon as Copy, PlusIcon as Plus, ToggleIcon as ToggleLeft, ToggleIcon as ToggleRight } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 
 interface FsoTeam {
   id:         string
@@ -78,7 +79,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
         <div className="border rounded-xl p-4 space-y-3 bg-card">
           <p className="text-sm font-semibold">New field team</p>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Team name</label>
+            <label className="text-xs font-medium text-muted-foreground">Team name</label>
             <input
               type="text"
               placeholder="e.g. Lagos North FSOs"
@@ -89,7 +90,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notes (optional)</label>
+            <label className="text-xs font-medium text-muted-foreground">Notes (optional)</label>
             <input
               type="text"
               placeholder="e.g. Covers Ikeja, Oshodi, Mushin"
@@ -102,14 +103,14 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
             <button
               onClick={createTeam}
               disabled={creating || !name.trim()}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 bg-press"
             >
-              {creating && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {creating && <Loader2 className="h-3.5 w-3.5" />}
               Create team
             </button>
             <button
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors bg-press"
             >
               Cancel
             </button>
@@ -118,7 +119,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
       ) : (
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors bg-press"
         >
           <Plus className="h-4 w-4" />
           Create team
@@ -138,7 +139,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold truncate">{team.name}</p>
-                <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${team.active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-muted text-muted-foreground'}`}>
+                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${team.active ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos' : 'bg-muted text-muted-foreground'}`}>
                   {team.active ? 'Active' : 'Inactive'}
                 </span>
               </div>
@@ -152,7 +153,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
             <button
               onClick={() => toggleActive(team)}
               disabled={toggling === team.id}
-              className="shrink-0 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+              className="shrink-0 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 bg-press"
               title={team.active ? 'Deactivate' : 'Activate'}
             >
               {team.active
@@ -163,10 +164,10 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
           </div>
 
           <div className="flex items-center gap-3 pt-1 border-t border-border/50">
-            <code className="text-xs text-muted-foreground font-mono">/fso/{maskToken(team.token)}</code>
+            <code className="text-xs text-muted-foreground bg-num">/fso/{maskToken(team.token)}</code>
             <button
               onClick={() => copyLink(team.token)}
-              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
+              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors bg-press"
             >
               <Copy className="h-3.5 w-3.5" />
               Copy link

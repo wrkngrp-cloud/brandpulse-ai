@@ -2,11 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  ArrowLeft, Star, AlertCircle, Globe, TrendingUp, CheckCircle,
-  XCircle, Loader2, ExternalLink, Users, BarChart2, Activity,
-  Calendar, RefreshCw,
-} from 'lucide-react'
+import { ArrowLeftIcon as ArrowLeft, StarIcon as Star, GlobeIcon as Globe, CheckIcon as CheckCircle, XCircleIcon as XCircle, ExternalLinkIcon as ExternalLink, UsersIcon as Users, TrendIcon as BarChart2, TrendIcon as Activity, CalendarIcon as Calendar, RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -19,6 +17,7 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { PostTracker } from '@/components/influencers/post-tracker'
+import { Crescendo } from '@/components/brand/crescendo'
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -123,36 +122,30 @@ function PlatformIcon({ platform }: { platform: string }) {
 
 function IqScore({ score }: { score: number | null }) {
   if (score === null) return <span className="text-muted-foreground text-sm">Not scored</span>
-  const color = score >= 70 ? 'text-emerald-600 dark:text-emerald-400'
-    : score >= 50 ? 'text-amber-600 dark:text-amber-400'
-    : 'text-rose-600 dark:text-rose-400'
-  const barColor = score >= 70 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-400' : 'bg-rose-500'
+  const color = score >= 70 ? 'text-pos dark:text-pos'
+    : score >= 50 ? 'text-tx-2 dark:text-tx-2'
+    : 'text-tx-flare dark:text-tx-flare'
   return (
     <div className="space-y-1">
-      <span className={cn('text-2xl font-bold tabular-nums', color)}>{score}</span>
-      <div className="h-1.5 bg-muted rounded-full overflow-hidden w-full">
-        <div className={cn('h-full rounded-full', barColor)} style={{ width: `${score}%` }} />
-      </div>
+      <span className={cn('text-2xl font-bold bg-num', color)}>{score}</span>
+      <Crescendo value={score} height={6} />
     </div>
   )
 }
 
 function RiskScore({ score }: { score: number | null }) {
   if (score === null) return <span className="text-muted-foreground text-sm">—</span>
-  const color = score < 30 ? 'text-emerald-600 dark:text-emerald-400'
-    : score <= 60 ? 'text-amber-600 dark:text-amber-400'
-    : 'text-rose-600 dark:text-rose-400'
-  const barColor = score < 30 ? 'bg-emerald-500' : score <= 60 ? 'bg-amber-400' : 'bg-rose-500'
+  const color = score < 30 ? 'text-pos dark:text-pos'
+    : score <= 60 ? 'text-tx-2 dark:text-tx-2'
+    : 'text-tx-flare dark:text-tx-flare'
   const label    = score < 30 ? 'Low risk' : score <= 60 ? 'Medium' : 'High risk'
   return (
     <div className="space-y-1">
       <div className="flex items-baseline gap-2">
-        <span className={cn('text-2xl font-bold tabular-nums', color)}>{score}</span>
+        <span className={cn('text-2xl font-bold bg-num', color)}>{score}</span>
         <span className="text-xs text-muted-foreground">{label}</span>
       </div>
-      <div className="h-1.5 bg-muted rounded-full overflow-hidden w-full">
-        <div className={cn('h-full rounded-full', barColor)} style={{ width: `${score}%` }} />
-      </div>
+      <Crescendo value={score} height={6} />
     </div>
   )
 }
@@ -160,12 +153,12 @@ function RiskScore({ score }: { score: number | null }) {
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     prospect: 'bg-muted text-muted-foreground',
-    active:   'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-    paused:   'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    rejected: 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400',
+    active:   'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+    paused:   'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+    rejected: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
   }
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
       {status}
     </span>
   )
@@ -173,14 +166,14 @@ function StatusBadge({ status }: { status: string }) {
 
 function RecommendationBadge({ rec }: { rec: string }) {
   const map: Record<string, string> = {
-    strong_fit:    'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-    potential_fit: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    poor_fit:      'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400',
+    strong_fit:    'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+    potential_fit: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+    poor_fit:      'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
   }
   const labels: Record<string, string> = {
     strong_fit: 'Strong fit', potential_fit: 'Potential fit', poor_fit: 'Poor fit',
   }
-  return <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', map[rec] ?? 'bg-muted text-muted-foreground')}>{labels[rec] ?? rec}</span>
+  return <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium', map[rec] ?? 'bg-muted text-muted-foreground')}>{labels[rec] ?? rec}</span>
 }
 
 // ── main component ────────────────────────────────────────────────────────────
@@ -288,7 +281,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           disabled={scoring}
           className="shrink-0 gap-1.5"
         >
-          {scoring ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+          {scoring ? <Loader2 className="h-3.5 w-3.5" /> : <RefreshCw className="h-3.5 w-3.5" />}
           {scoring ? 'Scoring…' : 'Score with AI'}
         </Button>
       </div>
@@ -328,7 +321,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
             </div>
             {inf.ai_notes && (
               <div className="border-t pt-4">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">AI Assessment</p>
+                <p className="text-xs font-semibold text-muted-foreground mb-2">AI Assessment</p>
                 <p className="text-sm leading-relaxed">{inf.ai_notes}</p>
               </div>
             )}
@@ -351,7 +344,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
                 disabled={reanalysing}
                 className="gap-1.5"
               >
-                {reanalysing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                {reanalysing ? <Loader2 className="h-3.5 w-3.5" /> : <RefreshCw className="h-3.5 w-3.5" />}
                 {reanalysing ? 'Analysing…' : 'Run brand fit analysis'}
               </Button>
             </div>
@@ -368,24 +361,19 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
                     disabled={reanalysing}
                     className="h-7 px-2 gap-1 text-xs text-muted-foreground"
                   >
-                    {reanalysing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+                    {reanalysing ? <Loader2 className="h-3 w-3" /> : <RefreshCw className="h-3 w-3" />}
                     {reanalysing ? 'Re-analysing…' : 'Re-analyse'}
                   </Button>
                   <span className="text-xs text-muted-foreground">Score</span>
-                  <span className={cn('text-lg font-bold tabular-nums',
-                    bf.score >= 70 ? 'text-emerald-600 dark:text-emerald-400'
-                    : bf.score >= 40 ? 'text-amber-600 dark:text-amber-400'
-                    : 'text-rose-600 dark:text-rose-400'
+                  <span className={cn('text-lg font-bold bg-num',
+                    bf.score >= 70 ? 'text-pos dark:text-pos'
+                    : bf.score >= 40 ? 'text-tx-2 dark:text-tx-2'
+                    : 'text-tx-flare dark:text-tx-flare'
                   )}>{bf.score}/100</span>
                 </div>
               </div>
 
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className={cn('h-full rounded-full', bf.score >= 70 ? 'bg-emerald-500' : bf.score >= 40 ? 'bg-amber-400' : 'bg-rose-500')}
-                  style={{ width: `${bf.score}%` }}
-                />
-              </div>
+              <Crescendo value={bf.score} />
 
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="space-y-0.5">
@@ -401,7 +389,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
               {bf.value_alignment && (
                 <div className="space-y-1">
                   <p className="text-xs font-medium text-muted-foreground">Value alignment</p>
-                  <p className="text-sm">{bf.value_alignment}</p>
+                  <p className="text-sm"><span className="bg-num">{bf.value_alignment}</span></p>
                 </div>
               )}
 
@@ -414,11 +402,11 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
 
               {bf.positive_indicators?.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Positive indicators</p>
+                  <p className="text-xs font-semibold text-pos dark:text-pos">Positive indicators</p>
                   <div className="space-y-1">
                     {bf.positive_indicators.map(s => (
                       <p key={s} className="text-xs flex gap-1.5">
-                        <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                        <CheckCircle className="h-3.5 w-3.5 text-pos shrink-0 mt-0.5" />
                         {s}
                       </p>
                     ))}
@@ -428,11 +416,11 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
 
               {bf.risk_factors?.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold text-rose-500 uppercase tracking-wide">Risk factors</p>
+                  <p className="text-xs font-semibold text-tx-flare">Risk factors</p>
                   <div className="space-y-1">
                     {bf.risk_factors.map(r => (
                       <p key={r} className="text-xs flex gap-1.5">
-                        <XCircle className="h-3.5 w-3.5 text-rose-500 shrink-0 mt-0.5" />
+                        <XCircle className="h-3.5 w-3.5 text-tx-flare shrink-0 mt-0.5" />
                         {r}
                       </p>
                     ))}
@@ -458,7 +446,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
 
           {/* Campaign link */}
           <div className="border rounded-2xl p-4 bg-card space-y-3">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Campaign</h2>
+            <h2 className="text-xs font-semibold text-muted-foreground">Campaign</h2>
             {campaigns.length > 0 ? (
               <Select
                 value={inf.campaign_id ?? 'none'}
@@ -492,7 +480,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           {/* Profile info */}
           {pd && (
             <div className="border rounded-2xl p-4 bg-card space-y-4">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Profile</h2>
+              <h2 className="text-xs font-semibold text-muted-foreground">Profile</h2>
 
               {pd.bio && (
                 <p className="text-xs leading-relaxed text-muted-foreground">{pd.bio}</p>
@@ -521,7 +509,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           {/* Audience demographics */}
           {pd?.audience_demographics && (
             <div className="border rounded-2xl p-4 bg-card space-y-3">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Audience</h2>
+              <h2 className="text-xs font-semibold text-muted-foreground">Audience</h2>
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="space-y-0.5">
                   <p className="text-muted-foreground">Age range</p>
@@ -545,7 +533,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
               {engRate != null && (
                 <div className="space-y-0.5">
                   <p className="text-xs text-muted-foreground">Est. engagement rate</p>
-                  <p className="text-sm font-semibold">{(engRate * 100).toFixed(1)}%</p>
+                  <p className="text-sm font-semibold bg-num">{(engRate * 100).toFixed(1)}%</p>
                 </div>
               )}
             </div>
@@ -554,28 +542,28 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           {/* Online reputation */}
           {pd?.online_reputation && (
             <div className="border rounded-2xl p-4 bg-card space-y-3">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Online Reputation</h2>
+              <h2 className="text-xs font-semibold text-muted-foreground">Online Reputation</h2>
               {pd.online_reputation.summary && (
-                <p className="text-xs text-muted-foreground italic">{pd.online_reputation.summary}</p>
+                <p className="text-xs text-muted-foreground">{pd.online_reputation.summary}</p>
               )}
               {pd.online_reputation.positive_signals?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {pd.online_reputation.positive_signals.map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">{s}</span>
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-shell text-pos dark:bg-shell/30 dark:text-pos">{s}</span>
                   ))}
                 </div>
               )}
               {pd.online_reputation.negative_signals?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {pd.online_reputation.negative_signals.map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">{s}</span>
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">{s}</span>
                   ))}
                 </div>
               )}
               {pd.online_reputation.controversy_flags?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {pd.online_reputation.controversy_flags.map(s => (
-                    <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400">{s}</span>
+                    <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{s}</span>
                   ))}
                 </div>
               )}
@@ -585,7 +573,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           {/* Social profiles */}
           {urls && urls.length > 0 && (
             <div className="border rounded-2xl p-4 bg-card space-y-2">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Social Profiles</h2>
+              <h2 className="text-xs font-semibold text-muted-foreground">Social Profiles</h2>
               {urls.map(u => (
                 <div key={u.platform} className="flex items-center gap-2">
                   <PlatformIcon platform={u.platform} />
@@ -630,7 +618,7 @@ function StatTile({ icon: Icon, label, value }: { icon: React.ElementType; label
         <Icon className="h-3.5 w-3.5" />
         {label}
       </div>
-      <p className="text-xl font-bold tabular-nums">{value}</p>
+      <p className="text-xl font-bold bg-num">{value}</p>
     </div>
   )
 }

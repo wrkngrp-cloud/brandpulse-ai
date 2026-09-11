@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Copy, Trash2, Plus, ExternalLink, Link2 } from 'lucide-react'
+import { CopyIcon as Copy, TrashIcon as Trash2, PlusIcon as Plus, ExternalLinkIcon as ExternalLink, LinkIcon as Link2 } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -136,7 +136,7 @@ export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit,
                   type="button"
                   onClick={() => toggleSection(opt.value)}
                   className={cn(
-                    'px-3 py-1.5 rounded-full text-[12px] font-medium border transition-all',
+                    'px-3 py-1.5 rounded-sm text-[12px] font-medium border transition-colors',
                     sections.includes(opt.value)
                       ? 'bg-foreground text-background border-foreground'
                       : 'border-border text-muted-foreground hover:border-foreground/40'

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon as ChevronRight } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 
 const LABELS: Record<string, string> = {

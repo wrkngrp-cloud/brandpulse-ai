@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { AlertTriangle, Camera, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
+import { CameraIcon as Camera, ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp } from '@/components/brand/icon'
+import { AlertIcon as AlertTriangle, AskIcon as Sparkles } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface RiskFlag {
   title?: string
@@ -27,47 +29,40 @@ interface Analysis {
 }
 
 function scoreColor(score: number): string {
-  if (score >= 75) return 'text-green-600'
-  if (score >= 50) return 'text-amber-600'
-  return 'text-red-500'
+  if (score >= 75) return 'text-pos'
+  if (score >= 50) return 'text-tx-2'
+  return 'text-tx-flare'
 }
 
-function ScoreBar({ score, invert = false }: { score: number; invert?: boolean }) {
-  const good = invert ? score <= 25 : score >= 75
-  const mid  = invert ? score <= 50 : score >= 50
-  const col  = good ? 'bg-green-500' : mid ? 'bg-amber-400' : 'bg-red-400'
-  return (
-    <div className="h-1 bg-muted rounded-full overflow-hidden w-16">
-      <div className={cn('h-full rounded-full', col)} style={{ width: `${score}%` }} />
-    </div>
-  )
+function ScoreBar({ score }: { score: number }) {
+  return <Crescendo value={score} height={6} />
 }
 
 function VerdictBadge({ verdict }: { verdict: string }) {
   if (verdict === 'Publish') {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 border border-green-200 dark:border-green-800">
+      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-sm bg-shell text-pos dark:bg-shell/40 dark:text-pos border border-line dark:border-line">
         Ready to Publish
       </span>
     )
   }
   if (verdict === 'Revise') {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-sm bg-shell text-tx-2 dark:bg-shell/40 dark:text-tx-2 border border-line dark:border-line">
         Needs Revision
       </span>
     )
   }
   if (verdict === 'Hold') {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border border-red-200 dark:border-red-800">
+      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-sm bg-flare-wash text-tx-flare dark:bg-shell/40 dark:text-tx-flare border border-line-strong dark:border-line-strong">
         On Hold
       </span>
     )
   }
   // Fallback: render raw verdict text as a neutral badge
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
+    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-sm bg-muted text-muted-foreground border border-border">
       {verdict}
     </span>
   )
@@ -85,7 +80,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap min-w-0">
           {a.verdict && <VerdictBadge verdict={a.verdict} />}
-          <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium">{formatPlatformLabel(a.platform)}</span>
+          <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium bg-num">{formatPlatformLabel(a.platform)}</span>
           {a.funnel_goal    && <span className="text-xs text-muted-foreground capitalize">{a.funnel_goal}</span>}
           {a.target_segment && <span className="text-xs text-muted-foreground">· {a.target_segment}</span>}
         </div>
@@ -101,7 +96,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
         ) : (
           <div className="flex items-center gap-1.5 text-muted-foreground/70">
             <Camera className="h-3.5 w-3.5 shrink-0" />
-            <span className="text-sm italic">Image/video analyzed</span>
+            <span className="text-sm">Image/video analyzed</span>
           </div>
         )}
       </div>
@@ -119,29 +114,29 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground">{s.label}</span>
               <span className={cn(
-                'text-xs font-semibold tabular-nums',
+                'text-xs font-semibold bg-num',
                 s.invert
-                  ? (s.score ?? 0) <= 25 ? 'text-green-600' : (s.score ?? 0) <= 50 ? 'text-amber-600' : 'text-red-500'
+                  ? (s.score ?? 0) <= 25 ? 'text-pos' : (s.score ?? 0) <= 50 ? 'text-tx-2' : 'text-tx-flare'
                   : scoreColor(s.score ?? 0),
               )}>
                 {s.score ?? '—'}
               </span>
             </div>
-            <ScoreBar score={s.score ?? 0} invert={s.invert} />
+            <ScoreBar score={s.score ?? 0} />
           </div>
         ))}
       </div>
 
       {/* Risk flags */}
       {hasRisk && riskFlags.length > 0 && (
-        <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg px-3 py-2">
-          <AlertTriangle className="h-3.5 w-3.5 text-amber-600 mt-0.5 shrink-0" />
-          <div className="text-xs text-amber-800 dark:text-amber-300 space-y-0.5">
+        <div className="flex items-start gap-2 bg-shell dark:bg-shell/30 border border-line dark:border-line rounded-lg px-3 py-2">
+          <AlertTriangle className="h-3.5 w-3.5 text-tx-2 mt-0.5 shrink-0" />
+          <div className="text-xs text-tx-2 dark:text-tx-2 space-y-0.5">
             {riskFlags.slice(0, 2).map((f, i) => (
               <p key={i}>{f.title}</p>
             ))}
             {riskFlags.length > 2 && (
-              <p className="text-amber-600 dark:text-amber-400">+{riskFlags.length - 2} more</p>
+              <p className="text-tx-2 dark:text-tx-2 bg-num">+{riskFlags.length - 2} more</p>
             )}
           </div>
         </div>
@@ -152,7 +147,7 @@ export function AnalysisCard({ analysis: a }: { analysis: Analysis }) {
         <div className="border-t pt-3 space-y-2">
           <button
             onClick={() => setRewriteOpen(o => !o)}
-            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors bg-press"
           >
             <Sparkles className="h-3.5 w-3.5" />
             AI Suggested Rewrite

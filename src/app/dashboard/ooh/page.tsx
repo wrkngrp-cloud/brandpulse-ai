@@ -3,10 +3,12 @@ import { redirect }         from 'next/navigation'
 import Link                 from 'next/link'
 import { buttonVariants }   from '@/components/ui/button'
 import { cn }               from '@/lib/utils'
-import { MapPin, Plus }     from 'lucide-react'
+import { MapIcon as MapPin, PlusIcon as Plus } from '@/components/brand/icon'
 import { getActiveBrand }   from '@/lib/active-brand'
 import { OohDashboardClient } from '@/components/ooh/ooh-dashboard-client'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export default async function OohPage() {
   const supabase = await createClient()
@@ -65,14 +67,11 @@ export default async function OohPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">OOH Intelligence</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Billboards, activations, and out-of-home attribution
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/ooh']}
+        title="OOH Intelligence"
+        subtitle="Billboards, activations, and out-of-home attribution"
+        actions={<>
           <TourTrigger module="ooh" autoStart />
           <Link
             href="/dashboard/ooh/new"
@@ -81,8 +80,8 @@ export default async function OohPage() {
             <Plus className="h-4 w-4 mr-1.5" />
             Add site
           </Link>
-        </div>
-      </div>
+        </>}
+      />
 
       <div data-tour="ooh-main">
       {!sitesWithCampaign.length ? (

@@ -1,4 +1,5 @@
 'use client'
+import { ChartState } from '@/components/brand/chart-states'
 
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -26,27 +27,29 @@ export function PrMentionsChart({ data }: Props) {
   const chartData = data && data.length > 0 ? data : FALLBACK_DATA
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={chartData} margin={{ top: 4, right: 12, left: -16, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-        <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-muted-foreground" />
-        <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" allowDecimals={false} />
-        <Tooltip
-          contentStyle={{
-            fontSize: 12,
-            border: '1px solid hsl(var(--border))',
-            borderRadius: 8,
-            background: 'hsl(var(--card))',
-          }}
-          labelStyle={{ fontWeight: 600 }}
-          formatter={(value) => [value, 'Press mentions']}
-        />
-        <Bar
-          dataKey="mentions"
-          fill="hsl(var(--primary))"
-          radius={[4, 4, 0, 0]}
-        />
-      </BarChart>
-    </ResponsiveContainer>
+    <ChartState rows={chartData} height={200} empty="Add a publication to start tracking press mentions.">
+          <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={chartData} margin={{ top: 4, right: 12, left: -16, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="month" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} className="text-muted-foreground" />
+          <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} className="text-muted-foreground" allowDecimals={false} />
+          <Tooltip
+            contentStyle={{
+              fontSize: 12,
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-card)',
+              background: 'var(--card)',
+            }}
+            labelStyle={{ fontWeight: 600 }}
+            formatter={(value) => [value, 'Press mentions']}
+          />
+          <Bar
+            dataKey="mentions"
+            fill="var(--primary)"
+            radius={[4, 4, 0, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartState>
   )
 }

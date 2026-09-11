@@ -1,0 +1,67 @@
+/* BrandGauge gradients — v3.5
+ *
+ * The rule that keeps this from becoming AI slop: a BrandGauge gradient is
+ * either QUANTISED (made of atoms, so you can count it) or ATMOSPHERIC
+ * (a soft wash on a dark ground that carries no information). There is no
+ * third kind. A gradient is never a fill on a button, card, chart bar, or
+ * piece of text.
+ *
+ * All of these live only on Ink or Char. Paper never carries a gradient.
+ */
+:root{
+  /* Hearth — the default dark chapter ground. Char breathing into Ink. */
+  --grad-hearth: radial-gradient(120% 100% at 12% 40%,
+                 #4A1A0A 0%, #2A150C 42%, #16120E 100%);
+
+  /* Forge — high-intensity moments only. Film, launch, a record reading. */
+  --grad-forge:  radial-gradient(90% 120% at 50% 108%,
+                 #FF3D14 0%, #7A2A0C 34%, #2A150C 68%, #16120E 100%);
+
+  /* Dawn — the quiet one. Empty states, onboarding, low-signal screens. */
+  --grad-dawn:   radial-gradient(80% 90% at 50% 100%,
+                 rgba(255,193,46,.14) 0%, rgba(255,158,27,.06) 45%, transparent 78%);
+
+  /* Scrim — the ONLY linear gradient in the system, and it is functional:
+     it buys legibility for type over photography. Never decorative. */
+  --grad-scrim:  linear-gradient(180deg,
+                 rgba(22,18,14,0) 0%, rgba(22,18,14,.62) 58%, rgba(22,18,14,.94) 100%);
+
+  /* Grain. Wide dark radials band on 8-bit displays; noise is the fix, and it
+     also stops the ground reading as flat vector. Fixed layer only. */
+  --grain-opacity: .035;
+}
+
+/* Atmospheric grounds */
+.bg-hearth{background:var(--grad-hearth);color:var(--tx-inv)}
+.bg-forge {background:var(--grad-forge); color:var(--tx-inv)}
+.bg-dawn  {position:relative}
+.bg-dawn::after{content:'';position:absolute;inset:0;background:var(--grad-dawn);pointer-events:none}
+.bg-scrim::before{content:'';position:absolute;inset:0;background:var(--grad-scrim);z-index:2;pointer-events:none}
+
+/* Grain. Fixed and pointer-events-none, never on a scrolling container —
+   attaching it to scrolling content causes continuous GPU repaints. */
+.bg-grain::after{
+  content:'';position:fixed;inset:0;z-index:60;pointer-events:none;
+  opacity:var(--grain-opacity);
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+}
+
+/* Bloom — the data-driven one. Set --bloom (0 to 1) from the live reading and
+   the glow grows with it. Soft light that is still a measurement. */
+.bg-bloom{position:relative;isolation:isolate}
+.bg-bloom::before{
+  content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(
+    calc(28% + 34% * var(--bloom,.5)) calc(30% + 36% * var(--bloom,.5)) at 50% 78%,
+    var(--flare) 0%, transparent 70%);
+  opacity:calc(.10 + .30 * var(--bloom,.5));
+  transition:opacity var(--d-needle) var(--ease-settle);
+}
+
+/* BANNED, and these are the ones that break the system:
+   - linear-gradient fills on buttons, cards, chips, chart bars or text
+   - gradient borders and gradient text
+   - any gradient on Paper
+   - any gradient crossing outside the ramp (no blue, no green, no purple)
+   - a gradient behind body copy
+   - two-stop 45deg fades of any kind                                        */

@@ -3,10 +3,12 @@ import { redirect }          from 'next/navigation'
 import Link                  from 'next/link'
 import { buttonVariants }    from '@/components/ui/button'
 import { cn }                from '@/lib/utils'
-import { Megaphone, Plus }   from 'lucide-react'
+import { MusicIcon as Megaphone, PlusIcon as Plus } from '@/components/brand/icon'
 import { CampaignsList }     from '@/components/campaigns/campaigns-list'
 import { getActiveBrand }    from '@/lib/active-brand'
 import { TourTrigger }       from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export default async function CampaignsPage({
   searchParams,
@@ -55,14 +57,11 @@ export default async function CampaignsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">Campaigns</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Organise OOH placements, events, and media spend by campaign.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/campaigns']}
+        title="Campaigns"
+        subtitle="Organise OOH placements, events, and media spend by campaign."
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="campaigns" autoStart />
           <Link
             href="/dashboard/campaigns/new"
@@ -72,8 +71,8 @@ export default async function CampaignsPage({
             <Plus className="h-4 w-4 mr-1.5" />
             New campaign
           </Link>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="campaign-list">
       {/* Channel tabs */}

@@ -1,12 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Users, Star, AlertCircle, TrendingUp, Loader2,
-  Plus, X, Globe, ChevronDown, Eye,
-  Megaphone, Filter,
-} from 'lucide-react'
-import { cn, formatNGN } from '@/lib/utils'
+import { UsersIcon as Users, StarIcon as Star, PlusIcon as Plus, XIcon as X, GlobeIcon as Globe, ChevronDownIcon as ChevronDown, EyeIcon as Eye, MusicIcon as Megaphone, FilterIcon as Filter } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AlertIcon as AlertCircle, TrendIcon as TrendingUp } from '@/components/brand/icon'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,13 +15,14 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  SelectValue } from '@/components/ui/select'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { PostTracker } from '@/components/influencers/post-tracker'
 import { InfluencerRoiTracker, type InfluencerCampaign } from '@/components/influencers/roi-tracker'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export interface Influencer {
   id: string
@@ -160,12 +159,11 @@ function PlatformIcon({ platform }: { platform: string }) {
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     prospect: 'bg-muted text-muted-foreground',
-    active:   'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    paused:   'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-  }
+    active:   'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+    paused:   'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+    rejected: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare' }
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium capitalize', map[status] ?? 'bg-muted text-muted-foreground')}>
       {status}
     </span>
   )
@@ -174,14 +172,13 @@ function StatusBadge({ status }: { status: string }) {
 function RecommendationBadge({ recommendation }: { recommendation: string | undefined }) {
   if (!recommendation) return null
   const map: Record<string, { label: string; className: string }> = {
-    strong_fit:    { label: 'Strong fit',    className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
-    potential_fit: { label: 'Potential fit', className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' },
-    poor_fit:      { label: 'Poor fit',      className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' },
-  }
+    strong_fit:    { label: 'Strong fit',    className: 'bg-shell text-pos dark:bg-shell/30 dark:text-pos' },
+    potential_fit: { label: 'Potential fit', className: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2' },
+    poor_fit:      { label: 'Poor fit',      className: 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare' } }
   const config = map[recommendation]
   if (!config) return null
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', config.className)}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-sm font-medium', config.className)}>
       {config.label}
     </span>
   )
@@ -192,12 +189,12 @@ function CulturalIQBadge({ score }: { score: number | null }) {
     return <span className="text-xs text-muted-foreground">Not scored</span>
   }
   const color = score >= 70
-    ? 'text-green-700 bg-green-100 dark:bg-green-900/30 dark:text-green-400'
+    ? 'text-pos bg-shell dark:bg-shell/30 dark:text-pos'
     : score >= 50
-    ? 'text-amber-700 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400'
-    : 'text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-400'
+    ? 'text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2'
+    : 'text-tx-flare bg-flare-wash dark:bg-shell/30 dark:text-tx-flare'
   return (
-    <span className={cn('text-xs px-2 py-0.5 rounded-full font-semibold', color)}>
+    <span className={cn('text-xs px-2 py-0.5 rounded-sm font-semibold bg-num', color)}>
       {score}
     </span>
   )
@@ -206,22 +203,22 @@ function CulturalIQBadge({ score }: { score: number | null }) {
 function RiskBadge({ score }: { score: number | null }) {
   if (score === null) return <span className="text-xs text-muted-foreground">—</span>
   if (score < 30) {
-    return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Low risk</span>
+    return <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-pos dark:bg-shell/30 dark:text-pos">Low risk</span>
   }
   if (score <= 60) {
-    return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Medium</span>
+    return <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">Medium</span>
   }
-  return <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">High risk</span>
+  return <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">High risk</span>
 }
 
 function BrandFitScore({ score }: { score: number }) {
   const color = score >= 70
-    ? 'text-green-700 bg-green-100 dark:bg-green-900/30 dark:text-green-400'
+    ? 'text-pos bg-shell dark:bg-shell/30 dark:text-pos'
     : score >= 40
-    ? 'text-amber-700 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400'
-    : 'text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-400'
+    ? 'text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2'
+    : 'text-tx-flare bg-flare-wash dark:bg-shell/30 dark:text-tx-flare'
   return (
-    <span className={cn('text-sm font-bold px-2.5 py-1 rounded-lg', color)}>
+    <span className={cn('text-sm font-bold px-2.5 py-1 rounded-lg bg-num', color)}>
       {score}/100
     </span>
   )
@@ -312,8 +309,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
       .map(e => ({
         platform: e.platform || 'instagram',
         handle:   parseHandle(e.input),
-        url:      e.input.startsWith('http') || e.input.includes('.com') ? e.input : undefined,
-      }))
+        url:      e.input.startsWith('http') || e.input.includes('.com') ? e.input : undefined }))
   }
 
   async function handleAnalyse() {
@@ -333,8 +329,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
       const res = await fetch('/api/influencers/analyse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ handles }),
-      })
+        body: JSON.stringify({ handles }) })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error ?? 'Analysis failed.')
@@ -375,9 +370,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
           followers:    totalFollowers ?? undefined,
           social_urls:  handles,
           profile_data: analysis?.profile_data ?? undefined,
-          brand_fit:    analysis?.brand_fit ?? undefined,
-        }),
-      })
+          brand_fit:    analysis?.brand_fit ?? undefined }) })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error ?? 'Failed to add influencer.')
@@ -448,8 +441,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
       followers:    i.followers,
       cultural_iq:  i.cultural_iq,
       campaign_id:  i.campaign_id!,
-      campaignName: campaignMap.get(i.campaign_id!) ?? 'Campaign',
-    }))
+      campaignName: campaignMap.get(i.campaign_id!) ?? 'Campaign' }))
 
   const uniqueCampaigns = Array.from(new Set(linkedInfluencers.map(i => i.campaignName)))
 
@@ -463,14 +455,11 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">Influencer Intelligence</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Discover, score, and track creators for your brand.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/influencers']}
+        title="Influencer Intelligence"
+        subtitle="Discover, score, and track creators for your brand."
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="influencers" autoStart />
           {activeTab === 'intelligence' && (
             <Button
@@ -485,8 +474,8 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
               )}
             </Button>
           )}
-        </div>
-      </div>
+        </div></>}
+      />
 
       {/* Tabs */}
       <div className="flex gap-1 border-b">
@@ -520,14 +509,14 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
                 <Users className="h-4 w-4" />
                 <span className="text-xs font-medium">Total</span>
               </div>
-              <p className="text-2xl font-bold">{total}</p>
+              <p className="text-2xl font-bold bg-num">{total}</p>
             </div>
             <div className="border rounded-xl p-4 bg-card space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <TrendingUp className="h-4 w-4" />
                 <span className="text-xs font-medium">Active</span>
               </div>
-              <p className="text-2xl font-bold">{activeCount}</p>
+              <p className="text-2xl font-bold bg-num">{activeCount}</p>
             </div>
             <div className="border rounded-xl p-4 bg-card space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -541,7 +530,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
                 <AlertCircle className="h-4 w-4" />
                 <span className="text-xs font-medium">High risk</span>
               </div>
-              <p className="text-2xl font-bold">{highRiskCount}</p>
+              <p className="text-2xl font-bold bg-num">{highRiskCount}</p>
             </div>
           </div>
 
@@ -604,7 +593,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
                 disabled={analysing}
                 className="w-full"
               >
-                {analysing && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+                {analysing && <Loader2 className="h-4 w-4 mr-1.5" />}
                 {analysing ? 'Analysing...' : 'Analyse Profile'}
               </Button>
 
@@ -630,7 +619,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
                   disabled={submitting}
                   onClick={handleSave}
                 >
-                  {submitting && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+                  {submitting && <Loader2 className="h-4 w-4 mr-1.5" />}
                   {submitting ? 'Saving...' : 'Save Influencer'}
                 </Button>
               </div>
@@ -708,8 +697,7 @@ function CampaignsTab({
   campaignFilter,
   onCampaignFilter,
   totalPotentialReach,
-  totalLinked,
-}: {
+  totalLinked }: {
   linked: LinkedInfluencer[]
   uniqueCampaigns: string[]
   campaignFilter: string
@@ -742,7 +730,7 @@ function CampaignsTab({
             <Users className="h-4 w-4" />
             <span className="text-xs font-medium">Linked Influencers</span>
           </div>
-          <p className="text-xl font-bold">{totalLinked}</p>
+          <p className="text-xl font-bold"><span className="bg-num">{totalLinked}</span></p>
         </div>
         <div className="border rounded-xl p-4 bg-card space-y-1">
           <div className="flex items-center gap-2 text-muted-foreground">
@@ -804,7 +792,7 @@ function CampaignsTab({
                 <div className="grid grid-cols-2 gap-3 pt-1 border-t">
                   <div className="space-y-0.5">
                     <p className="text-xs text-muted-foreground">Followers</p>
-                    <p className="text-sm font-semibold">{inf.followers !== null ? formatCount(inf.followers) : '—'}</p>
+                    <p className="text-sm font-semibold bg-num">{inf.followers !== null ? formatCount(inf.followers) : '—'}</p>
                   </div>
                   <div className="space-y-0.5">
                     <p className="text-xs text-muted-foreground">Cultural IQ</p>
@@ -843,7 +831,7 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
             {ef.tiktok > 0 && <FollowerChip platform="TikTok" count={ef.tiktok} />}
             {ef.twitter > 0 && <FollowerChip platform="Twitter" count={ef.twitter} />}
             {ef.youtube > 0 && <FollowerChip platform="YouTube" count={ef.youtube} />}
-            <span className="text-xs font-semibold text-foreground self-center">
+            <span className="text-xs font-semibold text-foreground self-center bg-num">
               Total: {formatFollowers(ef.total)}
             </span>
           </div>
@@ -884,7 +872,7 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
       {pd?.engagement_rate_estimate != null && (
         <div className="text-xs">
           <span className="text-muted-foreground">Engagement rate: </span>
-          <span className="font-semibold">{(pd.engagement_rate_estimate * 100).toFixed(1)}%</span>
+          <span className="font-semibold bg-num">{(pd.engagement_rate_estimate * 100).toFixed(1)}%</span>
         </div>
       )}
 
@@ -895,26 +883,26 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
           {pd.online_reputation.positive_signals?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {pd.online_reputation.positive_signals.map(s => (
-                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">{s}</span>
+                <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-shell text-pos dark:bg-shell/30 dark:text-pos">{s}</span>
               ))}
             </div>
           )}
           {pd.online_reputation.negative_signals?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {pd.online_reputation.negative_signals.map(s => (
-                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">{s}</span>
+                <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">{s}</span>
               ))}
             </div>
           )}
           {pd.online_reputation.controversy_flags?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {pd.online_reputation.controversy_flags.map(s => (
-                <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">{s}</span>
+                <span key={s} className="text-xs px-2 py-0.5 rounded-sm bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{s}</span>
               ))}
             </div>
           )}
           {pd.online_reputation.summary && (
-            <p className="text-xs text-muted-foreground italic">{pd.online_reputation.summary}</p>
+            <p className="text-xs text-muted-foreground">{pd.online_reputation.summary}</p>
           )}
         </div>
       )}
@@ -928,7 +916,7 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <span className="text-muted-foreground">Audience overlap: <span className="text-foreground font-medium">{bf.audience_overlap}%</span></span>
-            <span className="text-muted-foreground col-span-2">Alignment: <span className="text-foreground">{bf.value_alignment}</span></span>
+            <span className="text-muted-foreground col-span-2">Alignment: <span className="text-foreground"><span className="bg-num">{bf.value_alignment}</span></span></span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Recommendation:</span>
@@ -940,14 +928,14 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
           {bf.positive_indicators?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {bf.positive_indicators.map(p => (
-                <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">{p}</span>
+                <span key={p} className="text-xs px-2 py-0.5 rounded-sm bg-shell text-pos dark:bg-shell/30 dark:text-pos">{p}</span>
               ))}
             </div>
           )}
           {bf.risk_factors?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {bf.risk_factors.map(r => (
-                <span key={r} className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">{r}</span>
+                <span key={r} className="text-xs px-2 py-0.5 rounded-sm bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare">{r}</span>
               ))}
             </div>
           )}
@@ -959,7 +947,7 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
 
 function FollowerChip({ platform, count }: { platform: string; count: number }) {
   return (
-    <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium">
+    <span className="text-xs bg-muted px-2 py-0.5 rounded font-medium bg-num">
       {platform}: {formatFollowers(count)}
     </span>
   )
@@ -972,8 +960,7 @@ function InfluencerCard({
   reanalysingId,
   onReanalyse,
   availableCampaigns = [],
-  onLinked,
-}: {
+  onLinked }: {
   inf: Influencer
   scoringId: string | null
   onScore: (id: string) => void
@@ -1011,18 +998,18 @@ function InfluencerCard({
               <RecommendationBadge recommendation={brandFit.recommendation} />
             )}
             {inf.campaign_id && availableCampaigns.length === 0 && (
-              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400">
+              <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">
                 In campaign
               </span>
             )}
             {inf.campaign_id && availableCampaigns.length > 0 && (() => {
               const linkedCampaign = availableCampaigns.find(c => c.id === inf.campaign_id)
               return linkedCampaign ? (
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400 truncate max-w-[180px]">
+                <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2 truncate max-w-[180px]">
                   {linkedCampaign.name}
                 </span>
               ) : (
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400">
+                <span className="text-xs px-2 py-0.5 rounded-sm font-medium bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2">
                   In campaign
                 </span>
               )
@@ -1063,7 +1050,7 @@ function InfluencerCard({
           {riskFactors.length > 0 && (
             <div className="flex flex-wrap gap-1 pt-0.5">
               {riskFactors.slice(0, 2).map(r => (
-                <span key={r} className="text-xs px-1.5 py-0.5 rounded bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400">{r}</span>
+                <span key={r} className="text-xs px-1.5 py-0.5 rounded bg-flare-wash text-tx-flare dark:bg-shell/20 dark:text-tx-flare">{r}</span>
               ))}
             </div>
           )}
@@ -1073,12 +1060,12 @@ function InfluencerCard({
         <div className="flex flex-row sm:flex-col items-start sm:items-end gap-3 sm:gap-2 shrink-0 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
             {totalFollowers != null && (
-              <span className="text-xs text-muted-foreground font-medium">
+              <span className="text-xs text-muted-foreground font-medium bg-num">
                 {formatFollowers(totalFollowers)} followers
               </span>
             )}
             {engagementRate != null && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground bg-num">
                 {(engagementRate * 100).toFixed(1)}% eng.
               </span>
             )}
@@ -1106,7 +1093,7 @@ function InfluencerCard({
               onClick={() => onScore(inf.id)}
             >
               {scoringId === inf.id ? (
-                <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Scoring...</>
+                <><Loader2 className="h-3 w-3 mr-1" /> Scoring...</>
               ) : (
                 'Score with AI'
               )}
@@ -1121,7 +1108,7 @@ function InfluencerCard({
                 title="Re-analyse full profile and brand fit"
               >
                 {reanalysingId === inf.id ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <Loader2 className="h-3 w-3" />
                 ) : (
                   'Re-analyse'
                 )}
@@ -1139,8 +1126,7 @@ function InfluencerCard({
                   const res = await fetch(`/api/influencers/${inf.id}/link-campaign`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ campaign_id: newCampaignId }),
-                  })
+                    body: JSON.stringify({ campaign_id: newCampaignId }) })
                   if (!res.ok) throw new Error('Failed to link')
                   onLinked?.(inf.id, newCampaignId)
                   toast.success(newCampaignId ? 'Linked to campaign.' : 'Removed from campaign.')
@@ -1167,7 +1153,7 @@ function InfluencerCard({
                   ))}
                 {availableCampaigns.some(c => c.status === 'completed') && (
                   <>
-                    <div className="px-2 py-1 text-[10px] text-muted-foreground uppercase tracking-wide mt-1">Completed</div>
+                    <div className="px-2 py-1 text-[10px] text-muted-foreground mt-1">Completed</div>
                     {availableCampaigns
                       .filter(c => c.status === 'completed')
                       .map(c => (
@@ -1181,7 +1167,7 @@ function InfluencerCard({
           {inf.campaign_id && (
             <button
               onClick={() => setShowTracker(v => !v)}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors h-7 px-2 rounded border border-transparent hover:border-border"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors h-7 px-2 rounded border border-transparent hover:border-border bg-press"
             >
               {showTracker ? 'Hide posts' : 'Track posts'}
             </button>

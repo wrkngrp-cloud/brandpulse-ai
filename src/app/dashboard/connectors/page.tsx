@@ -12,10 +12,13 @@ import { AppStoreConnectCard, type AppStoreConfigData }     from '@/components/d
 import { EmailConnectCard, type EmailConnectorStatus }      from '@/components/dashboard/email-connect-card'
 // WhatsAppConnectCard hidden until dedicated number is configured
 import { PixelCard } from './pixel-card'
-import { ShoppingCart, ArrowRight, Search, Users, Music2 } from 'lucide-react'
+import { Icon, type BrandIconName, BriefcaseIcon as ShoppingCart, ArrowRightIcon as ArrowRight, UsersIcon as Users, MusicIcon as Music2 } from '@/components/brand/icon'
+import { SearchIcon as Search } from '@/components/brand/icon'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export const dynamic = 'force-dynamic'
 
@@ -108,17 +111,12 @@ export default async function ConnectorsPage() {
     <div className="max-w-3xl space-y-8 pb-12">
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="eyebrow mb-1">Platform</p>
-          <h1 className="h-display text-[26px] leading-none">All Connectors</h1>
-          <p className="mt-2 text-[13px] text-muted-foreground/70 max-w-xl">
-            Connect your data sources here. Every module in BrandGauge reads from these connections automatically.
-            Connect once. Every module updates automatically.
-          </p>
-        </div>
-        <TourTrigger module="connectors" autoStart />
-      </div>
+      <PageHeader
+        {...PAGE_META['/dashboard/connectors']}
+        title="All Connectors"
+        subtitle="Connect your data sources here. Every module in BrandGauge reads from these connections automatically. Connect once. Every module updates automatically."
+        actions={<TourTrigger module="connectors" autoStart />}
+      />
 
       {/* Context note */}
       <div className="rounded-xl border bg-muted/20 px-4 py-3 text-[12.5px] text-muted-foreground leading-relaxed">
@@ -128,12 +126,13 @@ export default async function ConnectorsPage() {
       {/* Recommended for industry */}
       {industryMeta && suggestedConns.length > 0 && (
         <div className="rounded-xl border bg-card px-4 py-4 space-y-2">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            {industryMeta.icon} Recommended for {industryMeta.label}
+          <p className="text-[11px] font-bold text-muted-foreground">
+            <Icon name={industryMeta.icon as BrandIconName} size={14} className="inline-block align-[-2px] mr-1.5" />
+            Recommended for {industryMeta.label}
           </p>
           <div className="flex flex-wrap gap-2">
             {suggestedConns.map(key => (
-              <span key={key} className="text-xs border rounded-full px-3 py-1 bg-muted/40 text-muted-foreground font-medium">
+              <span key={key} className="text-xs border rounded-sm px-3 py-1 bg-muted/40 text-muted-foreground font-medium">
                 {CONNECTOR_LABEL[key] ?? key}
               </span>
             ))}
@@ -146,19 +145,19 @@ export default async function ConnectorsPage() {
 
       {/* Social Listening */}
       <section data-tour="social-connectors">
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Social Listening</h2>
+        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Social Listening</h2>
         <SocialConnectCard connections={connections ?? []} />
       </section>
 
       {/* Analytics */}
       <section>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Web Analytics</h2>
+        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Web Analytics</h2>
         <GA4ConnectCard connection={ga4Connection} />
       </section>
 
       {/* Paid Media */}
       <section data-tour="paid-connectors">
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Paid Media</h2>
+        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Paid Media</h2>
         <div className="space-y-3">
           <MetaAdsConnectCard account={metaAdsAccount} />
           {/* Google Ads is built (see google-ads-connect-card.tsx) but needs a
@@ -183,13 +182,13 @@ export default async function ConnectorsPage() {
 
       {/* CRM */}
       <section>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">CRM</h2>
+        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">CRM</h2>
         {/* HubSpot is built (see hubspot-connect-card.tsx) but needs a HubSpot
             developer app registered before it can go live — see
             docs/connector-setup-guide.md. */}
         <ComingSoonConnectorCard
-          icon={<Users className="h-5 w-5 text-[#FF7A59]" />}
-          iconBg="bg-[#FF7A59]/10"
+          icon={<Users className="h-5 w-5 text-[var(--ember)]" />}
+          iconBg="bg-[var(--ember)]/10"
           label="HubSpot"
           description="Read your marketing qualified lead count from HubSpot."
         />
@@ -197,27 +196,27 @@ export default async function ConnectorsPage() {
 
       {/* Website Pixel */}
       <section>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Website & App Tracking</h2>
+        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Website & App Tracking</h2>
         <PixelCard />
       </section>
 
       {/* Payments & Commerce — hidden for industries that are payment platforms themselves */}
       {!hidePayments && (
         <section data-tour="payments-connectors">
-          <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Payments & Commerce</h2>
+          <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Payments & Commerce</h2>
           <PaymentConnectCard status={paymentStatus} appUrl={appUrl} />
         </section>
       )}
 
       {/* App Stores & Reviews */}
       <section>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">App Stores & Reviews</h2>
+        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">App Stores & Reviews</h2>
         <AppStoreConnectCard config={appStoreConfig} />
       </section>
 
       {/* Email Marketing */}
       <section>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Email Marketing</h2>
+        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Email Marketing</h2>
         <EmailConnectCard status={emailStatus} />
       </section>
 
@@ -225,7 +224,7 @@ export default async function ConnectorsPage() {
 
       {/* E-commerce */}
       <section>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">E-commerce Sales</h2>
+        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">E-commerce Sales</h2>
         <div className="border rounded-xl p-5 bg-card space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex items-start gap-3">

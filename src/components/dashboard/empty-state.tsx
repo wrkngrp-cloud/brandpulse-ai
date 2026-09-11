@@ -18,7 +18,7 @@ interface EmptyStateProps {
   actions?:    Action[]
   className?:  string
   size?:       'sm' | 'md' | 'lg'
-  tone?:       'default' | 'blue' | 'clay'
+  tone?:       'quiet' | 'hero'
 }
 
 const SIZE = {
@@ -28,9 +28,8 @@ const SIZE = {
 }
 
 const TONE_ICON: Record<string, string> = {
-  default: 'bg-muted/60 text-muted-foreground/40',
-  blue:    'bg-primary/8 text-primary/50',
-  clay:    'bg-[#D4602A]/8 text-[#D4602A]/60',
+  quiet: 'bg-shell text-tx-3',
+  hero:  'bg-flare-wash text-tx-flare',
 }
 
 export function EmptyState({
@@ -40,7 +39,7 @@ export function EmptyState({
   actions = [],
   className,
   size = 'md',
-  tone = 'default',
+  tone = 'quiet',
 }: EmptyStateProps) {
   const s = SIZE[size]
 
@@ -75,13 +74,13 @@ export function EmptyState({
         <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
           {actions.map(a => {
             const cls = cn(
-              'inline-flex items-center h-8 rounded-xl px-4 text-[12.5px] font-semibold transition-all duration-150 active:scale-[0.98]',
+              'inline-flex items-center h-8 rounded-xl px-4 text-[12.5px] font-semibold transition-colors duration-150 active:scale-[0.98]',
               a.primary
-                ? 'text-white hover:opacity-90'
+                ? 'text-tx-inv hover:opacity-90'
                 : 'border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50',
             )
             const style = a.primary
-              ? { background: 'linear-gradient(135deg, #E8763E 0%, #C4501D 100%)', boxShadow: '0 4px 14px -4px rgba(212,96,42,0.5)' }
+              ? { background: 'var(--char)' }
               : undefined
 
             if (a.href) {

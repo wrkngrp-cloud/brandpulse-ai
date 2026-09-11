@@ -2,9 +2,11 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Zap } from 'lucide-react'
+import { AskIcon as Zap } from '@/components/brand/icon'
 import { AnalysisCard } from './analysis-card'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 async function PrePostHistory() {
   const supabase = await createClient()
@@ -47,19 +49,16 @@ export default async function PrePostPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Pre-Post Analysis</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Content scored before publishing · 5 dimensions: engagement, cultural resonance, tone, clarity, risk
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/pre-post']}
+        title="Pre-Post Analysis"
+        subtitle="Content scored before publishing · 5 dimensions: engagement, cultural resonance, tone, clarity, risk"
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="pre_post" autoStart />
           <kbd className="text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">⌘⇧P</kbd>
           <span className="text-xs text-muted-foreground">to open widget</span>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <Suspense fallback={
         <div className="space-y-3">

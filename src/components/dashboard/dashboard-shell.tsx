@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Search } from 'lucide-react'
+import { SearchIcon as Search } from '@/components/brand/icon'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -15,6 +15,7 @@ import { MobileNav }          from './mobile-nav'
 import { CommandPalette }     from './command-palette'
 import { cn }                 from '@/lib/utils'
 import type { BrandOption }   from './brand-switcher'
+import { BrandLockup } from '@/components/brand/logo'
 
 const LS_KEY = 'bp-sidebar'
 
@@ -94,15 +95,7 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
           <div className="flex items-center gap-2.5 md:hidden">
             <MobileNav userName={userName} userEmail={userEmail} brandName={brandName} />
             <div className="flex items-center gap-2">
-              <div
-                className="h-6 w-6 rounded-lg grid place-items-center"
-                style={{ background: 'linear-gradient(135deg, #6B8FFF 0%, #2B59FF 100%)' }}
-              >
-                <svg viewBox="0 0 20 20" className="h-3 w-3" fill="none" aria-hidden>
-                  <polyline points="2,10 6,6 9.5,13 13.5,7.5 18,10" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <span className="font-bold text-[14px] tracking-tight text-gradient-blue">BrandGauge</span>
+              <BrandLockup height={18} />
             </div>
           </div>
 
@@ -114,13 +107,13 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
           {/* Center search trigger (desktop) */}
           <div className="hidden md:flex flex-1 max-w-[340px] mx-4">
             <button
-              className="search-trigger w-full flex items-center gap-2 h-9 rounded-xl px-3 cursor-pointer"
+              className="search-trigger w-full flex items-center gap-2 h-9 rounded-xl px-3 cursor-pointer bg-press"
               aria-label="Search"
               onClick={() => document.dispatchEvent(new CustomEvent('bp:open-command', { detail: '' }))}
             >
               <Search className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
               <span className="text-[13px] text-muted-foreground/50 flex-1 text-left">Search or ask anything…</span>
-              <kbd className="text-[10px] font-mono bg-background/70 border border-border rounded-md px-1.5 py-0.5 text-muted-foreground/50 leading-none shrink-0">
+              <kbd className="text-[10px] bg-num bg-background/70 border border-border rounded-md px-1.5 py-0.5 text-muted-foreground/50 leading-none shrink-0">
                 ⌘K
               </kbd>
             </button>

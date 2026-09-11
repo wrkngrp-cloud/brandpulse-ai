@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Plus, Trash2, Loader2, Building } from 'lucide-react'
+import { PlusIcon as Plus, TrashIcon as Trash2, VenueIcon as Building } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Input }  from '@/components/ui/input'
 import { toast }  from 'sonner'
@@ -75,7 +76,7 @@ export function CompetitorsClient({ initialCompetitors }: Props) {
           disabled={isPending || !newName.trim()}
         >
           {isPending && !deletingId
-            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ? <Loader2 className="h-3.5 w-3.5" />
             : <><Plus className="h-3.5 w-3.5 mr-1" />Add</>
           }
         </Button>
@@ -102,18 +103,18 @@ export function CompetitorsClient({ initialCompetitors }: Props) {
                 i < competitors.length - 1 && 'border-b',
               )}
             >
-              <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center shrink-0 text-xs font-semibold text-muted-foreground uppercase">
+              <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center shrink-0 text-xs font-semibold text-muted-foreground">
                 {c.name.charAt(0)}
               </div>
               <span className="flex-1 text-sm font-medium">{c.name}</span>
               <button
                 onClick={() => handleDelete(c)}
                 disabled={isPending}
-                className="text-muted-foreground hover:text-destructive transition-colors disabled:opacity-40"
+                className="text-muted-foreground hover:text-destructive transition-colors disabled:opacity-40 bg-press"
                 aria-label={`Remove ${c.name}`}
               >
                 {deletingId === c.id
-                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  ? <Loader2 className="h-4 w-4" />
                   : <Trash2 className="h-4 w-4" />
                 }
               </button>

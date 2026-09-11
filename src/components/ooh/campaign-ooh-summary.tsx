@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { MapPin, TrendingUp, DollarSign, Link2, BarChart2 } from 'lucide-react'
+import { MapIcon as MapPin, CurrencyIcon as DollarSign, LinkIcon as Link2, TrendIcon as BarChart2 } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import Link from 'next/link'
 
 interface Props {
@@ -73,7 +74,7 @@ export async function CampaignOohSummary({ campaignId, currency }: Props) {
           <MapPin className="h-4 w-4 text-muted-foreground" />
           <h3 className="text-sm font-semibold">OOH Campaign Summary</h3>
         </div>
-        <span className="text-xs text-muted-foreground">{sites.length} site{sites.length !== 1 ? 's' : ''}</span>
+        <span className="text-xs text-muted-foreground bg-num">{sites.length} site{sites.length !== 1 ? 's' : ''}</span>
       </div>
 
       {/* KPI row */}
@@ -83,7 +84,7 @@ export async function CampaignOohSummary({ campaignId, currency }: Props) {
             <TrendingUp className="h-3 w-3" />
             Est. Reach
           </div>
-          <p className="text-lg font-bold tabular-nums">{dedupImpressions > 0 ? fmtNum(dedupImpressions) : '—'}</p>
+          <p className="text-lg font-bold bg-num">{dedupImpressions > 0 ? fmtNum(dedupImpressions) : '—'}</p>
           <p className="text-xs text-muted-foreground">65% dedup applied</p>
         </div>
         <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
@@ -91,7 +92,7 @@ export async function CampaignOohSummary({ campaignId, currency }: Props) {
             <DollarSign className="h-3 w-3" />
             Total Spend
           </div>
-          <p className="text-lg font-bold tabular-nums">{fmtMoney(totalSpend || null, currency)}</p>
+          <p className="text-lg font-bold bg-num">{fmtMoney(totalSpend || null, currency)}</p>
           <p className="text-xs text-muted-foreground">across all sites / mo</p>
         </div>
         <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
@@ -99,7 +100,7 @@ export async function CampaignOohSummary({ campaignId, currency }: Props) {
             <Link2 className="h-3 w-3" />
             Link Visits
           </div>
-          <p className="text-lg font-bold tabular-nums">{fmtNum(totalVanityVisits)}</p>
+          <p className="text-lg font-bold bg-num">{fmtNum(totalVanityVisits)}</p>
           <p className="text-xs text-muted-foreground">vanity URLs</p>
         </div>
         <div className="bg-muted/40 rounded-lg p-3 space-y-0.5">
@@ -107,7 +108,7 @@ export async function CampaignOohSummary({ campaignId, currency }: Props) {
             <BarChart2 className="h-3 w-3" />
             Blended CPM
           </div>
-          <p className="text-lg font-bold tabular-nums">
+          <p className="text-lg font-bold bg-num">
             {blendedCpm !== null ? fmtMoney(Math.round(blendedCpm), currency) : '—'}
           </p>
           <p className="text-xs text-muted-foreground">per 1,000 impressions</p>
@@ -128,7 +129,7 @@ export async function CampaignOohSummary({ campaignId, currency }: Props) {
                 {site.format_type ? ` · ${site.format_type}` : ''}
               </span>
             </div>
-            <span className="shrink-0 tabular-nums">
+            <span className="shrink-0 bg-num">
               {visitsBySite[site.id] ? fmtNum(visitsBySite[site.id]) : '—'}
               <span className="text-muted-foreground ml-1">visits</span>
             </span>

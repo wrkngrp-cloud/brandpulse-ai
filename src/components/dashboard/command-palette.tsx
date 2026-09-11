@@ -6,12 +6,8 @@ import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput,
   CommandItem, CommandList, CommandSeparator,
 } from '@/components/ui/command'
-import {
-  LayoutDashboard, FileText, BarChart2, ClipboardList, CalendarDays,
-  MapPin, Megaphone, Zap, Trophy, Filter, Award, Users, Palette, Globe,
-  Plus, Settings, TrendingUp, Sparkles, Radio, Search, ArrowRight,
-  Monitor, Tv, Newspaper,
-} from 'lucide-react'
+import { LayoutGridIcon as LayoutDashboard, FileIcon as FileText, TrendIcon as BarChart2, SurveyIcon as ClipboardList, CalendarIcon as CalendarDays, MapIcon as MapPin, MusicIcon as Megaphone, AskIcon as Zap, StarIcon as Trophy, FilterIcon as Filter, StarIcon as Award, UsersIcon as Users, CreativeIcon as Palette, GlobeIcon as Globe, PlusIcon as Plus, SettingsIcon as Settings, MusicIcon as Radio, ArrowRightIcon as ArrowRight, PanelIcon as Monitor, PanelIcon as Tv, PrinterIcon as Newspaper } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp, AskIcon as Sparkles, SearchIcon as Search } from '@/components/brand/icon'
 
 // ── Nav items ──────────────────────────────────────────────────────────────
 
@@ -107,7 +103,7 @@ export function CommandPalette() {
             {query.trim() && (
               <button
                 onClick={() => go(askAiHref)}
-                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                className="inline-flex items-center gap-2 text-sm text-primary hover:underline bg-press"
               >
                 <Sparkles className="h-3.5 w-3.5" />
                 Ask AI: &ldquo;{query.trim()}&rdquo;

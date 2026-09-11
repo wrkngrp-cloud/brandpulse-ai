@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Sparkles, Loader2, MessageSquareQuote } from 'lucide-react'
+import { MentionsIcon as MessageSquareQuote } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { AskIcon as Sparkles } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -19,15 +21,15 @@ interface Props {
 }
 
 const SENTIMENT_DOT: Record<string, string> = {
-  positive: 'bg-green-500',
+  positive: 'bg-pos',
   neutral:  'bg-muted-foreground/40',
-  negative: 'bg-red-400',
+  negative: 'bg-flare',
 }
 
 const SENTIMENT_LABEL: Record<string, string> = {
-  positive: 'text-green-600',
+  positive: 'text-pos',
   neutral:  'text-muted-foreground',
-  negative: 'text-red-500',
+  negative: 'text-tx-flare',
 }
 
 export function TopicClusters({ mentions }: Props) {
@@ -65,7 +67,7 @@ export function TopicClusters({ mentions }: Props) {
         {!clusters && (
           <Button size="sm" variant="outline" onClick={handleAnalyse} disabled={isPending}>
             {isPending ? (
-              <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Clustering…</>
+              <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Clustering…</>
             ) : (
               <><Sparkles className="h-3.5 w-3.5 mr-1.5" />Analyse topics</>
             )}
@@ -92,7 +94,7 @@ export function TopicClusters({ mentions }: Props) {
                     {c.sentiment}
                   </span>
                   <span className="text-xs text-muted-foreground">·</span>
-                  <span className="text-xs text-muted-foreground">{c.count} mentions</span>
+                  <span className="text-xs text-muted-foreground bg-num"><span className="bg-num">{c.count}</span> mentions</span>
                 </div>
               </div>
 
@@ -103,7 +105,7 @@ export function TopicClusters({ mentions }: Props) {
                   {c.quotes.map((q, qi) => (
                     <div key={qi} className="flex items-start gap-2 bg-muted/40 rounded-lg px-3 py-2">
                       <MessageSquareQuote className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0 mt-0.5" />
-                      <p className="text-xs italic text-muted-foreground leading-relaxed">"{q}"</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">"{q}"</p>
                     </div>
                   ))}
                 </div>

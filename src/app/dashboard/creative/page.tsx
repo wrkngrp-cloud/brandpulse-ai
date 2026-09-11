@@ -3,6 +3,8 @@ import { redirect }      from 'next/navigation'
 import { getActiveBrand } from '@/lib/active-brand'
 import { CreativeClient } from './creative-client'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,15 +32,12 @@ export default async function CreativePage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Creative Analysis</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Compare creatives, check brand voice consistency, and analyse competitor content.
-          </p>
-        </div>
-        <TourTrigger module="creative" autoStart />
-      </div>
+      <PageHeader
+        {...PAGE_META['/dashboard/creative']}
+        title="Creative Analysis"
+        subtitle="Compare creatives, check brand voice consistency, and analyse competitor content."
+        actions={<TourTrigger module="creative" autoStart />}
+      />
 
       <CreativeClient
         brandId={brand.id}

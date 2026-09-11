@@ -25,7 +25,7 @@ export function ComingSoonConnectorCard({ icon, iconBg, label, description }: Pr
           </div>
         </div>
 
-        <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide bg-primary/15 text-primary rounded px-2 py-1 leading-none">
+        <span className="shrink-0 text-[10px] font-bold bg-primary/15 text-primary rounded px-2 py-1 leading-none">
           Coming soon
         </span>
       </div>

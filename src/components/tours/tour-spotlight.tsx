@@ -168,14 +168,22 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
     const mutationObserver = new MutationObserver(() => sync())
     mutationObserver.observe(el, { attributes: true, attributeFilter: ['style', 'class'] })
 
+    // A scroll listener is a hard ban in this system, so the box follows the
+    // target through an IntersectionObserver instead. Thresholds every 1%
+    // make it fire repeatedly as the element travels the viewport, which is
+    // what keeps the ring on the target during the smooth scrollIntoView
+    // above, with no per-frame work and nothing running once it settles.
+    const thresholds = Array.from({ length: 101 }, (_, i) => i / 100)
+    const travelObserver = new IntersectionObserver(() => sync(), { threshold: thresholds })
+    travelObserver.observe(el)
+
     sync()
 
-    window.addEventListener('scroll', sync, { passive: true })
     window.addEventListener('resize', sync)
     return () => {
       resizeObserver.disconnect()
       mutationObserver.disconnect()
-      window.removeEventListener('scroll', sync)
+      travelObserver.disconnect()
       window.removeEventListener('resize', sync)
     }
   }, [current, step])
@@ -222,7 +230,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className={`fixed inset-0 z-[9990] ${hasHighlight ? '' : 'bg-black/30'}`}
+        className={`fixed inset-0 z-[9990] ${hasHighlight ? '' : 'bg-ink/30'}`}
         onClick={handleSkip}
         aria-hidden="true"
       />
@@ -243,8 +251,10 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
               left:         box.left,
               width:        box.width,
               height:       box.height,
-              borderRadius: 14,
-              boxShadow:    '0 0 0 3px #E8763E, 0 0 24px 4px rgba(232,118,62,0.35), 0 0 0 9999px rgba(0,0,0,0.6)',
+              borderRadius: 'var(--r-card)',
+              /* The spotlight is a ring and a scrim, not a glow: 2px Flare at
+                 2px offset, which is the focus ring this system uses. */
+              boxShadow:    '0 0 0 2px var(--bg-paper), 0 0 0 4px var(--flare), 0 0 0 9999px color-mix(in srgb, var(--bg-ink) 72%, transparent)',
               zIndex:       9992,
               pointerEvents: 'none',
             }}
@@ -261,14 +271,14 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
         exit={{ opacity: 0, scale: 0.94 }}
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
         style={{ ...cardStyle, width: cardWidth(), zIndex: 9995 }}
-        className="bg-background border border-border rounded-xl shadow-xl p-5 space-y-3"
+        className="bg-background border border-border rounded-xl p-5 space-y-3"
         role="dialog"
         aria-modal="true"
         aria-label={step.title}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Step counter */}
-        <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wider select-none">
+        <p className="text-[11px] font-semibold text-muted-foreground/60 select-none bg-num">
           {current + 1} of {steps.length}
         </p>
 
@@ -287,7 +297,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
           {steps.map((_, i) => (
             <div
               key={i}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
+              className={`h-1.5 rounded-full transition-colors duration-300 ${
                 i === current
                   ? 'w-4 bg-foreground'
                   : 'w-1.5 bg-muted-foreground/25'

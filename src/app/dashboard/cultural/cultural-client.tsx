@@ -1,13 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Flame, TrendingUp, TrendingDown, Calendar, Sparkles, Loader2,
-  AlertTriangle, ChevronRight, ChevronDown, Star, Globe,
-} from 'lucide-react'
+import {  TrendDownIcon as TrendingDown, CalendarIcon as Calendar, ChevronRightIcon as ChevronRight, ChevronDownIcon as ChevronDown, StarIcon as Star, GlobeIcon as Globe } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { TrendIcon as TrendingUp, AskIcon as Sparkles, AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { cn, formatPlatformLabel } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
+import { Crescendo } from '@/components/brand/crescendo'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -88,250 +90,205 @@ const BASE_CALENDAR: BaseMoment[] = [
     name: 'FIFA World Cup 2026 — Kickoff', mmdd: '06-11', type: 'Sports',
     brandRelevance: 'Biggest sporting event on earth — 48 teams including Nigeria. Watch parties, street activations, and themed content across all demographics',
     tags: ['sports', 'youth', 'male', 'all', 'food', 'beverage', 'entertainment'],
-    floatingDates: { '2026': '2026-06-11' },
-  },
+    floatingDates: { '2026': '2026-06-11' } },
   {
     name: 'FIFA World Cup 2026 — Final', mmdd: '07-19', type: 'Sports',
     brandRelevance: 'World Cup Final watch parties drive peak F&B and lifestyle spend. Nigeria fans celebrate regardless of who plays',
     tags: ['sports', 'youth', 'male', 'all', 'food', 'beverage'],
-    floatingDates: { '2026': '2026-07-19' },
-  },
+    floatingDates: { '2026': '2026-07-19' } },
   {
     name: 'Premier League Season Start', mmdd: '08-16', type: 'Sports',
     brandRelevance: 'EPL is Nigeria\'s second religion — viewing parties and fan activations from August through May',
-    tags: ['sports', 'youth', 'male', 'urban', 'food', 'beverage'],
-  },
+    tags: ['sports', 'youth', 'male', 'urban', 'food', 'beverage'] },
   {
     name: 'UEFA Champions League Final', mmdd: '05-30', type: 'Sports',
     brandRelevance: 'UCL Final unites football fans across Nigeria — screen-viewing events in Lagos, Abuja, and PH',
-    tags: ['sports', 'youth', 'male', 'urban', 'food', 'beverage'],
-  },
+    tags: ['sports', 'youth', 'male', 'urban', 'food', 'beverage'] },
   {
     name: 'Lagos Marathon', mmdd: '02-07', type: 'Sports',
     brandRelevance: 'Nigeria\'s largest road race — 50,000+ participants. Health, fitness, hydration, and apparel brands take centre stage',
-    tags: ['sports', 'health', 'fitness', 'female', 'urban', 'lagos', 'fmcg'],
-  },
+    tags: ['sports', 'health', 'fitness', 'female', 'urban', 'lagos', 'fmcg'] },
   {
     name: 'NBA Africa Game', mmdd: '08-08', type: 'Sports',
     brandRelevance: 'Growing NBA × Afrobeats × Nigerian identity crossover — powerful youth and fashion activation',
-    tags: ['sports', 'youth', 'male', 'fashion', 'culture', 'urban'],
-  },
+    tags: ['sports', 'youth', 'male', 'fashion', 'culture', 'urban'] },
   {
     name: 'AFCON 2027', mmdd: '01-10', type: 'Sports',
     brandRelevance: 'Africa Cup of Nations — peak Super Eagles patriotism. Brands that show up for Nigeria during AFCON earn lasting loyalty',
     tags: ['sports', 'all', 'patriotic', 'community', 'male', 'youth'],
-    floatingDates: { '2027': '2027-01-10' },
-  },
+    floatingDates: { '2027': '2027-01-10' } },
 
   // ── Nigerian Cultural ────────────────────────────────────────────────────
   {
     name: 'Ojude Oba Festival', mmdd: '05-30', type: 'Cultural',
     brandRelevance: 'Ijebu-Ode\'s royal durbar — spectacular fashion, horsemanship, and Yoruba heritage. Premium brand and influencer moment',
     tags: ['culture', 'fashion', 'premium', 'southwest', 'muslim', 'yoruba', 'food'],
-    floatingDates: { '2026': '2026-05-30', '2027': '2027-05-19', '2028': '2028-05-07' },
-  },
+    floatingDates: { '2026': '2026-05-30', '2027': '2027-05-19', '2028': '2028-05-07' } },
   {
     name: 'New Yam Festival (Iriji)', mmdd: '08-20', type: 'Cultural',
     brandRelevance: 'Igbo harvest celebration — food, music, and community across Southeast Nigeria and diaspora',
-    tags: ['culture', 'food', 'community', 'southeast', 'igbo', 'traditional', 'fmcg'],
-  },
+    tags: ['culture', 'food', 'community', 'southeast', 'igbo', 'traditional', 'fmcg'] },
   {
     name: 'Eyo Festival', mmdd: '05-02', type: 'Cultural',
     brandRelevance: 'Lagos Island\'s iconic masquerade — white-clad Eyo fill Lagos streets. Tourism, fashion, and premium brands resonate',
-    tags: ['culture', 'fashion', 'premium', 'lagos', 'yoruba', 'tourism'],
-  },
+    tags: ['culture', 'fashion', 'premium', 'lagos', 'yoruba', 'tourism'] },
   {
     name: 'Argungu Fishing Festival', mmdd: '03-14', type: 'Cultural',
     brandRelevance: 'Kebbi State\'s centuries-old fishing festival — powerful northern Nigeria mass-market moment',
-    tags: ['culture', 'north', 'hausa', 'community', 'rural', 'mass', 'fmcg'],
-  },
+    tags: ['culture', 'north', 'hausa', 'community', 'rural', 'mass', 'fmcg'] },
   {
     name: 'Durbar Festival', mmdd: '03-20', type: 'Cultural',
     brandRelevance: 'Royal Durbar at Eid — thousands of horsemen in ceremonial dress across Kano, Zaria, Sokoto. Premium northern storytelling moment',
     tags: ['culture', 'fashion', 'premium', 'north', 'hausa', 'muslim', 'traditional'],
-    floatingDates: { '2026': '2026-03-20', '2027': '2027-03-09', '2028': '2028-02-27' },
-  },
+    floatingDates: { '2026': '2026-03-20', '2027': '2027-03-09', '2028': '2028-02-27' } },
   {
     name: 'Calabar Carnival', mmdd: '12-01', type: 'Cultural',
     brandRelevance: 'Africa\'s biggest street party — one month of parades, floats, and colour in Cross River State. Huge youth activation window',
-    tags: ['culture', 'youth', 'entertainment', 'south', 'tourism', 'fashion', 'food'],
-  },
+    tags: ['culture', 'youth', 'entertainment', 'south', 'tourism', 'fashion', 'food'] },
   {
     name: 'Ake Arts and Book Festival', mmdd: '10-27', type: 'Cultural',
     brandRelevance: 'West Africa\'s premier literary festival in Abeokuta — premium, educated, diaspora audience',
-    tags: ['culture', 'premium', 'educated', 'diaspora', 'female', 'southwest'],
-  },
+    tags: ['culture', 'premium', 'educated', 'diaspora', 'female', 'southwest'] },
   {
     name: 'Felabration', mmdd: '10-15', type: 'Entertainment',
     brandRelevance: 'Week-long Fela anniversary at Afrika Shrine — counterculture, Afrobeats, and progressive Nigerian identity',
-    tags: ['music', 'youth', 'culture', 'afrobeats', 'urban', 'activist', 'lagos'],
-  },
+    tags: ['music', 'youth', 'culture', 'afrobeats', 'urban', 'activist', 'lagos'] },
   {
     name: 'Gidi Culture Festival', mmdd: '04-18', type: 'Entertainment',
     brandRelevance: 'Lagos\'s outdoor festival of music, art, and culture — premium youth activation in Eko Atlantic area',
-    tags: ['music', 'youth', 'fashion', 'urban', 'premium', 'lagos', 'entertainment'],
-  },
+    tags: ['music', 'youth', 'fashion', 'urban', 'premium', 'lagos', 'entertainment'] },
 
   // ── Entertainment / Awards ───────────────────────────────────────────────
   {
     name: 'AMVCA (Africa Magic Viewers\' Choice)', mmdd: '03-22', type: 'Entertainment',
     brandRelevance: 'Nigeria\'s biggest TV awards night — Nollywood fans, premium lifestyle consumers, and fashion moment',
-    tags: ['entertainment', 'fashion', 'premium', 'female', 'nollywood', 'urban'],
-  },
+    tags: ['entertainment', 'fashion', 'premium', 'female', 'nollywood', 'urban'] },
   {
     name: 'Headies Awards', mmdd: '10-25', type: 'Entertainment',
     brandRelevance: 'Afrobeats\' biggest night — massive youth engagement and influencer amplification',
-    tags: ['music', 'afrobeats', 'youth', 'fashion', 'urban', 'entertainment'],
-  },
+    tags: ['music', 'afrobeats', 'youth', 'fashion', 'urban', 'entertainment'] },
   {
     name: 'Afro Nation Portugal', mmdd: '07-03', type: 'Entertainment',
     brandRelevance: 'World\'s largest Afrobeats festival — strong diaspora and international audience for premium Nigerian brands',
-    tags: ['music', 'afrobeats', 'diaspora', 'youth', 'premium', 'fashion'],
-  },
+    tags: ['music', 'afrobeats', 'diaspora', 'youth', 'premium', 'fashion'] },
   {
     name: 'ONE Africa Music Fest', mmdd: '11-07', type: 'Entertainment',
     brandRelevance: 'Pan-African music festival spotlighting Afropop — high-income urban youth audience',
-    tags: ['music', 'youth', 'premium', 'urban', 'afrobeats', 'entertainment'],
-  },
+    tags: ['music', 'youth', 'premium', 'urban', 'afrobeats', 'entertainment'] },
 
   // ── Global Cultural ──────────────────────────────────────────────────────
   {
     name: "International Women's Day", mmdd: '03-08', type: 'Cultural',
     brandRelevance: 'Powerful moment for brands to celebrate female consumers and gender equity — campaigns that feel genuine earn high loyalty',
-    tags: ['female', 'urban', 'educated', 'premium', 'all', 'health'],
-  },
+    tags: ['female', 'urban', 'educated', 'premium', 'all', 'health'] },
   {
     name: 'World Music Day', mmdd: '06-21', type: 'Cultural',
     brandRelevance: 'Global celebration of music — especially resonant for youth-facing, entertainment, and F&B brands in Nigeria',
-    tags: ['music', 'youth', 'urban', 'afrobeats', 'entertainment', 'food'],
-  },
+    tags: ['music', 'youth', 'urban', 'afrobeats', 'entertainment', 'food'] },
   {
     name: 'World Jollof Day', mmdd: '08-22', type: 'Cultural',
     brandRelevance: 'Created to celebrate West African jollof rice — massive organic social moment. Direct brand moment for food companies',
-    tags: ['food', 'fmcg', 'all', 'diaspora', 'culture', 'social_media'],
-  },
+    tags: ['food', 'fmcg', 'all', 'diaspora', 'culture', 'social_media'] },
   {
     name: 'Earth Day', mmdd: '04-22', type: 'Cultural',
     brandRelevance: 'Sustainability storytelling — growing relevance with educated urban Nigerian millennials and premium consumers',
-    tags: ['educated', 'premium', 'urban', 'youth', 'health', 'tech'],
-  },
+    tags: ['educated', 'premium', 'urban', 'youth', 'health', 'tech'] },
   {
     name: 'World Food Day', mmdd: '10-16', type: 'Health',
     brandRelevance: 'UN-backed day on food security — natural platform for FMCG and food brands to lead conversations in Nigeria',
-    tags: ['food', 'fmcg', 'health', 'community', 'educated'],
-  },
+    tags: ['food', 'fmcg', 'health', 'community', 'educated'] },
   {
     name: "Mother's Day", mmdd: '05-11', type: 'Cultural',
     brandRelevance: 'Strong gifting and celebration moment across all demographics — one of Nigeria\'s highest-engagement social media dates',
-    tags: ['female', 'family', 'all', 'premium', 'gifting', 'fmcg', 'food'],
-  },
+    tags: ['female', 'family', 'all', 'premium', 'gifting', 'fmcg', 'food'] },
   {
     name: "Father's Day", mmdd: '06-22', type: 'Cultural',
     brandRelevance: 'Growing occasion in urban Nigeria — fashion, electronics, and F&B brands activate strongly',
-    tags: ['male', 'family', 'urban', 'premium', 'gifting', 'fashion', 'food'],
-  },
+    tags: ['male', 'family', 'urban', 'premium', 'gifting', 'fashion', 'food'] },
   {
     name: "Valentine's Day", mmdd: '02-14', type: 'Cultural',
     brandRelevance: 'High gifting and affinity moment — restaurants, fashion, FMCG, and experience brands all activate',
-    tags: ['youth', 'urban', 'couple', 'gifting', 'food', 'fashion', 'premium'],
-  },
+    tags: ['youth', 'urban', 'couple', 'gifting', 'food', 'fashion', 'premium'] },
   {
     name: 'World Environment Day', mmdd: '06-05', type: 'Cultural',
     brandRelevance: 'Brands with a sustainability or community angle can lead conversations and earn goodwill',
-    tags: ['educated', 'premium', 'youth', 'urban', 'community', 'health'],
-  },
+    tags: ['educated', 'premium', 'youth', 'urban', 'community', 'health'] },
 
   // ── Religious ───────────────────────────────────────────────────────────
   {
     name: 'Ramadan Start', mmdd: '02-18', type: 'Religious',
     brandRelevance: 'Reach Muslim consumers with values-led, community, and Sahur/Iftar-themed content',
     tags: ['muslim', 'north', 'hausa', 'yoruba', 'community', 'food', 'fmcg', 'religious'],
-    floatingDates: { '2026': '2026-02-18', '2027': '2027-02-08', '2028': '2028-01-28' },
-  },
+    floatingDates: { '2026': '2026-02-18', '2027': '2027-02-08', '2028': '2028-01-28' } },
   {
     name: 'Easter', mmdd: '04-05', type: 'Religious',
     brandRelevance: 'Family gatherings drive food and gifting spend — strong moment for FMCG, travel, and celebration brands',
     tags: ['christian', 'south', 'east', 'family', 'food', 'gifting', 'all'],
-    floatingDates: { '2026': '2026-04-05', '2027': '2027-03-28', '2028': '2028-04-16' },
-  },
+    floatingDates: { '2026': '2026-04-05', '2027': '2027-03-28', '2028': '2028-04-16' } },
   {
     name: 'Eid al-Fitr', mmdd: '03-20', type: 'Religious',
     brandRelevance: 'End of Ramadan celebration — gifting, fashion, and premium experiences resonate with Muslim consumers',
     tags: ['muslim', 'north', 'hausa', 'yoruba', 'family', 'fashion', 'food', 'premium', 'gifting'],
-    floatingDates: { '2026': '2026-03-20', '2027': '2027-03-09', '2028': '2028-02-27' },
-  },
+    floatingDates: { '2026': '2026-03-20', '2027': '2027-03-09', '2028': '2028-02-27' } },
   {
     name: 'Eid al-Adha (Sallah)', mmdd: '05-27', type: 'Religious',
     brandRelevance: 'Themes of sacrifice, generosity, and community — food and lifestyle brands create lasting impressions',
     tags: ['muslim', 'north', 'hausa', 'community', 'food', 'family', 'religious'],
-    floatingDates: { '2026': '2026-05-27', '2027': '2027-05-16', '2028': '2028-05-05' },
-  },
+    floatingDates: { '2026': '2026-05-27', '2027': '2027-05-16', '2028': '2028-05-05' } },
   {
     name: 'Christmas', mmdd: '12-25', type: 'Religious',
     brandRelevance: 'Peak gifting, family, and celebration campaigns — Nigeria\'s biggest commercial season alongside Detty December',
-    tags: ['christian', 'family', 'all', 'gifting', 'food', 'fashion', 'premium'],
-  },
+    tags: ['christian', 'family', 'all', 'gifting', 'food', 'fashion', 'premium'] },
 
   // ── National ─────────────────────────────────────────────────────────────
   {
     name: "Workers' Day", mmdd: '05-01', type: 'National',
     brandRelevance: 'Opportunity to celebrate your workforce, community, and everyday Nigerians',
-    tags: ['all', 'community', 'mass', 'family'],
-  },
+    tags: ['all', 'community', 'mass', 'family'] },
   {
     name: 'Democracy Day', mmdd: '06-12', type: 'National',
     brandRelevance: 'June 12 marks Nigerian democracy — growing civic pride moment among urban educated millennials',
-    tags: ['youth', 'urban', 'educated', 'community', 'patriotic'],
-  },
+    tags: ['youth', 'urban', 'educated', 'community', 'patriotic'] },
   {
     name: 'Africa Day', mmdd: '05-25', type: 'National',
     brandRelevance: 'Pan-African identity and pride — strong cultural storytelling for youth-facing and premium brands',
-    tags: ['pan_african', 'diaspora', 'educated', 'youth', 'culture', 'premium'],
-  },
+    tags: ['pan_african', 'diaspora', 'educated', 'youth', 'culture', 'premium'] },
   {
     name: 'Independence Day', mmdd: '10-01', type: 'National',
     brandRelevance: 'National pride moment — connect brand to Nigerian identity and community values',
-    tags: ['all', 'patriotic', 'community', 'national', 'family', 'food'],
-  },
+    tags: ['all', 'patriotic', 'community', 'national', 'family', 'food'] },
 
   // ── Seasonal / Commerce ─────────────────────────────────────────────────
   {
     name: 'Back to School', mmdd: '09-07', type: 'Commerce',
     brandRelevance: 'Nigeria\'s biggest retail surge outside Q4 — stationery, uniforms, food, and tech brands all compete for family spend',
-    tags: ['family', 'parent', 'youth', 'fmcg', 'food', 'tech', 'education'],
-  },
+    tags: ['family', 'parent', 'youth', 'fmcg', 'food', 'tech', 'education'] },
   {
     name: 'Black Friday', mmdd: '11-27', type: 'Commerce',
     brandRelevance: 'Nigeria\'s fastest-growing commerce day — digital and physical retail see massive conversion uplift',
-    tags: ['youth', 'urban', 'value_seeker', 'fmcg', 'fashion', 'tech', 'all'],
-  },
+    tags: ['youth', 'urban', 'value_seeker', 'fmcg', 'fashion', 'tech', 'all'] },
   {
     name: 'Detty December', mmdd: '12-01', type: 'Seasonal',
     brandRelevance: 'Biggest entertainment and spending season in West Africa — diaspora returns, budgets loosen, every brand competes for share of wallet',
-    tags: ['entertainment', 'diaspora', 'youth', 'premium', 'music', 'food', 'fashion', 'lagos'],
-  },
+    tags: ['entertainment', 'diaspora', 'youth', 'premium', 'music', 'food', 'fashion', 'lagos'] },
   {
     name: 'End of Year Campaign Season', mmdd: '11-01', type: 'Commerce',
     brandRelevance: 'Brands that launch November 1 own the full holiday season — budget-setting and gifting decisions start here',
-    tags: ['all', 'fmcg', 'premium', 'fashion', 'food', 'gifting'],
-  },
+    tags: ['all', 'fmcg', 'premium', 'fashion', 'food', 'gifting'] },
 
   // ── Health ───────────────────────────────────────────────────────────────
   {
     name: 'Breast Cancer Awareness Month', mmdd: '10-01', type: 'Health',
     brandRelevance: 'Pink October drives deep engagement with female consumers — brands that show up authentically earn long-term loyalty',
-    tags: ['female', 'health', 'educated', 'premium', 'urban', 'community'],
-  },
+    tags: ['female', 'health', 'educated', 'premium', 'urban', 'community'] },
   {
     name: 'World Diabetes Day', mmdd: '11-14', type: 'Health',
     brandRelevance: 'Rising diabetes rates in Nigeria make this a high-value health education moment — food and FMCG brands can lead',
-    tags: ['health', 'food', 'fmcg', 'educated', 'older', 'family'],
-  },
+    tags: ['health', 'food', 'fmcg', 'educated', 'older', 'family'] },
   {
     name: 'World Mental Health Day', mmdd: '10-10', type: 'Health',
     brandRelevance: 'Growing mental health conversation in Nigeria — brands that acknowledge it authentically build deep loyalty with millennials',
-    tags: ['youth', 'urban', 'educated', 'health', 'premium', 'female'],
-  },
+    tags: ['youth', 'urban', 'educated', 'health', 'premium', 'female'] },
 ]
 
 // ---------------------------------------------------------------------------
@@ -369,8 +326,7 @@ const CATEGORY_TAGS: Record<string, string[]> = {
   'Automotive':      ['premium', 'male', 'urban'],
   'Telecom':         ['all', 'tech', 'urban'],
   'Hospitality':     ['premium', 'tourism', 'food'],
-  'Media':           ['entertainment', 'youth', 'urban'],
-}
+  'Media':           ['entertainment', 'youth', 'urban'] }
 
 function extractAudienceTags(segments: TargetSegment[], culturalProfile: CulturalProfile): Set<string> {
   const tags = new Set<string>()
@@ -445,27 +401,24 @@ function fitLabel(score: number): 'High fit' | 'Good fit' | 'Monitor' {
 // ---------------------------------------------------------------------------
 
 const TYPE_BADGE: Record<MomentType, string> = {
-  Religious:     'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-  National:      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  Cultural:      'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-  Seasonal:      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-  Sports:        'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
-  Entertainment: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300',
-  Health:        'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
-  Commerce:      'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
-}
+  Religious:     'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+  National:      'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  Cultural:      'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+  Seasonal:      'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
+  Sports:        'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare',
+  Entertainment: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+  Health:        'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  Commerce:      'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2' }
 
 const FIT_BADGE: Record<string, string> = {
-  'High fit':  'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-  'Good fit':  'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-  'Monitor':   'bg-muted text-muted-foreground',
-}
+  'High fit':  'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  'Good fit':  'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
+  'Monitor':   'bg-muted text-muted-foreground' }
 
 const EFFORT_BADGE: Record<string, string> = {
-  Low:    'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  Medium: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-  High:   'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-}
+  Low:    'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
+  Medium: 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2',
+  High:   'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare' }
 
 function daysUntil(dateStr: string, todayStr: string): number {
   const diffMs = new Date(dateStr).getTime() - new Date(todayStr).getTime()
@@ -473,15 +426,15 @@ function daysUntil(dateStr: string, todayStr: string): number {
 }
 
 function crsColor(score: number): string {
-  if (score >= 70) return 'text-green-600'
-  if (score >= 50) return 'text-amber-500'
-  return 'text-red-500'
+  if (score >= 70) return 'text-pos'
+  if (score >= 50) return 'text-tx-2'
+  return 'text-tx-flare'
 }
 
 function crsRingColor(score: number): string {
-  if (score >= 70) return 'stroke-green-500'
-  if (score >= 50) return 'stroke-amber-400'
-  return 'stroke-red-500'
+  if (score >= 70) return 'stroke-pos'
+  if (score >= 50) return 'stroke-tx-2'
+  return 'stroke-tx-flare'
 }
 
 // ---------------------------------------------------------------------------
@@ -502,13 +455,13 @@ function CRSGauge({ score, drift }: { score: number | null; drift: number | null
           {score !== null && (
             <circle cx="68" cy="68" r={radius} fill="none" strokeWidth="10" strokeLinecap="round"
               strokeDasharray={circumference} strokeDashoffset={dashOffset}
-              className={cn('transition-all duration-700', crsRingColor(score))} />
+              className={cn('transition-colors duration-700', crsRingColor(score))} />
           )}
         </svg>
         <div className="absolute flex flex-col items-center">
           {score !== null ? (
             <>
-              <span className={cn('text-4xl font-bold tabular-nums', crsColor(score))}>{Math.round(score)}</span>
+              <span className={cn('text-4xl font-bold bg-num', crsColor(score))}>{Math.round(score)}</span>
               <span className="text-xs text-muted-foreground mt-0.5">/ 100</span>
             </>
           ) : (
@@ -517,9 +470,9 @@ function CRSGauge({ score, drift }: { score: number | null; drift: number | null
         </div>
       </div>
       {drift !== null && (
-        <div className={cn('inline-flex items-center gap-1 text-sm font-medium px-2.5 py-1 rounded-full',
-          drift >= 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                     : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+        <div className={cn('inline-flex items-center gap-1 text-sm font-medium px-2.5 py-1 rounded-sm',
+          drift >= 0 ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos'
+                     : 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
         )}>
           {drift >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
           {drift >= 0 ? '+' : ''}{drift.toFixed(1)} pts vs prior period
@@ -534,13 +487,9 @@ function EmotionBar({ value }: { value: number | null }) {
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <span className="text-sm text-muted-foreground">Audience emotional positivity</span>
-        <span className="text-sm font-semibold tabular-nums">{value !== null ? `${Math.round(value)}%` : '—'}</span>
+        <span className="text-sm font-semibold bg-num">{value !== null ? `${Math.round(value)}%` : '—'}</span>
       </div>
-      <div className="h-2.5 bg-muted rounded-full overflow-hidden">
-        <div className={cn('h-full rounded-full transition-all duration-700',
-          value === null ? 'w-0' : value >= 60 ? 'bg-green-500' : value >= 40 ? 'bg-amber-400' : 'bg-red-400'
-        )} style={{ width: value !== null ? `${Math.min(100, value)}%` : '0%' }} />
-      </div>
+      <Crescendo value={value === null ? 0 : Math.min(100, value)} />
       <p className="text-xs text-muted-foreground">Based on joy, trust and anticipation signals in recent posts</p>
     </div>
   )
@@ -548,8 +497,7 @@ function EmotionBar({ value }: { value: number | null }) {
 
 // Full calendar row (compact)
 function CalendarRow({
-  moment, daysAway, fit,
-}: {
+  moment, daysAway, fit }: {
   moment: CulturalMoment; daysAway: number; fit: ReturnType<typeof fitLabel>
 }) {
   return (
@@ -565,19 +513,19 @@ function CalendarRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
           <p className="text-sm font-medium">{moment.name}</p>
-          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', TYPE_BADGE[moment.type])}>
+          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', TYPE_BADGE[moment.type])}>
             {moment.type}
           </span>
-          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', FIT_BADGE[fit])}>
+          <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', FIT_BADGE[fit])}>
             {fit}
           </span>
         </div>
         <p className="text-xs text-muted-foreground mt-0.5 leading-snug line-clamp-2">{moment.brandRelevance}</p>
       </div>
       <div className="shrink-0 text-right pt-0.5">
-        <span className={cn('text-xs font-semibold tabular-nums px-2 py-0.5 rounded-full',
-          daysAway <= 14 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-          : daysAway <= 30 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+        <span className={cn('text-xs font-semibold bg-num px-2 py-0.5 rounded-sm',
+          daysAway <= 14 ? 'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-flare'
+          : daysAway <= 30 ? 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
           : 'bg-muted text-muted-foreground'
         )}>
           {daysAway === 0 ? 'Today' : daysAway === 1 ? 'Tomorrow' : `${daysAway}d`}
@@ -589,8 +537,7 @@ function CalendarRow({
 
 // Top-pick card with on-demand activation ideas
 function TopPickCard({
-  moment, daysAway, fit, relevanceReason, brandName, category, brandValues, targetSegments,
-}: {
+  moment, daysAway, fit, relevanceReason, brandName, category, brandValues, targetSegments }: {
   moment:          CulturalMoment
   daysAway:        number
   fit:             ReturnType<typeof fitLabel>
@@ -617,9 +564,7 @@ function TopPickCard({
           brandName,
           category:       category ?? undefined,
           brandValues:    brandValues.length ? brandValues : undefined,
-          targetSegments: targetSegments.length ? targetSegments : undefined,
-        }),
-      })
+          targetSegments: targetSegments.length ? targetSegments : undefined }) })
       if (!res.ok) throw new Error('Failed to generate ideas')
       const data = (await res.json()) as { ideas: ActivationIdea[] }
       setIdeas(data.ideas)
@@ -636,24 +581,24 @@ function TopPickCard({
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
             <p className="text-sm font-semibold">{moment.name}</p>
-            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', TYPE_BADGE[moment.type])}>
+            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', TYPE_BADGE[moment.type])}>
               {moment.type}
             </span>
-            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', FIT_BADGE[fit])}>
+            <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', FIT_BADGE[fit])}>
               {fit}
             </span>
           </div>
           <p className="text-[11px] text-muted-foreground">
             {new Date(moment.date + 'T00:00:00').toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}
             {' · '}
-            <span className={cn('font-medium', daysAway <= 14 ? 'text-red-600' : daysAway <= 30 ? 'text-amber-600' : 'text-muted-foreground')}>
+            <span className={cn('font-medium', daysAway <= 14 ? 'text-tx-flare' : daysAway <= 30 ? 'text-tx-2' : 'text-muted-foreground')}>
               {daysAway === 0 ? 'Today' : daysAway === 1 ? 'Tomorrow' : `${daysAway} days away`}
             </span>
           </p>
         </div>
         {!ideas && (
           <Button size="sm" variant="outline" onClick={generate} disabled={loading} className="shrink-0 h-8 text-xs gap-1">
-            {loading ? <><Loader2 className="h-3 w-3 animate-spin" />Thinking</> : <><Sparkles className="h-3 w-3" />Get ideas</>}
+            {loading ? <><Loader2 className="h-3 w-3" />Thinking</> : <><Sparkles className="h-3 w-3" />Get ideas</>}
           </Button>
         )}
       </div>
@@ -663,7 +608,7 @@ function TopPickCard({
         {relevanceReason}
       </div>
 
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-tx-flare">{error}</p>}
 
       {ideas && (
         <div className="space-y-2 pt-1">
@@ -673,7 +618,7 @@ function TopPickCard({
                 <p className="text-sm font-medium">{idea.title}</p>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className="text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">{idea.channel}</span>
-                  <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-full', EFFORT_BADGE[idea.effort] ?? 'bg-muted text-muted-foreground')}>
+                  <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded-sm', EFFORT_BADGE[idea.effort] ?? 'bg-muted text-muted-foreground')}>
                     {idea.effort}
                   </span>
                 </div>
@@ -681,7 +626,7 @@ function TopPickCard({
               <p className="text-xs text-muted-foreground leading-snug">{idea.description}</p>
             </div>
           ))}
-          <button onClick={() => setIdeas(null)} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 pt-1">
+          <button onClick={() => setIdeas(null)} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 pt-1 bg-press">
             Regenerate
           </button>
         </div>
@@ -697,8 +642,7 @@ function TopPickCard({
 export function CulturalClient({
   brandName, category, crsScore, drift, emotionResonance,
   today, analysisCount, brandValues, analyses,
-  targetSegments, culturalProfile,
-}: Props) {
+  targetSegments, culturalProfile }: Props) {
   const [crsOpen, setCrsOpen] = useState(false)
   const [showAllCalendar, setShowAllCalendar] = useState(false)
 
@@ -716,8 +660,7 @@ export function CulturalClient({
   const scoredMoments = allUpcoming.map(m => ({
     moment: m,
     score:  scoreMoment(m, category, audienceTags, categoryTagSet),
-    days:   daysUntil(m.date, today),
-  }))
+    days:   daysUntil(m.date, today) }))
 
   // Top picks: highest relevance score within next 180 days
   const topPicks = [...scoredMoments]
@@ -772,26 +715,19 @@ export function CulturalClient({
   return (
     <div className="max-w-3xl mx-auto space-y-6 p-4 sm:p-6">
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Flame className="h-5 w-5 text-orange-500" />
-            <h1 className="text-2xl font-semibold tracking-tight">Cultural Intelligence</h1>
-          </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            How well {brandName} resonates with Nigerian and West African audiences
-          </p>
-        </div>
-        <TourTrigger module="cultural" autoStart />
-      </div>
+      <PageHeader
+        {...PAGE_META['/dashboard/cultural']}
+        title="Cultural Intelligence"
+        subtitle={<>How well {brandName} resonates with Nigerian and West African audiences</>}
+        actions={<TourTrigger module="cultural" autoStart />}
+      />
 
       <div data-tour="cultural-main" className="space-y-6">
       {/* Drift alert */}
       {showDriftAlert && (
-        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/40 px-4 py-3">
-          <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700 dark:text-red-300">
+        <div className="flex items-start gap-3 rounded-xl border border-line-strong bg-flare-wash dark:bg-shell/20 dark:border-line-strong px-4 py-3">
+          <AlertTriangle className="h-4 w-4 text-tx-flare dark:text-tx-flare shrink-0 mt-0.5" />
+          <p className="text-sm text-tx-flare dark:text-tx-flare">
             Cultural drift detected — your content has become less resonant with Nigerian audiences recently.
           </p>
         </div>
@@ -828,7 +764,7 @@ export function CulturalClient({
 
         {crsOpen && analyses.length > 0 && (
           <div className="border-t pt-4 mt-2 space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Breakdown — last 30 days</p>
+            <p className="text-xs font-semibold text-muted-foreground">Breakdown — last 30 days</p>
             {analyses.map(a => {
               const date = new Date(a.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })
               const preview = a.content_text ? a.content_text.slice(0, 80) + (a.content_text.length > 80 ? '…' : '') : null
@@ -836,18 +772,18 @@ export function CulturalClient({
                 <div key={a.id} className="rounded-lg border bg-muted/30 px-3 py-2.5 space-y-1.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      {a.platform && <span className="text-[10px] font-medium bg-background border rounded px-1.5 py-0.5">{formatPlatformLabel(a.platform)}</span>}
+                      {a.platform && <span className="text-[10px] font-medium bg-background border rounded px-1.5 py-0.5 bg-num">{formatPlatformLabel(a.platform)}</span>}
                       {a.funnel_goal && <span className="text-[10px] text-muted-foreground capitalize">{a.funnel_goal}</span>}
                     </div>
                     <span className="text-[10px] text-muted-foreground shrink-0">{date}</span>
                   </div>
                   {preview && <p className="text-xs text-muted-foreground leading-snug">{preview}</p>}
                   <div className="flex flex-wrap items-center gap-3 pt-0.5">
-                    <span className={cn('text-xs font-semibold tabular-nums', crsColor(a.cultural_score))}>Cultural {Math.round(a.cultural_score)}</span>
-                    {a.engagement_score != null && <span className="text-xs text-muted-foreground tabular-nums">Eng {Math.round(a.engagement_score)}</span>}
-                    {a.tone_score != null && <span className="text-xs text-muted-foreground tabular-nums">Tone {Math.round(a.tone_score)}</span>}
+                    <span className={cn('text-xs font-semibold bg-num', crsColor(a.cultural_score))}>Cultural {Math.round(a.cultural_score)}</span>
+                    {a.engagement_score != null && <span className="text-xs text-muted-foreground bg-num">Eng {Math.round(a.engagement_score)}</span>}
+                    {a.tone_score != null && <span className="text-xs text-muted-foreground bg-num">Tone {Math.round(a.tone_score)}</span>}
                     {a.risk_score != null && (
-                      <span className={cn('text-xs tabular-nums', a.risk_score > 50 ? 'text-red-500' : a.risk_score > 20 ? 'text-amber-500' : 'text-muted-foreground')}>
+                      <span className={cn('text-xs bg-num', a.risk_score > 50 ? 'text-tx-flare' : a.risk_score > 20 ? 'text-tx-2' : 'text-muted-foreground')}>
                         Risk {Math.round(a.risk_score)}
                       </span>
                     )}
@@ -867,7 +803,7 @@ export function CulturalClient({
       {/* ── Top picks for this brand ────────────────────────────────────────── */}
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
-          <Star className="h-4 w-4 text-amber-500" />
+          <Star className="h-4 w-4 text-tx-2" />
           <p className="text-sm font-semibold">Top picks for {brandName}</p>
           <span className="hidden sm:inline text-xs text-muted-foreground">— ranked by audience fit, next 6 months</span>
         </div>
@@ -923,7 +859,7 @@ export function CulturalClient({
             {calendarList.length > 12 && (
               <button
                 onClick={() => setShowAllCalendar(o => !o)}
-                className="w-full text-center text-xs text-muted-foreground hover:text-foreground mt-2 py-1.5 border rounded-lg transition-colors hover:bg-muted/30"
+                className="w-full text-center text-xs text-muted-foreground hover:text-foreground mt-2 py-1.5 border rounded-lg transition-colors hover:bg-muted/30 bg-press"
               >
                 {showAllCalendar ? 'Show less' : `Show all ${calendarList.length} moments`}
               </button>

@@ -3,11 +3,8 @@
 import { useState, useMemo } from 'react'
 import { useRouter }          from 'next/navigation'
 import { toast }              from 'sonner'
-import {
-  Image as ImageIcon, Video, FileText, LayoutGrid, Sparkles,
-  Filter, CheckSquare, Square, Zap, ExternalLink, Tag,
-  TrendingUp, BookOpen, Copy, Star, Eye,
-} from 'lucide-react'
+import { ImageIcon, CameraIcon as Video, FileIcon as FileText, LayoutGridIcon as LayoutGrid, FilterIcon as Filter, CheckIcon as CheckSquare, LayoutGridIcon as Square, AskIcon as Zap, ExternalLinkIcon as ExternalLink, FlagIcon as Tag, FileIcon as BookOpen, CopyIcon as Copy, StarIcon as Star, EyeIcon as Eye } from '@/components/brand/icon'
+import { AskIcon as Sparkles, TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button }  from '@/components/ui/button'
 import { Badge }   from '@/components/ui/badge'
 import { cn, formatPlatformLabel, toSentenceCase } from '@/lib/utils'
@@ -25,17 +22,17 @@ const ASSET_ICON: Record<string, React.ElementType> = {
 }
 
 const ASSET_COLOR: Record<string, string> = {
-  image:    'bg-blue-500/10 text-blue-600',
-  video:    'bg-purple-500/10 text-purple-600',
-  copy:     'bg-amber-500/10 text-amber-600',
-  carousel: 'bg-teal-500/10 text-teal-600',
-  audio:    'bg-pink-500/10 text-pink-600',
+  image:    'bg-flare/10 text-tx-flare',
+  video:    'bg-neu/10 text-tx-2',
+  copy:     'bg-ember/10 text-tx-2',
+  carousel: 'bg-pos/10 text-pos',
+  audio:    'bg-neu/10 text-tx-2',
 }
 
 const STATUS_BADGE: Record<string, string> = {
   draft:    'bg-muted text-muted-foreground',
-  active:   'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  vetted:   'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  active:   'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
+  vetted:   'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
   archived: 'bg-muted/60 text-muted-foreground/60',
 }
 
@@ -61,7 +58,7 @@ function AssetCard({
   return (
     <div
       className={cn(
-        'group relative rounded-2xl border bg-card transition-all duration-150 overflow-hidden',
+        'group relative rounded-2xl border bg-card transition-colors duration-150 overflow-hidden',
         selected ? 'ring-2 ring-primary border-primary' : 'hover:border-primary/30',
       )}
     >
@@ -69,7 +66,7 @@ function AssetCard({
       <div
         className={cn(
           'relative h-36 flex items-center justify-center cursor-pointer',
-          'bg-gradient-to-br from-muted/60 to-muted',
+          'bg-shell',
         )}
         onClick={onView}
       >
@@ -83,7 +80,7 @@ function AssetCard({
         {/* Overlay badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {asset.fit_for_ads && (
-            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-primary text-primary-foreground rounded px-1.5 py-0.5">
+            <span className="flex items-center gap-1 text-[10px] font-bold bg-primary text-primary-foreground rounded px-1.5 py-0.5">
               <Zap className="h-2.5 w-2.5" />Ads-ready
             </span>
           )}
@@ -102,7 +99,7 @@ function AssetCard({
         >
           {selected
             ? <CheckSquare className="h-5 w-5 text-primary fill-primary" />
-            : <Square className="h-5 w-5 text-white/80 drop-shadow" />}
+            : <Square className="h-5 w-5 text-tx-inv/80 drop-shadow" />}
         </button>
       </div>
 
@@ -118,7 +115,7 @@ function AssetCard({
         {/* Platform + format */}
         <div className="flex flex-wrap gap-1">
           {asset.platform && (
-            <span className="text-[10px] bg-muted rounded px-1.5 py-0.5 text-muted-foreground">{formatPlatformLabel(asset.platform)}</span>
+            <span className="text-[10px] bg-muted rounded px-1.5 py-0.5 text-muted-foreground bg-num">{formatPlatformLabel(asset.platform)}</span>
           )}
           {asset.format && (
             <span className="text-[10px] bg-muted rounded px-1.5 py-0.5 text-muted-foreground">{asset.format === 'ooh' ? 'OOH' : toSentenceCase(asset.format)}</span>
@@ -158,8 +155,8 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-background border-l shadow-2xl overflow-y-auto flex flex-col">
+      <div className="absolute inset-0 bg-ink/40" onClick={onClose} />
+      <div className="relative w-full max-w-md bg-background border-l overflow-y-auto flex flex-col">
         {/* Header */}
         <div className="p-5 border-b flex items-start gap-3">
           <span className={cn('h-8 w-8 rounded-lg flex items-center justify-center shrink-0', ASSET_COLOR[asset.asset_type])}>
@@ -171,17 +168,17 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
               {asset.asset_type} · {asset.platform ?? 'No platform'} · {asset.format ?? 'No format'}
             </p>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl leading-none shrink-0">×</button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl leading-none shrink-0 bg-press">×</button>
         </div>
 
         <div className="flex-1 divide-y divide-border/40">
           {/* Status + ads-ready */}
           <div className="p-5 flex items-center gap-3">
-            <span className={cn('text-[11px] font-medium capitalize rounded-full px-2.5 py-1', STATUS_BADGE[asset.status])}>
+            <span className={cn('text-[11px] font-medium capitalize rounded-sm px-2.5 py-1', STATUS_BADGE[asset.status])}>
               {asset.status}
             </span>
             {asset.fit_for_ads && (
-              <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide text-primary">
+              <span className="flex items-center gap-1 text-[11px] font-bold text-primary">
                 <Zap className="h-3 w-3" />Approved for ads
               </span>
             )}
@@ -190,7 +187,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
           {/* Description */}
           {asset.description && (
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Description</p>
+              <p className="text-[11px] font-bold text-muted-foreground mb-2">Description</p>
               <p className="text-[13px] leading-relaxed text-muted-foreground">{asset.description}</p>
             </div>
           )}
@@ -198,42 +195,42 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
           {/* Performance */}
           {Object.keys(perf).length > 0 && (
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Performance</p>
+              <p className="text-[11px] font-bold text-muted-foreground mb-3">Performance</p>
               <div className="grid grid-cols-3 gap-2">
                 {perf.impressions && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">Impressions</p>
-                    <p className="text-[13px] font-semibold tabular-nums">{fmtNum(perf.impressions)}</p>
+                    <p className="text-[13px] font-semibold bg-num">{fmtNum(perf.impressions)}</p>
                   </div>
                 )}
                 {perf.clicks && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">Clicks</p>
-                    <p className="text-[13px] font-semibold tabular-nums">{fmtNum(perf.clicks)}</p>
+                    <p className="text-[13px] font-semibold bg-num">{fmtNum(perf.clicks)}</p>
                   </div>
                 )}
                 {perf.ctr && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">CTR</p>
-                    <p className="text-[13px] font-semibold tabular-nums">{perf.ctr.toFixed(2)}%</p>
+                    <p className="text-[13px] font-semibold bg-num">{perf.ctr.toFixed(2)}%</p>
                   </div>
                 )}
                 {perf.conversions && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">Conversions</p>
-                    <p className="text-[13px] font-semibold tabular-nums">{fmtNum(perf.conversions)}</p>
+                    <p className="text-[13px] font-semibold bg-num">{fmtNum(perf.conversions)}</p>
                   </div>
                 )}
                 {perf.spend && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">Spend</p>
-                    <p className="text-[13px] font-semibold tabular-nums">₦{fmtNum(perf.spend)}</p>
+                    <p className="text-[13px] font-semibold bg-num">₦{fmtNum(perf.spend)}</p>
                   </div>
                 )}
                 {perf.roas && (
                   <div className="bg-muted/40 rounded-lg p-2.5 text-center">
                     <p className="text-[10px] text-muted-foreground">ROAS</p>
-                    <p className="text-[13px] font-semibold tabular-nums">{perf.roas.toFixed(1)}x</p>
+                    <p className="text-[13px] font-semibold bg-num">{perf.roas.toFixed(1)}x</p>
                   </div>
                 )}
               </div>
@@ -243,7 +240,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
           {/* Replication elements */}
           {asset.replication_elements?.length > 0 && (
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">
+              <p className="text-[11px] font-bold text-muted-foreground mb-3">
                 What made it work — replicate these
               </p>
               <ul className="space-y-2">
@@ -260,7 +257,7 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
           {/* Notes */}
           {asset.notes && (
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Notes</p>
+              <p className="text-[11px] font-bold text-muted-foreground mb-2">Notes</p>
               <p className="text-[12.5px] text-muted-foreground leading-relaxed">{asset.notes}</p>
             </div>
           )}
@@ -268,10 +265,10 @@ function AssetDrawer({ asset, onClose }: { asset: CreativeAsset; onClose: () => 
           {/* Tags */}
           {asset.tags?.length > 0 && (
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Tags</p>
+              <p className="text-[11px] font-bold text-muted-foreground mb-2">Tags</p>
               <div className="flex flex-wrap gap-1.5">
                 {asset.tags.map(t => (
-                  <span key={t} className="text-[11px] bg-muted rounded-full px-2.5 py-1 text-muted-foreground">{t}</span>
+                  <span key={t} className="text-[11px] bg-muted rounded-sm px-2.5 py-1 text-muted-foreground">{t}</span>
                 ))}
               </div>
             </div>
@@ -397,7 +394,7 @@ export function CreativeLibraryClient({ brandId, brandName, assets }: Props) {
                 <Zap className="h-3.5 w-3.5 mr-1.5" />Create Ad Set ({adReadySelected.length})
               </Button>
             )}
-            <button onClick={() => setSelected(new Set())} className="text-[12px] text-muted-foreground hover:text-foreground">
+            <button onClick={() => setSelected(new Set())} className="text-[12px] text-muted-foreground hover:text-foreground bg-press">
               Clear
             </button>
           </div>

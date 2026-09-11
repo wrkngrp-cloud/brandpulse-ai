@@ -3,7 +3,7 @@ import { redirect, notFound }  from 'next/navigation'
 import Link                    from 'next/link'
 import { buttonVariants }      from '@/components/ui/button'
 import { cn }                  from '@/lib/utils'
-import { ArrowLeft, Edit, Copy, QrCode } from 'lucide-react'
+import { ArrowLeftIcon as ArrowLeft, EditIcon as Edit, CopyIcon as Copy, QrIcon as QrCode } from '@/components/brand/icon'
 import { OohVisitChart }       from '@/components/ooh/ooh-visit-chart'
 import { ImpressionCalculator } from '@/components/ooh/impression-calculator'
 import { SpendJustification }  from '@/components/ooh/spend-justification'
@@ -209,7 +209,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="border rounded-xl p-4 bg-card">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-lg font-semibold mt-1 tabular-nums">{value}</p>
+      <p className="text-lg font-semibold mt-1 bg-num">{value}</p>
     </div>
   )
 }

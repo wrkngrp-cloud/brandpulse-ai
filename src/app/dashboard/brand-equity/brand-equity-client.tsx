@@ -5,12 +5,13 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip as RechartTooltip,
   LineChart, Line, XAxis, YAxis, CartesianGrid, ReferenceLine,
 } from 'recharts'
-import { Info, Link as LinkIcon, ChevronDown } from 'lucide-react'
+import { InfoIcon as Info, LinkIcon, ChevronDownIcon as ChevronDown } from '@/components/brand/icon'
 import Link from 'next/link'
 import { BHIGauge } from '@/components/dashboard/bhi-gauge'
 import { cn, formatNGN } from '@/lib/utils'
 import { computeFullBHI, ZONE_META, type FullBHIComponents, type FullBHIResult, type BHIZone } from '@/lib/bhi'
 import { rangeLabelShort, rangeLabelLong } from '@/lib/range-label'
+import { ChartState } from '@/components/brand/chart-states'
 
 interface PerceptionDimension {
   dimension: string
@@ -44,13 +45,13 @@ interface Props {
 
 // Marker reference-line colors by type
 const MARKER_STROKE: Record<string, string> = {
-  product_launch:  '#6366f1', // indigo
-  campaign_launch: '#a855f7', // purple
-  partnership:     '#14b8a6', // teal
-  crisis:          '#ef4444', // red
-  rebrand:         '#f97316', // orange
-  event:           '#22c55e', // green
-  other:           '#94a3b8', // gray
+  product_launch:  'var(--neu)', // indigo
+  campaign_launch: 'var(--neu)', // purple
+  partnership:     'var(--pos)', // teal
+  crisis:          'var(--flare)', // red
+  rebrand:         'var(--ember)', // orange
+  event:           'var(--pos)', // green
+  other:           'var(--tx-3)', // gray
 }
 
 const COMPONENT_META: {
@@ -78,11 +79,11 @@ const ZONE_GUIDE: { zone: BHIZone; range: string; description: string }[] = [
 ]
 
 const ESOV_POSTURE = (esov: number) =>
-  esov > 5    ? { label: 'Growth Mode',      color: 'text-green-600',  bg: 'bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900'  } :
-  esov > 0    ? { label: 'Mild Growth',      color: 'text-green-600',  bg: 'bg-green-50 border-green-100 dark:bg-green-950/30 dark:border-green-900'  } :
+  esov > 5    ? { label: 'Growth Mode',      color: 'text-pos',  bg: 'bg-shell border-line dark:bg-shell/40 dark:border-line'  } :
+  esov > 0    ? { label: 'Mild Growth',      color: 'text-pos',  bg: 'bg-shell border-line dark:bg-shell/30 dark:border-line'  } :
   esov === 0  ? { label: 'Parity',           color: 'text-muted-foreground', bg: 'bg-muted border-border' } :
-  esov > -5   ? { label: 'Decline Risk',     color: 'text-amber-500',  bg: 'bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900' } :
-                { label: 'Critical Decline', color: 'text-red-500',    bg: 'bg-red-50 border-red-200 dark:bg-red-950/40 dark:border-red-900'         }
+  esov > -5   ? { label: 'Decline Risk',     color: 'text-tx-2',  bg: 'bg-shell border-line dark:bg-shell/40 dark:border-line' } :
+                { label: 'Critical Decline', color: 'text-tx-flare',    bg: 'bg-flare-wash border-line-strong dark:bg-shell/40 dark:border-line-strong'         }
 
 export function BrandEquityClient({
   bhi, sparkline, sovPct, currentNps, npsTotal, emvRaw, perceptionDimensions, brandName, days = 30,
@@ -146,7 +147,7 @@ export function BrandEquityClient({
             <p className="text-xs text-muted-foreground">7 components · {bhi.coverage}% data coverage</p>
           </div>
           {bhi.coverage < 70 && (
-            <div className="flex items-center gap-1.5 text-xs text-amber-500">
+            <div className="flex items-center gap-1.5 text-xs text-tx-2">
               <Info className="h-3.5 w-3.5 shrink-0" />
               <span>Low coverage — run more surveys to improve accuracy</span>
             </div>
@@ -181,29 +182,29 @@ export function BrandEquityClient({
                   : (score as number) >= b.p25       ? 'Below P50'
                   : 'Bottom 25%'
                 : null
-              const pctileColor = pctile === 'Top 10%' || pctile === 'Top 25%' ? 'text-green-600'
-                : pctile === 'Above P50' ? 'text-blue-500'
-                : pctile === 'Below P50' ? 'text-amber-500'
-                : pctile ? 'text-red-500' : ''
+              const pctileColor = pctile === 'Top 10%' || pctile === 'Top 25%' ? 'text-pos'
+                : pctile === 'Above P50' ? 'text-tx-2'
+                : pctile === 'Below P50' ? 'text-tx-2'
+                : pctile ? 'text-tx-flare' : ''
 
               return (
                 <div key={meta.key} className="rounded-lg transition-colors">
                   {/* Row header — clickable */}
                   <button
                     onClick={() => setExpandedKey(isOpen ? null : meta.key)}
-                    className="w-full flex items-center gap-3 py-1.5 px-1 rounded-lg hover:bg-muted/40 transition-colors group text-left"
+                    className="w-full flex items-center gap-3 py-1.5 px-1 rounded-lg hover:bg-muted/40 transition-colors group text-left bg-press"
                   >
                     <div className="w-24 shrink-0">
                       <p className="text-xs font-medium truncate">{meta.label}</p>
                       <p className="text-[10px] text-muted-foreground/60">{meta.weight}% weight</p>
                     </div>
                     <div className="flex-1">
-                      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-muted rounded-sm overflow-hidden">
                         <div
-                          className="h-full rounded-full transition-all duration-700"
+                          className="h-full rounded-sm transition-colors duration-700"
                           style={{
                             width: available ? `${score}%` : '0%',
-                            backgroundColor: available ? (zone?.color ?? '#94a3b8') : undefined,
+                            backgroundColor: available ? (zone?.color ?? 'var(--tx-3)') : undefined,
                             opacity: available ? 1 : 0,
                           }}
                         />
@@ -211,14 +212,14 @@ export function BrandEquityClient({
                     </div>
                     <div className="w-12 text-right shrink-0">
                       {available ? (
-                        <span className="text-sm font-semibold tabular-nums">{Math.round(score as number)}</span>
+                        <span className="text-sm font-semibold bg-num">{Math.round(score as number)}</span>
                       ) : meta.phase ? (
                         <span className="text-[10px] text-muted-foreground/40 bg-muted rounded px-1">{meta.phase}</span>
                       ) : (
                         <span className="text-xs text-muted-foreground/40">—</span>
                       )}
                       {pctile && (
-                        <p className={cn('text-[9px] font-semibold uppercase tracking-wide leading-none mt-0.5', pctileColor)}>{pctile}</p>
+                        <p className={cn('text-[9px] font-semibold leading-none mt-0.5', pctileColor)}>{pctile}</p>
                       )}
                     </div>
                     <div className="w-20 shrink-0 hidden sm:flex items-center justify-between gap-1">
@@ -237,7 +238,7 @@ export function BrandEquityClient({
                   {/* Breakdown panel */}
                   {isOpen && (
                     <div className="ml-1 mr-1 mb-2 border border-border rounded-lg bg-muted p-3 space-y-2.5">
-                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <p className="text-[10px] font-semibold text-muted-foreground">
                         Contributing data sources
                       </p>
                       {breakdown && breakdown.sources.length > 0 ? (
@@ -250,19 +251,19 @@ export function BrandEquityClient({
                                   <div className="flex items-center gap-2 min-w-0">
                                     <span className="text-[11px] text-foreground/80 font-medium truncate">{source.label}</span>
                                     {source.rawDisplay && (
-                                      <span className="text-[10px] text-muted-foreground/60 tabular-nums shrink-0">{source.rawDisplay}</span>
+                                      <span className="text-[10px] text-muted-foreground/60 bg-num shrink-0">{source.rawDisplay}</span>
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2 shrink-0">
-                                    <span className="text-[10px] text-muted-foreground/50 tabular-nums">
+                                    <span className="text-[10px] text-muted-foreground/50 bg-num">
                                       {source.weight > 0 ? `${source.weight}% wt` : 'no data'}
                                     </span>
                                     <span className={cn(
-                                      'text-[11px] font-bold tabular-nums w-10 text-right',
+                                      'text-[11px] font-bold bg-num w-10 text-right',
                                       source.score !== null
-                                        ? source.score >= 70 ? 'text-green-600'
-                                          : source.score >= 45 ? 'text-amber-500'
-                                          : 'text-red-500'
+                                        ? source.score >= 70 ? 'text-pos'
+                                          : source.score >= 45 ? 'text-tx-2'
+                                          : 'text-tx-flare'
                                         : 'text-muted-foreground/30',
                                     )}>
                                       {source.score !== null ? `${source.score}/100` : '—'}
@@ -270,20 +271,20 @@ export function BrandEquityClient({
                                   </div>
                                 </div>
                                 {/* Weight + score bar */}
-                                <div className="relative h-1 bg-muted rounded-full overflow-hidden">
+                                <div className="relative h-1 bg-muted rounded-sm overflow-hidden">
                                   {/* Weight indicator (total bar width shows relative weight) */}
                                   <div
-                                    className="absolute inset-y-0 left-0 rounded-full bg-muted-foreground/15"
+                                    className="absolute inset-y-0 left-0 rounded-sm bg-muted-foreground/15"
                                     style={{ width: `${source.weight}%` }}
                                   />
                                   {/* Score fill within the weight area */}
                                   {source.score !== null && source.weight > 0 && (
                                     <div
-                                      className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                                      className="absolute inset-y-0 left-0 rounded-sm transition-colors duration-700"
                                       style={{
                                         width: `${(source.weight / 100) * source.score}%`,
-                                        backgroundColor: source.score >= 70 ? '#22c55e'
-                                          : source.score >= 45 ? '#f59e0b' : '#ef4444',
+                                        backgroundColor: source.score >= 70 ? 'var(--pos)'
+                                          : source.score >= 45 ? 'var(--ember)' : 'var(--flare)',
                                         opacity: 0.8,
                                       }}
                                     />
@@ -305,7 +306,7 @@ export function BrandEquityClient({
                           )}
                         </>
                       ) : (
-                        <p className="text-xs text-muted-foreground italic">
+                        <p className="text-xs text-muted-foreground">
                           No source data available for this component yet.
                         </p>
                       )}
@@ -342,10 +343,10 @@ export function BrandEquityClient({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: meta.color }} />
+                    <span className="h-[11px] w-[5px] rounded-[var(--r-tick)]" style={{ backgroundColor: meta.color }} />
                     <span className="text-xs font-semibold" style={{ color: meta.color }}>{meta.label}</span>
                   </div>
-                  <span className="text-[10px] font-mono text-muted-foreground/50 tabular-nums">{range}</span>
+                  <span className="text-[10px] bg-num text-muted-foreground/50 bg-num">{range}</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
                 {bhi.zone === zone && (
@@ -381,26 +382,26 @@ export function BrandEquityClient({
                 : value >= b.p50       ? 'Above median'
                 : value >= b.p25       ? 'Below median'
                 : 'Bottom 25%'
-              const colour = pctile === 'Top 10%' || pctile === 'Top 25%' ? 'text-green-600'
-                : pctile === 'Above median' ? 'text-blue-500'
-                : pctile === 'Below median' ? 'text-amber-500'
-                : 'text-red-500'
+              const colour = pctile === 'Top 10%' || pctile === 'Top 25%' ? 'text-pos'
+                : pctile === 'Above median' ? 'text-tx-2'
+                : pctile === 'Below median' ? 'text-tx-2'
+                : 'text-tx-flare'
               return (
                 <div key={key} className="rounded-lg border border-border/60 p-3 space-y-2">
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-medium">{label}</p>
-                    {pctile && <span className={cn('text-[10px] font-bold uppercase tracking-wide', colour)}>{pctile}</span>}
+                    {pctile && <span className={cn('text-[10px] font-bold', colour)}>{pctile}</span>}
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-lg font-bold tabular-nums">
+                    <span className="text-lg font-bold bg-num">
                       {value != null ? `${Math.round(value)}${suffix}` : '—'}
                     </span>
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-[10px] text-muted-foreground bg-num">
                       median {Math.round(b.p50)}{suffix}
                     </span>
                   </div>
                   {/* Percentile bar */}
-                  <div className="relative h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="relative h-1.5 bg-muted rounded-sm overflow-hidden">
                     {/* p25 marker */}
                     <div className="absolute top-0 bottom-0 w-px bg-border/60" style={{ left: '25%' }} />
                     {/* median marker */}
@@ -414,17 +415,17 @@ export function BrandEquityClient({
                       const pos   = Math.min(100, Math.max(0, ((value - min) / range) * 100))
                       return (
                         <div
-                          className="absolute top-1/2 -translate-y-1/2 h-3 w-3 rounded-full border-2 border-background shadow"
-                          style={{ left: `${pos}%`, transform: `translateX(-50%) translateY(-50%)`, backgroundColor: '#3b82f6' }}
+                          className="absolute top-1/2 -translate-y-1/2 h-[11px] w-[5px] rounded-[var(--r-tick)] border-2 border-background"
+                          style={{ left: `${pos}%`, transform: `translateX(-50%) translateY(-50%)`, backgroundColor: 'var(--flare)' }}
                         />
                       )
                     })()}
                   </div>
                   <div className="flex justify-between text-[10px] text-muted-foreground/50">
-                    <span>P25: {Math.round(b.p25)}</span>
-                    <span>P50: {Math.round(b.p50)}</span>
-                    <span>P75: {Math.round(b.p75)}</span>
-                    <span>Top: {Math.round(b.top_decile)}</span>
+                    <span className="bg-num">P25: {Math.round(b.p25)}</span>
+                    <span className="bg-num">P50: {Math.round(b.p50)}</span>
+                    <span className="bg-num">P75: {Math.round(b.p75)}</span>
+                    <span className="bg-num">Top: {Math.round(b.top_decile)}</span>
                   </div>
                 </div>
               )
@@ -440,74 +441,76 @@ export function BrandEquityClient({
             <p className="text-sm font-semibold">Brand Health Trend</p>
             <p className="text-xs text-muted-foreground">{rlShort} history — hover data points for details</p>
           </div>
-          <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={sparkline} margin={{ top: 4, right: 8, left: -28, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
-                tickLine={false}
-                axisLine={false}
-                interval="preserveStartEnd"
-                tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
-                fontFamily="var(--font-sans)"
-              />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'currentColor', opacity: 0.35 }} tickLine={false} axisLine={false} tickCount={5} fontFamily="var(--font-sans)" />
-              <ReferenceLine y={80} stroke="#14b8a6" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Leading', fontSize: 9, fill: '#14b8a6', opacity: 0.5 }} />
-              <ReferenceLine y={65} stroke="#22c55e" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Healthy', fontSize: 9, fill: '#22c55e', opacity: 0.5 }} />
-              <ReferenceLine y={40} stroke="#f59e0b" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Building', fontSize: 9, fill: '#f59e0b', opacity: 0.5 }} />
-              {benchmarks['bhi']?.p50 != null && (
-                <ReferenceLine
-                  y={benchmarks['bhi'].p50}
-                  stroke="#a855f7"
-                  strokeDasharray="6 3"
-                  strokeWidth={1.5}
-                  strokeOpacity={0.65}
-                  label={{ value: `Sector P50 (${Math.round(benchmarks['bhi'].p50)})`, position: 'insideBottomRight', fontSize: 9, fill: '#a855f7', opacity: 0.8 }}
+          <ChartState rows={sparkline} height={180} empty="Connect a source to start the brand health trend.">
+                      <ResponsiveContainer width="100%" height={180}>
+              <LineChart data={sparkline} margin={{ top: 4, right: 8, left: -28, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="0" vertical={false} stroke="currentColor" className="text-border opacity-40" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'currentColor', opacity: 0.4 }}
+                  tickLine={false}
+                  axisLine={false}
+                  interval="preserveStartEnd"
+                  tickFormatter={(v: string) => new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', timeZone: 'Africa/Lagos' })}
+                  fontFamily="var(--font-num)"
                 />
-              )}
-              <RechartTooltip
-                formatter={(v) => [typeof v === 'number' ? Math.round(v) : v, 'BHI Score']}
-                labelFormatter={(v) => typeof v === 'string' ? new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' }) : String(v)}
-                contentStyle={{
-                  background: '#14182B',
-                  border: '1px solid rgba(255,255,255,0.10)',
-                  borderRadius: 12,
-                  fontSize: 12,
-                  color: '#fff',
-                }}
-                labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em', marginBottom: 4 }}
-              />
-              {markers.map(m => (
-                <ReferenceLine
-                  key={`${m.marker_date}-${m.label}`}
-                  x={m.marker_date}
-                  stroke={MARKER_STROKE[m.marker_type] ?? MARKER_STROKE.other}
-                  strokeDasharray="3 3"
-                  label={{ value: '🚀', position: 'top', fontSize: 10 }}
+                <YAxis domain={[0, 100]} tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'currentColor', opacity: 0.35 }} tickLine={false} axisLine={false} tickCount={5} fontFamily="var(--font-num)" />
+                <ReferenceLine y={80} stroke="var(--line-strong)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Leading', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.5 }} />
+                <ReferenceLine y={65} stroke="var(--line-strong)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Healthy', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.5 }} />
+                <ReferenceLine y={40} stroke="var(--line-strong)" strokeDasharray="4 3" strokeOpacity={0.25} label={{ value: 'Building', fontSize: 9, fill: 'var(--tx-3)', opacity: 0.5 }} />
+                {benchmarks['bhi']?.p50 != null && (
+                  <ReferenceLine
+                    y={benchmarks['bhi'].p50}
+                    stroke="var(--line-strong)"
+                    strokeDasharray="6 3"
+                    strokeWidth={1.5}
+                    strokeOpacity={0.65}
+                    label={{ value: `Sector P50 (${Math.round(benchmarks['bhi'].p50)})`, position: 'insideBottomRight', fontSize: 9, fill: 'var(--neu)', opacity: 0.8 }}
+                  />
+                )}
+                <RechartTooltip
+                  formatter={(v) => [typeof v === 'number' ? Math.round(v) : v, 'BHI Score']}
+                  labelFormatter={(v) => typeof v === 'string' ? new Date(v).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' }) : String(v)}
+                  contentStyle={{
+                    background: 'var(--bg-ink)',
+                    border: 'var(--line)',
+                    borderRadius: 'var(--r-card)',
+                    fontSize: 12,
+                    color: 'var(--bg-card)',
+                  }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em', marginBottom: 4 }}
                 />
-              ))}
-              <Line
-                type="monotone"
-                dataKey="score"
-                name="BHI"
-                stroke="#2B59FF"
-                strokeWidth={2.5}
-                dot={false}
-                activeDot={{ r: 5, fill: '#2B59FF', strokeWidth: 2, stroke: '#fff' }}
-                connectNulls={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+                {markers.map(m => (
+                  <ReferenceLine
+                    key={`${m.marker_date}-${m.label}`}
+                    x={m.marker_date}
+                    stroke={MARKER_STROKE[m.marker_type] ?? MARKER_STROKE.other}
+                    strokeDasharray="3 3"
+                    label={{ value: '🚀', position: 'top', fontSize: 10 }}
+                  />
+                ))}
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  name="BHI"
+                  stroke="var(--flare)"
+                  strokeWidth={2.5}
+                  dot={false}
+                  activeDot={{ r: 5, fill: 'var(--flare)', strokeWidth: 2, stroke: 'var(--bg-card)' }}
+                  connectNulls={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartState>
           <div className="flex items-center gap-4 flex-wrap">
             {[
-              { label: 'Leading', color: '#14b8a6', range: '80–100' },
-              { label: 'Healthy', color: '#22c55e', range: '65–79' },
-              { label: 'Building', color: '#f59e0b', range: '40–64' },
-              { label: 'At Risk', color: '#ef4444', range: '0–39' },
+              { label: 'Leading', color: 'var(--pos)', range: '80–100' },
+              { label: 'Healthy', color: 'var(--pos)', range: '65–79' },
+              { label: 'Building', color: 'var(--ember)', range: '40–64' },
+              { label: 'At Risk', color: 'var(--flare)', range: '0–39' },
             ].map(z => (
               <div key={z.label} className="flex items-center gap-1.5">
-                <span className="h-[2px] w-4 rounded-full" style={{ background: z.color, opacity: 0.5 }} />
+                <span className="h-[2px] w-4 rounded-sm" style={{ background: z.color, opacity: 0.5 }} />
                 <span className="text-[10px] text-muted-foreground">{z.label} ({z.range})</span>
               </div>
             ))}
@@ -559,7 +562,7 @@ export function BrandEquityClient({
 
         {/* Budget simulator */}
         <div className="border rounded-lg p-4 space-y-3 bg-muted/20">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Budget-to-ESOV Simulator</p>
+          <p className="text-xs font-semibold text-muted-foreground">Budget-to-ESOV Simulator</p>
           <div className="flex items-center gap-3 flex-wrap">
             <p className="text-sm text-muted-foreground">Target ESOV:</p>
             <div className="flex items-center gap-1">
@@ -581,7 +584,7 @@ export function BrandEquityClient({
                 <span className="font-semibold">{marketShare + targetEsov}% SOV</span>
                 {' '}(ESOV +{targetEsov}%), estimated additional media investment needed:
               </p>
-              <p className="text-2xl font-bold">{formatNGN(estimatedAdditionalSpend)}</p>
+              <p className="text-2xl font-bold bg-num">{formatNGN(estimatedAdditionalSpend)}</p>
               <p className="text-xs text-muted-foreground">
                 Estimated time to impact: {targetEsov <= 5 ? '3–6 months' : targetEsov <= 15 ? '6–9 months' : '9–12 months'} at sustained spend.
                 Based on current social EMV as spend proxy — accuracy improves when digital ad accounts are connected.
@@ -618,37 +621,39 @@ export function BrandEquityClient({
         </div>
 
         {hasPerceptionData ? (
-          <ResponsiveContainer width="100%" height={280}>
-            <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
-              <PolarGrid className="stroke-border" />
-              <PolarAngleAxis
-                dataKey="dimension"
-                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-              />
-              <Radar
-                name={brandName}
-                dataKey="score"
-                stroke="#2B59FF"
-                fill="#2B59FF"
-                fillOpacity={0.18}
-                strokeWidth={2}
-              />
-              <RechartTooltip
-                formatter={(v, _name, props) => [
-                  `${Number(v).toFixed(0)}/100`,
-                  (props.payload as { fullLabel?: string })?.fullLabel ?? String(_name),
-                ]}
-                contentStyle={{
-                  background: '#14182B',
-                  border: '1px solid rgba(255,255,255,0.10)',
-                  borderRadius: 12,
-                  fontSize: 12,
-                  color: '#fff',
-                }}
-                labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
-              />
-            </RadarChart>
-          </ResponsiveContainer>
+          <ChartState rows={radarData} height={280} empty="Connect a source to start the brand health trend.">
+                      <ResponsiveContainer width="100%" height={280}>
+              <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+                <PolarGrid className="stroke-border" />
+                <PolarAngleAxis
+                  dataKey="dimension"
+                  tick={{ fontFamily: 'var(--font-num)',  fontSize: 10, fill: 'var(--muted-foreground)' }}
+                />
+                <Radar
+                  name={brandName}
+                  dataKey="score"
+                  stroke="var(--flare)"
+                  fill="var(--flare)"
+                  fillOpacity={0.18}
+                  strokeWidth={2}
+                />
+                <RechartTooltip
+                  formatter={(v, _name, props) => [
+                    `${Number(v).toFixed(0)}/100`,
+                    (props.payload as { fullLabel?: string })?.fullLabel ?? String(_name),
+                  ]}
+                  contentStyle={{
+                    background: 'var(--bg-ink)',
+                    border: 'var(--line)',
+                    borderRadius: 'var(--r-card)',
+                    fontSize: 12,
+                    color: 'var(--bg-card)',
+                  }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10, textTransform: '', letterSpacing: '0.10em' }}
+                />
+              </RadarChart>
+            </ResponsiveContainer>
+          </ChartState>
         ) : (
           <div className="h-48 flex items-center justify-center border rounded-lg border-dashed">
             <div className="text-center space-y-1.5">
@@ -688,8 +693,8 @@ export function BrandEquityClient({
             </Link>
           </div>
           <p className={cn('text-3xl font-bold', currentNps == null ? 'text-muted-foreground/40' :
-            currentNps >= 50 ? 'text-green-600' : currentNps >= 30 ? 'text-foreground' :
-            currentNps >= 0 ? 'text-amber-500' : 'text-red-500')}>
+            currentNps >= 50 ? 'text-pos' : currentNps >= 30 ? 'text-foreground' :
+            currentNps >= 0 ? 'text-tx-2' : 'text-tx-flare')}>
             {currentNps != null ? `${currentNps >= 0 ? '+' : ''}${currentNps}` : '—'}
           </p>
           <p className="text-xs text-muted-foreground">

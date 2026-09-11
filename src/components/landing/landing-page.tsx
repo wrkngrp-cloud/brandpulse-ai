@@ -1,41 +1,59 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
-import { ArrowRight, Moon, Sun } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
 import { VideoHero } from './video-hero'
 import { HorizontalTour } from './horizontal-tour'
-import { AiScene, CLAY, CompetitiveScene, GaugeMark, darkSceneVars, lightSceneVars } from './scenes'
+import { AiScene, CompetitiveScene, darkSceneVars, lightSceneVars } from './scenes'
+import { BrandLockup } from '@/components/brand/logo'
+import { useDarkGround, useMode } from './use-mode'
 
+// Fade-and-slide-up on every element is banned: one reveal group per section,
+// maximum, and it is the section's own .bg-reveal group in motion.css. What is
+// left here is the shared easing, so the call sites keep reading the same.
 const rise = {
-  initial: { opacity: 0, y: 28 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-80px' },
   transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
 }
 
-// ————— theme palettes —————
-export const LIGHT = {
-  '--lp-bg': '#FBF9F5', '--lp-ink': '#14182B', '--lp-mut': 'rgba(20,24,43,0.55)',
-  '--lp-line': 'rgba(20,24,43,0.10)', '--lp-card': '#FFFFFF', '--lp-glass': 'rgba(255,255,255,0.75)',
-  '--lp-chip': 'rgba(20,24,43,0.04)', '--lp-clay': CLAY, '--lp-band': '#14182B', '--lp-band-ink': '#F4EDE4',
-  '--lp-dot': 'rgba(20,24,43,0.10)',
+// ————— theme —————
+/**
+ * One palette. The `--lp-*` variables map onto the tokens, and the tokens flip
+ * under [data-mode="dark"], so the page cannot disagree with the app's mode.
+ * Two hand-kept copies is how the headline ended up ink on ink.
+ *
+ * `--lp-band` is the raised ink plane, one value in both modes: on Paper it
+ * reads as the ink band, and on Ink it still stands off the ground instead of
+ * collapsing into it. Its type is therefore fixed Paper.
+ */
+export const LP_VARS = {
+  '--lp-bg': 'var(--bg-paper)',
+  '--lp-ink': 'var(--tx)',
+  '--lp-mut': 'var(--tx-3)',
+  '--lp-line': 'var(--line)',
+  '--lp-card': 'var(--bg-card)',
+  '--lp-glass': 'var(--bg-paper)',   /* the nav bar: the ground plane, so the supplied lockup's own ground matches it */
+  '--lp-chip': 'var(--bg-shell)',
+  '--lp-clay': 'var(--flare)',
+  '--lp-band': 'var(--bg-ink-raised)',
+  '--lp-band-ink': 'var(--tx-inv)',
+  '--lp-dot': 'var(--tick-1)',
 } as React.CSSProperties
 
-export const DARK = {
-  '--lp-bg': '#080C1A', '--lp-ink': '#F4EDE4', '--lp-mut': 'rgba(244,237,228,0.52)',
-  '--lp-line': 'rgba(255,255,255,0.10)', '--lp-card': '#0E1430', '--lp-glass': 'rgba(11,16,34,0.75)',
-  '--lp-chip': 'rgba(255,255,255,0.04)', '--lp-clay': '#E06A32', '--lp-band': '#0E1430', '--lp-band-ink': '#F4EDE4',
-  '--lp-dot': 'rgba(255,255,255,0.10)',
-} as React.CSSProperties
+/** Kept for the film, which renders these scenes outside the app. */
+export const LIGHT = LP_VARS
+export const DARK = LP_VARS
 
-export function Wordmark({ className = 'text-xl' }: { className?: string }) {
-  return (
-    <span className={`font-extrabold tracking-tight ${className}`} style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
-      Brand<span style={{ color: 'var(--lp-clay)' }}>Gauge</span>
-    </span>
-  )
+/**
+ * The lockup as supplied. The wordmark is not set in type here.
+ *
+ * Ground follows the document mode: each supplied file carries its own
+ * full-bleed ground rect, so the Paper lockup draws a Paper box on ink.
+ */
+export function Wordmark({ height = 22 }: { height?: number }) {
+  const dark = useDarkGround()
+  return <BrandLockup height={height} ground={dark ? 'ink' : 'paper'} />
 }
 
 export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
@@ -44,10 +62,9 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
       <div className="mx-4 mt-4 flex max-w-6xl items-center justify-between rounded-2xl border px-4 py-3 backdrop-blur-xl sm:mx-6 sm:px-5 lg:mx-auto"
         style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-glass)' }}>
         <Link href="/" className="flex items-center gap-2.5" style={{ color: 'var(--lp-ink)' }}>
-          <GaugeMark className="h-7 w-7" />
           <Wordmark />
         </Link>
-        <nav className="hidden items-center gap-7 font-mono text-[11px] uppercase tracking-[0.18em] md:flex" style={{ color: 'var(--lp-mut)' }}>
+        <nav className="hidden items-center gap-7 text-[11px] md:flex" style={{ color: 'var(--lp-mut)' }}>
           <a href="/#tour" className="transition-opacity hover:opacity-60">Product</a>
           <Link href="/features" className="transition-opacity hover:opacity-60">Features</Link>
           <Link href="/use-cases" className="transition-opacity hover:opacity-60">Industries</Link>
@@ -55,14 +72,13 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
         </nav>
         <div className="flex items-center gap-2.5">
           <button onClick={onToggle} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="flex h-9 w-9 items-center justify-center rounded-full border transition-transform hover:rotate-12"
+            className="flex h-9 w-9 items-center justify-center rounded-full border transition-transform hover:rotate-12 bg-press"
             style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)' }}>
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
           <Link href="/auth/login" className="hidden text-[13px] font-medium transition-opacity hover:opacity-70 sm:block" style={{ color: 'var(--lp-ink)' }}>Sign in</Link>
           <Link href="/auth/signup"
-            className="whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-bold text-white shadow-[0_8px_28px_rgba(212,96,42,0.35)] transition-transform hover:scale-[1.04]"
-            style={{ background: 'var(--lp-clay)' }}>
+            className="whitespace-nowrap rounded-sm px-4 py-2 text-[13px] font-bold transition-transform border border-line" style={{ background: 'var(--tx)', color: 'var(--bg-paper)' }}>
             Start free
           </Link>
         </div>
@@ -72,21 +88,9 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
 }
 
 /** Mouse-follow tilt wrapper: the "hold the product in your hand" delighter. */
+/** The demo sits flat. Nothing in this brand tilts toward the cursor. */
 function Tilt({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [tf, setTf] = useState('rotateX(0deg) rotateY(0deg)')
-  function onMove(e: React.MouseEvent) {
-    const r = ref.current?.getBoundingClientRect()
-    if (!r) return
-    const x = (e.clientX - r.left) / r.width - 0.5
-    const y = (e.clientY - r.top) / r.height - 0.5
-    setTf(`rotateX(${(-y * 4).toFixed(2)}deg) rotateY(${(x * 6).toFixed(2)}deg)`)
-  }
-  return (
-    <div ref={ref} style={{ perspective: '1400px' }} onMouseMove={onMove} onMouseLeave={() => setTf('rotateX(0deg) rotateY(0deg)')}>
-      <div className="transition-transform duration-300 ease-out will-change-transform" style={{ transform: tf }}>{children}</div>
-    </div>
-  )
+  return <div>{children}</div>
 }
 
 /** Adire-inspired concentric circle motif, kept faint. */
@@ -123,23 +127,9 @@ function GaugeArcMotif({ className = '', size = 520, color = 'var(--lp-clay)', o
   )
 }
 
-function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-40px' })
-  const [v, setV] = useState(0)
-  useEffect(() => {
-    if (!inView) return
-    const t0 = performance.now()
-    let raf = 0
-    const loop = (now: number) => {
-      const p = Math.min(1, (now - t0) / 1200)
-      setV(Math.round(to * (1 - Math.pow(1 - p, 3))))
-      if (p < 1) raf = requestAnimationFrame(loop)
-    }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
-  }, [inView, to])
-  return <span ref={ref}>{v}{suffix}</span>
+/** A reading is printed, not counted up to. The reading is not a slot machine. */
+function Reading({ to, suffix = '' }: { to: number; suffix?: string }) {
+  return <span>{to}{suffix}</span>
 }
 
 function Hero() {
@@ -153,20 +143,20 @@ function Hero() {
           backgroundSize: '26px 26px',
           maskImage: 'radial-gradient(75% 55% at 50% 32%, black, transparent)',
         }} />
-        <div className="absolute -left-24 top-40 opacity-70"><div className="lp-par lp-par-b"><CircleMotif /></div></div>
-        <div className="absolute -right-16 top-[560px] opacity-50"><div className="lp-par lp-par-a"><CircleMotif size={220} /></div></div>
-        <div className="absolute left-1/2 top-[-180px] h-[420px] w-[820px] -translate-x-1/2 rounded-full blur-[130px]"
-          style={{ background: 'rgba(43,89,255,0.10)' }} />
-        <div className="absolute left-1/2 top-[380px] h-[380px] w-[700px] -translate-x-1/2 rounded-full blur-[130px]"
-          style={{ background: 'rgba(212,96,42,0.10)' }} />
+        <div className="absolute -left-24 top-40 opacity-70"><div><CircleMotif /></div></div>
+        <div className="absolute -right-16 top-[560px] opacity-50"><div><CircleMotif size={220} /></div></div>
+        <div className="absolute left-1/2 top-[-180px] h-[420px] w-[820px] -translate-x-1/2 rounded-sm blur-[130px]"
+          style={{ background: 'var(--bg-shell)' }} />
+        <div className="absolute left-1/2 top-[380px] h-[380px] w-[700px] -translate-x-1/2 rounded-sm blur-[130px]"
+          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6 text-center">
-        <motion.p {...rise} className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>
-          Brand intelligence · Lagos to Accra
+        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>
+          Brand intelligence built in Lagos, for West Africa
         </motion.p>
         <h1 className="mx-auto mt-5 max-w-4xl text-5xl font-black leading-[1.02] tracking-[-0.03em] sm:text-7xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           {words.map((w, i) => (
             <motion.span key={i} className="inline-block whitespace-pre"
               initial={{ opacity: 0, y: 34, rotate: 2 }}
@@ -184,12 +174,12 @@ function Hero() {
         </motion.p>
         <motion.div {...rise} transition={{ ...rise.transition, delay: 0.6 }} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Link href="/auth/signup"
-            className="group flex items-center gap-2 rounded-full px-6 py-3.5 text-[14px] font-bold text-white shadow-[0_14px_44px_rgba(212,96,42,0.4)] transition-transform hover:scale-[1.03]"
-            style={{ background: 'var(--lp-clay)' }}>
+            className="group flex items-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-on-hot border border-line bg-press"
+            style={{ background: 'var(--flare)' }}>
             Start free in beta
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
-          <a href="#demo" className="rounded-full border px-6 py-3.5 text-[14px] font-medium transition-colors"
+          <a href="#demo" className="rounded-sm border px-6 py-3.5 text-[14px] font-medium transition-colors"
             style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)' }}>
             Watch the demo
           </a>
@@ -199,21 +189,15 @@ function Hero() {
         <motion.div id="demo" {...rise} transition={{ ...rise.transition, delay: 0.72 }} className="relative mx-auto mt-16 max-w-4xl scroll-mt-28">
           <Tilt><VideoHero /></Tilt>
         </motion.div>
-
-        {/* connector marquee */}
-        <div className="relative mt-16 overflow-hidden" style={{ maskImage: 'linear-gradient(90deg, transparent, black 12%, black 88%, transparent)' }}>
-          <div className="flex w-max animate-[lp-marquee_26s_linear_infinite] gap-10 font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--lp-mut)' }}>
-            {[...Array(2)].flatMap((_, k) =>
-              ['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
-                <span key={`${k}-${c}`} className="flex items-center gap-10">
-                  <span>{c}</span><span style={{ color: 'var(--lp-clay)' }}>·</span>
-                </span>
-              )),
-            )}
+        {/* The connectors, listed. Nothing here loops. */}
+        <div className="relative mt-16">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px]" style={{ color: 'var(--lp-mut)' }}>
+            {['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
+              <span key={c}>{c}</span>
+            ))}
           </div>
         </div>
       </div>
-      <style>{`@keyframes lp-marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }`}</style>
     </section>
   )
 }
@@ -237,30 +221,30 @@ function Differentiators() {
           backgroundSize: '26px 26px',
           maskImage: 'radial-gradient(65% 70% at 50% 0%, black, transparent)',
         }} />
-        <div className="absolute -left-20 -top-16 opacity-40"><div className="lp-par lp-par-a"><CircleMotif size={200} /></div></div>
-        <div className="absolute -bottom-32 -right-24"><div className="lp-par lp-par-b"><GaugeArcMotif size={560} opacity={0.24} /></div></div>
-        <div className="absolute right-0 top-0 h-[360px] w-[560px] rounded-full blur-[130px]"
-          style={{ background: 'rgba(43,89,255,0.08)' }} />
-        <div className="absolute -bottom-40 left-0 h-[340px] w-[600px] rounded-full blur-[130px]"
-          style={{ background: 'rgba(212,96,42,0.09)' }} />
+        <div className="absolute -left-20 -top-16 opacity-40"><div><CircleMotif size={200} /></div></div>
+        <div className="absolute -bottom-32 -right-24"><div><GaugeArcMotif size={560} opacity={0.24} /></div></div>
+        <div className="absolute right-0 top-0 h-[360px] w-[560px] rounded-sm blur-[130px]"
+          style={{ background: 'var(--bg-shell)' }} />
+        <div className="absolute -bottom-40 left-0 h-[340px] w-[600px] rounded-sm blur-[130px]"
+          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
-        <motion.p {...rise} className="font-mono text-[11px] uppercase tracking-[0.3em]" style={{ color: 'var(--lp-clay)' }}>Why BrandGauge</motion.p>
+        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Why BrandGauge</motion.p>
         <motion.h2 {...rise} className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Built for here. Not adapted for here.
         </motion.h2>
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {DIFFS.map((d, i) => (
             <motion.div key={d.n} {...rise} transition={{ ...rise.transition, delay: i * 0.05 }}
-              className="group relative overflow-hidden rounded-2xl border p-7 transition-all duration-300 hover:-translate-y-1.5"
-              style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', boxShadow: '0 1px 2px rgba(20,24,43,0.04)' }}>
+              className="group relative overflow-hidden rounded-2xl border p-7 transition-colors duration-300"
+              style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
               {/* clay corner sweep on hover */}
               <div className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                style={{ background: 'rgba(212,96,42,0.22)' }} />
-              <span className="font-mono text-[11px]" style={{ color: 'var(--lp-clay)' }}>{d.n}</span>
-              <h3 className="mt-3 text-[17px] font-bold leading-snug" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>{d.title}</h3>
+                style={{ background: 'var(--bg-shell)' }} />
+              <span className="bg-num text-[11px]" style={{ color: 'var(--tx-flare)' }}>{d.n}</span>
+              <h3 className="mt-3 text-[17px] font-bold leading-snug" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{d.title}</h3>
               <p className="mt-2.5 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{d.body}</p>
             </motion.div>
           ))}
@@ -269,7 +253,7 @@ function Differentiators() {
         {/* stats band */}
         <motion.div {...rise} className="relative mt-16 grid grid-cols-2 gap-4 rounded-2xl border p-8 text-center sm:grid-cols-4"
           style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-chip)' }}>
-          <div className="pointer-events-none absolute -bottom-16 -right-10"><div className="lp-par lp-par-c"><GaugeArcMotif size={220} opacity={0.3} /></div></div>
+          <div className="pointer-events-none absolute -bottom-16 -right-10"><div><GaugeArcMotif size={220} opacity={0.3} /></div></div>
           {[
             { v: 4,  s: '',  label: 'languages read natively' },
             { v: 7,  s: '',  label: 'industry playbooks' },
@@ -277,8 +261,8 @@ function Differentiators() {
             { v: 5,  s: '',  label: 'offline channels measured' },
           ].map(st => (
             <div key={st.label} className="relative">
-              <p className="text-4xl font-black tabular-nums" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-clay)' }}>
-                <CountUp to={st.v} suffix={st.s} />
+              <p className="text-4xl font-black bg-num" style={{ fontFamily: 'var(--font-num)', color: 'var(--tx-flare)' }}>
+                <Reading to={st.v} suffix={st.s} />
               </p>
               <p className="mt-1 text-[12px]" style={{ color: 'var(--lp-mut)' }}>{st.label}</p>
             </div>
@@ -294,11 +278,11 @@ function DeepDives() {
     <section className="relative overflow-hidden py-16">
       {/* patterned backdrop: diagonal wash pair + a faint circle motif cropped at the edge */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 top-1/4 opacity-30"><div className="lp-par lp-par-b"><CircleMotif size={380} /></div></div>
-        <div className="absolute -right-20 top-0 h-[360px] w-[520px] rounded-full blur-[140px]"
-          style={{ background: 'rgba(212,96,42,0.07)' }} />
-        <div className="absolute -left-10 bottom-0 h-[320px] w-[480px] rounded-full blur-[140px]"
-          style={{ background: 'rgba(43,89,255,0.08)' }} />
+        <div className="absolute -left-32 top-1/4 opacity-30"><div><CircleMotif size={380} /></div></div>
+        <div className="absolute -right-20 top-0 h-[360px] w-[520px] rounded-sm blur-[140px]"
+          style={{ background: 'var(--bg-shell)' }} />
+        <div className="absolute -left-10 bottom-0 h-[320px] w-[480px] rounded-sm blur-[140px]"
+          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
       <div className="relative mx-auto max-w-6xl space-y-24 px-6">
@@ -311,8 +295,8 @@ function DeepDives() {
           <motion.div key={s.kicker} {...rise}
             className={`flex flex-col gap-10 lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
             <div className="lg:w-[38%]">
-              <p className="font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--lp-clay)' }}>{s.kicker}</p>
-              <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>{s.title}</h3>
+              <p className="text-[10px]" style={{ color: 'var(--tx-flare)' }}>{s.kicker}</p>
+              <h3 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{s.title}</h3>
               <p className="mt-4 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{s.body}</p>
             </div>
             <div className="@container h-[430px] flex-1 sm:h-[360px]"><s.Comp t={1} /></div>
@@ -345,14 +329,14 @@ function Industries() {
           maskImage: 'radial-gradient(60% 65% at 50% 50%, black, transparent)',
         }} />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="lp-par lp-par-a"><GaugeArcMotif size={620} opacity={0.22} /></div>
+          <div><GaugeArcMotif size={620} opacity={0.22} /></div>
         </div>
-        <div className="absolute left-1/2 top-0 h-[300px] w-[560px] -translate-x-1/2 rounded-full blur-[130px]"
-          style={{ background: 'rgba(212,96,42,0.07)' }} />
+        <div className="absolute left-1/2 top-0 h-[300px] w-[560px] -translate-x-1/2 rounded-sm blur-[130px]"
+          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6">
-        <motion.h2 {...rise} className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-ink)' }}>
+        <motion.h2 {...rise} className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           One gauge. Seven industries.
         </motion.h2>
         <motion.p {...rise} className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
@@ -362,15 +346,15 @@ function Industries() {
         <motion.div {...rise} className="mt-10 flex flex-wrap justify-center gap-3">
           {list.map((v, i) => (
             <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
-              className="rounded-full border px-5 py-2.5 text-[13px] transition-all duration-200"
+              className="rounded-sm border px-5 py-2.5 text-[13px] transition-colors duration-200 bg-press"
               style={active === i
-                ? { borderColor: 'var(--lp-clay)', color: 'var(--lp-clay)', background: 'rgba(212,96,42,0.08)', transform: 'translateY(-2px)' }
+                ? { borderColor: 'var(--tx)', color: 'var(--bg-paper)', background: 'var(--tx)' }
                 : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
               {v.name}
             </button>
           ))}
         </motion.div>
-        <p className="mx-auto mt-6 h-6 max-w-md font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: 'var(--lp-mut)' }}>
+        <p className="mx-auto mt-6 h-6 max-w-md text-[11px]" style={{ color: 'var(--lp-mut)' }}>
           {list[active].hint}
         </p>
       </div>
@@ -384,25 +368,23 @@ function FinalCta() {
       <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl px-6 py-24 text-center"
         style={{ background: 'var(--lp-band)' }}>
         <div className="pointer-events-none absolute inset-0" style={{
-          backgroundImage: 'radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px)', backgroundSize: '22px 22px',
+          backgroundImage: 'radial-gradient(var(--tick-1) 1px, transparent 1px)', backgroundSize: '22px 22px',
           maskImage: 'radial-gradient(70% 80% at 50% 50%, black, transparent)',
         }} />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[320px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px]"
-          style={{ background: 'rgba(224,106,50,0.20)' }} />
         <div className="pointer-events-none absolute -right-16 -top-16">
-          <div className="lp-par lp-par-c"><GaugeArcMotif size={300} color="#F4EDE4" opacity={0.2} /></div>
+          <div><GaugeArcMotif size={300} color="var(--tx-inv)" opacity={0.2} /></div>
         </div>
         <motion.h2 {...rise} className="relative mx-auto max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--lp-band-ink)' }}>
+          style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
           Your brand already has a reputation. Start measuring it.
         </motion.h2>
-        <motion.p {...rise} className="relative mx-auto mt-6 max-w-xl text-[15px]" style={{ color: 'rgba(244,237,228,0.6)' }}>
+        <motion.p {...rise} className="relative mx-auto mt-6 max-w-xl text-[15px]" style={{ color: 'var(--tx-inv-2)' }}>
           Free while in beta. Connect a social account and see your first Brand Health Index in minutes.
         </motion.p>
         <motion.div {...rise} className="relative mt-10">
           <Link href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-bold text-white shadow-[0_0_60px_rgba(224,106,50,0.45)] transition-transform hover:scale-[1.04]"
-            style={{ background: '#E06A32' }}>
+            className="inline-flex items-center gap-2 rounded-sm px-8 py-4 text-[15px] font-bold border border-line"
+            style={{ background: 'var(--flare)', color: 'var(--on-hot)' }}>
             Create your workspace <ArrowRight className="h-4 w-4" />
           </Link>
         </motion.div>
@@ -416,10 +398,9 @@ export function Footer() {
     <footer className="border-t px-6 py-10" style={{ borderColor: 'var(--lp-line)' }}>
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
         <div className="flex items-center gap-2" style={{ color: 'var(--lp-ink)' }}>
-          <GaugeMark className="h-5 w-5" />
-          <Wordmark className="text-sm" />
+          <Wordmark height={16} />
         </div>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: 'var(--lp-mut)' }}>
+        <p className="text-[10px]" style={{ color: 'var(--lp-mut)' }}>
           Made for West African marketers
         </p>
         <div className="flex gap-6 text-[12px]" style={{ color: 'var(--lp-mut)' }}>
@@ -442,127 +423,20 @@ export function Footer() {
  * backdrop animates with zero React re-renders. Returns whether the effect is live so
  * the caller can skip rendering the overlay entirely on touch / reduced-motion.
  */
-function useCursorBackdrop(ref: React.RefObject<HTMLElement | null>) {
-  const [active, setActive] = useState(false)
-  useEffect(() => {
-    const el = ref.current
-    if (!el || typeof window === 'undefined' || !window.matchMedia) return
-    const fine = window.matchMedia('(pointer: fine)')
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)')
-    if (!fine.matches || reduce.matches) return
-    const activateId = requestAnimationFrame(() => setActive(true))
-
-    const tgt = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
-    const cur = { x: tgt.x, y: tgt.y }
-    let raf = 0
-    let running = false
-    let lastMove = 0
-
-    const write = () => {
-      el.style.setProperty('--lp-x', cur.x.toFixed(1) + 'px')
-      el.style.setProperty('--lp-y', cur.y.toFixed(1) + 'px')
-      el.style.setProperty('--lp-px', (cur.x / window.innerWidth - 0.5).toFixed(4))
-      el.style.setProperty('--lp-py', (cur.y / window.innerHeight - 0.5).toFixed(4))
-    }
-    const tick = () => {
-      cur.x += (tgt.x - cur.x) * 0.14
-      cur.y += (tgt.y - cur.y) * 0.14
-      write()
-      const settled = Math.hypot(tgt.x - cur.x, tgt.y - cur.y) < 0.4
-      if (settled && performance.now() - lastMove > 250) { running = false; return }
-      raf = requestAnimationFrame(tick)
-    }
-    const run = () => { if (!running) { running = true; raf = requestAnimationFrame(tick) } }
-    const onMove = (e: PointerEvent) => {
-      tgt.x = e.clientX
-      tgt.y = e.clientY
-      lastMove = performance.now()
-      el.style.setProperty('--lp-glow', '1')
-      run()
-    }
-    const onLeave = () => el.style.setProperty('--lp-glow', '0')
-
-    write()
-    window.addEventListener('pointermove', onMove, { passive: true })
-    document.addEventListener('pointerleave', onLeave)
-    window.addEventListener('blur', onLeave)
-    return () => {
-      cancelAnimationFrame(activateId)
-      cancelAnimationFrame(raf)
-      window.removeEventListener('pointermove', onMove)
-      document.removeEventListener('pointerleave', onLeave)
-      window.removeEventListener('blur', onLeave)
-    }
-  }, [ref])
-  return active
-}
-
-/** Viewport-fixed layer that trails the cursor: a soft clay glow plus the Adire dot-grid
- *  lighting up in place through a radial mask that follows the pointer. Sits behind all
- *  content (main sets `isolation: isolate`). Movement is transform / mask only. */
-function CursorField() {
-  return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10"
-      style={{ opacity: 'var(--lp-glow, 0)', transition: 'opacity 0.5s ease' }}>
-      {/* clay glow blob, moved by transform (compositor-only) */}
-      <div className="absolute left-0 top-0 h-[620px] w-[620px] rounded-full blur-[85px]"
-        style={{
-          transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
-          background: 'radial-gradient(circle, rgba(212,96,42,0.20), rgba(43,89,255,0.08) 45%, transparent 72%)',
-          willChange: 'transform',
-        }} />
-      {/* a defined ring right at the cursor, so the pointer itself reads as the source */}
-      <div className="absolute left-0 top-0 h-[70px] w-[70px] rounded-full"
-        style={{
-          transform: 'translate3d(var(--lp-x, -9999px), var(--lp-y, -9999px), 0) translate(-50%, -50%)',
-          border: '1px solid var(--lp-clay)',
-          opacity: 0.18,
-          willChange: 'transform',
-        }} />
-      {/* dot grid revealed in place around the pointer via a cursor-tracking radial mask */}
-      <div className="absolute inset-0"
-        style={{
-          backgroundImage: 'radial-gradient(var(--lp-clay) 1.6px, transparent 1.6px)',
-          backgroundSize: '26px 26px',
-          opacity: 0.5,
-          WebkitMaskImage: 'radial-gradient(260px circle at var(--lp-x, -999px) var(--lp-y, -999px), rgba(0,0,0,0.95), transparent 72%)',
-          maskImage: 'radial-gradient(260px circle at var(--lp-x, -999px) var(--lp-y, -999px), rgba(0,0,0,0.95), transparent 72%)',
-        }} />
-    </div>
-  )
-}
+// A layer that trails the cursor is decoration: it represents no value, no
+// state and no touch, so it does not ship. The dot field it lit is now a
+// static tick field behind the hero.
 
 export function LandingPage() {
-  const [dark, setDark] = useState(false)
+  const { dark, toggle } = useMode()
   const rootRef = useRef<HTMLElement>(null)
-  const cursorLive = useCursorBackdrop(rootRef)
-  useEffect(() => {
-    const id = requestAnimationFrame(() => {
-      if (window.localStorage.getItem('bg-landing-theme') === 'dark') setDark(true)
-    })
-    return () => cancelAnimationFrame(id)
-  }, [])
-  function toggle() {
-    setDark(d => {
-      window.localStorage.setItem('bg-landing-theme', d ? 'light' : 'dark')
-      return !d
-    })
-  }
+
   return (
     <main
       ref={rootRef}
       className="min-h-screen antialiased transition-colors duration-500"
-      style={{ ...(dark ? DARK : LIGHT), ...(dark ? darkSceneVars : lightSceneVars), background: 'var(--lp-bg)', color: 'var(--lp-ink)', isolation: 'isolate' }}
+      style={{ ...LP_VARS, ...(dark ? darkSceneVars : lightSceneVars), background: 'var(--lp-bg)', color: 'var(--lp-ink)', isolation: 'isolate' }}
     >
-      {/* parallax drift for the Adire motifs, keyed off the eased cursor custom properties.
-          Vars default to 0, so touch / reduced-motion renders these perfectly static. */}
-      <style>{`
-        .lp-par { will-change: transform }
-        .lp-par-a { transform: translate3d(calc(var(--lp-px,0) * 22px), calc(var(--lp-py,0) * 22px), 0) }
-        .lp-par-b { transform: translate3d(calc(var(--lp-px,0) * -30px), calc(var(--lp-py,0) * -30px), 0) }
-        .lp-par-c { transform: translate3d(calc(var(--lp-px,0) * 16px), calc(var(--lp-py,0) * -18px), 0) }
-      `}</style>
-      {cursorLive && <CursorField />}
       <Nav dark={dark} onToggle={toggle} />
       <Hero />
       <div id="tour" className="scroll-mt-20"><HorizontalTour /></div>

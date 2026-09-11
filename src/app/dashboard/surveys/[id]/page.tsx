@@ -1,19 +1,20 @@
 import { createClient }  from '@/lib/supabase/server'
 import { notFound }       from 'next/navigation'
 import Link               from 'next/link'
-import { ArrowLeft }      from 'lucide-react'
+import { ArrowLeftIcon as ArrowLeft } from '@/components/brand/icon'
 import { StatusToggle }   from './status-toggle'
 import { CopyLinkButton } from './copy-link-button'
 import { SurveyAiAnalysis } from './ai-analysis'
 import { SendSurvey }     from './send-survey'
 import { getTemplateLabel } from '@/lib/survey-templates'
 import type { SurveyQuestion } from '@/lib/survey-templates'
+import { Crescendo } from '@/components/brand/crescendo'
 
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
 
 const STATUS_COLOURS: Record<string, string> = {
   draft:  'bg-muted text-muted-foreground',
-  live:   'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400',
+  live:   'bg-shell text-pos dark:bg-pos dark:text-pos',
   closed: 'bg-muted text-muted-foreground',
 }
 
@@ -119,9 +120,9 @@ export default async function SurveyDetailPage({
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div className="border rounded-xl p-4 space-y-1">
           <p className="text-xs text-muted-foreground">Total responses</p>
-          <p className="text-2xl font-bold">{allResponses.length}</p>
+          <p className="text-2xl font-bold bg-num">{allResponses.length}</p>
           {allResponses.length !== okResponses.length && (
-            <p className="text-xs text-muted-foreground">{okResponses.length} quality</p>
+            <p className="text-xs text-muted-foreground bg-num">{okResponses.length} quality</p>
           )}
         </div>
         {npsQuestion && (
@@ -154,11 +155,9 @@ export default async function SurveyDetailPage({
                   <div key={label} className="space-y-1">
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground truncate max-w-[70%]">{label}</span>
-                      <span className="font-medium shrink-0">{count} ({pct}%)</span>
+                      <span className="font-medium shrink-0 bg-num">{count} ({pct}%)</span>
                     </div>
-                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div className="h-full bg-foreground rounded-full" style={{ width: `${pct}%` }} />
-                    </div>
+                    <Crescendo value={pct} height={6} />
                   </div>
                 )
               })}
@@ -169,7 +168,7 @@ export default async function SurveyDetailPage({
       {/* Response feed — shows all questions generically */}
       {allResponses.length > 0 && (
         <div className="space-y-3">
-          <p className="text-sm font-medium">Responses ({allResponses.length})</p>
+          <p className="text-sm font-medium bg-num">Responses ({allResponses.length})</p>
           <div className="space-y-3">
             {allResponses.slice(0, 50).map(r => {
               const ans = r.answers as Record<string, unknown>
@@ -179,7 +178,7 @@ export default async function SurveyDetailPage({
                     <span>{new Date(r.collected_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}</span>
                     <div className="flex items-center gap-2">
                       {r.source && <span className="bg-muted px-1.5 py-0.5 rounded">{r.source}</span>}
-                      <span className={r.quality_flag === 'ok' ? 'text-green-600' : 'text-amber-500'}>
+                      <span className={r.quality_flag === 'ok' ? 'text-pos' : 'text-tx-2'}>
                         {r.quality_flag}
                       </span>
                     </div>
@@ -193,7 +192,7 @@ export default async function SurveyDetailPage({
                           <span className="text-muted-foreground shrink-0 w-24 truncate" title={q.text.replace('{brand}', 'brand')}>
                             {q.text.replace('{brand}', 'brand').slice(0, 30)}{q.text.length > 30 ? '…' : ''}
                           </span>
-                          <span className="font-medium">{fmtAnswer(val)}</span>
+                          <span className="font-medium bg-num">{fmtAnswer(val)}</span>
                         </div>
                       )
                     })}

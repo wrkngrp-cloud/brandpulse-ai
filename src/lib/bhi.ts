@@ -1,3 +1,5 @@
+import { TOKENS } from '@/lib/brand-tokens'
+
 // BHI computation.
 //
 // computeFullBHI() is the only scoring function. It takes the seven components
@@ -13,10 +15,10 @@
 export type BHIZone = 'at_risk' | 'building' | 'healthy' | 'leading'
 
 export const ZONE_META: Record<BHIZone, { label: string; color: string; textClass: string }> = {
-  at_risk:  { label: 'At Risk',  color: '#ef4444', textClass: 'text-red-500' },
-  building: { label: 'Building', color: '#f59e0b', textClass: 'text-amber-500' },
-  healthy:  { label: 'Healthy',  color: '#22c55e', textClass: 'text-green-600' },
-  leading:  { label: 'Leading',  color: '#14b8a6', textClass: 'text-teal-500' },
+  at_risk:  { label: 'At Risk',  color: TOKENS.flare, textClass: 'text-tx-flare' },
+  building: { label: 'Building', color: TOKENS.ember, textClass: 'text-tx-2' },
+  healthy:  { label: 'Healthy',  color: TOKENS.pos, textClass: 'text-pos' },
+  leading:  { label: 'Leading',  color: TOKENS.pos, textClass: 'text-pos' },
 }
 
 export function getBHIZone(score: number): BHIZone {

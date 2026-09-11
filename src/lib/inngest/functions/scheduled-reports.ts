@@ -2,6 +2,7 @@ import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
 import { Resend } from 'resend'
+import { TOKENS } from '@/lib/brand-tokens'
 
 // Constructed lazily: the Resend SDK throws when the key is absent, and building
 // the app should not require a mail credential.
@@ -120,17 +121,17 @@ Return JSON only:
         from:    'BrandGauge <reports@brandgauge.app>',
         to:      adminEmails,
         subject: `Monthly brand report — ${brand.name} — ${month}`,
-        html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a;">
+        html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:${TOKENS.tx};">
           <h2 style="font-size:20px;margin-bottom:4px;">${brand.name} — ${month}</h2>
-          <p style="font-size:14px;color:#666;margin-top:0;">${result.data_quality ?? ''} data quality</p>
+          <p style="font-size:14px;color:${TOKENS.tx2};margin-top:0;">${result.data_quality ?? ''} data quality</p>
           <h3 style="font-size:16px;">${result.headline ?? ''}</h3>
           <p style="font-size:14px;line-height:1.6;">${result.summary ?? ''}</p>
-          <div style="background:#f5f5f5;border-radius:8px;padding:16px;margin:20px 0;">
-            <p style="margin:0;font-size:13px;font-weight:600;color:#555;">TOP PRIORITY FOR NEXT MONTH</p>
+          <div style="background:${TOKENS.shell};border-radius:8px;padding:16px;margin:20px 0;">
+            <p style="margin:0;font-size:13px;font-weight:600;color:${TOKENS.tx2};">Top priority for next month</p>
             <p style="margin:8px 0 0;font-size:14px;">${result.top_priority ?? ''}</p>
           </div>
-          <p style="margin:28px 0;"><a href="${APP_URL}/dashboard/brand-equity" style="display:inline-block;background:#1a1a1a;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">View full report</a></p>
-          <p style="font-size:12px;color:#aaa;border-top:1px solid #eee;padding-top:16px;">BrandGauge · Unsubscribe from monthly reports in Settings</p>
+          <p style="margin:28px 0;"><a href="${APP_URL}/dashboard/brand-equity" style="display:inline-block;background:${TOKENS.tx};color:${TOKENS.paper};text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">View full report</a></p>
+          <p style="font-size:12px;color:${TOKENS.tx3};border-top:1px solid ${TOKENS.shell};padding-top:16px;">BrandGauge · Unsubscribe from monthly reports in Settings</p>
         </div>`,
       }).catch(() => null)
 
@@ -189,7 +190,7 @@ export const weeklyDigestCron = inngest.createFunction(
       if (!avgSent && !latestSov && !mentions.length && !alerts.length) continue
 
       const topMentionsHtml = mentions.slice(0, 3).map(m =>
-        `<li style="margin-bottom:8px;"><strong style="color:${m.sentiment_label === 'positive' ? '#16a34a' : '#dc2626'}">${m.sentiment_label === 'positive' ? '↑' : '↓'}</strong> ${m.content?.slice(0, 100) ?? ''}… <span style="color:#888;font-size:12px;">@${m.author_handle ?? m.platform}</span></li>`
+        `<li style="margin-bottom:8px;"><strong style="color:${m.sentiment_label === 'positive' ? TOKENS.pos : TOKENS.flare}">${m.sentiment_label === 'positive' ? '+' : '−'}</strong> ${m.content?.slice(0, 100) ?? ''}… <span style="color:${TOKENS.tx3};font-size:12px;">@${m.author_handle ?? m.platform}</span></li>`
       ).join('')
 
       const alertsHtml = alerts.slice(0, 3).map(a =>
@@ -215,17 +216,17 @@ export const weeklyDigestCron = inngest.createFunction(
         from:    'BrandGauge <digest@brandgauge.app>',
         to:      emails,
         subject: `Your week in brand — ${brand.name}`,
-        html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a;">
+        html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:${TOKENS.tx};">
           <h2 style="font-size:18px;margin-bottom:4px;">Good Monday — here's your brand digest</h2>
-          <p style="color:#666;font-size:13px;margin-top:0;">${brand.name} · Last 7 days</p>
+          <p style="color:${TOKENS.tx2};font-size:13px;margin-top:0;">${brand.name} · Last 7 days</p>
 
           <div style="display:flex;gap:16px;margin:20px 0;">
-            <div style="flex:1;background:#f5f5f5;border-radius:8px;padding:14px;text-align:center;">
-              <p style="margin:0;font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.05em;">Sentiment</p>
+            <div style="flex:1;background:${TOKENS.shell};border-radius:8px;padding:14px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:${TOKENS.tx3};">Sentiment</p>
               <p style="margin:4px 0 0;font-size:22px;font-weight:700;">${avgSent ? `${avgSent}/100` : '—'}</p>
             </div>
-            <div style="flex:1;background:#f5f5f5;border-radius:8px;padding:14px;text-align:center;">
-              <p style="margin:0;font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.05em;">SOV</p>
+            <div style="flex:1;background:${TOKENS.shell};border-radius:8px;padding:14px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:${TOKENS.tx3};">SOV</p>
               <p style="margin:4px 0 0;font-size:22px;font-weight:700;">${latestSov != null ? `${latestSov}%` : '—'}</p>
             </div>
           </div>
@@ -233,8 +234,8 @@ export const weeklyDigestCron = inngest.createFunction(
           ${topMentionsHtml ? `<h3 style="font-size:14px;margin-bottom:8px;">Notable mentions</h3><ul style="padding-left:0;list-style:none;margin:0 0 20px;">${topMentionsHtml}</ul>` : ''}
           ${alertsHtml ? `<h3 style="font-size:14px;margin-bottom:8px;">Alerts this week</h3><ul style="padding-left:16px;margin:0 0 20px;">${alertsHtml}</ul>` : ''}
 
-          <p style="margin:24px 0;"><a href="${APP_URL}/dashboard" style="display:inline-block;background:#1a1a1a;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">Open dashboard</a></p>
-          <p style="font-size:12px;color:#aaa;border-top:1px solid #eee;padding-top:16px;">BrandGauge · Manage digest preferences in Settings</p>
+          <p style="margin:24px 0;"><a href="${APP_URL}/dashboard" style="display:inline-block;background:${TOKENS.tx};color:${TOKENS.paper};text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">Open dashboard</a></p>
+          <p style="font-size:12px;color:${TOKENS.tx3};border-top:1px solid ${TOKENS.shell};padding-top:16px;">BrandGauge · Manage digest preferences in Settings</p>
         </div>`,
       }).catch(() => null)
 

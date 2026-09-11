@@ -12,6 +12,8 @@ import { VenueReputationPanel } from './venue-reputation-panel'
 import { TrustPillarCard } from './trust-pillar-card'
 import { getActiveBrandId } from '@/lib/active-brand'
 import { loadBHIInputs } from '@/lib/bhi-inputs'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 export const dynamic = 'force-dynamic'
 
@@ -260,19 +262,15 @@ export default async function BrandEquityPage({
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-xl font-semibold">Brand Equity Tracker</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Full 7-component Brand Health Index, ESOV engine, and perception analysis for{' '}
-            {brand?.name ?? 'your brand'}.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/brand-equity']}
+        title="Brand Equity Tracker"
+        subtitle={<>Full 7-component Brand Health Index, ESOV engine, and perception analysis for{' '} {brand?.name ?? 'your brand'}.</>}
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="brand_health" autoStart />
           <DateRangeFilter currentDays={days} defaultDays={30} />
-        </div>
-      </div>
+        </div></>}
+      />
 
       <BrandEquityClient
         bhi={bhi}

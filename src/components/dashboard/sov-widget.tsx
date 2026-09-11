@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, X, TrendingUp } from 'lucide-react'
+import { PlusIcon as Plus, XIcon as X } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { toast } from 'sonner'
+import { Crescendo } from '@/components/brand/crescendo'
 
 export interface SovData {
   brand_mentions: number
@@ -53,17 +55,12 @@ export function SovWidget({
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>Your brand</span>
-          <span className="font-semibold text-foreground tabular-nums">
+          <span className="font-semibold text-foreground bg-num">
             {sovPct !== null ? `${sovPct.toFixed(1)}%` : '—'}
           </span>
         </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-full transition-all duration-500"
-            style={{ width: sovPct !== null ? `${sovPct}%` : '0%' }}
-          />
-        </div>
-        <p className="text-xs text-muted-foreground">
+        <Crescendo value={sovPct ?? 0} />
+        <p className="text-xs text-muted-foreground bg-num">
           {sov.brand_mentions.toLocaleString()} mentions of {total.toLocaleString()} total
         </p>
       </div>
@@ -77,7 +74,7 @@ export function SovWidget({
 
       {/* Competitor breakdown */}
       <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Competitor breakdown</p>
+        <p className="text-xs font-medium text-muted-foreground">Competitor breakdown</p>
         {competitors.length === 0 ? (
           <p className="text-xs text-muted-foreground">Add competitors below to compare your SOV.</p>
         ) : (
@@ -88,16 +85,11 @@ export function SovWidget({
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-medium text-foreground truncate max-w-[140px]">Your brand</span>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="tabular-nums text-muted-foreground text-[10px]">{sov.brand_mentions.toLocaleString()} mentions</span>
-                    <span className="tabular-nums font-semibold text-primary">{sovPct !== null ? `${sovPct.toFixed(1)}%` : '—'}</span>
+                    <span className="bg-num text-muted-foreground text-[10px]">{sov.brand_mentions.toLocaleString()} mentions</span>
+                    <span className="bg-num font-semibold text-primary">{sovPct !== null ? `${sovPct.toFixed(1)}%` : '—'}</span>
                   </div>
                 </div>
-                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full transition-all duration-500"
-                    style={{ width: `${sovPct ?? 0}%` }}
-                  />
-                </div>
+                <Crescendo value={sovPct ?? 0} height={6} />
               </div>
             )}
             {competitors.map(c => {
@@ -110,8 +102,8 @@ export function SovWidget({
                     <div className="flex items-center gap-1.5 shrink-0">
                       {count > 0 ? (
                         <>
-                          <span className="tabular-nums text-muted-foreground text-[10px]">{count.toLocaleString()} mentions</span>
-                          <span className="tabular-nums font-medium text-foreground/70">{pct.toFixed(1)}%</span>
+                          <span className="bg-num text-muted-foreground text-[10px]"><span className="bg-num">{count.toLocaleString()}</span> mentions</span>
+                          <span className="bg-num font-medium text-foreground/70">{pct.toFixed(1)}%</span>
                         </>
                       ) : (
                         <span className="text-muted-foreground/40 text-[10px]">no data</span>
@@ -126,12 +118,7 @@ export function SovWidget({
                       </Button>
                     </div>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-muted-foreground/40 rounded-full transition-all duration-500"
-                      style={{ width: count > 0 ? `${pct}%` : '0%' }}
-                    />
-                  </div>
+                  <Crescendo value={count > 0 ? pct : 0} />
                 </div>
               )
             })}

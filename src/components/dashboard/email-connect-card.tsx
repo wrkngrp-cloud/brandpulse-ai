@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Mail, RefreshCw } from 'lucide-react'
+import { CheckIcon as CheckCircle2, MailIcon as Mail, RefreshIcon as RefreshCw } from '@/components/brand/icon'
 import { toast } from 'sonner'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -103,7 +103,7 @@ function ProviderCard({
           <span className="text-sm font-medium">{label}</span>
         </div>
         {connected && (
-          <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+          <span className="flex items-center gap-1.5 text-xs text-pos font-medium">
             <CheckCircle2 className="h-3.5 w-3.5" />
             Connected
           </span>
@@ -118,7 +118,7 @@ function ProviderCard({
             className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-2 text-xs')}
           >
             {loading === 'sync'
-              ? <RefreshCw className="h-3 w-3 animate-spin" />
+              ? <RefreshCw className="h-3 w-3" />
               : <RefreshCw className="h-3 w-3" />
             }
             Sync now

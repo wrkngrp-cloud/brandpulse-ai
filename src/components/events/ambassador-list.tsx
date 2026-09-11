@@ -7,7 +7,7 @@ import { Button }   from '@/components/ui/button'
 import { Input }    from '@/components/ui/input'
 import { Label }    from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Copy, QrCode, Plus, Check } from 'lucide-react'
+import { CopyIcon as Copy, QrIcon as QrCode, PlusIcon as Plus, CheckIcon as Check } from '@/components/brand/icon'
 import { addAmbassador } from '@/app/dashboard/events/actions'
 
 interface Ambassador {
@@ -64,7 +64,7 @@ export function AmbassadorList({ eventId, ambassadors, appUrl }: Props) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium">{list.length} ambassador{list.length !== 1 ? 's' : ''}</p>
+        <p className="text-sm font-medium bg-num">{list.length} ambassador{list.length !== 1 ? 's' : ''}</p>
         <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
           <Plus className="h-4 w-4 mr-1.5" />
           Add
@@ -74,7 +74,7 @@ export function AmbassadorList({ eventId, ambassadors, appUrl }: Props) {
       {/* Demo mode when no real ambassadors */}
       {list.length === 0 && (
         <div className="space-y-3">
-          <div className="border rounded-xl px-4 py-3 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 text-xs">
+          <div className="border rounded-xl px-4 py-3 bg-shell dark:bg-shell/20 text-tx-2 dark:text-tx-2 text-xs">
             Demo data — add ambassadors using the + button above
           </div>
           {DEMO_AMBASSADORS.map(amb => (
@@ -86,8 +86,8 @@ export function AmbassadorList({ eventId, ambassadors, appUrl }: Props) {
                 </div>
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                   amb.status === 'Active'
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                    ? 'bg-shell text-pos dark:bg-shell/30 dark:text-pos'
+                    : 'bg-shell text-tx-2 dark:bg-shell/30 dark:text-tx-2'
                 }`}>
                   {amb.status}
                 </span>
@@ -122,14 +122,14 @@ export function AmbassadorList({ eventId, ambassadors, appUrl }: Props) {
               </div>
               <div className="flex gap-1.5 shrink-0">
                 <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => copyLink(amb.session_token)}>
-                  {copied === amb.session_token ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copied === amb.session_token ? <Check className="h-3.5 w-3.5 text-pos" /> : <Copy className="h-3.5 w-3.5" />}
                 </Button>
                 <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setQrAmb(amb)}>
                   <QrCode className="h-3.5 w-3.5" />
                 </Button>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground font-mono break-all">{url}</p>
+            <p className="text-xs text-muted-foreground bg-num break-all">{url}</p>
           </div>
         )
       })}

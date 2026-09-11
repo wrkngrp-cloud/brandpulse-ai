@@ -6,12 +6,10 @@ import { Button }   from '@/components/ui/button'
 import { Input }    from '@/components/ui/input'
 import { Label }    from '@/components/ui/label'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import {
-  Users, Target, Handshake, UserCheck, Gift, FlaskConical,
-  Trophy, Camera, ClipboardList, Trophy as Leaderboard, Loader2,
-  WifiOff, RefreshCw,
-} from 'lucide-react'
+import { UsersIcon as Users, CircleDotIcon as Target, UsersIcon as Handshake, UsersIcon as UserCheck, GiftIcon as Gift, FlaskIcon as FlaskConical, StarIcon as Trophy, CameraIcon as Camera, SurveyIcon as ClipboardList, StarIcon as Leaderboard, WifiOffIcon as WifiOff, RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 import { cn } from '@/lib/utils'
+import { Crescendo } from '@/components/brand/crescendo'
 
 interface QueuedInteraction {
   clientUuid:       string
@@ -41,14 +39,14 @@ interface Props {
 const QUEUE_KEY = (token: string) => `bp_queue_${token}`
 
 const BUTTONS = [
-  { type: 'engaged',           label: 'Engaged',          icon: Users,       color: 'bg-blue-500'    },
-  { type: 'new_lead',          label: 'New Lead',          icon: Target,      color: 'bg-green-500'   },
-  { type: 'new_customer',      label: 'New Customer',      icon: Handshake,   color: 'bg-emerald-600' },
-  { type: 'existing_customer', label: 'Existing Customer', icon: UserCheck,   color: 'bg-purple-500'  },
-  { type: 'merch',             label: 'Merch Given',       icon: Gift,        color: 'bg-orange-400'  },
-  { type: 'sample',            label: 'Sample Given',      icon: FlaskConical,color: 'bg-yellow-500'  },
-  { type: 'prize',             label: 'Prize Won',         icon: Trophy,      color: 'bg-pink-500'    },
-  { type: 'photo',             label: 'Photo Moment',      icon: Camera,      color: 'bg-violet-500'  },
+  { type: 'engaged',           label: 'Engaged',          icon: Users,       color: 'bg-flare'    },
+  { type: 'new_lead',          label: 'New Lead',          icon: Target,      color: 'bg-pos'   },
+  { type: 'new_customer',      label: 'New Customer',      icon: Handshake,   color: 'bg-pos' },
+  { type: 'existing_customer', label: 'Existing Customer', icon: UserCheck,   color: 'bg-neu'  },
+  { type: 'merch',             label: 'Merch Given',       icon: Gift,        color: 'bg-ember'  },
+  { type: 'sample',            label: 'Sample Given',      icon: FlaskConical,color: 'bg-ember'  },
+  { type: 'prize',             label: 'Prize Won',         icon: Trophy,      color: 'bg-neu'    },
+  { type: 'photo',             label: 'Photo Moment',      icon: Camera,      color: 'bg-neu'  },
 ] as const
 
 const SURVEY_QUESTIONS = [
@@ -268,11 +266,11 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
           <div className="text-right">
             <p className="text-xs opacity-70">{ambassadorName}</p>
             <div className="flex items-center gap-1.5 justify-end">
-              {!isOnline && <WifiOff className="h-3 w-3 text-red-400" />}
+              {!isOnline && <WifiOff className="h-3 w-3 text-tx-flare" />}
               {queue.length > 0 && (
-                <span className="text-xs bg-yellow-400 text-black rounded-full px-1.5 font-medium">{queue.length} pending</span>
+                <span className="text-xs bg-ember text-tx rounded-sm px-1.5 font-medium bg-num">{queue.length} pending</span>
               )}
-              <span className="text-sm font-bold tabular-nums">{totalMine}</span>
+              <span className="text-sm font-bold bg-num">{totalMine}</span>
             </div>
           </div>
         </div>
@@ -304,7 +302,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
                 onClick={() => handleTap(type)}
                 disabled={pending}
                 className={cn(
-                  'relative rounded-2xl p-5 flex flex-col items-center gap-3 transition-all active:scale-95 select-none',
+                  'relative rounded-2xl p-5 flex flex-col items-center gap-3 transition-colors active:scale-95 select-none',
                   'border-2',
                   lastTap === type ? 'border-foreground scale-95' : 'border-transparent',
                   'bg-card hover:bg-muted',
@@ -315,7 +313,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
                 </div>
                 <span className="text-sm font-medium text-center leading-tight">{label}</span>
                 {counts[type] ? (
-                  <span className="absolute top-2 right-2 text-xs font-bold tabular-nums bg-foreground text-background rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute top-2 right-2 text-xs font-bold bg-num bg-foreground text-background rounded-full h-5 w-5 flex items-center justify-center">
                     {counts[type]}
                   </span>
                 ) : null}
@@ -326,7 +324,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
           {queue.length > 0 && isOnline && (
             <button
               onClick={flushQueue}
-              className="mt-4 w-full flex items-center justify-center gap-2 text-xs text-muted-foreground py-2 border rounded-xl"
+              className="mt-4 w-full flex items-center justify-center gap-2 text-xs text-muted-foreground py-2 border rounded-xl bg-press"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Sync {queue.length} pending interaction{queue.length !== 1 ? 's' : ''}
@@ -340,8 +338,8 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
         <div className="flex-1 p-6 flex flex-col safe-bottom">
           {surveyDone ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
-              <div className="h-16 w-16 rounded-full bg-green-500/10 flex items-center justify-center">
-                <ClipboardList className="h-8 w-8 text-green-600" />
+              <div className="h-16 w-16 rounded-full bg-pos/10 flex items-center justify-center">
+                <ClipboardList className="h-8 w-8 text-pos" />
               </div>
               <div>
                 <p className="font-semibold">Survey submitted!</p>
@@ -361,13 +359,8 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
           ) : (
             <div className="space-y-6 flex-1 flex flex-col">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Question {surveyQ + 1} of {SURVEY_QUESTIONS.length}</p>
-                <div className="h-1 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-foreground rounded-full transition-all"
-                    style={{ width: `${((surveyQ + 1) / SURVEY_QUESTIONS.length) * 100}%` }}
-                  />
-                </div>
+                <p className="text-xs text-muted-foreground mb-1 bg-num">Question {surveyQ + 1} of {SURVEY_QUESTIONS.length}</p>
+                <Crescendo value={((surveyQ + 1) / SURVEY_QUESTIONS.length) * 100} height={6} />
               </div>
 
               <div className="flex-1 space-y-4">
@@ -391,7 +384,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
               </div>
 
               <Button className="w-full" onClick={handleSurveyNext} disabled={surveyPending || !surveyAnswers[SURVEY_QUESTIONS[surveyQ].key]}>
-                {surveyPending ? <Loader2 className="h-4 w-4 animate-spin" /> : surveyQ < SURVEY_QUESTIONS.length - 1 ? 'Next' : 'Submit survey'}
+                {surveyPending ? <Loader2 className="h-4 w-4" /> : surveyQ < SURVEY_QUESTIONS.length - 1 ? 'Next' : 'Submit survey'}
               </Button>
             </div>
           )}
@@ -403,7 +396,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
         <div className="flex-1 p-4 safe-bottom space-y-3">
           {lbLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <Loader2 className="h-6 w-6 text-muted-foreground" />
             </div>
           ) : leaderboard.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-12">No data yet.</p>
@@ -416,7 +409,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
                   entry.id === myId && 'border-foreground bg-foreground text-background',
                 )}
               >
-                <span className={cn('text-lg font-bold tabular-nums w-6 text-center', entry.id === myId ? 'text-background' : 'text-muted-foreground')}>
+                <span className={cn('text-lg font-bold bg-num w-6 text-center', entry.id === myId ? 'text-background' : 'text-muted-foreground')}>
                   {rank + 1}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -427,7 +420,7 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
                     {entry.leads} leads · {entry.engaged} engaged
                   </p>
                 </div>
-                <span className="text-xl font-bold tabular-nums">{entry.total}</span>
+                <span className="text-xl font-bold bg-num">{entry.total}</span>
               </div>
             ))
           )}

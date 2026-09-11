@@ -1,4 +1,5 @@
 'use client'
+import { ChartState } from '@/components/brand/chart-states'
 
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -17,29 +18,31 @@ const WEEKLY_DATA = [
 
 export function CampaignConversionsChart() {
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <LineChart data={WEEKLY_DATA} margin={{ top: 4, right: 12, left: -16, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-        <XAxis dataKey="week" tick={{ fontSize: 11 }} className="text-muted-foreground" />
-        <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" />
-        <Tooltip
-          contentStyle={{
-            fontSize: 12,
-            border: '1px solid hsl(var(--border))',
-            borderRadius: 8,
-            background: 'hsl(var(--card))',
-          }}
-          labelStyle={{ fontWeight: 600 }}
-        />
-        <Line
-          type="monotone"
-          dataKey="conversions"
-          stroke="hsl(var(--primary))"
-          strokeWidth={2}
-          dot={{ r: 3, fill: 'hsl(var(--primary))' }}
-          activeDot={{ r: 5 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <ChartState rows={WEEKLY_DATA} height={200} empty="Link a campaign to an influencer to see conversions.">
+          <ResponsiveContainer width="100%" height={200}>
+        <LineChart data={WEEKLY_DATA} margin={{ top: 4, right: 12, left: -16, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="week" tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} className="text-muted-foreground" />
+          <YAxis tick={{ fontFamily: 'var(--font-num)',  fontSize: 11 }} className="text-muted-foreground" />
+          <Tooltip
+            contentStyle={{
+              fontSize: 12,
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-card)',
+              background: 'var(--card)',
+            }}
+            labelStyle={{ fontWeight: 600 }}
+          />
+          <Line
+            type="monotone"
+            dataKey="conversions"
+            stroke="var(--primary)"
+            strokeWidth={2}
+            dot={{ r: 3, fill: 'var(--primary)' }}
+            activeDot={{ r: 5 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </ChartState>
   )
 }

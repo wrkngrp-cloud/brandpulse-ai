@@ -2,11 +2,16 @@
 
 import { useState } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { Loader2, TrendingUp, TrendingDown, Zap, RefreshCw } from 'lucide-react'
+import { TrendDownIcon as TrendingDown, AskIcon as Zap, RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { ChartState } from '@/components/brand/chart-states'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 interface MmmRun {
   id: string
@@ -23,14 +28,14 @@ interface MmmRun {
 }
 
 const CHANNEL_COLORS: Record<string, string> = {
-  events:  '#22c55e',
-  email:   '#6366f1',
-  digital: '#3b82f6',
-  social:  '#f59e0b',
-  radio:   '#ec4899',
-  tv:      '#8b5cf6',
-  ooh:     '#14b8a6',
-  print:   '#f97316',
+  events:  'var(--pos)',
+  email:   'var(--neu)',
+  digital: 'var(--flare)',
+  social:  'var(--ember)',
+  radio:   'var(--neu)',
+  tv:      'var(--neu)',
+  ooh:     'var(--pos)',
+  print:   'var(--ember)',
 }
 
 const CHANNEL_LABELS: Record<string, string> = {
@@ -95,7 +100,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
     .map(([ch, pct]) => ({
       name:  CHANNEL_LABELS[ch] ?? ch,
       value: pct,
-      color: CHANNEL_COLORS[ch] ?? '#94a3b8',
+      color: CHANNEL_COLORS[ch] ?? 'var(--tx-3)',
       ch,
     }))
 
@@ -105,15 +110,11 @@ export function MmmClient({ brandName, lastRun }: Props) {
     <div className="space-y-6 max-w-[1200px]">
 
       {/* Header */}
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow mb-1.5">Attribution</p>
-          <h1 className="h-display text-[28px] sm:text-[32px] leading-none">Media Mix</h1>
-          <p className="mt-1.5 text-[13px] text-muted-foreground/60">
-            Activity-weighted channel attribution — estimated contribution based on media activity levels
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+      <PageHeader
+        {...PAGE_META['/dashboard/mmm']}
+        title="Media Mix"
+        subtitle="Activity-weighted channel attribution — estimated contribution based on media activity levels"
+        actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="mmm" autoStart />
           <div className="flex rounded-xl border border-border overflow-hidden">
             {DAYS_OPTIONS.map(opt => (
@@ -133,11 +134,11 @@ export function MmmClient({ brandName, lastRun }: Props) {
           </div>
           <Button onClick={runAnalysis} disabled={loading} size="sm">
             {loading
-              ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Analysing...</>
+              ? <><Loader2 className="h-3.5 w-3.5 mr-1.5" />Analysing...</>
               : <><RefreshCw className="h-3.5 w-3.5 mr-1.5" />Run analysis</>}
           </Button>
-        </div>
-      </div>
+        </div></>}
+      />
 
       <div data-tour="mmm-main">
       {result === null ? (
@@ -152,7 +153,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
             </p>
           </div>
           <Button onClick={runAnalysis} disabled={loading}>
-            {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+            {loading ? <Loader2 className="h-4 w-4 mr-2" /> : null}
             Run media mix analysis
           </Button>
         </div>
@@ -162,8 +163,8 @@ export function MmmClient({ brandName, lastRun }: Props) {
           {/* Summary bar */}
           <div className="rounded-2xl border bg-card p-5">
             <div className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
-                <Zap className="h-4 w-4 text-blue-500" />
+              <div className="h-8 w-8 rounded-xl bg-flare/10 flex items-center justify-center shrink-0">
+                <Zap className="h-4 w-4 text-tx-2" />
               </div>
               <div className="flex-1">
                 <p className="text-[13px] font-medium mb-1">AI Summary</p>
@@ -183,30 +184,32 @@ export function MmmClient({ brandName, lastRun }: Props) {
               {/* Pie chart */}
               <div className="rounded-2xl border bg-card p-5">
                 <p className="text-[13px] font-medium mb-4 eyebrow">Channel contribution</p>
-                <ResponsiveContainer width="100%" height={260}>
-                  <PieChart>
-                    <Pie
-                      data={chartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={70}
-                      outerRadius={110}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {chartData.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(v) => [`${v}%`, 'Contribution']}
-                      contentStyle={{ fontSize: 12, borderRadius: 8 }}
-                    />
-                    <Legend
-                      formatter={(value) => <span style={{ fontSize: 12, color: '#888' }}>{value}</span>}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <ChartState rows={chartData} loading={loading} height={260} empty="Run the media mix model to see where your spend is working.">
+                                  <ResponsiveContainer width="100%" height={260}>
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={70}
+                        outerRadius={110}
+                        paddingAngle={2}
+                        dataKey="value"
+                      >
+                        {chartData.map((entry, i) => (
+                          <Cell key={i} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(v) => [`${v}%`, 'Contribution']}
+                        contentStyle={{ fontSize: 12, borderRadius: 'var(--r-card)' }}
+                      />
+                      <Legend
+                        formatter={(value) => <span style={{ fontSize: 12, color: 'var(--tx-3)' }}><span className="bg-num">{value}</span></span>}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </ChartState>
               </div>
 
               {/* Channel table */}
@@ -215,16 +218,16 @@ export function MmmClient({ brandName, lastRun }: Props) {
                 <div className="space-y-2">
                   {chartData.map(ch => (
                     <div key={ch.ch} className="flex items-center gap-3">
-                      <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: ch.color }} />
+                      <div className="h-[11px] w-[5px] rounded-[var(--r-tick)] shrink-0" style={{ background: ch.color }} />
                       <span className="text-[13px] flex-1">{ch.name}</span>
-                      <span className="text-[13px] font-semibold tabular-nums w-12 text-right">{ch.value}%</span>
+                      <span className="text-[13px] font-semibold bg-num w-12 text-right">{ch.value}%</span>
                       {spend[ch.ch] > 0 && (
-                        <span className="text-[11px] text-muted-foreground w-16 text-right">{fmtNGN(spend[ch.ch])}</span>
+                        <span className="text-[11px] text-muted-foreground w-16 text-right bg-num">{fmtNGN(spend[ch.ch])}</span>
                       )}
                       {roi[ch.ch] !== undefined && (
                         <span className={cn(
                           'text-[11px] font-medium w-14 text-right',
-                          roi[ch.ch] > 0 ? 'text-green-500' : 'text-red-500'
+                          roi[ch.ch] > 0 ? 'text-pos' : 'text-tx-flare'
                         )}>
                           {roi[ch.ch] > 0 ? '+' : ''}{roi[ch.ch]}x
                         </span>
@@ -234,7 +237,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
                   {totalSpend > 0 && (
                     <div className="pt-2 border-t border-border/40 flex justify-between">
                       <span className="text-[12px] text-muted-foreground">Total tracked spend</span>
-                      <span className="text-[12px] font-semibold">{fmtNGN(totalSpend)}</span>
+                      <span className="text-[12px] font-semibold bg-num">{fmtNGN(totalSpend)}</span>
                     </div>
                   )}
                 </div>
@@ -246,20 +249,20 @@ export function MmmClient({ brandName, lastRun }: Props) {
           {(result.increase || result.reduce) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {result.increase && (
-                <div className="rounded-2xl border border-green-200 bg-green-50 dark:bg-green-950/30 dark:border-green-900 p-5">
+                <div className="rounded-2xl border border-line bg-shell dark:bg-shell/30 dark:border-line p-5">
                   <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-green-600" />
-                    <p className="text-[13px] font-semibold text-green-700 dark:text-green-400">Increase investment</p>
+                    <TrendingUp className="h-4 w-4 text-pos" />
+                    <p className="text-[13px] font-semibold text-pos dark:text-pos">Increase investment</p>
                   </div>
                   <p className="text-[13px] font-medium capitalize mb-1">{result.increase.channel}</p>
                   <p className="text-[12.5px] text-muted-foreground leading-relaxed">{result.increase.rationale}</p>
                 </div>
               )}
               {result.reduce && (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900 p-5">
+                <div className="rounded-2xl border border-line bg-shell dark:bg-shell/30 dark:border-line p-5">
                   <div className="flex items-center gap-2 mb-2">
-                    <TrendingDown className="h-4 w-4 text-amber-600" />
-                    <p className="text-[13px] font-semibold text-amber-700 dark:text-amber-400">Optimise or reduce</p>
+                    <TrendingDown className="h-4 w-4 text-tx-2" />
+                    <p className="text-[13px] font-semibold text-tx-2 dark:text-tx-2">Optimise or reduce</p>
                   </div>
                   <p className="text-[13px] font-medium capitalize mb-1">{result.reduce.channel}</p>
                   <p className="text-[12.5px] text-muted-foreground leading-relaxed">{result.reduce.rationale}</p>
@@ -274,7 +277,7 @@ export function MmmClient({ brandName, lastRun }: Props) {
               <p className="text-[13px] font-medium eyebrow">Recommendations</p>
               {result.recommendations.map((r, i) => (
                 <div key={i} className="flex gap-3 py-3 border-b border-border/40 last:border-0">
-                  <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/60 w-14 shrink-0 pt-0.5 capitalize">{r.channel}</span>
+                  <span className="text-[11px] font-bold text-muted-foreground/60 w-14 shrink-0 pt-0.5 capitalize">{r.channel}</span>
                   <div>
                     <p className="text-[13px] font-medium">{r.action}</p>
                     <p className="text-[12px] text-muted-foreground mt-0.5 leading-relaxed">{r.rationale}</p>

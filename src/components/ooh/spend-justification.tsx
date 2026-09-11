@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { TrendingUp } from 'lucide-react'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 
 interface SpendJustificationProps {
   monthlyCost:    number
@@ -68,14 +68,14 @@ export function SpendJustification({
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div className="bg-muted/40 rounded-lg p-3">
           <p className="text-xs text-muted-foreground">Total campaign spend</p>
-          <p className="text-base font-semibold mt-0.5 tabular-nums">
+          <p className="text-base font-semibold mt-0.5 bg-num">
             {currency} {metrics.totalCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </p>
           <p className="text-xs text-muted-foreground">{metrics.campaignDays} days</p>
         </div>
         <div className="bg-muted/40 rounded-lg p-3">
           <p className="text-xs text-muted-foreground">OOH effective CPM</p>
-          <p className="text-base font-semibold mt-0.5 tabular-nums">
+          <p className="text-base font-semibold mt-0.5 bg-num">
             {metrics.oohCpm != null
               ? `${currency} ${metrics.oohCpm.toFixed(2)}`
               : '—'}
@@ -84,7 +84,7 @@ export function SpendJustification({
         </div>
         <div className="bg-muted/40 rounded-lg p-3">
           <p className="text-xs text-muted-foreground">Cost per tracked visit</p>
-          <p className="text-base font-semibold mt-0.5 tabular-nums">
+          <p className="text-base font-semibold mt-0.5 bg-num">
             {metrics.costPerVisit != null
               ? `${currency} ${metrics.costPerVisit.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
               : '—'}
@@ -109,30 +109,30 @@ export function SpendJustification({
                 margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
                 layout="vertical"
               >
-                <XAxis type="number" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                <XAxis type="number" tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false} />
                 <YAxis
                   dataKey="channel" type="category"
-                  tick={{ fontSize: 10 }} tickLine={false} axisLine={false}
+                  tick={{ fontFamily: 'var(--font-num)',  fontSize: 10 }} tickLine={false} axisLine={false}
                   width={80}
                 />
                 <Tooltip
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(v: any) => [`${currency} ${Number(v).toFixed(2)}`, 'CPM']}
                   contentStyle={{
-                    background: '#14182B',
-                    border: '1px solid rgba(255,255,255,0.10)',
-                    borderRadius: 12,
+                    background: 'var(--bg-ink)',
+                    border: 'var(--line)',
+                    borderRadius: 'var(--r-card)',
                     fontSize: 11,
-                    color: '#fff',
+                    color: 'var(--bg-card)',
                   }}
-                  labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.10em' }}
+                  labelStyle={{ color: 'var(--tx-inv-2)', fontSize: 10 }}
                   cursor={{ fill: 'currentColor', opacity: 0.05 }}
                 />
                 <Bar dataKey="cpm" radius={[0, 4, 4, 0]}>
                   {[{ channel: 'This OOH' }, ...DIGITAL_BENCHMARKS].map((entry, i) => (
                     <Cell
                       key={entry.channel}
-                      fill={i === 0 ? '#2B59FF' : 'rgba(43,89,255,0.18)'}
+                      fill={i === 0 ? 'var(--chart-1)' : 'var(--chart-4)'}
                     />
                   ))}
                 </Bar>
@@ -140,7 +140,7 @@ export function SpendJustification({
             </ResponsiveContainer>
           </div>
           {oohIsChapest && (
-            <p className="text-xs text-green-700 dark:text-green-400 mt-2 bg-green-50 dark:bg-green-950/30 rounded-md px-3 py-2">
+            <p className="text-xs text-pos dark:text-pos mt-2 bg-shell dark:bg-shell/30 rounded-md px-3 py-2">
               This OOH site is delivering a lower CPM than all tracked digital channels.
             </p>
           )}

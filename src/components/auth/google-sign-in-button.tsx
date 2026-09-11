@@ -4,7 +4,7 @@ import { useState }     from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { cn }           from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
-import { Loader2 }      from 'lucide-react'
+import { Working as Loader2 } from '@/components/brand/working'
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -50,7 +50,7 @@ export function GoogleSignInButton({ className }: GoogleSignInButtonProps) {
       )}
     >
       {loading
-        ? <Loader2 className="h-4 w-4 animate-spin" />
+        ? <Loader2 className="h-4 w-4" />
         : <GoogleIcon className="h-4 w-4" />
       }
       {loading ? 'Redirecting…' : 'Continue with Google'}

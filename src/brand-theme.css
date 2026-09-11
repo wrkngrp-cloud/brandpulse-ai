@@ -1,0 +1,97 @@
+/**
+ * The brand layer, as Tailwind utilities.
+ *
+ * Shared on purpose. The app imports it through globals.css and the Remotion
+ * film imports it through video/src/style.css, so `bg-flare`, `text-tx-2`,
+ * `border-line` and the four radii mean the same thing in both bundles. The
+ * film renders the app's own scene components; when it did not carry this
+ * layer, every one of those utilities resolved to nothing and the product
+ * screens in the film looked like a different, half-drawn product.
+ *
+ * Nothing is defined here. Every value is a variable in brand/tokens.css.
+ */
+@theme inline {
+  /* ── The ramp, the grounds and the polarity axis, as utilities ──────────
+     Every one of these is a variable in brand/tokens.css. Nothing new is
+     defined here; this only makes bg-flare / text-tx-2 / border-line resolve. */
+  --color-paper:        var(--bg-paper);
+  --color-shell:        var(--bg-shell);
+  --color-ink:          var(--bg-ink);
+  --color-ink-raised:   var(--bg-ink-raised);
+
+  --color-char:         var(--char);
+  --color-danfo:        var(--danfo);
+  --color-ember:        var(--ember);
+  --color-flare:        var(--flare);
+  --color-flare-press:  var(--flare-press);
+  --color-flare-wash:   var(--flare-wash);
+  --color-on-hot:       var(--on-hot);
+
+  --color-tick-1:       var(--tick-1);
+  --color-tick-2:       var(--tick-2);
+  --color-tick-3:       var(--tick-3);
+  --color-tick-4:       var(--tick-4);
+  --color-tick-5:       var(--tick-5);
+
+  --color-pos:          var(--pos);
+  --color-neu:          var(--neu);
+  --color-neg:          var(--neg);
+
+  --color-tx:           var(--tx);
+  --color-tx-2:         var(--tx-2);
+  --color-tx-3:         var(--tx-3);
+  --color-tx-inv:       var(--tx-inv);
+  --color-tx-inv-2:     var(--tx-inv-2);
+  --color-tx-flare:     var(--tx-flare);
+
+  --color-line:         var(--line);
+  --color-line-strong:  var(--line-strong);
+  --color-line-inv:     var(--line-inv);
+
+  /* ── Type scale, from the tokens ─────────────────────────────────────── */
+  --text-display:  var(--t-display);
+  --text-h1:       var(--t-h1);
+  --text-h2:       var(--t-h2);
+  --text-h3:       var(--t-h3);
+  --text-body:     var(--t-body);
+  --text-small:    var(--t-small);
+  --text-micro:    var(--t-micro);
+  --text-readout:  var(--t-readout);
+
+  /* ── Radius discipline. Cards 4, controls 3, ticks 2.5, pills round.
+     Nothing else is rounded, so every rounded-* utility lands on one of
+     those four rather than on its own scale. ───────────────────────────── */
+  --radius-xs:  var(--r-tick);
+  --radius-sm:  var(--r-control);
+  --radius-md:  var(--r-control);
+  --radius-lg:  var(--r-card);
+  --radius-xl:  var(--r-card);
+  --radius-2xl: var(--r-card);
+  --radius-3xl: var(--r-card);
+  --radius-4xl: var(--r-card);
+}
+
+/* The two classes brand/components.tsx expects, in the shared layer for the
+   same reason the tokens are: the film renders those components too, and when
+   .bg-num was missing there every reading in it fell back to Nohemi. */
+@layer utilities {
+  /* .bg-num — every number in the app. Disket Mono, tabular so digits do not
+     jitter as data updates. .bg-label — the ONLY place capitals are allowed:
+     Disket 700 at .20em tracking. Nohemi is never set in caps. */
+  .bg-num {
+    font-family: var(--font-num);
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+    font-weight: 400;
+  }
+  .bg-label {
+    font-family: var(--font-num);
+    font-weight: 700;
+    font-size: var(--t-micro);
+    letter-spacing: .20em;
+    text-transform: uppercase;
+    line-height: 1.45;
+    color: var(--tx-3);
+  }
+
+}

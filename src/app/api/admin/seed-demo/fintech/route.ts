@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
+import { TOKENS } from '@/lib/brand-tokens'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: PocketPay — Nigerian fintech (payments + savings app)
@@ -81,8 +82,8 @@ export async function POST(req: NextRequest) {
     category:        'Fintech',
     industry:        'fintech',
     brand_type:      'fintech',
-    primary_color:   '#6C3FE8',
-    secondary_color: '#F0A500',
+    primary_color:   TOKENS.neu,
+    secondary_color: TOKENS.danfo,
     market_share_pct: 8.4,
     brand_values:    ['Financial Inclusion', 'Speed', 'Trust', 'Simplicity'],
     cultural_profile: { community_corporate: 35, traditional_modern: 70, religious_secular: 40, mass_premium: 55, local_global: 60 },
@@ -696,9 +697,9 @@ export async function POST(req: NextRequest) {
 
   let ppStarter: { id: string } | null = null, ppPlus: { id: string } | null = null, ppElite: { id: string } | null = null
   if (ppLp?.id) {
-    const { data: pt1 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: ppLp.id, name: 'Starter', min_points: 0,     color: '#B0B0B0', perks: ['1x points on transfers', 'Standard support queue'], sort_order: 1 }).select('id').single()
-    const { data: pt2 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: ppLp.id, name: 'Plus',    min_points: 3_000, color: '#6C3FE8', perks: ['1.5x points on transfers', 'Priority support queue', 'One free transfer fee waiver per month'], sort_order: 2 }).select('id').single()
-    const { data: pt3 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: ppLp.id, name: 'Elite',   min_points: 12_000, color: '#F0A500', perks: ['2x points on transfers', 'Dedicated support line', 'Unlimited fee waivers', 'Early access to new features'], sort_order: 3 }).select('id').single()
+    const { data: pt1 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: ppLp.id, name: 'Starter', min_points: 0,     color: TOKENS.tx3, perks: ['1x points on transfers', 'Standard support queue'], sort_order: 1 }).select('id').single()
+    const { data: pt2 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: ppLp.id, name: 'Plus',    min_points: 3_000, color: TOKENS.neu, perks: ['1.5x points on transfers', 'Priority support queue', 'One free transfer fee waiver per month'], sort_order: 2 }).select('id').single()
+    const { data: pt3 } = await sb.from('loyalty_tiers').insert({ brand_id: brandId, program_id: ppLp.id, name: 'Elite',   min_points: 12_000, color: TOKENS.danfo, perks: ['2x points on transfers', 'Dedicated support line', 'Unlimited fee waivers', 'Early access to new features'], sort_order: 3 }).select('id').single()
     ppStarter = pt1; ppPlus = pt2; ppElite = pt3
 
     await sb.from('loyalty_rewards').insert([

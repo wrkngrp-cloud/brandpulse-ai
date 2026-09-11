@@ -1,11 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  TrendingUp, TrendingDown, Plus, DollarSign, Eye, Heart,
-  MousePointerClick, ShoppingBag, ChevronDown, ChevronUp,
-  Info,
-} from 'lucide-react'
+import { TrendDownIcon as TrendingDown, PlusIcon as Plus, CurrencyIcon as DollarSign, EyeIcon as Eye, HeartIcon as Heart, CircleDotIcon as MousePointerClick, MarketIcon as ShoppingBag, ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp, InfoIcon as Info } from '@/components/brand/icon'
+import { TrendIcon as TrendingUp } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Input }  from '@/components/ui/input'
 import { Label }  from '@/components/ui/label'
@@ -51,9 +48,9 @@ function fmtNGN(n: number) {
 }
 
 function roiColor(roi: number) {
-  if (roi >= 100) return 'text-emerald-600'
-  if (roi >= 0)   return 'text-teal-600'
-  return               'text-red-600'
+  if (roi >= 100) return 'text-pos'
+  if (roi >= 0)   return 'text-pos'
+  return               'text-tx-flare'
 }
 
 function RoiPill({ roi }: { roi: number }) {
@@ -72,7 +69,7 @@ function MetricChip({ icon: Icon, label, value }: { icon: React.ElementType; lab
       <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
         <Icon className="h-3 w-3" /> {label}
       </div>
-      <p className="text-[13px] font-semibold">{value}</p>
+      <p className="text-[13px] font-semibold"><span className="bg-num">{value}</span></p>
     </div>
   )
 }
@@ -162,15 +159,15 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
       {campaigns.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { label: 'Total EMV',     value: fmtNGN(totalEmv),          icon: TrendingUp,       color: 'text-emerald-600' },
-            { label: 'Total Fee Paid', value: fmtNGN(totalFee),         icon: DollarSign,       color: 'text-amber-600' },
-            { label: 'Blended ROI',   value: `${totalRoi.toFixed(0)}%`, icon: totalRoi >= 0 ? TrendingUp : TrendingDown, color: totalRoi >= 0 ? 'text-emerald-600' : 'text-red-600' },
-            { label: 'Avg Eng. Rate', value: `${avgEr.toFixed(1)}%`,    icon: Heart,            color: 'text-pink-600' },
+            { label: 'Total EMV',     value: fmtNGN(totalEmv),          icon: TrendingUp,       color: 'text-pos' },
+            { label: 'Total Fee Paid', value: fmtNGN(totalFee),         icon: DollarSign,       color: 'text-tx-2' },
+            { label: 'Blended ROI',   value: `${totalRoi.toFixed(0)}%`, icon: totalRoi >= 0 ? TrendingUp : TrendingDown, color: totalRoi >= 0 ? 'text-pos' : 'text-tx-flare' },
+            { label: 'Avg Eng. Rate', value: `${avgEr.toFixed(1)}%`,    icon: Heart,            color: 'text-tx-2' },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="rounded-2xl border bg-card p-4">
               <Icon className={cn('h-4 w-4 mb-1.5', color)} />
-              <p className="text-[10.5px] text-muted-foreground font-medium uppercase tracking-wider">{label}</p>
-              <p className={cn('text-[20px] font-bold leading-tight', color)}>{value}</p>
+              <p className="text-[10.5px] text-muted-foreground font-medium">{label}</p>
+              <p className={cn('text-[20px] font-bold leading-tight', color)}><span className="bg-num">{value}</span></p>
             </div>
           ))}
         </div>
@@ -245,15 +242,15 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
           {/* Live ROI preview */}
           {n(form.fee) > 0 && (
             <div className="rounded-xl bg-muted/40 border px-4 py-3 space-y-1">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">EMV Preview</p>
+              <p className="text-[11px] font-bold text-muted-foreground">EMV Preview</p>
               <div className="flex flex-wrap gap-4">
                 <div>
                   <p className="text-[10.5px] text-muted-foreground">Estimated Media Value</p>
-                  <p className="text-[16px] font-bold">{fmtNGN(previewEmv)}</p>
+                  <p className="text-[16px] font-bold bg-num">{fmtNGN(previewEmv)}</p>
                 </div>
                 <div>
                   <p className="text-[10.5px] text-muted-foreground">Fee</p>
-                  <p className="text-[16px] font-bold">{fmtNGN(n(form.fee))}</p>
+                  <p className="text-[16px] font-bold bg-num">{fmtNGN(n(form.fee))}</p>
                 </div>
                 <div>
                   <p className="text-[10.5px] text-muted-foreground">ROI</p>
@@ -296,14 +293,14 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
             return (
               <div key={c.id} className="rounded-2xl border bg-card overflow-hidden">
                 <button
-                  className="w-full flex items-center gap-3 px-5 py-4 text-left"
+                  className="w-full flex items-center gap-3 px-5 py-4 text-left bg-press"
                   onClick={() => setExpanded(isOpen ? null : c.id)}
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-[13.5px] font-semibold truncate">{c.name}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       {c.creator_handle && <span className="text-[11.5px] text-muted-foreground">{c.creator_handle}</span>}
-                      {c.platform && <span className="text-[10px] font-bold uppercase text-muted-foreground/60 bg-muted rounded px-1.5 py-0.5">{c.platform}</span>}
+                      {c.platform && <span className="text-[10px] font-bold text-muted-foreground/60 bg-muted rounded px-1.5 py-0.5">{c.platform}</span>}
                     </div>
                   </div>
                   <RoiPill roi={roi} />
@@ -321,15 +318,15 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
                     </div>
 
                     <div className="rounded-xl bg-background border p-4 space-y-3">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">ROI Breakdown</p>
+                      <p className="text-[11px] font-bold text-muted-foreground">ROI Breakdown</p>
                       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">Earned Media Value</p>
-                          <p className="text-[16px] font-bold text-emerald-600">{fmtNGN(c.emv)}</p>
+                          <p className="text-[16px] font-bold text-pos bg-num">{fmtNGN(c.emv)}</p>
                         </div>
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">Fee Paid</p>
-                          <p className="text-[16px] font-bold">{fmtNGN(c.fee)}</p>
+                          <p className="text-[16px] font-bold bg-num">{fmtNGN(c.fee)}</p>
                         </div>
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">ROI</p>
@@ -337,25 +334,25 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
                         </div>
                         <div>
                           <p className="text-[10.5px] text-muted-foreground">Eng. rate</p>
-                          <p className="text-[16px] font-bold">{er.toFixed(2)}%</p>
+                          <p className="text-[16px] font-bold bg-num">{er.toFixed(2)}%</p>
                         </div>
                       </div>
                       {c.engagements > 0 && (
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2 border-t">
                           <div>
                             <p className="text-[10.5px] text-muted-foreground">Cost per engagement</p>
-                            <p className="text-[14px] font-semibold">₦{cpe.toFixed(0)}</p>
+                            <p className="text-[14px] font-semibold bg-num">₦{cpe.toFixed(0)}</p>
                           </div>
                           {c.attributed_clicks > 0 && (
                             <div>
                               <p className="text-[10.5px] text-muted-foreground">Cost per click</p>
-                              <p className="text-[14px] font-semibold">₦{(c.fee / c.attributed_clicks).toFixed(0)}</p>
+                              <p className="text-[14px] font-semibold bg-num">₦{(c.fee / c.attributed_clicks).toFixed(0)}</p>
                             </div>
                           )}
                           {c.attributed_conversions > 0 && (
                             <div>
                               <p className="text-[10.5px] text-muted-foreground">Cost per conversion</p>
-                              <p className="text-[14px] font-semibold">₦{(c.fee / c.attributed_conversions).toFixed(0)}</p>
+                              <p className="text-[14px] font-semibold bg-num">₦{(c.fee / c.attributed_conversions).toFixed(0)}</p>
                             </div>
                           )}
                         </div>

@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { MessageSquare, X, Send, Loader2, ChevronDown, ArrowRight } from 'lucide-react'
+import { XIcon as X, SendIcon as Send, ChevronDownIcon as ChevronDown, ArrowRightIcon as ArrowRight } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
+import { MentionsIcon as MessageSquare } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
@@ -27,8 +29,8 @@ interface Message {
 }
 
 const CONFIDENCE_CLASS: Record<string, string> = {
-  High:   'bg-green-50 text-green-700 border-green-200',
-  Medium: 'bg-amber-50 text-amber-700 border-amber-200',
+  High:   'bg-shell text-pos border-line',
+  Medium: 'bg-shell text-tx-2 border-line',
   Low:    'bg-muted text-muted-foreground border-border',
 }
 
@@ -121,7 +123,7 @@ export function AiCommand() {
         <button
           data-tour="ask-ai"
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-foreground text-background shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+          className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-foreground text-background flex items-center justify-center transition-transform border border-line bg-press"
           aria-label="Open BrandGauge"
         >
           <MessageSquare className="h-5 w-5" />
@@ -130,11 +132,11 @@ export function AiCommand() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col w-[360px] sm:w-[420px] h-[540px] rounded-2xl border bg-background shadow-2xl overflow-hidden">
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col w-[360px] sm:w-[420px] h-[540px] rounded-2xl border bg-background overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
             <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500" />
+              <div className="h-[11px] w-[5px] rounded-[var(--r-tick)] bg-pos" />
               <span className="text-sm font-semibold">BrandGauge</span>
             </div>
             <div className="flex items-center gap-1">
@@ -159,7 +161,7 @@ export function AiCommand() {
                     <button
                       key={s}
                       onClick={() => send(s)}
-                      className="w-full text-left text-xs px-3 py-2 rounded-lg border hover:bg-muted transition-colors text-muted-foreground"
+                      className="w-full text-left text-xs px-3 py-2 rounded-lg border hover:bg-muted transition-colors text-muted-foreground bg-press"
                     >
                       {s}
                     </button>
@@ -200,7 +202,7 @@ export function AiCommand() {
 
                     {/* Collection recommendation */}
                     {m.collectionRecommendation && (
-                      <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
+                      <div className="text-[11px] text-tx-2 bg-shell border border-line rounded-lg px-3 py-2 leading-relaxed">
                         <span className="font-medium">To get a better answer:</span> {m.collectionRecommendation}
                       </div>
                     )}
@@ -212,7 +214,7 @@ export function AiCommand() {
                           <Link
                             key={a.href + a.label}
                             href={a.href}
-                            className="inline-flex items-center gap-1 text-[11px] font-medium border rounded-full px-2.5 py-1 hover:bg-muted transition-colors"
+                            className="inline-flex items-center gap-1 text-[11px] font-medium border rounded-sm px-2.5 py-1 hover:bg-muted transition-colors"
                           >
                             {a.label}
                             <ArrowRight className="h-3 w-3" />
@@ -228,7 +230,7 @@ export function AiCommand() {
             {loading && (
               <div className="flex items-start">
                 <div className="bg-muted rounded-2xl rounded-bl-sm px-3 py-2 flex items-center gap-1.5">
-                  <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                  <Loader2 className="h-3 w-3 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Thinking...</span>
                 </div>
               </div>
@@ -256,7 +258,7 @@ export function AiCommand() {
               disabled={!input.trim() || loading}
               aria-label="Send message"
             >
-              {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+              {loading ? <Loader2 className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5" />}
             </Button>
           </div>
         </div>

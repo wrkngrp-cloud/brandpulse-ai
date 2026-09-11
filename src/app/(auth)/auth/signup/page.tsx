@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button'
-import { Loader2, BarChart2 } from 'lucide-react'
+import { TrendIcon as BarChart2 } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 
 export default function SignupPage() {
   const [state, action, pending] = useActionState(signup, null)
@@ -71,7 +72,7 @@ export default function SignupPage() {
           </div>
 
           <Button className="w-full" type="submit" disabled={pending}>
-            {pending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            {pending ? <Loader2 className="h-4 w-4 mr-2" /> : null}
             {pending ? 'Creating account...' : 'Create account'}
           </Button>
         </form>
