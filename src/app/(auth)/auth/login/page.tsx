@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button'
 import { cn } from '@/lib/utils'
-import { ArrowRightIcon as ArrowRight, TrendIcon as BarChart2, GlobeIcon as Globe2, UsersIcon as Users2, AskIcon as Zap } from '@/components/brand/icon'
+import { ArrowRightIcon as ArrowRight, TrendIcon as BarChart2, GlobeIcon as Globe2, UsersIcon as Users2, AskIcon as Zap,
+  ShelfIcon, CardIcon, BriefcaseIcon, SaasIcon } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { BrandLockup } from '@/components/brand/logo'
 
@@ -20,7 +21,7 @@ const DEMOS = [
     slug:     'jara',
     brand:    'Jara Foods',
     industry: 'FMCG',
-    icon:     '🛒',
+    Icon:     ShelfIcon,
     tagline:  'Nigerian packaged goods brand with 12-month brand health story arc',
     email:    'demo@jarafoods.brandgauge.app',
     password: 'Demo@Jara2026!',
@@ -29,7 +30,7 @@ const DEMOS = [
     slug:     'fintech',
     brand:    'PocketPay',
     industry: 'Fintech',
-    icon:     '💳',
+    Icon:     CardIcon,
     tagline:  'Mobile payments app — PR crisis, recovery, Series A growth story',
     email:    'demo@pocketpay.brandgauge.app',
     password: 'Demo@PocketPay2026!',
@@ -38,7 +39,7 @@ const DEMOS = [
     slug:     'agency',
     brand:    'Pinnacle Media',
     industry: 'Agency',
-    icon:     '🏆',
+    Icon:     BriefcaseIcon,
     tagline:  'Full-service Lagos marketing agency managing multiple client brands',
     email:    'demo@pinnaclemedia.brandgauge.app',
     password: 'Demo@Pinnacle2026!',
@@ -47,7 +48,7 @@ const DEMOS = [
     slug:     'saas',
     brand:    'Bridger CRM',
     industry: 'B2B SaaS',
-    icon:     '⚙',
+    Icon:     SaasIcon,
     tagline:  'Nigerian CRM tool — MRR, churn, NRR and enterprise launch story',
     email:    'demo@bridgercrm.brandgauge.app',
     password: 'Demo@Bridger2026!',
@@ -79,12 +80,14 @@ function DemoTile({
       type="button"
       onClick={() => onSelect(demo)}
       className={cn(
-        'w-full text-left rounded-xl border p-3 transition-colors hover:border-foreground/40 hover:bg-muted/30',
+        'w-full rounded-sm border p-3 text-left transition-colors hover:border-foreground/40 hover:bg-muted/30 bg-press',
         active && 'border-foreground/60 bg-muted/40 ring-1 ring-foreground/10',
       )}
     >
       <div className="flex items-start gap-2.5">
-        <span className="text-xl leading-none mt-0.5">{demo.icon}</span>
+        <span aria-hidden className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-line">
+          <demo.Icon className="h-3.5 w-3.5 text-tx-2" />
+        </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-1.5">
             <span className="text-[13px] font-semibold">{demo.brand}</span>
@@ -140,7 +143,7 @@ function LoginContent() {
           <div className="space-y-3.5">
             {FEATURES.map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-3">
-                <div className="h-7 w-7 rounded-lg bg-background/10 flex items-center justify-center shrink-0">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-line-inv">
                   <Icon className="h-3.5 w-3.5 text-background/80" />
                 </div>
                 <span className="text-[13px] text-background/80">{text}</span>
@@ -156,7 +159,7 @@ function LoginContent() {
 
       {/* ── Right panel: form + demos ──────────────────────────── */}
       <div className="flex-1 flex flex-col overflow-y-auto">
-        <div className="flex-1 flex flex-col lg:flex-row gap-8 p-6 sm:p-10 lg:p-12 max-w-4xl mx-auto w-full">
+        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center gap-8 p-6 sm:p-10 lg:flex-row lg:items-center lg:p-12">
 
           {/* Sign-in form */}
           <div className="flex-1 max-w-sm">
@@ -222,8 +225,8 @@ function LoginContent() {
               </div>
 
               {selectedDemo && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/40 rounded-lg px-3 py-2">
-                  <span>{selectedDemo.icon}</span>
+                <div className="flex items-center gap-2 rounded-sm bg-muted/40 px-3 py-2 text-xs text-tx-2">
+                  <selectedDemo.Icon className="h-3.5 w-3.5" />
                   <span>Logging in as <strong>{selectedDemo.brand}</strong> demo</span>
                 </div>
               )}
