@@ -412,7 +412,7 @@ export function GeoAttributionPanel({
                         }}
                       >
                         {syncing === aud.id
-                          ? <><Zap className="h-3 w-3 animate-pulse" />Syncing…</>
+                          ? <><Zap className="h-3 w-3" />Syncing…</>
                           : <><ExternalLink className="h-3 w-3" />Sync to Meta</>
                         }
                       </Button>
@@ -436,7 +436,7 @@ export function GeoAttributionPanel({
                     )}
                     {aud.status === 'syncing' && (
                       <div className="flex items-center gap-1 text-xs text-tx-flare">
-                        <Zap className="h-3.5 w-3.5 animate-pulse" />
+                        <Zap className="h-3.5 w-3.5" />
                         Syncing
                       </div>
                     )}

@@ -92,7 +92,7 @@ export function SurveyAiAnalysis({ surveyId, responseCount }: { surveyId: string
       {loading && !result && (
         <div className="py-6 text-center space-y-2">
           <Loader2 className="h-6 w-6 mx-auto text-muted-foreground" />
-          <p className="text-xs text-muted-foreground animate-pulse">Reading your survey data and generating insights...</p>
+          <p className="text-xs text-muted-foreground">Reading your survey data and generating insights...</p>
         </div>
       )}
 

@@ -397,7 +397,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                   )}
                 >
                   {creativeUploading
-                    ? <Upload className="h-6 w-6 text-tx-3 animate-pulse" />
+                    ? <Upload className="h-6 w-6 text-tx-3" />
                     : <ImageIcon className="h-6 w-6 text-tx-3" />}
                   <p className="text-sm text-muted-foreground">
                     {creativeUploading ? 'Uploading…' : 'Upload flyer or photobooth backdrop'}

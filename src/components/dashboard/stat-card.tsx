@@ -170,7 +170,7 @@ export function StatCard({
 
       {/* Value */}
       {loading ? (
-        <div className="h-10 w-20 rounded-lg bg-muted/50 animate-pulse mb-1" />
+        <div className="bg-skeleton-block mb-1 h-10 w-20" />
       ) : (
         <div className="flex items-baseline gap-1 leading-none">
           <span className="metric text-[36px]">

@@ -309,7 +309,7 @@ function BriefingTab({
           </Button>
 
           {loading && (
-            <p className="text-center text-xs text-muted-foreground animate-pulse">
+            <p className="text-center text-xs text-muted-foreground">
               Analysing share of voice, sentiment trends, and social signals...
             </p>
           )}

@@ -172,7 +172,7 @@ export function CdpClient() {
       {loading && profiles.length === 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-40 rounded-xl bg-muted animate-pulse" />
+            <div key={i} className="bg-skeleton-block h-40" />
           ))}
         </div>
       )}

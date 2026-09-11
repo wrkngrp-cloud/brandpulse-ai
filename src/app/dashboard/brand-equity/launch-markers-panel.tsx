@@ -225,7 +225,7 @@ export function LaunchMarkersPanel() {
       {loading ? (
         <div className="space-y-2">
           {[0, 1, 2].map(i => (
-            <div key={i} className="h-12 rounded-lg bg-muted animate-pulse" />
+            <div key={i} className="bg-skeleton-block h-12" />
           ))}
         </div>
       ) : markers.length === 0 ? (

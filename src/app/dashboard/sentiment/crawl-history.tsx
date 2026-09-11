@@ -80,7 +80,7 @@ export function CrawlHistory() {
           {loading && !runs && (
             <div className="space-y-2">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-16 bg-muted rounded-lg animate-pulse" />
+                <div key={i} className="bg-skeleton-block h-16" />
               ))}
             </div>
           )}
