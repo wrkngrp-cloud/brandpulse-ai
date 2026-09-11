@@ -25,8 +25,9 @@ export const TOKENS = {
   flarePress: '#D62E0B',
   flareWash: '#FFE9E3',
 
-  /* Polarity. There is no green in this system. */
-  pos: '#16120E',
+  /* Polarity. Positive is a forest green at hue 110, chosen to sit with the
+     warm ramp rather than against it; the axis is green / ash / Flare. */
+  pos: '#345C2C',
   neu: '#8C877E',
   neg: '#FF3D14',
 

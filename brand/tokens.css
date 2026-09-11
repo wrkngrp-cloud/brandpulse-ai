@@ -30,7 +30,9 @@
   --tick-5:        rgba(255,61,20,1);
 
   /* ---- Polarity. There is no green in this system. Deviation runs hot. ---- */
-  --pos:           #16120E;   /* nominal / positive — solid ink */
+  --pos:           #345C2C;   /* nominal / positive — forest, hue 110 so it
+                                 sits with the warm ramp rather than against it.
+                                 7.2:1 on Paper, 7.7:1 on a white card. */
   --neu:           #8C877E;   /* neutral — ash */
   --neg:           #FF3D14;   /* negative / alert — flare */
 
@@ -116,7 +118,7 @@
   --tx-2:          #CCC8C2;   /* 11.2:1 on Ink, 10.0:1 on the raised card */
   --tx-3:          #C1BDB7;   /* 10.0:1 on Ink, 8.9:1 on the raised card */
   --tx-flare:      #FFC12E;
-  --pos:           #FAF6EF;
+  --pos:           #9BC98A;   /* the same hue, lifted for Ink — 9.9:1 */
   --line:          rgba(250,246,239,.13);
   --line-strong:   rgba(250,246,239,.28);
   --flare-wash:    #3A1409;

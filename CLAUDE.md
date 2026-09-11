@@ -210,8 +210,10 @@ a hex, an `rgb()`, an `oklch()` or a Tailwind palette class — there are none l
   hero, applied to whole planes, once per frame; it fills, it never outlines, and it is
   never text — `--tx-flare` (Char) is Flare as type. Type on a hot plane is `--on-hot`
   (ink), because paper on Flare reads 3.3:1 and ink reads 5.3:1. There is no blue and no
-  green: polarity runs `--pos` (ink), `--neu` (ash), `--neg` (flare), and success is a
-  filled ink tick plus the word. Ash is not a text colour; use `--tx-2` or `--tx-3`, which
+  blue. Polarity runs `--pos` (forest green, hue 110 — `#345C2C` on Paper,
+  `#9BC98A` on Ink), `--neu` (ash), `--neg` (flare). The green is dark and Flare is
+  bright, so the pair stays separable in lightness alone; success is still a filled
+  tick plus the word, never a hue on its own. Never introduce a second green. Ash is not a text colour; use `--tx-2` or `--tx-3`, which
   both clear 7:1 on every ground.
 - **Type.** Nohemi for everything, Disket Mono (`--font-num`, or the `.bg-num` class) for
   numerals only, always tabular. Nothing else is monospace — not eyebrows, nav, captions or
