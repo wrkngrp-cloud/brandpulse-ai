@@ -12,6 +12,7 @@ import { BrandLockup } from '@/components/brand/logo'
 import { useDarkGround, useMode } from './use-mode'
 import { HERO_PHOTOS } from './photo-frame'
 import { HeatRow, ReadingLine, ReadingRail, Tick, TickReveal } from './reading'
+import { ARC_ASPECT, TickArcMask, useArcReveal } from './tick-mask'
 
 // Fade-and-slide-up on every element is banned: one reveal group per section,
 // maximum, and it is the section's own .bg-reveal group in motion.css. What is
@@ -100,53 +101,85 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
 /**
  * The hero.
  *
- * Two earlier attempts failed for the same reason: a widget sat in it. First a
- * drawn dashboard, then the gauge on a card in the bottom-right corner. A gauge
- * reading 95 that belongs to nobody is a decoration of a number, and putting it
- * beside the headline asks the reader to trust a figure before they know what it
- * measures. The real gauge is a scroll away, attached to a real workspace.
+ * Three earlier attempts failed the same way. A drawn dashboard, then a gauge
+ * on a card reading 95 for nobody, then a split with the photograph in a
+ * rectangle on the right. All three put the mark *beside* the page instead of
+ * making it the page, and the last one was the worst of them: a picture in a
+ * box is a picture in a box, whoever owns the box.
  *
- * What replaces it is a split: type on the ink plane, photograph flush to the
- * right edge and bleeding off it, a hairline between them, and a rule of four
- * readouts closing the block. The photograph is the subject — the street the
- * brand is being judged on — so it gets its own plane rather than being buried
- * under a scrim so the type can survive on top of it.
+ * So the arc is the subject. The market comes through the mark's own seven
+ * ticks, on the engine's sweep and the engine's growth curve, and the claim
+ * sits in the bowl the arc leaves under itself. Nothing is decorating anything:
+ * the shape is holding the photograph up, and the negative space it encloses is
+ * where the type had to go.
+ *
+ * It reads cold to hot left to right because that is the only direction heat
+ * runs in this system, and it arrives one aperture at a time because that is
+ * how a reading rises. By the time the last tick opens on the right, the
+ * picture is densest exactly where the gauge would be hottest.
  */
 function Hero() {
   const street = HERO_PHOTOS.street
+  const [shown, setShown] = useState(false)
+  const reveal = useArcReveal({ start: shown })
   return (
-    <section className="relative isolate" style={{ background: 'var(--bg-ink)' }}>
-      <div className="mx-auto grid w-full grid-cols-1 lg:grid-cols-12">
-        {/* ── Type ─────────────────────────────────────────────────────── */}
-        <div className="relative order-2 flex flex-col justify-center px-6 pb-12 pt-10 sm:px-10 sm:pb-16 sm:pt-14 lg:order-1 lg:col-span-7 lg:min-h-[86vh] lg:py-40 lg:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pr-16">
-          {/* The mark's own material, held well behind the type. */}
-          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{
-            backgroundImage: 'radial-gradient(var(--tick-1) 1.4px, transparent 1.4px)',
-            backgroundSize: '30px 30px',
-            maskImage: 'radial-gradient(70% 60% at 20% 40%, black, transparent)',
-            WebkitMaskImage: 'radial-gradient(70% 60% at 20% 40%, black, transparent)',
-          }} />
+    <section className="relative isolate overflow-hidden" style={{ background: 'var(--bg-ink)' }}>
+      {/* The mark's own material, held well behind everything. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{
+        backgroundImage: 'radial-gradient(var(--tick-1) 1.4px, transparent 1.4px)',
+        backgroundSize: '30px 30px',
+        maskImage: 'radial-gradient(60% 50% at 50% 30%, black, transparent)',
+        WebkitMaskImage: 'radial-gradient(60% 50% at 50% 30%, black, transparent)',
+      }} />
 
-          <motion.div {...rise}>
-            <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>
-              Brand intelligence built in Lagos, for West Africa
-            </p>
-            {/* The claim arrives a word at a time, once, on first paint. Words
-                rather than letters: letter-by-letter is a typewriter, and this
-                is a reading being taken. */}
+      <div className="mx-auto w-full max-w-6xl px-6 pb-14 pt-24 sm:pt-28 lg:pb-20 lg:pt-32">
+        <motion.p {...rise} className="text-center text-[11px]" style={{ color: 'var(--danfo)' }}>
+          Brand intelligence built in Lagos, for West Africa
+        </motion.p>
+
+        {/* ── The arc ────────────────────────────────────────────────
+            The frame is the arc's own measured proportion, so the head tick
+            keeps its full width and depth. Two earlier hand-set boxes cropped
+            it, which loses the hot end: the one end that carries the reading. */}
+        <div className="relative mt-8 w-full sm:mt-10" style={{ aspectRatio: ARC_ASPECT }}>
+          <TickArcMask id="hero-arc" reveal={reveal} className="h-full w-full">
+            <div className="relative h-full w-full">
+              {street.src && (
+                <Image src={street.src} alt={street.brief} fill priority
+                  onLoad={() => setShown(true)}
+                  sizes="(max-width: 1152px) 100vw, 1152px" className="object-cover" />
+              )}
+            </div>
+          </TickArcMask>
+          <span className="bg-label absolute bottom-0 left-0 hidden lg:block" style={{ color: 'var(--tx-inv-2)' }}>
+            {street.slot}, 07:40
+          </span>
+
+          {/* ── The bowl ───────────────────────────────────────────────
+              In flow under the arc on a phone, where the sweep is too
+              shallow to hold anything. Lifted into the negative space from
+              lg, and positioned rather than pulled up by a negative margin:
+              a margin shortens the section, which cropped the head tick off
+              the foot of the frame. Centred on the bowl at 44% rather than on
+              the frame at 50%, because the sweep is not symmetrical and the
+              type wants to sit away from the dense end, not under it. */}
+          <div className="relative mx-auto mt-10 max-w-xl text-center lg:absolute lg:left-[44%] lg:top-[40%] lg:mt-0 lg:w-[52%] lg:max-w-none lg:-translate-x-1/2">
+            <div aria-hidden className="pointer-events-none absolute -inset-x-12 -inset-y-8 -z-10 hidden lg:block" style={{
+              background: 'radial-gradient(62% 62% at 50% 52%, var(--bg-ink) 58%, transparent)',
+            }} />
             <ReadingLine
               text="See your brand the way the street sees it."
               accent="street"
               accentStyle={{ color: 'var(--danfo)' }}
-              className="mt-4 text-[2.5rem] font-black leading-[1.04] tracking-[-0.03em] sm:mt-5 sm:text-6xl xl:text-7xl"
+              className="text-[2.25rem] font-black leading-[1.04] tracking-[-0.03em] sm:text-5xl xl:text-[3.4rem]"
               style={{ fontFamily: 'var(--font)', color: 'var(--tx-inv)' }}
             />
-            <p className="mt-6 max-w-xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--tx-inv-2)' }}>
+            <p className="mx-auto mt-5 max-w-lg text-[15px] leading-relaxed sm:text-base" style={{ color: 'var(--tx-inv-2)' }}>
               BrandGauge reads sentiment in Pidgin, Yoruba, Igbo and Hausa. It measures every
               channel, from Instagram to a billboard on the expressway. Then it turns it all
               into numbers your board will trust.
             </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
+            <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
               <Link href="/auth/signup"
                 className="flex items-center justify-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-on-hot bg-press"
                 style={{ background: 'var(--flare)' }}>
@@ -158,51 +191,22 @@ function Hero() {
                 Watch the demo
               </a>
             </div>
-            <div className="mt-8 hidden max-w-xl flex-wrap gap-x-6 gap-y-2 text-[10px] sm:mt-12 sm:flex" style={{ color: 'var(--tx-inv-2)' }}>
-              {['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
-                <span key={c}>{c}</span>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* ── The street ───────────────────────────────────────────────── */}
-        <div className="relative order-1 min-h-[30vh] border-line-inv pt-14 sm:min-h-[38vh] lg:order-2 lg:col-span-5 lg:min-h-0 lg:border-l lg:pt-0">
-          {street.src && (
-            <Image src={street.src} alt={street.brief} fill priority
-              sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover" />
-          )}
-          {/* A short hold at the foot of the frame so the caption has a ground. */}
-          <div aria-hidden className="absolute inset-x-0 bottom-0 h-32" style={{
-            background: 'linear-gradient(to top, color-mix(in srgb, var(--bg-ink) 82%, transparent), transparent)',
-          }} />
-          <span className="bg-label absolute bottom-5 left-5" style={{ color: 'var(--tx-inv)' }}>
-            The market, 07:40
-          </span>
+          </div>
         </div>
       </div>
 
-      {/* ── The rule that closes the block ───────────────────────────── */}
+      {/* ── What it reads from ───────────────────────────────────────── */}
       <div className="border-t border-line-inv">
-        <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-px px-6 sm:grid-cols-4">
-          {HERO_READINGS.map(r => (
-            <div key={r.label} className="py-7 sm:py-8">
-              <dt className="text-[10px]" style={{ color: 'var(--tx-inv-2)' }}>{r.label}</dt>
-              <dd className="bg-num mt-2 text-3xl leading-none" style={{ color: 'var(--tx-inv)' }}>{r.value}</dd>
-            </div>
+        <div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-x-6 gap-y-2 px-6 py-5 text-[10px]"
+          style={{ color: 'var(--tx-inv-2)' }}>
+          {['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
+            <span key={c}>{c}</span>
           ))}
-        </dl>
+        </div>
       </div>
     </section>
   )
 }
-
-const HERO_READINGS = [
-  { value: '7', label: 'Industries the index reshapes for' },
-  { value: '4', label: 'Nigerian languages read natively' },
-  { value: '04:00', label: 'Nightly refresh, Lagos time' },
-  { value: '1', label: 'Number your board asks about' },
-]
 
 /**
  * The rest of the photography, under the film.
