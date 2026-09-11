@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
 import { VideoHero } from './video-hero'
 import { ProductCards } from './product-cards'
@@ -12,7 +12,10 @@ import { BrandLockup } from '@/components/brand/logo'
 import { useDarkGround, useMode } from './use-mode'
 import { HERO_PHOTOS } from './photo-frame'
 import { HeatRow, ReadingLine, ReadingRail, Tick, TickReveal } from './reading'
-import { ARC_ASPECT, TickArcMask, useArcReveal } from './tick-mask'
+import { ARC_ASPECT, TickArcMask, TickRowMask, rowAspect, useArcReveal } from './tick-mask'
+
+/** The unrolled run's proportion, measured once. */
+const ROW_ASPECT = rowAspect(6, 1.7)
 
 // Fade-and-slide-up on every element is banned: one reveal group per section,
 // maximum, and it is the section's own .bg-reveal group in motion.css. What is
@@ -211,35 +214,48 @@ export function Hero() {
 /**
  * The rest of the photography, under the film.
  *
- * Three frames, hairlined, each labelled with what it is. The page argues that
- * a brand is judged out on the road, so the road belongs on the page more than
- * once.
+ * It was three hairlined frames in a row, which is the grid-of-things family
+ * again and the fourth time this page used it. It is one band now: the three
+ * shots run together edge to edge and the whole strip arrives through the
+ * crescendo, the arc unrolled. Same ticks, same growth curve, same cold to hot
+ * reading as the hero and the product rail, at a fourth scale and lying flat.
+ *
+ * The ticks light left to right as the band comes into view, which is the only
+ * direction heat runs here. Names of the three shots sit under it as a rule, so
+ * nothing is lost by taking the boxes away.
  */
 function StreetStrip() {
   const shots = [HERO_PHOTOS.aerial, HERO_PHOTOS.billboard, HERO_PHOTOS.roundabout]
+  const band = useRef<HTMLDivElement>(null)
+  const inView = useInView(band, { once: true, amount: 0.35 })
+  const reveal = useArcReveal({ start: inView, startDelayMs: 60 })
   return (
-    <section aria-label="Where the brand is judged" className="px-6 pb-8 pt-20">
-      <div className="mx-auto max-w-6xl">
+    <section aria-label="Where the brand is judged" className="pb-10 pt-20">
+      <div className="mx-auto max-w-6xl px-6">
         <h2 className="max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Your budget goes out here. So should your measurement.
         </h2>
-        <TickReveal className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3" amount={0.2}>
-          {shots.map((photo, i) => (
-            <Tick key={photo.slot} as="div" className={i === 1 ? 'sm:mt-12' : undefined}>
-              <figure>
-              <div className="relative w-full overflow-hidden rounded-sm border border-line"
-                style={{ aspectRatio: i === 1 ? '4 / 5' : '4 / 3' }}>
+      </div>
+
+      <div ref={band} className="mx-auto mt-10 w-full max-w-6xl px-6" style={{ aspectRatio: ROW_ASPECT }}>
+        <TickRowMask id="street-band" reveal={reveal} ticks={6} fill={1.7} className="h-full w-full">
+          <div className="flex h-full w-full">
+            {shots.map(photo => (
+              <div key={photo.slot} className="relative h-full flex-1">
                 {photo.src && (
-                  <Image src={photo.src} alt={photo.brief} fill
-                    sizes="(max-width: 640px) 100vw, 31vw" className="object-cover" />
+                  <Image src={photo.src} alt={photo.brief} fill sizes="34vw" className="object-cover" />
                 )}
               </div>
-              <figcaption className="bg-label mt-2.5" style={{ color: 'var(--lp-mut)' }}>{photo.slot}</figcaption>
-              </figure>
-            </Tick>
-          ))}
-        </TickReveal>
+            ))}
+          </div>
+        </TickRowMask>
+      </div>
+
+      <div className="mx-auto mt-5 flex max-w-6xl flex-wrap gap-x-8 gap-y-2 px-6">
+        {shots.map(photo => (
+          <span key={photo.slot} className="bg-label" style={{ color: 'var(--lp-mut)' }}>{photo.slot}</span>
+        ))}
       </div>
     </section>
   )

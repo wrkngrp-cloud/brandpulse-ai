@@ -130,6 +130,12 @@ export const ARC_ASPECT = (() => {
   return b.w / b.h
 })()
 
+/** The same, for the unrolled run. */
+export function rowAspect(ticks = GEOM.ticks, fill = 1.35) {
+  const b = tickBounds(rowTicks(ticks, 1000, 320, fill))
+  return b.w / b.h
+}
+
 interface MaskProps {
   /** Unique id: two masks with the same id on one page silently merge. */
   id: string
@@ -191,10 +197,13 @@ export function TickArcMask({
  * rather than curve. Same ticks, unrolled.
  */
 export function TickRowMask({
-  id, children, reveal = 1, className = '', ticks = 6, fill = 1.3,
+  id, children, reveal = 1, className = '', ticks = GEOM.ticks, fill = 1.35,
 }: MaskProps) {
-  const W = 1000, H = 320
-  const row = rowTicks(ticks, W, H, fill)
+  // Fitted to the ticks, same as the arc: the head tick is the widest and a
+  // box sized to the centre line shaves it off the right edge.
+  const row = rowTicks(ticks, 1000, 320, fill)
+  const box = tickBounds(row)
+  const W = box.w, H = box.h
   const lit = reveal * ticks
   return (
     <div className={`relative ${className}`}>
@@ -202,7 +211,7 @@ export function TickRowMask({
         <defs>
           <mask id={id} maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
             {row.map((tk, i) => (
-              <g key={i} transform={`scale(${1 / W},${1 / H})`}>
+              <g key={i} transform={`scale(${1 / W},${1 / H}) translate(${-box.x0},${-box.y0})`}>
                 <g transform={`${tk.transform} scale(${i < lit ? 1 : 0.88})`} style={TICK_SETTLE}>
                   <path d={ATOM} fill="#fff" fillOpacity={i < lit ? 1 : 0} style={TICK_SETTLE} />
                 </g>
