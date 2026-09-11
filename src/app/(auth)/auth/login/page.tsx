@@ -136,7 +136,7 @@ function LoginContent() {
           <h2 className="text-[28px] font-bold leading-tight mb-4">
             Intelligence for Nigerian marketing teams
           </h2>
-          <p className="text-[14px] text-background/60 leading-relaxed mb-8">
+          <p className="mb-8 text-[14px] leading-relaxed text-tx-inv-2">
             Track brand health, measure campaigns, monitor competitors and generate board-ready reports. Built for West Africa.
           </p>
 
@@ -144,15 +144,15 @@ function LoginContent() {
             {FEATURES.map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-3">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-line-inv">
-                  <Icon className="h-3.5 w-3.5 text-background/80" />
+                  <Icon className="h-3.5 w-3.5 text-tx-inv" />
                 </div>
-                <span className="text-[13px] text-background/80">{text}</span>
+                <span className="text-[13px] text-tx-inv">{text}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="text-[11px] text-background/30">
+        <p className="text-[11px] text-tx-inv-2">
           BrandGauge. Made for Nigerian and West African brands.
         </p>
       </div>
