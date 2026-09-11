@@ -22,6 +22,8 @@ interface BreakdownItem {
 
 interface StageScore {
   score:      number | null
+  /** Share of the stage's weight that had data, 0-100. */
+  coverage:   number
   source:     string
   dataPoints: number
   breakdown:  BreakdownItem[]
@@ -212,7 +214,7 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
       {/* Funnel */}
       <div className="border rounded-xl overflow-hidden bg-card">
         {STAGES.map((stage, idx) => {
-          const { score, source, dataPoints, breakdown } = scores[stage.key]
+          const { score, coverage, source, dataPoints, breakdown } = scores[stage.key]
           const Icon        = stage.icon
           const drop        = dropOffMeta(stageScores[idx], stageScores[idx + 1])
           const isLast      = idx === STAGES.length - 1
@@ -236,11 +238,17 @@ export function FunnelClient({ scores, brandName, industry }: Props) {
                         <p className="text-sm font-semibold">{stage.label}</p>
                         <p className="text-xs text-muted-foreground">{stage.description}</p>
                       </div>
+                      {/* Three states, not two. A stage with no signal at all
+                          says so; a stage with some but under half its weight
+                          says that instead of printing a number one signal
+                          would be carrying on its own. */}
                       <div className="text-right shrink-0">
                         {score != null ? (
                           <span className={cn('text-2xl font-bold bg-num', scoreColor(score))}>
                             {score}
                           </span>
+                        ) : coverage > 0 ? (
+                          <span className="text-xs text-tx-3">Not enough to score</span>
                         ) : (
                           <span className="text-xs text-tx-3">No data</span>
                         )}
