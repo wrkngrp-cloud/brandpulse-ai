@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button'
-import { TrendIcon as BarChart2 } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
+import { BrandLockup } from '@/components/brand/logo'
 
 export default function SignupPage() {
   const [state, action, pending] = useActionState(signup, null)
@@ -17,11 +17,8 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-10">
       <div className="w-full max-w-sm">
 
-        <div className="flex items-center gap-2 mb-8">
-          <div className="h-7 w-7 rounded-lg bg-foreground flex items-center justify-center">
-            <BarChart2 className="h-3.5 w-3.5 text-background" />
-          </div>
-          <span className="font-bold text-[14px]">BrandGauge</span>
+        <div className="mb-8">
+          <BrandLockup height={20} />
         </div>
 
         <h1 className="text-2xl font-bold mb-1">Create your account</h1>

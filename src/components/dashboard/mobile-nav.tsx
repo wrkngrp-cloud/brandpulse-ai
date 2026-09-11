@@ -79,7 +79,7 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
               </span>
               <div className="min-w-0">
                 <p className="text-[13px] font-semibold truncate leading-tight">{brandName}</p>
-                <p className="text-[11px] text-sidebar-foreground/45 truncate leading-tight mt-0.5">{userEmail}</p>
+                <p className="text-[11px] text-sidebar-foreground truncate leading-tight mt-0.5">{userEmail}</p>
               </div>
             </div>
           </div>

@@ -64,9 +64,9 @@ function SidebarUserBlock({
           <>
             <span className="flex-1 min-w-0 text-left">
               <span className="block text-[13px] font-semibold truncate leading-tight">{brandName}</span>
-              <span className="block text-[11px] text-sidebar-foreground/45 truncate leading-tight mt-0.5">{email}</span>
+              <span className="block text-[11px] text-sidebar-foreground truncate leading-tight mt-0.5">{email}</span>
             </span>
-            <ChevronsUpDown className="h-3.5 w-3.5 text-sidebar-foreground/35 shrink-0" />
+            <ChevronsUpDown className="h-3.5 w-3.5 text-sidebar-foreground shrink-0" />
           </>
         )}
       </DropdownMenuTrigger>
@@ -152,24 +152,18 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
 
       {/* ── Logo area ──────────────────────────────────────────── */}
       <div className="h-14 shrink-0 flex items-center gap-3 border-b border-sidebar-border/70 px-[18px]">
-        {/* The mark as supplied. Duotone on the ink plane, and the lockup
-            only once the rail is wide enough to carry the wordmark. */}
-        <BrandMark size={28} ground="ink" className="shrink-0" />
-        <span
-          className={cn(
-            'transition-opacity duration-150',
-            expanded ? 'opacity-100 delay-75' : 'opacity-0',
-          )}
-        >
-          <BrandLockup height={16} ground="ink" />
-        </span>
+        {/* One or the other, never both: the lockup already contains the
+            mark, so drawing the mark beside it printed the needle twice. */}
+        {expanded
+          ? <BrandLockup height={16} ground="ink" />
+          : <BrandMark size={28} ground="ink" className="shrink-0" />}
 
         {/* Collapse/expand toggle */}
         <button
           onClick={onToggle}
           className={cn(
             'ml-auto h-7 w-7 shrink-0 grid place-items-center rounded-lg cursor-pointer',
-            'text-sidebar-foreground/35 hover:text-sidebar-foreground hover:bg-sidebar-accent',
+            'text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent',
             'transition-colors duration-150',
             expanded ? 'opacity-100 delay-75' : 'opacity-0 pointer-events-none',
           )}

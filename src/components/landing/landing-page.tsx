@@ -2,13 +2,15 @@
 
 import { useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
 import { VideoHero } from './video-hero'
 import { HorizontalTour } from './horizontal-tour'
-import { AiScene, CompetitiveScene, darkSceneVars, lightSceneVars } from './scenes'
+import { AiScene, CompetitiveScene, GaugeScene, darkSceneVars, lightSceneVars } from './scenes'
 import { BrandLockup } from '@/components/brand/logo'
 import { useDarkGround, useMode } from './use-mode'
+import { HERO_PHOTOS } from './photo-frame'
 
 // Fade-and-slide-up on every element is banned: one reveal group per section,
 // maximum, and it is the section's own .bg-reveal group in motion.css. What is
@@ -132,72 +134,97 @@ function Reading({ to, suffix = '' }: { to: number; suffix?: string }) {
   return <span>{to}{suffix}</span>
 }
 
+/**
+ * The hero: the street, full bleed, with the claim over it.
+ *
+ * The headline says the street sees your brand, so the street is the plane
+ * and the type sits on it. Ink rules apply over the photograph: the copy is
+ * Paper, the accent word is Danfo, because Char inverts to Danfo on Ink and
+ * Flare is never type. Flare stays where it belongs, filling the one CTA.
+ *
+ * With no photograph in the slot yet this renders as an ink plane carrying
+ * the mark's own tick field, which is a finished-looking hero rather than a
+ * hole. It is still a placeholder: the section is built for a picture.
+ *
+ * Two things the old hero did that this system bans, gone: the headline
+ * revealed a word at a time, and it sat on two 130px blur blooms.
+ */
 function Hero() {
-  const words = 'See your brand the way the street sees it.'.split(' ')
+  const street = HERO_PHOTOS.street
   return (
-    <section className="relative overflow-hidden pb-24 pt-36 sm:pt-44">
-      {/* patterned backdrop: dot grid + washes + adire motifs */}
-      <div className="pointer-events-none absolute inset-0">
+    <section className="relative isolate overflow-hidden">
+      {/* ── The plane ─────────────────────────────────────────────────── */}
+      <div className="absolute inset-0 -z-10" style={{ background: 'var(--bg-ink)' }}>
+        {street.src ? (
+          <Image src={street.src} alt={street.brief} fill priority sizes="100vw" className="object-cover" />
+        ) : (
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(var(--tick-1) 1.4px, transparent 1.4px)',
+            backgroundSize: '30px 30px',
+            maskImage: 'radial-gradient(85% 70% at 30% 45%, black, transparent)',
+          }} />
+        )}
+        {/* The scrim. A plane over a plane, so the type has a ground to sit
+            on whatever the photograph turns out to be. */}
         <div className="absolute inset-0" style={{
-          backgroundImage: 'radial-gradient(var(--lp-dot) 1px, transparent 1px)',
-          backgroundSize: '26px 26px',
-          maskImage: 'radial-gradient(75% 55% at 50% 32%, black, transparent)',
+          background: 'linear-gradient(100deg, color-mix(in srgb, var(--bg-ink) 88%, transparent) 0%, color-mix(in srgb, var(--bg-ink) 72%, transparent) 45%, color-mix(in srgb, var(--bg-ink) 30%, transparent) 100%)',
         }} />
-        <div className="absolute -left-24 top-40 opacity-70"><div><CircleMotif /></div></div>
-        <div className="absolute -right-16 top-[560px] opacity-50"><div><CircleMotif size={220} /></div></div>
-        <div className="absolute left-1/2 top-[-180px] h-[420px] w-[820px] -translate-x-1/2 rounded-sm blur-[130px]"
-          style={{ background: 'var(--bg-shell)' }} />
-        <div className="absolute left-1/2 top-[380px] h-[380px] w-[700px] -translate-x-1/2 rounded-sm blur-[130px]"
-          style={{ background: 'var(--bg-shell)' }} />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-6 text-center">
-        <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>
-          Brand intelligence built in Lagos, for West Africa
-        </motion.p>
-        <h1 className="mx-auto mt-5 max-w-4xl text-5xl font-black leading-[1.02] tracking-[-0.03em] sm:text-7xl"
-          style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
-          {words.map((w, i) => (
-            <motion.span key={i} className="inline-block whitespace-pre"
-              initial={{ opacity: 0, y: 34, rotate: 2 }}
-              animate={{ opacity: 1, y: 0, rotate: 0 }}
-              transition={{ delay: 0.1 + i * 0.055, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}>
-              {w === 'street' ? <span style={{ color: 'var(--lp-clay)' }}>{w}</span> : w}{' '}
-            </motion.span>
-          ))}
-        </h1>
-        <motion.p {...rise} transition={{ ...rise.transition, delay: 0.5 }}
-          className="mx-auto mt-6 max-w-2xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--lp-mut)' }}>
-          BrandGauge reads sentiment in Pidgin, Yoruba, Igbo and Hausa. It measures every
-          channel, from Instagram to a billboard on the expressway. Then it turns it all
-          into numbers your board will trust.
-        </motion.p>
-        <motion.div {...rise} transition={{ ...rise.transition, delay: 0.6 }} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-          <Link href="/auth/signup"
-            className="group flex items-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-on-hot border border-line bg-press"
-            style={{ background: 'var(--flare)' }}>
-            Start free in beta
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-          <a href="#demo" className="rounded-sm border px-6 py-3.5 text-[14px] font-medium transition-colors"
-            style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)' }}>
-            Watch the demo
-          </a>
-        </motion.div>
-
-        {/* the unveil film, framed and held in the viewer's hand */}
-        <motion.div id="demo" {...rise} transition={{ ...rise.transition, delay: 0.72 }} className="relative mx-auto mt-16 max-w-4xl scroll-mt-28">
-          <Tilt><VideoHero /></Tilt>
-        </motion.div>
-        {/* The connectors, listed. Nothing here loops. */}
-        <div className="relative mt-16">
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px]" style={{ color: 'var(--lp-mut)' }}>
+      <div className="mx-auto flex min-h-[78vh] max-w-6xl flex-col justify-center px-6 pb-20 pt-40 sm:pt-44">
+        <motion.div {...rise} className="max-w-3xl">
+          <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>
+            Brand intelligence built in Lagos, for West Africa
+          </p>
+          <h1 className="mt-5 text-5xl font-black leading-[1.02] tracking-[-0.03em] sm:text-7xl"
+            style={{ fontFamily: 'var(--font)', color: 'var(--tx-inv)' }}>
+            See your brand the way the{' '}
+            <span style={{ color: 'var(--danfo)' }}>street</span> sees it.
+          </h1>
+          <p className="mt-6 max-w-xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--tx-inv-2)' }}>
+            BrandGauge reads sentiment in Pidgin, Yoruba, Igbo and Hausa. It measures every
+            channel, from Instagram to a billboard on the expressway. Then it turns it all
+            into numbers your board will trust.
+          </p>
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
+            <Link href="/auth/signup"
+              className="flex items-center justify-center gap-2 rounded-sm px-6 py-3.5 text-[14px] font-bold text-on-hot bg-press"
+              style={{ background: 'var(--flare)' }}>
+              Start free in beta
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <a href="#demo" className="rounded-sm border px-6 py-3.5 text-center text-[14px] font-medium"
+              style={{ borderColor: 'var(--line-inv)', color: 'var(--tx-inv)' }}>
+              Watch the demo
+            </a>
+          </div>
+          <div className="mt-12 flex flex-wrap gap-x-6 gap-y-2 text-[10px]" style={{ color: 'var(--tx-inv-2)' }}>
             {['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
               <span key={c}>{c}</span>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
+
+      {/* The reading taken off that street, held on Paper against the ink. */}
+      <motion.div {...rise} transition={{ ...rise.transition, delay: 0.15 }}
+        className="pointer-events-none absolute bottom-10 right-6 hidden w-[300px] lg:block">
+        <div className="@container overflow-hidden rounded-sm border border-line"
+          style={{ background: 'var(--bg-card)', height: 360 }}>
+          <GaugeScene t={0.95} />
+        </div>
+      </motion.div>
+    </section>
+  )
+}
+
+/** The film, on Paper, directly under the hero. */
+function HeroFilm() {
+  return (
+    <section className="relative px-6 pb-4 pt-16">
+      <motion.div id="demo" {...rise} className="mx-auto max-w-4xl scroll-mt-28">
+        <VideoHero />
+      </motion.div>
     </section>
   )
 }
@@ -439,6 +466,7 @@ export function LandingPage() {
     >
       <Nav dark={dark} onToggle={toggle} />
       <Hero />
+      <HeroFilm />
       <div id="tour" className="scroll-mt-20"><HorizontalTour /></div>
       <Differentiators />
       <DeepDives />
