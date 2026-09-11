@@ -118,7 +118,7 @@ function Hero() {
     <section className="relative isolate" style={{ background: 'var(--bg-ink)' }}>
       <div className="mx-auto grid w-full grid-cols-1 lg:grid-cols-12">
         {/* ── Type ─────────────────────────────────────────────────────── */}
-        <div className="relative order-2 flex flex-col justify-center px-6 pb-16 pt-14 sm:px-10 lg:order-1 lg:col-span-7 lg:min-h-[86vh] lg:py-40 lg:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pr-16">
+        <div className="relative order-2 flex flex-col justify-center px-6 pb-12 pt-10 sm:px-10 sm:pb-16 sm:pt-14 lg:order-1 lg:col-span-7 lg:min-h-[86vh] lg:py-40 lg:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pr-16">
           {/* The mark's own material, held well behind the type. */}
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{
             backgroundImage: 'radial-gradient(var(--tick-1) 1.4px, transparent 1.4px)',
@@ -138,7 +138,7 @@ function Hero() {
               text="See your brand the way the street sees it."
               accent="street"
               accentStyle={{ color: 'var(--danfo)' }}
-              className="mt-5 text-5xl font-black leading-[1.02] tracking-[-0.03em] sm:text-6xl xl:text-7xl"
+              className="mt-4 text-[2.5rem] font-black leading-[1.04] tracking-[-0.03em] sm:mt-5 sm:text-6xl xl:text-7xl"
               style={{ fontFamily: 'var(--font)', color: 'var(--tx-inv)' }}
             />
             <p className="mt-6 max-w-xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--tx-inv-2)' }}>
@@ -158,7 +158,7 @@ function Hero() {
                 Watch the demo
               </a>
             </div>
-            <div className="mt-12 flex max-w-xl flex-wrap gap-x-6 gap-y-2 text-[10px]" style={{ color: 'var(--tx-inv-2)' }}>
+            <div className="mt-8 hidden max-w-xl flex-wrap gap-x-6 gap-y-2 text-[10px] sm:mt-12 sm:flex" style={{ color: 'var(--tx-inv-2)' }}>
               {['Meta Ads', 'Instagram', 'X', 'GA4', 'Paystack', 'Mailchimp', 'Site Pixel', 'First-party API'].map(c => (
                 <span key={c}>{c}</span>
               ))}
@@ -167,7 +167,7 @@ function Hero() {
         </div>
 
         {/* ── The street ───────────────────────────────────────────────── */}
-        <div className="relative order-1 min-h-[46vh] border-line-inv pt-16 lg:order-2 lg:col-span-5 lg:min-h-0 lg:border-l lg:pt-0">
+        <div className="relative order-1 min-h-[30vh] border-line-inv pt-14 sm:min-h-[38vh] lg:order-2 lg:col-span-5 lg:min-h-0 lg:border-l lg:pt-0">
           {street.src && (
             <Image src={street.src} alt={street.brief} fill priority
               sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover" />

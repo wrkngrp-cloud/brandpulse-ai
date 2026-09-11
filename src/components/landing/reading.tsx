@@ -1,10 +1,9 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import {
   motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform,
 } from 'framer-motion'
-import { useState } from 'react'
 
 /**
  * The page, read as a gauge.
@@ -26,8 +25,37 @@ const D_TICK = 0.09
 const STAGGER = 0.04
 const EASE_SNAP = [0.4, 0, 0.2, 1] as const
 
-/** The ramp, coldest to hottest. The head of a lit run is always Flare. */
-const RAMP = ['var(--tick-1)', 'var(--tick-2)', 'var(--tick-3)', 'var(--tick-4)', 'var(--flare)']
+/**
+ * Reduced motion is handled in CSS, not in JS.
+ *
+ * Two wrong turns before this one. Trusting `useReducedMotion()` at first
+ * render paints `opacity: 0` before the query is readable, so a reduced-motion
+ * reader sees the content flash in. Rendering plain markup first and swapping
+ * a motion component in a frame later remounts the node, so *everyone* sees it
+ * flash 1 to 0 to 1.
+ *
+ * So the component never changes identity, and `.bg-lightin` in motion.css
+ * forces the final state under `prefers-reduced-motion: reduce` with
+ * `!important`, which beats the inline style Motion writes. No render race,
+ * and the reduced path costs nothing at runtime.
+ */
+const LIT = 'bg-lightin'
+
+/**
+ * The ramp, coldest to hottest. The head of a lit run is always Flare.
+ *
+ * `--tick-1` is deliberately NOT in here. It is the unlit track, and a lit
+ * tick painted with it is invisible: the first cut of this rail coloured each
+ * lit tick by how far back it sat from the head, which left 24 of 28 lit ticks
+ * at the unlit tint. The rail read as a four-tick blob sliding down the gutter
+ * instead of an arc filling. The ramp now spans the whole lit run.
+ */
+const RAMP = ['var(--tick-2)', 'var(--tick-3)', 'var(--tick-4)', 'var(--flare)']
+
+/** The unlit track: the ground's own ink, which is what the engine does. */
+const TRACK = 'color-mix(in srgb, var(--tx) 14%, transparent)'
+
+const cx = (...v: (string | undefined)[]) => v.filter(Boolean).join(' ')
 
 const RAIL_TICKS = 28
 
@@ -35,10 +63,10 @@ const RAIL_TICKS = 28
  * The reading rail.
  *
  * Fixed to the left gutter, one tick per 1/28th of the page. Ticks grow in
- * width and heat toward the head, which is the crescendo's own construction —
- * the engine draws the arc exactly this way. The head tick is Flare; the four
- * behind it fall back down the ramp; everything past the reading sits at the
- * unlit tint.
+ * width toward the head, which is the crescendo's own construction: the engine
+ * draws the arc exactly this way. Heat is spread across the whole lit run, so
+ * the bottom of the reading sits at the coldest ramp step and the head is
+ * always Flare. Everything past the reading is the unlit track.
  *
  * Hidden below `lg`, where there is no gutter to put it in, and frozen at full
  * under `prefers-reduced-motion` so it still reads as a graphic.
@@ -61,9 +89,12 @@ export function ReadingRail() {
     >
       {Array.from({ length: RAIL_TICKS }, (_, i) => {
         const isLit = i < reading
-        // Distance back from the head decides where on the ramp this tick sits.
-        const back = reading - 1 - i
-        const colour = isLit ? RAMP[Math.max(0, RAMP.length - 1 - back)] ?? RAMP[0] : 'var(--tick-1)'
+        // Position within the lit run, not distance from the head: the cold end
+        // of the ramp belongs to the bottom of the reading, the head to Flare.
+        const through = reading > 1 ? i / (reading - 1) : 1
+        const colour = isLit
+          ? RAMP[Math.min(RAMP.length - 1, Math.round(through * (RAMP.length - 1)))]
+          : TRACK
         // Ticks grow toward the head: 5px at the tail, 13px at the top of the run.
         const width = 5 + Math.round((i / (RAIL_TICKS - 1)) * 8)
         return (
@@ -95,8 +126,6 @@ export function TickReveal({
   delay?: number
   amount?: number
 }) {
-  const reduce = useReducedMotion()
-  if (reduce) return <div className={className}>{children}</div>
   return (
     <motion.div
       className={className}
@@ -122,15 +151,10 @@ export function Tick({
   style?: React.CSSProperties
   as?: 'div' | 'li' | 'span' | 'p'
 }) {
-  const reduce = useReducedMotion()
   const Comp = motion[as]
-  if (reduce) {
-    const Plain = as
-    return <Plain className={className} style={style}>{children}</Plain>
-  }
   return (
     <Comp
-      className={className}
+      className={cx(LIT, className)}
       style={style}
       variants={{
         // Opacity and a 4px lift. Not the banned fade-and-slide-up: that rule
@@ -161,19 +185,7 @@ export function ReadingLine({
   accent?: string
   accentStyle?: React.CSSProperties
 }) {
-  const reduce = useReducedMotion()
   const words = text.split(' ')
-  if (reduce) {
-    return (
-      <h1 className={className} style={style}>
-        {words.map((w, i) => (
-          <span key={i} style={w === accent ? accentStyle : undefined}>
-            {w}{i < words.length - 1 ? ' ' : ''}
-          </span>
-        ))}
-      </h1>
-    )
-  }
   return (
     <motion.h1
       className={className}
@@ -185,7 +197,7 @@ export function ReadingLine({
       {words.map((w, i) => (
         <motion.span
           key={i}
-          className="inline-block"
+          className={cx(LIT, 'inline-block')}
           style={w === accent ? accentStyle : undefined}
           variants={{
             off: { opacity: 0, y: '0.18em' },
@@ -216,7 +228,10 @@ export function HeatRow({
   const ref = useRef<HTMLDivElement>(null)
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] })
-  const width = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
+  // scaleX, not width. Width is a layout property, so animating it forces
+  // layout on every scroll frame; a full-width rule scaled from its left edge
+  // is the same picture and stays on the compositor.
+  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1])
   const heat = RAMP[Math.min(RAMP.length - 1, Math.round((index / Math.max(1, total - 1)) * (RAMP.length - 1)))]
 
   return (
@@ -226,8 +241,8 @@ export function HeatRow({
       <span aria-hidden className="absolute inset-x-0 top-0 h-px" style={{ background: 'var(--line)' }} />
       <motion.span
         aria-hidden
-        className="absolute left-0 top-0 h-px origin-left"
-        style={{ width: reduce ? '100%' : width, background: heat }}
+        className="absolute inset-x-0 top-0 h-px origin-left"
+        style={{ scaleX: reduce ? 1 : scaleX, background: heat }}
       />
       {children}
     </div>
