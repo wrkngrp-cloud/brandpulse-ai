@@ -86,7 +86,7 @@ export function CulturalSlider({ left, right, hint, value, onChange }: {
         onChange={e => onChange(Number(e.target.value))} className="w-full accent-primary" />
       <div className="flex items-baseline justify-between gap-2">
         <p className="text-xs text-muted-foreground">{hint}</p>
-        <p className="shrink-0 text-[10px] text-muted-foreground/60">0 is all {left.toLowerCase()}, 100 is all {right.toLowerCase()}</p>
+        <p className="shrink-0 text-[10px] text-tx-2">0 is all {left.toLowerCase()}, 100 is all {right.toLowerCase()}</p>
       </div>
     </div>
   )

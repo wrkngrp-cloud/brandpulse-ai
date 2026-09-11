@@ -28,12 +28,16 @@
    and only when the underlying number actually changed. */
 .bg-needle{transition:transform var(--d-needle) var(--ease-settle);transform-box:fill-box}
 .bg-tick{transition:fill var(--d-tick) var(--ease-snap),
-                    fill-opacity var(--d-tick) var(--ease-snap),
-                    transform var(--d-tick) var(--ease-snap);
+                    fill-opacity var(--d-tick) var(--ease-snap);
          transition-delay:calc(var(--i,0) * var(--stagger))}
 
 /* First paint only, once per session. Never on scroll. */
-@keyframes bg-light{from{fill-opacity:0;transform:scale(.7)}to{fill-opacity:1;transform:scale(1)}}
+/* Lights by opacity only. The engine positions every atom with a transform
+   attribute, and a CSS transform replaces that attribute rather than composing
+   with it — so scaling here collapsed the whole arc onto the viewBox origin,
+   and `both` made it permanent. The size crescendo is a static property of the
+   ticks; the entrance lights them, it does not resize them. */
+@keyframes bg-light{from{fill-opacity:0}to{fill-opacity:1}}
 .bg-gauge-enter .bg-tick{animation:bg-light var(--d-tick) var(--ease-snap) both;
                          animation-delay:calc(var(--i,0) * var(--stagger))}
 @keyframes bg-settle{0%{transform:rotate(var(--from,-40deg))}

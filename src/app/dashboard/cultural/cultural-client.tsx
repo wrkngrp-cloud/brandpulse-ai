@@ -465,7 +465,7 @@ function CRSGauge({ score, drift }: { score: number | null; drift: number | null
               <span className="text-xs text-muted-foreground mt-0.5">/ 100</span>
             </>
           ) : (
-            <span className="text-4xl font-bold text-muted-foreground/30">—</span>
+            <span className="text-4xl font-bold text-tx-3">—</span>
           )}
         </div>
       </div>
@@ -604,7 +604,7 @@ function TopPickCard({
       </div>
 
       {/* Relevance reasoning */}
-      <div className="rounded-lg bg-primary/5 border border-primary/10 px-3 py-2 text-xs text-foreground/70 leading-relaxed">
+      <div className="rounded-lg bg-primary/5 border border-primary/10 px-3 py-2 text-xs text-tx-2 leading-relaxed">
         {relevanceReason}
       </div>
 

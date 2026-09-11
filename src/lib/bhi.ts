@@ -288,13 +288,16 @@ export function computeAwarenessComposite(inputs: AwarenessInputs): {
 export interface TrustInputs {
   appStoreRating:     number | null   // 0–5 stars
   regulatoryStatus:   'clean' | 'under_review' | 'sanctioned' | null
-  complaintSurges30d: number          // count of volume_surge alerts in last 30d
+  complaintSurges30d: number | null   // volume_surge alerts in last 30d; null when
+                                      // there is no mention feed to detect surges in
   negSentimentTrend:  number | null   // avg negative_pct from sentiment_daily 14d
 }
 
 export interface TrustScore {
   score:    number | null
   grade:    'excellent' | 'good' | 'fair' | 'poor' | null
+  /** Share of the four weights that had data, 0–100. */
+  coverage: number
   breakdown: {
     appStoreRating:     { score: number | null; weight: number; display: string | null }
     regulatoryStanding: { score: number | null; weight: number; display: string | null }
@@ -317,7 +320,13 @@ export function computeTrustScore(inputs: TrustInputs): TrustScore {
     ? Math.max(0, Math.round(100 - inputs.negSentimentTrend * 2))
     : null
 
-  const compScore = Math.max(0, 100 - inputs.complaintSurges30d * 25)
+  // Zero complaint surges is only good news when something was watching for
+  // them. With no mention feed the count is 0 because nothing was counted, and
+  // scoring that as a perfect 100 is what produced a 100/100 "Excellent" trust
+  // score on a workspace with no data in it at all.
+  const compScore = inputs.complaintSurges30d != null
+    ? Math.max(0, 100 - inputs.complaintSurges30d * 25)
+    : null
 
   const signals = [
     { score: appScore,  weight: 35 },
@@ -331,12 +340,18 @@ export function computeTrustScore(inputs: TrustInputs): TrustScore {
     appStoreRating:     { score: appScore,  weight: 35, display: inputs.appStoreRating != null ? `${inputs.appStoreRating.toFixed(1)}/5.0` : null },
     regulatoryStanding: { score: regScore,  weight: 30, display: inputs.regulatoryStatus ?? null },
     reliabilitySignal:  { score: relScore,  weight: 20, display: inputs.negSentimentTrend != null ? `${inputs.negSentimentTrend.toFixed(0)}% neg` : null },
-    complaintHealth:    { score: compScore, weight: 15, display: `${inputs.complaintSurges30d} surge${inputs.complaintSurges30d === 1 ? '' : 's'} in 30d` },
+    complaintHealth:    { score: compScore, weight: 15, display: inputs.complaintSurges30d != null ? `${inputs.complaintSurges30d} surge${inputs.complaintSurges30d === 1 ? '' : 's'} in 30d` : null },
   }
 
-  if (active.length === 0) return { score: null, grade: null, breakdown }
+  // The four weights sum to 100, so the active weight is the coverage.
+  const totalW   = active.reduce((s, x) => s + x.weight, 0)
+  const coverage = totalW
 
-  const totalW    = active.reduce((s, x) => s + x.weight, 0)
+  // Below half the weight, redistribution stops being a correction and starts
+  // being an invention: one signal out of four would carry the whole grade.
+  // Say "not enough to score" instead of publishing a confident number.
+  if (coverage < 50) return { score: null, grade: null, coverage, breakdown }
+
   const composite = Math.round(
     active.reduce((s, x) => s + (x.score as number) * (x.weight / totalW), 0)
   )
@@ -346,7 +361,7 @@ export function computeTrustScore(inputs: TrustInputs): TrustScore {
     composite >= 60 ? 'good' :
     composite >= 40 ? 'fair' : 'poor'
 
-  return { score: composite, grade, breakdown }
+  return { score: composite, grade, coverage, breakdown }
 }
 
 // ── Generic stage composite (multi-signal, weight-redistributing) ──────────────

@@ -103,10 +103,10 @@ export function SovWidget({
                       {count > 0 ? (
                         <>
                           <span className="bg-num text-muted-foreground text-[10px]"><span className="bg-num">{count.toLocaleString()}</span> mentions</span>
-                          <span className="bg-num font-medium text-foreground/70">{pct.toFixed(1)}%</span>
+                          <span className="bg-num font-medium text-tx-2">{pct.toFixed(1)}%</span>
                         </>
                       ) : (
-                        <span className="text-muted-foreground/40 text-[10px]">no data</span>
+                        <span className="text-tx-3 text-[10px]">no data</span>
                       )}
                       <Button
                         variant="ghost" size="icon"

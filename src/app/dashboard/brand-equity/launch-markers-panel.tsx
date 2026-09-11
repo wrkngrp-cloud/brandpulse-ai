@@ -231,7 +231,7 @@ export function LaunchMarkersPanel() {
       ) : markers.length === 0 ? (
         <div className="text-center py-6 border border-dashed rounded-lg">
           <p className="text-sm text-muted-foreground">No markers yet</p>
-          <p className="text-xs text-muted-foreground/60 mt-0.5">
+          <p className="text-xs text-tx-2 mt-0.5">
             Add your first launch or campaign to track its brand impact.
           </p>
         </div>
@@ -258,7 +258,7 @@ export function LaunchMarkersPanel() {
                 </span>
                 <span className={cn(
                   'hidden sm:inline text-xs font-semibold bg-num shrink-0',
-                  delta == null ? 'text-muted-foreground/50'
+                  delta == null ? 'text-tx-3'
                     : delta > 0 ? 'text-pos'
                     : delta < 0 ? 'text-tx-flare'
                     : 'text-muted-foreground',
@@ -269,7 +269,7 @@ export function LaunchMarkersPanel() {
                 </span>
                 <button
                   onClick={() => handleDelete(m.id, m.label)}
-                  className="text-muted-foreground/40 hover:text-tx-flare transition-colors shrink-0 opacity-0 group-hover:opacity-100 bg-press"
+                  className="text-tx-3 hover:text-tx-flare transition-colors shrink-0 opacity-0 group-hover:opacity-100 bg-press"
                   aria-label="Delete marker"
                 >
                   <Trash2 className="h-3.5 w-3.5" />

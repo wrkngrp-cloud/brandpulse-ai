@@ -33,7 +33,7 @@ const STATUS_BADGE: Record<string, string> = {
   draft:    'bg-muted text-muted-foreground',
   active:   'bg-flare-wash text-tx-flare dark:bg-shell/30 dark:text-tx-2',
   vetted:   'bg-shell text-pos dark:bg-shell/30 dark:text-pos',
-  archived: 'bg-muted/60 text-muted-foreground/60',
+  archived: 'bg-muted/60 text-tx-2',
 }
 
 function fmtNum(n: number): string {
@@ -74,7 +74,7 @@ function AssetCard({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={asset.thumbnail_url} alt={asset.title} className="w-full h-full object-cover" />
         ) : (
-          <Icon className="h-10 w-10 text-muted-foreground/25" />
+          <Icon className="h-10 w-10 text-tx-3" />
         )}
 
         {/* Overlay badges */}
@@ -99,7 +99,7 @@ function AssetCard({
         >
           {selected
             ? <CheckSquare className="h-5 w-5 text-primary fill-primary" />
-            : <Square className="h-5 w-5 text-tx-inv/80 drop-shadow" />}
+            : <Square className="h-5 w-5 text-tx-inv drop-shadow" />}
         </button>
       </div>
 
@@ -356,13 +356,13 @@ export function CreativeLibraryClient({ brandId, brandName, assets }: Props) {
         <div>
           <p className="eyebrow mb-1">Creative Intelligence</p>
           <h1 className="h-display text-[28px] leading-none">Creative Library</h1>
-          <p className="mt-1.5 text-[13px] text-muted-foreground/60">
+          <p className="mt-1.5 text-[13px] text-tx-2">
             Your vault of vetted creatives — with performance data, replication learnings, and one-click ad set creation.
           </p>
         </div>
         <div className="rounded-2xl border bg-card p-12 flex flex-col items-center gap-4 text-center">
           <div className="h-14 w-14 rounded-full bg-muted/40 flex items-center justify-center">
-            <ImageIcon className="h-6 w-6 text-muted-foreground/25" />
+            <ImageIcon className="h-6 w-6 text-tx-3" />
           </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">No creative assets yet</p>
@@ -382,7 +382,7 @@ export function CreativeLibraryClient({ brandId, brandName, assets }: Props) {
         <div>
           <p className="eyebrow mb-1">Creative Intelligence</p>
           <h1 className="h-display text-[28px] leading-none">Creative Library</h1>
-          <p className="mt-1.5 text-[13px] text-muted-foreground/60">
+          <p className="mt-1.5 text-[13px] text-tx-2">
             {assets.length} assets · {assets.filter(a => a.fit_for_ads).length} ads-ready · {assets.filter(a => a.status === 'vetted').length} vetted
           </p>
         </div>

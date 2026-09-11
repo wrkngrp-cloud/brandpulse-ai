@@ -206,7 +206,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
       {/* Panel list */}
       {panels.length === 0 ? (
         <div className="rounded-2xl border bg-card p-10 flex flex-col items-center gap-3 text-center">
-          <Calendar className="h-8 w-8 text-muted-foreground/20" />
+          <Calendar className="h-8 w-8 text-tx-3" />
           <p className="text-sm text-muted-foreground">No panels yet. Create your first recurring survey panel above.</p>
         </div>
       ) : (
@@ -270,28 +270,28 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
 
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+                  <Calendar className="h-3.5 w-3.5 text-tx-3 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">Next run</p>
                     <p className="text-[12px] font-medium bg-num">{fmtDate(panel.next_run_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+                  <Calendar className="h-3.5 w-3.5 text-tx-3 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">Last run</p>
                     <p className="text-[12px] font-medium bg-num">{fmtDate(panel.last_run_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Mail className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+                  <Mail className="h-3.5 w-3.5 text-tx-3 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">Emails</p>
                     <p className="text-[12px] font-medium bg-num">{panel.recipient_emails?.length ?? 0}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Phone className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+                  <Phone className="h-3.5 w-3.5 text-tx-3 shrink-0" />
                   <div>
                     <p className="text-[10px] text-muted-foreground">WhatsApp</p>
                     <p className="text-[12px] font-medium bg-num">{panel.recipient_phones?.length ?? 0}</p>

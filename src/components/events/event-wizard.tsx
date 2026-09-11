@@ -397,12 +397,12 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
                   )}
                 >
                   {creativeUploading
-                    ? <Upload className="h-6 w-6 text-muted-foreground/50 animate-pulse" />
-                    : <ImageIcon className="h-6 w-6 text-muted-foreground/50" />}
+                    ? <Upload className="h-6 w-6 text-tx-3 animate-pulse" />
+                    : <ImageIcon className="h-6 w-6 text-tx-3" />}
                   <p className="text-sm text-muted-foreground">
                     {creativeUploading ? 'Uploading…' : 'Upload flyer or photobooth backdrop'}
                   </p>
-                  <p className="text-xs text-muted-foreground/60">PNG, JPG, WebP up to 10 MB</p>
+                  <p className="text-xs text-tx-2">PNG, JPG, WebP up to 10 MB</p>
                 </button>
               )}
               <input

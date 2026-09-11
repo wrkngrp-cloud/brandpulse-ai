@@ -329,7 +329,7 @@ export default function MethodologyPage() {
               {section.body.map((block, i) => (
                 <div key={i} className="px-5 py-4 space-y-1.5">
                   <p className="text-xs font-semibold text-muted-foreground">{block.heading}</p>
-                  <p className="text-sm leading-relaxed text-foreground/90">{block.text}</p>
+                  <p className="text-sm leading-relaxed text-tx-2">{block.text}</p>
                 </div>
               ))}
             </div>
@@ -394,7 +394,7 @@ export default function MethodologyPage() {
               <p className="text-[11px] text-primary font-medium mt-0.5">Used in: {fw.where}</p>
             </div>
             <div className="px-5 py-4">
-              <p className="text-sm leading-relaxed text-foreground/90">{fw.body}</p>
+              <p className="text-sm leading-relaxed text-tx-2">{fw.body}</p>
             </div>
           </div>
         ))}

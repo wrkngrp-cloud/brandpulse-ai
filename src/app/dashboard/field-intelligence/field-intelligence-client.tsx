@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils'
 import { SurveyIcon as ClipboardList, MapIcon as MapPin, BriefcaseIcon as Package, ChevronRightIcon as ChevronRight, TrendDownIcon as TrendingDown } from '@/components/brand/icon'
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { TourTrigger } from '@/components/tours/tour-trigger'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { PAGE_META } from '@/components/dashboard/page-meta'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -102,7 +104,7 @@ function StatCard({
         {value}{suffix}
       </p>
       <p className="text-xs text-muted-foreground font-medium">{label}</p>
-      {note && <p className="text-[10px] text-muted-foreground/60">{note}</p>}
+      {note && <p className="text-[10px] text-tx-2">{note}</p>}
     </div>
   )
 }
@@ -118,9 +120,14 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-end">
-        <TourTrigger module="field_intelligence" autoStart />
-      </div>
+      {/* This page had no heading at all: it opened straight onto four stat
+          cards, so you could not tell from the screen which screen you were on. */}
+      <PageHeader
+        {...PAGE_META['/dashboard/field-intelligence']}
+        title="Field Intelligence"
+        subtitle="Availability, pricing, POSM and competitor activity across your distribution network, reported daily by your field team."
+        actions={<TourTrigger module="field_intelligence" autoStart />}
+      />
 
       {/* Header stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4" data-tour="field-intel-main">

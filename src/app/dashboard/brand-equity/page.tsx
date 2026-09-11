@@ -159,10 +159,15 @@ export default async function BrandEquityPage({
     : null
   const negSentimentTrend = avgPosPct != null ? Math.max(0, 100 - avgPosPct) : null
 
+  // A surge is detected in the mention feed, so with no mentions in the window
+  // there is no surge count to report — only an absence. Passing 0 here scored
+  // complaint health at a perfect 100 on an empty workspace.
+  const hasMentionFeed = sentRows14d.length > 0
+
   const trustScore = computeTrustScore({
     appStoreRating:     bestAppRating != null ? +bestAppRating : null,
     regulatoryStatus,
-    complaintSurges30d: (volumeSurgeAlerts ?? []).length,
+    complaintSurges30d: hasMentionFeed ? (volumeSurgeAlerts ?? []).length : null,
     negSentimentTrend,
   })
 

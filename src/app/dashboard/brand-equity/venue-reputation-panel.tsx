@@ -36,7 +36,7 @@ function Stars({ rating }: { rating: number }) {
         const fill = Math.max(0, Math.min(1, rating - (i - 1)))
         return (
           <div key={i} className="relative h-5 w-5">
-            <Star className="absolute inset-0 h-5 w-5 text-tx-2/40" />
+            <Star className="absolute inset-0 h-5 w-5 text-tx-3" />
             <div className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
               <Star className="h-5 w-5 fill-tx-2 text-tx-2" />
             </div>

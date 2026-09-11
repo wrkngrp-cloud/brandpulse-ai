@@ -1026,7 +1026,7 @@ function InfluencerCard({
             ))}
             <span className="text-xs text-muted-foreground">@{inf.handle.replace(/^@/, '')}</span>
             {inf.category && (
-              <><span className="text-muted-foreground/40 text-xs">·</span><span className="text-xs text-muted-foreground">{inf.category}</span></>
+              <><span className="text-tx-3 text-xs">·</span><span className="text-xs text-muted-foreground">{inf.category}</span></>
             )}
           </div>
 

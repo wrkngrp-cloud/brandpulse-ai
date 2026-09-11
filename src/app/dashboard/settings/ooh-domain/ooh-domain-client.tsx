@@ -255,7 +255,7 @@ function TierCard({
         </span>
       </div>
       <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
-      <p className="text-xs bg-num text-muted-foreground/70 truncate">{example}</p>
+      <p className="text-xs bg-num text-tx-2 truncate">{example}</p>
     </button>
   )
 }

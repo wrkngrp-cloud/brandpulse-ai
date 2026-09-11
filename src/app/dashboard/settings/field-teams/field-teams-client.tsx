@@ -86,7 +86,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
               value={name}
               onChange={e => setName(e.target.value)}
               autoFocus
-              className="w-full h-10 px-3 rounded-lg border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full h-10 px-3 rounded-lg border border-border bg-background text-sm placeholder:text-tx-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
           <div className="space-y-1.5">
@@ -96,7 +96,7 @@ export function FieldTeamsClient({ initialTeams }: { initialTeams: FsoTeam[] }) 
               placeholder="e.g. Covers Ikeja, Oshodi, Mushin"
               value={notes}
               onChange={e => setNotes(e.target.value)}
-              className="w-full h-10 px-3 rounded-lg border border-border bg-background text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full h-10 px-3 rounded-lg border border-border bg-background text-sm placeholder:text-tx-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
           <div className="flex gap-2">

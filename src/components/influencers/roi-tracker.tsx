@@ -275,9 +275,9 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
       {/* Empty state */}
       {campaigns.length === 0 && !showForm && (
         <div className="rounded-2xl border border-dashed bg-muted/20 py-12 text-center space-y-2">
-          <TrendingUp className="h-8 w-8 text-muted-foreground/40 mx-auto" />
+          <TrendingUp className="h-8 w-8 text-tx-3 mx-auto" />
           <p className="text-[13px] font-medium text-muted-foreground">No influencer campaigns yet</p>
-          <p className="text-[12px] text-muted-foreground/60">Log a paid partnership to see ROI vs Earned Media Value.</p>
+          <p className="text-[12px] text-tx-2">Log a paid partnership to see ROI vs Earned Media Value.</p>
         </div>
       )}
 
@@ -300,7 +300,7 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
                     <p className="text-[13.5px] font-semibold truncate">{c.name}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       {c.creator_handle && <span className="text-[11.5px] text-muted-foreground">{c.creator_handle}</span>}
-                      {c.platform && <span className="text-[10px] font-bold text-muted-foreground/60 bg-muted rounded px-1.5 py-0.5">{c.platform}</span>}
+                      {c.platform && <span className="text-[10px] font-bold text-tx-2 bg-muted rounded px-1.5 py-0.5">{c.platform}</span>}
                     </div>
                   </div>
                   <RoiPill roi={roi} />

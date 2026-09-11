@@ -66,7 +66,7 @@ export function EmptyState({
       {/* Copy */}
       <div className="space-y-1.5 max-w-[280px]">
         <p className={cn('font-semibold tracking-tight', s.title)}>{title}</p>
-        <p className={cn('text-muted-foreground/65 leading-relaxed', s.desc)}>{description}</p>
+        <p className={cn('text-tx-2 leading-relaxed', s.desc)}>{description}</p>
       </div>
 
       {/* Actions */}

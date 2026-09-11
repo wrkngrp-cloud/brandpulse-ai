@@ -32,14 +32,14 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-[var(--bg-ink)] border border-line-inv rounded-xl px-3.5 py-2.5 min-w-[155px]">
-      <p className="text-[10.5px] font-semibold text-tx-inv/40 mb-2">
+      <p className="text-[10.5px] font-semibold text-tx-inv-2 mb-2">
         {shortDate(label ?? '')}
       </p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center justify-between gap-4 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
             <span className="h-[3px] w-3 rounded-sm shrink-0" style={{ background: p.color }} />
-            <span className="text-[11.5px] text-tx-inv/55 capitalize">{p.name}</span>
+            <span className="text-[11.5px] text-tx-inv-2 capitalize">{p.name}</span>
           </div>
           <span className="text-[13px] font-semibold bg-num" style={{ color: p.color }}>
             {Math.round(p.value)}

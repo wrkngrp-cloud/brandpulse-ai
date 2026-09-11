@@ -233,7 +233,7 @@ export default async function PrintPage({
                               <ExternalLink className="h-3 w-3" />
                             </a>
                           ) : (
-                            <span className="text-muted-foreground/40">–</span>
+                            <span className="text-tx-3">–</span>
                           )}
                         </td>
                         <td className="py-2.5 pr-4 font-medium">

@@ -137,7 +137,7 @@ export default async function ConnectorsPage() {
               </span>
             ))}
           </div>
-          <p className="text-[12px] text-muted-foreground/70 leading-relaxed">
+          <p className="text-[12px] text-tx-2 leading-relaxed">
             These are the data sources that matter most for {industryMeta.label} brands. Others are still available below.
           </p>
         </div>

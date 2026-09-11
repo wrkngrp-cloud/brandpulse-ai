@@ -18,6 +18,7 @@ import type { PlaceDemographics } from '@/lib/ooh/places-demographics'
 import { NigeriaLocationSelect } from '@/components/nigeria-location-select'
 import { TOKENS } from '@/lib/brand-tokens'
 import { Crescendo } from '@/components/brand/crescendo'
+import { useMapboxCss } from './use-mapbox-css'
 
 const FORMAT_TYPES = [
   'Billboard', 'Unipole', 'Bridge Panel', 'Transit Shelter',
@@ -97,6 +98,7 @@ interface OohSiteFormProps {
 }
 
 export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultValues, draft, campaignId }: OohSiteFormProps) {
+  useMapboxCss()
   const [state, formAction, pending] = useActionState(action, null)
 
   const dv = defaultValues ?? {}

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl/mapbox'
 import { MapIcon as MapPin } from '@/components/brand/icon'
 import { TOKENS } from '@/lib/brand-tokens'
+import { useMapboxCss } from './use-mapbox-css'
 
 interface OohSiteMapClientProps {
   lat: number
@@ -28,6 +29,7 @@ export function OohSiteMapClient({
   lat, lng, siteName, address, city, state, lga, formatType, visits = 0,
   campaignStart, campaignEnd,
 }: OohSiteMapClientProps) {
+  useMapboxCss()
   const [showPopup, setShowPopup] = useState(true)
   const [mapError, setMapError]   = useState<string | null>(null)
 

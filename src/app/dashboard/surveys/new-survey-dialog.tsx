@@ -92,7 +92,7 @@ export function NewSurveyDialog() {
                           <span className="text-[11px] text-muted-foreground bg-num">
                             {tmpl.questionCount}Q
                           </span>
-                          <span className="text-[11px] text-muted-foreground/50">·</span>
+                          <span className="text-[11px] text-tx-3">·</span>
                           <span className="text-[11px] text-muted-foreground">
                             {tmpl.timeEstimate}
                           </span>
@@ -123,7 +123,7 @@ export function NewSurveyDialog() {
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Change template
               </button>
-              <span className="text-muted-foreground/40">·</span>
+              <span className="text-tx-3">·</span>
               <span className="text-xs text-muted-foreground bg-num">
                 {selectedTemplate.label} — {selectedTemplate.questionCount}Q, {selectedTemplate.timeEstimate}
               </span>

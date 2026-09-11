@@ -285,7 +285,7 @@ function AskPageContent() {
                     <div className="flex items-start gap-1.5">
                       <MessageSquare className="h-3 w-3 mt-0.5 shrink-0 opacity-50" />
                       <div className="min-w-0">
-                        <p className="text-[11px] font-medium leading-tight line-clamp-2 text-foreground/80">{conv.title}</p>
+                        <p className="text-[11px] font-medium leading-tight line-clamp-2 text-tx-2">{conv.title}</p>
                         <p className="text-[10px] text-muted-foreground mt-0.5">{timeAgo(conv.updatedAt)}</p>
                       </div>
                     </div>

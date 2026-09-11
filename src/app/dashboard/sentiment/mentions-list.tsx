@@ -92,7 +92,7 @@ function DisputeMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         disabled={pending}
-        className="flex items-center gap-1 h-6 px-1.5 rounded text-[10px] text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+        className="flex items-center gap-1 h-6 px-1.5 rounded text-[10px] text-tx-2 hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
       >
         <Flag className="h-3 w-3" />
         {pending ? 'Saving…' : 'Dispute'}
@@ -134,7 +134,7 @@ export function MentionsList({ initialMentions }: { initialMentions: Mention[] }
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold">Recent mentions</p>
-        <p className="text-[11px] text-muted-foreground/60">
+        <p className="text-[11px] text-tx-2">
           Dispute wrong labels — corrections improve future analysis
         </p>
       </div>

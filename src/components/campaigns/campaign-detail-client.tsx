@@ -1199,7 +1199,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                             <td key={obj} className="text-center py-2 px-2">
                               {linked.includes(obj)
                                 ? <span className={cn('inline-block h-3 w-3 rounded-full', OBJECTIVE_COLOR[obj] ?? 'bg-foreground')} />
-                                : <span className="text-muted-foreground/30">·</span>
+                                : <span className="text-tx-3">·</span>
                               }
                             </td>
                           ))}
@@ -1277,7 +1277,7 @@ export function CampaignDetailClient({ campaign, oohSites, events, activeTab, un
                       )}
                       {urls.length === 0 && (
                         <div className="pl-3.5">
-                          <div className="h-12 rounded-lg border border-dashed flex items-center justify-center gap-2 text-xs text-muted-foreground/50">
+                          <div className="h-12 rounded-lg border border-dashed flex items-center justify-center gap-2 text-xs text-tx-3">
                             <ImageIcon className="h-4 w-4" />
                             No creatives yet — add one above
                           </div>

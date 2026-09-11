@@ -129,7 +129,7 @@ async function PerceptionAuditSection() {
                   <div className="flex-1">
                     <Crescendo value={dim.avg != null ? dimScorePct(dim.avg) : 0} />
                   </div>
-                  <span className={`text-sm font-semibold bg-num w-8 text-right shrink-0 ${dim.avg != null ? dimScoreColor(dim.avg) : 'text-muted-foreground/40'}`}>
+                  <span className={`text-sm font-semibold bg-num w-8 text-right shrink-0 ${dim.avg != null ? dimScoreColor(dim.avg) : 'text-tx-3'}`}>
                     {dim.avg != null ? dim.avg.toFixed(1) : '—'}
                   </span>
                 </div>
@@ -138,9 +138,9 @@ async function PerceptionAuditSection() {
           </>
         ) : (
           <div className="p-8 text-center space-y-2">
-            <BarChart2 className="h-8 w-8 text-muted-foreground/30 mx-auto" />
+            <BarChart2 className="h-8 w-8 text-tx-3 mx-auto" />
             <p className="text-sm text-muted-foreground">No perception audit responses yet</p>
-            <p className="text-xs text-muted-foreground/60">
+            <p className="text-xs text-tx-2">
               Launch a Perception Audit survey to start measuring your brand across 8 dimensions.
             </p>
           </div>
@@ -204,7 +204,7 @@ async function SurveyListServer() {
   if (!surveys?.length) {
     return (
       <div className="border rounded-xl p-12 text-center space-y-2">
-        <MessageSquare className="h-8 w-8 text-muted-foreground/40 mx-auto" />
+        <MessageSquare className="h-8 w-8 text-tx-3 mx-auto" />
         <p className="text-sm font-medium">No surveys yet</p>
         <p className="text-xs text-muted-foreground">
           Create a brand intercept survey and share the link with your audience.

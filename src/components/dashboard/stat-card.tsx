@@ -177,19 +177,19 @@ export function StatCard({
             {value !== null && value !== undefined ? value : '—'}
           </span>
           {suffix && value !== null && (
-            <span className="metric text-[18px] text-muted-foreground/35 ml-0.5">{suffix}</span>
+            <span className="metric text-[18px] text-tx-3 ml-0.5">{suffix}</span>
           )}
         </div>
       )}
 
       {/* Label */}
-      <p className="mt-2 text-[11px] font-semibold text-muted-foreground/50 select-none leading-none">
+      <p className="mt-2 text-[11px] font-semibold text-tx-3 select-none leading-none">
         {label}
       </p>
 
       {/* Delta sub-label */}
       {deltaLabel && !loading && (
-        <p className="mt-1.5 text-[11px] text-muted-foreground/38">{deltaLabel}</p>
+        <p className="mt-1.5 text-[11px] text-tx-3">{deltaLabel}</p>
       )}
 
       {/* Sparkline — bleeds to bottom edge with vertical fade */}

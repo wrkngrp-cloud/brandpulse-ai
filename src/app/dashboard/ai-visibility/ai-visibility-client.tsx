@@ -76,7 +76,7 @@ function PlatformScore({ platform, score }: { platform: string; score: number | 
 }
 
 function MentionIcon({ mentioned, tone }: { mentioned: boolean; tone: string | null }) {
-  if (!mentioned) return <XCircle className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+  if (!mentioned) return <XCircle className="h-4 w-4 text-tx-3 shrink-0" />
   if (tone === 'positive') return <CheckCircle2 className="h-4 w-4 text-pos shrink-0" />
   if (tone === 'negative') return <AlertCircle className="h-4 w-4 text-tx-flare shrink-0" />
   return <MinusCircle className="h-4 w-4 text-tx-2 shrink-0" />

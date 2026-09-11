@@ -91,7 +91,7 @@ export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit,
       <div>
         <p className="eyebrow mb-1">Settings</p>
         <h1 className="h-display text-[26px] leading-none">Client Portal</h1>
-        <p className="mt-1.5 text-[13px] text-muted-foreground/70 max-w-xl">
+        <p className="mt-1.5 text-[13px] text-tx-2 max-w-xl">
           Create read-only shareable links for clients to view brand performance data. No login required. Your {plan} plan supports {portalLimit === -1 ? 'unlimited' : portalLimit} portal link{portalLimit === 1 ? '' : 's'}.
         </p>
       </div>

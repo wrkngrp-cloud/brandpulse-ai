@@ -59,16 +59,16 @@ export function BreadcrumbNav({ className }: { className?: string }) {
         return (
           <span key={crumb.href} className="flex items-center gap-0.5">
             {i > 0 && (
-              <ChevronRight className="h-3 w-3 text-muted-foreground/30 shrink-0 mx-0.5" />
+              <ChevronRight className="h-3 w-3 text-tx-3 shrink-0 mx-0.5" />
             )}
             {isLast ? (
-              <span className="text-[12px] font-medium text-foreground/75 select-none">
+              <span className="text-[12px] font-medium text-tx-2 select-none">
                 {crumb.label}
               </span>
             ) : (
               <Link
                 href={crumb.href}
-                className="text-[12px] text-muted-foreground/55 hover:text-foreground/75 transition-colors"
+                className="text-[12px] text-tx-2 hover:text-tx-2 transition-colors"
               >
                 {crumb.label}
               </Link>

@@ -104,7 +104,7 @@ export function TopicClusters({ mentions }: Props) {
                 <div className="space-y-1.5 pt-1">
                   {c.quotes.map((q, qi) => (
                     <div key={qi} className="flex items-start gap-2 bg-muted/40 rounded-lg px-3 py-2">
-                      <MessageSquareQuote className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0 mt-0.5" />
+                      <MessageSquareQuote className="h-3.5 w-3.5 text-tx-2 shrink-0 mt-0.5" />
                       <p className="text-xs text-muted-foreground leading-relaxed">"{q}"</p>
                     </div>
                   ))}

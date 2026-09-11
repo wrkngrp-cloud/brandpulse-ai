@@ -43,7 +43,7 @@ const CONFIDENCE_META: Record<string, { label: string; class: string }> = {
 
 function StepBadge({ step, label }: { step: number; label?: string }) {
   return (
-    <p className="text-[11px] font-semibold text-muted-foreground/70">
+    <p className="text-[11px] font-semibold text-tx-2">
       Brand setup · Step {step} of 3{label ? ` · ${label}` : ''}
     </p>
   )
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
                     {meta.tagline}
                   </span>
                   {meta.examples && (
-                    <span className="text-[10px] text-muted-foreground/60 mt-1.5 block truncate">
+                    <span className="text-[10px] text-tx-2 mt-1.5 block truncate">
                       e.g. {meta.examples}
                     </span>
                   )}
@@ -305,7 +305,7 @@ export default function OnboardingPage() {
             We read your website and public pages, then suggest a profile as a head start.
             You review every suggestion in the next step. Nothing is saved until you approve it.
           </p>
-          <p className="text-center text-xs text-muted-foreground/50">
+          <p className="text-center text-xs text-tx-3">
             Wrong account?{' '}
             <a href="/api/auth/signout" className="underline hover:text-muted-foreground">Sign out</a>
           </p>
@@ -329,7 +329,7 @@ export default function OnboardingPage() {
             <p className="text-sm text-muted-foreground transition-colors duration-500 min-h-[20px]">
               {LOADING_MESSAGES[msgIdx]}
             </p>
-            <p className="text-xs text-muted-foreground/70">
+            <p className="text-xs text-tx-2">
               Next you review our suggestions and correct anything we got wrong.
             </p>
           </div>
@@ -513,7 +513,7 @@ export default function OnboardingPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Change brand name or website
           </Button>
-          <p className="text-center text-xs text-muted-foreground/50 pt-1">
+          <p className="text-center text-xs text-tx-3 pt-1">
             Wrong account?{' '}
             <a href="/api/auth/signout" className="underline hover:text-muted-foreground">Sign out</a>
           </p>

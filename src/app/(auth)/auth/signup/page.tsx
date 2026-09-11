@@ -81,7 +81,7 @@ export default function SignupPage() {
           </Link>
         </p>
 
-        <p className="text-[11px] text-muted-foreground/60 text-center mt-4">
+        <p className="text-[11px] text-tx-2 text-center mt-4">
           By signing up you agree to our{' '}
           <Link href="/privacy-policy" className="underline hover:text-muted-foreground">privacy policy</Link>.
         </p>

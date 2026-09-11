@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRightIcon as ArrowRight } from '@/components/brand/icon'
 import { MarketingShell } from './marketing-shell'
-import { FunnelScene, GaugeScene, OohScene, SentimentScene } from './scenes'
+import { SHOTS, ProductShotFrame, type ProductShot } from './product-shots'
 
 // One reveal group per section. See landing-page.tsx.
 const rise = {
@@ -16,7 +16,8 @@ interface Feature {
   title: string
   body: string
   chips: string[]
-  Scene?: (p: { t: number }) => React.ReactNode
+  /** A screenshot of the running app. Drawn scenes do not go on this page. */
+  shot?: ProductShot
 }
 
 /** Everything on this page is live in the product today. When something ships
@@ -26,25 +27,24 @@ const FEATURES: Feature[] = [
     n: '01', title: 'Brand Health Index',
     body: 'Five signal families blend into one score your CEO can ask about, weighted for your industry. A fintech counts trust. An FMCG counts shelf and share of voice. Signals you have not connected yet redistribute their weight instead of dragging the score down.',
     chips: ['Industry-weighted score', 'Six-stage funnel', 'Trust pillar', '30-day trend'],
-    Scene: GaugeScene,
+    shot: SHOTS.zones,
   },
   {
     n: '02', title: 'Cultural sentiment',
     body: 'BrandGauge reads mentions from X and Instagram in Pidgin, Yoruba, Igbo and Hausa. It classifies them the way a Lagos marketer would. "This brand no try" is negative. Every mention carries its language, platform and aspect, so you see what people praise and what they drag.',
     chips: ['4 languages', 'X + Instagram mentions', 'Aspect tags', 'Per-platform breakdown'],
-    Scene: SentimentScene,
+    shot: SHOTS.sentiment,
   },
   {
     n: '03', title: 'Commercial proof',
     body: 'CAC, ROI, MQLs and funnel lift pulled live from Meta Ads, GA4, Paystack and your site pixel. Budget pacing flags overspend before month end. An AI-written business case turns the numbers into something you can hand to the board.',
     chips: ['CAC / ROI / MQLs', 'Budget pacing', 'AI business case', 'Board pack'],
-    Scene: FunnelScene,
+    shot: SHOTS.commercial,
   },
   {
     n: '04', title: 'Offline and OOH attribution',
     body: 'Every billboard, radio spot, TV flight and print placement gets a branded vanity link and a place on the map. Geo attribution ties nearby new customers back to the site. Your media plans import straight from Excel, with AI analysis of daypart efficiency and delivery.',
     chips: ['Site map + geo attribution', 'Vanity links', 'Geo-retargeting audiences', 'Radio / TV / print import'],
-    Scene: OohScene,
   },
   {
     n: '05', title: 'Surveys and NPS',
@@ -55,6 +55,9 @@ const FEATURES: Feature[] = [
     n: '06', title: 'Competitive intelligence',
     body: 'See share of voice against your named competitors, competitor sightings from the field, and an auto-written briefing every Monday morning. When a rival cuts prices, you hear it from us first.',
     chips: ['Share of voice', 'Monday briefing', 'Competitor sightings'],
+    // The briefing crop is a paragraph of body text at 7.5:1. It reads at full
+    // width on the home page and is illegible in this page's 42% column, so it
+    // stays where it works.
   },
   {
     n: '07', title: 'Events and field intelligence',
@@ -99,8 +102,12 @@ export function FeaturesPage() {
       <section className="mx-auto max-w-6xl space-y-20 px-6 py-14">
         {FEATURES.map((f, i) => (
           <motion.div key={f.n} {...rise}
-            className={`flex flex-col gap-8 lg:items-center ${f.Scene ? (i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row') : ''}`}>
-            <div className={f.Scene ? 'lg:w-[38%]' : 'max-w-2xl'}>
+            /* lg:items-center only belongs on the rows that have two columns
+               to centre against each other. On a text-only row it centred the
+               max-w-2xl block, so those features sat indented from the rule
+               every other one starts on. */
+            className={`flex flex-col gap-8 ${f.shot ? `lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}` : ''}`}>
+            <div className={f.shot ? 'lg:w-[42%]' : 'max-w-2xl'}>
               <span className="bg-num text-[11px]" style={{ color: 'var(--tx-flare)' }}>{f.n}</span>
               <h2 className="mt-2 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl"
                 style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
@@ -116,9 +123,9 @@ export function FeaturesPage() {
                 ))}
               </div>
             </div>
-            {f.Scene && (
-              <div className="@container h-[430px] flex-1 sm:h-[360px]">
-                <f.Scene t={1} />
+            {f.shot && (
+              <div className="w-full flex-1 overflow-hidden rounded-sm border border-line">
+                <ProductShotFrame shot={f.shot} sizes="(max-width: 1024px) 100vw, 52vw" />
               </div>
             )}
           </motion.div>

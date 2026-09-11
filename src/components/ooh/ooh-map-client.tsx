@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Map, { Marker, Popup, NavigationControl, type MapRef } from 'react-map-gl/mapbox'
 import { MapIcon as MapPin } from '@/components/brand/icon'
 import { TOKENS } from '@/lib/brand-tokens'
+import { useMapboxCss } from './use-mapbox-css'
 
 interface Site {
   id: string
@@ -37,6 +38,7 @@ function fmtDate(iso: string | null) {
 }
 
 export function OohMapClient({ sites, onMapReady }: OohMapClientProps) {
+  useMapboxCss()
   const mapRef                    = useRef<MapRef>(null)
   const [popupId, setPopupId]     = useState<string | null>(null)
   const [mapError, setMapError]   = useState<string | null>(null)

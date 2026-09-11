@@ -26,7 +26,7 @@ export function VideoHero() {
   }
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border"
+    <div className="group relative overflow-hidden rounded-sm border"
       style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
       <video
         ref={ref}
