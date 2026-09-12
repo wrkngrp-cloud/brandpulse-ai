@@ -144,16 +144,43 @@ glyph or a label as well.
 
 Nohemi only, plus a mono for numerals.
 
+### Four weights exist. Only four.
+
+`brand/fonts.css` loads Nohemi at **400, 500, 700 and 800**, and Disket Mono at
+**400 and 700**. Nothing else is supplied, so nothing else can be specified.
+Asking for a weight that has no file does not fail loudly, it silently resolves
+to a neighbour, which is how this table came to name three weights that never
+rendered. Measured in the browser at 64px:
+
+| Asked for | Renders as | Evidence |
+|---|---|---|
+| 600 semibold | **700** | identical width to 700, 469.59px |
+| 900 black | **800** | identical width to 800, 473.22px |
+| mono 500 | 400 | no 500 file for Disket |
+
+So `font-semibold` and `font-bold` are the same thing across this product, and
+`font-black` and `font-extrabold` are the same thing. Either supply the files or
+stop naming the weights. Until a 600 lands, write 500 or 700 and mean it.
+
+### The table, as it actually is
+
 | Role | Size | Weight | Tracking | Leading |
 |---|---|---|---|---|
-| Display | `--t-display` | 800 | -0.035em | 0.94 |
-| H1 | `--t-h1` | 800 | -0.03em | 1.0 |
+| Display | `--t-display` | 700 | -0.03em | 1.0 |
+| H1 | `--t-h1` | 700 | -0.03em | 1.05 |
 | H2 | `--t-h2` | 700 | -0.02em | 1.06 |
-| H3 | 21px | 600 | -0.02em | 1.15 |
+| H3 | 21px | 500 | -0.02em | 1.15 |
 | Body | 17px | 400 | 0 | 1.55 |
 | Small | 14px | 400 | 0 | 1.5 |
 | Micro | 12px | 500 | 0.01em | 1.45 |
-| Readout | `--t-readout` | mono 500 | -0.03em | 1.0 |
+| Readout | `--t-readout` | mono 400 | -0.03em | 1.0 |
+
+**700 is the heaviest weight that ships.** 800 was the display weight and it was
+too much: at 56px with -0.03em tracking the counters close up and the line reads
+as a wall rather than a sentence. Hierarchy comes from size and tracking, which
+is where it belongs. 800 is now reserved for a single numeral inside an
+illustrative scene, and if it stops being used there it should be dropped from
+`fonts.css` and the payload with it.
 
 **Mono has exactly one job: numerals.** Scores, currency, percentages, counts, timestamps, ASCII meters, code. Always `font-variant-numeric: tabular-nums` so digits do not jitter as data updates.
 

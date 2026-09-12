@@ -92,7 +92,7 @@ export function FeaturesPage() {
         <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>
           Features
         </motion.p>
-        <motion.h1 {...rise} className="mt-4 max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
+        <motion.h1 {...rise} className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Everything you need to prove brand work pays.
         </motion.h1>
@@ -108,7 +108,7 @@ export function FeaturesPage() {
           <motion.div key={f.n} {...rise} className="flex flex-col gap-8">
             <div className="max-w-2xl">
               <span className="bg-num text-[11px]" style={{ color: 'var(--tx-flare)' }}>{f.n}</span>
-              <h2 className="mt-2 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl"
+              <h2 className="mt-2 text-2xl font-bold leading-tight tracking-tight sm:text-3xl"
                 style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
                 {f.title}
               </h2>
@@ -127,7 +127,7 @@ export function FeaturesPage() {
       </section>
 
       <section className="px-6 py-20 text-center">
-        <motion.h2 {...rise} className="mx-auto max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl"
+        <motion.h2 {...rise} className="mx-auto max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           See it with your own data.
         </motion.h2>

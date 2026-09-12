@@ -100,7 +100,7 @@ export function UseCasesPage() {
         <motion.p {...rise} className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>
           Use cases
         </motion.p>
-        <motion.h1 {...rise} className="mt-4 max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
+        <motion.h1 {...rise} className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           One gauge, tuned to your industry.
         </motion.h1>
@@ -125,7 +125,7 @@ export function UseCasesPage() {
           <motion.div key={ind.id} id={ind.id} {...rise}
             className="scroll-mt-28 rounded-2xl border p-7 sm:p-10"
             style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
-            <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl"
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl"
               style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
               {ind.name}
             </h2>
@@ -153,7 +153,7 @@ export function UseCasesPage() {
       </section>
 
       <section className="px-6 py-20 text-center">
-        <motion.h2 {...rise} className="mx-auto max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl"
+        <motion.h2 {...rise} className="mx-auto max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Your industry is already set up.
         </motion.h2>

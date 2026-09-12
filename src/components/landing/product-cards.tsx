@@ -182,7 +182,7 @@ export function ProductCards() {
     <section ref={section} id="tour" aria-label="Product" className="scroll-mt-24 py-28" style={{ background: 'var(--lp-band)' }}>
       <div className="mx-auto max-w-6xl px-6">
         <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>Inside BrandGauge</p>
-        <h2 className="mt-3 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
+        <h2 className="mt-3 max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
           This is your Monday morning.
         </h2>
@@ -214,7 +214,7 @@ export function ProductCards() {
           >
             <ProductShotFrame shot={card.shot} className="border-b border-line-inv" />
             <div className="flex flex-1 flex-col p-6">
-              <h3 className="text-xl font-extrabold tracking-tight"
+              <h3 className="text-xl font-bold tracking-tight"
                 style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
                 {card.title}
               </h3>
