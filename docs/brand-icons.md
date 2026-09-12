@@ -1,12 +1,12 @@
 # The BrandGauge icon set
 
-107 glyphs, supplied. The product uses nothing else: no icon library appears in
+113 glyphs. The product uses nothing else: no icon library appears in
 the dependency graph of any screen.
 
 ## Where the artwork lives
 
-    brand/icons/currentcolor/   107 files, stroke="currentColor". For inlining.
-    brand/icons/ink/            107 files, stroke #16120E. For design tools.
+    brand/icons/currentcolor/   113 files, stroke="currentColor". For inlining.
+    brand/icons/ink/            113 files, stroke #16120E. For design tools.
     brand/icons.svg             the sprite, built from currentcolor/.
                                 Mounted once in the root layout, so
                                 <use href="#bg-gauge"> resolves anywhere.
@@ -14,9 +14,21 @@ the dependency graph of any screen.
 Every file: 24x24 viewBox, 20px live area, stroke 1.75, butt caps, miter
 joins. Filled sub-paths carry their own fill and no stroke.
 
-Do not edit the individual files by hand. The sprite is generated from them,
-and `src/components/brand/icon-sprite.tsx` and `src/components/brand/icon.tsx`
-are generated from the sprite.
+`brand/icons/currentcolor` is the artwork. Everything else is derived from it:
+
+    npm run icons          redraw ink/, icons.svg and icon-sprite.tsx
+    npm run icons:check    check only, writes nothing
+
+Run the check before shipping. It fails when the product asks for an id nobody
+drew, which is how three onboarding cards came to render a label with an empty
+space above it: `bg-broadcast`, `bg-shop` and `bg-people` were referenced in
+`industry-config.ts` and never existed. A `<use>` pointing at a missing symbol
+draws nothing, silently, and reads as a spacing bug rather than a missing icon.
+
+To add a glyph: draw it on the construction grid in section 7 of the design
+system, save it into `brand/icons/currentcolor`, run `npm run icons`, then add
+its name to the `BrandIconName` union and a `named()` export in
+`src/components/brand/icon.tsx`.
 
 ## Using them
 
@@ -42,13 +54,14 @@ element of a card, and then it is a filled tick rather than a stroke.
 ## The set
 
 - `bg-alert`
-- `bg-arrow-updown`
 - `bg-arrow`
+- `bg-arrow-updown`
 - `bg-ask`
 - `bg-book`
 - `bg-bot`
 - `bg-bottle`
 - `bg-briefcase`
+- `bg-building`
 - `bg-calendar`
 - `bg-camera`
 - `bg-card`
@@ -56,8 +69,8 @@ element of a card, and then it is a filled tick rather than a stroke.
 - `bg-chevron`
 - `bg-chevrons-updown`
 - `bg-circle-dot`
-- `bg-clipboard-list`
 - `bg-clipboard`
+- `bg-clipboard-list`
 - `bg-clock`
 - `bg-code`
 - `bg-connect`
@@ -65,13 +78,14 @@ element of a card, and then it is a filled tick rather than a stroke.
 - `bg-creative`
 - `bg-currency`
 - `bg-database`
+- `bg-draft`
 - `bg-edit`
 - `bg-export`
 - `bg-external-link`
 - `bg-eye`
 - `bg-field`
-- `bg-file-search`
 - `bg-file`
+- `bg-file-search`
 - `bg-film`
 - `bg-filter`
 - `bg-flag`
@@ -82,6 +96,7 @@ element of a card, and then it is a filled tick rather than a stroke.
 - `bg-git-branch`
 - `bg-git-fork`
 - `bg-globe`
+- `bg-hanger`
 - `bg-heart`
 - `bg-help`
 - `bg-history`
@@ -97,6 +112,7 @@ element of a card, and then it is a filled tick rather than a stroke.
 - `bg-mail`
 - `bg-map`
 - `bg-market`
+- `bg-mast`
 - `bg-mentions`
 - `bg-menu`
 - `bg-message-question`
@@ -110,23 +126,25 @@ element of a card, and then it is a filled tick rather than a stroke.
 - `bg-panel`
 - `bg-pause`
 - `bg-phone`
+- `bg-pill`
 - `bg-play`
 - `bg-plus`
+- `bg-pre-post`
 - `bg-printer`
 - `bg-qr`
 - `bg-refresh`
 - `bg-saas`
-- `bg-search-x`
 - `bg-search`
+- `bg-search-x`
 - `bg-send`
 - `bg-settings`
-- `bg-share-nodes`
 - `bg-share`
+- `bg-share-nodes`
 - `bg-shelf`
+- `bg-shield`
 - `bg-shield-alert`
 - `bg-shield-check`
 - `bg-shield-x`
-- `bg-shield`
 - `bg-smartphone`
 - `bg-star`
 - `bg-sun`
@@ -136,8 +154,8 @@ element of a card, and then it is a filled tick rather than a stroke.
 - `bg-thumbs-up`
 - `bg-toggle`
 - `bg-trash`
-- `bg-trend-down`
 - `bg-trend`
+- `bg-trend-down`
 - `bg-triangle-alert`
 - `bg-truck`
 - `bg-unplug`
@@ -146,5 +164,5 @@ element of a card, and then it is a filled tick rather than a stroke.
 - `bg-wand`
 - `bg-wifi-off`
 - `bg-wrench`
-- `bg-x-circle`
 - `bg-x`
+- `bg-x-circle`

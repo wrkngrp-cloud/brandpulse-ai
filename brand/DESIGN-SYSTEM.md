@@ -418,7 +418,7 @@ Annotations on photography are the atom, rotated, with a Flare label. They show 
 
 ## 7. Icons
 
-22 icons in `brandgauge-icons.svg`, drawn on a 24px grid with a 20px live area, 1.75px stroke, butt caps, miter joins.
+113 icons in `brand/icons/currentcolor`, drawn on a 24px grid with a 20px live area, 1.75px stroke, butt caps, miter joins. `brand/icons.svg` and the React module are built from them by `npm run icons`; `npm run icons:check` fails when a glyph the product asks for was never drawn.
 
 **The rule the last set broke:** an icon names the thing, never the abstraction. Marketplaces is a market stall canopy, not three floating circles. Offline attribution is a billboard on two posts, not a signal wave. If someone has to read the label to know what the icon means, redraw it.
 
@@ -448,9 +448,16 @@ Icons are `--tx` or `--tx-3`. An icon is Flare only when it is the single hero e
 
 ### The set
 
-`bg-gauge` `bg-mentions` `bg-funnel` `bg-ooh` `bg-survey` `bg-share` `bg-field` `bg-creative` `bg-ask` `bg-connect` `bg-trend` `bg-alert` `bg-export` `bg-filter` `bg-search` `bg-shelf` `bg-card` `bg-venue` `bg-saas` `bg-market` `bg-bottle` `bg-truck`
+The full list is in `docs/brand-icons.md`. The eight that carry the brand-type
+verticals are `bg-shelf` (FMCG), `bg-card` (fintech), `bg-venue` (venues),
+`bg-saas` (B2B SaaS), `bg-market` (marketplaces), `bg-bottle` (beverage),
+`bg-truck` (distribution) and `bg-creative` (agencies).
 
-The last seven map one-to-one to the seven industries: FMCG, fintech, venues, B2B SaaS, marketplaces, beverage, distribution.
+The onboarding industry list is longer than the brand types and adds
+`bg-mast` (telco), `bg-camera` (media), `bg-pill` (healthcare and pharma),
+`bg-building` (real estate), `bg-shield` (insurance) and `bg-hanger`
+(fashion). Every one of those names a thing you could photograph, which is
+the rule above: a mast, not a signal wave; a hanger, not a shopping bag.
 
 ---
 

@@ -20,7 +20,7 @@ import {
   MusicIcon as Megaphone, PanelIcon as Monitor, UsersIcon as Users,
   CalendarIcon as CalendarDays, MusicIcon as Radio, PanelIcon as Tv,
   PrinterIcon as Newspaper, MentionsIcon as MessageCircle,
-  AskIcon as Sparkles, AskIcon as Zap, TrendIcon as TrendingUp,
+  AskIcon as Sparkles, PrePostIcon as PrePost, TrendIcon as TrendingUp,
   CheckIcon as ClipboardCheck, CircleDotIcon as Target,
   CurrencyIcon as DollarSign, AlertIcon as AlertTriangle, GiftIcon as Gift,
   HeartIcon as Heart, DatabaseIcon as Database, ExportIcon as FileDown,
@@ -62,7 +62,7 @@ export const PAGE_META: Record<string, PageMeta> = {
 
   /* Creative lab — what am I saying? */
   '/dashboard/voice-builder':     { eyebrow: 'Creative lab', icon: Sparkles },
-  '/dashboard/pre-post':          { eyebrow: 'Creative lab', icon: Zap },
+  '/dashboard/pre-post':          { eyebrow: 'Creative lab', icon: PrePost },
   '/dashboard/creative':          { eyebrow: 'Creative lab', icon: CreativeIcon },
   '/dashboard/creative-library':  { eyebrow: 'Creative lab', icon: BookOpen },
   '/dashboard/creative-fatigue':  { eyebrow: 'Creative lab', icon: AlertTriangle },

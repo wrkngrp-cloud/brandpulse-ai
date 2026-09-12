@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion, LayoutGroup } from 'framer-motion'
-import { LayoutGridIcon as LayoutDashboard, CalendarIcon as CalendarDays, MusicIcon as Megaphone, AskIcon as Zap, StarIcon as Trophy, ChevronDownIcon as ChevronDown, PanelIcon as Monitor, MusicIcon as Radio, PanelIcon as Tv, PrinterIcon as Newspaper, UsersIcon as Users, GlobeIcon as Globe, CircleDotIcon as Target, FileIcon as FileSearch, FileIcon as BookOpen, CheckIcon as ClipboardCheck, TrendIcon as BarChart3, HeartIcon as Heart, DatabaseIcon as Database, CurrencyIcon as DollarSign, FlaskIcon as FlaskConical, GiftIcon as Gift, FileIcon as FileText, CameraIcon as Video, EyeIcon as Eye } from '@/components/brand/icon'
-import { AskIcon as Sparkles, ConnectIcon as Plug, AlertIcon as AlertTriangle, TrendIcon as TrendingUp, ExportIcon as FileDown, MentionsIcon as MessageCircle, GaugeIcon, MentionsIcon, FunnelIcon, OohIcon, SurveyIcon, ShareIcon, FieldIcon, CreativeIcon, MarketIcon } from '@/components/brand/icon'
+import { LayoutGridIcon as LayoutDashboard, CalendarIcon as CalendarDays, MusicIcon as Megaphone, StarIcon as Trophy, ChevronDownIcon as ChevronDown, PanelIcon as Monitor, MusicIcon as Radio, PanelIcon as Tv, PrinterIcon as Newspaper, UsersIcon as Users, GlobeIcon as Globe, CircleDotIcon as Target, FileIcon as FileSearch, FileIcon as BookOpen, CheckIcon as ClipboardCheck, TrendIcon as BarChart3, HeartIcon as Heart, DatabaseIcon as Database, CurrencyIcon as DollarSign, FlaskIcon as FlaskConical, GiftIcon as Gift, FileIcon as FileText, CameraIcon as Video, EyeIcon as Eye } from '@/components/brand/icon'
+import { PrePostIcon as PrePost, AskIcon as Sparkles, ConnectIcon as Plug, AlertIcon as AlertTriangle, TrendIcon as TrendingUp, ExportIcon as FileDown, MentionsIcon as MessageCircle, GaugeIcon, MentionsIcon, FunnelIcon, OohIcon, SurveyIcon, ShareIcon, FieldIcon, CreativeIcon, MarketIcon } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { isPathHidden, type IndustryId } from '@/lib/industry-config'
 
@@ -72,7 +72,7 @@ const CAMPAIGNS: NavEntry[] = [
 const CREATIVE_LAB_PATHS = ['/dashboard/voice-builder', '/dashboard/pre-post', '/dashboard/creative']
 const CREATIVE_LAB_SUB = [
   { label: 'Voice Builder',    href: '/dashboard/voice-builder', icon: Sparkles },
-  { label: 'Pre-Post Intel',   href: '/dashboard/pre-post',      icon: Zap      },
+  { label: 'Pre-Post Intel',   href: '/dashboard/pre-post',      icon: PrePost  },
   { label: 'Creative Analysis',href: '/dashboard/creative',      icon: CreativeIcon },
 ]
 

@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner'
 import { Icon, type BrandIconName, CheckIcon as Check, GlobeIcon as Globe, ArrowRightIcon as ArrowRight, ArrowLeftIcon as ArrowLeft, XIcon as X, PlusIcon as Plus } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
-import { AskIcon as Sparkles, AlertIcon as AlertCircle } from '@/components/brand/icon'
+import { AskIcon as Sparkles, DraftIcon as Draft, AlertIcon as AlertCircle } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
 import { INDUSTRY_META, INDUSTRY_IDS, type IndustryId, getIndustryFromCategory } from '@/lib/industry-config'
@@ -181,7 +181,7 @@ export default function OnboardingPage() {
         <div className="w-full max-w-2xl space-y-8">
           <div className="text-center space-y-2">
             <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
-              <Sparkles className="h-5 w-5 text-background" />
+              <Draft className="h-5 w-5 text-background" />
             </div>
             <StepBadge step={1} />
             <h1 className="text-2xl font-medium tracking-tight">What kind of brand are you?</h1>
@@ -254,7 +254,7 @@ export default function OnboardingPage() {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center space-y-2">
             <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
-              <Sparkles className="h-5 w-5 text-background" />
+              <Draft className="h-5 w-5 text-background" />
             </div>
             <StepBadge step={2} />
             <h1 className="text-2xl font-medium tracking-tight">Tell us who you are</h1>
@@ -295,6 +295,7 @@ export default function OnboardingPage() {
               onClick={runInference}
               disabled={!brandName.trim()}
             >
+              <Draft className="h-4 w-4 mr-2" />
               Draft my profile with AI
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
