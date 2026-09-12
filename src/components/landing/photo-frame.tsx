@@ -75,18 +75,27 @@ export const HERO_PHOTOS: Record<string, Photo> = {
 export const INDUSTRY_PHOTOS: Record<string, Photo> = {
   fmcg: {
     src: '/landing/photos/lagos-market-crowd.jpg',
+    /* Upgrade waiting on a file: /landing/photos/fmcg-provision-store.jpg
+       The roadside provision store, stacked head-high with crates of soft
+       drinks, water and juice under a painted sign. It beats the market crowd
+       for this slot because the whole vertical is shelf visibility and
+       distributor pull, and that picture is a shelf. */
     slot: 'FMCG',
-    brief: 'A crowded market street where the brand competes for a glance, shot wide at rush hour.',
+    brief: 'A roadside provision store stacked with crates of drinks, where shelf space is the whole battle.',
   },
   fintech: {
     src: null,
+    /* Waiting on: /landing/photos/fintech-pos-payment.jpg
+       A card going into a POS terminal, both hands in frame, counter behind. */
     slot: 'Fintech',
-    brief: 'A customer paying with a phone at a small Lagos shop counter, hands and screen in frame, no logos.',
+    brief: 'A card going into a POS terminal at a counter, hands and screen in frame. Trust, at the moment it is decided.',
   },
   venue: {
     src: '/landing/photos/roundabout-billboard.jpg',
     slot: 'Venues and restaurants',
-    brief: 'A busy junction at night with a lit venue frontage, shot from across the road.',
+    /* Still the weakest of the seven. A junction stands in for a venue; what
+       it wants is a floor at service: tables full, a queue at the door. */
+    brief: 'A busy junction at night standing in for the venue trade. Wants a real floor at service.',
   },
   b2b_saas: {
     src: null,
@@ -95,18 +104,27 @@ export const INDUSTRY_PHOTOS: Record<string, Photo> = {
   },
   marketplace: {
     src: '/landing/photos/lagos-market-aerial.jpg',
+    /* Upgrade waiting on a file: /landing/photos/marketplace-storefront.jpg
+       A marketplace storefront open on a laptop with a card in hand. The
+       aerial market is a market; this slot is about the digital kind. */
     slot: 'Marketplaces',
-    brief: 'A market from above, stalls and buyers reading as thousands of small transactions.',
+    brief: 'A marketplace open on a laptop, card in hand, mid-checkout. Thousands of small transactions, one at a time.',
   },
   beverage_alcohol: {
     src: null,
+    /* Waiting on: /landing/photos/beverage-bar-counter.jpg
+       The bar back at service: spirits shelf, glassware, stools, warm light. */
     slot: 'Beverage and alcohol',
-    brief: 'A bar counter at 11pm, bottles and glasses in the foreground, crowd soft behind, no visible brands.',
+    brief: 'A bar counter at service, spirits shelf and glassware behind, stools waiting. Where the brand is chosen out loud.',
   },
   b2b_distribution: {
     src: '/landing/photos/expressway-billboard.jpg',
+    /* Upgrade waiting on a file: /landing/photos/b2b-wholesale-load.jpg
+       A three-wheeler loaded shoulder-high with wholesale crates, two men
+       working the load. Distribution as the physical fact it is, which a
+       billboard over a road is not. */
     slot: 'B2B distribution',
-    brief: 'A loaded truck on an expressway, shot from the bridge, distribution as a physical fact.',
+    brief: 'A three-wheeler loaded shoulder-high with wholesale crates, mid-drop. Distribution as a physical fact.',
   },
 }
 
