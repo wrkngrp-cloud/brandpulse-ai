@@ -6,8 +6,8 @@ import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput,
   CommandItem, CommandList, CommandSeparator,
 } from '@/components/ui/command'
-import { LayoutGridIcon as LayoutDashboard, FileIcon as FileText, TrendIcon as BarChart2, SurveyIcon as ClipboardList, CalendarIcon as CalendarDays, MapIcon as MapPin, MusicIcon as Megaphone, AskIcon as Zap, StarIcon as Trophy, FilterIcon as Filter, StarIcon as Award, UsersIcon as Users, CreativeIcon as Palette, GlobeIcon as Globe, PlusIcon as Plus, SettingsIcon as Settings, MusicIcon as Radio, ArrowRightIcon as ArrowRight, PanelIcon as Monitor, PanelIcon as Tv, PrinterIcon as Newspaper } from '@/components/brand/icon'
-import { TrendIcon as TrendingUp, AskIcon as Sparkles, SearchIcon as Search } from '@/components/brand/icon'
+import { LayoutGridIcon as LayoutDashboard, FileIcon as FileText, TrendIcon as BarChart2, SurveyIcon as ClipboardList, CalendarIcon as CalendarDays, MapIcon as MapPin, MusicIcon as Megaphone, StarIcon as Trophy, FilterIcon as Filter, StarIcon as Award, UsersIcon as Users, CreativeIcon as Palette, GlobeIcon as Globe, PlusIcon as Plus, SettingsIcon as Settings, MusicIcon as Radio, ArrowRightIcon as ArrowRight, PanelIcon as Monitor, PanelIcon as Tv, PrinterIcon as Newspaper } from '@/components/brand/icon'
+import { PrePostIcon as PrePost, TrendIcon as TrendingUp, AskIcon as Sparkles, SearchIcon as Search } from '@/components/brand/icon'
 
 // ── Nav items ──────────────────────────────────────────────────────────────
 
@@ -25,7 +25,7 @@ const PAGES = [
   { label: 'Radio Intelligence',  href: '/dashboard/radio',             icon: Radio,            group: 'Campaigns'    },
   { label: 'TV Intelligence',     href: '/dashboard/tv',                icon: Tv,               group: 'Campaigns'    },
   { label: 'Print Intelligence',  href: '/dashboard/print',             icon: Newspaper,        group: 'Campaigns'    },
-  { label: 'Pre-Post Analysis',   href: '/dashboard/pre-post',          icon: Zap,              group: 'Deep Intel'   },
+  { label: 'Pre-Post Analysis',   href: '/dashboard/pre-post',          icon: PrePost,          group: 'Deep Intel'   },
   { label: 'Funnel Intelligence', href: '/dashboard/funnel',            icon: Filter,           group: 'Deep Intel'   },
   { label: 'Cultural Intelligence',href: '/dashboard/cultural',         icon: Globe,            group: 'Deep Intel'   },
   { label: 'Competitive Intel',   href: '/dashboard/competitive',       icon: Trophy,           group: 'Deep Intel'   },
@@ -43,7 +43,7 @@ const ACTIONS = [
   { label: 'Create Event',   href: '/dashboard/events/new',      icon: Plus        },
   { label: 'New OOH Site',   href: '/dashboard/ooh/new',         icon: Plus        },
   { label: 'Launch Survey',  href: '/dashboard/surveys',         icon: ClipboardList },
-  { label: 'Run Pre-Post',   href: '/dashboard/pre-post',        icon: Zap         },
+  { label: 'Run Pre-Post',   href: '/dashboard/pre-post',        icon: PrePost     },
   { label: 'Search Mentions', href: '/dashboard/sentiment',      icon: Search      },
 ]
 

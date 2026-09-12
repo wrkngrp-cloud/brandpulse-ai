@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "icons": "node scripts/icons-build.mjs",
+    "icons:check": "node scripts/icons-build.mjs --check"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

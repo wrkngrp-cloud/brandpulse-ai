@@ -36,7 +36,7 @@ export const INDUSTRY_META: Record<IndustryId, IndustryMeta> = {
   telco: {
     id:       'telco',
     label:    'Telco / Telecoms',
-    icon:     'bg-broadcast',
+    icon:     'bg-mast',
     tagline:  'Mobile networks, data services, broadband and enterprise connectivity',
     examples: 'MTN, Airtel, Glo, 9mobile, Smile Communications',
   },
@@ -71,14 +71,14 @@ export const INDUSTRY_META: Record<IndustryId, IndustryMeta> = {
   healthcare: {
     id:       'healthcare',
     label:    'Healthcare / Pharma',
-    icon:     'bg-shield',
+    icon:     'bg-pill',
     tagline:  'Hospitals, pharmaceuticals, healthtech and wellness brands',
     examples: 'Emzor, May and Baker, LifeBank, Reliance HMO, Helium Health',
   },
   real_estate: {
     id:       'real_estate',
     label:    'Real Estate',
-    icon:     'bg-venue',
+    icon:     'bg-building',
     tagline:  'Property development, agencies, proptech and facilities',
     examples: 'Landwey, Revolution Plus, PropertyPro, Mixta Africa',
   },
@@ -92,14 +92,14 @@ export const INDUSTRY_META: Record<IndustryId, IndustryMeta> = {
   fashion: {
     id:       'fashion',
     label:    'Fashion / Lifestyle',
-    icon:     'bg-shop',
+    icon:     'bg-hanger',
     tagline:  'Clothing, footwear, beauty, accessories and lifestyle brands',
     examples: 'Polo Ralph Lauren Nigeria, Veekee James, Zaron, House of Lunaris',
   },
   agency: {
     id:       'agency',
     label:    'Marketing Agency',
-    icon:     'bg-people',
+    icon:     'bg-creative',
     tagline:  'Managing campaigns, strategy and measurement for multiple clients',
     examples: 'Insight Publicis, Noah, X3M Ideas, Rosabel, DDB Lagos',
   },

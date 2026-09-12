@@ -22,6 +22,7 @@ export type BrandIconName =
   | 'bg-book'
   | 'bg-bot'
   | 'bg-bottle'
+  | 'bg-building'
   | 'bg-briefcase'
   | 'bg-calendar'
   | 'bg-camera'
@@ -39,6 +40,7 @@ export type BrandIconName =
   | 'bg-creative'
   | 'bg-currency'
   | 'bg-database'
+  | 'bg-draft'
   | 'bg-edit'
   | 'bg-export'
   | 'bg-external-link'
@@ -52,6 +54,7 @@ export type BrandIconName =
   | 'bg-flask'
   | 'bg-funnel'
   | 'bg-gauge'
+  | 'bg-hanger'
   | 'bg-gift'
   | 'bg-git-branch'
   | 'bg-git-fork'
@@ -70,6 +73,7 @@ export type BrandIconName =
   | 'bg-logout'
   | 'bg-mail'
   | 'bg-map'
+  | 'bg-mast'
   | 'bg-market'
   | 'bg-mentions'
   | 'bg-menu'
@@ -84,8 +88,10 @@ export type BrandIconName =
   | 'bg-panel'
   | 'bg-pause'
   | 'bg-phone'
+  | 'bg-pill'
   | 'bg-play'
   | 'bg-plus'
+  | 'bg-pre-post'
   | 'bg-printer'
   | 'bg-qr'
   | 'bg-refresh'
@@ -372,6 +378,7 @@ export const AskIcon = named('bg-ask')
 export const BookIcon = named('bg-book')
 export const BotIcon = named('bg-bot')
 export const BottleIcon = named('bg-bottle')
+export const BuildingIcon = named('bg-building')
 export const BriefcaseIcon = named('bg-briefcase')
 export const CalendarIcon = named('bg-calendar')
 export const CameraIcon = named('bg-camera')
@@ -389,6 +396,7 @@ export const CopyIcon = named('bg-copy')
 export const CreativeIcon = named('bg-creative')
 export const CurrencyIcon = named('bg-currency')
 export const DatabaseIcon = named('bg-database')
+export const DraftIcon = named('bg-draft')
 export const EditIcon = named('bg-edit')
 export const ExportIcon = named('bg-export')
 export const ExternalLinkIcon = named('bg-external-link')
@@ -402,6 +410,7 @@ export const FlagIcon = named('bg-flag')
 export const FlaskIcon = named('bg-flask')
 export const FunnelIcon = named('bg-funnel')
 export const GaugeIcon = named('bg-gauge')
+export const HangerIcon = named('bg-hanger')
 export const GiftIcon = named('bg-gift')
 export const GitBranchIcon = named('bg-git-branch')
 export const GitForkIcon = named('bg-git-fork')
@@ -420,6 +429,7 @@ export const LockIcon = named('bg-lock')
 export const LogoutIcon = named('bg-logout')
 export const MailIcon = named('bg-mail')
 export const MapIcon = named('bg-map')
+export const MastIcon = named('bg-mast')
 export const MarketIcon = named('bg-market')
 export const MentionsIcon = named('bg-mentions')
 export const MenuIcon = named('bg-menu')
@@ -434,8 +444,10 @@ export const OohIcon = named('bg-ooh')
 export const PanelIcon = named('bg-panel')
 export const PauseIcon = named('bg-pause')
 export const PhoneIcon = named('bg-phone')
+export const PillIcon = named('bg-pill')
 export const PlayIcon = named('bg-play')
 export const PlusIcon = named('bg-plus')
+export const PrePostIcon = named('bg-pre-post')
 export const PrinterIcon = named('bg-printer')
 export const QrIcon = named('bg-qr')
 export const RefreshIcon = named('bg-refresh')

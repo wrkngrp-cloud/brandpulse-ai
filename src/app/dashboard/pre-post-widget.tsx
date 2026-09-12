@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { AskIcon as Zap, XIcon as X, ChevronDownIcon as ChevronDown, SendIcon as Send, CopyIcon as Copy, CheckIcon as Check, ExportIcon as ImagePlus, CameraIcon as Video, XCircleIcon as XCircle } from '@/components/brand/icon'
+import { PrePostIcon as PrePost, XIcon as X, ChevronDownIcon as ChevronDown, SendIcon as Send, CopyIcon as Copy, CheckIcon as Check, ExportIcon as ImagePlus, CameraIcon as Video, XCircleIcon as XCircle } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { AlertIcon as AlertTriangle } from '@/components/brand/icon'
 import { Button } from '@/components/ui/button'
@@ -268,7 +268,7 @@ export function PrePostWidget() {
       className="h-12 w-12 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center border border-line bg-press"
       title="Pre-Post Analysis (⌘⇧P)"
     >
-      <Zap className="h-5 w-5" />
+      <PrePost className="h-5 w-5" />
     </button>
   )
 
@@ -283,7 +283,7 @@ export function PrePostWidget() {
           onClick={() => setMinimised(false)}
           className="flex items-center gap-2 bg-foreground text-background text-xs font-medium px-4 py-2 rounded-sm hover:opacity-90 transition-opacity border border-line bg-press"
         >
-          <Zap className="h-3.5 w-3.5" />
+          <PrePost className="h-3.5 w-3.5" />
           Pre-Post
         </button>
       ) : (
@@ -296,7 +296,7 @@ export function PrePostWidget() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
             <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4" />
+              <PrePost className="h-4 w-4" />
               <span className="text-sm font-semibold">Pre-Post Analysis</span>
               <kbd className="hidden sm:inline-flex items-center text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">⌘⇧P</kbd>
             </div>
@@ -517,7 +517,7 @@ export function PrePostWidget() {
           className="h-12 w-12 rounded-full bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center border border-line bg-press"
           title="Pre-Post Analysis"
         >
-          <Zap className="h-5 w-5" />
+          <PrePost className="h-5 w-5" />
         </button>
       )}
     </div>
