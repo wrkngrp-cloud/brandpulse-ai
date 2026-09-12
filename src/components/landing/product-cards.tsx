@@ -181,13 +181,14 @@ export function ProductCards() {
        whichever way the toggle is set. */
     <section ref={section} id="tour" aria-label="Product" className="scroll-mt-24 py-28" style={{ background: 'var(--lp-band)' }}>
       <div className="mx-auto max-w-6xl px-6">
-        <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>The product, not a mockup</p>
+        <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>Inside BrandGauge</p>
         <h2 className="mt-3 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
-          Every screen here is the running app.
+          This is your Monday morning.
         </h2>
         <p className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--tx-inv-2)' }}>
-          Screenshots, taken from a live workspace. Nothing here is drawn for the website.
+          One page tells you where the brand stands, what moved it last week, and what it cost
+          to move. No exports, no chasing four dashboards before a 10am meeting.
         </p>
       </div>
 

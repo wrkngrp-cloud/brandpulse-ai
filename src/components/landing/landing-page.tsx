@@ -10,7 +10,7 @@ import { ProductCards } from './product-cards'
 import { AiScene, darkSceneVars, lightSceneVars } from './scenes'
 import { BrandLockup } from '@/components/brand/logo'
 import { useDarkGround, useMode } from './use-mode'
-import { HERO_PHOTOS } from './photo-frame'
+import { HERO_PHOTOS, INDUSTRY_PHOTOS, PhotoFrame } from './photo-frame'
 import { HeatRow, ReadingLine, ReadingRail, Tick, TickReveal } from './reading'
 import {
   TickArcMask, TickRowMask, arcAspect, rowAspect, useArcReveal, useScrubReveal,
@@ -281,8 +281,12 @@ function HeroFilm() {
       <div className="mx-auto max-w-6xl">
         <h2 className="max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
-          The whole thing, start to finish.
+          Two minutes on a real brand.
         </h2>
+        <p className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
+          Watch a Lagos food brand go from one connected account to a number its board signed
+          off on. If your quarter looks anything like this, you will know by the end of it.
+        </p>
         <div id="demo" className="scroll-mt-28">
           <TickReveal className="mt-10">
             <Tick><VideoHero /></Tick>
@@ -405,17 +409,27 @@ function DeepDives() {
   )
 }
 
+/**
+ * Seven verticals, with a picture each.
+ *
+ * It was seven words on an empty plane, and a word is not an industry. Picking
+ * "Fintech" told you nothing about what the product would do differently. Now
+ * choosing a vertical swaps the photograph of the place that brand is judged in
+ * and the line of signals the index reweights toward, so the claim that the
+ * gauge reshapes itself is something you can see rather than read.
+ */
 function Industries() {
   const list = [
-    { name: 'FMCG', hint: 'Shelf visibility, share of voice, distributor pull' },
-    { name: 'Fintech', hint: 'Trust signals: social comments, street discourse, NPS' },
-    { name: 'Venues & Restaurants', hint: 'Footfall, Google Maps reviews, event ROI' },
-    { name: 'B2B SaaS', hint: 'G2 reviews, developer health, pipeline lift' },
-    { name: 'Marketplaces', hint: 'Seller ratings, GMV attribution, buyer NPS' },
-    { name: 'Beverage & Alcohol', hint: 'Venue sightings, sponsorships, cultural moments' },
-    { name: 'B2B Distribution', hint: 'Trade partner scores, field reports, coverage' },
+    { key: 'fmcg', name: 'FMCG', hint: 'Shelf visibility, share of voice, distributor pull' },
+    { key: 'fintech', name: 'Fintech', hint: 'Trust signals: social comments, street discourse, NPS' },
+    { key: 'venue', name: 'Venues & Restaurants', hint: 'Footfall, Google Maps reviews, event ROI' },
+    { key: 'b2b_saas', name: 'B2B SaaS', hint: 'G2 reviews, developer health, pipeline lift' },
+    { key: 'marketplace', name: 'Marketplaces', hint: 'Seller ratings, GMV attribution, buyer NPS' },
+    { key: 'beverage_alcohol', name: 'Beverage & Alcohol', hint: 'Venue sightings, sponsorships, cultural moments' },
+    { key: 'b2b_distribution', name: 'B2B Distribution', hint: 'Trade partner scores, field reports, coverage' },
   ]
-  const [active, setActive] = useState(1)
+  const [active, setActive] = useState(0)
+  const shot = INDUSTRY_PHOTOS[list[active].key]
   return (
     <section id="industries" className="relative overflow-hidden scroll-mt-24 py-24">
       {/* The tick field, bookending the hero's. */}
@@ -427,30 +441,44 @@ function Industries() {
         }} />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-6">
-        <TickReveal>
-        <Tick as="div"><h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
-          One gauge. Seven industries.
-        </h2></Tick>
-        <Tick as="p" className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
-          Pick your industry once. The health index, funnel signals and connector
-          recommendations reshape themselves around how your business actually works.
-        </Tick>
-        <Tick className="mt-10 flex flex-wrap gap-3">
-          {list.map((v, i) => (
-            <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
-              className="rounded-sm border px-5 py-2.5 text-[13px] transition-colors duration-200 bg-press"
-              style={active === i
-                ? { borderColor: 'var(--tx)', color: 'var(--bg-paper)', background: 'var(--tx)' }
-                : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
-              {v.name}
-            </button>
-          ))}
-        </Tick>
+      <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 lg:grid-cols-12 lg:gap-14">
+        <TickReveal className="lg:col-span-7">
+          <Tick as="div"><h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl"
+            style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
+            A fintech and a beer brand are not the same brand.
+          </h2></Tick>
+          <Tick as="p" className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
+            Pick your industry once. The score, the funnel signals and the connectors it asks
+            you for all reweight around how your business actually makes money. Tap through and
+            watch what changes.
+          </Tick>
+          <Tick className="mt-9 flex flex-wrap gap-2.5">
+            {list.map((v, i) => (
+              <button key={v.name} onClick={() => setActive(i)} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}
+                aria-pressed={active === i}
+                className="rounded-sm border px-4 py-2.5 text-[13px] transition-colors duration-200 bg-press"
+                style={active === i
+                  ? { borderColor: 'var(--tx)', color: 'var(--bg-paper)', background: 'var(--tx)' }
+                  : { borderColor: 'var(--lp-line)', color: 'var(--lp-ink)', background: 'var(--lp-card)' }}>
+                {v.name}
+              </button>
+            ))}
+          </Tick>
+          <p className="mt-6 min-h-[3rem] max-w-md text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
+            <span className="bg-label" style={{ color: 'var(--tx-flare)' }}>What the index leans on</span>
+            <span className="mt-1.5 block">{list[active].hint}</span>
+          </p>
         </TickReveal>
-        <p className="mt-6 h-6 max-w-md text-[11px]" style={{ color: 'var(--lp-mut)' }}>
-          {list[active].hint}
-        </p>
+
+        <TickReveal className="lg:col-span-5">
+          <Tick>
+            {/* Keyed on the vertical so the frame remounts and lights again as
+                you move through the list: the same 90ms tick, not a crossfade. */}
+            <PhotoFrame key={shot.slot} photo={shot} ratio="4 / 3"
+              sizes="(max-width: 1024px) 100vw, 38vw" />
+            <p className="bg-label mt-2.5" style={{ color: 'var(--lp-mut)' }}>{shot.slot}</p>
+          </Tick>
+        </TickReveal>
       </div>
     </section>
   )

@@ -60,6 +60,56 @@ export const HERO_PHOTOS: Record<string, Photo> = {
   },
 }
 
+/**
+ * One shot per vertical, for the industries section.
+ *
+ * The industry chips were seven words on an empty plane, and a word is not an
+ * industry. A picture of the place the brand is judged in is: a shelf, a
+ * banking hall queue, a bar at 11pm. Four of the seven already have a file
+ * that genuinely fits. The other three draw the tick field with their brief
+ * printed on it, which is the pattern this file exists for, so the section
+ * ships now and improves the day a photograph lands.
+ *
+ * Keys match `brand_type` so nothing has to be mapped by hand.
+ */
+export const INDUSTRY_PHOTOS: Record<string, Photo> = {
+  fmcg: {
+    src: '/landing/photos/lagos-market-crowd.jpg',
+    slot: 'FMCG',
+    brief: 'A crowded market street where the brand competes for a glance, shot wide at rush hour.',
+  },
+  fintech: {
+    src: null,
+    slot: 'Fintech',
+    brief: 'A customer paying with a phone at a small Lagos shop counter, hands and screen in frame, no logos.',
+  },
+  venue: {
+    src: '/landing/photos/roundabout-billboard.jpg',
+    slot: 'Venues and restaurants',
+    brief: 'A busy junction at night with a lit venue frontage, shot from across the road.',
+  },
+  b2b_saas: {
+    src: null,
+    slot: 'B2B SaaS',
+    brief: 'Two people at a laptop in a Lagos co-working space, mid-conversation, screens turned away.',
+  },
+  marketplace: {
+    src: '/landing/photos/lagos-market-aerial.jpg',
+    slot: 'Marketplaces',
+    brief: 'A market from above, stalls and buyers reading as thousands of small transactions.',
+  },
+  beverage_alcohol: {
+    src: null,
+    slot: 'Beverage and alcohol',
+    brief: 'A bar counter at 11pm, bottles and glasses in the foreground, crowd soft behind, no visible brands.',
+  },
+  b2b_distribution: {
+    src: '/landing/photos/expressway-billboard.jpg',
+    slot: 'B2B distribution',
+    brief: 'A loaded truck on an expressway, shot from the bridge, distribution as a physical fact.',
+  },
+}
+
 export function PhotoFrame({
   photo, className = '', ratio = '4 / 5', priority = false, sizes = '(max-width: 768px) 100vw, 40vw',
 }: {

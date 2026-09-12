@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRightIcon as ArrowRight } from '@/components/brand/icon'
 import { MarketingShell } from './marketing-shell'
-import { SHOTS, ProductShotFrame, type ProductShot } from './product-shots'
 
 // One reveal group per section. See landing-page.tsx.
 const rise = {
@@ -17,29 +16,29 @@ interface Feature {
   body: string
   chips: string[]
   /** A screenshot of the running app. Drawn scenes do not go on this page. */
-  shot?: ProductShot
 }
 
 /** Everything on this page is live in the product today. When something ships
- *  behind a credential or is still in testing, it does not belong here yet. */
+ *  behind a credential or is still in testing, it does not belong here yet.
+ *
+ *  Bodies lead with what the reader gets to do, not with what the module is
+ *  called or whether it exists. "Score a creator before you pay them" is the
+ *  job; "influencer management" is a menu item. */
 const FEATURES: Feature[] = [
   {
     n: '01', title: 'Brand Health Index',
     body: 'Five signal families blend into one score your CEO can ask about, weighted for your industry. A fintech counts trust. An FMCG counts shelf and share of voice. Signals you have not connected yet redistribute their weight instead of dragging the score down.',
     chips: ['Industry-weighted score', 'Six-stage funnel', 'Trust pillar', '30-day trend'],
-    shot: SHOTS.zones,
   },
   {
     n: '02', title: 'Cultural sentiment',
     body: 'BrandGauge reads mentions from X and Instagram in Pidgin, Yoruba, Igbo and Hausa. It classifies them the way a Lagos marketer would. "This brand no try" is negative. Every mention carries its language, platform and aspect, so you see what people praise and what they drag.',
     chips: ['4 languages', 'X + Instagram mentions', 'Aspect tags', 'Per-platform breakdown'],
-    shot: SHOTS.sentiment,
   },
   {
     n: '03', title: 'Commercial proof',
     body: 'CAC, ROI, MQLs and funnel lift pulled live from Meta Ads, GA4, Paystack and your site pixel. Budget pacing flags overspend before month end. An AI-written business case turns the numbers into something you can hand to the board.',
     chips: ['CAC / ROI / MQLs', 'Budget pacing', 'AI business case', 'Board pack'],
-    shot: SHOTS.commercial,
   },
   {
     n: '04', title: 'Offline and OOH attribution',
@@ -65,17 +64,22 @@ const FEATURES: Feature[] = [
     chips: ['Ambassador PWA', 'Live event ROI', 'Field team reports'],
   },
   {
-    n: '08', title: 'Creative intelligence',
+    n: '08', title: 'Influencer and creator ROI',
+    body: 'Score a creator before you pay them. Cultural IQ rates authenticity, community fit, brand integration and past performance, and flags the high-risk ones. Once a post is live, BrandGauge tracks its impressions, engagements and conversions, and reads the comments so you know whether the audience actually warmed to you or just scrolled past.',
+    chips: ['Cultural IQ score', 'Risk flags', 'Per-post conversions', 'Comment sentiment'],
+  },
+  {
+    n: '09', title: 'Creative intelligence',
     body: 'A library holds every asset you run. Fatigue alerts fire before an ad wears out. A brand voice builder checks new content against how your brand actually speaks, before it goes out.',
     chips: ['Creative library', 'Fatigue alerts', 'Voice builder', 'Pre-post check'],
   },
   {
-    n: '09', title: 'AI command layer',
+    n: '10', title: 'AI command layer',
     body: 'Ask a plain question, get a straight answer sourced from your own numbers. Monthly reports write themselves. A weekly check tracks how AI assistants describe your brand when customers ask about your category.',
     chips: ['Ask anything', 'Monthly AI reports', 'AI visibility check'],
   },
   {
-    n: '10', title: 'Connectors and data',
+    n: '11', title: 'Connectors and data',
     body: 'Meta Ads, Instagram, X, GA4, Paystack, Mailchimp and your own site pixel feed the dashboard daily. A first-party data API takes anything else you measure. Every token is encrypted at rest.',
     chips: ['7 live connectors', 'Site pixel + SDK', 'First-party API', 'Encrypted tokens'],
   },
@@ -90,24 +94,19 @@ export function FeaturesPage() {
         </motion.p>
         <motion.h1 {...rise} className="mt-4 max-w-3xl text-4xl font-black leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
-          Every module, working today.
+          Everything you need to prove brand work pays.
         </motion.h1>
         <motion.p {...rise} className="mt-5 max-w-2xl text-[15px] leading-relaxed sm:text-lg" style={{ color: 'var(--lp-mut)' }}>
-          This page only lists what is live in the product right now. No roadmap
-          slides, no coming-soon labels. If it is written here, you can use it the
-          day you sign up.
+          Eleven modules, from sentiment in four Nigerian languages to a business case
+          your CFO will actually read. Start with the score, connect one account, and add
+          the rest as you go.
         </motion.p>
       </section>
 
       <section className="mx-auto max-w-6xl space-y-20 px-6 py-14">
-        {FEATURES.map((f, i) => (
-          <motion.div key={f.n} {...rise}
-            /* lg:items-center only belongs on the rows that have two columns
-               to centre against each other. On a text-only row it centred the
-               max-w-2xl block, so those features sat indented from the rule
-               every other one starts on. */
-            className={`flex flex-col gap-8 ${f.shot ? `lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}` : ''}`}>
-            <div className={f.shot ? 'lg:w-[42%]' : 'max-w-2xl'}>
+        {FEATURES.map(f => (
+          <motion.div key={f.n} {...rise} className="flex flex-col gap-8">
+            <div className="max-w-2xl">
               <span className="bg-num text-[11px]" style={{ color: 'var(--tx-flare)' }}>{f.n}</span>
               <h2 className="mt-2 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl"
                 style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
@@ -123,11 +122,6 @@ export function FeaturesPage() {
                 ))}
               </div>
             </div>
-            {f.shot && (
-              <div className="w-full flex-1 overflow-hidden rounded-sm border border-line">
-                <ProductShotFrame shot={f.shot} sizes="(max-width: 1024px) 100vw, 52vw" />
-              </div>
-            )}
           </motion.div>
         ))}
       </section>
