@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useInView } from 'framer-motion'
+
 import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
 import { VideoHero } from './video-hero'
 import { ProductCards } from './product-cards'
@@ -18,7 +18,7 @@ import {
 
 /** Measured once, from the geometry, so no frame can crop its own ticks. */
 const HERO_ARC_ASPECT = arcAspect()
-const ROW_ASPECT = rowAspect(6, 1.7)
+const ROW_ASPECT = rowAspect(6)
 
 // ————— theme —————
 /**
@@ -141,8 +141,13 @@ function Hero() {
         WebkitMaskImage: 'radial-gradient(70% 55% at 50% 34%, black, transparent)',
       }} />
 
+      {/* Not "built in Lagos, for West Africa". That reads as a ceiling: it
+          tells a Nairobi or Accra or Johannesburg team the product is not for
+          them, and it tells everyone the ambition stops at a region. Lagos is
+          proof of how deep the language work goes, so it belongs in the body
+          copy as evidence, not in the eyebrow as a boundary. */}
       <p className="mx-auto max-w-6xl px-6 text-center text-[11px]" style={{ color: 'var(--danfo)' }}>
-        Brand intelligence built in Lagos, for West Africa
+        Brand intelligence that reads your market in its own language
       </p>
 
       {/* ── The arc, running off both edges ─────────────────────────── */}
@@ -197,36 +202,55 @@ function Hero() {
  * The rest of the photography, under the film.
  *
  * It was three hairlined frames in a row, which is the grid-of-things family
- * again and the fourth time this page used it. It is one band now: the three
- * shots run together edge to edge and the whole strip arrives through the
- * crescendo, the arc unrolled. Same ticks, same growth curve, same cold to hot
- * reading as the hero and the product rail, at a fourth scale and lying flat.
+ * for the fourth time on this page. It is one band: the three shots run
+ * together edge to edge and arrive through the arc unrolled.
  *
- * The ticks light left to right as the band comes into view, which is the only
- * direction heat runs here. Names of the three shots sit under it as a rule, so
- * nothing is lost by taking the boxes away.
+ * This is the page's one fully scroll-driven reveal, and the right place for
+ * it. It sits below the fold, so there is no first-paint problem to solve, and
+ * the windows opening left to right as the band crosses the viewport is the
+ * reading rising because you are moving. It only ever rises: scanning back up
+ * does not shut the apertures.
+ *
+ * Spacing went the same way as the hero arc. Six windows at fill 1.7 fused the
+ * last three into one mass; 1.15 with growth from 0.62 keeps every window its
+ * own shape while the run still gets hotter to the right.
  */
+/** Where each band shot's subject actually sits in the frame. */
+const SHOT_FOCUS: Record<string, string> = {
+  'The billboard': '50% 78%',
+  'The junction':  '50% 45%',
+  'The market':    '50% 55%',
+}
+
 function StreetStrip() {
   const shots = [HERO_PHOTOS.aerial, HERO_PHOTOS.billboard, HERO_PHOTOS.roundabout]
   const band = useRef<HTMLDivElement>(null)
-  const inView = useInView(band, { once: true, amount: 0.35 })
-  const reveal = useArcReveal({ start: inView, startDelayMs: 60 })
+  const reveal = useScrubReveal(band, { ticks: 6, offset: ['start 0.92', 'end 0.55'] })
   return (
-    <section aria-label="Where the brand is judged" className="pb-10 pt-20">
+    <section aria-label="Where the brand is judged" className="pb-8 pt-20">
       <div className="mx-auto max-w-6xl px-6">
         <h2 className="max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
-          Your budget goes out here. So should your measurement.
+          Your spend goes out here. Your proof should come back from here.
         </h2>
+        <p className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
+          A billboard on the expressway, a market stall in Oshodi, a junction full of danfos.
+          BrandGauge ties a vanity link and a UTM to each one, so the board sees what the
+          outdoor spend actually returned.
+        </p>
       </div>
 
-      <div ref={band} className="mx-auto mt-10 w-full max-w-6xl px-6" style={{ aspectRatio: ROW_ASPECT }}>
-        <TickRowMask id="street-band" reveal={reveal} ticks={6} fill={1.7} className="h-full w-full">
+      <div ref={band} className="mx-auto mt-8 w-full max-w-6xl px-6" style={{ aspectRatio: ROW_ASPECT }}>
+        <TickRowMask id="street-band" reveal={reveal} ticks={6} className="h-full w-full">
           <div className="flex h-full w-full">
             {shots.map(photo => (
               <div key={photo.slot} className="relative h-full flex-1">
                 {photo.src && (
-                  <Image src={photo.src} alt={photo.brief} fill sizes="34vw" className="object-cover" />
+                  /* Each window samples a fixed third of the band, so the crop
+                     has to be aimed. Left at the default, the billboard shot
+                     gave two windows of empty sky. */
+                  <Image src={photo.src} alt={photo.brief} fill sizes="34vw"
+                    className="object-cover" style={{ objectPosition: SHOT_FOCUS[photo.slot] ?? '50% 50%' }} />
                 )}
               </div>
             ))}

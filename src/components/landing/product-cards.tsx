@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion'
 import { ArrowLeftIcon, ArrowRightIcon } from '@/components/brand/icon'
 import { SHOTS, ProductShotFrame, type ProductShot } from './product-shots'
 
@@ -15,12 +16,19 @@ import { SHOTS, ProductShotFrame, type ProductShot } from './product-shots'
  *
  * The second was a grid. Honest, and inert.
  *
- * This is the third: a rail you pan yourself. Horizontal, snapping, driven by
- * the reader's own gesture, so nothing is taken away from them. What makes it
- * the brand's rather than any rail on the web is what sits under it. Position
- * in the run is drawn as a crescendo, the same arc of ticks as the mark and the
- * reading rail, lit cold to hot as you pan. Getting to the end of the product
- * is a reading reaching full.
+ * This is the third: a rail that pans itself as the section crosses the
+ * viewport, and that you can also pan by hand. Both, and that is the point.
+ * Waiting for a reader to discover a control and work through five cards one
+ * click at a time is how a section gets skipped, so scroll moves it for them.
+ * But the moment anyone touches it, by wheel, drag, key or arrow, the
+ * auto-drive stands down for good and the rail is theirs. Nothing is ever
+ * wrestled back, and the page's own scrollbar is never captured: the section
+ * travels normally, the track just moves sideways while it does.
+ *
+ * What makes it the brand's rather than any rail on the web is what sits under
+ * it. Position in the run is drawn as a crescendo, the same arc of ticks as
+ * the mark, lit cold to hot as you pan. Getting to the end of the product is a
+ * reading reaching full.
  *
  * Card widths stay uneven for the same reason the grid spans were: a catalogue
  * of equal boxes says every one of these carries equal weight, and they do not.
@@ -105,8 +113,14 @@ function RailCrescendo({ progress }: { progress: number }) {
 
 export function ProductCards() {
   const rail = useRef<HTMLDivElement>(null)
+  const section = useRef<HTMLElement>(null)
   const [progress, setProgress] = useState(0)
   const [ends, setEnds] = useState({ start: true, end: false })
+  /* Once true, scroll stops driving the rail for the rest of the session. A
+     control that keeps yanking itself back after you have moved it is worse
+     than one that never moved. */
+  const taken = useRef(false)
+  const reduce = useReducedMotion()
 
   /* Read from the element's own scroll, not the window's. The banned listener
      is the one that drives page effects off window scroll; a control reporting
@@ -127,6 +141,23 @@ export function ProductCards() {
     return () => window.removeEventListener('resize', measure)
   }, [measure])
 
+  /* The section's own progress through the viewport, mapped onto scrollLeft.
+     Scroll position is the value on display here, which is the one case the
+     motion law allows it to drive anything. */
+  const { scrollYProgress } = useScroll({
+    target: section,
+    offset: ['start 0.85', 'end 0.35'],
+  })
+  useMotionValueEvent(scrollYProgress, 'change', v => {
+    const el = rail.current
+    if (!el || taken.current || reduce) return
+    const span = el.scrollWidth - el.clientWidth
+    if (span <= 0) return
+    el.scrollLeft = Math.max(0, Math.min(span, v * span))
+  })
+
+  const takeOver = () => { taken.current = true }
+
   const queued = useRef(false)
   const onScroll = () => {
     if (queued.current) return
@@ -137,6 +168,7 @@ export function ProductCards() {
   const step = (dir: 1 | -1) => {
     const el = rail.current
     if (!el) return
+    taken.current = true
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: reduce ? 'auto' : 'smooth' })
   }
@@ -147,7 +179,7 @@ export function ProductCards() {
        different plane, not a different shade of the same one. `--lp-band` is
        the one value that holds in both modes, so this section reads the same
        whichever way the toggle is set. */
-    <section id="tour" aria-label="Product" className="scroll-mt-24 py-28" style={{ background: 'var(--lp-band)' }}>
+    <section ref={section} id="tour" aria-label="Product" className="scroll-mt-24 py-28" style={{ background: 'var(--lp-band)' }}>
       <div className="mx-auto max-w-6xl px-6">
         <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>The product, not a mockup</p>
         <h2 className="mt-3 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl"
@@ -164,6 +196,10 @@ export function ProductCards() {
       <div
         ref={rail}
         onScroll={onScroll}
+        onWheel={takeOver}
+        onPointerDown={takeOver}
+        onTouchStart={takeOver}
+        onKeyDown={takeOver}
         tabIndex={0}
         role="group"
         aria-label="Product screens, pan sideways"

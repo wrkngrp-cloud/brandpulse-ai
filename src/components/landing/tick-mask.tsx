@@ -113,11 +113,14 @@ export function arcTicks(
 }
 
 /** The crescendo: the arc unrolled into a straight run, for wide images. */
-export function rowTicks(n: number, W: number, H: number, fill: number): ArcTick[] {
+export function rowTicks(
+  n: number, W: number, H: number, fill: number,
+  growth: readonly [number, number] = [0.62, 1],
+): ArcTick[] {
   const gap = W / n
   return Array.from({ length: n }, (_, k) => {
     const t = k / (n - 1)
-    const size = gap * fill * (0.42 + 0.58 * t)
+    const size = gap * fill * (growth[0] + (growth[1] - growth[0]) * t)
     const x = gap * (k + 0.5)
     return { t, x, y: H / 2, size, transform: tickTransform(x, H / 2, 0, size) }
   })
@@ -162,8 +165,10 @@ export function arcAspect(
 }
 
 /** The same, for the unrolled run. */
-export function rowAspect(ticks = GEOM.ticks, fill = 1.35) {
-  const b = tickBounds(rowTicks(ticks, 1000, 320, fill))
+export function rowAspect(
+  ticks = GEOM.ticks, fill = 1.15, growth: readonly [number, number] = [0.62, 1],
+) {
+  const b = tickBounds(rowTicks(ticks, 1000, 320, fill, growth))
   return b.w / b.h
 }
 
@@ -237,11 +242,12 @@ export function TickArcMask({
  * rather than curve. Same ticks, unrolled.
  */
 export function TickRowMask({
-  id, children, reveal = 1, className = '', ticks = GEOM.ticks, fill = 1.35,
+  id, children, reveal = 1, className = '', ticks = GEOM.ticks, fill = 1.15,
+  growth = [0.62, 1],
 }: MaskProps) {
   // Fitted to the ticks, same as the arc: the head tick is the widest and a
   // box sized to the centre line shaves it off the right edge.
-  const row = rowTicks(ticks, 1000, 320, fill)
+  const row = rowTicks(ticks, 1000, 320, fill, growth)
   const box = tickBounds(row)
   const W = box.w, H = box.h
   const lit = reveal * ticks
