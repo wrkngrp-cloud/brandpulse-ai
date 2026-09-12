@@ -169,7 +169,7 @@ function Hero() {
       </div>
 
       {/* ── Under the crown ─────────────────────────────────────────── */}
-      <div className="relative mx-auto -mt-[28vw] max-w-2xl px-6 text-center sm:-mt-[24.5vw] lg:-mt-[22.5vw] xl:-mt-[20vw]">
+      <div className="relative mx-auto -mt-[32vw] max-w-2xl px-6 text-center sm:-mt-[28vw] lg:-mt-[26vw] xl:-mt-[23.5vw]">
         <ReadingLine
           text="See your brand the way the street sees it."
           accent="street"
