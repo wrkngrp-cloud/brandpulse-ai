@@ -55,10 +55,8 @@ type Beat =
   | { kind: 'outro'; dur: number }
 
 /** The eight verticals, in the order the product lists them. `photo: null`
- *  draws the tick field with the mark standing on it, which is honest for
- *  agencies: the place their brand is judged in is the work they show, and
- *  this is the instrument they show it with. It also means the cell is a
- *  composed panel rather than a gap while that photograph is still to come. */
+ *  draws the tick field with the mark standing on it, so a vertical added
+ *  before its photograph arrives is a composed panel rather than a gap. */
 const VERTICALS: { name: string; photo: string | null }[] = [
   { name: 'FMCG',        photo: 'fmcg-provision-store' },
   { name: 'Fintech',     photo: 'fintech-pos-payment' },
@@ -67,7 +65,7 @@ const VERTICALS: { name: string; photo: string | null }[] = [
   { name: 'Marketplaces', photo: 'marketplace-storefront' },
   { name: 'Beverage',    photo: 'beverage-bar-counter' },
   { name: 'Distribution', photo: 'b2b-wholesale-load' },
-  { name: 'Agencies',    photo: null },
+  { name: 'Agencies',    photo: 'agency-floor' },
 ]
 
 const BEATS: Beat[] = [
