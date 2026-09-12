@@ -6,8 +6,11 @@ The logo building itself, 3.4 seconds, 1920×1080 at 30fps. Three beats:
    head, 90ms apart, each opening on its own centre.
 2. **The needle sweeps and settles.** It winds back to the bottom of the scale
    and rises to the reading it is drawn at. It settles; it does not bounce.
-3. **The wordmark unveils** through the same crescendo lying flat, nine
-   apertures opening left to right.
+3. **The wordmark is uncovered**, left to right, on a straight edge. It steps
+   once every 90ms like the ticks do, and each step is longer than the one
+   before it on the same 0.6-to-1 ramp: cold and short at the B, hot and long
+   by the e. The crescendo is in the size of the steps, not in their shape.
+   The letters are never bent to fit anything.
 
 Nothing in it is redrawn. The paths are read out of `../brandgauge-lockup-*.svg`
 at render time and measured in the browser, and the needle's pivot is a circle
