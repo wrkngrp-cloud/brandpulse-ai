@@ -394,6 +394,12 @@ interface FlipProps {
   back: React.ReactNode
   /** 0 is fully front, 1 is fully back. Reversible. */
   progress: number
+  /**
+   * How much of the run has arrived at all, 0 to 1. A tick that has not been
+   * revealed shows nothing on either face, so the arc can still open aperture
+   * by aperture before it has anything to turn.
+   */
+  reveal?: number
   className?: string
   ticks?: number
   fill?: number
@@ -425,7 +431,7 @@ interface FlipProps {
  * window a hard-edged view of one place.
  */
 export function TickFlip({
-  id, front, back, progress, className = '', ticks = GEOM.ticks, fill = 1,
+  id, front, back, progress, reveal = 1, className = '', ticks = GEOM.ticks, fill = 1,
   shape = 'arc', sweep = ARC_SEGMENT, growth = ARC_GROWTH, dwell = 0.36,
 }: FlipProps) {
   const run = shape === 'arc'
@@ -433,15 +439,21 @@ export function TickFlip({
     : rowTicks(ticks, 1000, 320, fill)
   const box = tickBounds(run)
   const W = box.w, H = box.h
+  const lit = reveal * ticks
   const layer = (face: 'a' | 'b') => (
     <mask id={`${id}-${face}`} maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
       {run.map((tk, i) => {
         const { scaleY, back: showBack } = flipState(i, ticks, progress, dwell)
-        const on = face === 'b' ? showBack : !showBack
+        /* Two gates. Has this tick arrived, and which face is it showing.
+           The reveal gate is what opens the arc on first paint; without it the
+           mask is simply open from the start, which is the regression that
+           came in when this component replaced TickArcMask. */
+        const on = i < lit && (face === 'b' ? showBack : !showBack)
         return (
           <g key={i} transform={`scale(${1 / W},${1 / H}) translate(${-box.x0},${-box.y0})`}>
-            <g transform={`${tk.transform} scale(1,${Math.max(scaleY, 0.001).toFixed(4)})`}>
-              <path d={ATOM} fill="#fff" fillOpacity={on ? 1 : 0} />
+            <g transform={`${tk.transform} scale(1,${Math.max(scaleY, 0.001).toFixed(4)})`}
+              style={TICK_SETTLE}>
+              <path d={ATOM} fill="#fff" fillOpacity={on ? 1 : 0} style={TICK_SETTLE} />
             </g>
           </g>
         )

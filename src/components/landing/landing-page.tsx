@@ -13,7 +13,8 @@ import { useDarkGround, useMode } from './use-mode'
 import { HERO_PHOTOS, INDUSTRY_PHOTOS, PhotoFrame, type Photo } from './photo-frame'
 import { HeatRow, ReadingLine, ReadingRail, Tick, TickReveal } from './reading'
 import {
-  TickFlip, TickRowMask, arcAspect, rowAspect, useScrubReveal, useScrubValue,
+  TickFlip, TickRowMask, arcAspect, rowAspect, useArcReveal, useScrubReveal,
+  useScrubValue,
 } from './tick-mask'
 
 /** Measured once, from the geometry, so no frame can crop its own ticks. */
@@ -123,6 +124,11 @@ function Hero() {
   const street = HERO_PHOTOS.street
   const second = HERO_PHOTOS.roundabout
   const hero = useRef<HTMLElement>(null)
+  const [shown, setShown] = useState(false)
+  /* The arc still opens aperture by aperture on first paint, waiting for the
+     photograph so the gesture is not spent on an empty frame. Swapping in the
+     flip component dropped this by accident: it had no reveal to pass. */
+  const reveal = useArcReveal({ start: shown })
   /* The turn has to finish while the arc is still on screen. Running it to the
      hero's foot looked right on paper and was invisible in practice: the arc
      sits at the top of the section, so it had left the viewport before the
@@ -156,9 +162,10 @@ function Hero() {
       {/* ── The arc, running off both edges ─────────────────────────── */}
       <div className="relative left-1/2 mt-7 w-[168%] -translate-x-1/2 sm:mt-9 sm:w-[142%] lg:w-[124%] xl:w-[112%]"
         style={{ aspectRatio: HERO_ARC_ASPECT }}>
-        <TickFlip id="hero-arc" progress={turn} className="h-full w-full"
+        <TickFlip id="hero-arc" progress={turn} reveal={reveal} className="h-full w-full"
           front={street.src ? (
             <Image src={street.src} alt={street.brief} fill priority
+              onLoad={() => setShown(true)}
               sizes="160vw" className="object-cover" />
           ) : null}
           back={second.src ? (
@@ -193,9 +200,6 @@ function Hero() {
             Watch the demo
           </a>
         </div>
-        <p className="bg-label mt-10" style={{ color: 'var(--tx-inv-2)' }}>
-          {street.slot}, 07:40
-        </p>
       </div>
     </section>
   )

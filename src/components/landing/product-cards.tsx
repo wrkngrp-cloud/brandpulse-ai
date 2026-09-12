@@ -152,14 +152,16 @@ export function ProductCards() {
   /* The section's own progress through the viewport, mapped onto scrollLeft.
      Scroll position is the value on display here, which is the one case the
      motion law allows it to drive anything. */
-  /* The window is the section's whole visible traversal: nothing from the
-     moment its top enters the bottom of the viewport, to full by the time its
-     foot is near the top. The old range started at 0.85 and finished at 0.35,
-     which left the rail motionless for the first 450px of visibility and then
-     finished it while the section was still on screen. */
+  /* The pan has to be over before the section leaves, not as it leaves.
+     Running to `end 0.2` finished the last card when the section's foot was
+     already near the top of the screen, so the rail was still moving as the
+     next section took over and you never saw it arrive. It completes at
+     `end 0.8` now: the section's foot is still four fifths of the way down
+     the viewport, so the whole run lands while the cards are in front of you
+     and the section then travels out static. */
   const { scrollYProgress } = useScroll({
     target: section,
-    offset: ['start end', 'end 0.2'],
+    offset: ['start end', 'end 0.8'],
   })
   useMotionValueEvent(scrollYProgress, 'change', v => {
     const el = rail.current
