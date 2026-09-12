@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useReducedMotion } from 'framer-motion'
+import { useEffect, useState, type RefObject } from 'react'
+import { useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion'
 import { ATOM, GEOM } from '@brand/engine.js'
 
 /**
@@ -93,15 +93,19 @@ export function tickBounds(ticks: ArcTick[]) {
  * Returned rather than drawn so the same geometry can become a mask, a set of
  * lit chips over a photograph, or both from one source of truth.
  */
-export function arcTicks(n: number, R: number, cx: number, cy: number, fill: number): ArcTick[] {
-  const [A0, A1] = GEOM.sweep
+export function arcTicks(
+  n: number, R: number, cx: number, cy: number, fill: number,
+  sweep: readonly [number, number] = GEOM.sweep,
+  growth: readonly [number, number] = GEOM.growth,
+): ArcTick[] {
+  const [A0, A1] = sweep
   const step = Math.abs(A1 - A0) / (n - 1)
   const chord = 2 * R * Math.sin((step * Math.PI) / 180 / 2)
   const D = Math.PI / 180
   return Array.from({ length: n }, (_, k) => {
     const t = k / (n - 1)
     const a = A0 + (A1 - A0) * t
-    const size = chord * fill * (GEOM.growth[0] + (GEOM.growth[1] - GEOM.growth[0]) * t)
+    const size = chord * fill * (growth[0] + (growth[1] - growth[0]) * t)
     const x = cx + Math.cos(a * D) * R
     const y = cy - Math.sin(a * D) * R
     return { t, x, y, size, transform: tickTransform(x, y, -a, size) }
@@ -120,15 +124,42 @@ export function rowTicks(n: number, W: number, H: number, fill: number): ArcTick
 }
 
 /**
+ * A segment of the sweep, not the whole horseshoe.
+ *
+ * The full 163 to 2 degrees drawn as a mask reads as a closed emblem: a
+ * horseshoe sitting in the middle of the frame with a heavy blob at the hot
+ * end. A middle segment reads as part of a much larger instrument that runs
+ * off both edges, which is what the mark actually is at any real scale.
+ *
+ * Degrees are the engine's own bearings, so this is a crop of the sweep rather
+ * than a different sweep.
+ */
+export const ARC_SEGMENT = [150, 30] as const
+
+/**
+ * The hero arc's growth range, tightened from the engine's 0.34 to 1.00.
+ *
+ * At full range the size gradient beats the curvature: the cold tail is a
+ * quarter the size of the head, so the run reads as a descending diagonal
+ * rather than an arc, and the frame has to be tall enough for the head, which
+ * leaves a lot of empty sky. From 0.58 the crescendo is still plainly there,
+ * 1.7 times from tail to head, and what you read first is the curve.
+ */
+export const ARC_GROWTH = [0.58, 1] as const
+
+/**
  * The arc's own proportion, for callers that need to reserve its frame.
  *
  * Derived from the same measurement the mask uses, so a hand-typed aspect
  * ratio can never drift out of step with the geometry and crop it again.
  */
-export const ARC_ASPECT = (() => {
-  const b = tickBounds(arcTicks(GEOM.ticks, 360, 500, 478, 1.35))
+export function arcAspect(
+  ticks = GEOM.ticks, fill = 1, sweep: readonly [number, number] = ARC_SEGMENT,
+  growth: readonly [number, number] = ARC_GROWTH,
+) {
+  const b = tickBounds(arcTicks(ticks, 360, 500, 478, fill, sweep, growth))
   return b.w / b.h
-})()
+}
 
 /** The same, for the unrolled run. */
 export function rowAspect(ticks = GEOM.ticks, fill = 1.35) {
@@ -145,8 +176,16 @@ interface MaskProps {
   className?: string
   /** Tick count. The mark's seven by default; more makes each window smaller. */
   ticks?: number
-  /** Overlap. Above 1 the hot end coalesces while the cold end stays discrete. */
+  /**
+   * Overlap. Just over 1 lets the hot neighbours touch while the cold end
+   * stands apart, which is the crescendo. Well above 1 fuses the last three
+   * into one mass, which reads as a blob rather than a reading.
+   */
   fill?: number
+  /** Which part of the engine's sweep to draw. Defaults to the mid segment. */
+  sweep?: readonly [number, number]
+  /** Tick scale at tail and head. Narrower than the engine's on wide arcs. */
+  growth?: readonly [number, number]
 }
 
 /**
@@ -156,12 +195,13 @@ interface MaskProps {
  * colour. The mask is the arc; everything outside a tick is cut away.
  */
 export function TickArcMask({
-  id, children, reveal = 1, className = '', ticks = GEOM.ticks, fill = 1.35,
+  id, children, reveal = 1, className = '', ticks = GEOM.ticks, fill = 1,
+  sweep = ARC_SEGMENT, growth = ARC_GROWTH,
 }: MaskProps) {
   // The box is fitted to the ticks, not the centre line they sit on. Hand-set
   // numbers clipped the head twice: it is the largest tick and the lowest, so
   // a box sized to the arc amputates exactly the end that carries the reading.
-  const arc = arcTicks(ticks, 360, 500, 478, fill)
+  const arc = arcTicks(ticks, 360, 500, 478, fill, sweep, growth)
   const box = tickBounds(arc)
   const W = box.w, H = box.h
   const lit = reveal * ticks
@@ -269,5 +309,36 @@ export function useArcReveal({
     }, startDelayMs)
     return () => { clearTimeout(begin); if (tick) clearInterval(tick) }
   }, [reduce, go, ticks, stepMs, startDelayMs])
+  return reduce ? 1 : lit / ticks
+}
+
+/**
+ * The arc filling as you scroll, rather than on a timer.
+ *
+ * A timed reveal is a thing that happens to you: miss the first second and the
+ * page simply looks finished. Driving it from scroll position makes the reading
+ * rise because you are moving, which is the whole metaphor, and it means the
+ * gesture cannot be missed.
+ *
+ * The count only ever rises. Scrolling back up does not un-light ticks: a
+ * needle settles, it does not flicker back and forth, and a mask that opens
+ * and shuts as you scan a page is nausea rather than motion.
+ */
+export function useScrubReveal(
+  ref: RefObject<HTMLElement | null>,
+  { ticks = GEOM.ticks, offset = ['start 0.9', 'end 0.4'] }: {
+    ticks?: number
+    /** Where in the viewport the run starts and finishes filling. */
+    offset?: (string | number)[]
+  } = {},
+) {
+  const reduce = useReducedMotion()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { scrollYProgress } = useScroll({ target: ref, offset: offset as any })
+  const [lit, setLit] = useState(0)
+  useMotionValueEvent(scrollYProgress, 'change', v => {
+    const n = Math.min(ticks, Math.round(v * ticks))
+    setLit(prev => (n > prev ? n : prev))
+  })
   return reduce ? 1 : lit / ticks
 }
