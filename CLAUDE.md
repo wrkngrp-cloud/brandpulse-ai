@@ -5,7 +5,7 @@ if you follow it, you should not need to guess how things are done here. When it
 code disagree, the code wins and this file is wrong. Fix the file.
 
 ## What this is
-Brand-intelligence SaaS for Nigerian / West African marketing teams, serving 7 verticals
+Brand-intelligence SaaS for Nigerian / West African marketing teams, serving 8 verticals
 (see `brand_type` below), not FMCG-only. It helps marketers measure brand health and
 justify spend to management.
 
@@ -67,7 +67,7 @@ Upstash Redis for cache / rate-limit / OAuth state.
 - Public endpoints (`/survey/[id]`, `/ambassador/[token]`, `/go/[slug]`) post/redirect via a
   service-role API route that validates the token/slug. NEVER open anon RLS on those tables.
 - Brands carry a `brand_type` (fmcg | fintech | venue | b2b_saas | marketplace |
-  beverage_alcohol | b2b_distribution). Any new funnel/BHI signal, nav item, or connector
+  beverage_alcohol | b2b_distribution | agency). Any new funnel/BHI signal, nav item, or connector
   recommendation MUST branch on `brand_type` (see `src/lib/industry-config.ts` and
   `src/lib/bhi.ts` `BRAND_TYPE_WEIGHTS`) instead of assuming FMCG. Check
   `docs/industry-fit-strategy.md` before adding a signal that only makes sense for one vertical.

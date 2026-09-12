@@ -65,10 +65,10 @@ export const HERO_PHOTOS: Record<string, Photo> = {
  *
  * The industry chips were seven words on an empty plane, and a word is not an
  * industry. A picture of the place the brand is judged in is: a shelf, a
- * banking hall queue, a bar at 11pm. Four of the seven already have a file
- * that genuinely fits. The other three draw the tick field with their brief
- * printed on it, which is the pattern this file exists for, so the section
- * ships now and improves the day a photograph lands.
+ * banking hall queue, a bar at 11pm. Seven of the eight have a file. Agencies
+ * draw the tick field with their brief printed on it, which is the pattern this
+ * file exists for, so the section ships now and improves the day the
+ * photograph lands.
  *
  * Keys match `brand_type` so nothing has to be mapped by hand.
  */
@@ -107,6 +107,13 @@ export const INDUSTRY_PHOTOS: Record<string, Photo> = {
     src: '/landing/photos/b2b-wholesale-load.jpg',
     slot: 'B2B distribution',
     brief: 'A three-wheeler loaded shoulder-high with wholesale crates, mid-drop. Distribution as a physical fact.',
+  },
+  agency: {
+    // Waiting on a photograph. Until one lands this draws the tick field with
+    // the brief printed on it, which is what the placeholder is for.
+    src: null,
+    slot: 'Agencies',
+    brief: 'An agency floor mid-review: work pinned up, a media plan on screen, three people arguing about one number for a client who is not in the room.',
   },
 }
 

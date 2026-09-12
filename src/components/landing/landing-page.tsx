@@ -439,7 +439,7 @@ function DeepDives() {
 }
 
 /**
- * Seven verticals, with a picture each.
+ * Eight verticals, with a picture each.
  *
  * It was seven words on an empty plane, and a word is not an industry. Picking
  * "Fintech" told you nothing about what the product would do differently. Now
@@ -456,6 +456,7 @@ function Industries() {
     { key: 'marketplace', name: 'Marketplaces', hint: 'Seller ratings, GMV attribution, buyer NPS' },
     { key: 'beverage_alcohol', name: 'Beverage & Alcohol', hint: 'Venue sightings, sponsorships, cultural moments' },
     { key: 'b2b_distribution', name: 'B2B Distribution', hint: 'Trade partner scores, field reports, coverage' },
+    { key: 'agency', name: 'Agencies', hint: 'A gauge per client brand, and the reputation that wins the next pitch' },
   ]
   const [active, setActive] = useState(0)
   const shot = INDUSTRY_PHOTOS[list[active].key]
@@ -505,7 +506,7 @@ function Industries() {
                 you move through the list: the same 90ms tick, not a crossfade. */}
             <PhotoFrame key={shot.slot} photo={shot} ratio="4 / 3"
               sizes="(max-width: 1024px) 100vw, 38vw" />
-            <p className="bg-label mt-2.5" style={{ color: 'var(--lp-mut)' }}>{shot.slot}</p>
+            {shot.src && <p className="bg-label mt-2.5" style={{ color: 'var(--lp-mut)' }}>{shot.slot}</p>}
           </Tick>
         </TickReveal>
       </div>
