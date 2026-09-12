@@ -194,7 +194,52 @@ a comment saying the animated state is written inline by the motion library.
 
 ---
 
-## 8. What stays banned, unchanged
+## 9. A tick may turn. It may not drift.
+
+**Current:** nothing covers it. The law allows a tick to light and a needle to
+travel, and says nothing about a tick changing state any other way.
+
+**What shipped:** the hero arc and the street band now turn as you scroll.
+Each aperture squashes along its own short axis to nothing and opens again on
+the other side, staggered along the run, and the photograph behind it is a
+different one when it comes back. It reads as a row of louvres, or a
+split-flap board.
+
+**Why it belongs:** this is the only motion a tick can make that is still
+mechanical. It rotates about its own centre, it never translates, tilts, scales
+overall or drifts at a rate different from the page, and it changes what you
+can see rather than how it looks. That is the line between an instrument moving
+and decoration moving, and the flip stays on the right side of it.
+
+It is also the closest thing on this page to that line, and worth saying so
+plainly rather than filing it as obviously fine.
+
+**Proposed wording:**
+
+> A tick may turn about its own centre to change what shows through it, at
+> `--d-tick` per tick with the standard stagger along the run. It may not
+> translate, tilt, skew, orbit, or move at a rate different from the page.
+>
+> A turn is reversible where a reveal is not. A reading rises and does not
+> fall, so a reveal is one-way and scanning back up must not shut it. A turn is
+> a mechanism, and a mechanism runs backwards: scrolling up turns the ticks
+> home. `useScrubReveal` is the one-way hook and `useScrubValue` the
+> reversible one, and picking the wrong one is a real bug either way.
+>
+> Two mask layers, never a crossfade. Each tick is opaque in exactly one layer
+> depending on whether it has passed its half-turn, so at any moment some
+> apertures show the first image and some the second. Dissolving the two
+> together turns both to mud and loses the hard edge that makes each window
+> read as a view of a real place.
+>
+> The turn must finish while the shape is still on screen. Driving the hero's
+> turn off the whole section's travel was correct on paper and invisible in
+> practice: the arc sits at the top of the section and had left the viewport
+> before the last tick turned.
+
+---
+
+## 10. What stays banned, unchanged
 
 Parallax. Scroll hijacking, including any sticky track that takes the scrollbar
 off the reader. Marquees and infinite logo strips. Numbers counting up. Hover

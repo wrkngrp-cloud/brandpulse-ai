@@ -187,8 +187,28 @@ moving every heading from 500 to 600 is one sweep of `<h1>`-`<h3>` and this
 table; until then 500 is the only real step below 700.
 
 800 is left on a single numeral inside an illustrative scene. If that goes, drop
-the file from `fonts.css` and the payload with it. 700 stays for buttons and
-emphasis inside body copy, which is what it is good at.
+the file from `fonts.css` and the payload with it.
+
+### What 700 is for
+
+Weight carries one job in this system and it is not hierarchy. Hierarchy is
+size, tracking and colour. Weight says **this is actionable, or this is the
+number**. So 700 is allowed in exactly three places:
+
+1. **Anything you press.** Buttons, the primary call to action, a chip that
+   toggles. A control at 500 stops reading as pressable.
+2. **A numeral that is the reading.** A score, a delta, a metric value, the
+   figure in a readout. This is the type-side of heat means value.
+3. **At most one phrase per paragraph** of body copy, where a sentence turns on
+   a specific claim. One per paragraph, and often none.
+
+And never to make a heading louder. A heading that needs more presence needs a
+bigger size, not a heavier face, and reaching for weight is how the page became
+bulky in the first place.
+
+**One marker per emphasis.** The trap is double-marking: the accent word in the
+hero is already Danfo-coloured, so setting it 700 as well says the same thing
+twice and the line goes lumpy again. Colour or weight, not both.
 
 **Mono has exactly one job: numerals.** Scores, currency, percentages, counts, timestamps, ASCII meters, code. Always `font-variant-numeric: tabular-nums` so digits do not jitter as data updates.
 

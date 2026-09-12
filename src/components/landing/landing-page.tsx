@@ -10,10 +10,10 @@ import { ProductCards } from './product-cards'
 import { AiScene, darkSceneVars, lightSceneVars } from './scenes'
 import { BrandLockup } from '@/components/brand/logo'
 import { useDarkGround, useMode } from './use-mode'
-import { HERO_PHOTOS, INDUSTRY_PHOTOS, PhotoFrame } from './photo-frame'
+import { HERO_PHOTOS, INDUSTRY_PHOTOS, PhotoFrame, type Photo } from './photo-frame'
 import { HeatRow, ReadingLine, ReadingRail, Tick, TickReveal } from './reading'
 import {
-  TickArcMask, TickRowMask, arcAspect, rowAspect, useArcReveal, useScrubReveal,
+  TickFlip, TickRowMask, arcAspect, rowAspect, useScrubReveal, useScrubValue,
 } from './tick-mask'
 
 /** Measured once, from the geometry, so no frame can crop its own ticks. */
@@ -121,18 +121,18 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
  */
 function Hero() {
   const street = HERO_PHOTOS.street
-  const band = useRef<HTMLDivElement>(null)
-  const [shown, setShown] = useState(false)
-  // Two drivers, and the higher one wins. First paint means the hero is never
-  // a half-open mask for someone who does not scroll; the scrub means someone
-  // who scrolls straight away drives the reading themselves rather than
-  // watching a timer they did not start.
-  const paint = useArcReveal({ start: shown })
-  const scrub = useScrubReveal(band, { offset: ['start start', 'end 0.35'] })
-  const reveal = Math.max(paint, scrub)
+  const second = HERO_PHOTOS.roundabout
+  const hero = useRef<HTMLElement>(null)
+  /* The turn has to finish while the arc is still on screen. Running it to the
+     hero's foot looked right on paper and was invisible in practice: the arc
+     sits at the top of the section, so it had left the viewport before the
+     last tick turned. This completes by the time the section has travelled
+     about half a screen, which is while the arc is still in view.
+     Reversible, so scrolling back turns it home again. */
+  const turn = useScrubValue(hero, { offset: ['start start', 'start -45%'] })
 
   return (
-    <section className="relative isolate overflow-hidden pb-14 pt-20 sm:pt-24" style={{ background: 'var(--bg-ink)' }}>
+    <section ref={hero} className="relative isolate overflow-hidden pb-14 pt-20 sm:pt-24" style={{ background: 'var(--bg-ink)' }}>
       {/* The mark's own material, held well behind everything. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{
         backgroundImage: 'radial-gradient(var(--tick-1) 1.4px, transparent 1.4px)',
@@ -151,18 +151,18 @@ function Hero() {
       </p>
 
       {/* ── The arc, running off both edges ─────────────────────────── */}
-      <div ref={band}
-        className="relative left-1/2 mt-7 w-[168%] -translate-x-1/2 sm:mt-9 sm:w-[142%] lg:w-[124%] xl:w-[112%]"
+      <div className="relative left-1/2 mt-7 w-[168%] -translate-x-1/2 sm:mt-9 sm:w-[142%] lg:w-[124%] xl:w-[112%]"
         style={{ aspectRatio: HERO_ARC_ASPECT }}>
-        <TickArcMask id="hero-arc" reveal={reveal} className="h-full w-full">
-          <div className="relative h-full w-full">
-            {street.src && (
-              <Image src={street.src} alt={street.brief} fill priority
-                onLoad={() => setShown(true)}
-                sizes="160vw" className="object-cover" />
-            )}
-          </div>
-        </TickArcMask>
+        <TickFlip id="hero-arc" progress={turn} className="h-full w-full"
+          front={street.src ? (
+            <Image src={street.src} alt={street.brief} fill priority
+              sizes="160vw" className="object-cover" />
+          ) : null}
+          back={second.src ? (
+            <Image src={second.src} alt={second.brief} fill
+              sizes="160vw" className="object-cover" />
+          ) : null}
+        />
       </div>
 
       {/* ── Under the crown ─────────────────────────────────────────── */}
@@ -218,14 +218,42 @@ function Hero() {
 /** Where each band shot's subject actually sits in the frame. */
 const SHOT_FOCUS: Record<string, string> = {
   'The billboard': '50% 78%',
+  'The expressway': '50% 70%',
   'The junction':  '50% 45%',
   'The market':    '50% 55%',
 }
 
+/** Three shots side by side, filling a band. */
+function Triptych({ shots }: { shots: (Photo | undefined)[] }) {
+  /* Filtered rather than indexed straight through. A mistyped key in the photo
+     registry used to reach `photo.src` on undefined and 500 the whole page,
+     which is a silly way to lose a landing page. */
+  return (
+    <div className="flex h-full w-full">
+      {shots.filter((x): x is Photo => Boolean(x)).map(photo => (
+        <div key={photo.slot} className="relative h-full flex-1">
+          {photo.src && (
+            /* Each window samples a fixed third of the band, so the crop has
+               to be aimed. Left at the default, the billboard shot gave two
+               windows of empty sky. */
+            <Image src={photo.src} alt={photo.brief} fill sizes="34vw"
+              className="object-cover" style={{ objectPosition: SHOT_FOCUS[photo.slot] ?? '50% 50%' }} />
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function StreetStrip() {
   const shots = [HERO_PHOTOS.aerial, HERO_PHOTOS.billboard, HERO_PHOTOS.roundabout]
+  const flip  = [HERO_PHOTOS.street, HERO_PHOTOS.highway, HERO_PHOTOS.aerial]
   const band = useRef<HTMLDivElement>(null)
-  const reveal = useScrubReveal(band, { ticks: 6, offset: ['start 0.92', 'end 0.55'] })
+  /* Two stages, one scroll. The band arrives by lighting its windows on the
+     way in, and once it is in view the same windows turn to the second set of
+     shots. Reversible, so scrolling back turns them home. */
+  const reveal = useScrubReveal(band, { ticks: 6, offset: ['start 0.92', 'end 0.75'] })
+  const turn   = useScrubValue(band, { offset: ['start 0.35', 'end 0.1'] })
   return (
     <section aria-label="Where the brand is judged" className="pb-8 pt-20">
       <div className="mx-auto max-w-6xl px-6">
@@ -241,20 +269,14 @@ function StreetStrip() {
       </div>
 
       <div ref={band} className="mx-auto mt-8 w-full max-w-6xl px-6" style={{ aspectRatio: ROW_ASPECT }}>
+        {/* Reveal first, then turn. The reveal mask sits over the flip and
+            gates it: a window that has not arrived yet cannot turn. */}
         <TickRowMask id="street-band" reveal={reveal} ticks={6} className="h-full w-full">
-          <div className="flex h-full w-full">
-            {shots.map(photo => (
-              <div key={photo.slot} className="relative h-full flex-1">
-                {photo.src && (
-                  /* Each window samples a fixed third of the band, so the crop
-                     has to be aimed. Left at the default, the billboard shot
-                     gave two windows of empty sky. */
-                  <Image src={photo.src} alt={photo.brief} fill sizes="34vw"
-                    className="object-cover" style={{ objectPosition: SHOT_FOCUS[photo.slot] ?? '50% 50%' }} />
-                )}
-              </div>
-            ))}
-          </div>
+          <TickFlip id="street-flip" shape="row" ticks={6} fill={1.15} progress={turn}
+            className="h-full w-full"
+            front={<Triptych shots={shots} />}
+            back={<Triptych shots={flip} />}
+          />
         </TickRowMask>
       </div>
 

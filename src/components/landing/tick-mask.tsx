@@ -348,3 +348,111 @@ export function useScrubReveal(
   })
   return reduce ? 1 : lit / ticks
 }
+
+/**
+ * Raw scroll progress through an element, 0 to 1, and reversible.
+ *
+ * `useScrubReveal` is deliberately one-way: a reading rises and does not fall,
+ * so scanning back up cannot shut its apertures. A flip is the opposite case.
+ * A tick turning back as you scroll up is the same mechanism running backwards,
+ * which is what a physical louvre does, so this one tracks the value both ways.
+ *
+ * Quantised to 120 steps. The flip only needs enough resolution to look
+ * continuous, and rounding keeps React from re-rendering a mask on every
+ * single scroll frame.
+ */
+export function useScrubValue(
+  ref: RefObject<HTMLElement | null>,
+  { offset = ['start start', 'end start'], steps = 120 }: {
+    offset?: (string | number)[]
+    steps?: number
+  } = {},
+) {
+  const reduce = useReducedMotion()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { scrollYProgress } = useScroll({ target: ref, offset: offset as any })
+  const [v, setV] = useState(0)
+  useMotionValueEvent(scrollYProgress, 'change', p => {
+    const q = Math.round(Math.max(0, Math.min(1, p)) * steps) / steps
+    setV(prev => (prev === q ? prev : q))
+  })
+  return reduce ? 0 : v
+}
+
+/** One tick mid-turn: how squashed it is, and which face is showing. */
+function flipState(i: number, n: number, g: number, dwell = 0.45) {
+  const stride = n > 1 ? (1 - dwell) / (n - 1) : 0
+  const p = Math.max(0, Math.min(1, (g - i * stride) / dwell))
+  return { scaleY: Math.abs(1 - 2 * p), back: p > 0.5 }
+}
+
+interface FlipProps {
+  id: string
+  /** What shows before the turn. */
+  front: React.ReactNode
+  /** What shows after it. */
+  back: React.ReactNode
+  /** 0 is fully front, 1 is fully back. Reversible. */
+  progress: number
+  className?: string
+  ticks?: number
+  fill?: number
+  /** 'arc' for the hero's segment, 'row' for the unrolled band. */
+  shape?: 'arc' | 'row'
+  sweep?: readonly [number, number]
+  growth?: readonly [number, number]
+}
+
+/**
+ * The ticks turn, and the picture behind them changes.
+ *
+ * Each aperture squashes along its own short axis to nothing and opens again
+ * on the other side, staggered along the run, so the arc turns the way a row
+ * of louvres or a split-flap board does. It is the one motion a tick can make
+ * that is still mechanical: it rotates about its own centre and never
+ * translates, tilts or drifts, so nothing here is parallax.
+ *
+ * Two mask layers rather than a crossfade. Each tick is drawn in both, opaque
+ * in exactly one of them depending on whether it has passed its half-turn, so
+ * at any moment some apertures show the first photograph and some show the
+ * second. A fade would dissolve the two images into mud; this keeps every
+ * window a hard-edged view of one place.
+ */
+export function TickFlip({
+  id, front, back, progress, className = '', ticks = GEOM.ticks, fill = 1,
+  shape = 'arc', sweep = ARC_SEGMENT, growth = ARC_GROWTH,
+}: FlipProps) {
+  const run = shape === 'arc'
+    ? arcTicks(ticks, 360, 500, 478, fill, sweep, growth)
+    : rowTicks(ticks, 1000, 320, fill)
+  const box = tickBounds(run)
+  const W = box.w, H = box.h
+  const layer = (face: 'a' | 'b') => (
+    <mask id={`${id}-${face}`} maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
+      {run.map((tk, i) => {
+        const { scaleY, back: showBack } = flipState(i, ticks, progress)
+        const on = face === 'b' ? showBack : !showBack
+        return (
+          <g key={i} transform={`scale(${1 / W},${1 / H}) translate(${-box.x0},${-box.y0})`}>
+            <g transform={`${tk.transform} scale(1,${Math.max(scaleY, 0.001).toFixed(4)})`}>
+              <path d={ATOM} fill="#fff" fillOpacity={on ? 1 : 0} />
+            </g>
+          </g>
+        )
+      })}
+    </mask>
+  )
+  return (
+    <div className={`relative ${className}`}>
+      <svg aria-hidden width="0" height="0" className="absolute">
+        <defs>{layer('a')}{layer('b')}</defs>
+      </svg>
+      <div style={{ mask: `url(#${id}-a)`, WebkitMask: `url(#${id}-a)` }} className="absolute inset-0">
+        {front}
+      </div>
+      <div style={{ mask: `url(#${id}-b)`, WebkitMask: `url(#${id}-b)` }} className="absolute inset-0">
+        {back}
+      </div>
+    </div>
+  )
+}
