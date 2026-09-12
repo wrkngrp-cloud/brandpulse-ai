@@ -7,6 +7,7 @@ import {
   SentimentScene, SurveyScene, clamp01, easeOut, lightSceneVars,
 } from '../../src/components/landing/scenes'
 import { rowTicks, tickBounds } from '../../src/components/landing/tick-mask'
+import { LogoUnveil, LOGO_UNVEIL_DURATION } from './LogoUnveil'
 import { ATOM } from '@brand/engine.js'
 
 export const FPS = 30
@@ -69,7 +70,7 @@ const VERTICALS: { name: string; photo: string | null }[] = [
 ]
 
 const BEATS: Beat[] = [
-  { kind: 'logo', dur: 96 },
+  { kind: 'logo', dur: 132 },
   { kind: 'place', dur: 84, word: 'KNOW', photo: 'lagos-market-crowd',
     alt: 'A Lagos market street at rush hour, the crowd the brand is being judged by.' },
   { kind: 'chapter', dur: 180, Comp: GaugeScene, headline: 'See how your brand is really performing', side: 'right' },
@@ -166,24 +167,31 @@ function Backdrop() {
   )
 }
 
+/**
+ * The opening: the logo builds itself.
+ *
+ * It used to arrive whole, at opacity 0 to 1 with a 26px lift, which is a
+ * stock title card and told you nothing about what the mark means. The arc
+ * fills, the needle sweeps up the dial and settles, and the wordmark comes
+ * through the crescendo lying flat. Same animation as the standalone cut in
+ * LogoUnveil, on the film's own ground rather than its own.
+ */
 function LogoIntro({ dur }: { dur: number }) {
   const frame = useCurrentFrame()
-  const draw = easeOut(frame / 24)
-  const word = easeOut((frame - 14) / 22)
-  const tag = easeOut((frame - 40) / 20)
+  const tag = easeOut((frame - LOGO_UNVEIL_DURATION + 26) / 20)
   const exit = interpolate(frame, [dur - OUT, dur], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
   return (
-    <AbsoluteFill className="items-center justify-center" style={{ filter: `blur(${exit * 12}px)`, opacity: 1 - exit * 0.35 }}>
-      <div style={{ opacity: draw, transform: `translateY(${(1 - word) * 26}px)` }}>
-        <Lockup height={120} />
-      </div>
+    <AbsoluteFill style={{ filter: `blur(${exit * 12}px)`, opacity: 1 - exit * 0.35 }}>
+      <LogoUnveil ground="transparent" width="46%" />
       {/* Not "built in Lagos, for West Africa". That reads as a ceiling: it
           tells a Nairobi or Accra team the product is not for them. Lagos is
           proof of how deep the language work goes, not a boundary. Same line
           the site now leads with. */}
-      <p style={{ marginTop: 34, fontFamily: 'var(--font)', fontWeight: 500, fontSize: 26, color: ASH, opacity: tag }}>
-        Brand intelligence that reads your market in its own language
-      </p>
+      <AbsoluteFill className="items-center justify-start" style={{ paddingTop: 620 }}>
+        <p style={{ fontFamily: 'var(--font)', fontWeight: 500, fontSize: 26, color: ASH, opacity: tag }}>
+          Brand intelligence that reads your market in its own language
+        </p>
+      </AbsoluteFill>
     </AbsoluteFill>
   )
 }
