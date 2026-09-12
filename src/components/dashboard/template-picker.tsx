@@ -33,7 +33,7 @@ export function TemplatePicker({ onSelect, defaultTemplateId }: Props) {
     <div className="fixed inset-0 z-[9980] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
       <div className="w-full max-w-2xl max-h-[calc(100dvh-2rem)] my-auto bg-card border rounded-2xl flex flex-col overflow-hidden">
         <div className="p-6 border-b shrink-0">
-          <h2 className="text-lg font-semibold">Set up your dashboard</h2>
+          <h2 className="text-lg font-medium">Set up your dashboard</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Choose a layout that fits how you work. You can customise it any time.
           </p>

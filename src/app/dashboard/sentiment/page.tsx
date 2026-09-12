@@ -338,7 +338,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
           <div className="flex items-center justify-between">
             <div>
               <p className="eyebrow mb-1">{rlShort} Trend</p>
-              <h3 className="text-[15px] font-semibold tracking-tight">Sentiment over time</h3>
+              <h3 className="text-[15px] font-medium tracking-tight">Sentiment over time</h3>
             </div>
             <div className="flex items-center gap-4">
               {[
@@ -413,7 +413,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
         <div className="border rounded-2xl bg-card card-shadow p-5 sm:p-6 space-y-4">
           <div>
             <p className="eyebrow mb-1">Who&apos;s talking</p>
-            <h3 className="text-[15px] font-semibold tracking-tight">Mentions by audience</h3>
+            <h3 className="text-[15px] font-medium tracking-tight">Mentions by audience</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               {audienceTotal} mention{audienceTotal === 1 ? '' : 's'} over the last 30 days
             </p>

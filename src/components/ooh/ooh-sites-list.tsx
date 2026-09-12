@@ -73,7 +73,7 @@ export function OohSitesList({ sites, appUrl, onLocateSite }: OohSitesListProps)
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-semibold">All Sites</h2>
+      <h2 className="text-sm font-medium">All Sites</h2>
       <div className="divide-y border rounded-xl overflow-hidden">
         {sites.map(site => {
           const status     = campaignStatus(site.campaign_start, site.campaign_end)

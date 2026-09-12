@@ -171,7 +171,7 @@ function Hero() {
           text="See your brand the way the street sees it."
           accent="street"
           accentStyle={{ color: 'var(--danfo)' }}
-          className="text-[2.1rem] font-bold leading-[1.05] tracking-[-0.03em] sm:text-5xl xl:text-[3.5rem]"
+          className="text-[2.1rem] font-medium leading-[1.05] tracking-[-0.03em] sm:text-5xl xl:text-[3.5rem]"
           style={{ fontFamily: 'var(--font)', color: 'var(--tx-inv)' }}
         />
         <p className="mx-auto mt-5 max-w-lg text-[15px] leading-relaxed sm:text-base" style={{ color: 'var(--tx-inv-2)' }}>
@@ -229,7 +229,7 @@ function StreetStrip() {
   return (
     <section aria-label="Where the brand is judged" className="pb-8 pt-20">
       <div className="mx-auto max-w-6xl px-6">
-        <h2 className="max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl"
+        <h2 className="max-w-2xl text-3xl font-medium leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Your spend goes out here. Your proof should come back from here.
         </h2>
@@ -279,7 +279,7 @@ function HeroFilm() {
   return (
     <section className="px-6 pb-4 pt-24">
       <div className="mx-auto max-w-6xl">
-        <h2 className="max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl"
+        <h2 className="max-w-2xl text-3xl font-medium leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
           Two minutes on a real brand.
         </h2>
@@ -326,7 +326,7 @@ function Differentiators() {
         <TickReveal className="max-w-3xl">
           <Tick as="p" className="text-[11px]" style={{ color: 'var(--tx-flare)' }}>Why BrandGauge</Tick>
           <Tick>
-            <h2 className="mt-4 text-3xl font-bold leading-[1.05] tracking-tight sm:text-5xl"
+            <h2 className="mt-4 text-3xl font-medium leading-[1.05] tracking-tight sm:text-5xl"
               style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
               Built for here. Not adapted for here.
             </h2>
@@ -341,7 +341,7 @@ function Differentiators() {
                   {d.n}
                 </Tick>
                 <Tick>
-                  <h3 className="text-[19px] font-bold leading-snug sm:text-[22px]"
+                  <h3 className="text-[19px] font-medium leading-snug sm:text-[22px]"
                     style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
                     {d.title}
                   </h3>
@@ -398,7 +398,7 @@ function DeepDives() {
           <TickReveal key={s.kicker}
             className={`flex flex-col gap-10 lg:items-center ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
             <Tick className="lg:w-[38%]">
-              <h3 className="mt-3 text-2xl font-bold leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{s.title}</h3>
+              <h3 className="mt-3 text-2xl font-medium leading-tight tracking-tight sm:text-3xl" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>{s.title}</h3>
               <p className="mt-4 text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{s.body}</p>
             </Tick>
             <Tick className="@container h-[430px] flex-1 sm:h-[360px]"><s.Comp t={1} /></Tick>
@@ -443,7 +443,7 @@ function Industries() {
 
       <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 lg:grid-cols-12 lg:gap-14">
         <TickReveal className="lg:col-span-7">
-          <Tick as="div"><h2 className="text-3xl font-bold tracking-tight sm:text-4xl"
+          <Tick as="div"><h2 className="text-3xl font-medium tracking-tight sm:text-4xl"
             style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
             A fintech and a beer brand are not the same brand.
           </h2></Tick>
@@ -494,7 +494,7 @@ function FinalCta() {
           maskImage: 'radial-gradient(70% 80% at 50% 50%, black, transparent)',
         }} />
         <TickReveal>
-        <Tick as="div"><h2 className="relative mx-auto max-w-3xl text-4xl font-bold leading-[1.05] tracking-[-0.02em] sm:text-6xl"
+        <Tick as="div"><h2 className="relative mx-auto max-w-3xl text-4xl font-medium leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
           Your brand already has a reputation. Start measuring it.
         </h2></Tick>

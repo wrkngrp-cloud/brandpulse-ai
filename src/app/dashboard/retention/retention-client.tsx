@@ -190,7 +190,7 @@ export function RetentionClient() {
           {data.signals.length > 0 && (
             <div className="rounded-xl border bg-card">
               <div className="px-5 py-4 border-b">
-                <h2 className="font-semibold text-sm">Risk signals detected</h2>
+                <h2 className="font-medium text-sm">Risk signals detected</h2>
               </div>
               <div className="divide-y">
                 {data.signals.map((sig, i) => (
@@ -215,7 +215,7 @@ export function RetentionClient() {
             <div className="rounded-xl border bg-card">
               <div className="px-5 py-4 border-b flex items-center gap-2">
                 <ThumbsDown className="h-4 w-4 text-tx-flare" />
-                <h2 className="font-semibold text-sm">Recent detractor voices</h2>
+                <h2 className="font-medium text-sm">Recent detractor voices</h2>
                 <Badge variant="secondary" className="ml-auto text-xs">{data.detractors.length}</Badge>
               </div>
               <div className="divide-y">

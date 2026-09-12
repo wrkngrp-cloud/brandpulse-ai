@@ -118,7 +118,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
       {/* Contact list preview */}
       {contacts.length > 0 && (
         <section>
-          <h2 className="text-[11px] font-bold text-muted-foreground mb-3">
+          <h2 className="text-[11px] font-medium text-muted-foreground mb-3">
             Recent contacts {totalCount > 100 && `(showing 100 of ${totalCount.toLocaleString()})`}
           </h2>
           <div className="border rounded-xl bg-card overflow-hidden divide-y">

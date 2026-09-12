@@ -42,7 +42,7 @@ export function ProfileForm({ name, email }: { name: string; email: string }) {
     <div className="space-y-8">
       {/* ── Profile info ── */}
       <section className="border rounded-xl p-5 space-y-4 bg-card">
-        <h2 className="text-sm font-semibold">Profile</h2>
+        <h2 className="text-sm font-medium">Profile</h2>
         <form action={profileAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Full name</Label>
@@ -62,7 +62,7 @@ export function ProfileForm({ name, email }: { name: string; email: string }) {
       {/* ── Change password ── */}
       <section className="border rounded-xl p-5 space-y-4 bg-card">
         <div>
-          <h2 className="text-sm font-semibold">Change password</h2>
+          <h2 className="text-sm font-medium">Change password</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Must be at least 8 characters.</p>
         </div>
         <form action={pwAction} className="space-y-4">
@@ -83,7 +83,7 @@ export function ProfileForm({ name, email }: { name: string; email: string }) {
       {/* ── Danger zone ── */}
       <section className="border border-destructive/40 rounded-xl p-5 space-y-4 bg-card">
         <div>
-          <h2 className="text-sm font-semibold text-destructive">Danger zone</h2>
+          <h2 className="text-sm font-medium text-destructive">Danger zone</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             Permanently deletes your account, brand, and all associated data. This cannot be undone.
           </p>

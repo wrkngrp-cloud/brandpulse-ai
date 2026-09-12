@@ -118,8 +118,16 @@ export function ProductCards() {
   const [ends, setEnds] = useState({ start: true, end: false })
   /* Once true, scroll stops driving the rail for the rest of the session. A
      control that keeps yanking itself back after you have moved it is worse
-     than one that never moved. */
+     than one that never moved.
+     Mirrored into state because snap has to change with it, and a ref alone
+     cannot re-render the class. */
   const taken = useRef(false)
+  const [manual, setManual] = useState(false)
+  /* The last position the scroll driver wrote. Divergence from it is how a
+     real gesture is detected. Listening for wheel and pointer events instead
+     was the bug: one vertical wheel tick with the cursor anywhere over the
+     rail counted as a horizontal pan and killed the drive on the spot. */
+  const wrote = useRef(-1)
   const reduce = useReducedMotion()
 
   /* Read from the element's own scroll, not the window's. The banned listener
@@ -144,22 +152,38 @@ export function ProductCards() {
   /* The section's own progress through the viewport, mapped onto scrollLeft.
      Scroll position is the value on display here, which is the one case the
      motion law allows it to drive anything. */
+  /* The window is the section's whole visible traversal: nothing from the
+     moment its top enters the bottom of the viewport, to full by the time its
+     foot is near the top. The old range started at 0.85 and finished at 0.35,
+     which left the rail motionless for the first 450px of visibility and then
+     finished it while the section was still on screen. */
   const { scrollYProgress } = useScroll({
     target: section,
-    offset: ['start 0.85', 'end 0.35'],
+    offset: ['start end', 'end 0.2'],
   })
   useMotionValueEvent(scrollYProgress, 'change', v => {
     const el = rail.current
     if (!el || taken.current || reduce) return
     const span = el.scrollWidth - el.clientWidth
     if (span <= 0) return
-    el.scrollLeft = Math.max(0, Math.min(span, v * span))
+    const to = Math.round(Math.max(0, Math.min(span, v * span)))
+    wrote.current = to
+    el.scrollLeft = to
   })
 
-  const takeOver = () => { taken.current = true }
+  const takeOver = () => {
+    taken.current = true
+    setManual(true)
+  }
 
   const queued = useRef(false)
   const onScroll = () => {
+    /* Any position we did not write is a person moving the rail, whatever
+       they used to do it: wheel, drag, touch, keyboard, a screen reader. That
+       is the whole detection, and it cannot mistake a vertical page scroll
+       for a horizontal pan the way an input listener did. */
+    const el = rail.current
+    if (el && !taken.current && Math.abs(el.scrollLeft - wrote.current) > 4) takeOver()
     if (queued.current) return
     queued.current = true
     requestAnimationFrame(() => { queued.current = false; measure() })
@@ -168,7 +192,7 @@ export function ProductCards() {
   const step = (dir: 1 | -1) => {
     const el = rail.current
     if (!el) return
-    taken.current = true
+    takeOver()
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: reduce ? 'auto' : 'smooth' })
   }
@@ -182,7 +206,7 @@ export function ProductCards() {
     <section ref={section} id="tour" aria-label="Product" className="scroll-mt-24 py-28" style={{ background: 'var(--lp-band)' }}>
       <div className="mx-auto max-w-6xl px-6">
         <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>Inside BrandGauge</p>
-        <h2 className="mt-3 max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl"
+        <h2 className="mt-3 max-w-2xl text-3xl font-medium leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
           This is your Monday morning.
         </h2>
@@ -197,14 +221,10 @@ export function ProductCards() {
       <div
         ref={rail}
         onScroll={onScroll}
-        onWheel={takeOver}
-        onPointerDown={takeOver}
-        onTouchStart={takeOver}
-        onKeyDown={takeOver}
         tabIndex={0}
         role="group"
         aria-label="Product screens, pan sideways"
-        className="mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-pl-6 pb-2 pl-6 pr-6 [&::-webkit-scrollbar]:hidden lg:scroll-pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))]"
+        className={`mt-12 flex gap-5 overflow-x-auto scroll-pl-6 pb-2 pl-6 pr-6 [&::-webkit-scrollbar]:hidden lg:scroll-pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] ${manual ? 'snap-x snap-mandatory' : ''}`}
         style={{ scrollbarWidth: 'none' }}
       >
         {CARDS.map(card => (
@@ -214,7 +234,7 @@ export function ProductCards() {
           >
             <ProductShotFrame shot={card.shot} className="border-b border-line-inv" />
             <div className="flex flex-1 flex-col p-6">
-              <h3 className="text-xl font-bold tracking-tight"
+              <h3 className="text-xl font-medium tracking-tight"
                 style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
                 {card.title}
               </h3>

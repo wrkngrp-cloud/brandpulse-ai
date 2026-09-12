@@ -177,7 +177,7 @@ export default function OnboardingPage() {
               <Sparkles className="h-5 w-5 text-background" />
             </div>
             <StepBadge step={1} />
-            <h1 className="text-2xl font-semibold tracking-tight">What kind of brand are you?</h1>
+            <h1 className="text-2xl font-medium tracking-tight">What kind of brand are you?</h1>
             <p className="text-sm text-muted-foreground">
               This shapes which modules, metrics and connectors we show you. You can change it any time.
             </p>
@@ -250,7 +250,7 @@ export default function OnboardingPage() {
               <Sparkles className="h-5 w-5 text-background" />
             </div>
             <StepBadge step={2} />
-            <h1 className="text-2xl font-semibold tracking-tight">Tell us who you are</h1>
+            <h1 className="text-2xl font-medium tracking-tight">Tell us who you are</h1>
             <p className="text-sm text-muted-foreground">
               We will research your brand and draft a profile for you to review in the next step.
             </p>
@@ -325,7 +325,7 @@ export default function OnboardingPage() {
           </div>
           <div className="space-y-2">
             <StepBadge step={2} />
-            <h2 className="text-lg font-semibold">Drafting a profile for {brandName}</h2>
+            <h2 className="text-lg font-medium">Drafting a profile for {brandName}</h2>
             <p className="text-sm text-muted-foreground transition-colors duration-500 min-h-[20px]">
               {LOADING_MESSAGES[msgIdx]}
             </p>
@@ -362,7 +362,7 @@ export default function OnboardingPage() {
         {/* Header */}
         <div className="text-center space-y-1.5">
           <StepBadge step={3} label="last one" />
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="text-2xl font-medium tracking-tight">
             {inferError ? 'Build your brand profile' : 'Check our suggestions'}
           </h1>
           <p className="text-sm text-muted-foreground">

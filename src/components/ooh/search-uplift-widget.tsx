@@ -67,7 +67,7 @@ export function SearchUpliftWidget({ upliftRows, siteName, siteId, brandId, tota
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center gap-2">
         <Search className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-sm font-semibold">Branded Search Uplift</h3>
+        <h3 className="text-sm font-medium">Branded Search Uplift</h3>
       </div>
 
       <p className="text-xs text-muted-foreground">

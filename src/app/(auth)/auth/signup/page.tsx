@@ -21,7 +21,7 @@ export default function SignupPage() {
           <BrandLockup height={20} />
         </div>
 
-        <h1 className="text-2xl font-bold mb-1">Create your account</h1>
+        <h1 className="text-2xl font-medium mb-1">Create your account</h1>
         <p className="text-sm text-muted-foreground mb-6">
           Start understanding your brand in Nigeria and West Africa
         </p>

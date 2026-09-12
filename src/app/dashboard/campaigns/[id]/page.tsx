@@ -140,7 +140,7 @@ export default async function CampaignDetailPage({
           <ArrowLeft className="h-3.5 w-3.5" />
           Campaigns
         </Link>
-        <h1 className="text-xl font-semibold">{campaign.name}</h1>
+        <h1 className="text-xl font-medium">{campaign.name}</h1>
         {campaign.description && (
           <p className="text-sm text-muted-foreground mt-0.5">{campaign.description}</p>
         )}

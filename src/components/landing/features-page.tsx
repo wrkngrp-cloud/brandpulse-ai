@@ -108,7 +108,7 @@ export function FeaturesPage() {
           <motion.div key={f.n} {...rise} className="flex flex-col gap-8">
             <div className="max-w-2xl">
               <span className="bg-num text-[11px]" style={{ color: 'var(--tx-flare)' }}>{f.n}</span>
-              <h2 className="mt-2 text-2xl font-bold leading-tight tracking-tight sm:text-3xl"
+              <h2 className="mt-2 text-2xl font-medium leading-tight tracking-tight sm:text-3xl"
                 style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
                 {f.title}
               </h2>

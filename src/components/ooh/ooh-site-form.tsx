@@ -482,7 +482,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
       {/* Section 1: Site Details */}
       <div className="border rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Site Details</h2>
+        <h2 className="text-sm font-medium">Site Details</h2>
 
         <div className="space-y-1.5">
           <Label htmlFor="site_name">Site name</Label>
@@ -819,7 +819,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
       {/* Section 2: Cost & Campaign */}
       <div className="border rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Cost &amp; Campaign Window</h2>
+        <h2 className="text-sm font-medium">Cost &amp; Campaign Window</h2>
 
         <div className="space-y-1.5">
           <Label htmlFor="daily_traffic">
@@ -905,7 +905,7 @@ export function OohSiteForm({ action, brandName, appUrl, customDomain, defaultVa
 
       {/* Section 3: Attribution Links */}
       <div className="border rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Attribution Links</h2>
+        <h2 className="text-sm font-medium">Attribution Links</h2>
 
         <div className="space-y-1.5">
           <Label htmlFor="landing_url">Landing page URL</Label>

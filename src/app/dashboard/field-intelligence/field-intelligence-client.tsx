@@ -162,7 +162,7 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold">Availability by area</h2>
+            <h2 className="text-sm font-medium">Availability by area</h2>
             <span className="text-xs text-muted-foreground">(lowest first)</span>
           </div>
           <div className="overflow-x-auto -mx-1 px-1">
@@ -199,7 +199,7 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <ClipboardList className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold">Recent reports</h2>
+            <h2 className="text-sm font-medium">Recent reports</h2>
           </div>
           <div className="space-y-2">
             {recentReports.map(r => {
@@ -238,7 +238,7 @@ export function FieldIntelligenceClient({ stats, areaBreakdown, recentReports, c
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-tx-2" />
-            <h2 className="text-sm font-semibold">Competitor activity</h2>
+            <h2 className="text-sm font-medium">Competitor activity</h2>
             <span className="text-xs text-muted-foreground">Last 30 days</span>
           </div>
           <div className="space-y-2">
@@ -275,7 +275,7 @@ function EmptyState() {
       </div>
 
       <div className="space-y-2 max-w-md">
-        <h2 className="text-lg font-bold">Field intelligence gives your brand a live view</h2>
+        <h2 className="text-lg font-medium">Field intelligence gives your brand a live view</h2>
         <p className="text-sm text-muted-foreground">
           Track product availability, pricing compliance, POSM placement, and competitor activity across your full distribution network — updated daily by your field team.
         </p>

@@ -226,7 +226,7 @@ export default async function PRTrackingPage({
 
           {/* Brand mention cards */}
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold">Recent Press Mentions</h2>
+            <h2 className="text-sm font-medium">Recent Press Mentions</h2>
             <div className="space-y-2">
               {brandMentions.map(mention => (
                 <div key={mention.id} className="border rounded-xl p-4 bg-card space-y-2">
@@ -275,7 +275,7 @@ export default async function PRTrackingPage({
           {/* Competitor section */}
           {competitorMentions.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold">
+              <h2 className="text-sm font-medium">
                 Competitor Mentions
                 <span className="text-xs font-normal text-muted-foreground ml-2 bg-num">{competitorMentions.length} articles</span>
               </h2>
@@ -318,7 +318,7 @@ export default async function PRTrackingPage({
           <div className="border rounded-xl p-5 bg-card space-y-3">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-primary" />
-              <h3 className="text-sm font-semibold">Press SOV Contribution</h3>
+              <h3 className="text-sm font-medium">Press SOV Contribution</h3>
             </div>
             {latestSov ? (
               <div className="flex items-center justify-between gap-4 flex-wrap">

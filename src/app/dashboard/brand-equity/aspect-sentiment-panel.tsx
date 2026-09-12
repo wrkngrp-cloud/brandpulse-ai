@@ -53,7 +53,7 @@ export function AspectSentimentPanel({ aspects, platform }: Props) {
         <div className="flex items-center gap-2">
           <MessageSquareText className="h-4 w-4 text-muted-foreground shrink-0" />
           <div>
-            <h2 className="text-sm font-semibold">Review Aspects</h2>
+            <h2 className="text-sm font-medium">Review Aspects</h2>
             <p className="text-xs text-muted-foreground">What people praise and complain about</p>
           </div>
         </div>

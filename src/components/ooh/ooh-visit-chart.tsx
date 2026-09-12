@@ -60,7 +60,7 @@ export function OohVisitChart({ visits }: OohVisitChartProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4 text-muted-foreground" />
-          <h3 className="text-sm font-semibold">Tracked visits</h3>
+          <h3 className="text-sm font-medium">Tracked visits</h3>
         </div>
         <span className="text-xs text-muted-foreground">Last 30 days</span>
       </div>

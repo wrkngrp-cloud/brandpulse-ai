@@ -44,7 +44,7 @@ export default async function NewOohSitePage({
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Add OOH Site</h1>
+        <h1 className="text-xl font-medium">Add OOH Site</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           {campaignName
             ? `Adding to campaign: ${campaignName}`

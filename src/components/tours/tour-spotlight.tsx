@@ -283,7 +283,7 @@ export function TourSpotlight({ steps, onComplete, initialStep = 0 }: TourSpotli
         </p>
 
         {/* Title */}
-        <h3 className="text-[15px] font-semibold leading-snug">
+        <h3 className="text-[15px] font-medium leading-snug">
           {step.title}
         </h3>
 

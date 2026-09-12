@@ -259,7 +259,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
         </Button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-semibold tracking-tight">{inf.name}</h1>
+            <h1 className="text-2xl font-medium tracking-tight">{inf.name}</h1>
             <StatusBadge status={inf.status} />
             {bf?.recommendation && <RecommendationBadge rec={bf.recommendation} />}
           </div>
@@ -302,7 +302,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
 
           {/* Cultural IQ + Risk */}
           <div className="border rounded-2xl p-5 bg-card space-y-4">
-            <h2 className="text-sm font-semibold">AI Scoring</h2>
+            <h2 className="text-sm font-medium">AI Scoring</h2>
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -335,7 +335,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           {/* Brand Fit */}
           {!bf && (
             <div className="border rounded-2xl p-5 bg-card space-y-3">
-              <h2 className="text-sm font-semibold">Brand Fit Analysis</h2>
+              <h2 className="text-sm font-medium">Brand Fit Analysis</h2>
               <p className="text-xs text-muted-foreground">No brand fit analysis yet.</p>
               <Button
                 size="sm"
@@ -352,7 +352,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           {bf && (
             <div className="border rounded-2xl p-5 bg-card space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold">Brand Fit Analysis</h2>
+                <h2 className="text-sm font-medium">Brand Fit Analysis</h2>
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
@@ -446,7 +446,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
 
           {/* Campaign link */}
           <div className="border rounded-2xl p-4 bg-card space-y-3">
-            <h2 className="text-xs font-semibold text-muted-foreground">Campaign</h2>
+            <h2 className="text-xs font-medium text-muted-foreground">Campaign</h2>
             {campaigns.length > 0 ? (
               <Select
                 value={inf.campaign_id ?? 'none'}
@@ -480,7 +480,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           {/* Profile info */}
           {pd && (
             <div className="border rounded-2xl p-4 bg-card space-y-4">
-              <h2 className="text-xs font-semibold text-muted-foreground">Profile</h2>
+              <h2 className="text-xs font-medium text-muted-foreground">Profile</h2>
 
               {pd.bio && (
                 <p className="text-xs leading-relaxed text-muted-foreground">{pd.bio}</p>
@@ -509,7 +509,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           {/* Audience demographics */}
           {pd?.audience_demographics && (
             <div className="border rounded-2xl p-4 bg-card space-y-3">
-              <h2 className="text-xs font-semibold text-muted-foreground">Audience</h2>
+              <h2 className="text-xs font-medium text-muted-foreground">Audience</h2>
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="space-y-0.5">
                   <p className="text-muted-foreground">Age range</p>
@@ -542,7 +542,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           {/* Online reputation */}
           {pd?.online_reputation && (
             <div className="border rounded-2xl p-4 bg-card space-y-3">
-              <h2 className="text-xs font-semibold text-muted-foreground">Online Reputation</h2>
+              <h2 className="text-xs font-medium text-muted-foreground">Online Reputation</h2>
               {pd.online_reputation.summary && (
                 <p className="text-xs text-muted-foreground">{pd.online_reputation.summary}</p>
               )}
@@ -573,7 +573,7 @@ export function InfluencerDetailClient({ influencer, initialPosts, campaigns, br
           {/* Social profiles */}
           {urls && urls.length > 0 && (
             <div className="border rounded-2xl p-4 bg-card space-y-2">
-              <h2 className="text-xs font-semibold text-muted-foreground">Social Profiles</h2>
+              <h2 className="text-xs font-medium text-muted-foreground">Social Profiles</h2>
               {urls.map(u => (
                 <div key={u.platform} className="flex items-center gap-2">
                   <PlatformIcon platform={u.platform} />

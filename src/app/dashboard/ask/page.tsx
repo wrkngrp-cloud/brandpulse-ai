@@ -300,7 +300,7 @@ function AskPageContent() {
               <div className="shrink-0 pb-4 border-b mb-4">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5" />
-                  <h1 className="text-2xl font-semibold tracking-tight">
+                  <h1 className="text-2xl font-medium tracking-tight">
                     {activeConvTitle
                       ? <span className="text-lg font-medium line-clamp-1">{activeConvTitle}</span>
                       : 'Ask AI'

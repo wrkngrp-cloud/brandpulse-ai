@@ -155,7 +155,7 @@ export function VisualMentions({ eventId, initialData, hasIgConnection, hasHasht
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold">Visual brand mentions</h2>
+          <h2 className="text-sm font-medium">Visual brand mentions</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             BrandGauge scans event hashtag photos for logos, merch, and branded materials
           </p>

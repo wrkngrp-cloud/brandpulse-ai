@@ -111,7 +111,7 @@ export function TrendChart({ data, className, height = 200, rangeLabel = '30-Day
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="eyebrow mb-1">{rangeLabel} Pulse</p>
-          <h3 className="text-[15px] font-semibold tracking-tight">Brand Signal Trend</h3>
+          <h3 className="text-[15px] font-medium tracking-tight">Brand Signal Trend</h3>
         </div>
         <Legend items={legendItems} />
       </div>

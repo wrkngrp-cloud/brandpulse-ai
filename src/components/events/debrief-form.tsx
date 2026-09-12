@@ -90,7 +90,7 @@ export function DebriefForm({ eventId, existingDebrief }: Props) {
           <CheckCircle2 className="h-7 w-7 text-pos" />
         </div>
         <div className="space-y-1">
-          <h3 className="text-base font-semibold">Debrief saved</h3>
+          <h3 className="text-base font-medium">Debrief saved</h3>
           <p className="text-sm text-muted-foreground">
             Your event debrief has been recorded and the ROI report is now generating in the background.
           </p>

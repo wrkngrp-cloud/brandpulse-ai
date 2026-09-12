@@ -320,7 +320,7 @@ function BriefingTab({
         <div className="space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-1">
-              <h2 className="text-base font-semibold">{result.title}</h2>
+              <h2 className="text-base font-medium">{result.title}</h2>
               <span className={cn('inline-flex text-xs px-2 py-0.5 rounded-sm font-medium', CONFIDENCE_STYLE[result.confidence])}>
                 {result.confidence} confidence
               </span>
@@ -458,7 +458,7 @@ function EsovLeagueTab({
   return (
     <div className="space-y-5 pt-5">
       <div>
-        <h2 className="text-sm font-semibold">Share of Voice vs Market Share</h2>
+        <h2 className="text-sm font-medium">Share of Voice vs Market Share</h2>
         <p className="text-xs text-muted-foreground mt-0.5">
           ESOV = SOV% minus market share %. Positive means you are punching above your weight.
         </p>
@@ -593,7 +593,7 @@ function SightingsTab({
     <div className="space-y-5 pt-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-sm font-semibold">Competitor Activity Feed</h2>
+          <h2 className="text-sm font-medium">Competitor Activity Feed</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Log what you spot in the field — billboards, events, campaigns.</p>
         </div>
         <Button size="sm" variant="outline" onClick={() => setShowForm(s => !s)}>
@@ -779,7 +779,7 @@ function ScorecardTab({
   return (
     <div className="space-y-5 pt-5">
       <div>
-        <h2 className="text-sm font-semibold">Side-by-side comparison</h2>
+        <h2 className="text-sm font-medium">Side-by-side comparison</h2>
         <p className="text-xs text-muted-foreground mt-0.5">
           How {brandName} measures up against your tracked competitors.
         </p>

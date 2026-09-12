@@ -14,7 +14,7 @@ export default async function FieldTeamsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-base font-semibold">Field teams</h2>
+        <h2 className="text-base font-medium">Field teams</h2>
         <p className="text-sm text-muted-foreground mt-0.5">
           Each team gets a unique link your FSOs open on their phones — no login, no app download.
         </p>

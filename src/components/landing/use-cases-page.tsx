@@ -125,7 +125,7 @@ export function UseCasesPage() {
           <motion.div key={ind.id} id={ind.id} {...rise}
             className="scroll-mt-28 rounded-2xl border p-7 sm:p-10"
             style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl"
+            <h2 className="text-2xl font-medium tracking-tight sm:text-3xl"
               style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
               {ind.name}
             </h2>
@@ -133,7 +133,7 @@ export function UseCasesPage() {
             <div className="mt-8 grid gap-6 md:grid-cols-3">
               {ind.jobs.map(job => (
                 <div key={job.title}>
-                  <h3 className="text-[15px] font-bold leading-snug" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
+                  <h3 className="text-[15px] font-medium leading-snug" style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
                     {job.title}
                   </h3>
                   <p className="mt-2 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>{job.how}</p>

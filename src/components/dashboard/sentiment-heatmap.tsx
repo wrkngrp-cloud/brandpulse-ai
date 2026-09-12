@@ -166,7 +166,7 @@ export function SentimentHeatmap({ data, className }: { data: HeatmapDay[]; clas
       <div className="flex items-start justify-between">
         <div>
           <p className="eyebrow mb-1">12-Month Sentiment Calendar</p>
-          <h3 className="text-[15px] font-semibold tracking-tight">When was your brand loved?</h3>
+          <h3 className="text-[15px] font-medium tracking-tight">When was your brand loved?</h3>
         </div>
         {pctPositive !== null && (
           <div className="hidden sm:flex items-center gap-5 text-right">

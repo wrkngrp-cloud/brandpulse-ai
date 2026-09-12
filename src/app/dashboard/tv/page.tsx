@@ -148,7 +148,7 @@ export default async function TVPage({
             <Tv className="h-7 w-7 text-tx-2" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">No TV schedules yet</h2>
+            <h2 className="text-lg font-medium">No TV schedules yet</h2>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
               Upload your agency buy plan and post-buy report to reconcile GRP delivery, reach, and CPRP across NTA, Channels TV, AIT, DSTV, and other Nigerian channels.
             </p>
@@ -195,7 +195,7 @@ export default async function TVPage({
 
           {/* Schedule table */}
           <Card className="border rounded-xl p-5 bg-card space-y-4">
-            <h2 className="text-xl font-semibold">Schedule (last {days} days)</h2>
+            <h2 className="text-xl font-medium">Schedule (last {days} days)</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>

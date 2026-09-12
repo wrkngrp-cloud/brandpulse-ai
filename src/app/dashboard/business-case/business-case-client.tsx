@@ -97,7 +97,7 @@ function SectionHead({ icon: Icon, children }: { icon: React.ElementType; childr
   return (
     <div className="flex items-center gap-2.5 mb-5">
       <Icon className="h-4.5 w-4.5 text-muted-foreground shrink-0" />
-      <h2 className="text-[12px] font-bold text-muted-foreground">{children}</h2>
+      <h2 className="text-[12px] font-medium text-muted-foreground">{children}</h2>
       <div className="flex-1 h-px bg-border/60" />
     </div>
   )

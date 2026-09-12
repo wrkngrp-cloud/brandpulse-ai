@@ -314,7 +314,7 @@ export function BusinessCaseTab() {
             <div className="h-8 w-8 rounded-lg bg-flare-wash flex items-center justify-center shrink-0">
               <FileText className="h-4 w-4 text-tx-flare" />
             </div>
-            <h2 className="text-lg font-semibold">Marketing Business Case</h2>
+            <h2 className="text-lg font-medium">Marketing Business Case</h2>
           </div>
           <p className="text-sm text-muted-foreground ml-10.5">
             Board-ready investment case applying ESOV, Aaker, Ansoff, and financial return frameworks.
@@ -414,7 +414,7 @@ export function BusinessCaseTab() {
 
           {/* Title + executive summary */}
           <div>
-            <h1 className="text-xl font-bold">{result.title}</h1>
+            <h1 className="text-xl font-medium">{result.title}</h1>
             <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{result.executive_summary}</p>
           </div>
 
@@ -689,7 +689,7 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
           <TrendingUp className="h-6 w-6 text-tx-2" />
         </div>
         <div>
-          <h2 className="text-lg font-semibold">Monthly Brand Report</h2>
+          <h2 className="text-lg font-medium">Monthly Brand Report</h2>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
             Compiles last 30 days of sentiment, content, SOV, and survey data into an executive-ready report.
             {userEmail && ` A copy will be emailed to ${userEmail}.`}
@@ -830,7 +830,7 @@ export function FunnelDiagnosticTab() {
         <Filter className="h-6 w-6 text-tx-2" />
       </div>
       <div>
-        <h2 className="text-lg font-semibold">Funnel Diagnostic</h2>
+        <h2 className="text-lg font-medium">Funnel Diagnostic</h2>
         <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
           Deep root-cause analysis of every conversion leak across your full customer journey.
           Open the Funnel page and click Diagnose to run an AI analysis.

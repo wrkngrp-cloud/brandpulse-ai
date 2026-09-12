@@ -27,7 +27,7 @@ export function OohVanityCard({ vanityLink, shortLink, qrToken, totalVisits, app
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center gap-2">
         <Link2 className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-sm font-semibold">Attribution Links</h3>
+        <h3 className="text-sm font-medium">Attribution Links</h3>
         <span className="ml-auto text-xs text-muted-foreground bg-num">
           {totalVisits.toLocaleString()} tracked visits
         </span>

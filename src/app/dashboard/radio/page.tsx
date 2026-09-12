@@ -153,7 +153,7 @@ export default async function RadioPage({
             <Radio className="h-7 w-7 text-tx-2" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">No radio schedules yet</h2>
+            <h2 className="text-lg font-medium">No radio schedules yet</h2>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
               Upload your radio buy plan from your media agency to start tracking airtime,
               reach, and CPT across Nigerian stations.
@@ -201,7 +201,7 @@ export default async function RadioPage({
 
           {/* Schedule table */}
           <Card className="border rounded-xl p-5 bg-card space-y-4">
-            <h2 className="text-xl font-semibold">Schedule (last {days} days)</h2>
+            <h2 className="text-xl font-medium">Schedule (last {days} days)</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>

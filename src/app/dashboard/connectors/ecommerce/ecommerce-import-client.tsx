@@ -106,7 +106,7 @@ export function EcommerceImportClient({ campaigns }: Props) {
 
       {/* Platform selector */}
       <div className="border rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Select platform</h2>
+        <h2 className="text-sm font-medium">Select platform</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {PLATFORMS.map(p => {
             const Icon = p.icon
@@ -135,7 +135,7 @@ export function EcommerceImportClient({ campaigns }: Props) {
 
       {/* Campaign attribution */}
       <div className="border rounded-xl p-5 space-y-3">
-        <h2 className="text-sm font-semibold">Campaign attribution <span className="text-muted-foreground font-normal">(optional)</span></h2>
+        <h2 className="text-sm font-medium">Campaign attribution <span className="text-muted-foreground font-normal">(optional)</span></h2>
         <select
           value={campaignId}
           onChange={e => setCampaignId(e.target.value)}
@@ -153,7 +153,7 @@ export function EcommerceImportClient({ campaigns }: Props) {
 
       {/* File upload */}
       <div className="border rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Upload CSV</h2>
+        <h2 className="text-sm font-medium">Upload CSV</h2>
 
         <div
           onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
@@ -217,7 +217,7 @@ export function EcommerceImportClient({ campaigns }: Props) {
             {result.imported > 0
               ? <CheckCircle className="h-5 w-5 text-pos dark:text-pos shrink-0" />
               : <AlertCircle className="h-5 w-5 text-tx-2 dark:text-tx-2 shrink-0" />}
-            <h2 className="text-sm font-semibold">Import complete</h2>
+            <h2 className="text-sm font-medium">Import complete</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

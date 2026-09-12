@@ -48,7 +48,7 @@ export function SovWidget({
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center gap-2">
         <TrendingUp className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-sm font-semibold">Social Share of Voice</h3>
+        <h3 className="text-sm font-medium">Social Share of Voice</h3>
       </div>
 
       {/* SOV gauge */}

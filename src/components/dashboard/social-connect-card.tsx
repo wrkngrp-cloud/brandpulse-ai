@@ -46,7 +46,7 @@ export function SocialConnectCard({ connections }: { connections: ConnectionStat
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold">Social accounts</h3>
+          <h3 className="text-sm font-medium">Social accounts</h3>
           <p className="text-xs text-muted-foreground mt-0.5">Connect to pull posts and metrics</p>
         </div>
         <Badge variant="outline" className="text-xs">

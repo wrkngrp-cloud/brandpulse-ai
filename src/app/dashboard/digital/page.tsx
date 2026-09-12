@@ -627,7 +627,7 @@ export default async function DigitalPage({
 
       {/* Core KPI grid */}
       <div className="space-y-2">
-        <h2 className="text-base font-semibold">Core Metrics</h2>
+        <h2 className="text-base font-medium">Core Metrics</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {kpis.map(m => (
             <Card key={m.label} className="border rounded-xl p-4 bg-card space-y-2">
@@ -648,7 +648,7 @@ export default async function DigitalPage({
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold">Campaigns</h2>
+            <h2 className="text-base font-medium">Campaigns</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
               Click any campaign to see objective-specific metrics and set performance targets
             </p>
@@ -728,7 +728,7 @@ export default async function DigitalPage({
       {/* 3-Pillar Performance Framework */}
       <div className="space-y-3">
         <div>
-          <h2 className="text-base font-semibold">Performance Framework</h2>
+          <h2 className="text-base font-medium">Performance Framework</h2>
           <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
             Three-tier view across all campaigns
             <span className="inline-block px-1.5 py-0.5 rounded bg-muted text-[10px] font-medium">Estimated</span>
@@ -759,7 +759,7 @@ export default async function DigitalPage({
       {/* Conversion Funnel */}
       <Card className="border rounded-xl p-5 bg-card space-y-4">
         <div>
-          <h2 className="text-base font-semibold">Conversion Funnel</h2>
+          <h2 className="text-base font-medium">Conversion Funnel</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             Impressions to conversions cascade across all campaigns
             {isDemo ? ' · Demo data' : ''}
@@ -772,7 +772,7 @@ export default async function DigitalPage({
       <Card className="border rounded-xl p-5 bg-card space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-base font-semibold">Creative Fatigue Monitor</h2>
+            <h2 className="text-base font-medium">Creative Fatigue Monitor</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
               Average ad frequency per platform. Above 7 signals audience fatigue and rising CPMs
               {isDemo ? ' · Demo data' : ''}
@@ -794,7 +794,7 @@ export default async function DigitalPage({
       {/* Platform Breakdown Table */}
       {platformSummaries.length > 0 && (
         <Card className="border rounded-xl p-5 bg-card space-y-4">
-          <h2 className="text-base font-semibold">Platform Breakdown</h2>
+          <h2 className="text-base font-medium">Platform Breakdown</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -842,7 +842,7 @@ export default async function DigitalPage({
       {/* Spend vs Impressions Chart */}
       <Card className="border rounded-xl p-5 bg-card space-y-3">
         <div>
-          <h2 className="text-base font-semibold">Spend vs Impressions ({days} Days)</h2>
+          <h2 className="text-base font-medium">Spend vs Impressions ({days} Days)</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             Weekly ad spend correlated with impression delivery
             {isDemo ? ' · Demo data' : ''}

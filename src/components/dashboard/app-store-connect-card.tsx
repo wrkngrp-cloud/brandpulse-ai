@@ -85,7 +85,7 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
         <div className="flex items-center gap-2.5">
           <Smartphone className="h-4 w-4 text-tx-2" />
           <div>
-            <h3 className="text-sm font-semibold">App Store Reviews</h3>
+            <h3 className="text-sm font-medium">App Store Reviews</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               Pull Apple App Store ratings and reviews weekly for sentiment analysis
             </p>

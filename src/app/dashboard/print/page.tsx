@@ -150,7 +150,7 @@ export default async function PrintPage({
             <Newspaper className="h-7 w-7 text-tx-2" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">No print placements yet</h2>
+            <h2 className="text-lg font-medium">No print placements yet</h2>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
               Upload your print media plan to start tracking readership reach, cost efficiency,
               and QR scan attribution across The Punch, Vanguard, BusinessDay, and more.
@@ -198,7 +198,7 @@ export default async function PrintPage({
 
           {/* Placements table */}
           <Card className="border rounded-xl p-5 bg-card space-y-4">
-            <h2 className="text-xl font-semibold">Placements</h2>
+            <h2 className="text-xl font-medium">Placements</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>

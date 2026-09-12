@@ -73,7 +73,7 @@ export function DeveloperHealthPanel({ github, githubPrev, npm, npmPrev, stackov
         <div className="flex items-center gap-2">
           <Code2 className="h-4 w-4 text-muted-foreground shrink-0" />
           <div>
-            <h2 className="text-sm font-semibold">Developer Health</h2>
+            <h2 className="text-sm font-medium">Developer Health</h2>
             <p className="text-xs text-muted-foreground">GitHub, npm, and Stack Overflow ecosystem signals</p>
           </div>
         </div>

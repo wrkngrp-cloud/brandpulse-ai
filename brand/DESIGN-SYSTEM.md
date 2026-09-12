@@ -166,21 +166,29 @@ stop naming the weights. Until a 600 lands, write 500 or 700 and mean it.
 
 | Role | Size | Weight | Tracking | Leading |
 |---|---|---|---|---|
-| Display | `--t-display` | 700 | -0.03em | 1.0 |
-| H1 | `--t-h1` | 700 | -0.03em | 1.05 |
-| H2 | `--t-h2` | 700 | -0.02em | 1.06 |
+| Display | `--t-display` | 500 | -0.03em | 1.0 |
+| H1 | `--t-h1` | 500 | -0.03em | 1.05 |
+| H2 | `--t-h2` | 500 | -0.02em | 1.06 |
 | H3 | 21px | 500 | -0.02em | 1.15 |
 | Body | 17px | 400 | 0 | 1.55 |
 | Small | 14px | 400 | 0 | 1.5 |
 | Micro | 12px | 500 | 0.01em | 1.45 |
 | Readout | `--t-readout` | mono 400 | -0.03em | 1.0 |
 
-**700 is the heaviest weight that ships.** 800 was the display weight and it was
-too much: at 56px with -0.03em tracking the counters close up and the line reads
-as a wall rather than a sentence. Hierarchy comes from size and tracking, which
-is where it belongs. 800 is now reserved for a single numeral inside an
-illustrative scene, and if it stops being used there it should be dropped from
-`fonts.css` and the payload with it.
+**Every heading is 500. One weight, all of them, app and marketing.** 800 was
+the display weight and it was too much: at 56px with -0.03em tracking the
+counters close up and the line reads as a wall rather than a sentence. 700 was
+better and still heavy. 500 is the step that reads clean, and hierarchy comes
+from size and tracking, which is where it belongs.
+
+600 would have been the natural heading weight and there is no file for it, so
+it renders as 700 and buys nothing. If `Nohemi-600.woff2` is ever supplied,
+moving every heading from 500 to 600 is one sweep of `<h1>`-`<h3>` and this
+table; until then 500 is the only real step below 700.
+
+800 is left on a single numeral inside an illustrative scene. If that goes, drop
+the file from `fonts.css` and the payload with it. 700 stays for buttons and
+emphasis inside body copy, which is what it is good at.
 
 **Mono has exactly one job: numerals.** Scores, currency, percentages, counts, timestamps, ASCII meters, code. Always `font-variant-numeric: tabular-nums` so digits do not jitter as data updates.
 

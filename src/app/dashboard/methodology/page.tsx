@@ -321,7 +321,7 @@ export default function MethodologyPage() {
             <div className={`${section.bg} border-b px-5 py-4 flex items-start gap-3`}>
               <Icon className={`h-5 w-5 shrink-0 mt-0.5 ${section.color}`} />
               <div>
-                <h2 className="text-base font-semibold">{section.title}</h2>
+                <h2 className="text-base font-medium">{section.title}</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">{section.subtitle}</p>
               </div>
             </div>
@@ -340,7 +340,7 @@ export default function MethodologyPage() {
       {/* Marketing Frameworks */}
       <div className="space-y-4">
         <div>
-          <h2 className="text-lg font-semibold">Marketing Frameworks Behind BrandGauge</h2>
+          <h2 className="text-lg font-medium">Marketing Frameworks Behind BrandGauge</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Every metric in BrandGauge is grounded in established academic and practitioner frameworks. Here is how we apply them — in plain terms.
           </p>

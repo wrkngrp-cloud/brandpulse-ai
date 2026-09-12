@@ -100,7 +100,7 @@ export function SectionCard({ title, children, className, badge }: {
   return (
     <div className={cn('border rounded-xl p-5 space-y-4 bg-card', className)}>
       <div className="flex items-center gap-2">
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        <h3 className="text-sm font-medium text-foreground">{title}</h3>
         {badge && (
           <span className="text-[10px] font-semibold rounded-sm border border-border bg-muted/50 text-muted-foreground px-2 py-0.5">
             {badge}

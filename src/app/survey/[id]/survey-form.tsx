@@ -67,7 +67,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
     return (
       <div className="w-full max-w-md text-center space-y-4 py-16">
         <CheckCircle2 className="h-12 w-12 text-pos mx-auto" />
-        <h2 className="text-xl font-semibold">Thank you!</h2>
+        <h2 className="text-xl font-medium">Thank you!</h2>
         <p className="text-muted-foreground text-sm">
           Your feedback helps {brandName} improve.
         </p>
@@ -104,7 +104,7 @@ export function SurveyForm({ surveyId, brandName, questions, source }: Props) {
 
       {/* Question */}
       <div className="space-y-5">
-        <h2 className="text-lg font-semibold leading-snug">{question.text}</h2>
+        <h2 className="text-lg font-medium leading-snug">{question.text}</h2>
 
         {/* ── single_choice ───────────────────────────────────────────── */}
         {question.type === 'single_choice' && question.options && (
