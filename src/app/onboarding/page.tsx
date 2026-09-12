@@ -116,7 +116,14 @@ export default function OnboardingPage() {
         body: JSON.stringify({ brandName, websiteUrl: websiteUrl || undefined }),
       })
 
-      if (!res.ok) throw new Error('inference_failed')
+      if (!res.ok) {
+        /* The reason was thrown away here, so a misconfigured environment and
+           a genuine inference failure looked identical on screen and in the
+           console. Both are worth telling apart when this is reported. */
+        const why = await res.json().catch(() => ({})) as { error?: string; detail?: string }
+        console.error('[onboarding] brand inference failed:', res.status, why.error ?? '', why.detail ?? '')
+        throw new Error(why.error ?? 'inference_failed')
+      }
       const result = await res.json() as BrandInferResult
 
       setData({
