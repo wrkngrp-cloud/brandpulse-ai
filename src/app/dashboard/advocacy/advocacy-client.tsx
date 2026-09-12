@@ -242,7 +242,7 @@ export function AdvocacyClient() {
           {promoters.flatMap(p => p.referral_codes).length > 0 ? (
             <div className="rounded-xl border bg-card overflow-hidden">
               <div className="px-5 py-4 border-b">
-                <h2 className="font-semibold text-sm">Referral code leaderboard</h2>
+                <h2 className="font-medium text-sm">Referral code leaderboard</h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm min-w-[560px]">

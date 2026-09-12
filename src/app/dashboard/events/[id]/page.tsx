@@ -129,7 +129,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         </div>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-xl font-semibold">{event.name}</h1>
+            <h1 className="text-xl font-medium">{event.name}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
               {event.city}{event.state ? `, ${event.state}` : ''}{event.date_start ? ` · ${fmtDate(event.date_start)}` : ''}
               {event.activation_type && ` · ${event.activation_type.replace(/_/g, ' ')}`}
@@ -149,7 +149,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       {/* BTL metrics panel */}
       {isBtl && (event.status === 'closed' || event.status === 'reported') && (
         <div className="border rounded-xl p-5 bg-card space-y-4">
-          <h2 className="text-sm font-semibold">BTL performance</h2>
+          <h2 className="text-sm font-medium">BTL performance</h2>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="border rounded-xl p-4 bg-muted/30 space-y-1">
               <p className="text-lg font-semibold bg-num">{fmtNGNLocal(costPerContact)}</p>
@@ -188,7 +188,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       {/* ROI report (reported status) */}
       {event.status === 'reported' && roiReport && (
         <div className="space-y-4" data-tour="event-report">
-          <h2 className="text-base font-semibold">ROI Report</h2>
+          <h2 className="text-base font-medium">ROI Report</h2>
 
           {/* Key metrics grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -268,7 +268,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         <div className="border rounded-xl p-5 bg-card space-y-4">
           <div className="flex items-center gap-2">
             <Trophy className="h-4 w-4 text-tx-2" />
-            <h2 className="text-sm font-semibold">Ambassador leaderboard</h2>
+            <h2 className="text-sm font-medium">Ambassador leaderboard</h2>
             <span className="text-xs text-muted-foreground ml-auto bg-num">
               {(interactions ?? []).length} total interactions
             </span>
@@ -308,7 +308,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       {/* Ambassador list with session links (planned + live only) */}
       {(event.status === 'planned' || event.status === 'live') && (
         <div className="border rounded-xl p-5 bg-card space-y-4">
-          <h2 className="text-sm font-semibold">Ambassador session links</h2>
+          <h2 className="text-sm font-medium">Ambassador session links</h2>
           <AmbassadorList
             eventId={id}
             ambassadors={ambassadors ?? []}
@@ -329,7 +329,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
       {/* Event info */}
       <div className="border rounded-xl p-5 bg-card space-y-3">
-        <h2 className="text-sm font-semibold">Event details</h2>
+        <h2 className="text-sm font-medium">Event details</h2>
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
           {event.venue && (
             <>

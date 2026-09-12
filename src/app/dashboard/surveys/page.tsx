@@ -103,7 +103,7 @@ async function PerceptionAuditSection() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <BarChart2 className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-base font-semibold">Perception Audit</h2>
+          <h2 className="text-base font-medium">Perception Audit</h2>
           {totalResponses > 0 && (
             <span className="text-xs bg-muted px-2 py-0.5 rounded-sm text-muted-foreground">
               {totalResponses} {totalResponses === 1 ? 'response' : 'responses'}

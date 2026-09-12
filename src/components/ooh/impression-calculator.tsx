@@ -106,7 +106,7 @@ export function ImpressionCalculator({
       <div className="border rounded-xl p-5 bg-card">
         <div className="flex items-center gap-2 mb-3">
           <Calculator className="h-4 w-4 text-muted-foreground" />
-          <h3 className="text-sm font-semibold">Impression Calculator</h3>
+          <h3 className="text-sm font-medium">Impression Calculator</h3>
         </div>
         <p className="text-sm text-muted-foreground">{noDataMsg}</p>
       </div>
@@ -117,7 +117,7 @@ export function ImpressionCalculator({
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center gap-2">
         <Calculator className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-sm font-semibold">Impression Calculator</h3>
+        <h3 className="text-sm font-medium">Impression Calculator</h3>
         <span className="text-xs text-muted-foreground ml-auto">{metrics.campaignDays}-day campaign</span>
       </div>
 

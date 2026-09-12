@@ -187,7 +187,7 @@ export function NpsClient({
         <div className="flex items-center justify-between mb-5">
           <div>
             <p className="eyebrow mb-1">12-Week Pulse</p>
-            <h3 className="text-[15px] font-semibold tracking-tight">NPS Trend</h3>
+            <h3 className="text-[15px] font-medium tracking-tight">NPS Trend</h3>
           </div>
           {hasEnoughData && (
             <Button

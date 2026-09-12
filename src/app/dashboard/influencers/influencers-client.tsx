@@ -537,7 +537,7 @@ export function InfluencersClient({ brandId, brandName, initialInfluencers, camp
           {/* Add influencer form */}
           {showForm && (
             <div className="border rounded-xl p-5 bg-card space-y-5">
-              <h2 className="text-sm font-semibold">Add influencer</h2>
+              <h2 className="text-sm font-medium">Add influencer</h2>
 
               {/* Social profile inputs */}
               <div className="space-y-3">
@@ -744,7 +744,7 @@ function CampaignsTab({
       {/* Influencer list */}
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h2 className="text-sm font-semibold">Linked to Campaigns</h2>
+          <h2 className="text-sm font-medium">Linked to Campaigns</h2>
           {uniqueCampaigns.length > 1 && (
             <div className="flex items-center gap-2">
               <Filter className="h-3.5 w-3.5 text-muted-foreground" />
@@ -816,7 +816,7 @@ function AnalysisPreview({ analysis }: { analysis: AnalysisResult }) {
   return (
     <div className="border rounded-xl p-4 bg-muted/30 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">Profile Analysis</h3>
+        <h3 className="text-sm font-medium">Profile Analysis</h3>
         {analysis.category && (
           <Badge variant="secondary" className="text-xs">{analysis.category}</Badge>
         )}

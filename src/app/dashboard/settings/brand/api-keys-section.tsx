@@ -161,7 +161,7 @@ export function ApiKeysSection() {
     <div className="rounded-xl border bg-card p-6 space-y-5">
       <div className="flex items-center gap-2">
         <Key className="w-4 h-4 text-muted-foreground" />
-        <h3 className="text-sm font-semibold">API Keys</h3>
+        <h3 className="text-sm font-medium">API Keys</h3>
         <span className="text-xs text-muted-foreground ml-1">First-party data ingestion</span>
       </div>
 

@@ -29,7 +29,7 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
           <ArrowLeft className="h-3.5 w-3.5" />
           {event.name}
         </Link>
-        <h1 className="text-xl font-semibold">Post-event debrief</h1>
+        <h1 className="text-xl font-medium">Post-event debrief</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           Capture field intelligence while it is still fresh.
         </p>

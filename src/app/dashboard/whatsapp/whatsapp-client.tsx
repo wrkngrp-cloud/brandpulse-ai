@@ -190,7 +190,7 @@ export function WhatsAppClient({ brandName, configured, stats, campaigns }: Prop
 
       {/* Campaign history */}
       <section>
-        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Campaign history</h2>
+        <h2 className="text-[11px] font-medium text-muted-foreground mb-3">Campaign history</h2>
 
         {campaigns.length === 0 ? (
           <div className="border rounded-xl p-8 bg-card text-center text-sm text-muted-foreground">

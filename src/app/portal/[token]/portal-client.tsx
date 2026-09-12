@@ -123,7 +123,7 @@ function SectionHeading({ icon: Icon, children }: { icon: React.ElementType; chi
   return (
     <div className="flex items-center gap-2.5 mb-4">
       <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-      <h2 className="text-[13px] font-bold text-muted-foreground">{children}</h2>
+      <h2 className="text-[13px] font-medium text-muted-foreground">{children}</h2>
       <div className="flex-1 h-px bg-border/60" />
     </div>
   )
@@ -245,7 +245,7 @@ export function PortalClient({ data: initialData, token }: { data: PortalData; t
 
         {/* ── Report header ──────────────────────────────────────── */}
         <div className="space-y-1">
-          <h1 className="text-[22px] sm:text-[28px] font-bold tracking-tight">{reportTitle}</h1>
+          <h1 className="text-[22px] sm:text-[28px] font-medium tracking-tight">{reportTitle}</h1>
           <p className="text-[13px] text-muted-foreground flex items-center gap-1.5">
             <Calendar className="h-3.5 w-3.5" />
             {reportPeriod}

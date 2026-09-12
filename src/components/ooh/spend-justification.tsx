@@ -61,7 +61,7 @@ export function SpendJustification({
     <div className="border rounded-xl p-5 bg-card space-y-5">
       <div className="flex items-center gap-2">
         <TrendingUp className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-sm font-semibold">Spend Justification</h3>
+        <h3 className="text-sm font-medium">Spend Justification</h3>
       </div>
 
       {/* Summary row */}

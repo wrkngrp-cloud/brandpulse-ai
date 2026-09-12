@@ -23,7 +23,7 @@ export default function PrivacyPolicyPage() {
       {/* Content */}
       <main className="max-w-3xl mx-auto px-6 py-12 space-y-10">
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight">Privacy Policy</h1>
+          <h1 className="text-3xl font-medium tracking-tight">Privacy Policy</h1>
           <p className="text-sm text-muted-foreground">Effective {EFFECTIVE_DATE}</p>
         </div>
 
@@ -155,7 +155,7 @@ export default function PrivacyPolicyPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold">{title}</h2>
+      <h2 className="text-lg font-medium">{title}</h2>
       <div className="text-muted-foreground leading-7 space-y-3">{children}</div>
     </section>
   )

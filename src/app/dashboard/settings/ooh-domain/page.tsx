@@ -23,7 +23,7 @@ export default async function OohDomainPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-base font-semibold">OOH Attribution Domain</h2>
+        <h2 className="text-base font-medium">OOH Attribution Domain</h2>
         <p className="text-sm text-muted-foreground mt-0.5">
           Choose how your OOH vanity links appear on billboards and print.
         </p>

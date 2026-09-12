@@ -45,3 +45,23 @@ export async function callAi(opts: AiCallOptions): Promise<string> {
   if (block.type !== 'text') throw new Error('Unexpected content type from Claude')
   return block.text
 }
+
+/**
+ * The `{...}` block out of a model response, parsed.
+ *
+ * A model asked for JSON will sometimes wrap it in a fence, and occasionally
+ * prefix it with a sentence however firmly the prompt forbids that. Stripping
+ * a fence and calling `JSON.parse` on the rest throws on the second case, and
+ * the throw usually lands in a bare catch that reports nothing, so the feature
+ * looks broken with no way to find out why.
+ *
+ * This takes the outermost brace pair instead, which survives both.
+ */
+export function extractJson<T>(raw: string): T {
+  const start = raw.indexOf('{')
+  const end   = raw.lastIndexOf('}')
+  if (start === -1 || end <= start) {
+    throw new Error(`No JSON object in model response: ${raw.slice(0, 200)}`)
+  }
+  return JSON.parse(raw.slice(start, end + 1)) as T
+}

@@ -145,19 +145,19 @@ export default async function ConnectorsPage() {
 
       {/* Social Listening */}
       <section data-tour="social-connectors">
-        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Social Listening</h2>
+        <h2 className="text-[11px] font-medium text-muted-foreground mb-3">Social Listening</h2>
         <SocialConnectCard connections={connections ?? []} />
       </section>
 
       {/* Analytics */}
       <section>
-        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Web Analytics</h2>
+        <h2 className="text-[11px] font-medium text-muted-foreground mb-3">Web Analytics</h2>
         <GA4ConnectCard connection={ga4Connection} />
       </section>
 
       {/* Paid Media */}
       <section data-tour="paid-connectors">
-        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Paid Media</h2>
+        <h2 className="text-[11px] font-medium text-muted-foreground mb-3">Paid Media</h2>
         <div className="space-y-3">
           <MetaAdsConnectCard account={metaAdsAccount} />
           {/* Google Ads is built (see google-ads-connect-card.tsx) but needs a
@@ -182,7 +182,7 @@ export default async function ConnectorsPage() {
 
       {/* CRM */}
       <section>
-        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">CRM</h2>
+        <h2 className="text-[11px] font-medium text-muted-foreground mb-3">CRM</h2>
         {/* HubSpot is built (see hubspot-connect-card.tsx) but needs a HubSpot
             developer app registered before it can go live — see
             docs/connector-setup-guide.md. */}
@@ -196,27 +196,27 @@ export default async function ConnectorsPage() {
 
       {/* Website Pixel */}
       <section>
-        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Website & App Tracking</h2>
+        <h2 className="text-[11px] font-medium text-muted-foreground mb-3">Website & App Tracking</h2>
         <PixelCard />
       </section>
 
       {/* Payments & Commerce — hidden for industries that are payment platforms themselves */}
       {!hidePayments && (
         <section data-tour="payments-connectors">
-          <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Payments & Commerce</h2>
+          <h2 className="text-[11px] font-medium text-muted-foreground mb-3">Payments & Commerce</h2>
           <PaymentConnectCard status={paymentStatus} appUrl={appUrl} />
         </section>
       )}
 
       {/* App Stores & Reviews */}
       <section>
-        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">App Stores & Reviews</h2>
+        <h2 className="text-[11px] font-medium text-muted-foreground mb-3">App Stores & Reviews</h2>
         <AppStoreConnectCard config={appStoreConfig} />
       </section>
 
       {/* Email Marketing */}
       <section>
-        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">Email Marketing</h2>
+        <h2 className="text-[11px] font-medium text-muted-foreground mb-3">Email Marketing</h2>
         <EmailConnectCard status={emailStatus} />
       </section>
 
@@ -224,7 +224,7 @@ export default async function ConnectorsPage() {
 
       {/* E-commerce */}
       <section>
-        <h2 className="text-[11px] font-bold text-muted-foreground mb-3">E-commerce Sales</h2>
+        <h2 className="text-[11px] font-medium text-muted-foreground mb-3">E-commerce Sales</h2>
         <div className="border rounded-xl p-5 bg-card space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex items-start gap-3">

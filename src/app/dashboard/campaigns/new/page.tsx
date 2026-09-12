@@ -14,7 +14,7 @@ export default function NewCampaignPage() {
           <ArrowLeft className="h-3.5 w-3.5" />
           Campaigns
         </Link>
-        <h1 className="text-xl font-semibold">Create campaign</h1>
+        <h1 className="text-xl font-medium">Create campaign</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           Define your campaign brief and select the media channels it will run across.
         </p>

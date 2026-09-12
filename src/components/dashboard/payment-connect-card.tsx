@@ -63,7 +63,7 @@ function PaymentProviderCard({
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold">{label}</h3>
+          <h3 className="text-sm font-medium">{label}</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             Capture payments as funnel signals (Action stage)
           </p>
@@ -170,7 +170,7 @@ export function PaymentConnectCard({
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-sm font-semibold">Payment connectors</h3>
+        <h3 className="text-sm font-medium">Payment connectors</h3>
         <p className="text-xs text-muted-foreground mt-0.5">
           Every successful payment is logged as an Action-stage funnel signal. Repeat purchases push the customer toward the Loyalty stage.
         </p>

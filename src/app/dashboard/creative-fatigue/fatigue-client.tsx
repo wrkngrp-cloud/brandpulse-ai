@@ -65,7 +65,7 @@ function AssetCard({ asset }: { asset: FatiguedAsset }) {
             {asset.platform && <Badge variant="secondary" className="text-xs">{formatPlatformLabel(asset.platform)}</Badge>}
             {asset.fit_for_ads && <Badge className="text-xs bg-pos text-tx-inv hover:bg-pos">Fit for Ads</Badge>}
           </div>
-          <h3 className="font-semibold text-sm truncate">{asset.title}</h3>
+          <h3 className="font-medium text-sm truncate">{asset.title}</h3>
           {asset.description && (
             <p className="text-xs text-muted-foreground line-clamp-2">{asset.description}</p>
           )}
@@ -174,7 +174,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
         <div className="space-y-8">
           {critical.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-tx-flare flex items-center gap-2">
+              <h2 className="text-sm font-medium text-tx-flare flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" /> Critical — Pause or Replace Now
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -185,7 +185,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
 
           {watch.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-tx-2 flex items-center gap-2">
+              <h2 className="text-sm font-medium text-tx-2 flex items-center gap-2">
                 <Eye className="h-4 w-4" /> Watch — Plan Refresh This Week
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -196,7 +196,7 @@ export function FatigueClient({ brandName, assets, totalActive }: Props) {
 
           {refresh.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-semibold text-tx-flare flex items-center gap-2">
+              <h2 className="text-sm font-medium text-tx-flare flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" /> Refresh Soon — Schedule Within 2 Weeks
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">

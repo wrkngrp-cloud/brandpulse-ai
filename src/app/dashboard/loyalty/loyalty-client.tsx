@@ -275,7 +275,7 @@ export function LoyaltyClient() {
           ) : (
             <div className="rounded-xl border overflow-hidden">
               <div className="px-5 py-3 border-b bg-muted/30">
-                <h2 className="text-sm font-semibold">Top members by lifetime points</h2>
+                <h2 className="text-sm font-medium">Top members by lifetime points</h2>
               </div>
               <div className="divide-y">
                 {members.slice(0, 20).map((m, i) => (
@@ -330,7 +330,7 @@ function ProgramCard({ program }: { program: LoyaltyProgram }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold">{program.name}</h3>
+            <h3 className="font-medium">{program.name}</h3>
             <Badge variant={program.status === 'active' ? 'default' : 'secondary'} className="text-xs capitalize">{program.status}</Badge>
           </div>
           {program.description && <p className="text-sm text-muted-foreground mt-0.5">{program.description}</p>}

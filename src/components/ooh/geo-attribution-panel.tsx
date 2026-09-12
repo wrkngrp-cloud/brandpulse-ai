@@ -143,7 +143,7 @@ export function GeoAttributionPanel({
 
       {/* Geo Attribution Header */}
       <div>
-        <h2 className="text-lg font-semibold flex items-center gap-2">
+        <h2 className="text-lg font-medium flex items-center gap-2">
           <MapPin className="h-5 w-5 text-brand" />
           Geo Attribution
         </h2>
@@ -180,7 +180,7 @@ export function GeoAttributionPanel({
         <div className="grid sm:grid-cols-2 gap-6">
           {/* Visits by city */}
           <Card className="p-5 space-y-4">
-            <h3 className="text-sm font-semibold flex items-center gap-2">
+            <h3 className="text-sm font-medium flex items-center gap-2">
               <MapPin className="h-4 w-4" /> Visits by Area
             </h3>
             {byCity.length === 0 ? (
@@ -198,7 +198,7 @@ export function GeoAttributionPanel({
 
           {/* Attribution method breakdown */}
           <Card className="p-5 space-y-4">
-            <h3 className="text-sm font-semibold flex items-center gap-2">
+            <h3 className="text-sm font-medium flex items-center gap-2">
               <TrendingUp className="h-4 w-4" /> Attribution Method
             </h3>
             {byMethod.map(([method, count]) => {
@@ -229,7 +229,7 @@ export function GeoAttributionPanel({
       {/* Recent geo visits */}
       {geoVisits.length > 0 && (
         <Card className="p-5 space-y-3">
-          <h3 className="text-sm font-semibold">Recent Attributed Visits</h3>
+          <h3 className="text-sm font-medium">Recent Attributed Visits</h3>
           <div className="divide-y">
             {geoVisits.slice(0, 10).map(v => (
               <div key={v.id} className="flex items-center justify-between py-2.5 gap-3">
@@ -259,7 +259,7 @@ export function GeoAttributionPanel({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold flex items-center gap-2">
+            <h2 className="text-lg font-medium flex items-center gap-2">
               <Target className="h-5 w-5 text-brand" />
               Geo-Retargeting Audiences
             </h2>
@@ -289,7 +289,7 @@ export function GeoAttributionPanel({
         {/* New audience form */}
         {showNewAudience && (
           <Card className="p-5 space-y-4 border-dashed">
-            <h3 className="text-sm font-semibold">Configure Audience</h3>
+            <h3 className="text-sm font-medium">Configure Audience</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs">Audience name</Label>

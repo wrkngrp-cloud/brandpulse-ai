@@ -60,6 +60,61 @@ export const HERO_PHOTOS: Record<string, Photo> = {
   },
 }
 
+/**
+ * One shot per vertical, for the industries section.
+ *
+ * The industry chips were seven words on an empty plane, and a word is not an
+ * industry. A picture of the place the brand is judged in is: a shelf, a
+ * banking hall queue, a bar at 11pm. All eight have a file. A slot without one
+ * draws the tick field with its brief printed on it instead of a broken image,
+ * which is what lets a new vertical ship the day it is added rather than the
+ * day its photograph arrives.
+ *
+ * Keys match `brand_type` so nothing has to be mapped by hand.
+ */
+export const INDUSTRY_PHOTOS: Record<string, Photo> = {
+  fmcg: {
+    src: '/landing/photos/fmcg-provision-store.jpg',
+    slot: 'FMCG',
+    brief: 'A roadside provision store stacked with crates of drinks, where shelf space is the whole battle.',
+  },
+  fintech: {
+    src: '/landing/photos/fintech-pos-payment.jpg',
+    slot: 'Fintech',
+    brief: 'A card going into a POS terminal at a counter, hands and screen in frame. Trust, at the moment it is decided.',
+  },
+  venue: {
+    src: '/landing/photos/venue-national-theatre.jpg',
+    slot: 'Venues and restaurants',
+    brief: 'The National Theatre at Iganmu from the forecourt. A place people make a journey for, and the reason footfall is the number.',
+  },
+  b2b_saas: {
+    src: '/landing/photos/b2b-saas-meeting.jpg',
+    slot: 'B2B SaaS',
+    brief: 'Two people across a table with a laptop of charts and a printed report between them. The deal being argued, not the software.',
+  },
+  marketplace: {
+    src: '/landing/photos/marketplace-storefront.jpg',
+    slot: 'Marketplaces',
+    brief: 'A marketplace open on a laptop, card in hand, mid-checkout. Thousands of small transactions, one at a time.',
+  },
+  beverage_alcohol: {
+    src: '/landing/photos/beverage-bar-counter.jpg',
+    slot: 'Beverage and alcohol',
+    brief: 'A bar counter at service, spirits shelf and glassware behind, stools waiting. Where the brand is chosen out loud.',
+  },
+  b2b_distribution: {
+    src: '/landing/photos/b2b-wholesale-load.jpg',
+    slot: 'B2B distribution',
+    brief: 'A three-wheeler loaded shoulder-high with wholesale crates, mid-drop. Distribution as a physical fact.',
+  },
+  agency: {
+    src: '/landing/photos/agency-floor.jpg',
+    slot: 'Agencies',
+    brief: 'An agency campaign review at the whiteboard: media mix, target cities and engagement rates for a client who is not in the room.',
+  },
+}
+
 export function PhotoFrame({
   photo, className = '', ratio = '4 / 5', priority = false, sizes = '(max-width: 768px) 100vw, 40vw',
 }: {

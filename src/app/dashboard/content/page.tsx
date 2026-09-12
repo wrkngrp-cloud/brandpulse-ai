@@ -119,7 +119,7 @@ async function ContentData({ days }: { days: number }) {
       {/* Content Performance table */}
       <div className="space-y-3">
         <div>
-          <h2 className="text-base font-semibold">Content Performance</h2>
+          <h2 className="text-base font-medium">Content Performance</h2>
           <p className="text-sm text-muted-foreground">
             {rangeLabelLong(days).charAt(0).toUpperCase() + rangeLabelLong(days).slice(1)} · syncs nightly at 3 AM Lagos time
           </p>

@@ -144,16 +144,71 @@ glyph or a label as well.
 
 Nohemi only, plus a mono for numerals.
 
+### Four weights exist. Only four.
+
+`brand/fonts.css` loads Nohemi at **400, 500, 700 and 800**, and Disket Mono at
+**400 and 700**. Nothing else is supplied, so nothing else can be specified.
+Asking for a weight that has no file does not fail loudly, it silently resolves
+to a neighbour, which is how this table came to name three weights that never
+rendered. Measured in the browser at 64px:
+
+| Asked for | Renders as | Evidence |
+|---|---|---|
+| 600 semibold | **700** | identical width to 700, 469.59px |
+| 900 black | **800** | identical width to 800, 473.22px |
+| mono 500 | 400 | no 500 file for Disket |
+
+So `font-semibold` and `font-bold` are the same thing across this product, and
+`font-black` and `font-extrabold` are the same thing. Either supply the files or
+stop naming the weights. Until a 600 lands, write 500 or 700 and mean it.
+
+### The table, as it actually is
+
 | Role | Size | Weight | Tracking | Leading |
 |---|---|---|---|---|
-| Display | `--t-display` | 800 | -0.035em | 0.94 |
-| H1 | `--t-h1` | 800 | -0.03em | 1.0 |
-| H2 | `--t-h2` | 700 | -0.02em | 1.06 |
-| H3 | 21px | 600 | -0.02em | 1.15 |
+| Display | `--t-display` | 500 | -0.03em | 1.0 |
+| H1 | `--t-h1` | 500 | -0.03em | 1.05 |
+| H2 | `--t-h2` | 500 | -0.02em | 1.06 |
+| H3 | 21px | 500 | -0.02em | 1.15 |
 | Body | 17px | 400 | 0 | 1.55 |
 | Small | 14px | 400 | 0 | 1.5 |
 | Micro | 12px | 500 | 0.01em | 1.45 |
-| Readout | `--t-readout` | mono 500 | -0.03em | 1.0 |
+| Readout | `--t-readout` | mono 400 | -0.03em | 1.0 |
+
+**Every heading is 500. One weight, all of them, app and marketing.** 800 was
+the display weight and it was too much: at 56px with -0.03em tracking the
+counters close up and the line reads as a wall rather than a sentence. 700 was
+better and still heavy. 500 is the step that reads clean, and hierarchy comes
+from size and tracking, which is where it belongs.
+
+600 would have been the natural heading weight and there is no file for it, so
+it renders as 700 and buys nothing. If `Nohemi-600.woff2` is ever supplied,
+moving every heading from 500 to 600 is one sweep of `<h1>`-`<h3>` and this
+table; until then 500 is the only real step below 700.
+
+800 is left on a single numeral inside an illustrative scene. If that goes, drop
+the file from `fonts.css` and the payload with it.
+
+### What 700 is for
+
+Weight carries one job in this system and it is not hierarchy. Hierarchy is
+size, tracking and colour. Weight says **this is actionable, or this is the
+number**. So 700 is allowed in exactly three places:
+
+1. **Anything you press.** Buttons, the primary call to action, a chip that
+   toggles. A control at 500 stops reading as pressable.
+2. **A numeral that is the reading.** A score, a delta, a metric value, the
+   figure in a readout. This is the type-side of heat means value.
+3. **At most one phrase per paragraph** of body copy, where a sentence turns on
+   a specific claim. One per paragraph, and often none.
+
+And never to make a heading louder. A heading that needs more presence needs a
+bigger size, not a heavier face, and reaching for weight is how the page became
+bulky in the first place.
+
+**One marker per emphasis.** The trap is double-marking: the accent word in the
+hero is already Danfo-coloured, so setting it 700 as well says the same thing
+twice and the line goes lumpy again. Colour or weight, not both.
 
 **Mono has exactly one job: numerals.** Scores, currency, percentages, counts, timestamps, ASCII meters, code. Always `font-variant-numeric: tabular-nums` so digits do not jitter as data updates.
 

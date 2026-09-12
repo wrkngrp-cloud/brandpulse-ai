@@ -44,7 +44,7 @@ export default async function EditOohSitePage({
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div>
-          <h1 className="text-xl font-semibold">Edit Site</h1>
+          <h1 className="text-xl font-medium">Edit Site</h1>
           <p className="text-sm text-muted-foreground mt-0.5">{site.site_name}</p>
         </div>
       </div>

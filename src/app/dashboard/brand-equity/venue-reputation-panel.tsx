@@ -93,7 +93,7 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
       <div className="rounded-xl border bg-card p-5 space-y-2">
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-          <h2 className="text-sm font-semibold">Venue Reputation</h2>
+          <h2 className="text-sm font-medium">Venue Reputation</h2>
         </div>
         <p className="text-sm text-muted-foreground">
           Add your Google Place ID in Brand Settings to track your venue reputation — star
@@ -118,7 +118,7 @@ export function VenueReputationPanel({ snapshot, hasPlaceId }: Props) {
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
           <div>
-            <h2 className="text-sm font-semibold">Venue Reputation</h2>
+            <h2 className="text-sm font-medium">Venue Reputation</h2>
             <p className="text-xs text-muted-foreground">Google Maps star rating and review velocity</p>
           </div>
         </div>

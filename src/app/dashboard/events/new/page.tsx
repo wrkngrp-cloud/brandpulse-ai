@@ -35,7 +35,7 @@ export default async function NewEventPage({
           <ArrowLeft className="h-3.5 w-3.5" />
           {campaignName ? campaignName : 'Events'}
         </Link>
-        <h1 className="text-xl font-semibold">Create event</h1>
+        <h1 className="text-xl font-medium">Create event</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           {campaignName
             ? `This event will be linked to campaign "${campaignName}".`

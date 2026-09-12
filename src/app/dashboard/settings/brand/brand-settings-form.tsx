@@ -13,11 +13,11 @@ import { ExportIcon as Upload, XIcon as X, ImageIcon, ArrowRightIcon as ArrowRig
 import { Working as Loader2 } from '@/components/brand/working'
 import { AskIcon as Sparkles } from '@/components/brand/icon'
 import Link from 'next/link'
-import { ShelfIcon, CardIcon, VenueIcon, SaasIcon, MarketIcon, BottleIcon, TruckIcon } from '@/components/brand/icon'
+import { ShelfIcon, CardIcon, VenueIcon, SaasIcon, MarketIcon, BottleIcon, TruckIcon, CreativeIcon } from '@/components/brand/icon'
 
 type CulturalKey = 'community_corporate' | 'traditional_modern' | 'religious_secular' | 'mass_premium' | 'local_global'
 
-// The seven verticals, and the seven glyphs the icon set draws for them.
+// The eight verticals, and the eight glyphs the icon set draws for them.
 const BRAND_TYPES: { value: BrandSettingsData['brandType']; label: string; description: string;
                      icon: React.ComponentType<{ className?: string }> }[] = [
   { value: 'fmcg',              label: 'FMCG / Consumer Goods', description: 'Physical products sold through retail or direct', icon: ShelfIcon },
@@ -27,6 +27,7 @@ const BRAND_TYPES: { value: BrandSettingsData['brandType']; label: string; descr
   { value: 'marketplace',       label: 'Creator Marketplace', description: 'Platforms for creators to sell or build on', icon: MarketIcon },
   { value: 'beverage_alcohol',  label: 'Alcohol / Beverage', description: 'Regulated consumer beverages', icon: BottleIcon },
   { value: 'b2b_distribution',  label: 'B2B Distribution', description: 'Trade and supply chain platforms', icon: TruckIcon },
+  { value: 'agency',            label: 'Marketing Agency', description: 'Agencies running brand and media work for client brands', icon: CreativeIcon },
 ]
 
 interface BrandSettingsFormProps {

@@ -14,7 +14,7 @@ export default async function CompetitorsSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-base font-semibold">Tracked competitors</h2>
+        <h2 className="text-base font-medium">Tracked competitors</h2>
         <p className="text-sm text-muted-foreground mt-0.5">
           Competitors you add here appear in your Competitive Intelligence briefings and Share of Voice calculations.
         </p>

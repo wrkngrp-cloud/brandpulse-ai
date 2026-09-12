@@ -20,5 +20,10 @@ Config.overrideWebpackConfig((c) => {
     },
   }
 })
+/* The film serves the app's own public folder rather than a second copy of
+   the logo, the fonts and the maps. The duplicate under video/public had
+   already started to drift, and the photography the film now uses lives with
+   the site. One folder, one source of truth. */
+Config.setPublicDir(path.join(repo, 'public'))
 Config.setVideoImageFormat('png')
 Config.setOverwriteOutput(true)

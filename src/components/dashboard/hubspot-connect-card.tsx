@@ -83,7 +83,7 @@ export function HubSpotConnectCard({ connection: initialConnection }: HubSpotCon
         <div className="flex items-center gap-2.5">
           <HubSpotIcon className="h-4 w-4" />
           <div>
-            <h3 className="text-sm font-semibold">HubSpot</h3>
+            <h3 className="text-sm font-medium">HubSpot</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               Read your marketing qualified lead count from HubSpot contact lifecycle stages
             </p>

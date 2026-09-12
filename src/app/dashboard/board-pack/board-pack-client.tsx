@@ -290,7 +290,7 @@ export function BoardPackClient({
                   {initials(brand.name)}
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-lg font-bold text-tx">{brand.name}</h2>
+                  <h2 className="text-lg font-medium text-tx">{brand.name}</h2>
                   <p className="text-sm text-tx-3">
                     Marketing Performance Report{brand.category ? ` · ${brand.category}` : ''}
                   </p>

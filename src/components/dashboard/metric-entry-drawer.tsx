@@ -68,7 +68,7 @@ export function MetricEntryDrawer({ industry, onClose, onSaved }: Props) {
       >
         <div className="flex items-center justify-between px-5 py-4 border-b">
           <div>
-            <h2 className="text-sm font-semibold">Enter marketing data</h2>
+            <h2 className="text-sm font-medium">Enter marketing data</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
               {today.toLocaleString('en-NG', { month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}
             </p>

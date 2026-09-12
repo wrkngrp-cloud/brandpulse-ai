@@ -93,7 +93,7 @@ export default function DraftsPage() {
             <ArrowLeft className="h-3.5 w-3.5" />
           </Link>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">Ad Drafts</h1>
+            <h1 className="text-xl font-medium tracking-tight">Ad Drafts</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
               Saved ad drafts. Connect your ad account to publish directly from here.
             </p>

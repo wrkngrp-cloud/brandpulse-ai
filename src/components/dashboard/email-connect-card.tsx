@@ -179,7 +179,7 @@ export function EmailConnectCard({ status: initialStatus }: EmailConnectCardProp
   return (
     <div className="border rounded-xl p-5 bg-card space-y-4">
       <div>
-        <h3 className="text-sm font-semibold">Email Marketing</h3>
+        <h3 className="text-sm font-medium">Email Marketing</h3>
         <p className="text-xs text-muted-foreground mt-0.5">
           Connect Mailchimp or Brevo to pull open rates and click rates as Loyalty signals in the Brand Funnel.
           Campaign metrics sync daily at 7 AM Lagos time.

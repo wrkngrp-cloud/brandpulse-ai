@@ -389,7 +389,7 @@ export function CampaignDetailClient({
         </Link>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-xl font-semibold truncate">{campaignName}</h1>
+            <h1 className="text-xl font-medium truncate">{campaignName}</h1>
             <Badge variant="secondary" className="text-[10px] shrink-0">{platformLabel(platform)}</Badge>
             {objective && (
               <Badge variant="outline" className="text-[10px] shrink-0 capitalize">
@@ -427,7 +427,7 @@ export function CampaignDetailClient({
       {/* Spend sparkline */}
       <Card className="border rounded-xl p-5 space-y-3">
         <div>
-          <h2 className="text-sm font-semibold">Daily Spend</h2>
+          <h2 className="text-sm font-medium">Daily Spend</h2>
           <p className="text-xs text-muted-foreground bg-num">Total: {fmtNGN(agg.totalSpend)}</p>
         </div>
         <div className="flex items-end gap-0.5 h-20">
@@ -444,7 +444,7 @@ export function CampaignDetailClient({
 
       {/* All metrics — expandable */}
       <Card className="border rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold flex items-center gap-2">
+        <h2 className="text-sm font-medium flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-tx-2" />
           All Metrics
         </h2>
@@ -478,7 +478,7 @@ export function CampaignDetailClient({
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Target className="h-4 w-4 text-tx-2" />
-            <h2 className="text-sm font-semibold">Performance Targets</h2>
+            <h2 className="text-sm font-medium">Performance Targets</h2>
           </div>
           <AddTargetForm
             campaignId={campaignId}

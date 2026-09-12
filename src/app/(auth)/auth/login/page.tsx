@@ -133,7 +133,7 @@ function LoginContent() {
             <BrandLockup height={22} ground="ink" />
           </div>
 
-          <h2 className="text-[28px] font-bold leading-tight mb-4">
+          <h2 className="text-[28px] font-medium leading-tight mb-4">
             Intelligence for Nigerian marketing teams
           </h2>
           <p className="mb-8 text-[14px] leading-relaxed text-tx-inv-2">
@@ -173,7 +173,7 @@ function LoginContent() {
               <BrandLockup height={20} />
             </div>
 
-            <h1 className="text-2xl font-bold mb-1">Welcome back</h1>
+            <h1 className="text-2xl font-medium mb-1">Welcome back</h1>
             <p className="text-sm text-muted-foreground mb-6">Sign in to your workspace</p>
 
             <GoogleSignInButton />
@@ -253,7 +253,7 @@ function LoginContent() {
           {/* Demo accounts */}
           <div className="flex-1 max-w-sm">
             <div className="mb-4">
-              <h3 className="text-sm font-semibold">Try a live demo</h3>
+              <h3 className="text-sm font-medium">Try a live demo</h3>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Click any demo to pre-fill credentials, then sign in.
               </p>

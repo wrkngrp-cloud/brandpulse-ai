@@ -253,7 +253,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
           <Check className="h-6 w-6 text-foreground" />
         </div>
         <div>
-          <h2 className="text-base font-semibold">Activation created</h2>
+          <h2 className="text-base font-medium">Activation created</h2>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-sm mx-auto">
             Your ambassador session links are ready. Head to the event to set up your team and go live when you are ready.
           </p>
@@ -306,7 +306,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
         {/* Step 0: Basics */}
         {logical === 0 && (
           <>
-            <h2 className="font-semibold text-sm">Activation basics</h2>
+            <h2 className="font-medium text-sm">Activation basics</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2 space-y-2">
                 <Label htmlFor="name">Activation name *</Label>
@@ -426,7 +426,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
         {/* Step 1: BTL Details (only shown for non-event activations) */}
         {logical === 1 && isBtl && (
           <>
-            <h2 className="font-semibold text-sm">BTL specifics</h2>
+            <h2 className="font-medium text-sm">BTL specifics</h2>
             <p className="text-xs text-muted-foreground">
               These numbers feed your cost-per-contact and sample conversion metrics.
             </p>
@@ -484,7 +484,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
         {/* Goals step */}
         {logical === 2 && (
           <>
-            <h2 className="font-semibold text-sm">Activation objectives</h2>
+            <h2 className="font-medium text-sm">Activation objectives</h2>
             <p className="text-xs text-muted-foreground">
               What do you want this activation to achieve? Select all that apply.
             </p>
@@ -530,7 +530,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
         {/* KPI Targets step */}
         {logical === 3 && (
           <>
-            <h2 className="font-semibold text-sm">KPI targets</h2>
+            <h2 className="font-medium text-sm">KPI targets</h2>
             <p className="text-xs text-muted-foreground">
               {objs.size > 0
                 ? `Showing targets relevant to: ${data.objectives.join(', ')}.`
@@ -597,7 +597,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
         {/* Budget step */}
         {logical === 4 && (
           <>
-            <h2 className="font-semibold text-sm">Budget</h2>
+            <h2 className="font-medium text-sm">Budget</h2>
             {isBtl && (
               <p className="text-xs text-muted-foreground">
                 If you entered a spend breakdown, the total will be used as your budget. You can override it here.
@@ -637,7 +637,7 @@ export function EventWizard({ campaignId }: { campaignId?: string | null }) {
         {/* Team step */}
         {logical === 5 && (
           <>
-            <h2 className="font-semibold text-sm">Brand ambassadors</h2>
+            <h2 className="font-medium text-sm">Brand ambassadors</h2>
             <p className="text-xs text-muted-foreground">Add your field team. Each ambassador gets a private session link for the PWA.</p>
             <div className="space-y-3">
               {data.ambassadors.map((amb, i) => (

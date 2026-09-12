@@ -95,7 +95,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
         <div className="flex items-center gap-2.5">
           <BarChart3 className="h-4 w-4 text-tx-2" />
           <div>
-            <h3 className="text-sm font-semibold">Google Analytics 4</h3>
+            <h3 className="text-sm font-medium">Google Analytics 4</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               Pull sessions, active users and conversions from your GA4 property
             </p>

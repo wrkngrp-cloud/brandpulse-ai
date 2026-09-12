@@ -79,7 +79,7 @@ const brandSchema = z.object({
   npmPackageName:     z.string().optional().default(''),
   stackoverflowTag:   z.string().optional().default(''),
   category:           z.string().min(1, 'Category is required'),
-  brandType:          z.enum(['fmcg','fintech','venue','b2b_saas','marketplace','beverage_alcohol','b2b_distribution']).default('fmcg'),
+  brandType:          z.enum(['fmcg','fintech','venue','b2b_saas','marketplace','beverage_alcohol','b2b_distribution','agency']).default('fmcg'),
   marketSharePct:     z.number().min(0).max(100).nullable().default(null),
   brandValues:        z.array(z.string()).default([]),
   monitoredHashtags:  z.array(z.string()).default([]),

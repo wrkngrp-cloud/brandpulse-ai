@@ -74,11 +74,18 @@
                      opacity var(--d-panel) var(--ease-glide)}
 .bg-panel[data-state="closed"]{transform:translateY(8px);opacity:0;pointer-events:none}
 
+/* ---- 5b. Reveal atoms. -------------------------------------------------
+   Motion writes opacity and transform as inline style, so the reduced-motion
+   override has to be !important to beat it. Doing this in CSS rather than in
+   a hook is what stops the reveal racing the first render: there is no frame
+   where a reduced-motion reader sees opacity 0. ------------------------- */
+
 /* ---- 6. Reduced motion. Non-negotiable. ------------------------------- */
 @media (prefers-reduced-motion:reduce){
   :root{--d-tick:0ms;--d-ui:0ms;--d-press:0ms;--d-needle:0ms;--d-climb:0ms;--d-panel:0ms;--stagger:0ms}
   .bg-gauge-enter .bg-tick,.bg-gauge-enter .bg-needle,
   .bg-skeleton .bg-tick,.bg-skeleton-block{animation:none}
+  .bg-lightin{opacity:1!important;transform:none!important}
   .bg-reveal>*{opacity:1;transform:none}
   .bg-skeleton .bg-tick{opacity:.3}
 }

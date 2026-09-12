@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
+import { callAi, extractJson } from '@/lib/ai/client'
 import { createClient } from '@/lib/supabase/server'
 
 export const runtime    = 'nodejs'
@@ -53,10 +53,22 @@ async function scrapeWebsite(url: string): Promise<string | null> {
       headers: { 'User-Agent': 'BrandGauge/1.0 (brand intelligence platform)' },
     })
     clearTimeout(timeout)
-    if (!res.ok) return null
+    if (!res.ok) {
+      console.warn(`[brand-infer] scrape of ${normalised} returned ${res.status}`)
+      return null
+    }
     const html = await res.text()
-    return stripHtml(html) || null
-  } catch {
+    const text = stripHtml(html)
+    if (!text) console.warn(`[brand-infer] scrape of ${normalised} yielded no text`)
+    return text || null
+  } catch (err) {
+    /* Silently returning null meant a site that blocks our user agent, times
+       out, or renders entirely client-side was indistinguishable from one
+       with nothing to say. The profile still comes back, drawn from the brand
+       name alone and marked low confidence, which is the "website search did
+       not work" symptom seen from the outside. */
+    const why = err instanceof Error ? err.message : String(err)
+    console.warn(`[brand-infer] scrape of ${url} failed: ${why}`)
     return null
   }
 }
@@ -119,27 +131,40 @@ culturalProfile values are integers 0-100.
 confidence must be exactly "High", "Medium", or "Low".
 inferenceSources must be an array using only these values: "brand_name", "website", "twitter_bio", "twitter_posts", "instagram_bio", "instagram_posts".`
 
+  /* Was a hand-rolled Anthropic client with the model id written out here.
+     CLAUDE.md is explicit that our AI calls go through callAi and that model
+     ids live in one place, and a second copy is exactly how a tier silently
+     drifts. Routed through the structural tier now, which is what a report or
+     a structured inference is. */
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('[brand-infer] ANTHROPIC_API_KEY is not set in this environment')
+    return NextResponse.json({ error: 'ai_not_configured' }, { status: 503 })
+  }
+
   try {
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-    const resp = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1200,
-      temperature: 0.1,
+    const raw = await callAi({
+      tier: 'structural',
       system,
       messages: [{ role: 'user', content: userMessage }],
+      maxTokens: 1200,
+      temperature: 0.1,
     })
-
-    const block = resp.content[0]
-    if (block.type !== 'text') throw new Error('Unexpected response type')
-
-    const cleaned = block.text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
-    const parsed = JSON.parse(cleaned) as BrandInferResult
+    const parsed = extractJson<BrandInferResult>(raw)
 
     // Merge actual sources used (API may report fewer than we passed)
     parsed.inferenceSources = [...new Set([...inferenceSources, ...(parsed.inferenceSources ?? [])])]
 
     return NextResponse.json(parsed)
-  } catch {
-    return NextResponse.json({ error: 'inference_failed' }, { status: 502 })
+  } catch (err) {
+    /* The old catch was bare: no logging, no distinction, always a 502. That
+       is why a failure here is indistinguishable from a wrong environment
+       from the outside, which is the position this bug was reported from. */
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[brand-infer] inference failed:', message)
+    const auth = /401|invalid.*api.?key|authentication/i.test(message)
+    return NextResponse.json(
+      { error: auth ? 'ai_not_configured' : 'inference_failed', detail: message.slice(0, 300) },
+      { status: auth ? 503 : 502 },
+    )
   }
 }

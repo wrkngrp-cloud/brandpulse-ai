@@ -72,7 +72,7 @@ function StudyCard({ study }: { study: GeoLiftStudy }) {
               {new Date(study.study_end).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Africa/Lagos' })}
             </span>
           </div>
-          <h3 className="text-sm font-semibold">
+          <h3 className="text-sm font-medium">
             &ldquo;{study.keyword}&rdquo; · {study.treatment_city} vs {study.control_city}
           </h3>
         </div>
@@ -198,7 +198,7 @@ export default async function GeoLiftPage() {
       <div className="border rounded-xl p-5 bg-card space-y-3">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-primary" />
-          <h3 className="text-sm font-semibold">
+          <h3 className="text-sm font-medium">
             {hasStudies ? 'Start another study' : 'Start your first study'}
           </h3>
         </div>

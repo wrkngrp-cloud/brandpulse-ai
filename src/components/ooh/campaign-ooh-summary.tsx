@@ -72,7 +72,7 @@ export async function CampaignOohSummary({ campaignId, currency }: Props) {
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-muted-foreground" />
-          <h3 className="text-sm font-semibold">OOH Campaign Summary</h3>
+          <h3 className="text-sm font-medium">OOH Campaign Summary</h3>
         </div>
         <span className="text-xs text-muted-foreground bg-num">{sites.length} site{sites.length !== 1 ? 's' : ''}</span>
       </div>

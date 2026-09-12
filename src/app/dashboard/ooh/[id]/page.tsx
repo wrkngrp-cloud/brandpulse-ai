@@ -88,7 +88,7 @@ export default async function OohSitePage({
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
-            <h1 className="text-xl font-semibold">{site.site_name}</h1>
+            <h1 className="text-xl font-medium">{site.site_name}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
               {[site.city, site.state, site.country].filter(Boolean).join(', ')}
               {site.format_type ? ` · ${site.format_type}` : ''}

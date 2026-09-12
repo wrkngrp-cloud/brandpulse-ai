@@ -290,7 +290,7 @@ export function FsoFormClient({
         {step === 1 && (
           <div className="py-6 space-y-5">
             <div>
-              <h1 className="text-xl font-bold">Who are you?</h1>
+              <h1 className="text-xl font-medium">Who are you?</h1>
               <p className="text-sm text-muted-foreground mt-1">Fill in your details to start today&apos;s route report.</p>
             </div>
 
@@ -360,7 +360,7 @@ export function FsoFormClient({
           <div className="py-6 space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold">Outlet {currentOutlet + 1}</h1>
+                <h1 className="text-xl font-medium">Outlet {currentOutlet + 1}</h1>
                 <p className="text-sm text-muted-foreground">
                   {outlets.length > 1 ? `${outlets.length} outlets logged so far` : 'First outlet on your route'}
                 </p>
@@ -533,7 +533,7 @@ export function FsoFormClient({
         {step === 3 && stats && (
           <div className="py-6 space-y-5">
             <div>
-              <h1 className="text-xl font-bold">Route summary</h1>
+              <h1 className="text-xl font-medium">Route summary</h1>
               <p className="text-sm text-muted-foreground mt-1">Review before submitting.</p>
             </div>
 

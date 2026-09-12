@@ -35,7 +35,7 @@ export default async function EcommercePage() {
           <ArrowLeft className="h-3.5 w-3.5" />
           All Connectors
         </Link>
-        <h1 className="text-xl font-semibold">E-commerce Sales Import</h1>
+        <h1 className="text-xl font-medium">E-commerce Sales Import</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           Upload order data from Jumia, Konga, or any CSV to track sales attributed to your campaigns.
         </p>

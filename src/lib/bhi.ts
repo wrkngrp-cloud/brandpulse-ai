@@ -374,8 +374,28 @@ export interface StageSignal {
   rawDisplay: string | null
 }
 
+/**
+ * A stage score, from whichever of its signals have data.
+ *
+ * Missing weight is redistributed onto the signals that have data, and that is
+ * right up to a point: a stage measured by four of its five signals is still a
+ * stage score. One of five is not. The Awareness stage was reading a flat 100
+ * off a single connected signal at full scale, with "1/5 signals active" as the
+ * only hint, because that signal inherited the whole 100 points.
+ *
+ * So `coverage` comes back with the score, and below half the weight the score
+ * is withheld: past that line redistribution stops being a correction and
+ * starts being an invention. The per-signal breakdown is always returned, so
+ * the screen can still show what is connected and what is not.
+ *
+ * Note this drives the funnel screen only. The Brand Health Index builds its
+ * awareness component from `computeAwarenessComposite`, which is a different
+ * function with its own coverage disclosure.
+ */
 export function computeStageComposite(signals: StageSignal[]): {
   score:     number | null
+  /** Share of the stage's weight that had data, 0-100. */
+  coverage:  number
   breakdown: ComponentBreakdown
 } {
   const active = signals.filter(s => s.value !== null && s.value !== undefined)
@@ -383,6 +403,7 @@ export function computeStageComposite(signals: StageSignal[]): {
   if (active.length === 0) {
     return {
       score: null,
+      coverage: 0,
       breakdown: {
         composite: null,
         sources: signals.map(s => ({
@@ -393,6 +414,10 @@ export function computeStageComposite(signals: StageSignal[]): {
   }
 
   const totalActiveWeight = active.reduce((sum, s) => sum + s.weight, 0)
+  const totalWeight       = signals.reduce((sum, s) => sum + s.weight, 0)
+  const coverage          = totalWeight > 0
+    ? Math.round((totalActiveWeight / totalWeight) * 100)
+    : 0
 
   const sources: BreakdownSource[] = signals.map(s => {
     if (s.value === null || s.value === undefined) {
@@ -403,6 +428,10 @@ export function computeStageComposite(signals: StageSignal[]): {
     return { label: s.label, rawDisplay: s.rawDisplay, weight: redistributedWt, score: subScore }
   })
 
+  if (coverage < STAGE_COVERAGE_FLOOR) {
+    return { score: null, coverage, breakdown: { sources, composite: null } }
+  }
+
   const composite = Math.round(
     active.reduce((sum, s) => {
       const subScore = Math.min(100, (s.value as number) / s.scale * 100)
@@ -410,5 +439,8 @@ export function computeStageComposite(signals: StageSignal[]): {
     }, 0),
   )
 
-  return { score: composite, breakdown: { sources, composite } }
+  return { score: composite, coverage, breakdown: { sources, composite } }
 }
+
+/** Half the stage's weight. The same floor `computeTrustScore` holds to. */
+export const STAGE_COVERAGE_FLOOR = 50

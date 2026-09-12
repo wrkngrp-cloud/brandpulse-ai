@@ -566,36 +566,42 @@ export default async function FunnelPage() {
   const scores = {
     awareness: {
       score:      awareness.score,
+      coverage:   awareness.coverage,
       source:     src.awareness,
       dataPoints: activeCount(awareness.breakdown),
       breakdown:  awareness.breakdown.sources,
     },
     consideration: {
       score:      consideration.score,
+      coverage:   consideration.coverage,
       source:     src.consideration,
       dataPoints: activeCount(consideration.breakdown),
       breakdown:  consideration.breakdown.sources,
     },
     preference: {
       score:      preference.score,
+      coverage:   preference.coverage,
       source:     src.preference,
       dataPoints: activeCount(preference.breakdown),
       breakdown:  preference.breakdown.sources,
     },
     action: {
       score:      action.score,
+      coverage:   action.coverage,
       source:     src.action,
       dataPoints: activeCount(action.breakdown),
       breakdown:  action.breakdown.sources,
     },
     loyalty: {
       score:      loyalty.score,
+      coverage:   loyalty.coverage,
       source:     src.loyalty,
       dataPoints: activeCount(loyalty.breakdown),
       breakdown:  loyalty.breakdown.sources,
     },
     advocacy: {
       score:      advocacy.score,
+      coverage:   advocacy.coverage,
       source:     src.advocacy,
       dataPoints: activeCount(advocacy.breakdown),
       breakdown:  advocacy.breakdown.sources,

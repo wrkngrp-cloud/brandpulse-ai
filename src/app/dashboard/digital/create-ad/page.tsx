@@ -486,7 +486,7 @@ function StepCampaign({ state, setState }: { state: WizardState; setState: React
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-base font-semibold">Campaign setup</h2>
+        <h2 className="text-base font-medium">Campaign setup</h2>
         <p className="text-xs text-muted-foreground mt-0.5">Choose where your ad runs and what you want to achieve.</p>
       </div>
 
@@ -586,7 +586,7 @@ function StepFormat({ state, setState }: { state: WizardState; setState: React.D
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-base font-semibold">Ad format</h2>
+        <h2 className="text-base font-medium">Ad format</h2>
         <p className="text-xs text-muted-foreground mt-0.5">Choose how your ad will appear in the feed.</p>
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
@@ -666,7 +666,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
     return (
       <div className="space-y-5">
         <div>
-          <h2 className="text-base font-semibold">Creative &amp; copy</h2>
+          <h2 className="text-base font-medium">Creative &amp; copy</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Upload your image and write the ad copy.</p>
         </div>
 
@@ -697,7 +697,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
     return (
       <div className="space-y-5">
         <div>
-          <h2 className="text-base font-semibold">Carousel cards</h2>
+          <h2 className="text-base font-medium">Carousel cards</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Add 2–10 cards. Each card has its own image, headline, and link.</p>
         </div>
 
@@ -791,7 +791,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
     return (
       <div className="space-y-5">
         <div>
-          <h2 className="text-base font-semibold">Responsive Search Ad</h2>
+          <h2 className="text-base font-medium">Responsive Search Ad</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             Google mixes and matches your headlines and descriptions to find the best-performing combinations. Add 3–15 headlines and 2–4 descriptions.
           </p>
@@ -882,7 +882,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
     return (
       <div className="space-y-5">
         <div>
-          <h2 className="text-base font-semibold">Responsive Display Ad</h2>
+          <h2 className="text-base font-medium">Responsive Display Ad</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Upload your image and write ad copy. Google adapts your ad to fit any placement size.</p>
         </div>
 
@@ -917,7 +917,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
     return (
       <div className="space-y-5">
         <div>
-          <h2 className="text-base font-semibold">Text Ad (LinkedIn Sidebar)</h2>
+          <h2 className="text-base font-medium">Text Ad (LinkedIn Sidebar)</h2>
           <p className="text-xs text-muted-foreground mt-0.5">A small ad with headline, description, and optional small image shown in LinkedIn's right column (desktop only).</p>
         </div>
         <div className="space-y-1.5">
@@ -941,7 +941,7 @@ function StepCreative({ state, setState }: { state: WizardState; setState: React
     return (
       <div className="space-y-5">
         <div>
-          <h2 className="text-base font-semibold">{isTikTok ? 'TikTok In-Feed Video' : 'Video Ad'}</h2>
+          <h2 className="text-base font-medium">{isTikTok ? 'TikTok In-Feed Video' : 'Video Ad'}</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             {isTikTok
               ? 'Full-screen vertical video (9:16). MP4 or WebM, up to 500 MB.'
@@ -1138,7 +1138,7 @@ function StepAudience({ state, setState }: { state: WizardState; setState: React
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-base font-semibold">Audience targeting</h2>
+        <h2 className="text-base font-medium">Audience targeting</h2>
         <p className="text-xs text-muted-foreground mt-0.5">Define who sees your ad. Narrower audiences are more efficient; broader audiences build awareness.</p>
       </div>
 
@@ -1307,7 +1307,7 @@ function StepBudget({ state, setState }: { state: WizardState; setState: React.D
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-base font-semibold">Budget, schedule &amp; delivery</h2>
+        <h2 className="text-base font-medium">Budget, schedule &amp; delivery</h2>
         <p className="text-xs text-muted-foreground mt-0.5">Set how much to spend, when to run, and where to show the ad.</p>
       </div>
 
@@ -1535,7 +1535,7 @@ function StepReview({ state }: { state: WizardState }) {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-base font-semibold">Review your draft</h2>
+        <h2 className="text-base font-medium">Review your draft</h2>
         <p className="text-xs text-muted-foreground mt-0.5">Your ad will be saved as a draft. It goes live only after you review and push it from the Ads Drafts section.</p>
       </div>
 
@@ -1777,7 +1777,7 @@ export default function CreateAdPage() {
             <Megaphone className="h-5 w-5 text-tx-2" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Create Ad</h1>
+            <h1 className="text-2xl font-medium tracking-tight">Create Ad</h1>
             <p className="text-sm text-muted-foreground mt-0.5">Draft saved first — you review before going live.</p>
           </div>
         </div>

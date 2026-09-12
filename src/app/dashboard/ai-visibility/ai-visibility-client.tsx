@@ -255,7 +255,7 @@ export function AiVisibilityClient({ brandName, brandCategory, scores, checks, h
       {/* Check log */}
       {checks.length > 0 && (
         <section>
-          <h2 className="text-[11px] font-bold text-muted-foreground mb-3">
+          <h2 className="text-[11px] font-medium text-muted-foreground mb-3">
             Question-by-question breakdown
           </h2>
           <div className="border rounded-2xl bg-card overflow-hidden divide-y">
