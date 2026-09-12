@@ -2,9 +2,6 @@ import { useEffect, useId, useState } from 'react'
 import {
   AbsoluteFill, Easing, continueRender, delayRender, interpolate, staticFile, useCurrentFrame,
 } from 'remotion'
-import { rowTicks, tickBounds } from '../../src/components/landing/tick-mask'
-import { ATOM } from '@brand/engine.js'
-
 /**
  * The logo, opening.
  *
@@ -15,8 +12,8 @@ import { ATOM } from '@brand/engine.js'
  *
  *   1. the crescendo runs, seven ticks lighting tail to head at 90ms apart
  *   2. the needle sweeps up the dial and settles, no bounce
- *   3. the wordmark unveils through the same crescendo lying flat, the row of
- *      apertures opening left to right
+ *   3. the wordmark is uncovered left to right, stepping at the same 90ms the
+ *      ticks light at, each step longer than the last
  *
  * Nothing here is redrawn. The paths come out of the supplied lockup SVG at
  * runtime and are measured in the browser, so the animation cannot drift away
@@ -212,11 +209,30 @@ function useLogoParts(ground: Ground): Parts | null {
   return parts
 }
 
-/** The wordmark's apertures: the crescendo unrolled, wide enough at the cold
- *  end that a fully lit run covers the word with no seams. ATOM is 0.767 wide
- *  for its nominal size, so full coverage wants fill * growth[0] * 0.767 >= 1. */
+/**
+ * How far across the wordmark the reveal has got, 0 to 1, after `lit` steps.
+ *
+ * The first cut of this masked the wordmark with the tick shape itself, nine
+ * ATOM apertures opening left to right. That was wrong and it showed: ATOM is
+ * a rounded, slightly tapered quadrilateral, so where two apertures met their
+ * corners cut notches into the tops and bottoms of the letters and the B came
+ * out bent. A letterform is not a photograph. It cannot be read through a
+ * shaped aperture without being damaged by it.
+ *
+ * So the wordmark gets a straight edge and stays itself. The crescendo is
+ * still here, in the size of the steps rather than in their shape: the run
+ * advances once every 90ms, and each step is longer than the one before it on
+ * the same 0.6-to-1 ramp the apertures used. Cold and short at the B, hot and
+ * long by the e.
+ */
 const WORD_GROWTH = [0.6, 1] as const
-const WORD_FILL = 2.25
+
+function wipeAt(lit: number) {
+  const step = (k: number) => WORD_GROWTH[0] + (WORD_GROWTH[1] - WORD_GROWTH[0]) * (k / (WORD_TICKS - 1))
+  let total = 0, run = 0
+  for (let k = 0; k < WORD_TICKS; k++) { total += step(k); if (k < lit) run += step(k) }
+  return Math.min(1, run / total)
+}
 
 export function LogoUnveil({
   ground = 'paper', width = '72%',
@@ -238,9 +254,11 @@ export function LogoUnveil({
   const needleP = interpolate(frame, [NEEDLE_IN, NEEDLE_IN + NEEDLE_DUR], [0, 1],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: SETTLE })
 
-  const run = rowTicks(WORD_TICKS, wordBox.w, wordBox.h, WORD_FILL, WORD_GROWTH)
-  const box = tickBounds(run)
   const wordLit = Math.floor((frame - WORD_IN) / D_TICK) + 1
+  const wipe = wipeAt(Math.max(0, wordLit))
+  /* A little air around the box so the mask's own edge never grazes a stem,
+     and so the last step closes past the final letter rather than on it. */
+  const BLEED = 6
 
   return (
     <AbsoluteFill style={{ background: GROUND[ground], display: 'grid', placeItems: 'center' }}>
@@ -250,13 +268,10 @@ export function LogoUnveil({
       >
         <defs>
           <mask id={maskId} maskUnits="userSpaceOnUse"
-            x={wordBox.x + box.x0} y={wordBox.y + box.y0} width={box.w} height={box.h}>
-            <g transform={`translate(${wordBox.x},${wordBox.y})`}>
-              {run.map((tk, i) => (
-                <path key={i} d={ATOM} transform={tk.transform} fill="#fff"
-                  fillOpacity={i < wordLit ? 1 : 0} />
-              ))}
-            </g>
+            x={wordBox.x - BLEED} y={wordBox.y - BLEED}
+            width={wordBox.w + BLEED * 2} height={wordBox.h + BLEED * 2}>
+            <rect x={wordBox.x - BLEED} y={wordBox.y - BLEED}
+              width={(wordBox.w + BLEED * 2) * wipe} height={wordBox.h + BLEED * 2} fill="#fff" />
           </mask>
         </defs>
 
@@ -278,7 +293,8 @@ export function LogoUnveil({
           {needle.map((n, i) => <path key={`n${i}`} d={n.d} fill={n.fill} />)}
         </g>
 
-        {/* 3. the wordmark, read through the apertures. */}
+        {/* 3. the wordmark, uncovered left to right. Straight edge: the
+              letters are not bent to fit anything. */}
         <g mask={`url(#${maskId})`}>
           {word.map((w, i) => <path key={`w${i}`} d={w.d} fill={w.fill} />)}
         </g>
