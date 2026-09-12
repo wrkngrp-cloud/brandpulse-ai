@@ -308,13 +308,18 @@ function HeroFilm() {
   return (
     <section className="px-6 pb-4 pt-24">
       <div className="mx-auto max-w-6xl">
+        {/* "Two minutes on a real brand" was wrong twice over. The film runs
+            sixty-two seconds, and it does not follow one brand through a
+            quarter: there is no food brand and no story arc in it. It is the
+            product, in three acts, and the acts are what the headline should
+            say. */}
         <h2 className="max-w-2xl text-3xl font-medium leading-tight tracking-tight sm:text-4xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
-          Two minutes on a real brand.
+          Know it, measure it, prove it.
         </h2>
         <p className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
-          Watch a Lagos food brand go from one connected account to a number its board signed
-          off on. If your quarter looks anything like this, you will know by the end of it.
+          A minute through the whole product: what the market is saying about your brand,
+          what your spend moved, and the page you hand your MD.
         </p>
         <div id="demo" className="scroll-mt-28">
           <TickReveal className="mt-10">

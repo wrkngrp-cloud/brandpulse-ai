@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion'
+import { useMotionValueEvent, useReducedMotion, useScroll, useSpring } from 'framer-motion'
 import { ArrowLeftIcon, ArrowRightIcon } from '@/components/brand/icon'
 import { SHOTS, ProductShotFrame, type ProductShot } from './product-shots'
 
@@ -113,6 +113,11 @@ function RailCrescendo({ progress }: { progress: number }) {
 
 export function ProductCards() {
   const rail = useRef<HTMLDivElement>(null)
+  /* A plain wrapper around the rail, used only as the scroll window's target.
+     Measuring the scroller itself would mean asking an element that scrolls
+     horizontally where it sits vertically, which works but reads as a trap
+     waiting to be stepped in. */
+  const railBox = useRef<HTMLDivElement>(null)
   const section = useRef<HTMLElement>(null)
   const [progress, setProgress] = useState(0)
   const [ends, setEnds] = useState({ start: true, end: false })
@@ -149,23 +154,43 @@ export function ProductCards() {
     return () => window.removeEventListener('resize', measure)
   }, [measure])
 
-  /* The section's own progress through the viewport, mapped onto scrollLeft.
+  /* The rail's own progress through the viewport, mapped onto scrollLeft.
      Scroll position is the value on display here, which is the one case the
-     motion law allows it to drive anything. */
-  /* The pan has to be over before the section leaves, not as it leaves.
-     Running to `end 0.2` finished the last card when the section's foot was
-     already near the top of the screen, so the rail was still moving as the
-     next section took over and you never saw it arrive. It completes at
-     `end 0.8` now: the section's foot is still four fifths of the way down
-     the viewport, so the whole run lands while the cards are in front of you
-     and the section then travels out static. */
+     motion law allows it to drive anything.
+
+     The window is the rail's, not the section's, and that is the whole fix.
+     It used to run from `start end` on the section, which is the earliest
+     anchor there is: progress started the instant the section's top edge
+     appeared at the bottom of the screen, a full viewport before you could
+     read anything. Measured at 1440x900 that put the run 66% complete by the
+     time the rail was fully visible, so the first cards had already gone
+     past. That is exactly what it looked like.
+
+     Now progress 0 is the moment the rail is completely in view (its bottom
+     edge reaching the bottom of the screen) and progress 1 is the moment it
+     starts to leave (its top edge reaching the top). Nothing moves before you
+     can see all of it, and the whole run lands while the section is still on
+     screen. */
   const { scrollYProgress } = useScroll({
-    target: section,
-    offset: ['start end', 'end 0.8'],
+    target: railBox,
+    offset: ['end end', 'start start'],
   })
-  useMotionValueEvent(scrollYProgress, 'change', v => {
+  /* The window is the rail's height against the viewport's, so on a short
+     screen it is short: 505px of scroll at 1440x900, but only 325px at
+     1280x720, against 1760px of cards. Written straight from raw progress
+     that makes one trackpad flick teleport the rail. The spring gives it the
+     system's own settle instead, so a fast scroll arrives rather than jumps.
+     It never overshoots, which is the needle's rule as much as the rail's. */
+  const drive = useSpring(scrollYProgress, { stiffness: 110, damping: 26, restDelta: 0.0005 })
+  useMotionValueEvent(drive, 'change', v => {
     const el = rail.current
     if (!el || taken.current || reduce) return
+    /* Those two anchors are only in that order while the rail is shorter than
+       the viewport. It is 395px tall against any real screen, but a landscape
+       phone can be shorter than that, and there the window inverts and the
+       rail would pan backwards. Leave it to the reader instead: swiping a rail
+       is the obvious gesture on the device where this happens. */
+    if (el.clientHeight > window.innerHeight - 40) return
     const span = el.scrollWidth - el.clientWidth
     if (span <= 0) return
     const to = Math.round(Math.max(0, Math.min(span, v * span)))
@@ -220,13 +245,14 @@ export function ProductCards() {
 
       {/* The rail bleeds off the right edge so it reads as a run that continues,
           rather than a row that happens to end where the container does. */}
+      <div ref={railBox} className="mt-12">
       <div
         ref={rail}
         onScroll={onScroll}
         tabIndex={0}
         role="group"
         aria-label="Product screens, pan sideways"
-        className={`mt-12 flex gap-5 overflow-x-auto scroll-pl-6 pb-2 pl-6 pr-6 [&::-webkit-scrollbar]:hidden lg:scroll-pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] ${manual ? 'snap-x snap-mandatory' : ''}`}
+        className={`flex gap-5 overflow-x-auto scroll-pl-6 pb-2 pl-6 pr-6 [&::-webkit-scrollbar]:hidden lg:scroll-pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] ${manual ? 'snap-x snap-mandatory' : ''}`}
         style={{ scrollbarWidth: 'none' }}
       >
         {CARDS.map(card => (
@@ -246,6 +272,7 @@ export function ProductCards() {
             </div>
           </article>
         ))}
+      </div>
       </div>
 
       {/* Where you are in the run, and the two ways to move through it that do
