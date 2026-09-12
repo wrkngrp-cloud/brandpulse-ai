@@ -128,8 +128,11 @@ function Hero() {
      sits at the top of the section, so it had left the viewport before the
      last tick turned. This completes by the time the section has travelled
      about half a screen, which is while the arc is still in view.
-     Reversible, so scrolling back turns it home again. */
-  const turn = useScrubValue(hero, { offset: ['start start', 'start -45%'] })
+     Reversible, so scrolling back turns it home again.
+     Shortened from -45% so the first tick hands over inside the first 60px of
+     scroll rather than the first 100: at the old length nothing had visibly
+     changed until you were already past the fold. */
+  const turn = useScrubValue(hero, { offset: ['start start', 'start -28%'] })
 
   return (
     <section ref={hero} className="relative isolate overflow-hidden pb-14 pt-20 sm:pt-24" style={{ background: 'var(--bg-ink)' }}>
@@ -166,7 +169,7 @@ function Hero() {
       </div>
 
       {/* ── Under the crown ─────────────────────────────────────────── */}
-      <div className="relative mx-auto -mt-[24vw] max-w-2xl px-6 text-center sm:-mt-[21vw] lg:-mt-[19.5vw] xl:-mt-[17vw]">
+      <div className="relative mx-auto -mt-[28vw] max-w-2xl px-6 text-center sm:-mt-[24.5vw] lg:-mt-[22.5vw] xl:-mt-[20vw]">
         <ReadingLine
           text="See your brand the way the street sees it."
           accent="street"
@@ -252,8 +255,8 @@ function StreetStrip() {
   /* Two stages, one scroll. The band arrives by lighting its windows on the
      way in, and once it is in view the same windows turn to the second set of
      shots. Reversible, so scrolling back turns them home. */
-  const reveal = useScrubReveal(band, { ticks: 6, offset: ['start 0.92', 'end 0.75'] })
-  const turn   = useScrubValue(band, { offset: ['start 0.35', 'end 0.1'] })
+  const reveal = useScrubReveal(band, { ticks: 6, offset: ['start 0.95', 'end 0.85'] })
+  const turn   = useScrubValue(band, { offset: ['start 0.62', 'end 0.15'] })
   return (
     <section aria-label="Where the brand is judged" className="pb-8 pt-20">
       <div className="mx-auto max-w-6xl px-6">
@@ -518,7 +521,12 @@ function FinalCta() {
         <TickReveal>
         <Tick as="div"><h2 className="relative mx-auto max-w-3xl text-4xl font-medium leading-[1.05] tracking-[-0.02em] sm:text-6xl"
           style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
-          Your brand already has a reputation. Start measuring it.
+          {/* Two sentences, two lines. Left to wrap on its own it broke after
+              "measuring" and left "it." alone on a third line, which is a
+              widow and reads as a mistake at this size. Each sentence is its
+              own block so the break lands where the meaning already does. */}
+          <span className="block [text-wrap:balance]">Your brand already has a reputation.</span>
+          <span className="block [text-wrap:balance]">Start measuring it.</span>
         </h2></Tick>
         <Tick as="p" className="relative mx-auto mt-6 max-w-xl text-[15px]" style={{ color: 'var(--tx-inv-2)' }}>
           Free while in beta. Connect a social account and see your first Brand Health Index in minutes.
@@ -544,7 +552,7 @@ export function Footer() {
           <Wordmark height={16} />
         </div>
         <p className="text-[10px]" style={{ color: 'var(--lp-mut)' }}>
-          Made for West African marketers
+          Made for marketers who have to prove it
         </p>
         <div className="flex gap-6 text-[12px]" style={{ color: 'var(--lp-mut)' }}>
           <Link href="/features" className="transition-opacity hover:opacity-60">Features</Link>

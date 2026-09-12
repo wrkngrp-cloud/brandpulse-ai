@@ -401,6 +401,12 @@ interface FlipProps {
   shape?: 'arc' | 'row'
   sweep?: readonly [number, number]
   growth?: readonly [number, number]
+  /**
+   * How much of the run's progress one tick's half-turn takes. Lower turns
+   * each tick faster and hands the first one over sooner, so the flip starts
+   * visibly earlier for the same scroll distance.
+   */
+  dwell?: number
 }
 
 /**
@@ -420,7 +426,7 @@ interface FlipProps {
  */
 export function TickFlip({
   id, front, back, progress, className = '', ticks = GEOM.ticks, fill = 1,
-  shape = 'arc', sweep = ARC_SEGMENT, growth = ARC_GROWTH,
+  shape = 'arc', sweep = ARC_SEGMENT, growth = ARC_GROWTH, dwell = 0.36,
 }: FlipProps) {
   const run = shape === 'arc'
     ? arcTicks(ticks, 360, 500, 478, fill, sweep, growth)
@@ -430,7 +436,7 @@ export function TickFlip({
   const layer = (face: 'a' | 'b') => (
     <mask id={`${id}-${face}`} maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
       {run.map((tk, i) => {
-        const { scaleY, back: showBack } = flipState(i, ticks, progress)
+        const { scaleY, back: showBack } = flipState(i, ticks, progress, dwell)
         const on = face === 'b' ? showBack : !showBack
         return (
           <g key={i} transform={`scale(${1 / W},${1 / H}) translate(${-box.x0},${-box.y0})`}>
