@@ -92,15 +92,20 @@ export const INDUSTRY_PHOTOS: Record<string, Photo> = {
   },
   venue: {
     src: '/landing/photos/roundabout-billboard.jpg',
+    /* Upgrade waiting on a file: /landing/photos/venue-national-theatre.jpg
+       The National Theatre at Iganmu, shot low from the forecourt. A landmark
+       every Lagos marketer can name beats a junction standing in for one, and
+       it carries the scale of the trade: a place people travel to. */
     slot: 'Venues and restaurants',
-    /* Still the weakest of the seven. A junction stands in for a venue; what
-       it wants is a floor at service: tables full, a queue at the door. */
-    brief: 'A busy junction at night standing in for the venue trade. Wants a real floor at service.',
+    brief: 'The National Theatre at Iganmu from the forecourt. A place people make a journey for, and the reason footfall is the number.',
   },
   b2b_saas: {
     src: null,
+    /* Waiting on: /landing/photos/b2b-saas-meeting.jpg
+       Two people across a table, laptop of charts open between them, a
+       printed report under a pen. The deal being argued, not the software. */
     slot: 'B2B SaaS',
-    brief: 'Two people at a laptop in a Lagos co-working space, mid-conversation, screens turned away.',
+    brief: 'Two people across a table with a laptop of charts and a printed report between them. The deal being argued, not the software.',
   },
   marketplace: {
     src: '/landing/photos/lagos-market-aerial.jpg',
