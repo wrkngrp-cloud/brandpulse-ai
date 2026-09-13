@@ -126,8 +126,18 @@ function LoginContent() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
 
-      {/* ── Left panel: branding ───────────────────────────────── */}
-      <div className="hidden lg:flex flex-col justify-between w-[420px] shrink-0 bg-foreground text-background p-10">
+      {/* ── Left panel: branding ───────────────────────────────────
+          A permanent ink plane, the same one the sidebar is. It used to be
+          `bg-foreground text-background`, which inverts with the mode, while
+          everything inside it is drawn in the fixed inverse tokens that do
+          not. In dark mode the panel turned Paper and its type stayed Paper:
+          the four feature lines measured 1.0:1, the paragraph and the footer
+          2.34:1. Half the screen was invisible.
+
+          The hairline is what separates it once the page itself is ink:
+          against Paper the plane speaks for itself, against Ink it needs the
+          edge drawn, which is how elevation works everywhere else here. */}
+      <div className="hidden lg:flex w-[420px] shrink-0 flex-col justify-between border-r border-line-inv bg-ink p-10 text-tx-inv">
         <div>
           <div className="mb-12">
             <BrandLockup height={22} ground="ink" />

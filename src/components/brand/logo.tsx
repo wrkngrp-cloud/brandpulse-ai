@@ -6,6 +6,19 @@
  * are for the ink plane; mono is for anything below 24px, single-colour
  * print, embroidery, engraving, or a ground that is itself in the ramp,
  * where seven graded ticks turn into mud.
+ *
+ * Each supplied file carries its own full-bleed ground rect, so the Paper
+ * lockup draws a Paper plate wherever it lands. The default used to be Paper
+ * regardless of the mode, which put a white plate around the wordmark at the
+ * top of the sign-up page, the dashboard shell and the mobile nav the moment
+ * the app went dark.
+ *
+ * So `ground` defaults to `auto`: both files are rendered and CSS shows the
+ * one that belongs. Switching in CSS rather than in JS matters — next-themes
+ * writes `.dark` on the document before first paint, so the right plate is
+ * there from the first frame, with no flash and nothing for hydration to
+ * disagree about. Pass `paper` or `ink` explicitly for a plane that does not
+ * follow the mode, like the sign-in rail or a frame in the film.
  */
 import Image from 'next/image'
 
@@ -16,32 +29,47 @@ type Ground = 'paper' | 'ink'
 const MARK_RATIO = 305 / 200
 const LOCKUP_RATIO = 1300 / 200
 
-export function BrandMark({
-  size = 32, tone = 'duotone', ground = 'paper', className,
-}: { size?: number; tone?: Tone; ground?: Ground; className?: string }) {
+interface LogoProps {
+  tone?: Tone
+  /** `auto` follows the document mode. Name a ground to pin it. */
+  ground?: Ground | 'auto'
+  className?: string
+}
+
+function Art({
+  kind, tone, ground, w, h, className,
+}: { kind: 'mark' | 'lockup'; tone: Tone; ground: Ground; w: number; h: number; className?: string }) {
   return (
     <Image
-      src={`/brand-logo/brandgauge-mark-${tone}-${ground}.svg`}
+      src={`/brand-logo/brandgauge-${kind}-${tone}-${ground}.svg`}
       alt="BrandGauge"
-      width={Math.round(size * MARK_RATIO)}
-      height={size}
+      width={w}
+      height={h}
       className={className}
       priority
     />
   )
 }
 
-export function BrandLockup({
-  height = 24, tone = 'duotone', ground = 'paper', className,
-}: { height?: number; tone?: Tone; ground?: Ground; className?: string }) {
+function Pair(props: { kind: 'mark' | 'lockup'; tone: Tone; w: number; h: number; className?: string }) {
   return (
-    <Image
-      src={`/brand-logo/brandgauge-lockup-${tone}-${ground}.svg`}
-      alt="BrandGauge"
-      width={Math.round(height * LOCKUP_RATIO)}
-      height={height}
-      className={className}
-      priority
-    />
+    <>
+      <Art {...props} ground="paper" className={`dark:hidden ${props.className ?? ''}`} />
+      <Art {...props} ground="ink" className={`hidden dark:block ${props.className ?? ''}`} />
+    </>
   )
+}
+
+export function BrandMark({
+  size = 32, tone = 'duotone', ground = 'auto', className,
+}: LogoProps & { size?: number }) {
+  const box = { kind: 'mark' as const, tone, w: Math.round(size * MARK_RATIO), h: size, className }
+  return ground === 'auto' ? <Pair {...box} /> : <Art {...box} ground={ground} />
+}
+
+export function BrandLockup({
+  height = 24, tone = 'duotone', ground = 'auto', className,
+}: LogoProps & { height?: number }) {
+  const box = { kind: 'lockup' as const, tone, w: Math.round(height * LOCKUP_RATIO), h: height, className }
+  return ground === 'auto' ? <Pair {...box} /> : <Art {...box} ground={ground} />
 }
