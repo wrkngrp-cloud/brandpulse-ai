@@ -416,7 +416,11 @@ export function AmbassadorPwa({ sessionToken, ambassadorName, eventName, brandNa
                   <p className="font-medium text-sm truncate">
                     {entry.name}{entry.id === myId ? ' (you)' : ''}
                   </p>
-                  <p className={cn('text-xs', entry.id === myId ? 'text-tx-inv-2' : 'text-muted-foreground')}>
+                  {/* Tied to the row's own ground, not to a fixed inverse.
+                      The row is `bg-foreground`, which flips with the mode,
+                      while text-tx-inv-2 does not: in dark mode the row turned
+                      Paper and this line stayed Paper-grey at 2.3:1. */}
+                  <p className={cn('text-xs', entry.id === myId ? 'text-background/70' : 'text-muted-foreground')}>
                     {entry.leads} leads · {entry.engaged} engaged
                   </p>
                 </div>

@@ -9,7 +9,7 @@ import { VideoHero } from './video-hero'
 import { ProductCards } from './product-cards'
 import { AiScene, darkSceneVars, lightSceneVars } from './scenes'
 import { BrandLockup } from '@/components/brand/logo'
-import { useDarkGround, useMode } from './use-mode'
+import { useMode } from './use-mode'
 import { HERO_PHOTOS, INDUSTRY_PHOTOS, PhotoFrame, type Photo } from './photo-frame'
 import { HeatRow, ReadingLine, ReadingRail, Tick, TickReveal } from './reading'
 import {
@@ -52,12 +52,12 @@ export const DARK = LP_VARS
 /**
  * The lockup as supplied. The wordmark is not set in type here.
  *
- * Ground follows the document mode: each supplied file carries its own
- * full-bleed ground rect, so the Paper lockup draws a Paper box on ink.
+ * Ground follows the document mode. Each supplied file carries its own
+ * full-bleed ground rect, so the Paper lockup draws a Paper box on ink; the
+ * lockup component handles that itself now, in CSS rather than after mount.
  */
 export function Wordmark({ height = 22 }: { height?: number }) {
-  const dark = useDarkGround()
-  return <BrandLockup height={height} ground={dark ? 'ink' : 'paper'} />
+  return <BrandLockup height={height} />
 }
 
 /**
@@ -88,8 +88,13 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
           <Link href="/auth/login" className="hidden text-[13px] font-medium transition-opacity hover:opacity-70 sm:block" style={{ color: 'var(--lp-ink)' }}>Sign in</Link>
+          {/* Flare, not the inverse of the ground. `--tx` flips with the mode,
+              so in dark this was a pure Paper block: the brightest plane on
+              the page, out-shouting the Flare hero button two hundred pixels
+              below it, for the lesser of the two calls to action. It is the
+              same action as that button, so it wears the same plane. */}
           <Link href="/auth/signup"
-            className="whitespace-nowrap rounded-sm border border-line px-4 py-2 text-[13px] font-bold bg-press" style={{ background: 'var(--tx)', color: 'var(--bg-paper)' }}>
+            className="whitespace-nowrap rounded-sm border border-line px-4 py-2 text-[13px] font-bold text-on-hot bg-press" style={{ background: 'var(--flare)' }}>
             Start free
           </Link>
         </div>

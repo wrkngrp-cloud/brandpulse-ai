@@ -230,7 +230,11 @@ export function ProductCards() {
        different plane, not a different shade of the same one. `--lp-band` is
        the one value that holds in both modes, so this section reads the same
        whichever way the toggle is set. */
-    <section ref={section} id="tour" aria-label="Product" className="scroll-mt-24 py-28" style={{ background: 'var(--lp-band)' }}>
+    /* The hairline is not decoration. The band is a permanent ink plane, so on
+       Paper it announces itself and on Ink it sits two steps off the ground
+       and all but disappears. Elevation in this system is a one-pixel line, so
+       the band draws one and reads as a plane in both modes. */
+    <section ref={section} id="tour" aria-label="Product" className="scroll-mt-24 border-y border-line-inv py-28" style={{ background: 'var(--lp-band)' }}>
       <div className="mx-auto max-w-6xl px-6">
         <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>Inside BrandGauge</p>
         <h2 className="mt-3 max-w-2xl text-3xl font-medium leading-tight tracking-tight sm:text-4xl"
