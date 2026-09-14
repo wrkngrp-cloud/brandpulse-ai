@@ -27,9 +27,16 @@ alter table lead_desk_admins enable row level security;
 create policy lead_desk_admins_read on lead_desk_admins
   for select using (user_id = auth.uid());
 
+-- security definer so it can read the allowlist past that table's own RLS,
+-- which is what stops the policy recursing. The fixed search_path is the part
+-- worth noting: a security-definer function without one resolves unqualified
+-- names against the caller's path, so a table shadowing `lead_desk_admins`
+-- would be read with this function's privileges. auth.uid() stays qualified,
+-- so pinning the path costs nothing.
 create or replace function is_lead_desk()
-returns boolean language sql security definer stable as $$
-  select exists (select 1 from lead_desk_admins a where a.user_id = auth.uid());
+returns boolean language sql security definer stable
+set search_path = public as $$
+  select exists (select 1 from public.lead_desk_admins a where a.user_id = auth.uid());
 $$;
 
 -- ── What someone ran on the public tool ──────────────────────────────────────
