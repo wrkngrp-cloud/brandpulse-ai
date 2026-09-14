@@ -36,21 +36,40 @@ export function TagInput({ label, placeholder, values, onChange, hint }: {
     if (t && !values.includes(t)) onChange([...values, t])
     setInput('')
   }
+  /* `min-w-0` on the root, and the tags below are allowed to wrap and shrink.
+     The base Badge is built for a short status word: `h-5`, `shrink-0`,
+     `whitespace-nowrap`, `overflow-hidden`. Every one of those is wrong for a
+     tag holding a sentence, and together they bled the brand voice editor
+     across the page: a grid column cannot shrink below a child that refuses
+     to, so "Don'ts" pushed its tags out through the side of the card, while
+     "Dos" had its own sentences cut off mid-word with nothing to say they had
+     been. These are lists of things people typed, and they are as long as
+     they are. */
   return (
-    <div className="space-y-2">
+    <div className="min-w-0 space-y-2">
       <Label className="text-sm font-medium">{label}</Label>
       {hint && <p className="text-xs text-muted-foreground -mt-1">{hint}</p>}
       <div className="flex gap-2">
         <Input value={input} onChange={e => setInput(e.target.value)} placeholder={placeholder}
-          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); add() } }} className="text-sm" />
-        <Button type="button" variant="outline" size="icon" onClick={add}><Plus className="h-4 w-4" /></Button>
+          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); add() } }} className="min-w-0 text-sm" />
+        <Button type="button" variant="outline" size="icon" onClick={add} className="shrink-0"><Plus className="h-4 w-4" /></Button>
       </div>
       {values.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {values.map(v => (
-            <Badge key={v} variant="secondary" className="gap-1 pr-1 text-xs">
-              {v}
-              <button type="button" onClick={() => onChange(values.filter(x => x !== v))} className="hover:text-destructive ml-0.5 bg-press">
+            <Badge key={v} variant="secondary"
+              /* Square, not a pill: round is reserved for status pills, and a
+                 999px radius on a chip that now runs to three lines reads as a
+                 lozenge rather than a tag. The hairline is what makes it a tag
+                 at all on Ink, where `--secondary` and `--card` are the same
+                 value and the chip had no plane of its own. The badge already
+                 reserves a 1px transparent border, so drawing it costs no
+                 layout. */
+              className="h-auto max-w-full shrink items-start gap-1 rounded-sm border-border py-1 pr-1 text-left text-xs leading-snug whitespace-normal">
+              <span className="min-w-0 break-words">{v}</span>
+              <button type="button" onClick={() => onChange(values.filter(x => x !== v))}
+                aria-label={`Remove ${v}`}
+                className="mt-px ml-0.5 shrink-0 hover:text-destructive bg-press">
                 <X className="h-3 w-3" />
               </button>
             </Badge>
