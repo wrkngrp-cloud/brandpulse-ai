@@ -40,13 +40,30 @@ export default function PrivacyPolicyPage() {
           <ul className="mt-3 space-y-2 list-disc list-inside text-muted-foreground">
             <li>Your account name, account ID, and follower count</li>
             <li>Post content, media URLs, and publication dates</li>
-            <li>Public engagement metrics — likes, comments, shares, saves, impressions, and reach</li>
+            <li>Public engagement metrics: likes, comments, shares, saves, impressions, and reach</li>
             <li>Public mentions of your connected brand name on X/Twitter</li>
             <li>OAuth access tokens that allow us to fetch the above on your behalf</li>
           </ul>
           <p className="mt-3">
+            When you connect an advertising account (Meta Ads, Google Ads, TikTok Ads, or
+            LinkedIn Ads), we collect campaign names, spend, impressions, clicks, conversions and
+            the reporting metrics the platform exposes for those campaigns. We read this data.
+            We do not create, edit, pause or spend against your campaigns.
+          </p>
+          <p className="mt-3">
+            When you connect Google Analytics, we collect aggregate traffic and conversion
+            reporting for the single property you select: sessions, users, channel and source
+            breakdowns, and goal completions. We also read the list of properties your Google
+            account can access, purely so we can show you which one to pick.
+          </p>
+          <p className="mt-3">
+            If you sign in with Google, we receive your name, email address and profile picture
+            from your Google account to create and identify your BrandGauge login.
+          </p>
+          <p className="mt-3">
             We do not collect private messages, follower lists, personal information about your
-            audience, or any data that is not directly related to your brand&apos;s public performance.
+            audience, individual website visitor identities, or any data that is not directly
+            related to your brand&apos;s performance.
           </p>
         </Section>
 
@@ -101,6 +118,7 @@ export default function PrivacyPolicyPage() {
           </p>
           <ul className="mt-3 space-y-2 list-disc list-inside text-muted-foreground">
             <li>Meta (Facebook and Instagram): facebook.com/policy.php</li>
+            <li>Google (Analytics, Ads, and Sign-In): policies.google.com/privacy</li>
             <li>X (Twitter): x.com/en/privacy</li>
           </ul>
           <p className="mt-3">
@@ -109,7 +127,47 @@ export default function PrivacyPolicyPage() {
           </p>
         </Section>
 
-        <Section title="6. Your rights and data deletion">
+        <Section title="6. Google user data and Limited Use">
+          <p>
+            BrandGauge&apos;s use and transfer of information received from Google APIs to any
+            other app will adhere to the{' '}
+            <a
+              href="https://developers.google.com/terms/api-services-user-data-policy"
+              className="text-foreground underline underline-offset-4"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Google API Services User Data Policy
+            </a>
+            , including the Limited Use requirements.
+          </p>
+          <p className="mt-3">In practice that means:</p>
+          <ul className="mt-3 space-y-2 list-disc list-inside text-muted-foreground">
+            <li>
+              We use Google data only to provide and improve the BrandGauge features you
+              connected it for, such as your dashboards, Brand Health Index and reports
+            </li>
+            <li>We do not transfer Google data to others except to run the service for you, or where you direct us to, or where the law requires it</li>
+            <li>We do not use Google data for advertising of any kind</li>
+            <li>We do not allow humans to read your Google data, except where you ask us to for support, where security or the law requires it, or on data that is aggregated and no longer identifies you</li>
+            <li>We do not use Google data to train generalised AI or machine learning models</li>
+          </ul>
+          <p className="mt-3">
+            You can disconnect Google from your dashboard at any time, which deletes the stored
+            tokens straight away. You can also revoke BrandGauge&apos;s access from your{' '}
+            <a
+              href="https://myaccount.google.com/permissions"
+              className="text-foreground underline underline-offset-4"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Google account permissions page
+            </a>
+            .
+          </p>
+        </Section>
+
+        <Section title="7. Your rights and data deletion">
           <p>You have the right to:</p>
           <ul className="mt-3 space-y-2 list-disc list-inside text-muted-foreground">
             <li>Access a copy of all data we hold about your workspace</li>
@@ -130,7 +188,7 @@ export default function PrivacyPolicyPage() {
           </p>
         </Section>
 
-        <Section title="7. Contact">
+        <Section title="8. Contact">
           <p>
             If you have any questions about this policy, reach us at{' '}
             <a

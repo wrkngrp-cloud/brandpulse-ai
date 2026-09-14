@@ -57,14 +57,25 @@ export async function POST(req: NextRequest) {
     // The deletion_request_id is used to confirm the deletion is complete
     const deletionId = `meta-del-${Date.now()}-${userId.slice(0, 8)}`
 
-    // In production: queue a job to delete the user's data.
-    // For now: log to a deletions table if it exists, otherwise just acknowledge.
-    void supabase.from('meta_deletion_requests').insert({
-      meta_user_id:    userId,
-      deletion_id:     deletionId,
-      requested_at:    new Date().toISOString(),
-      raw_payload:     data,
-    })  // fire-and-forget; table may not exist yet
+    // Await the insert. On serverless the function can return before a
+    // fire-and-forget promise flushes, which would drop the request on the
+    // floor and leave the status URL below resolving to "reference not found".
+    const { error: insertErr } = await supabase
+      .from('meta_deletion_requests')
+      .insert({
+        meta_user_id: userId,
+        deletion_id:  deletionId,
+        status:       'pending',
+        requested_at: new Date().toISOString(),
+        raw_payload:  data,
+      })
+
+    if (insertErr) {
+      // Meta retries on a non-200, so surface the failure rather than handing
+      // back a confirmation code for a request we did not record.
+      console.error('[meta-deauthorize] failed to record deletion request:', insertErr)
+      return NextResponse.json({ error: 'Could not record deletion request' }, { status: 500 })
+    }
 
     return NextResponse.json({
       url:               `${APP_URL}/data-deletion-status?id=${deletionId}`,

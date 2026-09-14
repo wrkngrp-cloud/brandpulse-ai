@@ -573,6 +573,7 @@ export function Footer() {
           <Link href="/features" className="transition-opacity hover:opacity-60">Features</Link>
           <Link href="/use-cases" className="transition-opacity hover:opacity-60">Industries</Link>
           <Link href="/privacy-policy" className="transition-opacity hover:opacity-60">Privacy</Link>
+          <Link href="/terms" className="transition-opacity hover:opacity-60">Terms</Link>
           <a href="mailto:hello@brandgauge.app" className="transition-opacity hover:opacity-60">Contact</a>
         </div>
       </div>
