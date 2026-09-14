@@ -66,6 +66,12 @@ Upstash Redis for cache / rate-limit / OAuth state.
   coming, never a spinner. Everything is responsive from iPhone SE width up.
 - Public endpoints (`/survey/[id]`, `/ambassador/[token]`, `/go/[slug]`) post/redirect via a
   service-role API route that validates the token/slug. NEVER open anon RLS on those tables.
+- The public scoreboard (`/scoreboard`, `/api/scoreboard/*`) is the one open endpoint with no
+  token, because it reads a public news feed and touches no tenant row: there is no caller to
+  verify. It is guarded instead by an IP rate limit and a cache, both of which fail open. Its
+  tables (`public_scans`, `leads`, `lead_desk_admins`) are the one place RLS does not scope to a
+  workspace: a lead belongs to BrandGauge, so they scope to the `is_lead_desk()` allowlist and
+  are written by the service role only. See `docs/scoreboard-and-leads.md`.
 - Brands carry a `brand_type` (fmcg | fintech | venue | b2b_saas | marketplace |
   beverage_alcohol | b2b_distribution | agency). Any new funnel/BHI signal, nav item, or connector
   recommendation MUST branch on `brand_type` (see `src/lib/industry-config.ts` and

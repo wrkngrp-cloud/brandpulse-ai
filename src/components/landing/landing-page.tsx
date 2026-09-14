@@ -80,6 +80,7 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
           <Link href="/features" className="transition-opacity hover:opacity-60">Features</Link>
           <Link href="/use-cases" className="transition-opacity hover:opacity-60">Industries</Link>
           <Link href="/#builtforhere" className="transition-opacity hover:opacity-60">Why us</Link>
+          <Link href="/scoreboard" className="transition-opacity hover:opacity-60" style={{ color: 'var(--tx-flare)' }}>Free tool</Link>
         </nav>
         <div className="flex items-center gap-2.5">
           <button onClick={onToggle} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -344,6 +345,47 @@ const DIFFS = [
   { n: '05', title: 'Tracks how AI talks about you', body: 'A weekly check on what ChatGPT, Gemini and Perplexity say when customers ask about your category. A channel your competitors ignore.' },
   { n: '06', title: 'Built for seven industries', body: 'FMCG, fintech, venues, B2B SaaS, marketplaces, beverages and distribution. The index, funnel and recommendations reshape for each.' },
 ]
+
+/**
+ * The free tool, on the page.
+ *
+ * It sits after Industries and before the closing ask on purpose. A reader
+ * who has got this far knows what the product is and is deciding whether to
+ * believe it. A stranger is not going to hand over a company to find out; they
+ * will hand over four brand names. So the cheapest possible commitment goes
+ * here, between the argument and the ask, and it is a real thing rather than a
+ * teaser: the whole board, priced, no account.
+ */
+function FreeTool() {
+  return (
+    <section id="scoreboard" className="scroll-mt-24 px-6 py-24">
+      <TickReveal className="mx-auto max-w-6xl">
+        <div className="rounded-2xl border p-8 sm:p-12" style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)' }}>
+          <Tick as="p" className="bg-label" style={{ color: 'var(--tx-flare)' }}>Free, no account</Tick>
+          <Tick as="div">
+            <h2 className="mt-4 max-w-2xl text-3xl font-medium leading-tight tracking-tight sm:text-4xl"
+              style={{ fontFamily: 'var(--font)', color: 'var(--lp-ink)' }}>
+              Who is winning the news in your category?
+            </h2>
+          </Tick>
+          <Tick as="p" className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
+            Name your brand and three rivals. We read thirty days of Punch, Vanguard, BusinessDay,
+            Nairametrics, TechCabal and five more, weight every story by how many people read that
+            outlet, and tell you your share of the earned reach in your category and what it would
+            have cost to buy. Nothing to connect. Nothing of yours goes anywhere.
+          </Tick>
+          <Tick className="mt-8">
+            <Link href="/scoreboard"
+              className="inline-flex items-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-bold text-on-hot bg-press"
+              style={{ background: 'var(--flare)' }}>
+              Run the scoreboard <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Tick>
+        </div>
+      </TickReveal>
+    </section>
+  )
+}
 
 /**
  * Why this, and not a global tool.
@@ -612,6 +654,7 @@ export function LandingPage() {
       <Differentiators />
       <DeepDives />
       <Industries />
+      <FreeTool />
       <FinalCta />
       <Footer />
     </main>
