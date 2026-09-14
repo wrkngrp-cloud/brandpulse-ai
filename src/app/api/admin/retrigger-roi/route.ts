@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { inngest }             from '@/lib/inngest/client'
+import { timingSafeEqual }     from 'crypto'
 
 export const runtime    = 'nodejs'
 export const maxDuration = 60
 
 export async function GET(req: NextRequest) {
-  // Simple secret guard so this can't be called by accident
-  const secret = req.nextUrl.searchParams.get('secret')
-  if (secret !== process.env.ADMIN_SECRET) {
+  // The secret arrives as a header, not a query parameter. Web addresses are
+  // written to server, proxy and CDN logs as a matter of course, so a secret in
+  // the query string ends up sitting in log files long after the call.
+  const expected = process.env.ADMIN_SECRET
+  if (!expected) {
+    // Fail closed: an unset secret must never mean an open endpoint.
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const provided = req.headers.get('x-admin-secret') ?? ''
+  const a = Buffer.from(provided)
+  const b = Buffer.from(expected)
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
