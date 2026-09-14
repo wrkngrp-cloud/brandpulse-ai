@@ -72,13 +72,26 @@ interface MonthlyReportResult {
 
 // ── Export helpers ─────────────────────────────────────────────────────────────
 
+// Everything in these reports is model-generated text derived from brand data the
+// user controls: brand and competitor names, survey verbatims, social mentions.
+// It lands in a same-origin window via document.write, so a mention containing
+// markup would run there with access to the session. Escape on the way in.
+function esc(v: unknown): string {
+  return String(v ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 function printHtml(title: string, body: string) {
   const w = window.open('', '_blank')
   if (!w) { toast.error('Pop-up blocked. Allow pop-ups for this site to export the PDF.'); return }
   w.document.write(`<!DOCTYPE html>
 <html>
 <head>
-<title>${title}</title>
+<title>${esc(title)}</title>
 <style>
   *{box-sizing:border-box}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:760px;margin:40px auto;padding:0 24px;color:${TOKENS.tx};line-height:1.65;font-size:13px}
@@ -198,46 +211,46 @@ export function BusinessCaseTab() {
     if (!result) return
     const verdictClass = isGoVerdict(result.recommendation) ? 'green' : 'amber'
     const html = `
-      <h1>${result.title}</h1>
-      <div class="banner ${verdictClass}"><strong>Recommendation:</strong> ${result.recommendation}</div>
-      <h2>Executive Summary</h2><p>${result.executive_summary}</p>
+      <h1>${esc(result.title)}</h1>
+      <div class="banner ${verdictClass}"><strong>Recommendation:</strong> ${esc(result.recommendation)}</div>
+      <h2>Executive Summary</h2><p>${esc(result.executive_summary)}</p>
       <h2>Strategic Context</h2>
       <div class="grid2">
-        <div class="card"><span class="label">Ansoff Quadrant</span><strong>${result.ansoff_quadrant ?? ''}</strong><p>${result.ansoff_implication ?? ''}</p></div>
-        <div class="card"><span class="label">ESOV Signal</span><p>${result.esov_signal ?? ''}</p></div>
+        <div class="card"><span class="label">Ansoff Quadrant</span><strong>${esc(result.ansoff_quadrant ?? '')}</strong><p>${esc(result.ansoff_implication ?? '')}</p></div>
+        <div class="card"><span class="label">ESOV Signal</span><p>${esc(result.esov_signal ?? '')}</p></div>
       </div>
       <h2>Financial Return</h2>
       <div class="grid2">
-        <div class="card"><span class="label">Marketing ROI</span><p>${result.financial_return?.marketing_roi_estimate ?? ''}</p></div>
-        <div class="card"><span class="label">Payback Period</span><p>${result.financial_return?.payback_period ?? ''}</p></div>
-        <div class="card"><span class="label">CLV:CAC</span><p>${result.financial_return?.clv_cac_implication ?? ''}</p></div>
-        <div class="card"><span class="label">MER Impact</span><p>${result.financial_return?.mer_impact ?? ''}</p></div>
+        <div class="card"><span class="label">Marketing ROI</span><p>${esc(result.financial_return?.marketing_roi_estimate ?? '')}</p></div>
+        <div class="card"><span class="label">Payback Period</span><p>${esc(result.financial_return?.payback_period ?? '')}</p></div>
+        <div class="card"><span class="label">CLV:CAC</span><p>${esc(result.financial_return?.clv_cac_implication ?? '')}</p></div>
+        <div class="card"><span class="label">MER Impact</span><p>${esc(result.financial_return?.mer_impact ?? '')}</p></div>
       </div>
       <h2>Scenario Analysis</h2>
       <div class="grid3">
-        <div class="card"><span class="label">Base</span><p>${result.scenario_analysis?.base ?? ''}</p></div>
-        <div class="card"><span class="label">Bull</span><p>${result.scenario_analysis?.bull ?? ''}</p></div>
-        <div class="card"><span class="label">Bear</span><p>${result.scenario_analysis?.bear ?? ''}</p></div>
+        <div class="card"><span class="label">Base</span><p>${esc(result.scenario_analysis?.base ?? '')}</p></div>
+        <div class="card"><span class="label">Bull</span><p>${esc(result.scenario_analysis?.bull ?? '')}</p></div>
+        <div class="card"><span class="label">Bear</span><p>${esc(result.scenario_analysis?.bear ?? '')}</p></div>
       </div>
-      <h2>Market Opportunity</h2><p>${result.market_opportunity}</p>
-      <h2>Strategic Rationale</h2><ul>${(result.strategic_rationale ?? []).map(r => `<li>${r}</li>`).join('')}</ul>
-      <h2>Proposed Investment</h2><p>${result.proposed_investment}</p>
-      <h2>Resource Requirements</h2><p>${result.resource_requirements ?? ''}</p>
+      <h2>Market Opportunity</h2><p>${esc(result.market_opportunity)}</p>
+      <h2>Strategic Rationale</h2><ul>${(result.strategic_rationale ?? []).map(r => `<li>${esc(r)}</li>`).join('')}</ul>
+      <h2>Proposed Investment</h2><p>${esc(result.proposed_investment)}</p>
+      <h2>Resource Requirements</h2><p>${esc(result.resource_requirements ?? '')}</p>
       <h2>Brand Equity Outcomes (Aaker)</h2>
       <div class="grid2">
-        <div class="card"><span class="label">Loyalty</span><p>${result.aaker_equity_outcomes?.loyalty ?? ''}</p></div>
-        <div class="card"><span class="label">Awareness</span><p>${result.aaker_equity_outcomes?.awareness ?? ''}</p></div>
-        <div class="card"><span class="label">Perceived Quality</span><p>${result.aaker_equity_outcomes?.perceived_quality ?? ''}</p></div>
-        <div class="card"><span class="label">Associations</span><p>${result.aaker_equity_outcomes?.associations ?? ''}</p></div>
-        <div class="card"><span class="label">Proprietary Assets</span><p>${result.aaker_equity_outcomes?.proprietary_assets ?? ''}</p></div>
+        <div class="card"><span class="label">Loyalty</span><p>${esc(result.aaker_equity_outcomes?.loyalty ?? '')}</p></div>
+        <div class="card"><span class="label">Awareness</span><p>${esc(result.aaker_equity_outcomes?.awareness ?? '')}</p></div>
+        <div class="card"><span class="label">Perceived Quality</span><p>${esc(result.aaker_equity_outcomes?.perceived_quality ?? '')}</p></div>
+        <div class="card"><span class="label">Associations</span><p>${esc(result.aaker_equity_outcomes?.associations ?? '')}</p></div>
+        <div class="card"><span class="label">Proprietary Assets</span><p>${esc(result.aaker_equity_outcomes?.proprietary_assets ?? '')}</p></div>
       </div>
       <h2>Expected Outcomes</h2>
-      <table><tr><th>Metric</th><th>Target</th><th>Timeline</th></tr>${(result.expected_outcomes ?? []).map(o => `<tr><td>${o.metric}</td><td>${o.target}</td><td>${o.timeline}</td></tr>`).join('')}</table>
+      <table><tr><th>Metric</th><th>Target</th><th>Timeline</th></tr>${(result.expected_outcomes ?? []).map(o => `<tr><td>${esc(o.metric)}</td><td>${esc(o.target)}</td><td>${esc(o.timeline)}</td></tr>`).join('')}</table>
       <h2>Risk Factors</h2>
-      ${(result.risk_factors ?? []).map(r => `<div class="card" style="margin-bottom:.5rem"><strong>${r.risk}</strong><p style="color:var(--tx-2)">${r.mitigation}</p></div>`).join('')}
-      <h2>Decision Gates</h2><ul>${(result.decision_gates ?? []).map(g => `<li>${g}</li>`).join('')}</ul>
-      <h2>Success Metrics</h2><ul>${(result.success_metrics ?? []).map(m => `<li>${m}</li>`).join('')}</ul>
-      <h2>Alternatives Considered</h2><p>${result.alternatives_considered ?? ''}</p>
+      ${(result.risk_factors ?? []).map(r => `<div class="card" style="margin-bottom:.5rem"><strong>${esc(r.risk)}</strong><p style="color:var(--tx-2)">${esc(r.mitigation)}</p></div>`).join('')}
+      <h2>Decision Gates</h2><ul>${(result.decision_gates ?? []).map(g => `<li>${esc(g)}</li>`).join('')}</ul>
+      <h2>Success Metrics</h2><ul>${(result.success_metrics ?? []).map(m => `<li>${esc(m)}</li>`).join('')}</ul>
+      <h2>Alternatives Considered</h2><p>${esc(result.alternatives_considered ?? '')}</p>
     `
     printHtml(result.title, html)
   }
@@ -635,18 +648,18 @@ export function MonthlyReportTab({ userEmail }: { userEmail: string }) {
   function handlePrint() {
     if (!result) return
     const html = `
-      <h1>Monthly Brand Report — ${result.month}</h1>
-      <p><strong className="bg-num">${result.headline_score}</strong></p>
-      <h2>Executive Summary</h2><p>${result.executive_summary}</p>
+      <h1>Monthly Brand Report — ${esc(result.month)}</h1>
+      <p><strong className="bg-num">${esc(result.headline_score)}</strong></p>
+      <h2>Executive Summary</h2><p>${esc(result.executive_summary)}</p>
       <div class="grid2">
-        <div class="wins"><strong style="font-size:.7rem;text-transform:;letter-spacing:.05em;color:var(--pos)">Key Wins</strong><ul>${(result.key_wins ?? []).map(w => `<li>${w}</li>`).join('')}</ul></div>
-        <div class="concerns"><strong style="font-size:.7rem;text-transform:;letter-spacing:.05em;color:var(--char)">Key Concerns</strong><ul>${(result.key_concerns ?? []).map(c => `<li>${c}</li>`).join('')}</ul></div>
+        <div class="wins"><strong style="font-size:.7rem;text-transform:;letter-spacing:.05em;color:var(--pos)">Key Wins</strong><ul>${(result.key_wins ?? []).map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>
+        <div class="concerns"><strong style="font-size:.7rem;text-transform:;letter-spacing:.05em;color:var(--char)">Key Concerns</strong><ul>${(result.key_concerns ?? []).map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
       </div>
-      <h2>Sentiment Narrative</h2><p>${result.sentiment_narrative}</p>
-      <h2>Content Performance</h2><p>${result.content_performance}</p>
-      <h2>Audience Signals</h2><p>${result.audience_signals}</p>
+      <h2>Sentiment Narrative</h2><p>${esc(result.sentiment_narrative)}</p>
+      <h2>Content Performance</h2><p>${esc(result.content_performance)}</p>
+      <h2>Audience Signals</h2><p>${esc(result.audience_signals)}</p>
       <h2>Next Month Priorities</h2>
-      ${(result.next_month_priorities ?? []).map((p, i) => `<div class="card" style="margin-bottom:.5rem"><strong>${i + 1}. ${p.priority}</strong><p style="color:var(--tx-2)">${p.rationale}</p></div>`).join('')}
+      ${(result.next_month_priorities ?? []).map((p, i) => `<div class="card" style="margin-bottom:.5rem"><strong>${i + 1}. ${esc(p.priority)}</strong><p style="color:var(--tx-2)">${esc(p.rationale)}</p></div>`).join('')}
     `
     printHtml(`Monthly Brand Report — ${result.month}`, html)
   }
