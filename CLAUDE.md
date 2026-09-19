@@ -55,6 +55,12 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 There is no unit-test suite. Verify behaviour by type-check + lint + driving the actual
 flow (see Definition of done).
 
+Demo data goes live by RUNNING the seeds, not by deploying them. The seed
+routes are endpoints; the demo accounts keep whatever was written the last time
+they ran. After any change to seed code:
+`ADMIN_SECRET=... ./scripts/seed-demos.sh https://<deployment>` — it POSTs all
+four accounts, wipes and rebuilds each, and prints any failed writes per table.
+
 Demo seeds: brand health history is produced by `bhiSnapshotRows` in
 `src/lib/demo/bhi-series.ts`, which runs the real `computeFullBHI` with the
 brand's `brand_type`, so seeded history matches the live number and is stamped
