@@ -5,6 +5,8 @@ import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
 import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
+import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
+import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Jara Foods Ltd — Nigerian FMCG brand
@@ -141,10 +143,10 @@ export async function POST(req: NextRequest) {
       personality:   'The dependable village elder who moved to the city',
       language_mix:  { english: 60, pidgin: 25, yoruba: 10, igbo: 5 },
     },
-    bhi_weights: {
-      awareness: 0.20, consideration: 0.15, preference: 0.20,
-      advocacy: 0.15, nps: 0.15, sentiment: 0.10, sov: 0.05,
-    },
+    // The live score weights by brand_type (BRAND_TYPE_WEIGHTS). This column
+    // is the per-brand override and was carrying the superseded component
+    // names, so it described a formula nothing computes.
+    bhi_weights: BRAND_TYPE_WEIGHTS['fmcg'],
   }).select('id').single()
   if (brandErr) return NextResponse.json({ error: brandErr.message }, { status: 500 })
   const brandId = brand.id
@@ -240,30 +242,17 @@ export async function POST(req: NextRequest) {
   await sb.from('sentiment_daily').insert(sentRows)
 
   /* ── 7. Brand health snapshots — 180 days ────────────────────────────── */
-  const bhiRows = []
-  for (let d = 179; d >= 0; d--) {
-    const ss = sentScore(d)
-    const t  = ss / 100
-    const comps = {
-      awareness:     +(55 + t * 35).toFixed(1),
-      consideration: +(44 + t * 38).toFixed(1),
-      preference:    +(36 + t * 42).toFixed(1),
-      advocacy:      +(30 + t * 46).toFixed(1),
-      nps:           +(28 + t * 48).toFixed(1),
-      sentiment:     ss,
-      sov:           +(34 + t * 28).toFixed(1),
-    }
-    const bhiVal = +(
-      comps.awareness * 0.20 + comps.consideration * 0.15 + comps.preference * 0.20 +
-      comps.advocacy  * 0.15 + comps.nps          * 0.15 + comps.sentiment  * 0.10 +
-      comps.sov       * 0.05
-    ).toFixed(1)
-    bhiRows.push({
-      brand_id: brandId, snapshot_date: dAgo(d),
-      bhi: bhiVal, components: comps,
-      data_coverage_pct: +(85 + Math.sin(d * 0.3) * 8).toFixed(1),
-    })
-  }
+  // Scored by computeFullBHI with this brand's brand_type, so the seeded
+  // history matches the number the dashboard computes today.
+  const bhiRows = bhiSnapshotRows({
+    brandId, brandType: 'fmcg', days: 180,
+    sentiment: sentScore,
+    dateFor: dAgo,
+    levels: {
+      awareness:  [58, 79], salience:   [46, 66], perception: [54, 72],
+      cultural:   [52, 71], sov:        [34, 52], emv:        [38, 60],
+    },
+  })
   await sb.from('brand_health_snapshots').insert(bhiRows)
 
   /* ── 8. SOV snapshots — every 7 days, 180 days ───────────────────────── */

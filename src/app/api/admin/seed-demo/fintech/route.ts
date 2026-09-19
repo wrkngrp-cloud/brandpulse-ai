@@ -5,6 +5,8 @@ import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
 import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
+import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
+import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: PocketPay — Nigerian fintech (payments + savings app)
@@ -104,7 +106,7 @@ export async function POST(req: NextRequest) {
       { name: 'Students',       age_range: '16-24', income: 'low',        location: 'National' },
     ],
     brand_voice: { tone: 'energetic, trustworthy, plain-speaking', personality: 'The savvy friend who always knows how to move money faster', language_mix: { english: 55, pidgin: 35, yoruba: 5, igbo: 5 } },
-    bhi_weights:  { awareness: 0.20, consideration: 0.15, preference: 0.20, advocacy: 0.15, nps: 0.15, sentiment: 0.10, sov: 0.05 },
+    bhi_weights: BRAND_TYPE_WEIGHTS['fintech'],
   }
   let { data: brand, error: brandErr } = await sb.from('brands').insert(brandRow).select('id').single()
   if (brandErr?.message.includes('industry')) {
@@ -199,17 +201,18 @@ export async function POST(req: NextRequest) {
   await sb.from('sentiment_daily').insert(sentRows)
 
   /* ── 7. BHI snapshots — 180 days ─────────────────────────────────────── */
-  const bhiRows = []
-  for (let d = 179; d >= 0; d--) {
-    const ss = sentScore(d); const t = ss / 100
-    const comps = {
-      awareness: +(50 + t * 38).toFixed(1), consideration: +(40 + t * 40).toFixed(1),
-      preference: +(32 + t * 44).toFixed(1), advocacy: +(28 + t * 48).toFixed(1),
-      nps: +(30 + t * 46).toFixed(1), sentiment: ss, sov: +(22 + t * 22).toFixed(1),
-    }
-    const bhiVal = +(comps.awareness*0.20 + comps.consideration*0.15 + comps.preference*0.20 + comps.advocacy*0.15 + comps.nps*0.15 + comps.sentiment*0.10 + comps.sov*0.05).toFixed(1)
-    bhiRows.push({ brand_id: brandId, snapshot_date: dAgo(d), bhi: bhiVal, components: comps, data_coverage_pct: +(80 + Math.sin(d * 0.3) * 8).toFixed(1) })
-  }
+  // Scored by computeFullBHI with this brand's brand_type, so the seeded
+  // history matches the number the dashboard computes today.
+  const bhiRows = bhiSnapshotRows({
+    brandId, brandType: 'fintech', days: 180,
+    sentiment: sentScore,
+    dateFor: dAgo,
+    levels: {
+      // fintech weights trust hardest: perception and sentiment carry it
+      awareness:  [49, 66], salience:   [38, 58], perception: [51, 78],
+      cultural:   [44, 55], sov:        [22, 41], emv:        [26, 47],
+    },
+  })
   await sb.from('brand_health_snapshots').insert(bhiRows)
 
   /* ── 8. SOV snapshots ─────────────────────────────────────────────────── */

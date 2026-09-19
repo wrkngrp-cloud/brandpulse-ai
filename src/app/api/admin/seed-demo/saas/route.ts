@@ -5,6 +5,8 @@ import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
 import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
+import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
+import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Bridger CRM — Nigerian B2B SaaS brand
@@ -132,10 +134,10 @@ export async function POST(req: NextRequest) {
       personality:   'The local expert who understands Nigerian business better than any imported tool',
       language_mix:  { english: 85, pidgin: 10, yoruba: 3, igbo: 2 },
     },
-    bhi_weights: {
-      awareness: 0.20, consideration: 0.15, preference: 0.20,
-      advocacy: 0.15, nps: 0.15, sentiment: 0.10, sov: 0.05,
-    },
+    // The live score weights by brand_type (BRAND_TYPE_WEIGHTS). This column
+    // is the per-brand override and was carrying the superseded component
+    // names, so it described a formula nothing computes.
+    bhi_weights: BRAND_TYPE_WEIGHTS['b2b_saas'],
   }
   let { data: brand, error: brandErr } = await sb.from('brands').insert(brandRow).select('id').single()
   if (brandErr?.message.includes('industry')) {
@@ -266,30 +268,19 @@ export async function POST(req: NextRequest) {
   await sb.from('sentiment_daily').insert(sentRows)
 
   /* ── 7. Brand health snapshots — 180 days ────────────────────────────── */
-  const bhiRows = []
-  for (let d = 179; d >= 0; d--) {
-    const ss = sentScore(d)
-    const t  = ss / 100
-    const comps = {
-      awareness:     +(42 + t * 40).toFixed(1),
-      consideration: +(35 + t * 42).toFixed(1),
-      preference:    +(28 + t * 44).toFixed(1),
-      advocacy:      +(24 + t * 48).toFixed(1),
-      nps:           +(30 + t * 46).toFixed(1),
-      sentiment:     ss,
-      sov:           +(22 + t * 32).toFixed(1),
-    }
-    const bhiVal = +(
-      comps.awareness * 0.20 + comps.consideration * 0.15 + comps.preference * 0.20 +
-      comps.advocacy  * 0.15 + comps.nps          * 0.15 + comps.sentiment  * 0.10 +
-      comps.sov       * 0.05
-    ).toFixed(1)
-    bhiRows.push({
-      brand_id: brandId, snapshot_date: dAgo(d),
-      bhi: bhiVal, components: comps,
-      data_coverage_pct: +(82 + Math.sin(d * 0.3) * 7).toFixed(1),
-    })
-  }
+  // Scored by computeFullBHI with this brand's brand_type, so the seeded
+  // history matches the number the dashboard computes today.
+  const bhiRows = bhiSnapshotRows({
+    brandId, brandType: 'b2b_saas', days: 180,
+    sentiment: sentScore,
+    dateFor: dAgo,
+    levels: {
+      // b2b_saas has no consumer cultural component, so it stays null and its
+      // weight redistributes across the components that do have data
+      awareness:  [41, 60], salience:   [44, 67], perception: [56, 79],
+      cultural:   null,     sov:        [29, 52], emv:        [21, 38],
+    },
+  })
   await sb.from('brand_health_snapshots').insert(bhiRows)
 
   /* ── 8. SOV snapshots — weekly, 25 snapshots ─────────────────────────── */
