@@ -25,6 +25,7 @@ export type BrandIconName =
   | 'bg-building'
   | 'bg-briefcase'
   | 'bg-calendar'
+  | 'bg-campaign'
   | 'bg-camera'
   | 'bg-card'
   | 'bg-check'
@@ -217,7 +218,7 @@ export const LUCIDE_TO_BRAND = {
   Mail: 'bg-mail',
   Map: 'bg-map',
   MapPin: 'bg-map',
-  Megaphone: 'bg-music',
+  Megaphone: 'bg-campaign',
   Menu: 'bg-menu',
   MessageCircle: 'bg-mentions',
   MessageCircleQuestion: 'bg-message-question',
@@ -440,6 +441,7 @@ export const MoonIcon = named('bg-moon')
 export const MoreIcon = named('bg-more')
 export const MousePointerIcon = named('bg-mouse-pointer')
 export const MusicIcon = named('bg-music')
+export const CampaignIcon = named('bg-campaign')
 export const OohIcon = named('bg-ooh')
 export const PanelIcon = named('bg-panel')
 export const PauseIcon = named('bg-pause')

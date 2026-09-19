@@ -8,7 +8,7 @@
  * seed still reports success. This script is the check that catches that.
  *
  * Reads:  supabase/migrations/*.sql   -> tables and columns
- * Checks: src/app/api/demo/**, src/app/api/admin/seed-demo/**
+ * Checks: src/app/api/demo/**, src/app/api/admin/seed-demo/**, src/lib/demo/**
  *
  * Usage: node scripts/validate-seeds.mjs        (exit 1 on any finding)
  */
@@ -99,6 +99,23 @@ function topLevelKeys(body) {
   return keys
 }
 
+/**
+ * Object-literal bodies returned by an arrow inside a .map(...) argument list,
+ * i.e. the `{ ... }` of `x => ({ ... })`. These are rows too, and missing them
+ * hid real column errors in the seeds.
+ */
+function arrowObjectBodies(argSrc) {
+  const bodies = []
+  const arrowRe = /=>\s*\(\s*\{/g
+  let m
+  while ((m = arrowRe.exec(argSrc))) {
+    const brace = argSrc.indexOf('{', m.index + m[0].length - 1)
+    const end = matchBracket(argSrc, brace)
+    if (end > 0) bodies.push(argSrc.slice(brace + 1, end - 1))
+  }
+  return bodies
+}
+
 /** every top-level object literal inside an array-literal body */
 function objectsInArray(body) {
   const objs = []
@@ -166,6 +183,8 @@ while ((m = alterRe.exec(sql))) {
 const seedFiles = [
   ...walk(join(ROOT, 'src/app/api/demo')),
   ...walk(join(ROOT, 'src/app/api/admin/seed-demo')),
+  // the shared generators write rows too, so they need the same check
+  ...walk(join(ROOT, 'src/lib/demo')),
 ].filter(f => f.endsWith('.ts')).sort()
 
 const badTables = [], badCols = [], unresolved = []
@@ -198,11 +217,32 @@ for (const file of seedFiles) {
       const end = matchBracket(src, i)
       if (end > 0) for (const o of objectsInArray(src.slice(i + 1, end - 1))) check(o)
     } else {
+      // .insert(xs.map(x => ({ ... }))) — the arrow returns the row literal
+      const inlineMap = /^[A-Za-z_$][A-Za-z0-9_$.\[\]]*\s*\.\s*map\s*\(/.exec(src.slice(i))
+      if (inlineMap) {
+        const open = src.indexOf('(', i + inlineMap[0].length - 1)
+        const end = matchBracket(src, open)
+        if (end > 0) {
+          for (const body of arrowObjectBodies(src.slice(open + 1, end - 1))) check(body)
+          continue
+        }
+      }
+
       // .insert(someVariable): resolve the variable in-file
       const vm = /^([A-Za-z_$][A-Za-z0-9_$]*)\s*\)/.exec(src.slice(i))
       if (!vm) { unresolved.push({ rel, line, table, what: 'expression' }); continue }
       const v = vm[1]
       let found = false
+      // const v = xs.map(x => ({ ... }))
+      const mapDeclRe = new RegExp(`(?:const|let|var)\\s+${v}\\b[^=]*=\\s*[A-Za-z_$][A-Za-z0-9_$.\\[\\]]*\\s*\\.\\s*map\\s*\\(`, 'g')
+      let md
+      while ((md = mapDeclRe.exec(src))) {
+        const open = src.lastIndexOf('(', md.index + md[0].length - 1)
+        const end = matchBracket(src, open)
+        if (end > 0) {
+          for (const body of arrowObjectBodies(src.slice(open + 1, end - 1))) { check(body); found = true }
+        }
+      }
       // const v = [ ... ]
       const declRe = new RegExp(`(?:const|let|var)\\s+${v}\\b[^=]*=\\s*\\[`, 'g')
       let d

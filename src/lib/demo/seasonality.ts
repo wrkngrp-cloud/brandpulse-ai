@@ -89,3 +89,44 @@ export function demoSentiment(opts: {
 
   return +(Math.min(95, Math.max(18, trend + season + noise)).toFixed(1))
 }
+
+/* ── Relative date labels ────────────────────────────────────────────────── */
+/*
+ * Seed narrative used to carry absolute labels ("the October 2025 stockout",
+ * "Q2 2026 pipeline"). They were true on the day they were written and read as
+ * stale the moment the calendar moved past them, which is how a demo seeded in
+ * September ended up quoting signals from July. These compute the label from
+ * the run date instead, so the prose always matches the rows.
+ */
+
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December']
+
+/** "October 2025" for a date `monthsBack` months before the run date. */
+export function monthLabel(monthsBack: number, base: Date = new Date()): string {
+  const d = new Date(base)
+  d.setUTCDate(1)
+  d.setUTCMonth(d.getUTCMonth() - monthsBack)
+  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+}
+
+/** Just the month name, no year. */
+export function monthName(monthsBack: number, base: Date = new Date()): string {
+  const d = new Date(base)
+  d.setUTCDate(1)
+  d.setUTCMonth(d.getUTCMonth() - monthsBack)
+  return MONTHS[d.getUTCMonth()]
+}
+
+/** "Q2 2026" for the quarter `quartersBack` quarters before the run date. */
+export function quarterLabel(quartersBack: number, base: Date = new Date()): string {
+  const d = new Date(base)
+  d.setUTCDate(1)
+  d.setUTCMonth(d.getUTCMonth() - quartersBack * 3)
+  return `Q${Math.floor(d.getUTCMonth() / 3) + 1} ${d.getUTCFullYear()}`
+}
+
+/** The year `yearsBack` years before the run date, as a string. */
+export function yearLabel(yearsBack = 0, base: Date = new Date()): string {
+  return String(base.getUTCFullYear() - yearsBack)
+}

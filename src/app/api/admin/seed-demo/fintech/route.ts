@@ -3,6 +3,8 @@ import { createClient }              from '@supabase/supabase-js'
 import { TOKENS } from '@/lib/brand-tokens'
 import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
+import { seedModulePack } from '@/lib/demo/module-pack'
+import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: PocketPay — Nigerian fintech (payments + savings app)
@@ -127,7 +129,7 @@ export async function POST(req: NextRequest) {
   /* ── 5. Campaigns ─────────────────────────────────────────────────────── */
   const { data: camp1 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'PocketPay Cares',
-    description: 'Brand trust recovery campaign after Oct 2025 support crisis. Influencer + digital.',
+    description: `Brand trust recovery campaign after the ${monthLabel(8, BASE)} support crisis. Influencer + digital.`,
     objective: 'awareness', status: 'completed',
     start_date: dAgo(210), end_date: dAgo(160), total_budget: 12_000_000, currency: 'NGN',
     ai_summary: 'PocketPay Cares reversed the Oct crisis within 6 weeks. Sentiment recovered from 42 to 69. Customer service influencer content drove 4.2M impressions. Trust score +18pts.',
@@ -378,7 +380,7 @@ export async function POST(req: NextRequest) {
 
   /* ── 13. NPS survey + records ─────────────────────────────────────────── */
   const { data: npsS } = await sb.from('surveys').insert({
-    brand_id: brandId, name: 'PocketPay NPS Q2 2026', type: 'nps_basic', status: 'active',
+    brand_id: brandId, name: `PocketPay NPS ${quarterLabel(1, BASE)}`, type: 'nps_basic', status: 'active',
     questions: [{ id: 'q1', text: 'How likely are you to recommend PocketPay to a friend?', type: 'nps' }],
   }).select('id').single()
 
@@ -399,7 +401,7 @@ export async function POST(req: NextRequest) {
     await sb.from('survey_responses').insert(npsScores.map(n => ({
       survey_id: npsS.id, quality_flag: 'ok',
       answers: { q1: n.score },
-      submitted_at: n.created_at,
+      collected_at: n.created_at,
     })))
   }
 
@@ -621,7 +623,7 @@ export async function POST(req: NextRequest) {
   await sb.from('ai_conversations').insert({
     brand_id: brandId, user_id: userId,
     messages: [
-      { role: 'user', content: 'Why did our sentiment crash in October 2025?', timestamp: tsAgo(200) },
+      { role: 'user', content: `Why did our sentiment crash in ${monthLabel(8, BASE)}?`, timestamp: tsAgo(200) },
       { role: 'assistant', content: 'The October 2025 crash (69 → 42 over roughly three weeks) traces back to a single viral thread: a user reported a frozen account and a failed transfer that took four days to resolve. Three things amplified it:\n\n**1. Support response time.** Median first-response time that month was 18 hours against a target of under 2. The delay itself became the story, independent of the original transaction issue.\n\n**2. Copycat complaints.** Once the thread passed 10K retweets, dozens of unrelated users piled on with older, smaller complaints — a pile-on effect common in fintech Twitter.\n\n**3. Silence.** PocketPay did not respond publicly for 36 hours. In a trust-sensitive category like payments, silence reads as confirmation.\n\nThe recovery came from PocketPay Cares: public acknowledgement, a visible support-team-led content series, and a published fix timeline. Sentiment moved from 42 to 69 in six weeks.', timestamp: tsAgo(200) },
       { role: 'user', content: 'How do we avoid this happening again now that Series A news is drawing more attention to us?', timestamp: tsAgo(48) },
       { role: 'assistant', content: 'Two things matter most with more eyes on the brand:\n\n**1. Speed of first response, not resolution.** Users forgive slow fixes more easily than slow acknowledgement. A same-day public response, even without a resolution, prevents the pile-on dynamic that hurt you in October.\n\n**2. Keep the trust content flowing, not just growth content.** Series A and Refer & Earn content is acquisition-focused. Without the occasional Cares-style trust post, growth-heavy feeds read as tone-deaf if an incident happens. Recommend one trust or support-spotlight post per two weeks going forward as insurance.', timestamp: tsAgo(48) },
@@ -827,6 +829,28 @@ export async function POST(req: NextRequest) {
   for (const asset of ppCreativeAssets) {
     await sb.from('creative_assets').insert({ brand_id: brandId, ...asset })
   }
+
+  /* ── Module pack: the modules every demo account was missing ───────────── */
+  // AI visibility, marketing mix modelling, WhatsApp, extra surveys, and the
+  // broadcast/field modules this vertical actually uses.
+  await seedModulePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'PocketPay', brandType: 'fintech',
+    competitors: ['OPay', 'PalmPay', 'Moniepoint', 'Kuda'],
+    campaignIds: [camp1Id, camp2Id, camp3Id],
+    aiQuestions: [
+      'What is the best mobile money app in Nigeria?',
+      'Which Nigerian fintech has the lowest transfer fees?',
+      'Safest app to send money to family in Nigeria',
+      'Best Nigerian app to open an account without visiting a bank',
+      'Which Nigerian fintech has the most reliable customer support?',
+    ],
+    aiMentionFrom: 0.29, aiMentionTo: 0.61,
+    mmmChannels: { referral: [0.34, 18_000_000], meta: [0.22, 31_000_000], google: [0.16, 19_500_000], agent_network: [0.14, 12_000_000], radio: [0.08, 6_400_000], influencer: [0.06, 9_800_000] },
+    mmmOutcomes: 96500,
+    mmmSummary: 'Referral is the cheapest acquisition channel by a wide margin and is carrying a third of measured outcomes on the smallest budget. Paid social is efficient at the top of the funnel and expensive at activation, which is the pattern to fix next.',
+    mmmRecommendations: ['Raise the referral reward ceiling: it is still the cheapest account opening', 'Move a share of Meta budget from awareness to activation retargeting', 'Agent network returns well in peri-urban Lagos and is under-resourced in Kano'],
+    base: BASE,
+  })
 
   return NextResponse.json({
     success: writeErrors.length === 0,

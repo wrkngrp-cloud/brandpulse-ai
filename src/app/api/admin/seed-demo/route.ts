@@ -3,6 +3,8 @@ import { createClient }              from '@supabase/supabase-js'
 import { TOKENS } from '@/lib/brand-tokens'
 import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
+import { seedModulePack } from '@/lib/demo/module-pack'
+import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Jara Foods Ltd — Nigerian FMCG brand
@@ -1812,7 +1814,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
         recommendations: [
           { action: 'Brief @chefkemisola for Summer Vibes Reel by end of week', rationale: 'Influencer seeding 2 weeks before paid launch historically drives 40% lower CPM for Jara campaigns.', priority: 'High' as const },
           { action: 'Prepare Gen-Z counter-narrative social pack for UNILAG/LASU audiences', rationale: 'ChowMate campus activation will start generating UGC within 10 days — preemptive content is cheaper than defensive response.', priority: 'High' as const },
-          { action: 'Restock Kano and Maiduguri to 120% before Sallah', rationale: 'October 2025 stockout threads cost 8 points of SOV. Distribution consistency is the fastest brand health lever.', priority: 'Medium' as const },
+          { action: 'Restock Kano and Maiduguri to 120% before Sallah', rationale: `${monthLabel(11, BASE)} stockout threads cost 8 points of SOV. Distribution consistency is the fastest brand health lever.`, priority: 'Medium' as const },
         ],
         data_gaps: [
           'No TikTok listening — ChowMate Gen-Z activity on platform unmonitored',
@@ -1950,7 +1952,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
         ],
         recommendations: [
           { action: 'Brief Sallah creators by July 1 (2 weeks away)', rationale: 'Cultural moments drive 2.4x engagement vs standard ads for Jara\'s audience. ChowMate has not booked Sallah talent — first mover wins.', priority: 'High' as const },
-          { action: 'Restock Kano and Maiduguri to 120% ahead of Sallah window', rationale: 'October 2025 stockout threads amplified ChowMate\'s SOV gain by 8 points. Prevention is cheaper than recovery.', priority: 'High' as const },
+          { action: 'Restock Kano and Maiduguri to 120% ahead of Sallah window', rationale: `${monthLabel(11, BASE)} stockout threads amplified ChowMate's SOV gain by 8 points. Prevention is cheaper than recovery.`, priority: 'High' as const },
           { action: 'Launch TikTok account with 4-week Summer Vibes extension (₦400k trial)', rationale: 'ChowMate earns 22% of its SOV on TikTok. Jara has zero presence. Low cost to test before Q4 budget lock.', priority: 'Medium' as const },
           { action: 'Activate 200 NPS promoters with Summer Vibes shareable kits', rationale: 'Promoter UGC converts at 3x paid CTR. The Summer Vibes high-sentiment window is the ideal moment to capture organic amplification.', priority: 'Medium' as const },
         ],
@@ -1992,7 +1994,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       },
       {
         role: 'assistant',
-        content: 'Three defensive plays, ranked by impact:\n\n**1. Pre-empt with a cultural moment.** Jara\'s cultural IQ is your moat. Own Sallah (late Sept) and October 1 Independence Day before ChowMate can fill that space. Brief @chefkemisola and @foodie_naija now for Q3 content — exclusivity windows are critical.\n\n**2. Lock down distribution visibility.** The October 2025 stockout threads did outsized damage. Work with your supply team to ensure Kano, Maiduguri and Ibadan are fully stocked by September 15. A visible stockout during a competitor blitz is a multiplier.\n\n**3. Activate your promoter base.** You currently have 57% promoters in NPS. Build a micro-advocacy programme — send promoters shareable content packs and limited-edition products pre-October. Your best defence against paid SOV is genuine community voice.',
+        content: `Three defensive plays, ranked by impact:\n\n**1. Pre-empt with a cultural moment.** Jara's cultural IQ is your moat. Own Sallah (late Sept) and October 1 Independence Day before ChowMate can fill that space. Brief @chefkemisola and @foodie_naija now for Q3 content — exclusivity windows are critical.\n\n**2. Lock down distribution visibility.** The ${monthLabel(11, BASE)} stockout threads did outsized damage. Work with your supply team to ensure Kano, Maiduguri and Ibadan are fully stocked by September 15. A visible stockout during a competitor blitz is a multiplier.\n\n**3. Activate your promoter base.** You currently have 57% promoters in NPS. Build a micro-advocacy programme — send promoters shareable content packs and limited-edition products pre-October. Your best defence against paid SOV is genuine community voice.`,
         timestamp: tsAgo(29),
       },
     ],
@@ -2273,7 +2275,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
     { headline: 'ChowMate\'s "Taste the Difference" OOH Blitz Divides Lagos Opinion', publication: 'BellaNaija', url: 'https://bellanaija.com/chowmate-ooh-lagos', pub_date: dAgo(38), sent_score: -0.20, sent_label: 'neutral',  reach: 320_000, emv:  -64_000, is_comp: true,  comp: 'ChowMate', snippet: 'ChowMate\'s aggressive billboard spend at Lekki Toll Gate and Ikeja has been noticed, but brand sentiment among focus groups remains mixed — consumers question whether quality matches the bold claims.' },
     { headline: 'Jara Summer Vibes Campaign Drives 22% Sales Uplift in Lagos', publication: 'Marketing Edge', url: 'https://marketingedge.com.ng/jara-summer-vibes-uplift', pub_date: dAgo(42), sent_score: 0.89, sent_label: 'positive', reach: 45_000,  emv:   247_500, is_comp: false, comp: null,       snippet: 'Internal figures from Jara Foods show the Summer Vibes campaign drove a 22% sales uplift in Lagos trade channels during its 6-week run, with digital contributing 38% of attributed revenue.' },
     { headline: 'Northern Nigeria FMCG Market Heats Up as Brands Battle for Distribution', publication: 'Blueprint', url: 'https://blueprint.ng/fmcg-northern-nigeria-battle', pub_date: dAgo(50), sent_score: 0.05, sent_label: 'neutral',  reach: 80_000,  emv:    32_000, is_comp: false, comp: null,       snippet: 'Jara Foods, ChowMate and NutriNg are all ramping up northern Nigeria investment, with Kano and Abuja seen as key battlegrounds for the next three years.' },
-    { headline: 'Jara Foods to Expand to East Africa — CEO Confirms 2027 Plans', publication: 'BusinessDay', url: 'https://businessday.ng/jara-east-africa-expansion', pub_date: dAgo(55), sent_score: 0.83, sent_label: 'positive', reach: 85_000,  emv:   467_500, is_comp: false, comp: null,       snippet: 'The CEO of Jara Foods confirmed at a Lagos business summit that the company intends to enter East Africa through Kenya and Ethiopia, leveraging the "Nourish" brand positioning.' },
+    { headline: `Jara Foods to Expand to East Africa — CEO Confirms ${yearLabel(-1, BASE)} Plans`, publication: 'BusinessDay', url: 'https://businessday.ng/jara-east-africa-expansion', pub_date: dAgo(55), sent_score: 0.83, sent_label: 'positive', reach: 85_000,  emv:   467_500, is_comp: false, comp: null,       snippet: 'The CEO of Jara Foods confirmed at a Lagos business summit that the company intends to enter East Africa through Kenya and Ethiopia, leveraging the "Nourish" brand positioning.' },
   ]
 
   await sb.from('press_mentions').insert(pressMentions.map(m => ({
@@ -2940,6 +2942,28 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
     }
     await sb.from('metric_manual').upsert(metricRows, { onConflict: 'brand_id,metric_key,period_start' })
   } catch (_) { /* metric_manual table may not exist in all environments */ }
+
+  /* ── Module pack: the modules every demo account was missing ───────────── */
+  // AI visibility, marketing mix modelling, WhatsApp, extra surveys, and the
+  // broadcast/field modules this vertical actually uses.
+  await seedModulePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'Jara Foods Ltd', brandType: 'fmcg',
+    competitors: ['ChowMate', 'NutriNg Foods', 'Golden Harvest'],
+    campaignIds: [camp1Id, camp2Id, camp3Id],
+    aiQuestions: [
+      'What are the best Nigerian packaged food brands?',
+      'Which Nigerian food brand is best value for a family?',
+      'What should I buy for a quick Nigerian breakfast?',
+      'Which Nigerian snack brands are trusted by parents?',
+      'Best Nigerian food brands for a naming ceremony tray',
+    ],
+    aiMentionFrom: 0.34, aiMentionTo: 0.58,
+    mmmChannels: { trade: [0.31, 42_000_000], ooh: [0.19, 26_000_000], meta: [0.18, 21_000_000], radio: [0.12, 9_500_000], tv: [0.11, 14_000_000], influencer: [0.09, 7_200_000] },
+    mmmOutcomes: 184000,
+    mmmSummary: 'Trade and distribution still carry the largest share of measured outcomes, which is what an FMCG brand in this market should expect. OOH is the strongest paid channel per naira. Radio is under-spent relative to the outcomes it returns in the North.',
+    mmmRecommendations: ['Shift roughly 15% of TV into radio for the Northern flight', 'Hold OOH spend: it is the best-performing paid channel per naira', 'Trade activation returns most when it runs in the four weeks before the festive peak'],
+    base: BASE,
+  })
 
   return NextResponse.json({
     success: writeErrors.length === 0,

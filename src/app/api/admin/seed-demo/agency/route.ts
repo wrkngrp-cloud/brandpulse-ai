@@ -3,6 +3,8 @@ import { createClient }              from '@supabase/supabase-js'
 import { TOKENS } from '@/lib/brand-tokens'
 import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
+import { seedModulePack } from '@/lib/demo/module-pack'
+import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Pinnacle Media Group — full-service Lagos marketing agency
@@ -383,15 +385,15 @@ export async function POST(req: NextRequest) {
 
   /* ── 13. NPS survey + records ─────────────────────────────────────────── */
   const { data: npsS } = await sb.from('surveys').insert({
-    brand_id: brandId, name: 'Pinnacle Client NPS Q2 2026', type: 'nps_basic', status: 'active',
+    brand_id: brandId, name: `Pinnacle Client NPS ${quarterLabel(1, BASE)}`, type: 'nps_basic', status: 'active',
     questions: [{ id: 'q1', text: 'How likely are you to recommend Pinnacle Media to a peer?', type: 'nps' }],
   }).select('id').single()
   if (npsS) {
     const dist = [10,10,9,9,9,9,8,8,8,8,8,7,7,7,7,6,6,5,4,3,2,1,1,0,0,
                   10,9,9,9,8,8,8,8,7,7,7,6,6,5,4,3,3,2,1,0,0,0,0,0,0]
-    const recs = dist.map((score, i) => ({ brand_id: brandId, survey_id: npsS.id, score, respondent_type: 'client', channel: 'email', submitted_at: tsAgo(i*3, 11) }))
+    const recs = dist.map((score, i) => ({ brand_id: brandId, score, respondent_role: 'client', channel: 'email', created_at: tsAgo(i*3, 11) }))
     await sb.from('nps_records').insert(recs)
-    await sb.from('survey_responses').insert(recs.map(n => ({ survey_id: npsS.id, quality_flag: 'ok', answers: { q1: n.score }, submitted_at: n.submitted_at })))
+    await sb.from('survey_responses').insert(recs.map(n => ({ survey_id: npsS.id, quality_flag: 'ok', answers: { q1: n.score }, collected_at: n.created_at })))
   }
 
   /* ── 14. Cultural resonance + competitive briefings ───────────────────── */
@@ -732,6 +734,28 @@ export async function POST(req: NextRequest) {
   for (const asset of pmCreativeAssets) {
     await sb.from('creative_assets').insert({ brand_id: brandId, ...asset })
   }
+
+  /* ── Module pack: the modules every demo account was missing ───────────── */
+  // AI visibility, marketing mix modelling, WhatsApp, extra surveys, and the
+  // broadcast/field modules this vertical actually uses.
+  await seedModulePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'Pinnacle Media', brandType: 'agency',
+    competitors: ["Noah's Ark", 'X3M Ideas', 'SO&U'],
+    campaignIds: [camp1Id, camp2Id, camp3Id],
+    aiQuestions: [
+      'Best creative agencies in Lagos',
+      'Which Nigerian agency handles fintech brands well?',
+      'Top integrated marketing agencies in West Africa',
+      'Which Lagos agency is strongest on influencer campaigns?',
+      'Best agency for an FMCG launch in Nigeria',
+    ],
+    aiMentionFrom: 0.26, aiMentionTo: 0.52,
+    mmmChannels: { trade_press: [0.3, 6_200_000], referral: [0.26, 2_100_000], linkedin: [0.18, 7_400_000], awards: [0.15, 5_800_000], events: [0.11, 4_300_000] },
+    mmmOutcomes: 38,
+    mmmSummary: 'New business comes from trade-press visibility and referral, not from paid media. Referral produces the most wins on the smallest spend, which is the number to protect when budgets tighten.',
+    mmmRecommendations: ['Protect the trade-press retainer: it is the top of the new-business funnel', 'Formalise the referral path, it is currently informal and still the best channel', 'Awards spend is worth keeping only where the category matches a target sector'],
+    base: BASE,
+  })
 
   return NextResponse.json({
     success: writeErrors.length === 0,

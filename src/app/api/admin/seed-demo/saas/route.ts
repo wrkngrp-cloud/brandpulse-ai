@@ -3,6 +3,8 @@ import { createClient }              from '@supabase/supabase-js'
 import { TOKENS } from '@/lib/brand-tokens'
 import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
+import { seedModulePack } from '@/lib/demo/module-pack'
+import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Bridger CRM — Nigerian B2B SaaS brand
@@ -596,7 +598,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     { c: 'Finally a CRM that does not need 6 consultants to set up. Bridger CRM is genuinely simple and powerful.',               p: 'twitter',   sl: 'positive', ss: 82, f: 3100,  d: 60  },
     { c: 'Bridger CRM SME Webinar was top-tier. Learned more about pipeline management in 1 hour than 3 months of HubSpot docs.', p: 'twitter',   sl: 'positive', ss: 87, f: 5400,  d: 62  },
     { c: 'Bridger CRM Built for Nigeria campaign was not marketing fluff. Product actually works for our use cases.',             p: 'twitter',   sl: 'positive', ss: 84, f: 4800,  d: 150 },
-    { c: 'Bridger CRM is the best investment we made in 2025. Team adoption rate 94%. That never happens with software.',         p: 'twitter',   sl: 'positive', ss: 91, f: 7200,  d: 70  },
+    { c: `Bridger CRM is the best investment we made in ${yearLabel(1, BASE)}. Team adoption rate 94%. That never happens with software.`,         p: 'twitter',   sl: 'positive', ss: 91, f: 7200,  d: 70  },
     { c: 'Switched from Zoho to Bridger CRM last quarter. Support quality and local understanding is night and day.',             p: 'twitter',   sl: 'positive', ss: 89, f: 9800,  d: 80  },
     { c: 'Bridger CRM enterprise tier has custom reporting that our CFO actually understands. ROI visible in 30 days.',           p: 'instagram', sl: 'positive', ss: 85, f: 2200,  d: 22  },
     { c: 'Bridger CRM handles USSD and WhatsApp deal tracking. That alone is worth the switch from imported CRMs.',              p: 'twitter',   sl: 'positive', ss: 90, f: 6700,  d: 15  },
@@ -696,7 +698,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     { c: 'SME Growth Webinar replay is live. Catch the full 60-minute session on pipeline velocity for Nigerian sales teams. Link in bio. #BridgerWebinar',                        p: 'instagram', fs: 'consideration', li: 1840,  co: 218,  sh: 490,  er: 3.2,  ai: 77, d: 52,  cmp: camp3Id },
     { c: 'Bridger Enterprise launch exceeded all expectations. 140 decision-makers at Demo Day. Pipeline generated in one afternoon. Details below.',                               p: 'twitter',   fs: 'advocacy',      li: 6120,  co: 880,  sh: 2540, er: 9.5,  ai: 93, d: 0,   cmp: camp2Id },
     { c: 'CRM built for the way Nigerian businesses actually run. Multi-location teams, Naira invoicing, WhatsApp deals. All in one place. #BridgerCRM',                           p: 'twitter',   fs: 'preference',    li: 3480,  co: 412,  sh: 1120, er: 5.7,  ai: 86, d: 27,  cmp: camp1Id },
-    { c: 'Bridger CRM 1,200 customers milestone. From 3 beta users in 2024 to 1,200 paying Nigerian businesses. This is just the beginning.',                                      p: 'twitter',   fs: 'advocacy',      li: 9820,  co: 1480, sh: 4200, er: 13.1, ai: 97, d: 6,   cmp: camp2Id },
+    { c: `Bridger CRM 1,200 customers milestone. From 3 beta users in ${yearLabel(2, BASE)} to 1,200 paying Nigerian businesses. This is just the beginning.`,                                      p: 'twitter',   fs: 'advocacy',      li: 9820,  co: 1480, sh: 4200, er: 13.1, ai: 97, d: 6,   cmp: camp2Id },
     { c: 'Nigerian startup ecosystem tip: stop paying dollar prices for CRM tools. Bridger CRM NGN pricing. Local support. Full features.',                                         p: 'twitter',   fs: 'awareness',     li: 5240,  co: 640,  sh: 2010, er: 8.3,  ai: 89, d: 38,  cmp: camp1Id },
     { c: 'Bridger CRM mobile app update is live. Offline deal logging, push notifications, voice note for call logs. Nigerian field teams rejoice.',                                p: 'twitter',   fs: 'preference',    li: 3980,  co: 520,  sh: 1380, er: 6.5,  ai: 88, d: 14,  cmp: camp2Id },
   ]
@@ -1094,7 +1096,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     { headline: 'Bridger CRM Launches Enterprise Tier at Lagos Demo Day',                     publication: 'TechCabal',    url: 'https://techcabal.com/bridger-enterprise-demo-day',      pub_date: dAgo(21),  sent_score: 0.88, sent_label: 'positive', reach: 180_000, emv: 1_260_000, is_comp: false, comp: null,               snippet: 'Bridger CRM used its Lagos Demo Day to launch an Enterprise tier aimed at Nigerian companies with 200 or more employees, drawing over 140 decision-makers to the event.' },
     { headline: 'Bridger CRM vs HubSpot: An Honest Comparison for Nigerian Sales Teams',      publication: 'Techpoint Africa', url: 'https://techpoint.africa/bridger-vs-hubspot-comparison', pub_date: dAgo(14),  sent_score: 0.72, sent_label: 'positive', reach: 95_000,  emv:   522_500, is_comp: true,  comp: 'HubSpot Nigeria', snippet: 'Bridger CRM has published a transparent comparison page against HubSpot, which within 72 hours was ranking on the first page of Google for "CRM Nigeria" searches.' },
     { headline: 'Zoho CRM Expands Partner Network to Eight Nigerian Cities',                  publication: 'BusinessDay',  url: 'https://businessday.ng/zoho-partner-network-expansion',  pub_date: dAgo(24),  sent_score: 0.15, sent_label: 'neutral',  reach: 85_000,  emv:   -42_500, is_comp: true,  comp: 'Zoho CRM',        snippet: 'Zoho CRM has signed reseller agreements in eight additional Nigerian cities, aiming to counter the distribution gap that has favoured Bridger CRM in mid-market accounts.' },
-    { headline: 'Bridger CRM Passes 1,200 Paying Nigerian Businesses',                        publication: 'Nairametrics', url: 'https://nairametrics.com/bridger-crm-1200-customers',    pub_date: dAgo(8),   sent_score: 0.90, sent_label: 'positive', reach: 130_000, emv:   715_000, is_comp: false, comp: null,               snippet: 'Bridger CRM has crossed 1,200 paying customers, growing from 3 beta users in 2024, with the company crediting its local support model and naira-first pricing for the traction.' },
+    { headline: 'Bridger CRM Passes 1,200 Paying Nigerian Businesses',                        publication: 'Nairametrics', url: 'https://nairametrics.com/bridger-crm-1200-customers',    pub_date: dAgo(8),   sent_score: 0.90, sent_label: 'positive', reach: 130_000, emv:   715_000, is_comp: false, comp: null,               snippet: `Bridger CRM has crossed 1,200 paying customers, growing from 3 beta users in ${yearLabel(2, BASE)}, with the company crediting its local support model and naira-first pricing for the traction.` },
   ]
   await sb.from('press_mentions').insert(bgPress.map(m => ({
     brand_id: brandId, headline: m.headline, publication: m.publication, url: m.url,
@@ -1344,6 +1346,28 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
   }
 
   /* ── Done ─────────────────────────────────────────────────────────────── */
+  /* ── Module pack: the modules every demo account was missing ───────────── */
+  // AI visibility, marketing mix modelling, WhatsApp, extra surveys, and the
+  // broadcast/field modules this vertical actually uses.
+  await seedModulePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'Bridger CRM', brandType: 'b2b_saas',
+    competitors: ['Zoho CRM', 'HubSpot', 'Salesforce Essentials'],
+    campaignIds: [camp1Id, camp2Id, camp3Id],
+    aiQuestions: [
+      'Best CRM for a Nigerian small business',
+      'Which CRM works well for African SMEs?',
+      'Affordable CRM with local payment support in Nigeria',
+      'Best CRM for a sales team of ten people',
+      'Which CRM has the easiest onboarding for non-technical teams?',
+    ],
+    aiMentionFrom: 0.22, aiMentionTo: 0.47,
+    mmmChannels: { content: [0.29, 8_400_000], google: [0.24, 14_200_000], linkedin: [0.21, 11_800_000], events: [0.14, 9_600_000], review_sites: [0.12, 3_200_000] },
+    mmmOutcomes: 2140,
+    mmmSummary: 'Content and organic search carry the pipeline, which is normal for B2B software and is the reason this brand barely moves with the festive calendar. Review-site presence returns the most per naira and is the smallest line in the budget.',
+    mmmRecommendations: ['Increase review-site investment: it is the highest return per naira in the mix', 'Keep content spend flat and improve conversion on existing pages before adding more', 'Events return slowly but produce the largest deal sizes, so judge them on a longer window'],
+    base: BASE,
+  })
+
   return NextResponse.json({
     success: writeErrors.length === 0,
     writes: summariseErrors(writeErrors),
