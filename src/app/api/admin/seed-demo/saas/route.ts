@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
 import { TOKENS } from '@/lib/brand-tokens'
+import { demoSentiment } from '@/lib/demo/seasonality'
+import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Bridger CRM — Nigerian B2B SaaS brand
-   Story arc: solid baseline → Zoho Nigeria launch dip (d~260-220) →
-              Built for Nigeria campaign recovery (d~220-150) →
-              Enterprise tier announcement lift (d~150-70) →
-              Recent position: strong, stable ~78
+   Story arc, relative to whenever the seed is run:
+     a year ago    solid baseline
+     ~8 months ago a competitor launches in Nigeria and the line dips
+     to today      steady recovery and growth
+   Barely seasonal on purpose: B2B SaaS buying is budget-led, not festive.
+
 ───────────────────────────────────────────────────────────────────────────── */
 
 const DEMO_EMAIL    = 'demo@bridgercrm.brandgauge.app'
@@ -34,14 +38,16 @@ function tsAgo(daysBack: number, hour = 10): string {
 /* ── Sentiment arc ───────────────────────────────────────────────────────── */
 
 function sentScore(d: number): number {
-  let base: number
-  if      (d >= 260) base = 68
-  else if (d >= 220) base = 68 - (d - 220) / 40 * 7
-  else if (d >= 150) base = 61 + (220 - d) / 70 * 9
-  else if (d >= 70)  base = 70 + (150 - d) / 80 * 7
-  else               base = 77 + (70 - d) * 0.04
-  const noise = Math.sin(d * 1.3) * 2.1 + Math.cos(d * 0.9) * 1.4
-  return +(Math.min(95, Math.max(18, base + noise)).toFixed(1))
+  // Bridger CRM, B2B SaaS: barely seasonal, buying cycles are budget-led.
+  // Seasonality is anchored to the real calendar, so December always reads as
+  // the festive peak however long after this was written the seed is run.
+  return demoSentiment({
+    daysAgo: d, windowDays: 365,
+    from: 63, to: 77,
+    seasonality: 1.5,
+    jitter: [1.3, 0.9],
+    base: BASE,
+  })
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -54,11 +60,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const sb = createClient(
+  // trackErrors records every failed insert without changing the call sites
+  // below, which mostly discard the error. Reported as `writes` in the response.
+  const { sb, errors: writeErrors } = trackErrors(createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { autoRefreshToken: false, persistSession: false } },
-  )
+  ))
 
   /* ── 1. Auth user ─────────────────────────────────────────────────────── */
   let userId: string
@@ -1052,12 +1060,16 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     bgFunnelRows.push({
       brand_id: brandId, snapshot_date: dAgo(d), segment: 'all',
       awareness:     +(40 + t * 42).toFixed(1),
-      consideration: +(32 + t * 44).toFixed(1),
-      preference:    +(24 + t * 46).toFixed(1),
       action:        +(15 + t * 34).toFixed(1),
-      loyalty:       +(20 + t * 40).toFixed(1),
-      advocacy:      +(12 + t * 30).toFixed(1),
       dropoffs: {
+        // funnel_snapshots stores awareness, action and dropoffs only;
+        // the middle stages ride in the dropoffs payload.
+        stages: {
+          consideration: +(32 + t * 44).toFixed(1),
+          preference:    +(24 + t * 46).toFixed(1),
+          loyalty:       +(20 + t * 40).toFixed(1),
+          advocacy:      +(12 + t * 30).toFixed(1),
+        },
         awareness_to_consideration:  +(38 - t * 14).toFixed(1),
         consideration_to_preference: +(30 - t * 12).toFixed(1),
         preference_to_action:        +(45 - t * 15).toFixed(1),
@@ -1333,7 +1345,8 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
 
   /* ── Done ─────────────────────────────────────────────────────────────── */
   return NextResponse.json({
-    success: true,
+    success: writeErrors.length === 0,
+    writes: summariseErrors(writeErrors),
     credentials: { email: DEMO_EMAIL, password: DEMO_PASSWORD, note: 'Login at /auth/login' },
     brand: 'Bridger CRM',
     workspace: 'Bridger (Pro plan)',

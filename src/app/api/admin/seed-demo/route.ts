@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
 import { TOKENS } from '@/lib/brand-tokens'
+import { demoSentiment } from '@/lib/demo/seasonality'
+import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Jara Foods Ltd — Nigerian FMCG brand
-   Story arc: healthy baseline → Oct 2025 competitor campaign dip →
-              Nov–Dec 2025 Nourish Nigeria recovery + festive peak →
-              Jan–Feb 2026 post-holiday stabilisation →
-              Mar–May 2026 Reconnect campaign growth →
-              June 2026 (now): strong summer position
+   Story arc, relative to whenever the seed is run:
+     a year ago    steady baseline
+     through       a competitor campaign dip, then recovery
+     every Dec     Detty December peak (calendar-anchored, see lib/demo/seasonality)
+     every Jan     the post-festive trough
+     to today      a brand roughly 20 points stronger than a year ago
+   Nothing here is pinned to a named month: run it in any month and the
+   festive peak still lands in December.
+
 ───────────────────────────────────────────────────────────────────────────── */
 
 const DEMO_EMAIL    = 'demo@jarafoods.brandgauge.app'
@@ -36,15 +42,16 @@ function tsAgo(daysBack: number, hour = 10): string {
 /* ── Story-arc sentiment model ───────────────────────────────────────────── */
 
 function sentScore(d: number): number {
-  let base: number
-  if      (d >= 290) base = 67
-  else if (d >= 250) base = 65 - (d - 250) / 40 * 17        // ChowMate blitz
-  else if (d >= 170) base = 48 + (250 - d) / 80 * 32        // recovery + festive
-  else if (d >= 110) base = 80 - (d - 110) / 60 * 18        // post-holiday dip
-  else if (d >= 30)  base = 62 + (110 - d) / 80 * 11        // Reconnect campaign
-  else               base = 71 + (30 - d) * 0.13            // summer
-  const noise = Math.sin(d * 1.7) * 2.5 + Math.cos(d * 0.9) * 1.8
-  return +(Math.min(95, Math.max(18, base + noise)).toFixed(1))
+  // Jara Foods, FMCG: lives on the festive calendar.
+  // Seasonality is anchored to the real calendar, so December always reads as
+  // the festive peak however long after this was written the seed is run.
+  return demoSentiment({
+    daysAgo: d, windowDays: 365,
+    from: 58, to: 78,
+    seasonality: 9.0,
+    jitter: [1.7, 0.9],
+    base: BASE,
+  })
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -57,11 +64,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const sb = createClient(
+  // trackErrors records every failed insert without changing the call sites
+  // below, which mostly discard the error. Reported as `writes` in the response.
+  const { sb, errors: writeErrors } = trackErrors(createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { autoRefreshToken: false, persistSession: false } },
-  )
+  ))
 
   /* ── 1. Auth user ─────────────────────────────────────────────────────── */
   let userId: string
@@ -104,6 +113,11 @@ export async function POST(req: NextRequest) {
     workspace_id:    wsId,
     name:            'Jara Foods Ltd',
     category:        'FMCG',
+    // brand_type drives the BHI component weights and the funnel signal set.
+    // Without it the brand silently scores on the default weights instead of
+    // the FMCG ones, so the demo stops demonstrating per-vertical scoring.
+    industry:        'fmcg',
+    brand_type:      'fmcg',
     primary_color:   TOKENS.ember,
     secondary_color: TOKENS.pos,
     market_share_pct: 14.7,
@@ -284,12 +298,16 @@ export async function POST(req: NextRequest) {
     funnelRows.push({
       brand_id: brandId, snapshot_date: dAgo(d), segment: 'all',
       awareness:      +(68 + t * 20).toFixed(1),
-      consideration:  +(45 + t * 25).toFixed(1),
-      preference:     +(32 + t * 28).toFixed(1),
       action:         +(18 + t * 18).toFixed(1),
-      loyalty:        +(28 + t * 22).toFixed(1),
-      advocacy:       +(15 + t * 18).toFixed(1),
       dropoffs: {
+        // funnel_snapshots stores awareness, action and dropoffs only;
+        // the middle stages ride in the dropoffs payload.
+        stages: {
+          consideration: +(45 + t * 25).toFixed(1),
+          preference:    +(32 + t * 28).toFixed(1),
+          loyalty:       +(28 + t * 22).toFixed(1),
+          advocacy:      +(15 + t * 18).toFixed(1),
+        },
         awareness_to_consideration: +(30 - t * 12).toFixed(1),
         consideration_to_preference: +(25 - t * 10).toFixed(1),
         preference_to_action:        +(35 - t * 8).toFixed(1),
@@ -759,9 +777,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 6.4698, lng: 3.5852, city: 'Lagos', state: 'Lagos',
       format_type: 'billboard', illuminated: true,
       daily_traffic: 85_000, operator: 'Outdoor Advertising Association of Nigeria',
-      monthly_cost: 380_000, currency: 'NGN',
+      weekly_cost: 87760, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
-      lga: 'Eti-Osa',
+      
       vanity_slug: 'jara-lekki', landing_url: 'https://jarafoods.com/summer',
       visits: 2847, qr_scan_count: 631,
     },
@@ -771,9 +789,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 6.5055, lng: 3.3576, city: 'Lagos', state: 'Lagos',
       format_type: 'unipole', illuminated: true,
       daily_traffic: 42_000, operator: 'Pison Outsourcing',
-      monthly_cost: 210_000, currency: 'NGN',
+      weekly_cost: 48499, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
-      lga: 'Surulere',
+      
       vanity_slug: 'jara-surulere', landing_url: 'https://jarafoods.com/summer',
       visits: 1234, qr_scan_count: 289,
     },
@@ -783,9 +801,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 9.0574, lng: 7.4898, city: 'Abuja', state: 'FCT',
       format_type: 'digital_screen', illuminated: true,
       daily_traffic: 22_000, operator: 'Ooh! Media',
-      monthly_cost: 480_000, currency: 'NGN',
+      weekly_cost: 110855, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
-      lga: 'Municipal Area Council',
+      
       vanity_slug: 'jara-transcorp', landing_url: 'https://jarafoods.com/summer',
       visits: 1482, qr_scan_count: 312,
     },
@@ -795,9 +813,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 6.5547, lng: 3.3500, city: 'Lagos', state: 'Lagos',
       format_type: 'lamppost', illuminated: false,
       daily_traffic: 110_000, operator: 'LASAA (Lagos State)',
-      monthly_cost: 180_000, currency: 'NGN',
+      weekly_cost: 41570, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
-      lga: 'Oshodi-Isolo',
+      
       vanity_slug: 'jara-oshodi', landing_url: 'https://jarafoods.com/summer',
       visits: 3612, qr_scan_count: 941,
     },
@@ -816,9 +834,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 6.5774, lng: 3.3212, city: 'Lagos', state: 'Lagos',
       format_type: 'digital_screen', illuminated: true,
       daily_traffic: 28_000, operator: 'Ooh! Media',
-      monthly_cost: 550_000, currency: 'NGN',
+      weekly_cost: 127021, currency: 'NGN',
       campaign_start: dAgo(218), campaign_end: dAgo(168),
-      lga: 'Ikeja',
+      
       vanity_slug: 'jara-airport', landing_url: 'https://jarafoods.com/nourish',
       visits: 4102, qr_scan_count: 893,
     },
@@ -828,9 +846,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 9.0063, lng: 7.4631, city: 'Abuja', state: 'FCT',
       format_type: 'unipole', illuminated: true,
       daily_traffic: 35_000, operator: 'AllOver Media',
-      monthly_cost: 290_000, currency: 'NGN',
+      weekly_cost: 66975, currency: 'NGN',
       campaign_start: dAgo(218), campaign_end: dAgo(168),
-      lga: 'Municipal Area Council',
+      
       vanity_slug: 'jara-abuja', landing_url: 'https://jarafoods.com/nourish',
       visits: 2291, qr_scan_count: 412,
     },
@@ -840,9 +858,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 11.9944, lng: 8.5082, city: 'Kano', state: 'Kano',
       format_type: 'billboard', illuminated: true,
       daily_traffic: 48_000, operator: 'Prime Outdoor',
-      monthly_cost: 120_000, currency: 'NGN',
+      weekly_cost: 27714, currency: 'NGN',
       campaign_start: dAgo(90), campaign_end: dAgo(-30),
-      lga: 'Kano Municipal',
+      
       vanity_slug: 'jara-kano', landing_url: 'https://jarafoods.com',
       visits: 891, qr_scan_count: 198,
     },
@@ -852,9 +870,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 4.8242, lng: 7.0336, city: 'Port Harcourt', state: 'Rivers',
       format_type: 'unipole', illuminated: true,
       daily_traffic: 31_000, operator: 'Rivers State SEMTRAC',
-      monthly_cost: 165_000, currency: 'NGN',
+      weekly_cost: 38106, currency: 'NGN',
       campaign_start: dAgo(60), campaign_end: dAgo(-30),
-      lga: 'Port Harcourt',
+      
       vanity_slug: 'jara-ph', landing_url: 'https://jarafoods.com',
       visits: 1124, qr_scan_count: 267,
     },
@@ -2924,7 +2942,8 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
   } catch (_) { /* metric_manual table may not exist in all environments */ }
 
   return NextResponse.json({
-    success: true,
+    success: writeErrors.length === 0,
+    writes: summariseErrors(writeErrors),
     credentials: {
       email:    DEMO_EMAIL,
       password: DEMO_PASSWORD,
