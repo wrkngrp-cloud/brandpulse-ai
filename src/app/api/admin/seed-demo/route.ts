@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
 import { TOKENS } from '@/lib/brand-tokens'
+import { demoSentiment } from '@/lib/demo/seasonality'
+import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
+import { seedModulePack } from '@/lib/demo/module-pack'
+import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Jara Foods Ltd — Nigerian FMCG brand
-   Story arc: healthy baseline → Oct 2025 competitor campaign dip →
-              Nov–Dec 2025 Nourish Nigeria recovery + festive peak →
-              Jan–Feb 2026 post-holiday stabilisation →
-              Mar–May 2026 Reconnect campaign growth →
-              June 2026 (now): strong summer position
+   Story arc, relative to whenever the seed is run:
+     a year ago    steady baseline
+     through       a competitor campaign dip, then recovery
+     every Dec     Detty December peak (calendar-anchored, see lib/demo/seasonality)
+     every Jan     the post-festive trough
+     to today      a brand roughly 20 points stronger than a year ago
+   Nothing here is pinned to a named month: run it in any month and the
+   festive peak still lands in December.
+
 ───────────────────────────────────────────────────────────────────────────── */
 
 const DEMO_EMAIL    = 'demo@jarafoods.brandgauge.app'
@@ -36,15 +44,16 @@ function tsAgo(daysBack: number, hour = 10): string {
 /* ── Story-arc sentiment model ───────────────────────────────────────────── */
 
 function sentScore(d: number): number {
-  let base: number
-  if      (d >= 290) base = 67
-  else if (d >= 250) base = 65 - (d - 250) / 40 * 17        // ChowMate blitz
-  else if (d >= 170) base = 48 + (250 - d) / 80 * 32        // recovery + festive
-  else if (d >= 110) base = 80 - (d - 110) / 60 * 18        // post-holiday dip
-  else if (d >= 30)  base = 62 + (110 - d) / 80 * 11        // Reconnect campaign
-  else               base = 71 + (30 - d) * 0.13            // summer
-  const noise = Math.sin(d * 1.7) * 2.5 + Math.cos(d * 0.9) * 1.8
-  return +(Math.min(95, Math.max(18, base + noise)).toFixed(1))
+  // Jara Foods, FMCG: lives on the festive calendar.
+  // Seasonality is anchored to the real calendar, so December always reads as
+  // the festive peak however long after this was written the seed is run.
+  return demoSentiment({
+    daysAgo: d, windowDays: 365,
+    from: 58, to: 78,
+    seasonality: 9.0,
+    jitter: [1.7, 0.9],
+    base: BASE,
+  })
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -57,11 +66,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const sb = createClient(
+  // trackErrors records every failed insert without changing the call sites
+  // below, which mostly discard the error. Reported as `writes` in the response.
+  const { sb, errors: writeErrors } = trackErrors(createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { autoRefreshToken: false, persistSession: false } },
-  )
+  ))
 
   /* ── 1. Auth user ─────────────────────────────────────────────────────── */
   let userId: string
@@ -104,6 +115,11 @@ export async function POST(req: NextRequest) {
     workspace_id:    wsId,
     name:            'Jara Foods Ltd',
     category:        'FMCG',
+    // brand_type drives the BHI component weights and the funnel signal set.
+    // Without it the brand silently scores on the default weights instead of
+    // the FMCG ones, so the demo stops demonstrating per-vertical scoring.
+    industry:        'fmcg',
+    brand_type:      'fmcg',
     primary_color:   TOKENS.ember,
     secondary_color: TOKENS.pos,
     market_share_pct: 14.7,
@@ -284,12 +300,16 @@ export async function POST(req: NextRequest) {
     funnelRows.push({
       brand_id: brandId, snapshot_date: dAgo(d), segment: 'all',
       awareness:      +(68 + t * 20).toFixed(1),
-      consideration:  +(45 + t * 25).toFixed(1),
-      preference:     +(32 + t * 28).toFixed(1),
       action:         +(18 + t * 18).toFixed(1),
-      loyalty:        +(28 + t * 22).toFixed(1),
-      advocacy:       +(15 + t * 18).toFixed(1),
       dropoffs: {
+        // funnel_snapshots stores awareness, action and dropoffs only;
+        // the middle stages ride in the dropoffs payload.
+        stages: {
+          consideration: +(45 + t * 25).toFixed(1),
+          preference:    +(32 + t * 28).toFixed(1),
+          loyalty:       +(28 + t * 22).toFixed(1),
+          advocacy:      +(15 + t * 18).toFixed(1),
+        },
         awareness_to_consideration: +(30 - t * 12).toFixed(1),
         consideration_to_preference: +(25 - t * 10).toFixed(1),
         preference_to_action:        +(35 - t * 8).toFixed(1),
@@ -759,9 +779,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 6.4698, lng: 3.5852, city: 'Lagos', state: 'Lagos',
       format_type: 'billboard', illuminated: true,
       daily_traffic: 85_000, operator: 'Outdoor Advertising Association of Nigeria',
-      monthly_cost: 380_000, currency: 'NGN',
+      weekly_cost: 87760, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
-      lga: 'Eti-Osa',
+      
       vanity_slug: 'jara-lekki', landing_url: 'https://jarafoods.com/summer',
       visits: 2847, qr_scan_count: 631,
     },
@@ -771,9 +791,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 6.5055, lng: 3.3576, city: 'Lagos', state: 'Lagos',
       format_type: 'unipole', illuminated: true,
       daily_traffic: 42_000, operator: 'Pison Outsourcing',
-      monthly_cost: 210_000, currency: 'NGN',
+      weekly_cost: 48499, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
-      lga: 'Surulere',
+      
       vanity_slug: 'jara-surulere', landing_url: 'https://jarafoods.com/summer',
       visits: 1234, qr_scan_count: 289,
     },
@@ -783,9 +803,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 9.0574, lng: 7.4898, city: 'Abuja', state: 'FCT',
       format_type: 'digital_screen', illuminated: true,
       daily_traffic: 22_000, operator: 'Ooh! Media',
-      monthly_cost: 480_000, currency: 'NGN',
+      weekly_cost: 110855, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
-      lga: 'Municipal Area Council',
+      
       vanity_slug: 'jara-transcorp', landing_url: 'https://jarafoods.com/summer',
       visits: 1482, qr_scan_count: 312,
     },
@@ -795,9 +815,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 6.5547, lng: 3.3500, city: 'Lagos', state: 'Lagos',
       format_type: 'lamppost', illuminated: false,
       daily_traffic: 110_000, operator: 'LASAA (Lagos State)',
-      monthly_cost: 180_000, currency: 'NGN',
+      weekly_cost: 41570, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
-      lga: 'Oshodi-Isolo',
+      
       vanity_slug: 'jara-oshodi', landing_url: 'https://jarafoods.com/summer',
       visits: 3612, qr_scan_count: 941,
     },
@@ -816,9 +836,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 6.5774, lng: 3.3212, city: 'Lagos', state: 'Lagos',
       format_type: 'digital_screen', illuminated: true,
       daily_traffic: 28_000, operator: 'Ooh! Media',
-      monthly_cost: 550_000, currency: 'NGN',
+      weekly_cost: 127021, currency: 'NGN',
       campaign_start: dAgo(218), campaign_end: dAgo(168),
-      lga: 'Ikeja',
+      
       vanity_slug: 'jara-airport', landing_url: 'https://jarafoods.com/nourish',
       visits: 4102, qr_scan_count: 893,
     },
@@ -828,9 +848,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 9.0063, lng: 7.4631, city: 'Abuja', state: 'FCT',
       format_type: 'unipole', illuminated: true,
       daily_traffic: 35_000, operator: 'AllOver Media',
-      monthly_cost: 290_000, currency: 'NGN',
+      weekly_cost: 66975, currency: 'NGN',
       campaign_start: dAgo(218), campaign_end: dAgo(168),
-      lga: 'Municipal Area Council',
+      
       vanity_slug: 'jara-abuja', landing_url: 'https://jarafoods.com/nourish',
       visits: 2291, qr_scan_count: 412,
     },
@@ -840,9 +860,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 11.9944, lng: 8.5082, city: 'Kano', state: 'Kano',
       format_type: 'billboard', illuminated: true,
       daily_traffic: 48_000, operator: 'Prime Outdoor',
-      monthly_cost: 120_000, currency: 'NGN',
+      weekly_cost: 27714, currency: 'NGN',
       campaign_start: dAgo(90), campaign_end: dAgo(-30),
-      lga: 'Kano Municipal',
+      
       vanity_slug: 'jara-kano', landing_url: 'https://jarafoods.com',
       visits: 891, qr_scan_count: 198,
     },
@@ -852,9 +872,9 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       lat: 4.8242, lng: 7.0336, city: 'Port Harcourt', state: 'Rivers',
       format_type: 'unipole', illuminated: true,
       daily_traffic: 31_000, operator: 'Rivers State SEMTRAC',
-      monthly_cost: 165_000, currency: 'NGN',
+      weekly_cost: 38106, currency: 'NGN',
       campaign_start: dAgo(60), campaign_end: dAgo(-30),
-      lga: 'Port Harcourt',
+      
       vanity_slug: 'jara-ph', landing_url: 'https://jarafoods.com',
       visits: 1124, qr_scan_count: 267,
     },
@@ -1794,7 +1814,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
         recommendations: [
           { action: 'Brief @chefkemisola for Summer Vibes Reel by end of week', rationale: 'Influencer seeding 2 weeks before paid launch historically drives 40% lower CPM for Jara campaigns.', priority: 'High' as const },
           { action: 'Prepare Gen-Z counter-narrative social pack for UNILAG/LASU audiences', rationale: 'ChowMate campus activation will start generating UGC within 10 days — preemptive content is cheaper than defensive response.', priority: 'High' as const },
-          { action: 'Restock Kano and Maiduguri to 120% before Sallah', rationale: 'October 2025 stockout threads cost 8 points of SOV. Distribution consistency is the fastest brand health lever.', priority: 'Medium' as const },
+          { action: 'Restock Kano and Maiduguri to 120% before Sallah', rationale: `${monthLabel(11, BASE)} stockout threads cost 8 points of SOV. Distribution consistency is the fastest brand health lever.`, priority: 'Medium' as const },
         ],
         data_gaps: [
           'No TikTok listening — ChowMate Gen-Z activity on platform unmonitored',
@@ -1932,7 +1952,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
         ],
         recommendations: [
           { action: 'Brief Sallah creators by July 1 (2 weeks away)', rationale: 'Cultural moments drive 2.4x engagement vs standard ads for Jara\'s audience. ChowMate has not booked Sallah talent — first mover wins.', priority: 'High' as const },
-          { action: 'Restock Kano and Maiduguri to 120% ahead of Sallah window', rationale: 'October 2025 stockout threads amplified ChowMate\'s SOV gain by 8 points. Prevention is cheaper than recovery.', priority: 'High' as const },
+          { action: 'Restock Kano and Maiduguri to 120% ahead of Sallah window', rationale: `${monthLabel(11, BASE)} stockout threads amplified ChowMate's SOV gain by 8 points. Prevention is cheaper than recovery.`, priority: 'High' as const },
           { action: 'Launch TikTok account with 4-week Summer Vibes extension (₦400k trial)', rationale: 'ChowMate earns 22% of its SOV on TikTok. Jara has zero presence. Low cost to test before Q4 budget lock.', priority: 'Medium' as const },
           { action: 'Activate 200 NPS promoters with Summer Vibes shareable kits', rationale: 'Promoter UGC converts at 3x paid CTR. The Summer Vibes high-sentiment window is the ideal moment to capture organic amplification.', priority: 'Medium' as const },
         ],
@@ -1974,7 +1994,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       },
       {
         role: 'assistant',
-        content: 'Three defensive plays, ranked by impact:\n\n**1. Pre-empt with a cultural moment.** Jara\'s cultural IQ is your moat. Own Sallah (late Sept) and October 1 Independence Day before ChowMate can fill that space. Brief @chefkemisola and @foodie_naija now for Q3 content — exclusivity windows are critical.\n\n**2. Lock down distribution visibility.** The October 2025 stockout threads did outsized damage. Work with your supply team to ensure Kano, Maiduguri and Ibadan are fully stocked by September 15. A visible stockout during a competitor blitz is a multiplier.\n\n**3. Activate your promoter base.** You currently have 57% promoters in NPS. Build a micro-advocacy programme — send promoters shareable content packs and limited-edition products pre-October. Your best defence against paid SOV is genuine community voice.',
+        content: `Three defensive plays, ranked by impact:\n\n**1. Pre-empt with a cultural moment.** Jara's cultural IQ is your moat. Own Sallah (late Sept) and October 1 Independence Day before ChowMate can fill that space. Brief @chefkemisola and @foodie_naija now for Q3 content — exclusivity windows are critical.\n\n**2. Lock down distribution visibility.** The ${monthLabel(11, BASE)} stockout threads did outsized damage. Work with your supply team to ensure Kano, Maiduguri and Ibadan are fully stocked by September 15. A visible stockout during a competitor blitz is a multiplier.\n\n**3. Activate your promoter base.** You currently have 57% promoters in NPS. Build a micro-advocacy programme — send promoters shareable content packs and limited-edition products pre-October. Your best defence against paid SOV is genuine community voice.`,
         timestamp: tsAgo(29),
       },
     ],
@@ -2255,7 +2275,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
     { headline: 'ChowMate\'s "Taste the Difference" OOH Blitz Divides Lagos Opinion', publication: 'BellaNaija', url: 'https://bellanaija.com/chowmate-ooh-lagos', pub_date: dAgo(38), sent_score: -0.20, sent_label: 'neutral',  reach: 320_000, emv:  -64_000, is_comp: true,  comp: 'ChowMate', snippet: 'ChowMate\'s aggressive billboard spend at Lekki Toll Gate and Ikeja has been noticed, but brand sentiment among focus groups remains mixed — consumers question whether quality matches the bold claims.' },
     { headline: 'Jara Summer Vibes Campaign Drives 22% Sales Uplift in Lagos', publication: 'Marketing Edge', url: 'https://marketingedge.com.ng/jara-summer-vibes-uplift', pub_date: dAgo(42), sent_score: 0.89, sent_label: 'positive', reach: 45_000,  emv:   247_500, is_comp: false, comp: null,       snippet: 'Internal figures from Jara Foods show the Summer Vibes campaign drove a 22% sales uplift in Lagos trade channels during its 6-week run, with digital contributing 38% of attributed revenue.' },
     { headline: 'Northern Nigeria FMCG Market Heats Up as Brands Battle for Distribution', publication: 'Blueprint', url: 'https://blueprint.ng/fmcg-northern-nigeria-battle', pub_date: dAgo(50), sent_score: 0.05, sent_label: 'neutral',  reach: 80_000,  emv:    32_000, is_comp: false, comp: null,       snippet: 'Jara Foods, ChowMate and NutriNg are all ramping up northern Nigeria investment, with Kano and Abuja seen as key battlegrounds for the next three years.' },
-    { headline: 'Jara Foods to Expand to East Africa — CEO Confirms 2027 Plans', publication: 'BusinessDay', url: 'https://businessday.ng/jara-east-africa-expansion', pub_date: dAgo(55), sent_score: 0.83, sent_label: 'positive', reach: 85_000,  emv:   467_500, is_comp: false, comp: null,       snippet: 'The CEO of Jara Foods confirmed at a Lagos business summit that the company intends to enter East Africa through Kenya and Ethiopia, leveraging the "Nourish" brand positioning.' },
+    { headline: `Jara Foods to Expand to East Africa — CEO Confirms ${yearLabel(-1, BASE)} Plans`, publication: 'BusinessDay', url: 'https://businessday.ng/jara-east-africa-expansion', pub_date: dAgo(55), sent_score: 0.83, sent_label: 'positive', reach: 85_000,  emv:   467_500, is_comp: false, comp: null,       snippet: 'The CEO of Jara Foods confirmed at a Lagos business summit that the company intends to enter East Africa through Kenya and Ethiopia, leveraging the "Nourish" brand positioning.' },
   ]
 
   await sb.from('press_mentions').insert(pressMentions.map(m => ({
@@ -2923,8 +2943,31 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
     await sb.from('metric_manual').upsert(metricRows, { onConflict: 'brand_id,metric_key,period_start' })
   } catch (_) { /* metric_manual table may not exist in all environments */ }
 
+  /* ── Module pack: the modules every demo account was missing ───────────── */
+  // AI visibility, marketing mix modelling, WhatsApp, extra surveys, and the
+  // broadcast/field modules this vertical actually uses.
+  await seedModulePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'Jara Foods Ltd', brandType: 'fmcg',
+    competitors: ['ChowMate', 'NutriNg Foods', 'Golden Harvest'],
+    campaignIds: [camp1Id, camp2Id, camp3Id],
+    aiQuestions: [
+      'What are the best Nigerian packaged food brands?',
+      'Which Nigerian food brand is best value for a family?',
+      'What should I buy for a quick Nigerian breakfast?',
+      'Which Nigerian snack brands are trusted by parents?',
+      'Best Nigerian food brands for a naming ceremony tray',
+    ],
+    aiMentionFrom: 0.34, aiMentionTo: 0.58,
+    mmmChannels: { trade: [0.31, 42_000_000], ooh: [0.19, 26_000_000], meta: [0.18, 21_000_000], radio: [0.12, 9_500_000], tv: [0.11, 14_000_000], influencer: [0.09, 7_200_000] },
+    mmmOutcomes: 184000,
+    mmmSummary: 'Trade and distribution still carry the largest share of measured outcomes, which is what an FMCG brand in this market should expect. OOH is the strongest paid channel per naira. Radio is under-spent relative to the outcomes it returns in the North.',
+    mmmRecommendations: ['Shift roughly 15% of TV into radio for the Northern flight', 'Hold OOH spend: it is the best-performing paid channel per naira', 'Trade activation returns most when it runs in the four weeks before the festive peak'],
+    base: BASE,
+  })
+
   return NextResponse.json({
-    success: true,
+    success: writeErrors.length === 0,
+    writes: summariseErrors(writeErrors),
     credentials: {
       email:    DEMO_EMAIL,
       password: DEMO_PASSWORD,

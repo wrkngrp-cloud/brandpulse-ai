@@ -9,12 +9,33 @@ Brand-intelligence SaaS for Nigerian / West African marketing teams, serving 8 v
 (see `brand_type` below), not FMCG-only. It helps marketers measure brand health and
 justify spend to management.
 
-Read the PRD set in `../docs` (one level above this repo root: Document 1 Foundations,
-2 Modules & Data, 3 Roadmap/Prompts/Risk, 4 Build Guide) before building any feature.
-The schema is in Document 2; the per-phase build prompts are in Document 3. The PRDs are
-not checked into git. This repo's own `docs/` folder holds supporting working docs only
-(`industry-fit-strategy.md`, `funnel-signals-explained.md`, `to-100-percent-build-list.md`).
-Those are not the PRD set.
+Read the PRD set in `docs/prd/` before building any feature. It is BrandGauge v8, five
+documents, and it is checked into git as of 14 September 2026:
+
+- `01-foundations.md`: identity, vision, verticals, personas, the Unified Funnel, module map
+- `02-modules-and-data.md`: module specs with build status, the tool suite, the data model,
+  and the data-access rules
+- `03-roadmap-prompts-metrics-risk.md`: where the build is, what is next, the runtime AI
+  prompts in full, every metric formula, the risk register
+- `04-build-guide.md`: stack and versions, environment variables and what each one gates,
+  conventions, definition of done
+- `05-design-system-and-decisions.md`: the design system in summary, and the **locked
+  decisions register**
+
+**Read the locked decisions register in Document 5 at the start of any session** before
+changing anything settled. The check is explicit, never assumed.
+
+Every item in Documents 2 and 3 carries a status: Built, Inert (built but missing a named
+credential), Deferred, or Dropped. Check the status before promising a feature works.
+
+The earlier BrandPulse AI v6 set lived one level above this repo root and was not in git,
+which meant no cloud session could ever see it. That is why the set moved in here. v6 is
+superseded; if you find a copy, it is history, not the spec.
+
+This repo's `docs/` folder also holds supporting working docs that are **not** the PRD set:
+`industry-fit-strategy.md`, `funnel-signals-explained.md`, `to-100-percent-build-list.md`,
+`scoreboard-and-leads.md`, `brand-icons.md`, `motion-amendments.md`,
+`design-system-update-brief.md`, `connector-setup-guide.md`.
 
 ## Commands
 - `npm run dev` — local dev server (Next.js + Turbopack).

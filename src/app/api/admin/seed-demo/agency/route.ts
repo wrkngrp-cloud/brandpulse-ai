@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
 import { TOKENS } from '@/lib/brand-tokens'
+import { demoSentiment } from '@/lib/demo/seasonality'
+import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
+import { seedModulePack } from '@/lib/demo/module-pack'
+import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Pinnacle Media Group — full-service Lagos marketing agency
-   Story arc: solid mid-tier → lost a major client → won two FMCG retainers
-              → Abuja expansion → strong position June 2026
+   Story arc, relative to whenever the seed is run:
+     a year ago    solid mid-tier agency
+     ~9 months ago loses a major client
+     ~6 months ago wins two FMCG retainers
+     ~3 months ago opens in Abuja
+     to today      strong position, tracking the ember-month pitch cycle
+
 ───────────────────────────────────────────────────────────────────────────── */
 
 const DEMO_EMAIL    = 'demo@pinnaclemedia.brandgauge.app'
@@ -28,25 +37,29 @@ function tsAgo(daysBack: number, hour = 10): string {
 }
 
 function sentScore(d: number): number {
-  let base: number
-  if      (d >= 280) base = 64
-  else if (d >= 240) base = 64 - (d - 240) / 40 * 9
-  else if (d >= 160) base = 55 + (240 - d) / 80 * 17
-  else if (d >= 60)  base = 72 + (160 - d) / 100 * 4
-  else               base = 76 + (60 - d) * 0.03
-  const noise = Math.sin(d * 1.5) * 2.8 + Math.cos(d * 1.1) * 1.9
-  return +(Math.min(95, Math.max(18, base + noise)).toFixed(1))
+  // Pinnacle Media, agency: pitch and retainer cycles track the ember months.
+  // Seasonality is anchored to the real calendar, so December always reads as
+  // the festive peak however long after this was written the seed is run.
+  return demoSentiment({
+    daysAgo: d, windowDays: 365,
+    from: 61, to: 76,
+    seasonality: 5.0,
+    jitter: [1.5, 1.1],
+    base: BASE,
+  })
 }
 
 export async function POST(req: NextRequest) {
   if (!SEED_SECRET || req.headers.get('x-seed-secret') !== SEED_SECRET)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const sb = createClient(
+  // trackErrors records every failed insert without changing the call sites
+  // below, which mostly discard the error. Reported as `writes` in the response.
+  const { sb, errors: writeErrors } = trackErrors(createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { autoRefreshToken: false, persistSession: false } },
-  )
+  ))
 
   /* ── 1. Auth user ─────────────────────────────────────────────────────── */
   let userId: string
@@ -232,15 +245,16 @@ export async function POST(req: NextRequest) {
     const ev = eventsData[ei]
     const { data: evRow } = await sb.from('events').insert({
       brand_id: brandId, name: ev.name, city: ev.city, status: ev.status,
-      activation_type: ev.type, day: ev.day, campaign_id: ev.campId ?? null,
-      target_interactions: 100,
+      activation_type: ev.type, date_start: ev.day, date_end: ev.day,
+      campaign_id: ev.campId ?? null,
+      kpi_targets: { expected_interactions: 100 },
     }).select('id').single()
     if (!evRow) continue
 
     const ambNames = ambassadorSets[ei]
     const ambIds: string[] = []
     for (const n of ambNames) {
-      const { data: a } = await sb.from('ambassadors').insert({ brand_id: brandId, event_id: evRow.id, name: n, status: 'active', phone: '+234803' + Math.floor(Math.random()*9000000+1000000) }).select('id').single()
+      const { data: a } = await sb.from('event_ambassadors').insert({ event_id: evRow.id, name: n, phone: '+234803' + Math.floor(Math.random()*9000000+1000000), session_token: `pm-${ei}-${n.toLowerCase().replace(/\s+/g, '-')}` }).select('id').single()
       if (a) ambIds.push(a.id)
     }
 
@@ -248,18 +262,20 @@ export async function POST(req: NextRequest) {
     const count = ei === 2 ? 20 : ei === 1 ? 28 : 30
     for (const aId of ambIds) {
       for (let i = 0; i < count; i++) {
-        interactions.push({ event_id: evRow.id, ambassador_id: aId, brand_id: brandId, interaction_type: interactionTypes[i % interactionTypes.length], occurred_at: tsAgo(ev.status === 'live' ? 0 : (ei === 0 ? 60 : 45), 9+(i%8)) })
+        interactions.push({ event_id: evRow.id, ambassador_id: aId,  interaction_type: interactionTypes[i % interactionTypes.length], occurred_at: tsAgo(ev.status === 'live' ? 0 : (ei === 0 ? 60 : 45), 9+(i%8)) })
       }
     }
     await sb.from('event_interactions').insert(interactions)
 
     if (ev.status !== 'live') {
       await sb.from('event_roi_reports').insert({
-        event_id: evRow.id, brand_id: brandId,
+        event_id: evRow.id,
         narrative: ei === 0
           ? 'Surulere sampling generated 4,200 product samples distributed across 3 zones. Ambassador NPS 74. Social amplification added 2.1M EMV.'
           : 'UNILAG campus tour activated 840 new PocketPay accounts in 6 hours. Cost per activation ₦2,200 vs ₦3,800 digital benchmark.',
-        ambassador_breakdown: ambNames.map(n => ({ name: n, leads: 8, customers: 5, interactions: count })),
+        metrics: {
+          ambassador_breakdown: ambNames.map(n => ({ name: n, leads: 8, customers: 5, interactions: count })),
+        },
       })
     }
   }
@@ -279,13 +295,46 @@ export async function POST(req: NextRequest) {
   for (const inf of influencerData) {
     const { data: infRow } = await sb.from('influencers').insert({
       brand_id: brandId, name: inf.name, handle: inf.handle, platform: inf.platform,
-      followers: inf.followers, engagement_rate: inf.engagement_rate, status: 'active', location: 'Lagos, Nigeria',
+      followers: inf.followers,  status: 'active', 
     }).select('id').single()
     if (!infRow) continue
+    // influencer_campaigns is keyed by brand and campaign name. Its creator_id
+    // references creators(), which is a different table from influencers().
+    const slug       = inf.handle.replace('@', '').toLowerCase()
+    const reachPost  = Math.round(inf.followers * 0.42)
+    const reachReel  = Math.round(inf.followers * 0.50)
+    const reachStory = Math.round(inf.followers * 0.35)
     await sb.from('influencer_campaigns').insert([
-      { brand_id: brandId, influencer_id: infRow.id, campaign_id: camp2Id ?? null, platform: inf.platform, content_type: 'post', agreed_rate: Math.round(inf.followers*0.012), actual_reach: Math.round(inf.followers*0.42), engagement_rate: inf.engagement_rate, status: 'completed', started_at: tsAgo(110), ended_at: tsAgo(80) },
-      { brand_id: brandId, influencer_id: infRow.id, campaign_id: camp1Id ?? null, platform: inf.platform, content_type: 'reel', agreed_rate: Math.round(inf.followers*0.018), actual_reach: Math.round(inf.followers*0.50), engagement_rate: inf.engagement_rate*1.4, status: 'active',    started_at: tsAgo(28), ended_at: null },
-      { brand_id: brandId, influencer_id: infRow.id, campaign_id: camp3Id ?? null, platform: inf.platform, content_type: 'story', agreed_rate: Math.round(inf.followers*0.008), actual_reach: Math.round(inf.followers*0.35), engagement_rate: inf.engagement_rate*0.8, status: 'completed', started_at: tsAgo(85), ended_at: tsAgo(60) },
+      {
+        brand_id: brandId, name: `${inf.name} feed post`,
+        utm_campaign: `pm_${slug}_post`, promo_code: `${slug.slice(0, 6).toUpperCase()}10`,
+        reach: reachPost, impressions: Math.round(reachPost * 1.3),
+        engagements: Math.round(reachPost * inf.engagement_rate),
+        emv: +(reachPost * 0.0039).toFixed(2),
+        attributed_clicks: Math.round(reachPost * 0.011),
+        attributed_conversions: Math.round(reachPost * 0.0014),
+        fee: Math.round(inf.followers * 0.012), currency: 'NGN',
+      },
+      {
+        brand_id: brandId, name: `${inf.name} reel`,
+        utm_campaign: `pm_${slug}_reel`, promo_code: `${slug.slice(0, 6).toUpperCase()}20`,
+        reach: reachReel, impressions: Math.round(reachReel * 1.55),
+        engagements: Math.round(reachReel * inf.engagement_rate * 1.4),
+        emv: +(reachReel * 0.0048).toFixed(2),
+        attributed_clicks: Math.round(reachReel * 0.017),
+        attributed_conversions: Math.round(reachReel * 0.0021),
+        fee: Math.round(inf.followers * 0.018), currency: 'NGN',
+      },
+      {
+        brand_id: brandId, name: `${inf.name} story series`,
+        utm_campaign: `pm_${slug}_story`, promo_code: `${slug.slice(0, 6).toUpperCase()}30`,
+        reach: reachStory, impressions: Math.round(reachStory * 1.15),
+        engagements: Math.round(reachStory * inf.engagement_rate * 0.8),
+        emv: +(reachStory * 0.0031).toFixed(2),
+        attributed_clicks: Math.round(reachStory * 0.009),
+        attributed_conversions: Math.round(reachStory * 0.0011),
+        fee: Math.round(inf.followers * 0.008), currency: 'NGN',
+      },
     ])
   }
 
@@ -326,7 +375,7 @@ export async function POST(req: NextRequest) {
     const imp = Math.round(50000 + Math.random() * 350000)
     postInserts.push({
       brand_id: brandId, platform: ['instagram','twitter','linkedin'][i % 3],
-      post_type: ['image','video','carousel'][i % 3],
+      content_type: ['image','video','carousel'][i % 3],
       impressions: imp, reach: Math.round(imp*0.70), likes: Math.round(imp*0.045),
       comments: Math.round(imp*0.006), shares: Math.round(imp*0.010),
       posted_at: tsAgo(Math.floor(i*5.5), 9+(i%6)),
@@ -336,38 +385,42 @@ export async function POST(req: NextRequest) {
 
   /* ── 13. NPS survey + records ─────────────────────────────────────────── */
   const { data: npsS } = await sb.from('surveys').insert({
-    brand_id: brandId, name: 'Pinnacle Client NPS Q2 2026', type: 'nps_basic', status: 'active',
+    brand_id: brandId, name: `Pinnacle Client NPS ${quarterLabel(1, BASE)}`, type: 'nps_basic', status: 'active',
     questions: [{ id: 'q1', text: 'How likely are you to recommend Pinnacle Media to a peer?', type: 'nps' }],
   }).select('id').single()
   if (npsS) {
     const dist = [10,10,9,9,9,9,8,8,8,8,8,7,7,7,7,6,6,5,4,3,2,1,1,0,0,
                   10,9,9,9,8,8,8,8,7,7,7,6,6,5,4,3,3,2,1,0,0,0,0,0,0]
-    const recs = dist.map((score, i) => ({ brand_id: brandId, survey_id: npsS.id, score, respondent_type: 'client', channel: 'email', submitted_at: tsAgo(i*3, 11) }))
+    const recs = dist.map((score, i) => ({ brand_id: brandId, score, respondent_role: 'client', channel: 'email', created_at: tsAgo(i*3, 11) }))
     await sb.from('nps_records').insert(recs)
-    await sb.from('survey_responses').insert(recs.map(n => ({ survey_id: npsS.id, quality_flag: 'ok', answers: { q1: n.score }, submitted_at: n.submitted_at })))
+    await sb.from('survey_responses').insert(recs.map(n => ({ survey_id: npsS.id, quality_flag: 'ok', answers: { q1: n.score }, collected_at: n.created_at })))
   }
 
   /* ── 14. Cultural resonance + competitive briefings ───────────────────── */
   const crsInserts = []
   for (let w = 0; w < 12; w++) {
     crsInserts.push({
-      brand_id: brandId, week_start: dAgo(w*7+7), week_end: dAgo(w*7),
-      overall_score: +(62+(12-w)*1.2+Math.sin(w*0.8)*3).toFixed(1),
-      trend_alignment: +(58+w*0.9).toFixed(1), language_score: +(72+Math.sin(w*1.1)*5).toFixed(1),
-      moment_relevance: +(60+w*0.8).toFixed(1), notes: null,
+      brand_id: brandId, snapshot_date: dAgo(w*7+7), 
+      crs: +(62+(12-w)*1.2+Math.sin(w*0.8)*3).toFixed(1),
+       language_relevance: +(72+Math.sin(w*1.1)*5).toFixed(1),
+       
     })
   }
   await sb.from('cultural_resonance_scores').insert(crsInserts)
 
   for (let w = 0; w < 4; w++) {
-    await sb.from('competitive_briefings').insert({
-      brand_id: brandId, week_start: dAgo(w*7+7), week_end: dAgo(w*7),
-      summary: `Noah's Ark won a new bank retainer this week. X3M is pitching aggressively on the fintech brief Pinnacle currently holds. Pinnacle's creative output and influencer ROI remain above category average.`,
-      competitor_moves: [
+    await sb.from('weekly_briefings').insert({
+      brand_id: brandId, week_start: dAgo(w*7+7), sent_at: tsAgo(w*7, 8),
+      // weekly_briefings keeps the whole briefing in one jsonb payload
+      content: {
+        week_end: dAgo(w*7),
+        summary: `Noah's Ark won a new bank retainer this week. X3M is pitching aggressively on the fintech brief Pinnacle currently holds. Pinnacle's creative output and influencer ROI remain above category average.`,
+        competitor_moves: [
         { competitor: "Noah's Ark", action: 'Won new bank retainer (rumoured)', impact: 'medium' },
         { competitor: 'X3M Ideas',  action: 'Aggressive pitching on fintech account', impact: 'high' },
       ],
-      recommendations: ['Brief renewal for fintech client in 6 weeks — start conversation now', 'Showcase Pinnacle Abuja expansion in next credentials deck'],
+        recommendations: ['Brief renewal for fintech client in 6 weeks, start the conversation now', 'Showcase Pinnacle Abuja expansion in next credentials deck'],
+      },
     })
   }
 
@@ -414,12 +467,16 @@ export async function POST(req: NextRequest) {
     pmFunnelRows.push({
       brand_id: brandId, snapshot_date: dAgo(d), segment: 'all',
       awareness:     +(48 + t * 38).toFixed(1),
-      consideration: +(38 + t * 40).toFixed(1),
-      preference:    +(30 + t * 42).toFixed(1),
       action:        +(20 + t * 30).toFixed(1),
-      loyalty:       +(24 + t * 36).toFixed(1),
-      advocacy:      +(15 + t * 26).toFixed(1),
       dropoffs: {
+        // funnel_snapshots stores awareness, action and dropoffs only;
+        // the middle stages ride in the dropoffs payload.
+        stages: {
+          consideration: +(38 + t * 40).toFixed(1),
+          preference:    +(30 + t * 42).toFixed(1),
+          loyalty:       +(24 + t * 36).toFixed(1),
+          advocacy:      +(15 + t * 26).toFixed(1),
+        },
         awareness_to_consideration:  +(32 - t * 12).toFixed(1),
         consideration_to_preference: +(26 - t * 10).toFixed(1),
         preference_to_action:        +(38 - t * 10).toFixed(1),
@@ -678,8 +735,31 @@ export async function POST(req: NextRequest) {
     await sb.from('creative_assets').insert({ brand_id: brandId, ...asset })
   }
 
+  /* ── Module pack: the modules every demo account was missing ───────────── */
+  // AI visibility, marketing mix modelling, WhatsApp, extra surveys, and the
+  // broadcast/field modules this vertical actually uses.
+  await seedModulePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'Pinnacle Media', brandType: 'agency',
+    competitors: ["Noah's Ark", 'X3M Ideas', 'SO&U'],
+    campaignIds: [camp1Id, camp2Id, camp3Id],
+    aiQuestions: [
+      'Best creative agencies in Lagos',
+      'Which Nigerian agency handles fintech brands well?',
+      'Top integrated marketing agencies in West Africa',
+      'Which Lagos agency is strongest on influencer campaigns?',
+      'Best agency for an FMCG launch in Nigeria',
+    ],
+    aiMentionFrom: 0.26, aiMentionTo: 0.52,
+    mmmChannels: { trade_press: [0.3, 6_200_000], referral: [0.26, 2_100_000], linkedin: [0.18, 7_400_000], awards: [0.15, 5_800_000], events: [0.11, 4_300_000] },
+    mmmOutcomes: 38,
+    mmmSummary: 'New business comes from trade-press visibility and referral, not from paid media. Referral produces the most wins on the smallest spend, which is the number to protect when budgets tighten.',
+    mmmRecommendations: ['Protect the trade-press retainer: it is the top of the new-business funnel', 'Formalise the referral path, it is currently informal and still the best channel', 'Awards spend is worth keeping only where the category matches a target sector'],
+    base: BASE,
+  })
+
   return NextResponse.json({
-    success: true,
+    success: writeErrors.length === 0,
+    writes: summariseErrors(writeErrors),
     credentials: { email: DEMO_EMAIL, password: DEMO_PASSWORD, note: 'Login at /auth/login' },
     brand: 'Pinnacle Media Group', workspace: 'Pinnacle Media (Pro plan)',
     seeded: {

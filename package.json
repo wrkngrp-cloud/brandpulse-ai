@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "icons": "node scripts/icons-build.mjs",
-    "icons:check": "node scripts/icons-build.mjs --check"
+    "icons:check": "node scripts/icons-build.mjs --check",
+    "seeds:check": "node scripts/validate-seeds.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
