@@ -116,6 +116,71 @@ function arrowObjectBodies(argSrc) {
   return bodies
 }
 
+
+
+/** The initializer expression starting at `start`, to the end of that statement. */
+function initializerSource(src, start) {
+  let i = start, depth = 0, str = null
+  while (i < src.length) {
+    const c = src[i]
+    if (str) {
+      if (c === '\\') { i += 2; continue }
+      if (c === str) str = null
+      i++; continue
+    }
+    if (c === '"' || c === "'" || c === '`') { str = c; i++; continue }
+    if (c === '(' || c === '[' || c === '{') { depth++; i++; continue }
+    if (c === ')' || c === ']' || c === '}') {
+      if (depth === 0) break
+      depth--; i++; continue
+    }
+    if (depth === 0 && (c === ';' || c === '\n')) {
+      // a newline ends it only when the expression is already balanced
+      if (c === ';') break
+      const rest = src.slice(i + 1, i + 40).trimStart()
+      if (/^(const|let|var|await|return|for|if|\}|\/\/)/.test(rest)) break
+    }
+    i++
+  }
+  return src.slice(start, i)
+}
+
+/**
+ * Row literals assigned to `v` anywhere in the file: array literals, pushes,
+ * and arrow bodies from .map/.flatMap/Array.from. Used when the simple
+ * declaration forms do not match.
+ */
+function scanRowLiterals(src, v, _rel) {
+  const out = []
+  const declRe = new RegExp(`(?:const|let|var)\\s+${v}\\b[^=\\n]*=\\s*`, 'g')
+  let d
+  while ((d = declRe.exec(src))) {
+    // Bound the scan to this initializer only. A fixed character window bleeds
+    // into the next statement and attributes its rows to the wrong table,
+    // which is exactly how tv_channels was reported with tv_schedules columns.
+    const start = d.index + d[0].length
+    const init = initializerSource(src, start)
+    if (!init) continue
+    for (const b of arrowObjectBodies(init)) out.push(b)
+    if (init.trimStart().startsWith('[')) {
+      const ob = src.indexOf('[', start)
+      const end = matchBracket(src, ob)
+      if (end > 0) for (const o of objectsInArray(src.slice(ob + 1, end - 1))) out.push(o)
+    }
+  }
+  const pushRe = new RegExp(`\\b${v}\\.push\\(`, 'g')
+  let p
+  while ((p = pushRe.exec(src))) {
+    let j = p.index + p[0].length
+    while (j < src.length && /\s/.test(src[j])) j++
+    if (src[j] === '{') {
+      const end = matchBracket(src, j)
+      if (end > 0) out.push(src.slice(j + 1, end - 1))
+    }
+  }
+  return out
+}
+
 /** every top-level object literal inside an array-literal body */
 function objectsInArray(body) {
   const objs = []
@@ -230,7 +295,17 @@ for (const file of seedFiles) {
 
       // .insert(someVariable): resolve the variable in-file
       const vm = /^([A-Za-z_$][A-Za-z0-9_$]*)\s*\)/.exec(src.slice(i))
-      if (!vm) { unresolved.push({ rel, line, table, what: 'expression' }); continue }
+      if (!vm) {
+        // Any other expression: Array.from(...), a chained .map, a spread.
+        // Take the whole argument list and check every `=> ({ ... })` in it.
+        const argEnd = matchBracket(src, i - 1 >= 0 && src[i - 1] === '(' ? i - 1 : src.lastIndexOf('(', i))
+        if (argEnd > 0) {
+          const arg = src.slice(src.lastIndexOf('(', i) + 1, argEnd - 1)
+          const bodies = arrowObjectBodies(arg)
+          if (bodies.length) { for (const b of bodies) check(b); continue }
+        }
+        unresolved.push({ rel, line, table, what: 'expression' }); continue
+      }
       const v = vm[1]
       let found = false
       // const v = xs.map(x => ({ ... }))
@@ -261,6 +336,13 @@ for (const file of seedFiles) {
           const end = matchBracket(src, j)
           if (end > 0) { check(src.slice(j + 1, end - 1)); found = true }
         }
+      }
+      if (!found) {
+        // last resort: scan the whole enclosing statement for row literals
+        const stmtEnd = src.indexOf('\n', c.index)
+        const scanned = scanRowLiterals(src, v, rel)
+        if (scanned.length) { for (const b of scanned) check(b); found = true }
+        void stmtEnd
       }
       if (!found) unresolved.push({ rel, line, table, what: `variable '${v}'` })
     }

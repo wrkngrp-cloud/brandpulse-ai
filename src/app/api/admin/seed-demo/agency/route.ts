@@ -5,6 +5,8 @@ import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
 import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
+import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
+import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: Pinnacle Media Group — full-service Lagos marketing agency
@@ -103,7 +105,7 @@ export async function POST(req: NextRequest) {
       { name: 'Telco Accounts', age_range: '35-55', income: 'high',   location: 'National'    },
     ],
     brand_voice: { tone: 'confident, creative, results-focused', personality: 'The strategic partner who delivers and talks straight', language_mix: { english: 80, pidgin: 15, yoruba: 5, igbo: 0 } },
-    bhi_weights:  { awareness: 0.20, consideration: 0.15, preference: 0.20, advocacy: 0.15, nps: 0.15, sentiment: 0.10, sov: 0.05 },
+    bhi_weights: BRAND_TYPE_WEIGHTS['agency'],
   }
   let { data: brand, error: brandErr } = await sb.from('brands').insert(brandRow).select('id').single()
   if (brandErr?.message.includes('industry')) {
@@ -200,17 +202,18 @@ export async function POST(req: NextRequest) {
   await sb.from('sentiment_daily').insert(sentRows)
 
   /* ── 7. BHI 180 days ─────────────────────────────────────────────────── */
-  const bhiRows = []
-  for (let d = 179; d >= 0; d--) {
-    const ss = sentScore(d); const t = ss / 100
-    const comps = {
-      awareness: +(52+t*36).toFixed(1), consideration: +(42+t*38).toFixed(1),
-      preference: +(34+t*42).toFixed(1), advocacy: +(30+t*44).toFixed(1),
-      nps: +(28+t*46).toFixed(1), sentiment: ss, sov: +(28+t*24).toFixed(1),
-    }
-    const bhiVal = +(comps.awareness*0.20+comps.consideration*0.15+comps.preference*0.20+comps.advocacy*0.15+comps.nps*0.15+comps.sentiment*0.10+comps.sov*0.05).toFixed(1)
-    bhiRows.push({ brand_id: brandId, snapshot_date: dAgo(d), bhi: bhiVal, components: comps, data_coverage_pct: +(82+Math.sin(d*0.3)*7).toFixed(1) })
-  }
+  // Scored by computeFullBHI with this brand's brand_type, so the seeded
+  // history matches the number the dashboard computes today.
+  const bhiRows = bhiSnapshotRows({
+    brandId, brandType: 'agency', days: 180,
+    sentiment: sentScore,
+    dateFor: dAgo,
+    levels: {
+      // agency: reputation and trade-press visibility win new business
+      awareness:  [37, 54], salience:   [42, 62], perception: [58, 81],
+      cultural:   null,     sov:        [31, 55], emv:        [24, 44],
+    },
+  })
   await sb.from('brand_health_snapshots').insert(bhiRows)
 
   /* ── 8. SOV snapshots ─────────────────────────────────────────────────── */

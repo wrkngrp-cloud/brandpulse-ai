@@ -44,8 +44,21 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 - `npx tsc --noEmit` — type-check the whole project. Must pass before a change is done.
 - `supabase db push` — apply pending SQL migrations to the linked project. Run
   `supabase migration list` first to confirm only your migration is pending.
+- `npm run seeds:check` — check every demo-seed insert against the migration set
+  with no database. Postgres rejects the whole insert on one bad column and the
+  seeds discard the error, so a broken seed still answers success.
+- `npm run demo:check` — run the shared demo generators against a fake client and
+  check every row they actually produce. Covers what the static check cannot.
+- `npm run icons` / `npm run icons:check` — build the sprite from
+  `brand/icons/currentcolor`, and fail when a glyph the product asks for was
+  never drawn.
 There is no unit-test suite. Verify behaviour by type-check + lint + driving the actual
 flow (see Definition of done).
+
+Demo seeds: brand health history is produced by `bhiSnapshotRows` in
+`src/lib/demo/bhi-series.ts`, which runs the real `computeFullBHI` with the
+brand's `brand_type`, so seeded history matches the live number and is stamped
+with the current `BHI_FORMULA_VERSION`. Never hand-roll a BHI in a seed.
 
 ## Repo layout
 - `src/app/**` — Next.js App Router. Pages are server components by default; API routes
