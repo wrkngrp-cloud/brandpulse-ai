@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
   await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Campus Banking Tour',
     description: 'On-ground events at Lagos, Ibadan and Abuja universities.',
-    objective: 'conversion', status: 'planned',
+    objective: 'conversion', status: 'draft',
     start_date: dAgo(-14), end_date: dAgo(-74), total_budget: 9_000_000, currency: 'NGN',
   })
 
@@ -164,17 +164,17 @@ export async function POST(req: NextRequest) {
   const camp2Id = camp2?.id
   const camp3Id = camp3?.id
 
+  // campaign_channels.channel is constrained to ooh/events/digital/radio/tv/print —
+  // influencer and PR spend get folded into the digital row rather than a channel
+  // value the check constraint would reject.
   if (camp1Id) await sb.from('campaign_channels').insert([
-    { campaign_id: camp1Id, channel: 'digital',    budget_allocation: 8_000_000, notes: 'Meta + YouTube pre-rolls' },
-    { campaign_id: camp1Id, channel: 'influencer', budget_allocation: 4_000_000, notes: '12 micro-influencers' },
+    { campaign_id: camp1Id, channel: 'digital', budget_allocation: 12_000_000, notes: 'Meta + YouTube pre-rolls; 12 micro-influencers' },
   ])
   if (camp2Id) await sb.from('campaign_channels').insert([
-    { campaign_id: camp2Id, channel: 'digital', budget_allocation: 14_000_000, notes: 'Meta + Google UAC' },
-    { campaign_id: camp2Id, channel: 'influencer', budget_allocation: 4_000_000 },
+    { campaign_id: camp2Id, channel: 'digital', budget_allocation: 18_000_000, notes: 'Meta + Google UAC; influencer seeding' },
   ])
   if (camp3Id) await sb.from('campaign_channels').insert([
-    { campaign_id: camp3Id, channel: 'digital', budget_allocation: 25_000_000 },
-    { campaign_id: camp3Id, channel: 'pr',      budget_allocation: 10_000_000, notes: 'TechCabal + Nairametrics' },
+    { campaign_id: camp3Id, channel: 'digital', budget_allocation: 35_000_000, notes: 'Includes PR: TechCabal + Nairametrics' },
   ])
 
   /* ── 6. Sentiment daily — 365 days ───────────────────────────────────── */
@@ -233,13 +233,13 @@ export async function POST(req: NextRequest) {
   /* ── 9. Events ────────────────────────────────────────────────────────── */
   const { data: evt1 } = await sb.from('events').insert({
     brand_id: brandId, name: 'PocketPay Lagos Social Mixer',
-    city: 'Lagos', status: 'closed', activation_type: 'brand_activation', date_start: dAgo(30), date_end: dAgo(30),
+    city: 'Lagos', status: 'closed', activation_type: 'event', date_start: dAgo(30), date_end: dAgo(30),
     kpi_targets: { expected_interactions: 80 }, campaign_id: camp2Id ?? null,
   }).select('id').single()
 
   const { data: evt2 } = await sb.from('events').insert({
     brand_id: brandId, name: 'PocketPay x TechCabal Demo Day',
-    city: 'Lagos', status: 'closed', activation_type: 'brand_activation', date_start: dAgo(10), date_end: dAgo(10),
+    city: 'Lagos', status: 'closed', activation_type: 'event', date_start: dAgo(10), date_end: dAgo(10),
     kpi_targets: { expected_interactions: 60 }, campaign_id: camp3Id ?? null,
   }).select('id').single()
 
@@ -373,6 +373,7 @@ export async function POST(req: NextRequest) {
     const imp = Math.round(80000 + Math.random() * 1120000)
     postInserts.push({
       brand_id: brandId, platform: ['instagram','twitter','tiktok'][i % 3],
+      external_id: `pocketpay-demo-post-${i}`,
       content_type: ['image','video','story'][i % 3],
       impressions: imp, reach: Math.round(imp * 0.65), likes: Math.round(imp * 0.04),
       comments: Math.round(imp * 0.005), shares: Math.round(imp * 0.008),
@@ -383,7 +384,7 @@ export async function POST(req: NextRequest) {
 
   /* ── 13. NPS survey + records ─────────────────────────────────────────── */
   const { data: npsS } = await sb.from('surveys').insert({
-    brand_id: brandId, name: `PocketPay NPS ${quarterLabel(1, BASE)}`, type: 'nps_basic', status: 'active',
+    brand_id: brandId, name: `PocketPay NPS ${quarterLabel(1, BASE)}`, type: 'nps_basic', status: 'live',
     questions: [{ id: 'q1', text: 'How likely are you to recommend PocketPay to a friend?', type: 'nps' }],
   }).select('id').single()
 
@@ -412,7 +413,7 @@ export async function POST(req: NextRequest) {
   const crsInserts = []
   for (let w = 0; w < 10; w++) {
     crsInserts.push({
-      brand_id: brandId, snapshot_date: dAgo(w * 7 + 7), 
+      brand_id: brandId, segment: 'General audience', snapshot_date: dAgo(w * 7 + 7),
       crs: +(60 + (10 - w) * 1.5 + Math.sin(w * 0.8) * 3).toFixed(1),
       
       language_relevance:  +(70 + Math.sin(w * 1.1) * 5).toFixed(1),

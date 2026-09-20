@@ -210,7 +210,7 @@ export async function POST(req: NextRequest) {
   const { data: camp4 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Q3 LinkedIn B2B Push',
     description: 'LinkedIn-first acquisition campaign targeting Nigerian sales directors and business owners.',
-    objective: 'conversion', status: 'planned',
+    objective: 'conversion', status: 'draft',
     start_date: dAgo(-7), end_date: dAgo(-67),
     total_budget: 8_000_000, currency: 'NGN',
     ai_summary: null,
@@ -221,10 +221,11 @@ export async function POST(req: NextRequest) {
   const camp3Id = camp3?.id
   const camp4Id = camp4?.id
 
+  // campaign_channels.channel is constrained to ooh/events/digital/radio/tv/print —
+  // PR and content spend get folded into the digital row rather than a channel
+  // value the check constraint would reject.
   if (camp1Id) await sb.from('campaign_channels').insert([
-    { campaign_id: camp1Id, channel: 'digital', budget_allocation: 6_000_000, notes: 'LinkedIn + Twitter awareness' },
-    { campaign_id: camp1Id, channel: 'pr',       budget_allocation: 4_000_000, notes: 'TechCabal, Techpoint, BusinessDay PR' },
-    { campaign_id: camp1Id, channel: 'content',  budget_allocation: 4_000_000, notes: 'SEO blog content + case studies' },
+    { campaign_id: camp1Id, channel: 'digital', budget_allocation: 14_000_000, notes: 'LinkedIn + Twitter awareness; PR: TechCabal, Techpoint, BusinessDay; content: SEO blog + case studies' },
   ])
   if (camp2Id) await sb.from('campaign_channels').insert([
     { campaign_id: camp2Id, channel: 'digital', budget_allocation: 16_000_000, notes: 'LinkedIn + Google Ads enterprise targeting' },

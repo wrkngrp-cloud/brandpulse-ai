@@ -63,7 +63,8 @@ try: d=json.load(sys.stdin)
 except Exception: print("    could not parse response"); sys.exit(0)
 w=d.get("writes") or {}
 n=w.get("failedWrites",0)
-print(f"    success={d.get(\"success\")}  failedWrites={n}")
+success=d.get("success")
+print(f"    success={success}  failedWrites={n}")
 if n:
     for k,v in (w.get("byTable") or {}).items(): print(f"      {v:>4}  {k}")
     for s in (w.get("sample") or []): print(f"      {s}")

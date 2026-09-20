@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
   await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Q3 Kano Expansion',
     description: 'OOH and radio push for FMCG client entering northern Nigeria.',
-    objective: 'awareness', status: 'planned',
+    objective: 'awareness', status: 'draft',
     start_date: dAgo(-14), end_date: dAgo(-74), total_budget: 15_000_000, currency: 'NGN',
   })
 
@@ -172,9 +172,11 @@ export async function POST(req: NextRequest) {
     { campaign_id: camp1Id, channel: 'digital', budget_allocation: 12_000_000 },
     { campaign_id: camp1Id, channel: 'ooh',     budget_allocation: 10_000_000 },
   ])
+  // campaign_channels.channel is constrained to ooh/events/digital/radio/tv/print —
+  // influencer spend gets folded into the digital row rather than a channel value
+  // the check constraint would reject.
   if (camp2Id) await sb.from('campaign_channels').insert([
-    { campaign_id: camp2Id, channel: 'influencer', budget_allocation: 6_500_000 },
-    { campaign_id: camp2Id, channel: 'digital',    budget_allocation: 2_000_000 },
+    { campaign_id: camp2Id, channel: 'digital', budget_allocation: 8_500_000, notes: 'Influencer (6.5M) + digital (2M)' },
   ])
   if (camp3Id) await sb.from('campaign_channels').insert([
     { campaign_id: camp3Id, channel: 'events', budget_allocation: 4_000_000 },
@@ -233,8 +235,8 @@ export async function POST(req: NextRequest) {
   /* ── 9. Events ────────────────────────────────────────────────────────── */
   const eventsData = [
     { name: 'FMCG Sampling — Surulere', status: 'closed', city: 'Lagos', type: 'sampling', day: dAgo(60), campId: camp3Id },
-    { name: 'PocketPay Campus Tour — UNILAG', status: 'closed', city: 'Lagos', type: 'brand_activation', day: dAgo(45), campId: camp2Id },
-    { name: 'Bridger SME Bootcamp — VI', status: 'live', city: 'Lagos', type: 'brand_activation', day: dAgo(0), campId: camp4?.id },
+    { name: 'PocketPay Campus Tour — UNILAG', status: 'closed', city: 'Lagos', type: 'roadshow', day: dAgo(45), campId: camp2Id },
+    { name: 'Bridger SME Bootcamp — VI', status: 'live', city: 'Lagos', type: 'event', day: dAgo(0), campId: camp4?.id },
   ]
 
   const ambassadorSets = [
@@ -378,6 +380,7 @@ export async function POST(req: NextRequest) {
     const imp = Math.round(50000 + Math.random() * 350000)
     postInserts.push({
       brand_id: brandId, platform: ['instagram','twitter','linkedin'][i % 3],
+      external_id: `pinnacle-demo-post-${i}`,
       content_type: ['image','video','carousel'][i % 3],
       impressions: imp, reach: Math.round(imp*0.70), likes: Math.round(imp*0.045),
       comments: Math.round(imp*0.006), shares: Math.round(imp*0.010),
@@ -388,7 +391,7 @@ export async function POST(req: NextRequest) {
 
   /* ── 13. NPS survey + records ─────────────────────────────────────────── */
   const { data: npsS } = await sb.from('surveys').insert({
-    brand_id: brandId, name: `Pinnacle Client NPS ${quarterLabel(1, BASE)}`, type: 'nps_basic', status: 'active',
+    brand_id: brandId, name: `Pinnacle Client NPS ${quarterLabel(1, BASE)}`, type: 'nps_basic', status: 'live',
     questions: [{ id: 'q1', text: 'How likely are you to recommend Pinnacle Media to a peer?', type: 'nps' }],
   }).select('id').single()
   if (npsS) {
@@ -403,7 +406,7 @@ export async function POST(req: NextRequest) {
   const crsInserts = []
   for (let w = 0; w < 12; w++) {
     crsInserts.push({
-      brand_id: brandId, snapshot_date: dAgo(w*7+7), 
+      brand_id: brandId, segment: 'General audience', snapshot_date: dAgo(w*7+7),
       crs: +(62+(12-w)*1.2+Math.sin(w*0.8)*3).toFixed(1),
        language_relevance: +(72+Math.sin(w*1.1)*5).toFixed(1),
        
