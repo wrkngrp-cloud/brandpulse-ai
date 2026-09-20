@@ -397,7 +397,7 @@ export async function POST(req: NextRequest) {
   if (npsS) {
     const dist = [10,10,9,9,9,9,8,8,8,8,8,7,7,7,7,6,6,5,4,3,2,1,1,0,0,
                   10,9,9,9,8,8,8,8,7,7,7,6,6,5,4,3,3,2,1,0,0,0,0,0,0]
-    const recs = dist.map((score, i) => ({ brand_id: brandId, score, respondent_role: 'client', channel: 'email', created_at: tsAgo(i*3, 11) }))
+    const recs = dist.map((score, i) => ({ brand_id: brandId, score, respondent_role: 'decision_maker', channel: 'email', created_at: tsAgo(i*3, 11) }))
     await sb.from('nps_records').insert(recs)
     await sb.from('survey_responses').insert(recs.map(n => ({ survey_id: npsS.id, quality_flag: 'ok', answers: { q1: n.score }, collected_at: n.created_at })))
   }

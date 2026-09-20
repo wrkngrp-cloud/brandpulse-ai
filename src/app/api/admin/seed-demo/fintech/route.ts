@@ -396,7 +396,7 @@ export async function POST(req: NextRequest) {
     for (let i = 0; i < 60; i++) {
       npsScores.push({
         brand_id: brandId, 
-        score: dist[i] ?? 7, respondent_role: 'customer',
+        score: dist[i] ?? 7, respondent_role: 'consumer',
         channel: ['in_app','email'][i % 2],
         created_at: tsAgo(Math.floor(i * 2.5), 11),
       })
