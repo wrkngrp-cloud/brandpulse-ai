@@ -127,30 +127,33 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
       const data = await res.json() as PulledMetricsResponse
       const m = data.metrics ?? {}
 
+      // Computed from the form snapshot this call closed over, not read back
+      // out of a setState updater — that updater may run after this function
+      // moves on, so anything written into it here would be read too early.
+      const patch: Partial<typeof form> = {}
       const nextSources: Partial<Record<MetricKey, MetricSource>> = {}
-      setForm(f => {
-        const next = { ...f }
-        // Impressions: the closest match across platforms to "how many times
-        // this was displayed" — X's impression_count, YouTube's view count,
-        // Instagram's play count on video posts.
-        if (m.views != null && !f.impressions.trim()) {
-          next.impressions = String(m.views)
-          nextSources.impressions = 'pulled'
-        }
-        if (m.reach != null && !f.reach.trim()) {
-          next.reach = String(m.reach)
-          nextSources.reach = 'pulled'
-        }
-        // Engagements here is one blended figure, not separate likes/comments/
-        // shares, so sum whatever the platform actually gave back.
-        const engagementParts = [m.likes, m.comments, m.shares, m.saves].filter((v): v is number => v != null)
-        if (engagementParts.length > 0 && !f.engagements.trim()) {
-          next.engagements = String(engagementParts.reduce((a, b) => a + b, 0))
-          nextSources.engagements = 'pulled'
-        }
-        return next
-      })
-      if (Object.keys(nextSources).length > 0) {
+
+      // Impressions: the closest match across platforms to "how many times
+      // this was displayed" — X's impression_count, YouTube's view count,
+      // Instagram's play count on video posts.
+      if (m.views != null && !form.impressions.trim()) {
+        patch.impressions = String(m.views)
+        nextSources.impressions = 'pulled'
+      }
+      if (m.reach != null && !form.reach.trim()) {
+        patch.reach = String(m.reach)
+        nextSources.reach = 'pulled'
+      }
+      // Engagements here is one blended figure, not separate likes/comments/
+      // shares, so sum whatever the platform actually gave back.
+      const engagementParts = [m.likes, m.comments, m.shares, m.saves].filter((v): v is number => v != null)
+      if (engagementParts.length > 0 && !form.engagements.trim()) {
+        patch.engagements = String(engagementParts.reduce((a, b) => a + b, 0))
+        nextSources.engagements = 'pulled'
+      }
+
+      if (Object.keys(patch).length > 0) {
+        setForm(f => ({ ...f, ...patch }))
         setMetricSources(prev => ({ ...prev, ...nextSources }))
       }
       setMetricsNote(data.metrics_note ?? null)
