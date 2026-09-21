@@ -55,7 +55,9 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 - `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
   mocked platform responses. Real calls cost X credit and burn Instagram's
   hashtag quota, so every branch is covered offline instead.
-  `./scripts/check-post-metrics.sh` is the separate live credential probe.
+  `./scripts/check-post-metrics.sh` hits the live APIs: with no arguments it
+  probes the credentials, and given post URLs or ids it reads them in one
+  batched call and prints a paste-ready POST body. Both modes spend X credit.
 There is no unit-test suite. Verify behaviour by type-check + lint + driving the actual
 flow (see Definition of done).
 
