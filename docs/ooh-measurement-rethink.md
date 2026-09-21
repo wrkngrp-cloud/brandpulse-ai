@@ -21,28 +21,49 @@ That viewer mostly does not exist on a Lagos roadside.
 
 Three observations kill the primary mechanism:
 
-1. **Nobody types a billboard URL.** Not in Lagos, not in London. The click-through rate on a
-   static OOH placement is not small, it is close to unmeasurable. The rare campaigns that
-   report a healthy number are almost always reporting brand-name search, not URL entry.
-2. **Advertisers do not give the link enough real estate to matter.** The creative hierarchy
-   on a 48-sheet or a lamppost is message first, brand mark second, everything else in the
-   remaining few percent of the plane. A vanity slug set at 4% of the artwork, read at 60km/h
-   from 40 metres, is not a call to action. It is a legal footnote.
-3. **Adding a URL adds cognitive load to a surface that has about 1.5 seconds of attention.**
-   Lumen's eye-tracking work with JCDecaux puts OOH dwell at one to two seconds, which is
-   actually the longest of the major media, and that is the ceiling, not the floor. Anything
-   that competes with the message reduces the thing OOH is actually good at.
+1. **The creative has no room for a URL, and that is a rule, not a failure of discipline.**
+   The OAAA's own benchmark is seven words or fewer, and the working guidance for large
+   roadside formats is six to eight words total. Average viewing time is three to five
+   seconds at speed. A vanity slug is not competing for leftover space on the artwork, it is
+   competing against the entire word budget of the medium. When a planner drops the link to
+   4% of the plane, they are obeying the effectiveness rules correctly. The link loses
+   because it should lose.
+2. **Attention sets a hard ceiling.** Lumen's eye-tracking work with JCDecaux puts actual
+   attentive dwell at one to two seconds, which is the longest of the major media, and that
+   is the ceiling, not the floor. Anything that competes with the message reduces the thing
+   OOH is actually good at.
+3. **A response that costs the viewer money is a price, not friction.** See section 3. This
+   is the point where the Nigerian market diverges hardest from the assumptions baked into
+   imported OOH playbooks.
 
-The QR critique in LD-4 was right, and it is even more right than LD-4 says. Drivers do not
-scan. Passengers pass too fast. And West African scanning behaviour is transactional and
-incentive-led: people scan to pay, to claim, to enter, to win. They do not scan to browse,
-and they will not spend data to land on a brand page with no reward at the end of it.
+### 1.1 Where the starting premises held, and where they did not
+
+These premises came from Emmanuel's reading of the market. I checked each one against
+outside sources rather than accepting them, and three of the five need amending.
+
+| Premise | Verdict | What the evidence says |
+|---|---|---|
+| Nobody types a billboard URL | **Holds, by mechanism rather than by measurement** | No published CTR benchmark exists for static OOH URL entry, which is itself the finding. The six-to-eight word constraint and the three-to-five second viewing window make URL entry structurally implausible. I had written that the CTR is "close to unmeasurable"; that was rhetoric, and the accurate statement is that it is not separately measured because the medium does not generate a trackable click event. |
+| Advertisers do not give the link enough prominence | **Holds, and is stronger than stated** | It is not carelessness. OAAA guidance and the readability research say a roadside board should carry six to eight words. There is no version of a correct billboard that also carries a legible URL. |
+| Drivers do not scan, passengers pass too fast | **Holds for moving traffic, fails at junctions** | Transit and pedestrian buys consistently outperform roadside on scan rate. QR is impractical at speed, **with a documented exception for boards near junctions, traffic lights and petrol stations where vehicles stop or slow.** In Lagos, go-slow means a large share of nominally roadside inventory is functionally dwell inventory. This is a real amendment to the blanket claim, and it changes the product rule in Layer 1. |
+| Nigerians and West Africans lack a scanning culture | **Partly wrong, and getting more wrong each year** | The instrumental half of the claim holds: people scan to transact, not to browse. But the base behaviour is being built fast. NIBSS is pushing NQR as a cash alternative for small-value payments, it now supports P2P and E2P, and Lagos State alone has generated over 750,000 QR codes for water bills and land duties. Global QR payment value is projected to rise from $5.4tn in 2025 to over $8tn in 2029. The correct framing is not "Nigerians do not scan", it is "Nigerians scan to complete a transaction, and a brand page is not a transaction." |
+| Scanning needs a reward, but not an app download | **Holds** | Consistent with the transactional framing above, and with the measured 0.5% to 4% conversion range for QR-based OOH, which is placement-dependent rather than flat. |
+
+Two further findings neither of us had:
+
+- **QR-based OOH converts at 0.5% to 4%, depending on placement.** That is low, but it is not
+  zero and it is not unmeasurable. LD-4's claim that "measured scan rates did not carry the
+  attribution claim" is right about the *attribution* conclusion and too harsh about the
+  *response* mechanism. QR is not useless. It is misplaced.
+- **Static QR codes contribute 0% of measurable events.** A static code encodes its
+  destination directly, never touches a redirect service, and therefore cannot appear in any
+  analytics. If any past scan-rate evidence behind LD-4 came from static codes, it measured
+  nothing and was guaranteed to read zero. **This should be checked before the LD-4 amendment
+  is finalised**, because it may mean the original decision rested on an artefact.
 
 So the honest position is: **the vanity link and the QR are both response mechanisms, and no
-response mechanism can carry an OOH attribution claim.** That is not a Nigerian problem. It
-is the global state of the art, and the rest of the industry stopped pretending otherwise
-about eight years ago. The click was never the KPI for OOH. We imported a digital habit into
-a medium that does not have a click.
+response mechanism can carry an OOH attribution claim.** The click was never the KPI for OOH.
+We imported a digital habit into a medium that does not have a click.
 
 ---
 
@@ -201,11 +222,19 @@ Seven market facts that should govern the design.
    Audiences' measurement currency to the sector, and in June 2026 OOH Academy commissioned a
    nationwide audience behaviour study through Research Brooks with TMKG Consulting. Neither
    is a finished, licensable, panel-level dataset today. **The gap is the opportunity.**
-2. **Data costs money and the viewer is paying.** A scan or a link tap spends airtime on a
-   destination the viewer did not choose. This is not friction in the UX sense, it is a
-   price. Incentive-free scanning loses to incentive-backed scanning by an enormous margin.
-3. **Scanning culture is transactional.** Scan to pay, scan to claim, scan to enter a draw.
-   Not scan to learn more. A reward changes the behaviour, an app download does not.
+2. **Data costs money and the viewer is paying, and it just got more expensive.** In January
+   2025 the NCC approved a 50% tariff increase, the first in twelve years: 1GB moved from
+   ₦287.50 to ₦431.25. Internet subscriptions then fell by 3.41 million to 138.75 million by
+   July 2025, and Nigerians now spend around ₦721 billion a month on data. GSMA has warned
+   that rising smartphone costs risk deepening the mobile internet gap. A scan or a link tap
+   spends money on a destination the viewer did not choose. This is not friction in the UX
+   sense, it is a price, and the price went up 50% while subscriptions went down.
+3. **Scanning culture is transactional, and it is growing.** The correction from section 1.1
+   matters here. NQR adoption is being driven hard by NIBSS and the public sector, so the
+   mechanical habit of pointing a camera at a code is becoming normal. What is not becoming
+   normal is scanning to browse. People scan to pay, to claim, to enter. A reward changes the
+   behaviour, an app download does not. Plan for a population that knows how to scan and has
+   no reason to.
 4. **WhatsApp is the default interface.** It is where commerce, support and discovery already
    happen. A phone number is more culturally readable off a billboard than a URL, and people
    already have the habit of saving and messaging a number they see.
@@ -321,10 +350,18 @@ Design rules:
 - **The incentive is the point.** An airtime drop, a discount code, a draw entry, a free
   sample reservation at a named nearby outlet. No incentive, no volume, no signal.
 - **Keep the vanity link,** because it costs nothing and it does survive a repost. Demote it.
-- **Keep QR as the secondary toggle,** exactly as LD-4 has it, and make it earn its place only
-  where the viewer is stationary: mall panels, lift lobbies, transit shelters with seating,
-  in-store. Stationary placements are a different medium from roadside and should be modelled
-  separately.
+- **Gate QR on dwell, not on format.** This replaces the "stationary placements only" rule I
+  first drafted, because the evidence does not support a static-versus-digital or a
+  roadside-versus-indoor split. The variable that predicts scan rate is how long the viewer
+  is stopped. So `ooh_sites` should carry a **dwell class**: transit and pedestrian, indoor
+  and mall, junction or signal-controlled, petrol station, and free-flow roadside. QR is
+  permitted as a primary call to action on the first four and off by default on the last.
+  In Lagos this matters more than it does anywhere the rule was written: congestion turns a
+  lot of nominally roadside inventory into dwell inventory, and a site on a bridge approach
+  at 6pm is a different medium from the same site at 11am. Dwell class should be time-banded,
+  not fixed.
+- **Never ship a static QR.** A static code cannot be measured at all, by anyone. Every code
+  the product generates routes through `/go/[slug]` so it is dynamic and countable.
 - **Label everything as a floor.** Every response count in the UI reads as "at least N people
   acted", never as "N people saw this and acted". This is the same discipline as
   `metric_sources` on influencer posts, applied to OOH.
@@ -439,13 +476,22 @@ Proposed replacement text for the Decision row:
 > headline, and survey-based recall as the market-proven corroboration. **No response
 > mechanism is a primary attribution metric.** The vanity link at `/go/[slug]` is retained as
 > a floor-level response signal and is reported as a floor. QR remains a secondary toggle, off
-> by default, and is permitted as a primary call to action only on stationary placements.
+> by default on free-flow roadside inventory, and permitted as a primary call to action on
+> sites whose dwell class is transit, pedestrian, indoor, junction or petrol station. Every
+> code the product generates is dynamic and routed through `/go/[slug]`; static codes are not
+> produced, because a static code cannot be measured by anyone.
+
+**Before this is locked, one thing needs checking.** LD-4's stated reason is that "measured
+scan rates did not carry the attribution claim". If those measured scan rates came from static
+QR codes, they were structurally incapable of registering anything and would have read zero
+whatever the real behaviour was. The conclusion may still be right, but it would be right by
+accident. Worth confirming what was actually measured before writing the amendment into Doc 5.
 
 And the Watch for row should gain:
 
 > A response count presented as an attribution total. Any screen that reads "N conversions from
 > this billboard" without stating that N is a floor. Also a geo study that reports a correlation
-> and calls it a lift.
+> and calls it a lift. Also a QR ruling made on format rather than on dwell.
 
 ---
 
@@ -458,6 +504,7 @@ Ordered by value per unit of effort. Sizes are rough.
 | 1 | Coordinate capture on survey responses, unlocking tool S4 | 3 | S | Nothing |
 | 2 | Relabel every OOH response metric as a floor, with an origin tag like `metric_sources` | 1 | S | Nothing |
 | 3 | Decompose `visibility_factor` into stored, shown component factors; add occupancy multipliers | 0 | M | Migration on `ooh_sites` |
+| 3b | Add a time-banded `dwell_class` to `ooh_sites`; gate the QR toggle on it | 0/1 | S | Same migration as 3 |
 | 4 | OOH section on `/dashboard/methodology` stating every assumption and constant | 0 | S | 3 |
 | 5 | Geo-lift rebuilt as difference-in-differences with a synthetic control and a reported interval | 2 | L | Nothing, improves further with `SERPAPI_KEY` |
 | 6 | Multi-series outcome basket for the geo study, with agreement count across series | 2 | L | 5 |
@@ -540,3 +587,16 @@ Items 1 and 2 are a single short session. Item 5 is the one that changes the pro
 - [Polygon launches first full-scale DV campaign in Nigeria, MarTech Series](https://martechseries.com/sales-marketing/messaging/polygon-launches-first-full-scale-display-video-dv-campaign-in-nigeria-marking-a-new-milestone-for-data-driven-outdoor-in-africa/)
 - [Nigeria OOH and DOOH market size and forecast to 2031, Mordor Intelligence](https://www.mordorintelligence.com/industry-reports/nigeria-ooh-and-dooh-market)
 - [WhatsApp marketing for Nigerian businesses, 2026 guide](https://realdataintl.com/articles/whatsapp-marketing-nigeria-guide)
+- [QR code scan rate benchmarks by industry, Linkbreakers](https://linkbreakers.com/help/article/qr-code-scan-rate-benchmarks-by-industry)
+- [QR codes on billboards and street ads, Supercode](https://www.supercode.com/use-case/qr-codes-street-advertising-and-billboards)
+- [Measure OOH ad exposure with dynamic QR codes, Broadsign](https://broadsign.com/blog/create-interactive-consumer-experiences-and-measure-ooh-ad-exposure-with-dynamic-qr-codes/)
+- [NIBSS bets on QR codes as a cash alternative for small-value payments, TechCabal](https://techcabal.com/2025/02/10/nibss-bets-on-qr/)
+- [Global QR code payments projected to exceed $8 trillion by 2029 as Nigeria revamps NQR, Nairametrics](http://nairametrics.com/2025/02/12/global-qr-code-payments-projected-to-exceed-8-trillion-by-2029-as-nigeria-revamps-nqr/)
+- [NQR, NIBSS](https://nibss-plc.com.ng/nqr/)
+- [NCC's tariff decision to drive investment in Nigeria's digital future, GSMA](https://www.gsma.com/newsroom/press-release/nccs-tariff-decision-to-drive-investment-in-nigerias-digital-future-benefitting-millions-of-consumers/)
+- [Tariff hikes and data surges: Nigeria's telecom sector in 2025, Techeconomy](https://techeconomy.ng/nigeria-telecom-sector-2025-tariffs-data-growth-challenges/)
+- [Life in Nigeria runs on data, and it now costs N721 billion monthly, TechCabal](https://techcabal.com/2025/09/01/nigeria-data-spend-721bn-monthly/)
+- [GSMA warns rising smartphone costs could deepen Nigeria's mobile internet gap, Nairametrics](https://nairametrics.com/2026/09/16/gsma-warns-rising-smartphone-costs-could-deepen-nigerias-mobile-internet-gap/)
+- [How many words should a billboard have, Trailhead Media](https://trailheadmedia.com/how-many-words-should-a-billboard-have/)
+- [Billboard readability: designing for real drivers, AdCorrector](https://adcorrector.com/billboard-readability-design-for-real-drivers)
+- [The 3-second rule in billboard design, AdCorrector](https://adcorrector.com/ooh-core-knowledge/3-second-rule-billboard-design)
