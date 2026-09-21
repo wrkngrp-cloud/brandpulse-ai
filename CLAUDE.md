@@ -35,7 +35,7 @@ superseded; if you find a copy, it is history, not the spec.
 This repo's `docs/` folder also holds supporting working docs that are **not** the PRD set:
 `industry-fit-strategy.md`, `funnel-signals-explained.md`, `to-100-percent-build-list.md`,
 `scoreboard-and-leads.md`, `brand-icons.md`, `motion-amendments.md`,
-`design-system-update-brief.md`, `connector-setup-guide.md`.
+`design-system-update-brief.md`, `connector-setup-guide.md`, `ooh-measurement-rethink.md`.
 
 ## Commands
 - `npm run dev` — local dev server (Next.js + Turbopack).
