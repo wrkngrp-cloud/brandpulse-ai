@@ -243,6 +243,27 @@ while ((m = alterRe.exec(sql))) {
   while ((a = addRe.exec(m[2]))) add(table, [a[1]])
 }
 
+/* A renamed column moves. Ignoring renames costs twice over: the new name
+   reads as unknown and fails a correct seed, and the old name still reads as
+   present, so a seed writing the dead name passes. Both happened here, with
+   ooh_sites weekly_cost -> monthly_cost and cultural_zone -> lga. Applied
+   after the adds because a rename always follows the column it renames. */
+const renameRe = /alter\s+table\s+(?:if\s+exists\s+)?(?:public\.)?([a-z0-9_]+)\s+rename\s+column\s+(?:if\s+exists\s+)?([a-z0-9_]+)\s+to\s+([a-z0-9_]+)/gi
+while ((m = renameRe.exec(sql))) {
+  const [, table, from, to] = m
+  const cols = schema.get(table)
+  if (cols) { cols.delete(from); cols.add(to) }
+  else add(table, [to])
+}
+
+/* No migration drops a column today, but a dropped column that still reads as
+   present is the same silent pass as a stale rename. */
+const dropColRe = /alter\s+table\s+(?:if\s+exists\s+)?(?:public\.)?([a-z0-9_]+)\s+drop\s+column\s+(?:if\s+exists\s+)?([a-z0-9_]+)/gi
+while ((m = dropColRe.exec(sql))) {
+  const [, table, col] = m
+  schema.get(table)?.delete(col)
+}
+
 /* ── 2. scan the seed routes ─────────────────────────────────────────────── */
 
 const seedFiles = [
