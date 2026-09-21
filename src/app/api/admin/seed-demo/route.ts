@@ -768,7 +768,7 @@ Cost efficiency was strong: at â‚¦3,483 per qualified lead against a target of â
       lat: 6.4698, lng: 3.5852, city: 'Lagos', state: 'Lagos',
       format_type: 'billboard', illuminated: true,
       daily_traffic: 85_000, operator: 'Outdoor Advertising Association of Nigeria',
-      weekly_cost: 87760, currency: 'NGN',
+      monthly_cost: 87760, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
       
       vanity_slug: 'jara-lekki', landing_url: 'https://jarafoods.com/summer',
@@ -780,7 +780,7 @@ Cost efficiency was strong: at â‚¦3,483 per qualified lead against a target of â
       lat: 6.5055, lng: 3.3576, city: 'Lagos', state: 'Lagos',
       format_type: 'unipole', illuminated: true,
       daily_traffic: 42_000, operator: 'Pison Outsourcing',
-      weekly_cost: 48499, currency: 'NGN',
+      monthly_cost: 48499, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
       
       vanity_slug: 'jara-surulere', landing_url: 'https://jarafoods.com/summer',
@@ -792,7 +792,7 @@ Cost efficiency was strong: at â‚¦3,483 per qualified lead against a target of â
       lat: 9.0574, lng: 7.4898, city: 'Abuja', state: 'FCT',
       format_type: 'digital_screen', illuminated: true,
       daily_traffic: 22_000, operator: 'Ooh! Media',
-      weekly_cost: 110855, currency: 'NGN',
+      monthly_cost: 110855, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
       
       vanity_slug: 'jara-transcorp', landing_url: 'https://jarafoods.com/summer',
@@ -804,7 +804,7 @@ Cost efficiency was strong: at â‚¦3,483 per qualified lead against a target of â
       lat: 6.5547, lng: 3.3500, city: 'Lagos', state: 'Lagos',
       format_type: 'lamppost', illuminated: false,
       daily_traffic: 110_000, operator: 'LASAA (Lagos State)',
-      weekly_cost: 41570, currency: 'NGN',
+      monthly_cost: 41570, currency: 'NGN',
       campaign_start: dAgo(14), campaign_end: dAgo(-76),
       
       vanity_slug: 'jara-oshodi', landing_url: 'https://jarafoods.com/summer',
@@ -825,7 +825,7 @@ Cost efficiency was strong: at â‚¦3,483 per qualified lead against a target of â
       lat: 6.5774, lng: 3.3212, city: 'Lagos', state: 'Lagos',
       format_type: 'digital_screen', illuminated: true,
       daily_traffic: 28_000, operator: 'Ooh! Media',
-      weekly_cost: 127021, currency: 'NGN',
+      monthly_cost: 127021, currency: 'NGN',
       campaign_start: dAgo(218), campaign_end: dAgo(168),
       
       vanity_slug: 'jara-airport', landing_url: 'https://jarafoods.com/nourish',
@@ -837,7 +837,7 @@ Cost efficiency was strong: at â‚¦3,483 per qualified lead against a target of â
       lat: 9.0063, lng: 7.4631, city: 'Abuja', state: 'FCT',
       format_type: 'unipole', illuminated: true,
       daily_traffic: 35_000, operator: 'AllOver Media',
-      weekly_cost: 66975, currency: 'NGN',
+      monthly_cost: 66975, currency: 'NGN',
       campaign_start: dAgo(218), campaign_end: dAgo(168),
       
       vanity_slug: 'jara-abuja', landing_url: 'https://jarafoods.com/nourish',
@@ -849,7 +849,7 @@ Cost efficiency was strong: at â‚¦3,483 per qualified lead against a target of â
       lat: 11.9944, lng: 8.5082, city: 'Kano', state: 'Kano',
       format_type: 'billboard', illuminated: true,
       daily_traffic: 48_000, operator: 'Prime Outdoor',
-      weekly_cost: 27714, currency: 'NGN',
+      monthly_cost: 27714, currency: 'NGN',
       campaign_start: dAgo(90), campaign_end: dAgo(-30),
       
       vanity_slug: 'jara-kano', landing_url: 'https://jarafoods.com',
@@ -861,7 +861,7 @@ Cost efficiency was strong: at â‚¦3,483 per qualified lead against a target of â
       lat: 4.8242, lng: 7.0336, city: 'Port Harcourt', state: 'Rivers',
       format_type: 'unipole', illuminated: true,
       daily_traffic: 31_000, operator: 'Rivers State SEMTRAC',
-      weekly_cost: 38106, currency: 'NGN',
+      monthly_cost: 38106, currency: 'NGN',
       campaign_start: dAgo(60), campaign_end: dAgo(-30),
       
       vanity_slug: 'jara-ph', landing_url: 'https://jarafoods.com',

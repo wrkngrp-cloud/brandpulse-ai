@@ -116,7 +116,7 @@ export async function seedModulePack(sb: Sb, cfg: ModulePackConfig) {
   /* ── Broadcast and print, for the verticals that buy them ─────────────── */
   if (USES_BROADCAST.has(brandType)) {
     const { data: tvCh } = await sb.from('tv_channels').insert({
-      name: 'Channels TV', type: 'news', platform: 'free_to_air',
+      name: 'Channels TV', type: 'fta_national', platform: 'free_to_air',
       reach_prime: 4_200_000, reach_day: 1_800_000,
     }).select('id').single()
 
@@ -142,7 +142,7 @@ export async function seedModulePack(sb: Sb, cfg: ModulePackConfig) {
     if (station?.id) {
       await sb.from('radio_schedules').insert([28, 21, 14, 7].map((d, i) => ({
         brand_id: brandId, campaign_id: campaignId, station_id: station.id,
-        station_name: 'Beat FM', daypart: i % 2 ? 'drive_pm' : 'drive_am',
+        station_name: 'Beat FM', daypart: i % 2 ? 'afternoon_drive' : 'morning_drive',
         spot_date: iso(dateDaysAgo(d, base)), spot_time: i % 2 ? '17:20' : '07:30',
         duration_sec: 45, spots_planned: 10, spots_aired: 10 - (i % 3),
         material_name: `${brandName} 45s`, rate_card: 320_000, discount_pct: 25,
@@ -160,8 +160,8 @@ export async function seedModulePack(sb: Sb, cfg: ModulePackConfig) {
       await sb.from('print_placements').insert([34, 20, 6].map((d, i) => ({
         brand_id: brandId, campaign_id: campaignId, publication_id: pub.id,
         publication_name: 'BusinessDay', edition_date: iso(dateDaysAgo(d, base)),
-        position: i === 0 ? 'back_page' : 'inside_right', size: 'half_page',
-        colour: true, rate_card: 1_200_000, discount_pct: 20, net_cost: 960_000,
+        position: i === 0 ? 'back_page' : 'rop_interior', size: 'half_page',
+        colour: 'full_colour', rate_card: 1_200_000, discount_pct: 20, net_cost: 960_000,
         insertions: 1, currency: 'NGN',
         vanity_slug: `${brandName.toLowerCase().replace(/\s+/g, '')}-bd-${i + 1}`,
         qr_scan_count: 0, status: 'published',
@@ -194,12 +194,13 @@ export async function seedModulePack(sb: Sb, cfg: ModulePackConfig) {
           await sb.from('field_report_outlets').insert([0, 1].map(k => ({
             field_report_id: report.id, brand_id: brandId,
             outlet_name: `${['Mile 12', 'Oshodi', 'Balogun', 'Lekki'][i]} outlet ${k + 1}`,
-            outlet_type: brandType === 'fintech' ? 'agent_kiosk' : 'open_market',
+            outlet_type: brandType === 'fintech' ? 'other' : 'open_market',
             product_available: k === 0, facings_count: k === 0 ? 6 : 0,
-            stock_level: k === 0 ? 'healthy' : 'out_of_stock',
+            stock_level: k === 0 ? 'full' : 'out_of_stock',
             observed_price_ngn: 1_450, rrp_ngn: 1_400,
             posm_present: k === 0, posm_condition: k === 0 ? 'good' : null,
-            competitor_activity: k === 1, competitor_name: k === 1 ? competitors[0] : null,
+            competitor_activity: k === 1 ? 'Competitor promo activity observed' : null,
+            competitor_name: k === 1 ? competitors[0] : null,
             lat: 6.52 + i * 0.01, lng: 3.37 + i * 0.01,
           })))
         }
@@ -234,7 +235,7 @@ export async function seedModulePack(sb: Sb, cfg: ModulePackConfig) {
       brand_id: brandId, name: def.name, type: def.type,
       questions: def.questions,
       deploy_channels: ['link', 'whatsapp', 'in_app'],
-      languages: ['en', 'pcm'], status: 'active',
+      languages: ['en', 'pcm'], status: 'live',
     }).select('id').single()
 
     if (survey?.id) {
