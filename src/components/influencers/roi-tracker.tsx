@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { TrendDownIcon as TrendingDown, PlusIcon as Plus, CurrencyIcon as DollarSign, EyeIcon as Eye, HeartIcon as Heart, CircleDotIcon as MousePointerClick, MarketIcon as ShoppingBag, ChevronDownIcon as ChevronDown, ChevronUpIcon as ChevronUp, InfoIcon as Info } from '@/components/brand/icon'
 import { TrendIcon as TrendingUp } from '@/components/brand/icon'
+import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { Input }  from '@/components/ui/input'
 import { Label }  from '@/components/ui/label'
@@ -11,6 +12,15 @@ import {
 } from '@/components/ui/select'
 import { cn }    from '@/lib/utils'
 import { toast } from 'sonner'
+
+type MetricKey    = 'reach' | 'impressions' | 'engagements'
+type MetricSource = 'pulled' | 'entered'
+
+interface PulledMetricsResponse {
+  metrics?:        { views?: number; likes?: number; comments?: number; shares?: number; saves?: number; reach?: number }
+  metric_sources?: Partial<Record<'views' | 'likes' | 'comments' | 'shares' | 'saves' | 'reach', 'pulled'>>
+  metrics_note?:   string | null
+}
 
 export interface InfluencerCampaign {
   id:                     string
@@ -88,10 +98,68 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
     name: '', creator_handle: '', platform: 'instagram' as typeof PLATFORMS[number],
     fee: '', reach: '', impressions: '', engagements: '',
     attributed_clicks: '', attributed_conversions: '',
-    promo_code: '', utm_campaign: '',
+    promo_code: '', utm_campaign: '', post_url: '',
   })
+  const [fetchingMetrics, setFetchingMetrics] = useState(false)
+  const [metricsNote, setMetricsNote]         = useState<string | null>(null)
+  const [metricSources, setMetricSources]     = useState<Partial<Record<MetricKey, MetricSource>>>({})
 
   const n = (v: string) => parseFloat(v) || 0
+
+  function setMetricField(key: MetricKey, value: string) {
+    setForm(f => ({ ...f, [key]: value }))
+    // Typing over a pulled number makes it the user's own figure again.
+    setMetricSources(prev => (prev[key] ? { ...prev, [key]: 'entered' } : prev))
+  }
+
+  /** Paste a post link, and the public counts that platform allows fill in
+   *  reach/impressions/engagements. Owner-only numbers (most of them, on most
+   *  platforms) stay blank rather than guessed — metricsNote says why. */
+  async function pullFromPostUrl(url: string) {
+    if (!url.trim().startsWith('http')) return
+    setFetchingMetrics(true)
+    setMetricsNote(null)
+    try {
+      const params = new URLSearchParams({ url: url.trim(), platform: form.platform })
+      if (form.creator_handle.trim()) params.set('handle', form.creator_handle.trim())
+      const res = await fetch(`/api/influencer-campaigns/post-metrics?${params}`)
+      if (!res.ok) return
+      const data = await res.json() as PulledMetricsResponse
+      const m = data.metrics ?? {}
+
+      const nextSources: Partial<Record<MetricKey, MetricSource>> = {}
+      setForm(f => {
+        const next = { ...f }
+        // Impressions: the closest match across platforms to "how many times
+        // this was displayed" — X's impression_count, YouTube's view count,
+        // Instagram's play count on video posts.
+        if (m.views != null && !f.impressions.trim()) {
+          next.impressions = String(m.views)
+          nextSources.impressions = 'pulled'
+        }
+        if (m.reach != null && !f.reach.trim()) {
+          next.reach = String(m.reach)
+          nextSources.reach = 'pulled'
+        }
+        // Engagements here is one blended figure, not separate likes/comments/
+        // shares, so sum whatever the platform actually gave back.
+        const engagementParts = [m.likes, m.comments, m.shares, m.saves].filter((v): v is number => v != null)
+        if (engagementParts.length > 0 && !f.engagements.trim()) {
+          next.engagements = String(engagementParts.reduce((a, b) => a + b, 0))
+          nextSources.engagements = 'pulled'
+        }
+        return next
+      })
+      if (Object.keys(nextSources).length > 0) {
+        setMetricSources(prev => ({ ...prev, ...nextSources }))
+      }
+      setMetricsNote(data.metrics_note ?? null)
+    } catch {
+      // silently fail — pulling is a convenience, manual entry still works
+    } finally {
+      setFetchingMetrics(false)
+    }
+  }
 
   const previewEmv = calcEmv(form.platform, n(form.impressions), n(form.engagements))
   const previewRoi = n(form.fee) > 0 ? ((previewEmv - n(form.fee)) / n(form.fee)) * 100 : 0
@@ -124,7 +192,9 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
       if (!res.ok) throw new Error(data.error ?? 'Failed')
       setCampaigns(c => [data, ...c])
       setShowForm(false)
-      setForm({ name: '', creator_handle: '', platform: 'instagram', fee: '', reach: '', impressions: '', engagements: '', attributed_clicks: '', attributed_conversions: '', promo_code: '', utm_campaign: '' })
+      setForm({ name: '', creator_handle: '', platform: 'instagram', fee: '', reach: '', impressions: '', engagements: '', attributed_clicks: '', attributed_conversions: '', promo_code: '', utm_campaign: '', post_url: '' })
+      setMetricSources({})
+      setMetricsNote(null)
       toast.success('Campaign logged')
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed to save')
@@ -205,18 +275,45 @@ export function InfluencerRoiTracker({ initialCampaigns }: Props) {
             </div>
           </div>
 
+          <div className="space-y-1.5">
+            <div className="flex items-baseline justify-between gap-1">
+              <Label className="text-[11.5px]">Post link (optional)</Label>
+              {fetchingMetrics && <Loader2 className="h-3 w-3 text-muted-foreground" />}
+            </div>
+            <Input
+              placeholder="https://instagram.com/reel/abc123"
+              value={form.post_url}
+              onChange={e => setForm(f => ({ ...f, post_url: e.target.value }))}
+              onBlur={e => void pullFromPostUrl(e.target.value)}
+            />
+            <p className="text-[10px] text-muted-foreground">
+              Paste the post and public counts fill in Reach, Impressions and Engagements below. Set the creator
+              handle and platform first — Instagram needs the handle, and every platform reads differently.
+            </p>
+            {metricsNote && <p className="text-[10px] text-tx-2">{metricsNote}</p>}
+          </div>
+
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-[11.5px]">Reach</Label>
-              <Input type="number" placeholder="0" value={form.reach} onChange={e => setForm(f => ({ ...f, reach: e.target.value }))} />
+            <div className="space-y-1">
+              <div className="flex items-baseline justify-between gap-1">
+                <Label className="text-[11.5px]">Reach</Label>
+                {metricSources.reach === 'pulled' && <span className="text-[9px] font-bold text-pos">Pulled</span>}
+              </div>
+              <Input type="number" placeholder="0" value={form.reach} onChange={e => setMetricField('reach', e.target.value)} />
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-[11.5px]">Impressions</Label>
-              <Input type="number" placeholder="0" value={form.impressions} onChange={e => setForm(f => ({ ...f, impressions: e.target.value }))} />
+            <div className="space-y-1">
+              <div className="flex items-baseline justify-between gap-1">
+                <Label className="text-[11.5px]">Impressions</Label>
+                {metricSources.impressions === 'pulled' && <span className="text-[9px] font-bold text-pos">Pulled</span>}
+              </div>
+              <Input type="number" placeholder="0" value={form.impressions} onChange={e => setMetricField('impressions', e.target.value)} />
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-[11.5px]">Engagements</Label>
-              <Input type="number" placeholder="0" value={form.engagements} onChange={e => setForm(f => ({ ...f, engagements: e.target.value }))} />
+            <div className="space-y-1">
+              <div className="flex items-baseline justify-between gap-1">
+                <Label className="text-[11.5px]">Engagements</Label>
+                {metricSources.engagements === 'pulled' && <span className="text-[9px] font-bold text-pos">Pulled</span>}
+              </div>
+              <Input type="number" placeholder="0" value={form.engagements} onChange={e => setMetricField('engagements', e.target.value)} />
             </div>
             <div className="space-y-1.5">
               <Label className="text-[11.5px]">Attributed clicks</Label>
