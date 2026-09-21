@@ -76,6 +76,7 @@ interface InfluencerPost {
   saves: number | null
   reach: number | null
   comment_samples: string | null
+  metric_sources: Partial<Record<string, 'pulled' | 'entered' | 'estimated'>> | null
   analysis: PostAnalysis | null
   overall_score: number | null
   analyzed_at: string | null
@@ -410,12 +411,12 @@ function PostCard({ post }: { post: InfluencerPost }) {
       {/* Engagement metrics row */}
       {(post.views || post.likes || post.comments || post.shares || post.saves || post.reach) && (
         <div className="px-3 pb-2 flex flex-wrap gap-3">
-          {post.views    && <MetricChip label="Views"    value={fmtNum(post.views)}    />}
-          {post.likes    && <MetricChip label="Likes"    value={fmtNum(post.likes)}    />}
-          {post.comments && <MetricChip label="Comments" value={fmtNum(post.comments)} />}
-          {post.shares   && <MetricChip label="Shares"   value={fmtNum(post.shares)}   />}
-          {post.saves    && <MetricChip label="Saves"    value={fmtNum(post.saves)}    />}
-          {post.reach    && <MetricChip label="Reach"    value={fmtNum(post.reach)}    />}
+          {post.views    && <MetricChip label="Views"    value={fmtNum(post.views)}    source={post.metric_sources?.views} />}
+          {post.likes    && <MetricChip label="Likes"    value={fmtNum(post.likes)}    source={post.metric_sources?.likes} />}
+          {post.comments && <MetricChip label="Comments" value={fmtNum(post.comments)} source={post.metric_sources?.comments} />}
+          {post.shares   && <MetricChip label="Shares"   value={fmtNum(post.shares)}   source={post.metric_sources?.shares} />}
+          {post.saves    && <MetricChip label="Saves"    value={fmtNum(post.saves)}    source={post.metric_sources?.saves} />}
+          {post.reach    && <MetricChip label="Reach"    value={fmtNum(post.reach)}    source={post.metric_sources?.reach} />}
         </div>
       )}
 
@@ -428,10 +429,15 @@ function PostCard({ post }: { post: InfluencerPost }) {
   )
 }
 
-function MetricChip({ label, value }: { label: string; value: string }) {
+function MetricChip(
+  { label, value, source }: { label: string; value: string; source?: 'pulled' | 'entered' | 'estimated' }
+) {
   return (
     <div className="text-[10px] text-muted-foreground">
       <span className="font-semibold text-foreground"><span className="bg-num">{value}</span></span> {label}
+      {source === 'pulled' && (
+        <span className="ml-1 text-pos" title="Read from the platform">&#183; pulled</span>
+      )}
     </div>
   )
 }
@@ -446,6 +452,32 @@ const METRIC_FIELDS = [
   { key: 'saves',    label: 'Saves',    placeholder: '621'    },
   { key: 'reach',    label: 'Reach',    placeholder: '42,000' },
 ] as const
+
+type MetricKey    = typeof METRIC_FIELDS[number]['key']
+type MetricSource = 'pulled' | 'entered' | 'estimated'
+
+/* Where each number came from. A field the platform gave us is marked Pulled;
+   the moment the user types over it, it becomes theirs. Owner-only fields are
+   marked so nobody reads a blank as a measurement of zero. */
+const SOURCE_LABEL: Record<MetricSource, string> = {
+  pulled:    'Pulled',
+  entered:   'Entered',
+  estimated: 'Estimated',
+}
+
+/* Anything with a value but no recorded origin was typed by hand. Fields left
+   blank are omitted entirely rather than recorded as a zero. */
+function buildSources(
+  form:    FormState,
+  pulled:  Partial<Record<MetricKey, MetricSource>>,
+): Partial<Record<MetricKey, MetricSource>> {
+  const out: Partial<Record<MetricKey, MetricSource>> = {}
+  for (const f of METRIC_FIELDS) {
+    if (!form[f.key]?.trim()) continue
+    out[f.key] = pulled[f.key] ?? 'entered'
+  }
+  return out
+}
 
 interface FormState {
   postUrl:        string
@@ -474,9 +506,16 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
   const [submitting, setSubmitting] = useState(false)
   const [fetching, setFetching]     = useState(false)
   const [metaNote, setMetaNote]     = useState<string | null>(null)
+  const [metricsNote, setMetricsNote] = useState<string | null>(null)
+  const [sources, setSources]       = useState<Partial<Record<MetricKey, MetricSource>>>({})
+  const [ownerOnly, setOwnerOnly]   = useState<MetricKey[]>([])
 
   function setField(key: keyof FormState, value: string) {
     setForm(prev => ({ ...prev, [key]: value }))
+    // Typing over a pulled number makes it the user's own figure.
+    if ((METRIC_FIELDS as readonly { key: string }[]).some(f => f.key === key)) {
+      setSources(prev => (prev[key as MetricKey] ? { ...prev, [key]: 'entered' } : prev))
+    }
   }
 
   async function fetchMetadata(url: string) {
@@ -491,6 +530,10 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
         caption?: string | null
         thumbnail_url?: string | null
         note?: string | null
+        metrics?: Partial<Record<MetricKey, number>>
+        metric_sources?: Partial<Record<MetricKey, MetricSource>>
+        owner_only?: MetricKey[]
+        metrics_note?: string | null
       }
       // Pre-fill comment_samples with the caption if present and field is empty
       if (data.caption && !form.commentSamples.trim()) {
@@ -499,6 +542,24 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
           commentSamples: `Post caption:\n${data.caption}`,
         }))
       }
+
+      // Fill only the numbers the platform actually gave us, and only where the
+      // user has not already typed something of their own.
+      const pulled = data.metrics ?? {}
+      if (Object.keys(pulled).length > 0) {
+        setForm(prev => {
+          const next = { ...prev }
+          for (const [key, value] of Object.entries(pulled)) {
+            if (value == null) continue
+            if (next[key as MetricKey]?.trim()) continue
+            next[key as MetricKey] = value.toLocaleString('en-NG')
+          }
+          return next
+        })
+        setSources(prev => ({ ...(data.metric_sources ?? {}), ...prev }))
+      }
+      setOwnerOnly(data.owner_only ?? [])
+      setMetricsNote(data.metrics_note ?? null)
       if (data.note) setMetaNote(data.note)
     } catch {
       // silently fail — metadata is optional
@@ -527,6 +588,7 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
           saves:           form.saves    ? Number(form.saves.replace(/,/g, ''))    : undefined,
           reach:           form.reach    ? Number(form.reach.replace(/,/g, ''))    : undefined,
           comment_samples: form.commentSamples.trim() || undefined,
+          metric_sources:  buildSources(form, sources),
         }),
       })
       if (!res.ok) {
@@ -561,7 +623,7 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
             <Loader2 className="h-3.5 w-3.5 text-muted-foreground absolute right-2.5 top-1/2 -translate-y-1/2" />
           )}
         </div>
-        <p className="text-[10px] text-muted-foreground">Instagram, TikTok, X, YouTube, or Facebook — caption auto-fetches for TikTok, YouTube, and X</p>
+        <p className="text-[10px] text-muted-foreground">Instagram, TikTok, X, YouTube or Facebook. Paste the link and we pull what the platform makes public.</p>
         {metaNote && (
           <p className="text-[10px] text-tx-2 dark:text-tx-2">{metaNote}</p>
         )}
@@ -571,20 +633,40 @@ function PostForm({ influencerId, campaignId, onSuccess, onCancel }: PostFormPro
       <div className="space-y-2">
         <div className="space-y-0.5">
           <Label className="text-xs">Engagement Metrics</Label>
-          <p className="text-[10px] text-muted-foreground">Enter from the creator&apos;s insights dashboard or your ad account. All fields optional.</p>
+          <p className="text-[10px] text-muted-foreground">
+            Public counts fill in from the post link. Reach and impressions are only visible to the
+            creator, so ask them for those. All fields optional.
+          </p>
+          {metricsNote && (
+            <p className="text-[10px] text-tx-2">{metricsNote}</p>
+          )}
         </div>
         <div className="grid grid-cols-3 gap-2">
-          {METRIC_FIELDS.map(f => (
-            <div key={f.key} className="space-y-1">
-              <Label className="text-[10px] text-muted-foreground">{f.label}</Label>
-              <Input
-                placeholder={f.placeholder}
-                value={form[f.key]}
-                onChange={e => setField(f.key as keyof FormState, e.target.value)}
-                className="text-xs h-7 px-2"
-              />
-            </div>
-          ))}
+          {METRIC_FIELDS.map(f => {
+            const source    = sources[f.key]
+            const isOwnerOnly = ownerOnly.includes(f.key) && !source
+            return (
+              <div key={f.key} className="space-y-1">
+                <div className="flex items-baseline justify-between gap-1">
+                  <Label className="text-[10px] text-muted-foreground">{f.label}</Label>
+                  {source === 'pulled' && (
+                    <span className="text-[9px] font-bold text-pos">{SOURCE_LABEL.pulled}</span>
+                  )}
+                  {isOwnerOnly && (
+                    <span className="text-[9px] text-tx-3" title="Only the creator can see this number. Ask them for it, or have them connect their account.">
+                      creator only
+                    </span>
+                  )}
+                </div>
+                <Input
+                  placeholder={f.placeholder}
+                  value={form[f.key]}
+                  onChange={e => setField(f.key as keyof FormState, e.target.value)}
+                  className="text-xs h-7 px-2"
+                />
+              </div>
+            )
+          })}
         </div>
       </div>
 

@@ -52,6 +52,12 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 - `npm run icons` / `npm run icons:check` — build the sprite from
   `brand/icons/currentcolor`, and fail when a glyph the product asks for was
   never drawn.
+- `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
+  mocked platform responses. Real calls cost X credit and burn Instagram's
+  hashtag quota, so every branch is covered offline instead.
+  `./scripts/check-post-metrics.sh` hits the live APIs: with no arguments it
+  probes the credentials, and given post URLs or ids it reads them in one
+  batched call and prints a paste-ready POST body. Both modes spend X credit.
 There is no unit-test suite. Verify behaviour by type-check + lint + driving the actual
 flow (see Definition of done).
 
@@ -65,6 +71,14 @@ Demo seeds: brand health history is produced by `bhiSnapshotRows` in
 `src/lib/demo/bhi-series.ts`, which runs the real `computeFullBHI` with the
 brand's `brand_type`, so seeded history matches the live number and is stamped
 with the current `BHI_FORMULA_VERSION`. Never hand-roll a BHI in a seed.
+
+Influencer post metrics: public counts (likes, comments, plays) are pulled from
+a post URL by `fetchPostMetrics`. Reach, impressions and saves are owner-only on
+every platform, so they are never pulled and never guessed. Every number carries
+its origin in `influencer_posts.metric_sources` (`pulled` | `entered` |
+`estimated`) and the UI must show it, so a screen never implies a typed figure
+was measured. TikTok has no public lookup at all; it needs the creator to
+connect their own account.
 
 ## Repo layout
 - `src/app/**` — Next.js App Router. Pages are server components by default; API routes
