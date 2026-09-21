@@ -10,7 +10,8 @@
     "icons": "node scripts/icons-build.mjs",
     "icons:check": "node scripts/icons-build.mjs --check",
     "seeds:check": "node scripts/validate-seeds.mjs",
-    "demo:check": "node scripts/check-demo-rows.mjs"
+    "demo:check": "node scripts/check-demo-rows.mjs",
+    "metrics:check": "node scripts/check-post-metrics.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

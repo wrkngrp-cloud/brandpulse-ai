@@ -1,14 +1,21 @@
 /**
  * GET /api/influencers/[id]/posts/metadata?url={postUrl}
  *
- * Fetches public metadata for a social post URL using platform oEmbed APIs.
- * Returns: author_name, caption, thumbnail_url, platform, post_type
- * Engagement metrics (views, likes, etc.) require authenticated platform APIs
- * and must be entered manually by the brand.
+ * Fetches what a post URL can tell us without the creator's permission:
+ *   - descriptive metadata (author, caption, thumbnail) via platform oEmbed
+ *   - public engagement counts via the connected platform APIs, where the
+ *     platform exposes them for someone else's post
+ *
+ * Reach, impressions and saves are owner-only on every platform here, so they
+ * are never returned. `owner_only` names them and `metric_sources` tags every
+ * number we did pull, so the form can label provenance instead of implying the
+ * whole row was measured.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
+import { fetchPostMetrics } from '@/lib/social/post-metrics'
 
 export const runtime = 'nodejs'
 
@@ -96,13 +103,16 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  await params  // ensure dynamic route is resolved
+  const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const postUrl = request.nextUrl.searchParams.get('url')
   if (!postUrl) return NextResponse.json({ error: 'url param required' }, { status: 400 })
+
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
 
   const platform = detectPlatform(postUrl)
   const postType = detectPostType(postUrl, platform)
@@ -120,17 +130,39 @@ export async function GET(
     if (platform === 'tiktok')  result = await fetchTikTokOembed(postUrl)
     if (platform === 'youtube') result = await fetchYoutubeOembed(postUrl)
     if (platform === 'twitter') result = await fetchTwitterOembed(postUrl)
-    // Instagram & Facebook require OAuth token — return platform/type only
+    // Instagram & Facebook have no open oEmbed — metrics below still work
   } catch (e) {
     console.warn('[posts/metadata] oEmbed fetch error:', e)
     // Return what we know from URL analysis — don't fail the request
   }
 
+  // The influencer's handle is what Instagram needs to look a post up.
+  // RLS scopes this read, and it is re-checked against the active brand.
+  const { data: influencer } = await supabase
+    .from('influencers')
+    .select('handle')
+    .eq('id', id)
+    .eq('brand_id', brandId)
+    .maybeSingle()
+
+  const metrics = await fetchPostMetrics({
+    supabase,
+    brandId,
+    platform,
+    postUrl,
+    influencerHandle: influencer?.handle ?? null,
+  }).catch(e => {
+    console.warn('[posts/metadata] metric fetch error:', e)
+    return null
+  })
+
   return NextResponse.json({
     ...result,
-    note: platform === 'instagram' || platform === 'facebook'
-      ? 'Caption and metrics for Instagram/Facebook posts must be entered manually (API requires connected account).'
-      : platform === 'other'
+    metrics:        metrics?.metrics  ?? {},
+    metric_sources: metrics?.sources  ?? {},
+    owner_only:     metrics?.ownerOnly ?? [],
+    metrics_note:   metrics?.note     ?? null,
+    note: platform === 'other'
       ? 'Unrecognised platform. Please enter metrics manually.'
       : null,
   })
