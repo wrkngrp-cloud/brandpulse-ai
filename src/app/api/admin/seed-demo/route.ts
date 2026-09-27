@@ -4,7 +4,7 @@ import { TOKENS } from '@/lib/brand-tokens'
 import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
-import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
+import { monthLabel, monthName, quarterLabel, yearLabel, nextMoment } from '@/lib/demo/seasonality'
 import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
 import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
 
@@ -27,6 +27,8 @@ const DEMO_PASSWORD = 'Demo@Jara2026!'
 // hardcoded literal, which would be committed to git and let anyone reseed.
 const SEED_SECRET   = process.env.ADMIN_SECRET
 const BASE          = new Date()
+// the next fixed-date moment on the calendar, so briefings plan forward from the run date
+const MOMENT        = nextMoment(BASE)
 
 /* ── Date helpers ────────────────────────────────────────────────────────── */
 
@@ -309,7 +311,7 @@ export async function POST(req: NextRequest) {
 
   /* ── 10. Events ───────────────────────────────────────────────────────── */
 
-  // evt1 — Nourish Nigeria Festival (closed, Oct 2025)
+  // evt1 — Nourish Nigeria Festival (closed, ~7 months ago)
   const { data: evt1 } = await sb.from('events').insert({
     brand_id: brandId, campaign_id: camp1Id,
     name: 'Nourish Nigeria Festival',
@@ -321,7 +323,7 @@ export async function POST(req: NextRequest) {
     activation_mechanics: ['Live cooking demos', 'Recipe sampling', 'Photo booth', 'Social media wall', 'Branded gifts', 'Influencer zone'],
     kpi_targets:          { expected_leads: 1500, expected_photo_moments: 500 },
     budget: 7_200_000, currency: 'NGN',
-    hashtags: ['NourishNigeria', 'JaraFoods', 'JaraFestival2025'],
+    hashtags: ['NourishNigeria', 'JaraFoods', `JaraFestival${dAgo(218).slice(0, 4)}`],
     status: 'closed',
     debrief: {
       actual_attendance: 2847, leads_captured: 1847, nps_achieved: 74,
@@ -335,7 +337,7 @@ export async function POST(req: NextRequest) {
     },
   }).select('id').single()
 
-  // evt2 — Jara Community Kitchen Abuja (reported, Mar 2026)
+  // evt2 — Jara Community Kitchen Abuja (reported, ~2 months ago)
   const { data: evt2 } = await sb.from('events').insert({
     brand_id: brandId, campaign_id: camp2Id,
     name: 'Jara Community Kitchen — Abuja',
@@ -636,7 +638,7 @@ Amaka Okonkwo led the ambassador team in both raw interactions and lead capture,
 
 The visit by the FCT Deputy Governor generated earned media coverage across 3 Abuja-based news outlets, contributing an estimated ₦280,000 in earned media value beyond what was planned. Fatima Aliyu's handling of the Governor's entourage was exceptional — she converted the moment into a press opportunity that amplified Jara's community credentials.
 
-Cost efficiency was strong: at ₦3,483 per qualified lead against a target of ₦5,500, this activation delivered 37% better efficiency than planned. Recommend scaling the community kitchen format to Port Harcourt and Kano in Q3 2026.`,
+Cost efficiency was strong: at ₦3,483 per qualified lead against a target of ₦5,500, this activation delivered 37% better efficiency than planned. Recommend scaling the community kitchen format to Port Harcourt and Kano in ${quarterLabel(-1, BASE)}.`,
       metrics: {
         total_interactions:  32,
         total_leads:         9,
@@ -1021,7 +1023,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
   /* ── 13. Surveys, responses, NPS records ──────────────────────────────── */
   const { data: survey } = await sb.from('surveys').insert({
     brand_id: brandId,
-    name: 'Jara Brand Health Survey — Q2 2026',
+    name: `Jara Brand Health Survey — ${quarterLabel(1, BASE)}`,
     type: 'nps',
     questions: [
       { id: 'q1', type: 'single_choice', text: 'How did you first discover Jara Foods?', options: ['TV/Radio', 'Social Media', 'Friend/Family', 'Supermarket', 'Event'] },
@@ -1121,7 +1123,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
   const { data: perceptionSurvey } = await sb.from('surveys').insert({
     brand_id: brandId,
     type:     'perception_audit',
-    name:     'Brand Perception Audit Q2 2025',
+    name:     `Brand Perception Audit ${quarterLabel(0, BASE)}`,
     status:   'live',
   }).select('id').single()
 
@@ -1154,7 +1156,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
   const { data: awarenessSurvey } = await sb.from('surveys').insert({
     brand_id: brandId,
     type:     'awareness_check',
-    name:     'Brand Awareness Check Q2 2025',
+    name:     `Brand Awareness Check ${quarterLabel(0, BASE)}`,
     status:   'live',
   }).select('id').single()
 
@@ -1181,7 +1183,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
   const { data: postNpsSurvey } = await sb.from('surveys').insert({
     brand_id: brandId,
     type:     'post_purchase_nps',
-    name:     'Customer NPS Survey Q2 2025',
+    name:     `Customer NPS Survey ${quarterLabel(0, BASE)}`,
     status:   'live',
   }).select('id').single()
 
@@ -1231,7 +1233,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
     const { data: recallSurvey } = await sb.from('surveys').insert({
       brand_id:  brandId,
       type:      'brand_recall',
-      name:      'Jara Brand Recall — Q1 2026',
+      name:      `Jara Brand Recall — ${quarterLabel(2, BASE)}`,
       status:    'closed',
       panel_id:  panel2.id,
       is_panel:  true,
@@ -1793,17 +1795,17 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
         competitor_threats: [
           'ChowMate UNILAG activation targets 18-24 segment with brand sampling and student ambassador programme',
           'NutriNg Foods "Clean Label" rebrand launching next quarter — credibility play in health segment',
-          'ChowMate planning 8 new Lekki-Ajah billboards starting July 2026',
+          `ChowMate planning 8 new Lekki-Ajah billboards starting ${monthLabel(-1, BASE)}`,
         ],
         opportunities: [
           'Summer Vibes pre-launch: seeding @chefkemisola ahead of competitors closes the Gen-Z gap',
-          'Kano restocking ahead of Sallah — first mover beats ChowMate in Northern recovery',
+          `Kano restocking ahead of ${MOMENT.name}: first mover beats ChowMate in Northern recovery`,
           'TikTok trial: 4-week campaign during Summer Vibes could capture organic Gen-Z attention at low cost',
         ],
         recommendations: [
           { action: 'Brief @chefkemisola for Summer Vibes Reel by end of week', rationale: 'Influencer seeding 2 weeks before paid launch historically drives 40% lower CPM for Jara campaigns.', priority: 'High' as const },
           { action: 'Prepare Gen-Z counter-narrative social pack for UNILAG/LASU audiences', rationale: 'ChowMate campus activation will start generating UGC within 10 days — preemptive content is cheaper than defensive response.', priority: 'High' as const },
-          { action: 'Restock Kano and Maiduguri to 120% before Sallah', rationale: `${monthLabel(11, BASE)} stockout threads cost 8 points of SOV. Distribution consistency is the fastest brand health lever.`, priority: 'Medium' as const },
+          { action: `Restock Kano and Maiduguri to 120% before ${MOMENT.name}`, rationale: `${monthLabel(11, BASE)} stockout threads cost 8 points of SOV. Distribution consistency is the fastest brand health lever.`, priority: 'Medium' as const },
         ],
         data_gaps: [
           'No TikTok listening — ChowMate Gen-Z activity on platform unmonitored',
@@ -1925,23 +1927,23 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
         ],
         brand_vulnerabilities: [
           'ChowMate OOH directly competing in Jara\'s strongest Lagos corridors',
-          'Northern distribution gap persists — Kano and Maiduguri under-served ahead of Sallah',
+          `Northern distribution gap persists: Kano and Maiduguri under-served ahead of ${MOMENT.name}`,
           'No TikTok presence — Gen-Z voice gap while ChowMate earns 22% of its SOV there',
         ],
         competitor_threats: [
           'ChowMate 6-board Lekki-VI OOH placement targets Jara\'s highest-value demographic',
-          'NutriNg Foods partnering with @FitNaija and @HealthyLagos for a clean-label campaign in Q3',
+          `NutriNg Foods partnering with @FitNaija and @HealthyLagos for a clean-label campaign in ${quarterLabel(-1, BASE).slice(0, 2)}`,
           'ChowMate reportedly in talks with two Gen-Z TikTok creators (500k+ followers each)',
         ],
         opportunities: [
-          'Sallah seeding: brief @AdaezeFoods and @HijabChic for July cultural content — exclusivity window closes soon',
-          'Kano restocking ahead of Sallah creates first-mover advantage in Northern market recovery',
+          `${MOMENT.name} seeding: brief @AdaezeFoods and @HijabChic for ${MOMENT.month} cultural content. The exclusivity window closes soon`,
+          `Kano restocking ahead of ${MOMENT.name} creates first-mover advantage in Northern market recovery`,
           'NPS promoter micro-advocacy campaign: 200 promoters at 57% NPS promoter rate = est. 2M organic impressions',
           'TikTok trial: 4-week Summer Vibes extension at ₦400k could close Gen-Z gap before ChowMate locks creator relationships',
         ],
         recommendations: [
-          { action: 'Brief Sallah creators by July 1 (2 weeks away)', rationale: 'Cultural moments drive 2.4x engagement vs standard ads for Jara\'s audience. ChowMate has not booked Sallah talent — first mover wins.', priority: 'High' as const },
-          { action: 'Restock Kano and Maiduguri to 120% ahead of Sallah window', rationale: `${monthLabel(11, BASE)} stockout threads amplified ChowMate's SOV gain by 8 points. Prevention is cheaper than recovery.`, priority: 'High' as const },
+          { action: `Brief ${MOMENT.name} creators by ${MOMENT.byLabel}`, rationale: `Cultural moments drive 2.4x engagement vs standard ads for Jara's audience. ChowMate has not booked ${MOMENT.name} talent, so the first mover wins.`, priority: 'High' as const },
+          { action: `Restock Kano and Maiduguri to 120% ahead of the ${MOMENT.name} window`, rationale: `${monthLabel(11, BASE)} stockout threads amplified ChowMate's SOV gain by 8 points. Prevention is cheaper than recovery.`, priority: 'High' as const },
           { action: 'Launch TikTok account with 4-week Summer Vibes extension (₦400k trial)', rationale: 'ChowMate earns 22% of its SOV on TikTok. Jara has zero presence. Low cost to test before Q4 budget lock.', priority: 'Medium' as const },
           { action: 'Activate 200 NPS promoters with Summer Vibes shareable kits', rationale: 'Promoter UGC converts at 3x paid CTR. The Summer Vibes high-sentiment window is the ideal moment to capture organic amplification.', priority: 'Medium' as const },
         ],
@@ -1968,30 +1970,30 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
     messages: [
       {
         role: 'user',
-        content: 'Why did our sentiment drop so sharply in October 2025?',
+        content: `Why did our sentiment drop so sharply in ${monthLabel(11, BASE)}?`,
         timestamp: tsAgo(30),
       },
       {
         role: 'assistant',
-        content: 'The October 2025 dip (65 → 48 over 30 days) aligns with ChowMate\'s "Festive Blitz" campaign that launched October 3rd. Three factors drove it:\n\n**1. Share of voice collapse.** ChowMate increased paid social spend by ~340% that month, dominating FMCG conversation. Jara\'s blended SOV fell from 22% to 14%.\n\n**2. Price perception hit.** ChowMate introduced a -18% promotional price during school resumption — exactly when your audience is budget-sensitive. Mentions linking "Jara" and "too expensive" peaked in week 2 of October.\n\n**3. Distribution noise amplified.** Two Twitter threads about Jara stockouts in Kano and Maiduguri went semi-viral (~180K combined impressions), layering negative sentiment on top of the competitive pressure.\n\nThe recovery from November was driven by the Nourish Nigeria campaign, which successfully reanchored Jara around community and authenticity. The Lagos festival alone generated 3.4M social impressions at 89% positive sentiment.',
+        content: `The ${monthLabel(11, BASE)} dip (65 → 48 over 30 days) aligns with ChowMate's "Festive Blitz" campaign that launched ${monthName(11, BASE)} 3rd. Three factors drove it:\n\n**1. Share of voice collapse.** ChowMate increased paid social spend by ~340% that month, dominating FMCG conversation. Jara\'s blended SOV fell from 22% to 14%.\n\n**2. Price perception hit.** ChowMate introduced a -18% promotional price during school resumption — exactly when your audience is budget-sensitive. Mentions linking "Jara" and "too expensive" peaked in week 2 of ${monthName(11, BASE)}.\n\n**3. Distribution noise amplified.** Two Twitter threads about Jara stockouts in Kano and Maiduguri went semi-viral (~180K combined impressions), layering negative sentiment on top of the competitive pressure.\n\nThe recovery from ${monthName(10, BASE)} was driven by the Nourish Nigeria campaign, which successfully reanchored Jara around community and authenticity. The Lagos festival alone generated 3.4M social impressions at 89% positive sentiment.`,
         timestamp: tsAgo(30),
       },
       {
         role: 'user',
-        content: 'What should we do if ChowMate runs another aggressive campaign this October?',
+        content: `What should we do if ChowMate runs another aggressive campaign this ${monthName(-1, BASE)}?`,
         timestamp: tsAgo(29),
       },
       {
         role: 'assistant',
-        content: `Three defensive plays, ranked by impact:\n\n**1. Pre-empt with a cultural moment.** Jara's cultural IQ is your moat. Own Sallah (late Sept) and October 1 Independence Day before ChowMate can fill that space. Brief @chefkemisola and @foodie_naija now for Q3 content — exclusivity windows are critical.\n\n**2. Lock down distribution visibility.** The ${monthLabel(11, BASE)} stockout threads did outsized damage. Work with your supply team to ensure Kano, Maiduguri and Ibadan are fully stocked by September 15. A visible stockout during a competitor blitz is a multiplier.\n\n**3. Activate your promoter base.** You currently have 57% promoters in NPS. Build a micro-advocacy programme — send promoters shareable content packs and limited-edition products pre-October. Your best defence against paid SOV is genuine community voice.`,
+        content: `Three defensive plays, ranked by impact:\n\n**1. Pre-empt with a cultural moment.** Jara's cultural IQ is your moat. Own ${MOMENT.name} before ChowMate can fill that space. Brief @chefkemisola and @foodie_naija by ${MOMENT.byLabel} — exclusivity windows are critical.\n\n**2. Lock down distribution visibility.** The ${monthLabel(11, BASE)} stockout threads did outsized damage. Work with your supply team to ensure Kano, Maiduguri and Ibadan are fully stocked within the next two weeks. A visible stockout during a competitor blitz is a multiplier.\n\n**3. Activate your promoter base.** You currently have 57% promoters in NPS. Build a micro-advocacy programme — send promoters shareable content packs and limited-edition products before ${monthName(-1, BASE)}. Your best defence against paid SOV is genuine community voice.`,
         timestamp: tsAgo(29),
       },
     ],
     sources_cited: [
-      { type: 'sentiment_daily',  period: 'Oct 2025',  rows: 31 },
-      { type: 'sov_snapshots',    period: 'Q4 2025',   rows: 12 },
+      { type: 'sentiment_daily',  period: monthLabel(11, BASE), rows: 31 },
+      { type: 'sov_snapshots',    period: quarterLabel(3, BASE), rows: 12 },
       { type: 'mentions',         keyword: 'ChowMate', count: 8  },
-      { type: 'nps_records',      period: 'Q2 2026',   rows: 100 },
+      { type: 'nps_records',      period: quarterLabel(1, BASE), rows: 100 },
     ],
   })
 
@@ -2350,7 +2352,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
 
   /* ── 29. Budget plan + line items + actuals (Summer Vibes) ───────────── */
   const { data: budgetPlan } = await sb.from('budget_plans').insert({
-    brand_id: brandId, name: 'Jara Summer Vibes — Q3 2026',
+    brand_id: brandId, name: `Jara Summer Vibes — ${quarterLabel(0, new Date(dAgo(14)))}`,
     period_start: dAgo(14), period_end: dAgo(-76),
     total_budget: 8_500_000, currency: 'NGN',
     status: 'active', notes: 'Full 90-day campaign. Digital + OOH weighted toward Lagos.',
@@ -2594,7 +2596,7 @@ Cost efficiency was strong: at ₦3,483 per qualified lead against a target of �
       status: 'vetted', fit_for_ads: true,
       performance: { impressions: 148000, clicks: 5920, ctr: 4.0, conversions: 890, spend: 320000, roas: 4.2 },
       replication_elements: ['Warm earthy tones (burnt orange, deep brown)', 'Real person — not a model', 'Pidgin tagline: "Rice wey make sense"', 'Product in hand, not on table', '5kg bag prominently visible'],
-      tags: ['hero', 'q4-2025', 'instagram', 'top-performer'],
+      tags: ['hero', `q4-${BASE.getUTCFullYear() - (BASE.getUTCMonth() === 11 ? 0 : 1)}`, 'instagram', 'top-performer'],
     },
     {
       title: 'Ramadan Healing Recipe Reel',

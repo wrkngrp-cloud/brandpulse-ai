@@ -130,3 +130,37 @@ export function quarterLabel(quartersBack: number, base: Date = new Date()): str
 export function yearLabel(yearsBack = 0, base: Date = new Date()): string {
   return String(base.getUTCFullYear() - yearsBack)
 }
+
+/** Fixed-date Nigerian calendar moments the seed narrative can plan around. */
+const MOMENTS: { month: number; day: number; name: string }[] = [
+  { month: 2,  day: 14, name: "Valentine's Day" },
+  { month: 5,  day: 27, name: "Children's Day" },
+  { month: 6,  day: 12, name: 'Democracy Day' },
+  { month: 10, day: 1,  name: 'Independence Day' },
+  { month: 12, day: 1,  name: 'Detty December' },
+]
+
+/**
+ * The next calendar moment at least `minDaysAhead` days after the run date, so
+ * a briefing written "this week" never tells the reader to prepare for a
+ * holiday that has already passed. `byLabel` is a date to brief creators by,
+ * about two weeks before the moment.
+ */
+export function nextMoment(base: Date = new Date(), minDaysAhead = 10): { name: string; month: string; byLabel: string } {
+  const year = base.getUTCFullYear()
+  const floor = base.getTime() + minDaysAhead * 86_400_000
+  for (const y of [year, year + 1]) {
+    for (const m of MOMENTS) {
+      const at = Date.UTC(y, m.month - 1, m.day)
+      if (at >= floor) {
+        const by = new Date(at - 14 * 86_400_000)
+        return {
+          name: m.name,
+          month: MONTHS[m.month - 1],
+          byLabel: `${MONTHS[by.getUTCMonth()]} ${by.getUTCDate()}`,
+        }
+      }
+    }
+  }
+  return { name: MOMENTS[0].name, month: MONTHS[1], byLabel: 'January 31' }
+}

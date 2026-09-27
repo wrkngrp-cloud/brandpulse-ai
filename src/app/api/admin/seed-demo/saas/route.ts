@@ -724,7 +724,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
   /* ── 13. NPS survey + 50 responses ───────────────────────────────────── */
   const { data: survey } = await sb.from('surveys').insert({
     brand_id: brandId,
-    name: 'Bridger CRM Customer NPS Survey Q2 2026',
+    name: `Bridger CRM Customer NPS Survey ${quarterLabel(1, BASE)}`,
     type: 'nps',
     questions: [
       { id: 'q1', type: 'single_choice', text: 'How did you first discover Bridger CRM?', options: ['LinkedIn', 'Referral / Word of mouth', 'Google Search', 'Event / Webinar', 'Tech Media (TechCabal / Techpoint)'] },
@@ -1192,7 +1192,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
       { role: 'assistant', content: 'Worth watching, not worrying yet. Two data points matter:\n\n**1. You have zero Enterprise pipeline in Kano, Kaduna, or Maiduguri today.** Zoho\'s reseller expansion is filling a gap you have not yet contested, not taking share from an existing Bridger position.\n\n**2. North Nigeria represents roughly 28% of Nigerian SME GDP by your own market sizing** — a real opportunity, not just defensive territory. The highest-leverage response is not matching Zoho\'s reseller count but securing one credible local partner in Kano before their network fully locks in distribution. First-mover credibility in an underserved region compounds faster than late competitive parity.', timestamp: tsAgo(10) },
     ],
     sources_cited: [
-      { type: 'sov_snapshots',   period: 'Q2 2026', rows: 8 },
+      { type: 'sov_snapshots',   period: quarterLabel(1, BASE), rows: 8 },
       { type: 'press_mentions',  keyword: 'HubSpot West Africa', count: 2 },
       { type: 'weekly_briefings', period: 'Enterprise launch', rows: 4 },
     ],
@@ -1200,7 +1200,7 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
 
   /* ── 25. Budget plan + line items + actuals (Enterprise Launch) ───────── */
   const { data: bgBudget } = await sb.from('budget_plans').insert({
-    brand_id: brandId, name: 'Bridger Enterprise Tier Launch — Q2 2026',
+    brand_id: brandId, name: `Bridger Enterprise Tier Launch — ${quarterLabel(0, new Date(dAgo(30)))}`,
     period_start: dAgo(30), period_end: dAgo(-60),
     total_budget: 22_000_000, currency: 'NGN',
     status: 'active', notes: 'Enterprise tier go-to-market. LinkedIn-weighted with a flagship Demo Day event.',
