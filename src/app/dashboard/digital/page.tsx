@@ -11,7 +11,9 @@ import {
   FrequencyBarChart,
 } from './digital-charts'
 import type { SpendDataPoint, FunnelData, FrequencyPoint } from './digital-charts'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
+import { generateDigitalDays } from '@/lib/demo/digital-performance'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 import {
@@ -166,17 +168,20 @@ export default async function DigitalPage({
   let perfRows:    PerfRow[]   = []
   let brandId:     string | null = null
   let brandIndustry: string | null = null
+  let brandName:   string = 'Demo brand'
 
   if (user) {
-    const { data: brand } = await supabase
-      .from('brands')
-      .select('id, category')
-      .limit(1)
-      .single()
+    // Always the active brand: .limit(1).single() ignores the active-brand
+    // cookie and silently shows another brand's numbers in a multi-brand
+    // workspace, which is every agency account.
+    const brand = await getActiveBrand<{ id: string; category: string | null; name: string | null }>(
+      supabase, 'id, category, name',
+    )
 
     if (brand) {
       brandId       = brand.id
       brandIndustry = brand.category ?? null
+      brandName     = brand.name ?? 'Demo brand'
 
       const { data: accounts } = await supabase
         .from('digital_ad_accounts')
@@ -195,16 +200,34 @@ export default async function DigitalPage({
     }
   }
 
-  const DEMO_EMAIL  = 'demo@jarafoods.brandgauge.app'
-  const isDemoUser  = user?.email === DEMO_EMAIL
+  const DEMO_EMAILS = [
+    'demo@jarafoods.brandgauge.app',
+    'demo@pocketpay.brandgauge.app',
+    'demo@bridgercrm.brandgauge.app',
+    'demo@pinnaclemedia.brandgauge.app',
+  ]
+  const isDemoUser  = DEMO_EMAILS.includes(user?.email ?? '')
   const hasRealData = perfRows.length > 0
   const isDemo      = !hasRealData && isDemoUser
 
-  if (isDemo && brandId && process.env.APP_URL) {
-    void fetch(`${process.env.APP_URL}/api/demo/seed-digital`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    }).catch(() => null)
+  // Seed inline rather than POSTing to our own API. That fetch carried no
+  // session cookie and no admin secret, so it answered 401 every time and this
+  // module stayed empty for every demo account. Doing it here also means the
+  // rows exist before this render finishes, so the page paints with data
+  // instead of showing an empty state until a refresh.
+  if (isDemo && brandId) {
+    const service = await createServiceClient()
+    const rows = generateDigitalDays(brandId, brandName)
+    const { error } = await service.from('digital_performance_daily').insert(rows)
+    if (!error) {
+      const { data: fresh } = await supabase
+        .from('digital_performance_daily')
+        .select('platform, date, spend, impressions, reach, clicks, ctr, cpm, cpc, cpa, roas, frequency, video_views, video_view_rate, conversions, campaign_id, campaign_name, objective')
+        .eq('brand_id', brandId)
+        .gte('date', cutoffStr)
+        .order('date', { ascending: true })
+      perfRows = (fresh ?? []) as PerfRow[]
+    }
   }
 
   const bench = getBenchmarks(brandIndustry)

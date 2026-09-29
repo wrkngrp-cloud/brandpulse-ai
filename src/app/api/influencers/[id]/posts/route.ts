@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getActiveBrandId } from '@/lib/active-brand'
+import { getActiveBrandId, getActiveBrand } from '@/lib/active-brand'
 import { createClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
 
@@ -85,12 +85,15 @@ export async function POST(
     return NextResponse.json({ error: 'post_url is required' }, { status: 400 })
   }
 
-  // Fetch brand context
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name, category, brand_values, target_segments')
-    .limit(1)
-    .single()
+  // Fetch brand context via the active-brand helper; a bare
+  // .from('brands').limit(1).single() ignores the active_brand_id cookie.
+  const brand = await getActiveBrand<{
+    id: string
+    name: string
+    category: string | null
+    brand_values: unknown
+    target_segments: unknown
+  }>(supabase, 'id, name, category, brand_values, target_segments')
   if (!brand) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
 
   // Fetch influencer (RLS enforces brand ownership)
@@ -127,6 +130,20 @@ export async function POST(
   const saves    = body.saves    ? Number(body.saves)    : null
   const reach    = body.reach    ? Number(body.reach)    : null
 
+  // Where each number came from. Only keys naming a real metric with a known
+  // origin are kept, so a crafted body cannot write arbitrary JSON here.
+  const METRIC_KEYS   = ['views', 'likes', 'comments', 'shares', 'saves', 'reach'] as const
+  const VALID_SOURCES = ['pulled', 'entered', 'estimated'] as const
+  const metricSources: Record<string, string> = {}
+  if (body.metric_sources && typeof body.metric_sources === 'object') {
+    for (const key of METRIC_KEYS) {
+      const value = (body.metric_sources as Record<string, unknown>)[key]
+      if (typeof value === 'string' && (VALID_SOURCES as readonly string[]).includes(value)) {
+        metricSources[key] = value
+      }
+    }
+  }
+
   // Save the post record first so we have an ID
   const { data: post, error: insertErr } = await supabase
     .from('influencer_posts')
@@ -143,6 +160,7 @@ export async function POST(
       shares,
       saves,
       reach,
+      metric_sources:  metricSources,
       comment_samples: body.comment_samples ?? null,
     })
     .select()

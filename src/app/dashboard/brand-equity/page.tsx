@@ -7,7 +7,6 @@ import { AspectSentimentPanel } from './aspect-sentiment-panel'
 import { DeveloperHealthPanel } from './developer-health-panel'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { TourTrigger } from '@/components/tours/tour-trigger'
-import { SeedDemoPanel } from './seed-demo-panel'
 import { VenueReputationPanel } from './venue-reputation-panel'
 import { TrustPillarCard } from './trust-pillar-card'
 import { getActiveBrandId } from '@/lib/active-brand'
@@ -25,11 +24,9 @@ export default async function BrandEquityPage({
   const params = await searchParams
   const days = Math.min(365, Math.max(7, Number(params.days ?? 30)))
 
-  const DEMO_EMAIL = 'demo@jarafoods.brandgauge.app'
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
-  const isDemoUser = user.email === DEMO_EMAIL
 
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - days)
@@ -324,10 +321,6 @@ export default async function BrandEquityPage({
           npmPrev={npmPrev}
           stackoverflow={soSnap}
         />
-      )}
-
-      {isDemoUser && (
-        <SeedDemoPanel />
       )}
     </div>
   )

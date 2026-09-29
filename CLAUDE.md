@@ -9,12 +9,33 @@ Brand-intelligence SaaS for Nigerian / West African marketing teams, serving 8 v
 (see `brand_type` below), not FMCG-only. It helps marketers measure brand health and
 justify spend to management.
 
-Read the PRD set in `../docs` (one level above this repo root: Document 1 Foundations,
-2 Modules & Data, 3 Roadmap/Prompts/Risk, 4 Build Guide) before building any feature.
-The schema is in Document 2; the per-phase build prompts are in Document 3. The PRDs are
-not checked into git. This repo's own `docs/` folder holds supporting working docs only
-(`industry-fit-strategy.md`, `funnel-signals-explained.md`, `to-100-percent-build-list.md`).
-Those are not the PRD set.
+Read the PRD set in `docs/prd/` before building any feature. It is BrandGauge v8, five
+documents, and it is checked into git as of 14 September 2026:
+
+- `01-foundations.md`: identity, vision, verticals, personas, the Unified Funnel, module map
+- `02-modules-and-data.md`: module specs with build status, the tool suite, the data model,
+  and the data-access rules
+- `03-roadmap-prompts-metrics-risk.md`: where the build is, what is next, the runtime AI
+  prompts in full, every metric formula, the risk register
+- `04-build-guide.md`: stack and versions, environment variables and what each one gates,
+  conventions, definition of done
+- `05-design-system-and-decisions.md`: the design system in summary, and the **locked
+  decisions register**
+
+**Read the locked decisions register in Document 5 at the start of any session** before
+changing anything settled. The check is explicit, never assumed.
+
+Every item in Documents 2 and 3 carries a status: Built, Inert (built but missing a named
+credential), Deferred, or Dropped. Check the status before promising a feature works.
+
+The earlier BrandPulse AI v6 set lived one level above this repo root and was not in git,
+which meant no cloud session could ever see it. That is why the set moved in here. v6 is
+superseded; if you find a copy, it is history, not the spec.
+
+This repo's `docs/` folder also holds supporting working docs that are **not** the PRD set:
+`industry-fit-strategy.md`, `funnel-signals-explained.md`, `to-100-percent-build-list.md`,
+`scoreboard-and-leads.md`, `brand-icons.md`, `motion-amendments.md`,
+`design-system-update-brief.md`, `connector-setup-guide.md`.
 
 ## Commands
 - `npm run dev` — local dev server (Next.js + Turbopack).
@@ -23,8 +44,41 @@ Those are not the PRD set.
 - `npx tsc --noEmit` — type-check the whole project. Must pass before a change is done.
 - `supabase db push` — apply pending SQL migrations to the linked project. Run
   `supabase migration list` first to confirm only your migration is pending.
+- `npm run seeds:check` — check every demo-seed insert against the migration set
+  with no database. Postgres rejects the whole insert on one bad column and the
+  seeds discard the error, so a broken seed still answers success.
+- `npm run demo:check` — run the shared demo generators against a fake client and
+  check every row they actually produce. Covers what the static check cannot.
+- `npm run icons` / `npm run icons:check` — build the sprite from
+  `brand/icons/currentcolor`, and fail when a glyph the product asks for was
+  never drawn.
+- `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
+  mocked platform responses. Real calls cost X credit and burn Instagram's
+  hashtag quota, so every branch is covered offline instead.
+  `./scripts/check-post-metrics.sh` hits the live APIs: with no arguments it
+  probes the credentials, and given post URLs or ids it reads them in one
+  batched call and prints a paste-ready POST body. Both modes spend X credit.
 There is no unit-test suite. Verify behaviour by type-check + lint + driving the actual
 flow (see Definition of done).
+
+Demo data goes live by RUNNING the seeds, not by deploying them. The seed
+routes are endpoints; the demo accounts keep whatever was written the last time
+they ran. After any change to seed code:
+`ADMIN_SECRET=... ./scripts/seed-demos.sh https://<deployment>` — it POSTs all
+four accounts, wipes and rebuilds each, and prints any failed writes per table.
+
+Demo seeds: brand health history is produced by `bhiSnapshotRows` in
+`src/lib/demo/bhi-series.ts`, which runs the real `computeFullBHI` with the
+brand's `brand_type`, so seeded history matches the live number and is stamped
+with the current `BHI_FORMULA_VERSION`. Never hand-roll a BHI in a seed.
+
+Influencer post metrics: public counts (likes, comments, plays) are pulled from
+a post URL by `fetchPostMetrics`. Reach, impressions and saves are owner-only on
+every platform, so they are never pulled and never guessed. Every number carries
+its origin in `influencer_posts.metric_sources` (`pulled` | `entered` |
+`estimated`) and the UI must show it, so a screen never implies a typed figure
+was measured. TikTok has no public lookup at all; it needs the creator to
+connect their own account.
 
 ## Repo layout
 - `src/app/**` — Next.js App Router. Pages are server components by default; API routes
@@ -66,6 +120,12 @@ Upstash Redis for cache / rate-limit / OAuth state.
   coming, never a spinner. Everything is responsive from iPhone SE width up.
 - Public endpoints (`/survey/[id]`, `/ambassador/[token]`, `/go/[slug]`) post/redirect via a
   service-role API route that validates the token/slug. NEVER open anon RLS on those tables.
+- The public scoreboard (`/scoreboard`, `/api/scoreboard/*`) is the one open endpoint with no
+  token, because it reads a public news feed and touches no tenant row: there is no caller to
+  verify. It is guarded instead by an IP rate limit and a cache, both of which fail open. Its
+  tables (`public_scans`, `leads`, `lead_desk_admins`) are the one place RLS does not scope to a
+  workspace: a lead belongs to BrandGauge, so they scope to the `is_lead_desk()` allowlist and
+  are written by the service role only. See `docs/scoreboard-and-leads.md`.
 - Brands carry a `brand_type` (fmcg | fintech | venue | b2b_saas | marketplace |
   beverage_alcohol | b2b_distribution | agency). Any new funnel/BHI signal, nav item, or connector
   recommendation MUST branch on `brand_type` (see `src/lib/industry-config.ts` and

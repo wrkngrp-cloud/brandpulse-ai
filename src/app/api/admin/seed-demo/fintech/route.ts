@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }              from '@supabase/supabase-js'
 import { TOKENS } from '@/lib/brand-tokens'
+import { demoSentiment } from '@/lib/demo/seasonality'
+import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
+import { seedModulePack } from '@/lib/demo/module-pack'
+import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
+import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
+import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Demo account: PocketPay — Nigerian fintech (payments + savings app)
-   Story arc: solid start → Oct 2025 PR crisis (viral support tweet) →
-              Nov 2025 PocketPay Cares recovery → Q1 2026 referral viral growth
-              → Apr 2026 Series A announcement peak → settled growth
+   Story arc, relative to whenever the seed is run:
+     a year ago    solid start
+     ~8 months ago a PR crisis (a viral support complaint)
+     ~7 months ago the PocketPay Cares recovery
+     ~4 months ago a funding announcement lifts the line
+     to today      settled growth, mildly seasonal
+
 ───────────────────────────────────────────────────────────────────────────── */
 
 const DEMO_EMAIL    = 'demo@pocketpay.brandgauge.app'
@@ -29,26 +39,29 @@ function tsAgo(daysBack: number, hour = 10): string {
 }
 
 function sentScore(d: number): number {
-  let base: number
-  if      (d >= 270) base = 71
-  else if (d >= 230) base = 71 - (d - 230) / 40 * 29
-  else if (d >= 180) base = 42 + (230 - d) / 50 * 27
-  else if (d >= 100) base = 69 + (180 - d) / 80 * 10
-  else if (d >= 40)  base = 79 + (100 - d) / 60 * 2
-  else               base = 81 - (40 - d) * 0.07
-  const noise = Math.sin(d * 1.9) * 2.3 + Math.cos(d * 0.8) * 1.6
-  return +(Math.min(95, Math.max(18, base + noise)).toFixed(1))
+  // PocketPay, fintech: festive spend lifts it, but trust drives more.
+  // Seasonality is anchored to the real calendar, so December always reads as
+  // the festive peak however long after this was written the seed is run.
+  return demoSentiment({
+    daysAgo: d, windowDays: 365,
+    from: 62, to: 81,
+    seasonality: 4.5,
+    jitter: [1.9, 0.8],
+    base: BASE,
+  })
 }
 
 export async function POST(req: NextRequest) {
   if (!SEED_SECRET || req.headers.get('x-seed-secret') !== SEED_SECRET)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const sb = createClient(
+  // trackErrors records every failed insert without changing the call sites
+  // below, which mostly discard the error. Reported as `writes` in the response.
+  const { sb, errors: writeErrors } = trackErrors(createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { autoRefreshToken: false, persistSession: false } },
-  )
+  ))
 
   /* ── 1. Auth user ─────────────────────────────────────────────────────── */
   let userId: string
@@ -93,7 +106,7 @@ export async function POST(req: NextRequest) {
       { name: 'Students',       age_range: '16-24', income: 'low',        location: 'National' },
     ],
     brand_voice: { tone: 'energetic, trustworthy, plain-speaking', personality: 'The savvy friend who always knows how to move money faster', language_mix: { english: 55, pidgin: 35, yoruba: 5, igbo: 5 } },
-    bhi_weights:  { awareness: 0.20, consideration: 0.15, preference: 0.20, advocacy: 0.15, nps: 0.15, sentiment: 0.10, sov: 0.05 },
+    bhi_weights: BRAND_TYPE_WEIGHTS['fintech'],
   }
   let { data: brand, error: brandErr } = await sb.from('brands').insert(brandRow).select('id').single()
   if (brandErr?.message.includes('industry')) {
@@ -118,7 +131,7 @@ export async function POST(req: NextRequest) {
   /* ── 5. Campaigns ─────────────────────────────────────────────────────── */
   const { data: camp1 } = await sb.from('campaigns').insert({
     brand_id: brandId, name: 'PocketPay Cares',
-    description: 'Brand trust recovery campaign after Oct 2025 support crisis. Influencer + digital.',
+    description: `Brand trust recovery campaign after the ${monthLabel(8, BASE)} support crisis. Influencer + digital.`,
     objective: 'awareness', status: 'completed',
     start_date: dAgo(210), end_date: dAgo(160), total_budget: 12_000_000, currency: 'NGN',
     ai_summary: 'PocketPay Cares reversed the Oct crisis within 6 weeks. Sentiment recovered from 42 to 69. Customer service influencer content drove 4.2M impressions. Trust score +18pts.',
@@ -143,7 +156,7 @@ export async function POST(req: NextRequest) {
   await sb.from('campaigns').insert({
     brand_id: brandId, name: 'Campus Banking Tour',
     description: 'On-ground events at Lagos, Ibadan and Abuja universities.',
-    objective: 'conversion', status: 'planned',
+    objective: 'conversion', status: 'draft',
     start_date: dAgo(-14), end_date: dAgo(-74), total_budget: 9_000_000, currency: 'NGN',
   })
 
@@ -151,17 +164,17 @@ export async function POST(req: NextRequest) {
   const camp2Id = camp2?.id
   const camp3Id = camp3?.id
 
+  // campaign_channels.channel is constrained to ooh/events/digital/radio/tv/print —
+  // influencer and PR spend get folded into the digital row rather than a channel
+  // value the check constraint would reject.
   if (camp1Id) await sb.from('campaign_channels').insert([
-    { campaign_id: camp1Id, channel: 'digital',    budget_allocation: 8_000_000, notes: 'Meta + YouTube pre-rolls' },
-    { campaign_id: camp1Id, channel: 'influencer', budget_allocation: 4_000_000, notes: '12 micro-influencers' },
+    { campaign_id: camp1Id, channel: 'digital', budget_allocation: 12_000_000, notes: 'Meta + YouTube pre-rolls; 12 micro-influencers' },
   ])
   if (camp2Id) await sb.from('campaign_channels').insert([
-    { campaign_id: camp2Id, channel: 'digital', budget_allocation: 14_000_000, notes: 'Meta + Google UAC' },
-    { campaign_id: camp2Id, channel: 'influencer', budget_allocation: 4_000_000 },
+    { campaign_id: camp2Id, channel: 'digital', budget_allocation: 18_000_000, notes: 'Meta + Google UAC; influencer seeding' },
   ])
   if (camp3Id) await sb.from('campaign_channels').insert([
-    { campaign_id: camp3Id, channel: 'digital', budget_allocation: 25_000_000 },
-    { campaign_id: camp3Id, channel: 'pr',      budget_allocation: 10_000_000, notes: 'TechCabal + Nairametrics' },
+    { campaign_id: camp3Id, channel: 'digital', budget_allocation: 35_000_000, notes: 'Includes PR: TechCabal + Nairametrics' },
   ])
 
   /* ── 6. Sentiment daily — 365 days ───────────────────────────────────── */
@@ -188,17 +201,18 @@ export async function POST(req: NextRequest) {
   await sb.from('sentiment_daily').insert(sentRows)
 
   /* ── 7. BHI snapshots — 180 days ─────────────────────────────────────── */
-  const bhiRows = []
-  for (let d = 179; d >= 0; d--) {
-    const ss = sentScore(d); const t = ss / 100
-    const comps = {
-      awareness: +(50 + t * 38).toFixed(1), consideration: +(40 + t * 40).toFixed(1),
-      preference: +(32 + t * 44).toFixed(1), advocacy: +(28 + t * 48).toFixed(1),
-      nps: +(30 + t * 46).toFixed(1), sentiment: ss, sov: +(22 + t * 22).toFixed(1),
-    }
-    const bhiVal = +(comps.awareness*0.20 + comps.consideration*0.15 + comps.preference*0.20 + comps.advocacy*0.15 + comps.nps*0.15 + comps.sentiment*0.10 + comps.sov*0.05).toFixed(1)
-    bhiRows.push({ brand_id: brandId, snapshot_date: dAgo(d), bhi: bhiVal, components: comps, data_coverage_pct: +(80 + Math.sin(d * 0.3) * 8).toFixed(1) })
-  }
+  // Scored by computeFullBHI with this brand's brand_type, so the seeded
+  // history matches the number the dashboard computes today.
+  const bhiRows = bhiSnapshotRows({
+    brandId, brandType: 'fintech', days: 180,
+    sentiment: sentScore,
+    dateFor: dAgo,
+    levels: {
+      // fintech weights trust hardest: perception and sentiment carry it
+      awareness:  [49, 66], salience:   [38, 58], perception: [51, 78],
+      cultural:   [44, 55], sov:        [22, 41], emv:        [26, 47],
+    },
+  })
   await sb.from('brand_health_snapshots').insert(bhiRows)
 
   /* ── 8. SOV snapshots ─────────────────────────────────────────────────── */
@@ -219,14 +233,14 @@ export async function POST(req: NextRequest) {
   /* ── 9. Events ────────────────────────────────────────────────────────── */
   const { data: evt1 } = await sb.from('events').insert({
     brand_id: brandId, name: 'PocketPay Lagos Social Mixer',
-    city: 'Lagos', status: 'closed', activation_type: 'brand_activation', day: dAgo(30),
-    target_interactions: 80, campaign_id: camp2Id ?? null,
+    city: 'Lagos', status: 'closed', activation_type: 'event', date_start: dAgo(30), date_end: dAgo(30),
+    kpi_targets: { expected_interactions: 80 }, campaign_id: camp2Id ?? null,
   }).select('id').single()
 
   const { data: evt2 } = await sb.from('events').insert({
     brand_id: brandId, name: 'PocketPay x TechCabal Demo Day',
-    city: 'Lagos', status: 'closed', activation_type: 'brand_activation', day: dAgo(10),
-    target_interactions: 60, campaign_id: camp3Id ?? null,
+    city: 'Lagos', status: 'closed', activation_type: 'event', date_start: dAgo(10), date_end: dAgo(10),
+    kpi_targets: { expected_interactions: 60 }, campaign_id: camp3Id ?? null,
   }).select('id').single()
 
   const evt1Id = evt1?.id
@@ -236,7 +250,7 @@ export async function POST(req: NextRequest) {
   const ambNames1 = ['Chidi Eze', 'Amina Bello', 'Tunde Okonkwo']
   const amb1Ids: string[] = []
   for (const n of ambNames1) {
-    const { data: a } = await sb.from('ambassadors').insert({ brand_id: brandId, event_id: evt1Id, name: n, status: 'active', phone: '+234801000' + Math.floor(Math.random()*9000+1000) }).select('id').single()
+    const { data: a } = await sb.from('event_ambassadors').insert({ event_id: evt1Id, name: n, phone: '+234801000' + Math.floor(Math.random()*9000+1000), session_token: `pp-e1-${n.toLowerCase().replace(/\s+/g, '-')}` }).select('id').single()
     if (a) amb1Ids.push(a.id)
   }
 
@@ -245,18 +259,18 @@ export async function POST(req: NextRequest) {
     const ints1 = []
     for (const aId of amb1Ids) {
       for (let i = 0; i < 25; i++) {
-        ints1.push({ event_id: evt1Id, ambassador_id: aId, brand_id: brandId, interaction_type: types1[i % types1.length], occurred_at: tsAgo(30, 10 + (i % 8)) })
+        ints1.push({ event_id: evt1Id, ambassador_id: aId,  interaction_type: types1[i % types1.length], occurred_at: tsAgo(30, 10 + (i % 8)) })
       }
     }
     await sb.from('event_interactions').insert(ints1)
-    await sb.from('event_roi_reports').insert({ event_id: evt1Id, brand_id: brandId, narrative: 'The Lagos Social Mixer generated 75 qualified leads and 18 new customer activations. Average CPA was ₦4,200 against a ₦6,500 benchmark. Photo activations drove 340 organic shares.', ambassador_breakdown: ambNames1.map((n, i) => ({ name: n, leads: 8, customers: 6, interactions: 25 })) })
+    await sb.from('event_roi_reports').insert({ event_id: evt1Id, narrative: 'The Lagos Social Mixer generated 75 qualified leads and 18 new customer activations. Average CPA was ₦4,200 against a ₦6,500 benchmark. Photo activations drove 340 organic shares.', metrics: { ambassador_breakdown: ambNames1.map((n, i) => ({ name: n, leads: 8, customers: 6, interactions: 25 })) } })
   }
 
   /* Event 2 ambassadors */
   const ambNames2 = ['Blessing Okafor', 'Emeka Nwosu', 'Fatima Sule']
   const amb2Ids: string[] = []
   for (const n of ambNames2) {
-    const { data: a } = await sb.from('ambassadors').insert({ brand_id: brandId, event_id: evt2Id, name: n, status: 'active', phone: '+234802000' + Math.floor(Math.random()*9000+1000) }).select('id').single()
+    const { data: a } = await sb.from('event_ambassadors').insert({ event_id: evt2Id, name: n, phone: '+234802000' + Math.floor(Math.random()*9000+1000), session_token: `pp-e2-${n.toLowerCase().replace(/\s+/g, '-')}` }).select('id').single()
     if (a) amb2Ids.push(a.id)
   }
 
@@ -264,11 +278,11 @@ export async function POST(req: NextRequest) {
     const ints2 = []
     for (const aId of amb2Ids) {
       for (let i = 0; i < 20; i++) {
-        ints2.push({ event_id: evt2Id, ambassador_id: aId, brand_id: brandId, interaction_type: types1[i % types1.length], occurred_at: tsAgo(10, 9 + (i % 9)) })
+        ints2.push({ event_id: evt2Id, ambassador_id: aId,  interaction_type: types1[i % types1.length], occurred_at: tsAgo(10, 9 + (i % 9)) })
       }
     }
     await sb.from('event_interactions').insert(ints2)
-    await sb.from('event_roi_reports').insert({ event_id: evt2Id, brand_id: brandId, narrative: 'TechCabal Demo Day attracted 60 senior tech professionals. 22 signed up for the enterprise API tier on the spot. Coverage in TechCabal and Techpoint generated 1.2M impressions.', ambassador_breakdown: ambNames2.map(n => ({ name: n, leads: 7, customers: 5, interactions: 20 })) })
+    await sb.from('event_roi_reports').insert({ event_id: evt2Id, narrative: 'TechCabal Demo Day attracted 60 senior tech professionals. 22 signed up for the enterprise API tier on the spot. Coverage in TechCabal and Techpoint generated 1.2M impressions.', metrics: { ambassador_breakdown: ambNames2.map(n => ({ name: n, leads: 7, customers: 5, interactions: 20 })) } })
   }
 
   /* ── 10. Influencers ──────────────────────────────────────────────────── */
@@ -286,14 +300,36 @@ export async function POST(req: NextRequest) {
   for (const inf of influencerData) {
     const { data: infRow } = await sb.from('influencers').insert({
       brand_id: brandId, name: inf.name, handle: inf.handle, platform: inf.platform,
-      followers: inf.followers, engagement_rate: inf.engagement_rate, niche: inf.niche,
-      status: 'active', location: 'Lagos, Nigeria',
+      followers: inf.followers,  category: inf.niche,
+      status: 'active', 
     }).select('id').single()
     if (!infRow) continue
-    const cId = inf.followers > 500000 ? camp1Id : camp2Id
+    // influencer_campaigns is keyed by brand and campaign name. Its creator_id
+    // references creators(), which is a different table from influencers().
+    const slug      = inf.handle.replace('@', '').toLowerCase()
+    const reachPost = Math.round(inf.followers * 0.45)
+    const reachReel = Math.round(inf.followers * 0.52)
     await sb.from('influencer_campaigns').insert([
-      { brand_id: brandId, influencer_id: infRow.id, campaign_id: cId, platform: inf.platform, content_type: 'post', agreed_rate: Math.round(inf.followers * 0.015), actual_reach: Math.round(inf.followers * 0.45), engagement_rate: inf.engagement_rate, status: 'completed', started_at: tsAgo(150), ended_at: tsAgo(120) },
-      { brand_id: brandId, influencer_id: infRow.id, campaign_id: camp2Id ?? null, platform: inf.platform, content_type: 'reel', agreed_rate: Math.round(inf.followers * 0.022), actual_reach: Math.round(inf.followers * 0.52), engagement_rate: inf.engagement_rate * 1.3, status: 'active', started_at: tsAgo(40), ended_at: null },
+      {
+        brand_id: brandId, name: `${inf.name} feed post`,
+        utm_campaign: `pp_${slug}_post`, promo_code: `${slug.slice(0, 6).toUpperCase()}10`,
+        reach: reachPost, impressions: Math.round(reachPost * 1.35),
+        engagements: Math.round(reachPost * inf.engagement_rate),
+        emv: +(reachPost * 0.0042).toFixed(2),
+        attributed_clicks: Math.round(reachPost * 0.012),
+        attributed_conversions: Math.round(reachPost * 0.0016),
+        fee: Math.round(inf.followers * 0.015), currency: 'NGN',
+      },
+      {
+        brand_id: brandId, name: `${inf.name} reel`,
+        utm_campaign: `pp_${slug}_reel`, promo_code: `${slug.slice(0, 6).toUpperCase()}20`,
+        reach: reachReel, impressions: Math.round(reachReel * 1.6),
+        engagements: Math.round(reachReel * inf.engagement_rate * 1.3),
+        emv: +(reachReel * 0.0051).toFixed(2),
+        attributed_clicks: Math.round(reachReel * 0.018),
+        attributed_conversions: Math.round(reachReel * 0.0023),
+        fee: Math.round(inf.followers * 0.022), currency: 'NGN',
+      },
     ])
   }
 
@@ -337,7 +373,8 @@ export async function POST(req: NextRequest) {
     const imp = Math.round(80000 + Math.random() * 1120000)
     postInserts.push({
       brand_id: brandId, platform: ['instagram','twitter','tiktok'][i % 3],
-      post_type: ['image','video','story'][i % 3],
+      external_id: `pocketpay-demo-post-${i}`,
+      content_type: ['image','video','story'][i % 3],
       impressions: imp, reach: Math.round(imp * 0.65), likes: Math.round(imp * 0.04),
       comments: Math.round(imp * 0.005), shares: Math.round(imp * 0.008),
       posted_at: tsAgo(d, 9 + (i % 6)),
@@ -347,7 +384,7 @@ export async function POST(req: NextRequest) {
 
   /* ── 13. NPS survey + records ─────────────────────────────────────────── */
   const { data: npsS } = await sb.from('surveys').insert({
-    brand_id: brandId, name: 'PocketPay NPS Q2 2026', type: 'nps_basic', status: 'active',
+    brand_id: brandId, name: `PocketPay NPS ${quarterLabel(1, BASE)}`, type: 'nps_basic', status: 'live',
     questions: [{ id: 'q1', text: 'How likely are you to recommend PocketPay to a friend?', type: 'nps' }],
   }).select('id').single()
 
@@ -358,17 +395,17 @@ export async function POST(req: NextRequest) {
                   10,10,10,10,9,9,9,8,8,8,7,7,7,7,6,5,5,4,3,2,1,0,0,0,0,0,0,0,0,0]
     for (let i = 0; i < 60; i++) {
       npsScores.push({
-        brand_id: brandId, survey_id: npsS.id,
-        score: dist[i] ?? 7, respondent_type: 'customer',
+        brand_id: brandId, 
+        score: dist[i] ?? 7, respondent_role: 'consumer',
         channel: ['in_app','email'][i % 2],
-        submitted_at: tsAgo(Math.floor(i * 2.5), 11),
+        created_at: tsAgo(Math.floor(i * 2.5), 11),
       })
     }
     await sb.from('nps_records').insert(npsScores)
-    await sb.from('survey_responses').insert(npsScores.map((n,i) => ({
+    await sb.from('survey_responses').insert(npsScores.map(n => ({
       survey_id: npsS.id, quality_flag: 'ok',
       answers: { q1: n.score },
-      submitted_at: n.submitted_at,
+      collected_at: n.created_at,
     })))
   }
 
@@ -376,26 +413,30 @@ export async function POST(req: NextRequest) {
   const crsInserts = []
   for (let w = 0; w < 10; w++) {
     crsInserts.push({
-      brand_id: brandId, week_start: dAgo(w * 7 + 7), week_end: dAgo(w * 7),
-      overall_score: +(60 + (10 - w) * 1.5 + Math.sin(w * 0.8) * 3).toFixed(1),
-      trend_alignment: +(55 + w * 1.2).toFixed(1),
-      language_score:  +(70 + Math.sin(w * 1.1) * 5).toFixed(1),
-      moment_relevance: +(58 + w * 0.9).toFixed(1),
-      notes: w === 0 ? 'Series A hype boosting cultural relevance across Gen Z segments' : null,
+      brand_id: brandId, segment: 'General audience', snapshot_date: dAgo(w * 7 + 7),
+      crs: +(60 + (10 - w) * 1.5 + Math.sin(w * 0.8) * 3).toFixed(1),
+      
+      language_relevance:  +(70 + Math.sin(w * 1.1) * 5).toFixed(1),
+      
+      
     })
   }
   await sb.from('cultural_resonance_scores').insert(crsInserts)
 
   /* ── 15. Competitive briefings ────────────────────────────────────────── */
   for (let w = 0; w < 4; w++) {
-    await sb.from('competitive_briefings').insert({
-      brand_id: brandId, week_start: dAgo(w * 7 + 7), week_end: dAgo(w * 7),
-      summary: `OPay ran heavy bus-stop OOH in Lagos this week. PalmPay launched a 0% fee promo targeting PocketPay's referral users. PocketPay's engagement rate remains 1.4x category average.`,
-      competitor_moves: [
+    await sb.from('weekly_briefings').insert({
+      brand_id: brandId, week_start: dAgo(w*7+7), sent_at: tsAgo(w*7, 8),
+      // weekly_briefings keeps the whole briefing in one jsonb payload
+      content: {
+        week_end: dAgo(w*7),
+        summary: `OPay ran heavy bus-stop OOH in Lagos this week. PalmPay launched a 0% fee promo targeting PocketPay's referral users. PocketPay's engagement rate remains 1.4x category average.`,
+        competitor_moves: [
         { competitor: 'OPay',    action: 'Billboard takeover in Lagos bus stops', impact: 'medium' },
         { competitor: 'PalmPay', action: '0% transfer fee promotion (7 days)',   impact: 'high'   },
       ],
-      recommendations: ['Accelerate Refer & Earn push to counter PalmPay promo', 'Match OPay OOH with digital geo-targeting in same locations'],
+        recommendations: ['Accelerate Refer & Earn push to counter PalmPay promo', 'Match OPay OOH with digital geo-targeting in same locations'],
+      },
     })
   }
 
@@ -448,12 +489,16 @@ export async function POST(req: NextRequest) {
     funnelRows.push({
       brand_id: brandId, snapshot_date: dAgo(d), segment: 'all',
       awareness:     +(55 + t * 30).toFixed(1),
-      consideration: +(40 + t * 32).toFixed(1),
-      preference:    +(28 + t * 34).toFixed(1),
       action:        +(20 + t * 30).toFixed(1),
-      loyalty:       +(22 + t * 28).toFixed(1),
-      advocacy:      +(16 + t * 24).toFixed(1),
       dropoffs: {
+        // funnel_snapshots stores awareness, action and dropoffs only;
+        // the middle stages ride in the dropoffs payload.
+        stages: {
+          consideration: +(40 + t * 32).toFixed(1),
+          preference:    +(28 + t * 34).toFixed(1),
+          loyalty:       +(22 + t * 28).toFixed(1),
+          advocacy:      +(16 + t * 24).toFixed(1),
+        },
         awareness_to_consideration:  +(34 - t * 14).toFixed(1),
         consideration_to_preference: +(28 - t * 10).toFixed(1),
         preference_to_action:        +(40 - t * 12).toFixed(1),
@@ -582,7 +627,7 @@ export async function POST(req: NextRequest) {
   await sb.from('ai_conversations').insert({
     brand_id: brandId, user_id: userId,
     messages: [
-      { role: 'user', content: 'Why did our sentiment crash in October 2025?', timestamp: tsAgo(200) },
+      { role: 'user', content: `Why did our sentiment crash in ${monthLabel(8, BASE)}?`, timestamp: tsAgo(200) },
       { role: 'assistant', content: 'The October 2025 crash (69 → 42 over roughly three weeks) traces back to a single viral thread: a user reported a frozen account and a failed transfer that took four days to resolve. Three things amplified it:\n\n**1. Support response time.** Median first-response time that month was 18 hours against a target of under 2. The delay itself became the story, independent of the original transaction issue.\n\n**2. Copycat complaints.** Once the thread passed 10K retweets, dozens of unrelated users piled on with older, smaller complaints — a pile-on effect common in fintech Twitter.\n\n**3. Silence.** PocketPay did not respond publicly for 36 hours. In a trust-sensitive category like payments, silence reads as confirmation.\n\nThe recovery came from PocketPay Cares: public acknowledgement, a visible support-team-led content series, and a published fix timeline. Sentiment moved from 42 to 69 in six weeks.', timestamp: tsAgo(200) },
       { role: 'user', content: 'How do we avoid this happening again now that Series A news is drawing more attention to us?', timestamp: tsAgo(48) },
       { role: 'assistant', content: 'Two things matter most with more eyes on the brand:\n\n**1. Speed of first response, not resolution.** Users forgive slow fixes more easily than slow acknowledgement. A same-day public response, even without a resolution, prevents the pile-on dynamic that hurt you in October.\n\n**2. Keep the trust content flowing, not just growth content.** Series A and Refer & Earn content is acquisition-focused. Without the occasional Cares-style trust post, growth-heavy feeds read as tone-deaf if an incident happens. Recommend one trust or support-spotlight post per two weeks going forward as insurance.', timestamp: tsAgo(48) },
@@ -789,8 +834,31 @@ export async function POST(req: NextRequest) {
     await sb.from('creative_assets').insert({ brand_id: brandId, ...asset })
   }
 
+  /* ── Module pack: the modules every demo account was missing ───────────── */
+  // AI visibility, marketing mix modelling, WhatsApp, extra surveys, and the
+  // broadcast/field modules this vertical actually uses.
+  await seedModulePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'PocketPay', brandType: 'fintech',
+    competitors: ['OPay', 'PalmPay', 'Moniepoint', 'Kuda'],
+    campaignIds: [camp1Id, camp2Id, camp3Id],
+    aiQuestions: [
+      'What is the best mobile money app in Nigeria?',
+      'Which Nigerian fintech has the lowest transfer fees?',
+      'Safest app to send money to family in Nigeria',
+      'Best Nigerian app to open an account without visiting a bank',
+      'Which Nigerian fintech has the most reliable customer support?',
+    ],
+    aiMentionFrom: 0.29, aiMentionTo: 0.61,
+    mmmChannels: { referral: [0.34, 18_000_000], meta: [0.22, 31_000_000], google: [0.16, 19_500_000], agent_network: [0.14, 12_000_000], radio: [0.08, 6_400_000], influencer: [0.06, 9_800_000] },
+    mmmOutcomes: 96500,
+    mmmSummary: 'Referral is the cheapest acquisition channel by a wide margin and is carrying a third of measured outcomes on the smallest budget. Paid social is efficient at the top of the funnel and expensive at activation, which is the pattern to fix next.',
+    mmmRecommendations: ['Raise the referral reward ceiling: it is still the cheapest account opening', 'Move a share of Meta budget from awareness to activation retargeting', 'Agent network returns well in peri-urban Lagos and is under-resourced in Kano'],
+    base: BASE,
+  })
+
   return NextResponse.json({
-    success: true,
+    success: writeErrors.length === 0,
+    writes: summariseErrors(writeErrors),
     credentials: { email: DEMO_EMAIL, password: DEMO_PASSWORD, note: 'Login at /auth/login' },
     brand: 'PocketPay', workspace: 'PocketPay (Pro plan)',
     seeded: {
