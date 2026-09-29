@@ -75,10 +75,16 @@ export function ScoreboardPage() {
 
         <Tick className="mt-9">
           <form onSubmit={run} className="space-y-4">
+            {/* Placeholders are packaged food, not fintech. This tool is public
+                and BrandGauge is not neutral about fintech, so naming a real
+                fintech and its three closest rivals reads as a position rather
+                than an example. Packaged food is well covered by every outlet
+                the scan reads, and each name is distinctive enough to search
+                cleanly, which is what the placeholder is teaching. */}
             <div>
               <label htmlFor="sb-brand" className="bg-label block" style={{ color: 'var(--lp-mut)' }}>Your brand</label>
               <input id="sb-brand" value={brand} onChange={e => setBrand(e.target.value)} required minLength={2}
-                placeholder="Kuda"
+                placeholder="Indomie"
                 className="mt-2 w-full rounded-sm border px-4 py-3 text-[15px] outline-none focus-visible:ring-2"
                 style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', color: 'var(--lp-ink)' }} />
             </div>
@@ -93,7 +99,7 @@ export function ScoreboardPage() {
                   </label>
                   <input id={`sb-rival-${i}`} value={r}
                     onChange={e => setRivals(v => v.map((x, j) => (j === i ? e.target.value : x)))}
-                    placeholder={['Moniepoint', 'OPay', 'PalmPay'][i]}
+                    placeholder={['Golden Penny', 'Honeywell', 'Dangote'][i]}
                     className="mt-2 w-full rounded-sm border px-4 py-3 text-[15px] outline-none focus-visible:ring-2"
                     style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', color: 'var(--lp-ink)' }} />
                 </div>
@@ -103,7 +109,7 @@ export function ScoreboardPage() {
               <div className="flex-1">
                 <label htmlFor="sb-cat" className="bg-label block" style={{ color: 'var(--lp-mut)' }}>Category, if you like</label>
                 <input id="sb-cat" value={category} onChange={e => setCategory(e.target.value)}
-                  placeholder="Fintech"
+                  placeholder="Packaged food"
                   className="mt-2 w-full rounded-sm border px-4 py-3 text-[15px] outline-none focus-visible:ring-2"
                   style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', color: 'var(--lp-ink)' }} />
               </div>
