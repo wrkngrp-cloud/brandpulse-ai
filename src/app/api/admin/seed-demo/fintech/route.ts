@@ -4,6 +4,7 @@ import { TOKENS } from '@/lib/brand-tokens'
 import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
+import { seedCoveragePack } from '@/lib/demo/coverage-pack'
 import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
 import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
@@ -853,6 +854,15 @@ export async function POST(req: NextRequest) {
     mmmOutcomes: 96500,
     mmmSummary: 'Referral is the cheapest acquisition channel by a wide margin and is carrying a third of measured outcomes on the smallest budget. Paid social is efficient at the top of the funnel and expensive at activation, which is the pattern to fix next.',
     mmmRecommendations: ['Raise the referral reward ceiling: it is still the cheapest account opening', 'Move a share of Meta budget from awareness to activation retargeting', 'Agent network returns well in peri-urban Lagos and is under-resourced in Kano'],
+    base: BASE,
+  })
+
+  /* Modules the first pack left empty: review reputation, the
+     regulatory record, commerce and product signal, creator posts,
+     email sends the mix model weighs, and the notification centre. */
+  await seedCoveragePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'PocketPay', brandType: 'fintech',
+    campaignIds: [camp1Id, camp2Id, camp3Id],
     base: BASE,
   })
 

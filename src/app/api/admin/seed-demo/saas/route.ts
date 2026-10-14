@@ -4,6 +4,7 @@ import { TOKENS } from '@/lib/brand-tokens'
 import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
+import { seedCoveragePack } from '@/lib/demo/coverage-pack'
 import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
 import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
@@ -1357,6 +1358,15 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     mmmOutcomes: 2140,
     mmmSummary: 'Content and organic search carry the pipeline, which is normal for B2B software and is the reason this brand barely moves with the festive calendar. Review-site presence returns the most per naira and is the smallest line in the budget.',
     mmmRecommendations: ['Increase review-site investment: it is the highest return per naira in the mix', 'Keep content spend flat and improve conversion on existing pages before adding more', 'Events return slowly but produce the largest deal sizes, so judge them on a longer window'],
+    base: BASE,
+  })
+
+  /* Modules the first pack left empty: review reputation, the
+     regulatory record, commerce and product signal, creator posts,
+     email sends the mix model weighs, and the notification centre. */
+  await seedCoveragePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'Bridger CRM', brandType: 'b2b_saas',
+    campaignIds: [camp1Id, camp2Id, camp3Id],
     base: BASE,
   })
 
