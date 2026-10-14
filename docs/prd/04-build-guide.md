@@ -115,6 +115,23 @@ supabase db push          # apply to the linked project
 The CLI authenticates through `SUPABASE_ACCESS_TOKEN` and is linked to the project. Port 5432
 to the pooler occasionally times out on input and output; retry it.
 
+Where the CLI is not installed, or the pooler will not hold, the same job runs over the
+Supabase Management API:
+
+```bash
+npm run db:pending     # plan only. Lists what would run, changes nothing
+npm run db:apply       # applies it, each migration in one transaction
+node scripts/apply-migrations.mjs --apply --only 20261014090000   # one migration
+node scripts/apply-migrations.mjs --self-test                     # offline, no token
+```
+
+It reads `supabase_migrations.schema_migrations` to see what the project already has and
+records each version there the same way the CLI does, so the two are interchangeable. It
+needs `SUPABASE_ACCESS_TOKEN` and a project ref, from `SUPABASE_PROJECT_REF`,
+`NEXT_PUBLIC_SUPABASE_URL`, `supabase/.temp/project-ref`, or `--project-ref`.
+`.env.local` and `.env` are read when present. `api.supabase.com` has to be reachable,
+which the default cloud session network policy does not allow.
+
 **There is no unit test suite.** That is a deliberate state, not a gap being hidden. Behaviour
 is verified by type-check, lint, and driving the actual flow. Section 7 says what that means.
 

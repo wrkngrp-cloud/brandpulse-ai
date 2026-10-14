@@ -44,6 +44,18 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 - `npx tsc --noEmit` — type-check the whole project. Must pass before a change is done.
 - `supabase db push` — apply pending SQL migrations to the linked project. Run
   `supabase migration list` first to confirm only your migration is pending.
+- `npm run db:pending` / `npm run db:apply` — the same job over the Supabase
+  Management API, for when the CLI is not installed or port 5432 to the pooler
+  will not hold. `db:pending` lists what would run and changes nothing;
+  `db:apply` runs it, each file in one transaction, and records the version in
+  `supabase_migrations.schema_migrations` exactly as the CLI does, so the two
+  stay interchangeable. One migration at a time:
+  `node scripts/apply-migrations.mjs --apply --only 20261014090000`. Needs
+  `SUPABASE_ACCESS_TOKEN` plus a project ref (`SUPABASE_PROJECT_REF`,
+  `NEXT_PUBLIC_SUPABASE_URL`, `supabase/.temp/project-ref`, or `--project-ref`).
+- `npm run db:check` — the applier's own checks (statement splitting, the
+  pending-set diff, every real migration's names and timestamps) with no network
+  and no token. Same as `node scripts/apply-migrations.mjs --self-test`.
 - `npm run seeds:check` — check every demo-seed insert against the migration set
   with no database. Postgres rejects the whole insert on one bad column and the
   seeds discard the error, so a broken seed still answers success.
@@ -167,6 +179,9 @@ and silently breaks multi-brand workspaces.
   on with an authenticated-read policy so the public anon key cannot write them.
 - Apply with `supabase db push`. The CLI is authenticated via `SUPABASE_ACCESS_TOKEN` and
   linked to the project; port 5432 to the pooler occasionally i/o-times-out, just retry.
+  Where the CLI is not available (a cloud session, say), `npm run db:pending` then
+  `npm run db:apply` does the same over HTTPS. Note that `api.supabase.com` has to be
+  reachable, which the default cloud network policy does not allow.
 - Store OAuth / connector tokens ENCRYPTED with `encrypt()` from `src/lib/crypto.ts`
   (AES-256-GCM). Never store access/refresh tokens in plaintext. `TOKEN_ENCRYPTION_KEY` is
   required in production.
