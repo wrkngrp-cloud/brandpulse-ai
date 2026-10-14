@@ -139,6 +139,27 @@ migration has not been applied, and every live-source path is therefore verified
 fixtures and stubs rather than against the real thing. Driving the real flow needs a
 deployment, or a session whose network policy allows those hosts.
 
+## 8b. What is deliberately not built
+
+So the next session does not go looking for it, or rebuild it by accident:
+
+- **The migrations are written and not applied.** `20261014090000_free_tools.sql` and
+  `20261014110000_fix_notifications_rls.sql` are both pending. Run `supabase migration list`
+  first and expect to see exactly those two, then `supabase db push`. Nothing in the free-tool
+  surface works until they are applied.
+- **Content opportunity briefs and an in-workspace research refresh** for the demand finder.
+  The workspace imports, prioritises, tracks and summarises opportunities; it does not yet
+  generate a content brief per opportunity, and re-running the research means re-running the
+  public tool.
+- **Conversion experiments.** No experiment framework for headlines, CTA placement or
+  registration timing. The copy and the registry are centralised, which is what makes it
+  cheap to add later. Nothing fakes urgency or an end date for the beta, and nothing should.
+- **An end-to-end browser suite.** The repo has no test runner and no Playwright setup, and
+  `tools:check` follows the existing `metrics:check` / `seeds:check` pattern instead. The
+  anonymous-to-beta journey is therefore checked at the unit and wiring level, not driven in a
+  real browser.
+- **A notification centre.** See below.
+
 ## 9. Known issues found on the way
 
 **The `notifications` RLS policy was broken and is fixed here.** Migration

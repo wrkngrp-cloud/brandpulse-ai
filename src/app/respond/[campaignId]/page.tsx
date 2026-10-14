@@ -61,6 +61,7 @@ export default async function RespondPage({
       campaignId={campaign.id}
       campaignName={campaign.name}
       brandName={brand?.name ?? null}
+      brandLogo={brand?.logo_url ?? null}
       headline={campaign.response_headline}
       blurb={campaign.response_blurb}
       destination={destination}

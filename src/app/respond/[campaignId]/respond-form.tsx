@@ -15,11 +15,12 @@ import { Working } from '@/components/brand/working'
  * with the row so the record says what was agreed to.
  */
 export function RespondForm({
-  campaignId, campaignName, brandName, headline, blurb, destination, placementSlug, placementName,
+  campaignId, campaignName, brandName, brandLogo, headline, blurb, destination, placementSlug, placementName,
 }: {
   campaignId: string
   campaignName: string
   brandName: string | null
+  brandLogo: string | null
   headline: string | null
   blurb: string | null
   destination: string
@@ -69,6 +70,14 @@ export function RespondForm({
   return (
     <main className="min-h-screen bg-paper px-5 py-12">
       <div className="mx-auto max-w-lg">
+        {/* The campaign owner's mark when they have one, so the page reads as
+            theirs. Plain img rather than next/image: this is an arbitrary
+            remote URL from a tenant's own settings, and it is not worth adding
+            a host to the image config for. */}
+        {brandLogo
+          // eslint-disable-next-line @next/next/no-img-element
+          ? <img src={brandLogo} alt={who} className="mb-4 h-8 w-auto" />
+          : null}
         <p className="bg-label text-tx-3">{who}</p>
         <h1 className="mt-3 text-[26px] font-medium leading-tight tracking-[-0.02em] text-tx">
           {headline ?? campaignName}
