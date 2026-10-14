@@ -13,6 +13,7 @@ import { GlobalTourButton }   from '@/components/tours/global-tour-button'
 import { UserDropdown }       from './user-dropdown'
 import { MobileNav }          from './mobile-nav'
 import { CommandPalette }     from './command-palette'
+import { ModuleBeacon }       from './module-beacon'
 import { cn }                 from '@/lib/utils'
 import type { BrandOption }   from './brand-switcher'
 import { BrandLockup } from '@/components/brand/logo'
@@ -67,6 +68,9 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
 
       {/* Global command palette — ⌘K anywhere */}
       <CommandPalette />
+
+      {/* Records which module is open, for adoption reporting. Renders nothing. */}
+      <ModuleBeacon />
 
       {/* Desktop sidebar */}
       <Sidebar
