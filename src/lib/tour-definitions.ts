@@ -28,6 +28,7 @@ export const TOUR_ROUTE_MODULE: Record<string, string> = {
   '/dashboard/campaigns':             'campaigns',
   '/dashboard/digital':               'digital',
   '/dashboard/influencers':           'influencers',
+  '/dashboard/campaign-audit':        'campaign_audit',
   '/dashboard/offline-tracker':       'offline_tracker',
   '/dashboard/ooh':                   'ooh',
   '/dashboard/events':                'events',
@@ -327,6 +328,35 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
       id:    'offline-limits',
       title: 'What this does not measure',
       body:  'It counts the interactions we instrumented. It is not billboard impressions, reach, incremental sales, brand lift or full campaign ROI, and no link tracker can measure those.',
+    },
+  ],
+
+  campaign_audit: [
+    {
+      id:    'audit-intro',
+      title: 'Fix the page before you scale the spend',
+      body:  'Every finding from the audit is a task here, with the measured evidence attached. Work the list, then re-run the audit: anything that does not come back is marked fixed, so the record shows what changed.',
+    },
+    {
+      id:       'audit-measured',
+      title:    'Measured findings come first',
+      body:     'Mobile performance, failing accessibility checks, a call to action whose destination does not load, a form with too many fields, page weight. Each one was checked by a tool and the evidence is the measurement.',
+      target:   '[data-tour="audit-measured"]',
+      position: 'top',
+    },
+    {
+      id:       'audit-interpreted',
+      title:    'And the reading is kept separate',
+      body:     'A model read your copy and formed a view on whether the offer, the audience and the next step are clear. That is a judgement about the page, not measured customer behaviour, and it sits in its own block so you always know which is which.',
+      target:   '[data-tour="audit-interpreted"]',
+      position: 'top',
+    },
+    {
+      id:       'audit-history',
+      title:    'Before and after',
+      body:     'Each re-run is kept, so the same page over time is readable. There is deliberately no overall score and no revenue estimate: we hold no conversion data for your page, so either would be decoration.',
+      target:   '[data-tour="audit-header"]',
+      position: 'bottom',
     },
   ],
 

@@ -49,6 +49,11 @@ const files = {
     // here touches it: withUtm, slugify, looksAutomated and deviceOf are pure.
     .replace("import { createServiceClient } from '@/lib/supabase/server'",
       "const createServiceClient = async (): Promise<any> => { throw new Error('no database in this check') }")],
+  'audit-vocab.ts':        ['src/lib/tools/audit-vocab.ts', s => s],
+  'pagespeed.ts':          ['src/lib/tools/pagespeed.ts', s => s],
+  'campaign-audit.ts':     ['src/lib/tools/campaign-audit.ts', s => s
+    .replace("import { callAi, extractJson } from '@/lib/ai/client'",
+      "import { callAi, extractJson } from './ai-stub'")],
   'competitor-tracker.ts': ['src/lib/tools/competitor-tracker.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
       "import { callAi, extractJson } from './ai-stub'")
@@ -113,6 +118,8 @@ const demand      = await import(`${OUT}/market-demand.mjs`)
 const search      = await import(`${OUT}/search-provider.mjs`)
 const offline     = await import(`${OUT}/offline-tracker.mjs`)
 const labels      = await import(`${OUT}/campaign-labels.mjs`)
+const auditMod    = await import(`${OUT}/campaign-audit.mjs`)
+const vocab       = await import(`${OUT}/audit-vocab.mjs`)
 
 let pass = 0, fail = 0
 const eq = (name, got, want) => {
@@ -454,6 +461,108 @@ console.log('\n── campaign labels cover every type')
 ok('a label per type', labels.CAMPAIGN_TYPES.every(t => labels.CAMPAIGN_TYPE_LABEL[t]))
 ok('a placement hint per type', labels.CAMPAIGN_TYPES.every(t => labels.PLACEMENT_HINT[t]))
 eq('free placement limit', labels.FREE_PLACEMENT_LIMIT, 3)
+
+
+// ── The audit's measured checks ─────────────────────────────────────────────
+console.log('\n── markup findings: measured, never a judgement')
+const BARE = `<!doctype html><html><head></head><body>
+<div id="app"></div><script src="/app.js"></script>
+</body></html>`
+const bareFacts = html.readPage(BARE, 'https://acme.ng/offer')
+let fs_ = auditMod.markupFindings(bareFacts, 'https://acme.ng/offer', 'https://acme.ng/offer', 'lead_generation')
+const titles = fs_.map(f => f.title)
+ok('no viewport flagged',   titles.some(t => /viewport/i.test(t)))
+ok('client-rendered flagged', titles.some(t => /without JavaScript/i.test(t)))
+ok('no title flagged',      titles.some(t => /no title/i.test(t)))
+ok('no description flagged',titles.some(t => /description/i.test(t)))
+ok('no way to leave a lead',titles.some(t => /no way to leave a lead/i.test(t)))
+ok('all measured',          fs_.every(f => f.provenance === 'observed'))
+ok('every one has evidence',fs_.every(f => f.evidence.length > 0))
+ok('every one has a fix',   fs_.every(f => f.recommendation.length > 0))
+
+console.log('\n── a redirect on the campaign URL is a finding')
+fs_ = auditMod.markupFindings(bareFacts, 'https://acme.ng/offer-v2', 'https://acme.ng/offer', null)
+ok('redirect flagged', fs_.some(f => /redirects/i.test(f.title)))
+fs_ = auditMod.markupFindings(bareFacts, 'https://acme.ng/offer/', 'https://acme.ng/offer', null)
+ok('trailing slash is not a redirect', !fs_.some(f => /redirects/i.test(f.title)))
+
+console.log('\n── a good page produces none of those')
+const GOOD = `<!doctype html><html lang="en-NG"><head>
+<title>Open an Acme account in five minutes</title>
+<meta name="description" content="No paperwork. Open an account and start sending money today.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://www.googletagmanager.com/gtag/js?id=G-X"></script></head><body>
+<h1>Open an Acme account in five minutes</h1>
+<p>No paperwork, no branch visit. We charge ₦10 per transfer and nothing else. Thousands of traders across Lagos use Acme every day to pay suppliers and get paid.</p>
+<a href="/signup">Open an account</a>
+<a href="https://wa.me/2348012345678">Ask us on WhatsApp</a>
+<form action="/lead" method="post"><input name="phone"><input type="submit"></form>
+</body></html>`
+const goodFacts = html.readPage(GOOD, 'https://acme.ng/offer')
+fs_ = auditMod.markupFindings(goodFacts, 'https://acme.ng/offer', 'https://acme.ng/offer', 'lead_generation')
+eq('nothing flagged on a sound page', fs_.length, 0)
+// A terse page is not a broken page: short copy with a headline and a call to
+// action must not trip the client-rendered check.
+const TERSE = `<html lang="en"><head><title>Order jollof</title>
+<meta name="description" content="Order jollof in Lagos."><meta name="viewport" content="width=device-width"></head>
+<body><h1>Order jollof</h1><a href="https://wa.me/2348000000000">Order on WhatsApp</a></body></html>`
+eq('terse page not flagged as client-rendered',
+   auditMod.markupFindings(html.readPage(TERSE, 'https://acme.ng/'), 'https://acme.ng/', 'https://acme.ng/', null)
+     .some(f => /without JavaScript/i.test(f.title)), false)
+
+console.log('\n── local market readiness')
+fs_ = auditMod.localFindings(goodFacts, 'lead_generation')
+ok('whatsapp link satisfies the channel check', !fs_.some(f => /no whatsapp/i.test(f.title)))
+ok('naira price satisfies the currency check',  !fs_.some(f => /naira/i.test(f.title)))
+fs_ = auditMod.localFindings(bareFacts, 'whatsapp_enquiries')
+const noChannel = fs_.find(f => /no whatsapp/i.test(f.title))
+ok('missing channel flagged', Boolean(noChannel))
+eq('and high when the campaign buys WhatsApp enquiries', noChannel.severity, 'high')
+
+const MENTIONS = `<html><head><meta name="viewport" content="width=device-width"></head><body>
+<h1>Order now</h1><p>Message us on WhatsApp to order. Price ₦5,000.</p></body></html>`
+fs_ = auditMod.localFindings(html.readPage(MENTIONS, 'https://acme.ng/'), 'purchases')
+ok('mentioned but not linked flagged', fs_.some(f => /mentioned but not linked/i.test(f.title)))
+
+console.log('\n── tracking is reported as present or absent, never as working')
+let tracking = auditMod.trackingFindings(bareFacts)
+eq('absent is high severity', [tracking.length, tracking[0].severity], [1, 'high'])
+tracking = auditMod.trackingFindings(goodFacts)
+ok('present is reported low', tracking[0].severity === 'low')
+ok('and makes no claim it works', /cannot be seen from outside/i.test(tracking[0].detail))
+
+console.log('\n── the AI reading can never be labelled as measured')
+aiStub.setNextResponse(JSON.stringify({
+  summary: 'The offer is clear.',
+  findings: [
+    // The model is asked for an area and a severity; it is never allowed to
+    // claim its reading was observed, whatever it returns.
+    { area: 'clarity', title: 'The headline does not say who this is for', detail: 'd', severity: 'high', evidence: 'e', recommendation: 'r' },
+    { area: 'performance', title: 'Out-of-scope area falls back to clarity', severity: 'nonsense', evidence: 'e', recommendation: 'r' },
+  ],
+}))
+const reading = await auditMod.readTheOffer({ facts: goodFacts, objective: null, market: 'Nigeria', competitor: null })
+eq('summary carried', reading.summary, 'The offer is clear.')
+eq('both findings kept', reading.findings.length, 2)
+ok('all interpreted', reading.findings.every(f => f.provenance === 'interpreted'))
+eq('out-of-scope area becomes clarity', reading.findings[1].area, 'clarity')
+eq('bad severity becomes medium',       reading.findings[1].severity, 'medium')
+aiStub.setNextResponse('not json')
+eq('unparseable reading yields nothing', (await auditMod.readTheOffer({ facts: goodFacts, objective: null, market: null, competitor: null })).findings.length, 0)
+
+console.log('\n── ordering: measured before interpreted at equal severity')
+const ordered = auditMod.orderFindings([
+  { area: 'clarity', title: 'low interpreted', detail: '', severity: 'low', provenance: 'interpreted', confidence: 'medium', evidence: '', recommendation: '' },
+  { area: 'clarity', title: 'high interpreted', detail: '', severity: 'high', provenance: 'interpreted', confidence: 'medium', evidence: '', recommendation: '' },
+  { area: 'performance', title: 'high measured', detail: '', severity: 'high', provenance: 'observed', confidence: 'high', evidence: 'x', recommendation: '' },
+  { area: 'tracking', title: 'medium measured', detail: '', severity: 'medium', provenance: 'observed', confidence: 'high', evidence: 'x', recommendation: '' },
+])
+eq('order', ordered.map(f => f.title), ['high measured', 'high interpreted', 'medium measured', 'low interpreted'])
+
+console.log('\n── audit vocabulary is complete')
+ok('a label per area',     vocab.AUDIT_AREAS.every(a => vocab.AREA_LABEL[a]))
+ok('a label per status',   vocab.FINDING_STATUS.every(s => vocab.FINDING_STATUS_LABEL[s]))
+ok('a label per objective',vocab.CAMPAIGN_OBJECTIVES.every(o => vocab.OBJECTIVE_LABEL[o]))
 
 console.log(`\n${fail === 0 ? 'PASS' : 'FAIL'} — ${pass} checks passed, ${fail} failed\n`)
 process.exit(fail === 0 ? 0 : 1)

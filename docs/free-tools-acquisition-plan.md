@@ -74,7 +74,7 @@ and `is_lead_desk()` read, plus a workspace-member read once claimed.
 | 2 | Competitor Move Tracker (public + beta workspace + Inngest monitoring) | Done |
 | 3 | Market Demand Gap Finder (public + beta workspace) | Done |
 | 4 | Offline Campaign Tracker (links, QR, redirect analytics, response forms) | Done |
-| 5 | Campaign Conversion Audit (public + improvement plan workspace) | Not started |
+| 5 | Campaign Conversion Audit (public + improvement plan workspace) | Done |
 | 6 | Cross-tool QA, regression on PR Scoreboard, docs | Not started |
 
 ## 5. Credentials and operational status
@@ -84,7 +84,7 @@ and `is_lead_desk()` read, plus a workspace-member read once claimed.
 | Competitor press + announcements | none (Google News RSS, public pages) | Fully implemented |
 | Competitor move classification | `ANTHROPIC_API_KEY` | Fully implemented |
 | Demand-gap search evidence | `SERPAPI_KEY` | Implemented; without the key the report switches to a labelled visibility gap and says no search volume was measured |
-| Landing-page performance | `PAGESPEED_API_KEY` optional; PageSpeed Insights also answers keyless at low quota | Implemented; audit degrades to HTML-only checks with the limitation stated |
+| Landing-page performance | `PAGESPEED_API_KEY` optional; PageSpeed Insights also answers keyless at low quota | Implemented; without an answer the audit runs its HTML, CTA, local-readiness and tracking checks and states that it makes no claim about speed |
 | Offline tracking links + QR | none | Fully implemented |
 | Rate limiting / caching | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Implemented, fails open |
 | Lead desk visibility | row in `lead_desk_admins` | Existing mechanism |
@@ -114,14 +114,15 @@ work, and a sixth tool is one registry entry away.
 
 `npm run tools:check` exercises the Free Tools libraries offline, in the shape the repo
 already uses for `metrics:check` and `seeds:check`: the modules are compiled standalone with
-the AI and press calls stubbed, so no key and no network are needed. 131 checks cover the SSRF
+the AI and press calls stubbed, so no key and no network are needed. 161 checks cover the SSRF
 screening, the HTML reader against a fixture page, `findSectionLinks`, the registry's
 invariants, `safeNext`, and the competitor classifier's source guard (a citation it cannot
 point at, an undated page demoted off a change claim, malformed JSON, the three-finding cap),
 the demand finder's guards (an opportunity with no citable evidence dropped, a demand claim
 demoted to a content gap when no search provider answered, the market-code mapping), and the
 offline tracker's UTM handling, slug generation and bot filtering (a WhatsApp link preview is
-not a visit).
+not a visit), and the audit's measured checks, its ordering, and the rule that a model's reading
+of page copy can never be labelled as measured.
 
 It has already caught one real hole: an IPv4-mapped IPv6 address reaches `screenHost` in hex
 form, because the WHATWG URL parser serialises `::ffff:10.0.0.1` as `::ffff:a00:1`, so the
@@ -142,6 +143,12 @@ deployment, or a session whose network policy allows those hosts.
   reader, provenance-aware report components, claim flow, and `next` carried through the whole
   auth round trip behind `safeNext`. Migration `20261014090000_free_tools.sql` written, not yet
   applied.
+- **14 Oct 2026 — Phase 5.** Campaign Conversion Audit: PageSpeed Insights wrapper that keeps
+  lab and real-user field data apart, deterministic markup, CTA, local-readiness and tracking
+  checks, a model reading of the copy that is always provenance `interpreted`, public page, and
+  an improvement-plan module with per-finding status, a re-audit that marks what did not come
+  back as fixed, audit history per page and a paste-ready plan. No overall score and no revenue
+  estimate anywhere, on purpose.
 - **14 Oct 2026 — Phase 4.** Offline Campaign Tracker: per-placement short links and QR codes
   with no account, `/go/[slug]` extended with a third lookup (slugs minted against all three
   redirect tables, because a printed code cannot be reissued), visit recording that separates
