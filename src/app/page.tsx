@@ -2,6 +2,7 @@ import { redirect }    from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { LandingPage }  from '@/components/landing/landing-page'
+import { ChatWidget }   from '@/components/support/chat-widget'
 
 export const metadata: Metadata = {
   title: 'BrandGauge — Brand intelligence for West African marketers',
@@ -12,7 +13,12 @@ export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) return <LandingPage />
+  if (!user) return (
+    <>
+      <LandingPage />
+      <ChatWidget source="site" />
+    </>
+  )
 
   // Check for at least one named brand (empty-name brand = incomplete onboarding)
   const { data: brands } = await supabase

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { ScoreboardPage } from '@/components/landing/scoreboard-page'
+import { ChatWidget } from '@/components/support/chat-widget'
 
 export const metadata: Metadata = {
   title: 'Category press scoreboard | BrandGauge',
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <ScoreboardPage />
+  return (
+    <>
+      <ScoreboardPage />
+      <ChatWidget source="scoreboard" />
+    </>
+  )
 }

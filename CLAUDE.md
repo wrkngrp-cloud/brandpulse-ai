@@ -52,6 +52,11 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 - `npm run icons` / `npm run icons:check` — build the sprite from
   `brand/icons/currentcolor`, and fail when a glyph the product asks for was
   never drawn.
+- `npm run desk:check` — check the Desk's access logic with no database: the
+  permission keys seeded in SQL against the ones the code checks, attachment
+  signatures against forgery and cross-thread replay, module-path resolution, and
+  email masking. A typo in a role template grants nothing and raises nothing, which
+  is why it is checked rather than trusted.
 - `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
   mocked platform responses. Real calls cost X credit and burn Instagram's
   hashtag quota, so every branch is covered offline instead.
@@ -120,12 +125,23 @@ Upstash Redis for cache / rate-limit / OAuth state.
   coming, never a spinner. Everything is responsive from iPhone SE width up.
 - Public endpoints (`/survey/[id]`, `/ambassador/[token]`, `/go/[slug]`) post/redirect via a
   service-role API route that validates the token/slug. NEVER open anon RLS on those tables.
+  The support chat (`/api/support/*`) is the same pattern: a stranger carries a random
+  `bg_visitor` httpOnly cookie, every route resolves the conversation from the session or
+  that cookie and never from the request body, and `support-attachments` is a private
+  bucket read through short-lived signed URLs.
 - The public scoreboard (`/scoreboard`, `/api/scoreboard/*`) is the one open endpoint with no
   token, because it reads a public news feed and touches no tenant row: there is no caller to
   verify. It is guarded instead by an IP rate limit and a cache, both of which fail open. Its
   tables (`public_scans`, `leads`, `lead_desk_admins`) are the one place RLS does not scope to a
   workspace: a lead belongs to BrandGauge, so they scope to the `is_lead_desk()` allowlist and
   are written by the service role only. See `docs/scoreboard-and-leads.md`.
+- Every AI call goes through `callAi`, which logs tokens, cost and latency to `ai_calls`
+  and a counter to `usage_events`. Pass `meta` (`workspaceId`, `brandId`, `userId`,
+  `feature`) at every call site so the call is attributed; without it the row lands under
+  `feature: 'unattributed'`, which is visible and fixable rather than silently wrong.
+  Dashboard module usage is recorded by `ModuleBeacon` in the dashboard shell through
+  `record_feature_event`. Add a new module to `src/lib/modules.ts` or it has no
+  adoption history.
 - Brands carry a `brand_type` (fmcg | fintech | venue | b2b_saas | marketplace |
   beverage_alcohol | b2b_distribution | agency). Any new funnel/BHI signal, nav item, or connector
   recommendation MUST branch on `brand_type` (see `src/lib/industry-config.ts` and
@@ -302,6 +318,34 @@ a hex, an `rgb()`, an `oklch()` or a Tailwind palette class — there are none l
   redraw the mark, simplify it, or rebuild the needle from ratios.
 - Ship a screen only when it passes the audit in section 12 of the design system.
 
+## The Desk (our internal tool)
+`desk.brandgauge.app`, served from this app at the `/desk` path. `docs/internal-tool-plan.md`
+is the spec. Rules that are easy to break without noticing:
+
+- **Host routing.** `src/proxy.ts` rewrites `DESK_HOST` onto `/desk`. With `DESK_HOST` set,
+  `/desk` on the main host 404s; with it unset, `/desk` answers there so the Desk can be
+  previewed on a deployment URL. The Desk host serves nothing but the Desk.
+- **The Desk has no API routes.** Every mutation is a server action. Do not add
+  `src/app/desk/api/**`.
+- **One gate.** `requireStaff(permission?, audit?)` from `src/lib/desk/auth.ts` at the top of
+  every Desk page and action. It is the only way to get a staff record, so a screen that
+  skips it renders nothing. Reads are audited as well as writes.
+- **One data layer.** `src/lib/desk/data.ts` is the only place allowed to use the service
+  client for cross-tenant reads, and it applies dataset redaction (`data.customer_email`,
+  `data.ai_cost`, `data.revenue_figures`, `data.customer_content`, `data.audit_all`) before
+  returning rows. Never redact in a component.
+- **Permissions.** `staff_can(key)` in SQL, `session.can(key)` in app code, both resolving
+  deny override → grant override → role template, with `super_admin` holding everything.
+  Add a key to `src/lib/desk/permissions.ts` AND to the `super_admin` seed, then run
+  `npm run desk:check`.
+- **Access is invite-only.** No signup route on the Desk host, no OAuth button. A correct
+  password is not access: the login action signs the session out again if there is no
+  active `staff` row. Nobody can act on their own staff row, and the last active
+  super admin cannot be suspended, removed or moved off the role. The first super admin is
+  seeded by migration, never by a route.
+- `lead_desk_admins` and `is_lead_desk()` still exist and still guard `/dashboard/leads`.
+  They retire when the lead desk moves into the Desk.
+
 ## Voice for any user-facing copy (hard rule)
 Warm, confident, plain English. Active voice. Connection before sales. No jargon. No em dashes.
 Banned words: delve, underscore, pivotal, crucial, robust, vibrant, leverage, seamless, tapestry.
@@ -312,6 +356,8 @@ A change is done only when all of the following hold:
 2. `npm run lint` introduces no new errors (pre-existing warnings are acceptable).
 3. For any DB change, the migration is written, enables RLS with a workspace policy, and
    `supabase migration list` shows it as the only pending item before you push.
+   For a change to Desk permissions, the support chat or the module registry,
+   `npm run desk:check` passes.
 4. For any user-triggered route using the service client, ownership is verified per "Data access".
 5. For a new dashboard module, the product tour (`data-tour` + tour definition + topbar trigger)
    is wired.

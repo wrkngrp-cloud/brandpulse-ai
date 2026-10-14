@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Owner** | Emmanuel Femi-Adejobi |
-| **Status** | Phase 0 and phase 1 built, phase 2 part built. See section 9. |
+| **Status** | Phases 0, 1, 2 and 4 built. See section 9. |
 | **Last updated** | 14 October 2026 |
 | **Authoritative on** | Staff access, the support chat, and every internal admin surface |
 | **Lives at** | `desk.brandgauge.app`, served from this app at the `/desk` path |
@@ -753,9 +753,9 @@ subdomain goes live whenever you want it to, and changes nothing about the code.
 |---|---|---|
 | **0. Instrumentation** | `ai_calls`, `feature_events`, `usage_events` writes, `staff_audit_log`, the module registry and the beacon | **Built**, 14 Oct 2026 |
 | **1. Staff access and shell** | `staff`, `staff_roles`, `role_permissions`, overrides, invites, `is_staff` / `is_super_admin` / `staff_can` / `staff_permissions`, `requireStaff`, `src/lib/desk/`, the host rewrite, `/desk/login`, invite and accept, the Desk shell and the overview | **Built**, 14 Oct 2026 |
-| **2. Super Admin** | Roster, invite, suspend, remove, role change, the audit feed. Still to do: the person page, the permissions and roles editors, the per-person activity | **Part built** |
+| **2. Super Admin** | Roster, invite, suspend, remove, role change, the person page, the permissions editor, per-person activity, the audit feed. Still to do: the roles editor, so a new role is still a seed rather than a screen | **Built**, 14 Oct 2026 |
+| **4. Support chat** | Tables, the four public routes, the private attachment bucket with signed references, the widget in the product, on the site and on the scoreboard, live presence, the Desk inbox and thread view with the account panel, reply by email and by the in-app bell | **Built**, 14 Oct 2026. Still to do: inbound email replies through a Resend webhook, and Realtime in place of the widget's poll for signed-in users |
 | **3. Accounts** | List, detail, timeline, connectors, usage, with dataset redaction | Next |
-| **4. Support chat** | Tables, service route, the private attachment bucket, the widget in the app, on the site and on every free tool, live presence, the Desk inbox, Resend out and in | To do, 3 sessions |
 | **5. Leads** | Move the lead desk across, retire `lead_desk_admins`, the nightly signed-up join | To do |
 | **6. Money** | `subscriptions`, `invoices`, manual entry, the Paystack handler left unregistered, revenue screens | To do |
 | **7. Impersonation** | `impersonation_sessions`, request, approve, the read-only server guard, the banner, the sweep job, the history on both sides | To do, last on purpose |
@@ -763,7 +763,7 @@ subdomain goes live whenever you want it to, and changes nothing about the code.
 | **9. Later** | AI reply assist, Slack notifications, 2FA on staff accounts | Unscheduled |
 
 **Before the Desk can be opened**, two things have to happen outside the code: run
-`supabase db push` to apply the two migrations, and sign in once as
+`supabase db push` to apply the three migrations, and sign in once as
 `adebusuyiadejobi@gmail.com` on the main app if that account does not exist yet, because
 the migration seeds the first super admin by matching that address in `auth.users` and
 does nothing if it is not there yet. Re-running the migration after signing up picks it up.

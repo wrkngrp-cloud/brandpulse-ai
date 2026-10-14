@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { FeaturesPage } from '@/components/landing/features-page'
+import { ChatWidget } from '@/components/support/chat-widget'
 
 export const metadata: Metadata = {
   title: 'Features — BrandGauge',
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <FeaturesPage />
+  return (
+    <>
+      <FeaturesPage />
+      <ChatWidget source="site" />
+    </>
+  )
 }
