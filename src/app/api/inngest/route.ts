@@ -28,6 +28,7 @@ import { b2bReviewSync }               from '@/lib/inngest/functions/b2b-review-
 import { developerHealthSync }         from '@/lib/inngest/functions/developer-health-sync'
 import { hubspotDailySync }            from '@/lib/inngest/functions/hubspot-daily-sync'
 import { googleAdsDailySync }          from '@/lib/inngest/functions/google-ads-daily-sync'
+import { competitorWatchCheck }        from '@/lib/inngest/functions/competitor-watch-check'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -48,6 +49,7 @@ export const { GET, POST, PUT } = serve({
     regulatoryMentionDetect,
     reviewAspectClassifier,
     b2bReviewSync,
+    competitorWatchCheck,
     developerHealthSync,
     hubspotDailySync,
     googleAdsDailySync,

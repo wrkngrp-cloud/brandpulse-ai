@@ -1,5 +1,5 @@
-import { lookup } from 'dns/promises'
-import { isIP } from 'net'
+import { lookup } from 'node:dns/promises'
+import { isIP } from 'node:net'
 
 /**
  * The only way these tools touch a URL a stranger typed.
@@ -69,7 +69,15 @@ export function normaliseUrl(input: string): URL | null {
   try {
     const url = new URL(withScheme)
     if (url.username || url.password) return null
-    if (!url.hostname.includes('.')) return null
+    /* A hostname with no dot is usually a typo, so it is refused here rather
+       than fetched. Two exceptions pass through on purpose: an IPv6 literal
+       (hostname "[::1]") and a bare internal name such as "localhost". Those
+       are not typos, they are attempts to reach inside the network, and they
+       belong to screenHost so the caller is told "blocked" rather than
+       "invalid" and the report's coverage note says the true thing. */
+    const host = url.hostname
+    const bareInternal = host === 'localhost' || host.endsWith('.localhost')
+    if (!host.includes('.') && !host.startsWith('[') && !bareInternal) return null
     return url
   } catch {
     return null
@@ -88,9 +96,19 @@ function isPrivateAddress(addr: string): boolean {
     const a = addr.toLowerCase()
     if (a === '::1' || a === '::') return true
     if (a.startsWith('fe80') || a.startsWith('fc') || a.startsWith('fd')) return true
-    // IPv4-mapped (::ffff:10.0.0.1) carries the v4 rules with it.
-    const mapped = /::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(a)
-    if (mapped) return isPrivateAddress(mapped[1])
+    /* IPv4-mapped addresses carry the v4 rules with them, and they arrive in
+       two shapes. A visitor types ::ffff:10.0.0.1, but the WHATWG URL parser
+       serialises the host as ::ffff:a00:1 — the same address in hex — so
+       matching only the dotted form let 10.0.0.1 through the screen. Both
+       forms are decoded here. */
+    const dotted = /::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(a)
+    if (dotted) return isPrivateAddress(dotted[1])
+    const hex = /::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/.exec(a)
+    if (hex) {
+      const high = parseInt(hex[1], 16)
+      const low  = parseInt(hex[2], 16)
+      return isPrivateAddress(`${high >> 8}.${high & 0xff}.${low >> 8}.${low & 0xff}`)
+    }
     return false
   }
   const p = addr.split('.').map(Number)
@@ -110,7 +128,8 @@ function isPrivateAddress(addr: string): boolean {
  *  when the host is fine, or the failure to report. */
 async function screenHost(url: URL): Promise<FetchFailure | null> {
   if (url.protocol !== 'https:' && url.protocol !== 'http:') return 'invalid_url'
-  const host = url.hostname
+  // url.hostname keeps the brackets on an IPv6 literal; isIP does not want them.
+  const host = url.hostname.replace(/^\[|\]$/g, '')
   if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.internal')) return 'blocked_address'
   if (isIP(host)) return isPrivateAddress(host) ? 'blocked_address' : null
   try {

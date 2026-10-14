@@ -18,6 +18,7 @@ export const TOUR_ROUTE_MODULE: Record<string, string> = {
   '/dashboard/surveys/nps':           'nps',
   '/dashboard/surveys/panels':        'survey_panels',
   '/dashboard/surveys':               'surveys',
+  '/dashboard/competitive/watchlist': 'competitor_watchlist',
   '/dashboard/competitive':           'competitive',
   '/dashboard/marketplace':           'marketplace',
   '/dashboard/cultural':              'cultural',
@@ -236,6 +237,33 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
       id:    'add-influencer',
       title: 'Add an influencer',
       body:  'Paste their Instagram or X handle to start tracking. Posts mentioning your brand or tagged to your account are picked up automatically.',
+    },
+  ],
+
+  competitor_watchlist: [
+    {
+      id:    'watchlist-intro',
+      title: 'What your competitors did, with the receipts',
+      body:  'This timeline holds public moves by the competitors you watch: launches, pricing changes, partnerships and expansion. Every entry carries the source it came from, so you can take it into a meeting and defend it.',
+    },
+    {
+      id:       'watchlist-competitors',
+      title:    'Who you are watching',
+      body:     'We read each competitor\u2019s website and thirty days of Nigerian business press every Monday morning. Check any of them now if you cannot wait, or pause one without losing its history.',
+      target:   '[data-tour="watchlist-competitors"]',
+      position: 'bottom',
+    },
+    {
+      id:       'watchlist-timeline',
+      title:    'New, baseline, and detected changes',
+      body:     'Baseline entries were already true when you started watching, so they are never presented as news. A detected website change tells you a page moved, not what moved. Only dated press carries a claim about what changed.',
+      target:   '[data-tour="watchlist-timeline"]',
+      position: 'top',
+    },
+    {
+      id:    'watchlist-reading',
+      title: 'Ask what a move means for you',
+      body:  'The reading of what a development means for your brand is generated when you ask for it, and it is labelled as an AI reading rather than mixed into the source. Export the whole timeline as a CSV when you need it in a deck.',
     },
   ],
 

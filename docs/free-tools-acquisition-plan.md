@@ -70,8 +70,8 @@ and `is_lead_desk()` read, plus a workspace-member read once claimed.
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 0 | Repository audit, this document | Done |
-| 1 | Free Tools nav dropdown, `/tools` directory, registry, anonymous run infra, claim flow, event taxonomy, shared report components, abuse protection | Not started |
-| 2 | Competitor Move Tracker (public + beta workspace + Inngest monitoring) | Not started |
+| 1 | Free Tools nav dropdown, `/tools` directory, registry, anonymous run infra, claim flow, event taxonomy, shared report components, abuse protection | Done |
+| 2 | Competitor Move Tracker (public + beta workspace + Inngest monitoring) | Done |
 | 3 | Market Demand Gap Finder (public + beta workspace) | Not started |
 | 4 | Offline Campaign Tracker (links, QR, redirect analytics, response forms) | Not started |
 | 5 | Campaign Conversion Audit (public + improvement plan workspace) | Not started |
@@ -110,6 +110,35 @@ Ecosystem: "Free Tool" is now "Free Tools", it is a dropdown, PR Scoreboard stil
 `/scoreboard`, all five tools appear in the dropdown and in `/tools`, desktop and mobile both
 work, and a sixth tool is one registry entry away.
 
-## 8. Worklog
+## 8. Testing
+
+`npm run tools:check` exercises the Free Tools libraries offline, in the shape the repo
+already uses for `metrics:check` and `seeds:check`: the modules are compiled standalone with
+the AI and press calls stubbed, so no key and no network are needed. 79 checks cover the SSRF
+screening, the HTML reader against a fixture page, `findSectionLinks`, the registry's
+invariants, `safeNext`, and the competitor classifier's source guard (a citation it cannot
+point at, an undated page demoted off a change claim, malformed JSON, the three-finding cap).
+
+It has already caught one real hole: an IPv4-mapped IPv6 address reaches `screenHost` in hex
+form, because the WHATWG URL parser serialises `::ffff:10.0.0.1` as `::ffff:a00:1`, so the
+dotted-form check alone let `10.0.0.1` through.
+
+**Not verifiable in this session.** The cloud container's egress policy denies CONNECT to
+arbitrary hosts, so no live source read (a competitor's website, Google News RSS, PageSpeed)
+can be exercised from here, and neither can a Supabase round trip or an Anthropic call. The
+migration has not been applied, and every live-source path is therefore verified against
+fixtures and stubs rather than against the real thing. Driving the real flow needs a
+deployment, or a session whose network policy allows those hosts.
+
+## 9. Worklog
 
 - **14 Oct 2026 — Phase 0.** Audit complete, this document written.
+- **14 Oct 2026 — Phase 1.** Registry, `/tools` directory, Free Tools dropdown (plus the
+  marketing nav's first mobile menu), `tool_runs` / `tool_events`, SSRF-safe fetcher, HTML
+  reader, provenance-aware report components, claim flow, and `next` carried through the whole
+  auth round trip behind `safeNext`. Migration `20261014090000_free_tools.sql` written, not yet
+  applied.
+- **14 Oct 2026 — Phase 2.** Competitor Move Tracker: engine, public page with SEO and
+  JSON-LD, open API route with per-IP limit and six-hour cache, watchlist dashboard module with
+  baseline/new/site-change separation and on-demand AI readings, weekly Inngest check, product
+  tour. `npm run tools:check` added and green.

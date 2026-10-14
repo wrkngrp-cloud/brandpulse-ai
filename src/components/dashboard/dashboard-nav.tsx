@@ -44,6 +44,7 @@ const BRAND_HEALTH: NavEntry[] = [
 
 const INTELLIGENCE: NavEntry[] = [
   { label: 'Competitive',        href: '/dashboard/competitive',        icon: Trophy      },
+  { label: 'Watchlist',          href: '/dashboard/competitive/watchlist', icon: FileSearch },
   { label: 'Marketplace',        href: '/dashboard/marketplace',        icon: MarketIcon },
   { label: 'Cultural Insights',  href: '/dashboard/cultural',           icon: Globe       },
   { label: 'Field Intelligence', href: '/dashboard/field-intelligence', icon: FieldIcon   },

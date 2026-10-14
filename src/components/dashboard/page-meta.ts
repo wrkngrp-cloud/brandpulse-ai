@@ -42,6 +42,7 @@ export const PAGE_META: Record<string, PageMeta> = {
 
   /* Intelligence — what is happening in the market? */
   '/dashboard/competitive':       { eyebrow: 'Intelligence', icon: Trophy },
+  '/dashboard/competitive/watchlist': { eyebrow: 'Intelligence', icon: FileSearch },
   '/dashboard/marketplace':       { eyebrow: 'Intelligence', icon: MarketIcon },
   '/dashboard/cultural':          { eyebrow: 'Intelligence', icon: Globe },
   '/dashboard/field-intelligence':{ eyebrow: 'Intelligence', icon: FieldIcon },
