@@ -15,6 +15,7 @@ export const TOUR_ROUTE_MODULE: Record<string, string> = {
   '/dashboard/brand-equity':          'brand_health',
   '/dashboard/content':               'content',
   '/dashboard/funnel':                'funnel',
+  '/dashboard/opportunities':         'opportunities',
   '/dashboard/surveys/nps':           'nps',
   '/dashboard/surveys/panels':        'survey_panels',
   '/dashboard/surveys':               'surveys',
@@ -264,6 +265,33 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
       id:    'watchlist-reading',
       title: 'Ask what a move means for you',
       body:  'The reading of what a development means for your brand is generated when you ask for it, and it is labelled as an AI reading rather than mixed into the source. Export the whole timeline as a CSV when you need it in a deck.',
+    },
+  ],
+
+  opportunities: [
+    {
+      id:    'opportunities-intro',
+      title: 'Demand you are not capturing yet',
+      body:  'Each opportunity here came from reading your website and the searches your buyers run. The evidence travels with it, so nobody has to take the ranking on faith.',
+    },
+    {
+      id:       'opportunities-kind',
+      title:    'Three different strengths of evidence',
+      body:     'Demand evidence means real competitors rank for a commercial search. A visibility gap means someone appears where you do not. A content gap means your own site never addresses something your buyers need to know. The badge on every card says which one you have.',
+      target:   '[data-tour="opportunities-list"]',
+      position: 'top',
+    },
+    {
+      id:       'opportunities-status',
+      title:    'Work it like a backlog',
+      body:     'Move an opportunity from identified to planned to done as your team picks it up, and copy a team summary when you need it in a channel or a deck.',
+      target:   '[data-tour="opportunities-summary"]',
+      position: 'bottom',
+    },
+    {
+      id:    'opportunities-limits',
+      title: 'What is deliberately not here',
+      body:  'No search volumes, growth rates, keyword difficulty or traffic estimates: no source we can legitimately read provides them. And no revenue projection, because we hold none of your conversion or margin data.',
     },
   ],
 

@@ -39,6 +39,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   '/dashboard/brand-equity':      { eyebrow: 'Brand health', icon: GaugeIcon },
   '/dashboard/content':           { eyebrow: 'Brand health', icon: FileText },
   '/dashboard/funnel':            { eyebrow: 'Brand health', icon: FunnelIcon },
+  '/dashboard/opportunities':     { eyebrow: 'Brand health', icon: MarketIcon },
 
   /* Intelligence — what is happening in the market? */
   '/dashboard/competitive':       { eyebrow: 'Intelligence', icon: Trophy },

@@ -38,6 +38,11 @@ const files = {
     "import type { BrandIconName } from '@/components/brand/icon'",
     'type BrandIconName = string',
   )],
+  'demand-labels.ts':      ['src/lib/tools/demand-labels.ts', s => s],
+  'search-provider.ts':    ['src/lib/tools/search-provider.ts', s => s],
+  'market-demand.ts':      ['src/lib/tools/market-demand.ts', s => s
+    .replace("import { callAi, extractJson } from '@/lib/ai/client'",
+      "import { callAi, extractJson } from './ai-stub'")],
   'competitor-tracker.ts': ['src/lib/tools/competitor-tracker.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
       "import { callAi, extractJson } from './ai-stub'")
@@ -98,6 +103,8 @@ const registry    = await import(`${OUT}/registry.mjs`)
 const tracker     = await import(`${OUT}/competitor-tracker.mjs`)
 const aiStub      = await import(`${OUT}/ai-stub.mjs`)
 const safe        = await import(`${OUT}/safe-next.mjs`)
+const demand      = await import(`${OUT}/market-demand.mjs`)
+const search      = await import(`${OUT}/search-provider.mjs`)
 
 let pass = 0, fail = 0
 const eq = (name, got, want) => {
@@ -285,6 +292,92 @@ aiStub.setNextResponse(JSON.stringify({ moves: Array.from({ length: 9 }, (_, i) 
   { source: 1, category: 'pricing', headline: `Move ${i}`, confidence: 'low' }
 )) }))
 eq('capped at three', (await tracker.classifyMoves(base)).length, 3)
+
+
+// ── The demand finder's evidence guards ─────────────────────────────────────
+console.log('\n── search provider')
+eq('nigeria code',  search.marketCode('Nigeria'), 'ng')
+eq('ghana code',    search.marketCode(' ghana '), 'gh')
+eq('unknown falls back to ng', search.marketCode('Atlantis'), 'ng')
+eq('no key, no provider', (() => { delete process.env.SERPAPI_KEY; return search.getSearchProvider() })(), null)
+
+console.log('\n── findOpportunities: an opportunity with no evidence is dropped')
+const ownPage = html.readPage(PAGE, 'https://acme.ng/')
+const understanding = {
+  name: 'Acme Pay', category: 'payments', products: ['transfers'], customers: ['traders'],
+  valueProps: ['instant'], problems: ['transfers fail'],
+  queries: [{ query: 'send money to nigeria', stage: 'purchase', why: '' }],
+}
+const demandBase = {
+  understanding, answers: [], facts: ownPage, extraPages: [],
+  competitorFacts: null, competitorHost: null,
+  market: 'Nigeria', yourHost: 'acme.ng', hasProvider: false,
+}
+
+aiStub.setNextResponse(JSON.stringify({ opportunities: [
+  { title: 'Nothing supports this', customerProblem: 'p', stage: 'purchase', evidenceKind: 'visibility_gap', evidence: [], recommendedAction: 'a', why: 'w' },
+  { title: 'This one cites our own page', customerProblem: 'p', stage: 'purchase', evidenceKind: 'content_gap', evidence: [1], recommendedAction: 'a', why: 'w' },
+] }))
+let opps = await demand.findOpportunities(demandBase)
+eq('unsupported opportunity dropped', opps.length, 1)
+eq('supported one kept', opps[0].title, 'This one cites our own page')
+ok('evidence has a URL', opps[0].evidence[0].sourceUrl.startsWith('https://acme.ng'))
+
+console.log('\n── findOpportunities: no provider means no visibility claim')
+aiStub.setNextResponse(JSON.stringify({ opportunities: [
+  { title: 'Competitors outrank you', customerProblem: 'p', stage: 'comparison', evidenceKind: 'demand_evidence', evidence: [1], recommendedAction: 'a', why: 'w' },
+] }))
+opps = await demand.findOpportunities(demandBase)
+eq('demand claim demoted to content gap', opps[0].evidenceKind, 'content_gap')
+
+console.log('\n── findOpportunities: with results, a visibility claim stands')
+const withResults = {
+  ...demandBase,
+  hasProvider: true,
+  answers: [{
+    stage: 'purchase',
+    answer: {
+      query: 'send money to nigeria',
+      provider: 'Google Search via SerpAPI',
+      results: [
+        { title: 'Rival Transfers', url: 'https://rival.ng/send', snippet: 'Send money home', position: 1 },
+        { title: 'Other Rival', url: 'https://other.ng/send', snippet: 'Cheap transfers', position: 2 },
+      ],
+    },
+  }],
+}
+aiStub.setNextResponse(JSON.stringify({ opportunities: [
+  { title: 'You are absent from the main purchase search', customerProblem: 'p', stage: 'purchase', evidenceKind: 'visibility_gap', evidence: [1, 2], competitorsVisible: ['Rival', 'Other Rival'], recommendedAction: 'a', why: 'w' },
+] }))
+opps = await demand.findOpportunities(withResults)
+eq('visibility gap kept', opps[0].evidenceKind, 'visibility_gap')
+eq('both results cited', opps[0].evidence.length, 2)
+eq('competitors carried', opps[0].competitorsVisible, ['Rival', 'Other Rival'])
+eq('unknown stage falls back', (await (async () => {
+  aiStub.setNextResponse(JSON.stringify({ opportunities: [
+    { title: 'T', stage: 'nonsense', evidenceKind: 'visibility_gap', evidence: [1] },
+  ] }))
+  return (await demand.findOpportunities(withResults))[0].intentStage
+})()), 'solution_discovery')
+
+aiStub.setNextResponse('garbage')
+eq('unparseable answer yields nothing', (await demand.findOpportunities(withResults)).length, 0)
+aiStub.setNextResponse(JSON.stringify({ opportunities: Array.from({ length: 7 }, (_, i) => (
+  { title: `O${i}`, stage: 'purchase', evidenceKind: 'visibility_gap', evidence: [1] }
+)) }))
+eq('capped at three', (await demand.findOpportunities(withResults)).length, 3)
+
+console.log('\n── understandBusiness refuses to work from nothing')
+aiStub.setNextResponse(JSON.stringify({ name: 'Acme', category: 'payments', queries: [] }))
+eq('no queries, no understanding', await demand.understandBusiness({ facts: ownPage, extraPages: [], market: 'Nigeria', category: null }), null)
+aiStub.setNextResponse(JSON.stringify({
+  name: 'Acme Pay', category: 'payments', products: ['transfers'], customers: ['traders'],
+  valueProps: [], problems: [],
+  queries: [{ query: 'how to send money to nigeria', stage: 'problem_aware', why: 'w' }, { query: 'x', stage: 'purchase', why: '' }],
+}))
+const u2 = await demand.understandBusiness({ facts: ownPage, extraPages: [], market: 'Nigeria', category: null })
+eq('too-short query dropped', u2.queries.length, 1)
+eq('stage kept',              u2.queries[0].stage, 'problem_aware')
 
 console.log(`\n${fail === 0 ? 'PASS' : 'FAIL'} — ${pass} checks passed, ${fail} failed\n`)
 process.exit(fail === 0 ? 0 : 1)

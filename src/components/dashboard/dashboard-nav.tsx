@@ -40,6 +40,7 @@ const BRAND_HEALTH: NavEntry[] = [
   { label: 'Brand Health', href: '/dashboard/brand-equity', icon: GaugeIcon },
   { label: 'Content',      href: '/dashboard/content',      icon: FileText  },
   { label: 'Funnel',       href: '/dashboard/funnel',       icon: FunnelIcon },
+  { label: 'Opportunities',href: '/dashboard/opportunities',icon: MarketIcon },
 ]
 
 const INTELLIGENCE: NavEntry[] = [
