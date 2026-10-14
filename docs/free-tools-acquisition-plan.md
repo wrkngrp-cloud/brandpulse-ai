@@ -144,9 +144,11 @@ deployment, or a session whose network policy allows those hosts.
 So the next session does not go looking for it, or rebuild it by accident:
 
 - **The migrations are written and not applied.** `20261014090000_free_tools.sql` and
-  `20261014110000_fix_notifications_rls.sql` are both pending. Run `supabase migration list`
-  first and expect to see exactly those two, then `supabase db push`. Nothing in the free-tool
-  surface works until they are applied.
+  `20261014110000_fix_notifications_rls.sql` are both pending. Nothing in the free-tool surface
+  works until they are. On a machine with CLI access: `supabase migration list`, expect exactly
+  those two, then `supabase db push`. From a Claude Code cloud session, where `db push` cannot
+  open a Postgres connection: `npm run db:pending` to see the plan, then `npm run db:apply`.
+  Both paths write the same ledger, so it does not matter which is used.
 - **Content opportunity briefs and an in-workspace research refresh** for the demand finder.
   The workspace imports, prioritises, tracks and summarises opportunities; it does not yet
   generate a content brief per opportunity, and re-running the research means re-running the

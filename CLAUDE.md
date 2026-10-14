@@ -44,7 +44,18 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 - `npm run lint` — ESLint (flat config in `eslint.config.mjs`).
 - `npx tsc --noEmit` — type-check the whole project. Must pass before a change is done.
 - `supabase db push` — apply pending SQL migrations to the linked project. Run
-  `supabase migration list` first to confirm only your migration is pending.
+  `supabase migration list` first to confirm only your migration is pending. This is the
+  path on your own machine.
+- `npm run db:pending` / `npm run db:apply` — the same thing over HTTPS, for a Claude Code
+  cloud session. `db push` opens a raw Postgres connection to the pooler on 5432/6543, and a
+  cloud session has no raw TCP egress, so it cannot work there however the network policy is
+  set. `scripts/apply-migrations.mjs` runs each pending migration through the Supabase
+  Management API instead, and writes the same `supabase_migrations.schema_migrations` ledger
+  the CLI reads, so the two never disagree. It needs `SUPABASE_ACCESS_TOKEN` in the
+  environment, plus `supabase.com` and `*.supabase.co` on the environment's allowed domains.
+  `db:pending` only plans; nothing changes without `--apply`. Each migration commits with its
+  ledger row or neither lands, and a failure stops the run rather than half-applying a set.
+  `node scripts/apply-migrations.mjs --self-test` checks the parsing and diff offline.
 - `npm run seeds:check` — check every demo-seed insert against the migration set
   with no database. Postgres rejects the whole insert on one bad column and the
   seeds discard the error, so a broken seed still answers success.
