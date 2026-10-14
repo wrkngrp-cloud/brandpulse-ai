@@ -6,6 +6,7 @@
 | **Status** | Plan, nothing built |
 | **Last updated** | 14 October 2026 |
 | **Authoritative on** | Staff access, the support chat, and every internal admin surface |
+| **Lives at** | `desk.brandgauge.app`, served from this app at the `/desk` path |
 | **Reads with** | `docs/scoreboard-and-leads.md` (the lead desk this extends), `CLAUDE.md`, PRD Document 5 Part B |
 
 This is a working doc, not part of the PRD set. It describes three things that belong
@@ -13,9 +14,10 @@ together because they share one access model:
 
 1. **Support chat.** Our own widget, in the product and on the marketing site, so customers
    and strangers can talk to us. We are not buying Intercom.
-2. **The Desk.** The staff tool at `/admin`: accounts, activity, usage, credits, revenue,
-   leads, adoption, and the support inbox.
-3. **Super Admin.** Who on staff may use the Desk, what they may do in it, and what they did.
+2. **The Desk.** The staff tool at `desk.brandgauge.app`: accounts, activity, usage,
+   credits, revenue, leads, adoption, and the support inbox.
+3. **Super Admin.** Staff accounts, invites, roles, per-module permissions, dataset access,
+   and what each person did.
 
 ---
 
@@ -58,42 +60,136 @@ Same spirit as PRD Document 5 Part B. Decide these once.
 
 | Decision | Why |
 |---|---|
-| The Desk lives in this app at `/admin`, not a separate deployment | The service client, `TOKEN_ENCRYPTION_KEY`, the Supabase factories and the Inngest registry are all here. A second app means a second copy of each. The cost is admin code sitting beside customer code, paid for with `requireStaff()` on every entry and one audited data layer. |
+| The Desk answers on its own host, `desk.brandgauge.app`, served from this one app and one deploy | A separate deployment means a second copy of the service client, `TOKEN_ENCRYPTION_KEY`, the Supabase factories and the Inngest registry. Host routing gives the separation that matters (own URL, own login, own session cookie, nothing about the Desk reachable from the customer app) at the cost of one middleware rule. See section 2b. |
+| The Desk is invite-only with its own login, email and password, no Google button, no signup route | Staff access is granted by a person, never self-served. A signup form on the Desk host is the whole security model undone. |
+| Permissions are per module action and per dataset, not a fixed role | A support agent needs the account timeline and not the revenue figures. Finance needs the revenue and not the customer's survey text. Roles are templates over the same permission keys, so a new role is configuration rather than a deploy. |
 | Staff access is an allowlist in the same shape as `is_lead_desk()` | Document 5 warns against a third RLS pattern copied from the lead desk. `is_staff()` is the same security-definer, fixed `search_path` form. `lead_desk_admins` folds into it. |
 | We build the support chat, we do not buy one | It is our own data, in our own tables, joinable to the account. A hosted widget cannot show the agent that this brand's BHI is 41 and their Meta connector expired on Tuesday. |
 | Anonymous chat goes through a service-role route holding a visitor token | Same mechanism as `/survey/[id]`, `/ambassador/[token]` and `/go/[slug]`. Anon RLS is never opened on the chat tables. |
-| We reach our customers by email and in-app notification only | `whatsapp_contacts` holds the *tenant's* customers under the tenant's consent. Messaging them from our admin tool would break the NDPR gate and the Model A consent regime. Not a grey area. |
+| We reach our customers by three channels only: email, the in-app notification bell, and the chat widget in the product and on the site | `whatsapp_contacts` holds the *tenant's* customers under the tenant's consent. Messaging them from our admin tool would break the NDPR gate and the Model A consent regime. Not a grey area. |
 | Every cross-tenant read and every staff action writes an audit row | The tool bypasses RLS on purpose. The log is what makes that defensible. |
 | The Desk uses the existing token layer and primitives | No second design system, no new UI dependency. |
 | Impersonation is deferred, and if built: read-only, time-boxed, consented, banner, audited | The alternative, staff silently browsing customer data, is hard to explain afterwards. |
 
 ---
 
-## 3. Access model
+## 2b. How the Desk gets its own address
 
-### Tables
+One app, one deploy, two hosts.
+
+```
+desk.brandgauge.app/*          ->  rewritten to /desk/*        (staff)
+brandgauge.app/*               ->  served as today             (customers and site)
+brandgauge.app/desk/*          ->  404                         (the path is not a back door)
+desk.brandgauge.app/dashboard  ->  404                         (the Desk host serves nothing else)
+```
+
+Both rules live in `src/proxy.ts`, which already runs on every request. It reads
+`DESK_HOST` from the environment, rewrites that host onto `/desk`, and refuses the
+crossings in both directions.
+
+**Setting it up, in order:**
+
+1. Build at `/desk` and preview on the Vercel deployment URL we already have live.
+   The path is real, so `https://<current-deployment>.vercel.app/desk` works from the
+   first commit with no DNS and no new project.
+2. When it is worth showing: Vercel project, Settings, Domains, add
+   `desk.brandgauge.app`.
+3. At the registrar holding `brandgauge.app`, one DNS record: `CNAME desk` pointing to
+   `cname.vercel-dns.com`. Vercel issues the certificate itself.
+4. Set two environment variables: `DESK_HOST=desk.brandgauge.app` and
+   `NEXT_PUBLIC_DESK_URL=https://desk.brandgauge.app`, the second for invite links and
+   email footers.
+5. The host rewrite turns on by itself once `DESK_HOST` is set. The `/desk` path on the
+   main host closes at the same moment, so there is no window where both work.
+
+Preview deployments keep working throughout, because a Vercel preview URL is not
+`DESK_HOST` and so falls back to the path. That is the point of doing it this way.
+
+**Session separation.** Supabase writes its auth cookie host-only, with no `Domain`
+attribute, so a staff session on `desk.brandgauge.app` is not sent to `brandgauge.app`
+and a customer session is not sent to the Desk. Signing in to one does not sign you in to
+the other, which is the behaviour we want, and it costs nothing to get.
+
+---
+
+## 3. Staff accounts and access
+
+Nobody reaches the Desk by having an account on BrandGauge. Staff accounts are made by
+invitation, hold a real profile, and carry permissions per module action and per dataset.
+
+### 3.1 Tables
 
 ```sql
--- Staff: who may open the Desk at all.
+-- A staff member. One row per person with Desk access.
 create table staff (
   user_id      uuid primary key references auth.users(id) on delete cascade,
-  email        text not null,
-  display_name text,
-  role         text not null default 'support'
-               check (role in ('support','finance','engineer','admin','super_admin')),
+  email        text not null unique,
+  full_name    text not null,
+  job_title    text,
+  phone        text,
+  avatar_url   text,
+  timezone     text not null default 'Africa/Lagos',
+  role         text not null references staff_roles(name),
   status       text not null default 'active'
                check (status in ('active','suspended')),
   invited_by   uuid references auth.users(id) on delete set null,
   invited_at   timestamptz not null default now(),
-  last_seen_at timestamptz
+  joined_at    timestamptz,
+  last_seen_at timestamptz,
+  last_sign_in_ip_hash text
 );
 
-alter table staff enable row level security;
+-- Roles are templates over permission keys, editable in the Desk.
+create table staff_roles (
+  name        text primary key,          -- 'support' | 'finance' | 'engineer' | 'admin' | 'super_admin'
+  label       text not null,
+  description text,
+  is_system   boolean not null default false   -- system roles cannot be deleted
+);
 
--- Staff see the roster, including who else has access. Writes are never from the
--- client: granting access happens through a super-admin route on the service client.
-create policy staff_read on staff for select using (is_staff());
+create table role_permissions (
+  role       text not null references staff_roles(name) on delete cascade,
+  permission text not null,
+  primary key (role, permission)
+);
 
+-- Per person, on top of their role. A deny always wins, so one person can be
+-- trusted with one extra screen, or kept out of one, without inventing a role.
+create table staff_permission_overrides (
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  permission text not null,
+  effect     text not null check (effect in ('grant','deny')),
+  set_by     uuid references auth.users(id) on delete set null,
+  set_at     timestamptz not null default now(),
+  primary key (user_id, permission)
+);
+
+-- An invitation. The token is stored hashed, used once, and expires.
+create table staff_invites (
+  id          uuid primary key default gen_random_uuid(),
+  email       text not null,
+  full_name   text,
+  role        text not null references staff_roles(name),
+  token_hash  text not null unique,      -- sha256 of a 32-byte random token
+  invited_by  uuid not null references auth.users(id) on delete cascade,
+  expires_at  timestamptz not null,
+  accepted_at timestamptz,
+  revoked_at  timestamptz,
+  created_at  timestamptz not null default now()
+);
+create index idx_staff_invites_email on staff_invites(lower(email));
+```
+
+All five get RLS on. `staff` and `staff_roles` are readable by staff so the roster and the
+role list can be shown. `role_permissions`, `staff_permission_overrides` and
+`staff_invites` are readable only by a super admin. None of them is writable from the
+client: every change goes through a Desk route on the service client that checks the
+permission and writes the audit row.
+
+### 3.2 The three functions
+
+```sql
 create or replace function is_staff()
 returns boolean language sql security definer stable
 set search_path = public as $$
@@ -111,18 +207,145 @@ set search_path = public as $$
     where s.user_id = auth.uid() and s.status = 'active' and s.role = 'super_admin'
   );
 $$;
+
+-- The one permission check. A super admin holds everything; a deny override beats a
+-- role grant; otherwise the role decides.
+create or replace function staff_can(perm text)
+returns boolean language sql security definer stable
+set search_path = public as $$
+  with me as (
+    select s.user_id, s.role from public.staff s
+    where s.user_id = auth.uid() and s.status = 'active'
+  )
+  select case
+    when not exists (select 1 from me) then false
+    when (select role from me) = 'super_admin' then true
+    when exists (select 1 from public.staff_permission_overrides o
+                 where o.user_id = (select user_id from me)
+                   and o.permission = perm and o.effect = 'deny') then false
+    when exists (select 1 from public.staff_permission_overrides o
+                 where o.user_id = (select user_id from me)
+                   and o.permission = perm and o.effect = 'grant') then true
+    else exists (select 1 from public.role_permissions rp
+                 where rp.role = (select role from me) and rp.permission = perm)
+  end;
+$$;
 ```
 
+`is_lead_desk()` and `lead_desk_admins` fold into this. The existing lead desk check
+becomes `staff_can('leads.view')`, and the old table is dropped in the same migration
+after its rows are copied across.
+
+### 3.3 Permission keys
+
+Two groups in one namespace, so the Desk can show them as two lists.
+
+**Actions, by module:**
+
+| Module | Keys |
+|---|---|
+| Accounts | `accounts.view`, `accounts.note`, `accounts.message`, `accounts.plan_change` |
+| Support | `support.view`, `support.reply`, `support.assign`, `support.close` |
+| Leads | `leads.view`, `leads.edit`, `leads.export` |
+| Usage | `usage.view` |
+| Revenue | `revenue.view`, `revenue.edit`, `revenue.export` |
+| Adoption | `adoption.view` |
+| Ops | `ops.view`, `ops.run_job`, `ops.reseed` |
+| Staff | `staff.view`, `staff.invite`, `staff.revoke`, `staff.permissions`, `staff.activity` |
+
+**Datasets**, which gate what a screen is allowed to render rather than what it does:
+
+| Key | What it unlocks |
+|---|---|
+| `data.customer_email` | Member and lead email addresses. Without it, addresses render masked. |
+| `data.customer_phone` | Phone numbers. Hashed values in `whatsapp_send_log` stay hashed regardless. |
+| `data.customer_content` | Survey responses, mentions, uploaded creative, AI outputs. |
+| `data.ai_cost` | Our cost per account and per call. |
+| `data.revenue_figures` | Amounts on subscriptions and invoices. |
+| `data.audit_all` | Other people's activity, not just your own. |
+
+So a support agent with `accounts.view` and `data.customer_email` but not
+`data.revenue_figures` sees the whole account timeline with the money redacted, and the
+redaction happens in the data layer rather than in the component.
+
+### 3.4 Default role templates
+
+Seeded by migration, editable afterwards in the Desk.
+
+| | support | finance | engineer | admin | super_admin |
+|---|---|---|---|---|---|
+| Accounts: view / note / message | yes | view | view | yes | all |
+| Accounts: change plan | no | yes | no | yes | all |
+| Support: view / reply / assign / close | yes | no | view | yes | all |
+| Leads | view, edit | no | no | all | all |
+| Usage | yes | yes | yes | yes | all |
+| Revenue | no | view, edit, export | no | view | all |
+| Adoption | yes | no | yes | yes | all |
+| Ops | no | no | yes | yes | all |
+| Staff management | no | no | no | no | yes |
+| `data.customer_email` | yes | yes | yes | yes | yes |
+| `data.customer_phone` | no | no | no | yes | yes |
+| `data.customer_content` | yes | no | yes | yes | yes |
+| `data.ai_cost` | no | yes | yes | yes | yes |
+| `data.revenue_figures` | no | yes | no | yes | yes |
+| `data.audit_all` | no | no | no | no | yes |
+
+### 3.5 Enforcement, in one place
+
+- `requireStaff('accounts.view')` at the top of every Desk page and route. It resolves the
+  session, checks `staff_can`, writes the audit row, and returns the staff record with its
+  full permission set.
+- `src/lib/desk/` is the only code allowed to use the service client for cross-tenant
+  reads. It takes the permission set and redacts by dataset key before returning rows, so
+  a new screen cannot leak a field by forgetting to check.
+- The middleware refuses `/desk` to anyone with no active `staff` row before a page ever
+  renders.
+
+### 3.6 Invite, suspend, remove
+
+**Invite.** Super admin enters email, full name, role. We create a `staff_invites` row
+with a hashed single-use token and a 72-hour expiry, and send the link with Resend from our
+own template, so the copy follows the Voice rule like any other message we send.
+
+**Accept.** The link opens `/desk/invite/[token]`. The page shows the address it was sent
+to, and asks for a password, job title and timezone. The accept route, on the service
+client, checks the hash, the expiry and that it has not been used, then creates the auth
+user with `auth.admin.createUser({ email, password, email_confirm: true })`, inserts the
+`staff` row, stamps `accepted_at`, and writes the audit row. If that address already has a
+BrandGauge account, no new user is created, the existing one is linked and their password
+is left alone.
+
+**Sign in.** `/desk/login`, email and password through the existing
+`signInWithPassword`, which the customer app already uses. No signup link, no Google
+button, no password field on the Desk host that creates anything. Rate limited by IP in
+Upstash, and every attempt, success or failure, writes an audit row.
+
+**Suspend.** Flip `status` to `suspended`. `is_staff()` goes false on the next request, so
+access stops at once while the person's history and their support threads stay attached to
+them. This is what to use the day someone leaves.
+
+**Remove.** Delete the `staff` row. Their audit trail survives, because
+`staff_audit_log.actor_id` holds a user id and not a staff id. Deleting the underlying
+auth user is a separate and rarer act, and the Desk refuses it if that address also
+belongs to a customer workspace, which it checks first.
+
+**Two rules in the code.** A super admin cannot change or suspend their own row, so the
+last one cannot lock everyone out by accident. The first super admin is seeded by
+migration, never by a route.
+
+---
+
+### 3.7 The audit log
+
 ```sql
--- Every staff action, including reads of customer data.
 create table staff_audit_log (
   id           uuid primary key default gen_random_uuid(),
-  actor_id     uuid not null references auth.users(id) on delete set null,
-  action       text not null,         -- 'account.view' | 'message.send' | 'staff.grant' ...
+  actor_id     uuid references auth.users(id) on delete set null,
+  action       text not null,         -- 'account.view' | 'message.send' | 'staff.invite' ...
   target_type  text,                  -- 'workspace' | 'lead' | 'conversation' | 'staff'
   target_id    text,
   workspace_id uuid references workspaces(id) on delete set null,
-  summary      text,                  -- one line, readable in the activity feed
+  summary      text,                  -- one readable line for the activity feed
   meta         jsonb not null default '{}'::jsonb,
   ip_hash      text,
   created_at   timestamptz not null default now()
@@ -131,30 +354,14 @@ create index idx_audit_actor on staff_audit_log(actor_id, created_at desc);
 create index idx_audit_target on staff_audit_log(target_type, target_id, created_at desc);
 
 alter table staff_audit_log enable row level security;
--- Staff see their own trail. Super admins see everyone's. Nobody updates or deletes.
+-- Your own trail, or everyone's with the dataset key. No update, no delete, ever.
 create policy audit_read on staff_audit_log
-  for select using (actor_id = auth.uid() or is_super_admin());
+  for select using (actor_id = auth.uid() or staff_can('data.audit_all'));
 ```
 
-### Role matrix
-
-| Capability | support | finance | engineer | admin | super_admin |
-|---|---|---|---|---|---|
-| Support inbox, reply | yes | no | yes | yes | yes |
-| Account list and detail | yes | yes | yes | yes | yes |
-| Lead desk | yes | no | no | yes | yes |
-| Send email or in-app message | yes | no | no | yes | yes |
-| Usage and AI cost | summary | yes | yes | yes | yes |
-| Revenue, subscriptions, invoices | no | yes | no | yes | yes |
-| Ops health, job failures, re-run seeds | no | no | yes | yes | yes |
-| Change a workspace plan | no | yes | no | yes | yes |
-| Grant or revoke staff access | no | no | no | no | yes |
-| See another person's activity | no | no | no | no | yes |
-
-Enforced in one place: a `requireStaff(roles[])` helper that every `/admin` page and route
-calls first, and a `src/lib/admin/` data layer that is the only code allowed to use the
-service client for cross-tenant reads. It writes the audit row itself, so a new screen
-cannot forget to.
+Written by `requireStaff` and by the `src/lib/desk/` data layer, not by each screen. Reads
+of customer data are logged as well as writes, because a tool that bypasses RLS by design
+needs to be able to answer who looked at what.
 
 ---
 
@@ -290,7 +497,7 @@ time per thread, which is also how staff performance gets measured in Super Admi
 
 ### 5.3 Leads
 
-Extend `/dashboard/leads` rather than replace it, and move it under `/admin/leads`.
+Extend `/dashboard/leads` rather than replace it, and move it under `/desk/leads`.
 One real gap to close: `signed_up` is a manual boolean, so a nightly job joins
 `leads.email` against `auth.users` and sets it. Then conversion by referrer and by
 scanned category is a number rather than a feeling.
@@ -409,54 +616,64 @@ by workspace members for their own rows (the billing page needs them) and by sta
 
 ## 7. Super Admin
 
-A small surface at `/admin/super`, `super_admin` only.
+A section of the Desk at `/desk/staff`, gated on the `staff.*` keys, which only the
+super_admin role holds by default.
 
-- **Grant access.** Email, role. Writes `staff` through the service client, sends the
-  invite by Resend, writes the audit row. If the address has no `auth.users` row yet, the
-  grant waits and attaches on their first sign-in.
-- **Revoke and suspend.** Suspend keeps the history and closes the door, which is what you
-  want the day someone leaves. Delete is for a mistaken grant.
-- **Role changes**, with the matrix in section 3 visible on the page so the effect of a
-  change is readable before it is made.
-- **Staff activity.** Per person: last seen, actions in the last 7 and 30 days, accounts
-  viewed, messages sent, plan changes made, conversations handled, median first response
-  time, open threads assigned. All of it from `staff_audit_log` and the support tables, so
-  it costs nothing extra to build once the log exists.
-- **The full audit feed**, filterable by person, action and account, exportable.
-- **Two rules in the code.** A super admin cannot edit their own row, which stops the last
-  one locking everyone out by accident. The first super admin is seeded by migration, not
-  by a route.
+- **Roster.** Everyone with access: name, job title, role, status, last seen, open threads
+  assigned. One row per person, with their photo if they uploaded one.
+- **Invite.** Email, full name, role. Sends the link, shows the invite as pending with its
+  expiry, and lets you resend or revoke it before it is used.
+- **Person page.** Their profile, their role, their overrides, and their activity.
+  Changing a role shows the permission diff before you save it, so the effect is readable
+  rather than guessed.
+- **Permissions editor.** The two lists from section 3.3, as checkboxes, at two levels:
+  the role template, which changes everyone holding that role, and the person, which
+  grants or denies one key for one person. The editor says which level a given yes came
+  from, because "why can she see this" needs to be answerable in one glance.
+- **Roles editor.** Create a role, name it, tick its keys. New roles are configuration,
+  not a deploy. System roles can be edited but not deleted.
+- **Activity.** Per person: last seen, actions in the last 7 and 30 days, accounts viewed,
+  messages sent, plan changes made, conversations handled, median first response time,
+  open threads. All of it from `staff_audit_log` and the support tables, so it costs
+  nothing extra once the log exists.
+- **The full audit feed**, filterable by person, action, account and date, exportable.
 
-Staff activity is a management tool, so say what it is for in the room: response times and
-who touched which account. Not keystrokes.
+Staff activity is a management tool, so say in the room what it is for: response times,
+and who touched which account. Not keystrokes.
 
 ---
 
 ## 8. Build order
 
+Everything is previewed at `<current-deployment>.vercel.app/desk` from phase 1 onward. The
+subdomain goes live whenever you want it to, and changes nothing about the code.
+
 | Phase | What | Rough size |
 |---|---|---|
 | **0. Instrumentation** | `ai_calls`, `feature_events`, write `usage_events`, `staff_audit_log`, the Upstash plus Inngest flush | 1 session. Useful alone: the day `callAi` logs tokens we know what the product costs to run. |
-| **1. Access and shell** | `staff`, `is_staff()`, `is_super_admin()`, `requireStaff()`, `/admin` shell and nav, `src/lib/admin/` data layer, fold in `lead_desk_admins` | 1 session |
-| **2. Accounts** | List, detail, timeline, connectors, usage | 2 sessions |
-| **3. Support chat** | Tables, service route, widget in app and site, Desk inbox, Resend out and in | 2 to 3 sessions. The biggest single piece. |
-| **4. Super Admin** | Grants, roles, staff activity, audit feed | 1 session |
-| **5. Money** | `subscriptions`, `invoices`, manual entry, revenue screens | 1 session |
-| **6. Adoption** | Module registry, the recommendation engine, the blocked list | 1 to 2 sessions |
-| **7. Later** | AI reply assist, Slack notifications, impersonation if we decide to | unscheduled |
+| **1. Staff access and shell** | `staff`, `staff_roles`, `role_permissions`, overrides, invites, the three SQL functions, `requireStaff`, `src/lib/desk/`, the host rewrite in `proxy.ts`, `/desk/login`, the invite and accept flow, the Desk shell and nav | 2 sessions. Nothing else can be built until a staff member can sign in. |
+| **2. Super Admin** | Roster, invite, person page, permissions and roles editors, activity, audit feed | 1 to 2 sessions. Early on purpose: you need to be able to let someone in before there is anything for them to do. |
+| **3. Accounts** | List, detail, timeline, connectors, usage, with dataset redaction | 2 sessions |
+| **4. Support chat** | Tables, service route, widget in app and site, Desk inbox, Resend out and in | 2 to 3 sessions. The biggest single piece. |
+| **5. Leads** | Move the lead desk across, retire `lead_desk_admins`, the nightly signed-up join | half a session |
+| **6. Money** | `subscriptions`, `invoices`, manual entry, revenue screens | 1 session |
+| **7. Adoption** | Module registry, the recommendation engine, the blocked list | 1 to 2 sessions |
+| **8. Later** | AI reply assist, Slack notifications, 2FA on staff accounts, impersonation if we decide to | unscheduled |
 
-Phases 2 and 3 can swap if support is the sharper pain. Phase 0 cannot move.
+Phase 0 cannot move. Phases 1 and 2 are one piece of work in practice.
 
 ---
 
 ## 9. Open questions
 
-1. Live chat or a reply promise at launch? Live chat with nobody watching it is worse than
-   a form that says "within 4 hours".
+1. Live chat or a stated reply time at launch? Live chat with nobody watching it is worse
+   than a form that says "within 4 hours".
 2. Does revenue go in by hand before Paystack subscriptions exist, or do we wait?
 3. Impersonation: defer, or build it with the consent gate?
-4. Who is on the staff roster at launch, with which roles?
+4. Who is invited at launch, and on which roles?
 5. Chat attachments, yes or no? Screenshots make support far better and mean a Storage
    bucket with its own access rules.
 6. Does the widget appear on `/scoreboard`? That is our highest-intent stranger traffic and
    also our noisiest.
+7. Two-factor on staff accounts: at launch, or once there are more than three of us?
+   Supabase supports TOTP, so it is a settings page rather than a build.
