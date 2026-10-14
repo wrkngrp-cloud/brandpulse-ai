@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient }       from '@/lib/supabase/server'
+import { recordVisit, withUtm }      from '@/lib/tools/offline-tracker'
+import type { CampaignType }         from '@/lib/tools/campaign-labels'
 
 export async function GET(
   request: NextRequest,
@@ -37,7 +39,60 @@ export async function GET(
     return NextResponse.redirect(placement.attribution_url, 302)
   }
 
-  // ── 2. Fall through to existing OOH redirect logic ────────────────────────
+  // ── 2. Free Offline Campaign Tracker placements ───────────────────────────
+  // Third in the order, after the two that predate it. A slug here is printed
+  // on a billboard or a flyer and can never be reissued, so mintSlug checks
+  // all three tables before handing one out.
+  const { data: toolPlacement } = await supabase
+    .from('tool_placements')
+    .select('id, campaign_id, slug, utm_content, tool_campaigns!inner(id, name, destination_url, campaign_type, response_enabled)')
+    .eq('slug', slug)
+    .maybeSingle()
+
+  if (toolPlacement) {
+    const campaign = (toolPlacement as unknown as {
+      tool_campaigns: {
+        id: string; name: string; destination_url: string
+        campaign_type: CampaignType; response_enabled: boolean
+      }
+    }).tool_campaigns
+
+    const ua = request.headers.get('user-agent') ?? ''
+    const ip = (request.headers.get('x-forwarded-for') ?? '').split(',')[0].trim()
+      || request.headers.get('x-real-ip') || 'unknown'
+    const region = request.headers.get('x-vercel-ip-country-region')
+      ?? request.headers.get('cf-ipcountry')
+      ?? null
+
+    // Awaited, not fired and forgotten: on a serverless platform the process
+    // exits with the response and the write is lost. The same reason the OOH
+    // branch below awaits its own.
+    await recordVisit({
+      placementId: toolPlacement.id,
+      campaignId:  campaign.id,
+      slug:        toolPlacement.slug,
+      ip, userAgent: ua,
+      referrer:    request.headers.get('referer') ?? null,
+      ipRegion:    region,
+    })
+
+    /* With response capture switched on, the campaign's own page comes first
+       and carries the destination as its primary action. The placement rides
+       along in the query so a form submission can be attributed to the
+       billboard it came from. Off by default, because the owner chose the
+       destination and we do not get to interpose on it uninvited. */
+    const destination = campaign.response_enabled
+      ? `${request.nextUrl.origin}/respond/${campaign.id}?p=${encodeURIComponent(toolPlacement.slug)}`
+      : withUtm(campaign.destination_url, {
+          campaignType: campaign.campaign_type,
+          campaignName: campaign.name,
+          placementUtm: toolPlacement.utm_content,
+        })
+
+    return NextResponse.redirect(destination, 302)
+  }
+
+  // ── 3. Fall through to existing OOH redirect logic ────────────────────────
   const { data: site } = await supabase
     .from('ooh_sites')
     .select('id, brand_id, landing_url')

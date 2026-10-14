@@ -73,7 +73,7 @@ and `is_lead_desk()` read, plus a workspace-member read once claimed.
 | 1 | Free Tools nav dropdown, `/tools` directory, registry, anonymous run infra, claim flow, event taxonomy, shared report components, abuse protection | Done |
 | 2 | Competitor Move Tracker (public + beta workspace + Inngest monitoring) | Done |
 | 3 | Market Demand Gap Finder (public + beta workspace) | Done |
-| 4 | Offline Campaign Tracker (links, QR, redirect analytics, response forms) | Not started |
+| 4 | Offline Campaign Tracker (links, QR, redirect analytics, response forms) | Done |
 | 5 | Campaign Conversion Audit (public + improvement plan workspace) | Not started |
 | 6 | Cross-tool QA, regression on PR Scoreboard, docs | Not started |
 
@@ -114,12 +114,14 @@ work, and a sixth tool is one registry entry away.
 
 `npm run tools:check` exercises the Free Tools libraries offline, in the shape the repo
 already uses for `metrics:check` and `seeds:check`: the modules are compiled standalone with
-the AI and press calls stubbed, so no key and no network are needed. 96 checks cover the SSRF
+the AI and press calls stubbed, so no key and no network are needed. 131 checks cover the SSRF
 screening, the HTML reader against a fixture page, `findSectionLinks`, the registry's
 invariants, `safeNext`, and the competitor classifier's source guard (a citation it cannot
 point at, an undated page demoted off a change claim, malformed JSON, the three-finding cap),
-and the demand finder's guards (an opportunity with no citable evidence dropped, a demand claim
-demoted to a content gap when no search provider answered, the market-code mapping).
+the demand finder's guards (an opportunity with no citable evidence dropped, a demand claim
+demoted to a content gap when no search provider answered, the market-code mapping), and the
+offline tracker's UTM handling, slug generation and bot filtering (a WhatsApp link preview is
+not a visit).
 
 It has already caught one real hole: an IPv4-mapped IPv6 address reaches `screenHost` in hex
 form, because the WHATWG URL parser serialises `::ffff:10.0.0.1` as `::ffff:a00:1`, so the
@@ -140,6 +142,13 @@ deployment, or a session whose network policy allows those hosts.
   reader, provenance-aware report components, claim flow, and `next` carried through the whole
   auth round trip behind `safeNext`. Migration `20261014090000_free_tools.sql` written, not yet
   applied.
+- **14 Oct 2026 — Phase 4.** Offline Campaign Tracker: per-placement short links and QR codes
+  with no account, `/go/[slug]` extended with a third lookup (slugs minted against all three
+  redirect tables, because a printed code cannot be reissued), visit recording that separates
+  uniques from repeats and records-but-excludes automated hits, an anonymous campaign dashboard
+  retrievable by token, the claimed campaign module with placement comparison and CSV export,
+  and a consent-gated branded response page at `/respond/[campaignId]` that attributes each
+  enquiry to the placement it came from.
 - **14 Oct 2026 — Phase 3.** Market Demand Gap Finder: search-provider abstraction over the
   `SERPAPI_KEY` the OOH jobs already use, two-pass engine (read the business, then rank gaps
   against numbered evidence), public page, open API route, acquisition-opportunity backlog

@@ -43,6 +43,12 @@ const files = {
   'market-demand.ts':      ['src/lib/tools/market-demand.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
       "import { callAi, extractJson } from './ai-stub'")],
+  'campaign-labels.ts':    ['src/lib/tools/campaign-labels.ts', s => s],
+  'offline-tracker.ts':    ['src/lib/tools/offline-tracker.ts', s => s
+    // The database is not reachable from this check, and nothing exercised
+    // here touches it: withUtm, slugify, looksAutomated and deviceOf are pure.
+    .replace("import { createServiceClient } from '@/lib/supabase/server'",
+      "const createServiceClient = async (): Promise<any> => { throw new Error('no database in this check') }")],
   'competitor-tracker.ts': ['src/lib/tools/competitor-tracker.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
       "import { callAi, extractJson } from './ai-stub'")
@@ -105,6 +111,8 @@ const aiStub      = await import(`${OUT}/ai-stub.mjs`)
 const safe        = await import(`${OUT}/safe-next.mjs`)
 const demand      = await import(`${OUT}/market-demand.mjs`)
 const search      = await import(`${OUT}/search-provider.mjs`)
+const offline     = await import(`${OUT}/offline-tracker.mjs`)
+const labels      = await import(`${OUT}/campaign-labels.mjs`)
 
 let pass = 0, fail = 0
 const eq = (name, got, want) => {
@@ -378,6 +386,74 @@ aiStub.setNextResponse(JSON.stringify({
 const u2 = await demand.understandBusiness({ facts: ownPage, extraPages: [], market: 'Nigeria', category: null })
 eq('too-short query dropped', u2.queries.length, 1)
 eq('stage kept',              u2.queries[0].stage, 'problem_aware')
+
+
+// ── Offline tracker: UTMs, slugs and bot filtering ──────────────────────────
+console.log('\n── withUtm keeps what the customer already put on the URL')
+let tagged = offline.withUtm('https://acme.ng/offer?sku=123&ref=abc', {
+  campaignType: 'outdoor', campaignName: 'Q4 Lagos Billboards', placementUtm: 'ikeja-bridge',
+})
+let u = new URL(tagged)
+eq('existing params kept',  [u.searchParams.get('sku'), u.searchParams.get('ref')], ['123', 'abc'])
+eq('utm_source added',      u.searchParams.get('utm_source'), 'brandgauge')
+eq('medium from type',      u.searchParams.get('utm_medium'), 'ooh')
+eq('campaign slugified',    u.searchParams.get('utm_campaign'), 'q4-lagos-billboards')
+eq('content is placement',  u.searchParams.get('utm_content'), 'ikeja-bridge')
+eq('path untouched',        u.pathname, '/offer')
+
+tagged = offline.withUtm('https://acme.ng/o?utm_source=radio&utm_campaign=mine', {
+  campaignType: 'radio', campaignName: 'Drive time', placementUtm: 'coolfm',
+})
+u = new URL(tagged)
+eq('their utm_source respected',   u.searchParams.get('utm_source'), 'radio')
+eq('their utm_campaign respected', u.searchParams.get('utm_campaign'), 'mine')
+eq('missing ones still filled',    u.searchParams.get('utm_medium'), 'radio')
+
+eq('bare domain gets a scheme', new URL(offline.withUtm('acme.ng/x', {
+  campaignType: 'flyer', campaignName: 'Yaba', placementUtm: 'market',
+})).protocol, 'https:')
+eq('unparseable destination returned as-is',
+   offline.withUtm('not a url at all', { campaignType: 'other', campaignName: 'c', placementUtm: 'p' }),
+   'not a url at all')
+
+console.log('\n── slugify')
+eq('spaces and case',  offline.slugify('Third Mainland Bridge ', 40), 'third-mainland-bridge')
+// Default cap cuts on a word boundary: this is typed off a poster, so a whole
+// word short beats a truncated one.
+eq('word-boundary cut', offline.slugify('Third Mainland Bridge '), 'third-mainland')
+eq('short name untouched', offline.slugify('Ikeja'), 'ikeja')
+eq('punctuation out',  offline.slugify('Shoprite (Lekki) — end cap'), 'shoprite-lekki')
+eq('no trailing dash', offline.slugify('Ikeja!!!').endsWith('-'), false)
+eq('empty stays empty', offline.slugify('!!!'), '')
+
+console.log('\n── automated traffic is not a visit')
+for (const ua of [
+  'WhatsApp/2.23.20.0 A',
+  'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',
+  'Twitterbot/1.0',
+  'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+  'curl/8.4.0',
+  'python-requests/2.31.0',
+  'Mozilla/5.0 (X11; Linux x86_64) HeadlessChrome/120.0.0.0',
+  '',
+]) ok(`filtered: ${ua.slice(0, 28) || '(no user agent)'}`, offline.looksAutomated(ua))
+
+for (const ua of [
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1',
+  'Mozilla/5.0 (Linux; Android 13; Infinix X6819) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+]) ok(`counted: ${ua.slice(0, 24)}`, !offline.looksAutomated(ua))
+
+console.log('\n── device detection')
+eq('iphone',  offline.deviceOf('iPhone; CPU iPhone OS 17_1'), 'mobile')
+eq('android', offline.deviceOf('Linux; Android 13; Infinix X6819 Mobile'), 'mobile')
+eq('ipad',    offline.deviceOf('iPad; CPU OS 17_1 like Mac OS X'), 'tablet')
+eq('desktop', offline.deviceOf('Windows NT 10.0; Win64; x64'), 'desktop')
+
+console.log('\n── campaign labels cover every type')
+ok('a label per type', labels.CAMPAIGN_TYPES.every(t => labels.CAMPAIGN_TYPE_LABEL[t]))
+ok('a placement hint per type', labels.CAMPAIGN_TYPES.every(t => labels.PLACEMENT_HINT[t]))
+eq('free placement limit', labels.FREE_PLACEMENT_LIMIT, 3)
 
 console.log(`\n${fail === 0 ? 'PASS' : 'FAIL'} — ${pass} checks passed, ${fail} failed\n`)
 process.exit(fail === 0 ? 0 : 1)

@@ -28,6 +28,7 @@ export const TOUR_ROUTE_MODULE: Record<string, string> = {
   '/dashboard/campaigns':             'campaigns',
   '/dashboard/digital':               'digital',
   '/dashboard/influencers':           'influencers',
+  '/dashboard/offline-tracker':       'offline_tracker',
   '/dashboard/ooh':                   'ooh',
   '/dashboard/events':                'events',
   '/dashboard/radio':                 'radio',
@@ -292,6 +293,40 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
       id:    'opportunities-limits',
       title: 'What is deliberately not here',
       body:  'No search volumes, growth rates, keyword difficulty or traffic estimates: no source we can legitimately read provides them. And no revenue projection, because we hold none of your conversion or margin data.',
+    },
+  ],
+
+  offline_tracker: [
+    {
+      id:    'offline-intro',
+      title: 'Which placement actually brought people in',
+      body:  'Every billboard, radio slot, flyer drop or activation gets its own short link and QR code, so the response can be attributed to the one that earned it rather than to the campaign as a whole.',
+    },
+    {
+      id:       'offline-comparison',
+      title:    'Visits, uniques and enquiries side by side',
+      body:     'Unique counts one person once a day, because a billboard gets the same commuter twice. Automated hits, mostly WhatsApp and Facebook link previews, are recorded and left out of the figures.',
+      target:   '[data-tour="offline-comparison"]',
+      position: 'bottom',
+    },
+    {
+      id:       'offline-assets',
+      title:    'Codes that are safe to print',
+      body:     'Download each QR at print size. These slugs never change, so a code already on a wall keeps working for ever, including after you add placements or rename the campaign.',
+      target:   '[data-tour="offline-assets"]',
+      position: 'top',
+    },
+    {
+      id:       'offline-responses',
+      title:    'Turn visits into enquiries',
+      body:     'Switch on the response page and your codes land on a branded page carrying your destination as its main button plus an enquiry form, tagged with the placement it came from. Enquiries are stored only with consent, and the wording the person agreed to is stored with them.',
+      target:   '[data-tour="offline-responses"]',
+      position: 'top',
+    },
+    {
+      id:    'offline-limits',
+      title: 'What this does not measure',
+      body:  'It counts the interactions we instrumented. It is not billboard impressions, reach, incremental sales, brand lift or full campaign ROI, and no link tracker can measure those.',
     },
   ],
 

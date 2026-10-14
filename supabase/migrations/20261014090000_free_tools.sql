@@ -417,3 +417,19 @@ begin
   select count(*) into removed from gone;
   return removed;
 end $$;
+
+-- Visit counters on the placement, so a dashboard read is one query rather
+-- than a count over every visit. Called from the /go redirect, which runs with
+-- the service role; security definer so the counter is still maintained if the
+-- caller's RLS context ever changes.
+create or replace function increment_tool_placement_visits(
+  p_placement_id uuid,
+  p_unique       boolean
+)
+returns void language sql security definer
+set search_path = public as $$
+  update tool_placements
+     set visits        = visits + 1,
+         unique_visits = unique_visits + case when p_unique then 1 else 0 end
+   where id = p_placement_id;
+$$;

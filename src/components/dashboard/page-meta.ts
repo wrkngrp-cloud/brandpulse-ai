@@ -25,7 +25,7 @@ import {
   CurrencyIcon as DollarSign, AlertIcon as AlertTriangle, GiftIcon as Gift,
   HeartIcon as Heart, DatabaseIcon as Database, ExportIcon as FileDown,
   TrendIcon as BarChart3, FileIcon as BookOpen, FlaskIcon as FlaskConical,
-  ConnectIcon as Plug, SettingsIcon as Settings,
+  ConnectIcon as Plug, SettingsIcon as Settings, QrIcon,
 } from '@/components/brand/icon'
 
 export interface PageMeta {
@@ -44,6 +44,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   /* Intelligence — what is happening in the market? */
   '/dashboard/competitive':       { eyebrow: 'Intelligence', icon: Trophy },
   '/dashboard/competitive/watchlist': { eyebrow: 'Intelligence', icon: FileSearch },
+  '/dashboard/offline-tracker':   { eyebrow: 'Campaigns', icon: QrIcon },
   '/dashboard/marketplace':       { eyebrow: 'Intelligence', icon: MarketIcon },
   '/dashboard/cultural':          { eyebrow: 'Intelligence', icon: Globe },
   '/dashboard/field-intelligence':{ eyebrow: 'Intelligence', icon: FieldIcon },
