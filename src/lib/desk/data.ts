@@ -1,0 +1,214 @@
+import { createServiceClient } from '@/lib/supabase/server'
+import type { StaffSession } from './auth'
+
+/**
+ * The Desk's data layer.
+ *
+ * The only place allowed to use the service client for cross-tenant reads, so
+ * there is one file to audit rather than one per screen. Two rules hold here:
+ *
+ * Nothing is read without a permission being checked first. The caller passes
+ * its StaffSession and the function decides, which keeps the decision next to
+ * the query rather than next to the markup.
+ *
+ * Datasets are redacted here, not in the component. A screen that renders what
+ * it is given cannot leak a field by forgetting a conditional, and the same
+ * redaction applies to every screen that asks for the same rows.
+ */
+
+const MASKED = '•••'
+
+/** An address shown to someone without `data.customer_email`. */
+export function maskEmail(email: string | null | undefined): string {
+  if (!email) return ''
+  const [local, domain] = email.split('@')
+  if (!domain) return MASKED
+  return `${local.slice(0, 1)}${MASKED}@${domain}`
+}
+
+export interface DeskOverview {
+  workspaces:      number
+  workspacesNew30: number
+  brands:          number
+  staffActive:     number
+  leads:           { total: number; new7: number } | null
+  ai:              { calls30: number; costUsd30: number | null } | null
+  modulesUsed30:   number | null
+}
+
+export async function deskOverview(session: StaffSession): Promise<DeskOverview> {
+  const service = await createServiceClient()
+  const since30 = new Date(Date.now() - 30 * 86_400_000).toISOString()
+  const since7  = new Date(Date.now() -  7 * 86_400_000).toISOString()
+
+  const [workspaces, workspacesNew30, brands, staffActive] = await Promise.all([
+    service.from('workspaces').select('*', { count: 'exact', head: true }),
+    service.from('workspaces').select('*', { count: 'exact', head: true }).gte('created_at', since30),
+    service.from('brands').select('*', { count: 'exact', head: true }),
+    service.from('staff').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+  ])
+
+  let leads: DeskOverview['leads'] = null
+  if (session.can('leads.view')) {
+    const [total, recent] = await Promise.all([
+      service.from('leads').select('*', { count: 'exact', head: true }),
+      service.from('leads').select('*', { count: 'exact', head: true }).gte('created_at', since7),
+    ])
+    leads = { total: total.count ?? 0, new7: recent.count ?? 0 }
+  }
+
+  let ai: DeskOverview['ai'] = null
+  if (session.can('usage.view')) {
+    const { data: calls } = await service
+      .from('ai_calls')
+      .select('cost_usd')
+      .gte('created_at', since30)
+      .limit(50_000)
+
+    const rows = calls ?? []
+    ai = {
+      calls30: rows.length,
+      // Cost is a dataset, not a count. Without the key the volume still
+      // shows, which is what a support person needs, and the money does not.
+      costUsd30: session.sees('data.ai_cost')
+        ? rows.reduce((sum, r) => sum + Number(r.cost_usd ?? 0), 0)
+        : null,
+    }
+  }
+
+  let modulesUsed30: number | null = null
+  if (session.can('adoption.view')) {
+    const { data } = await service
+      .from('feature_events')
+      .select('module')
+      .gte('day', since30.slice(0, 10))
+      .limit(50_000)
+    modulesUsed30 = new Set((data ?? []).map(r => r.module)).size
+  }
+
+  return {
+    workspaces:      workspaces.count ?? 0,
+    workspacesNew30: workspacesNew30.count ?? 0,
+    brands:          brands.count ?? 0,
+    staffActive:     staffActive.count ?? 0,
+    leads, ai, modulesUsed30,
+  }
+}
+
+// ── The staff roster ─────────────────────────────────────────────────────────
+
+export interface StaffRow {
+  userId:     string
+  email:      string
+  fullName:   string
+  jobTitle:   string | null
+  role:       string
+  roleLabel:  string
+  status:     'active' | 'suspended'
+  lastSeenAt: string | null
+  joinedAt:   string | null
+  overrides:  number
+}
+
+export interface PendingInvite {
+  id:        string
+  email:     string
+  fullName:  string | null
+  role:      string
+  expiresAt: string
+  createdAt: string
+}
+
+export async function staffRoster(session: StaffSession): Promise<{
+  staff: StaffRow[]; invites: PendingInvite[]; roles: { name: string; label: string }[]
+}> {
+  const service = await createServiceClient()
+
+  const [{ data: staff }, { data: roles }, { data: overrides }] = await Promise.all([
+    service.from('staff')
+      .select('user_id, email, full_name, job_title, role, status, last_seen_at, joined_at')
+      .order('full_name'),
+    service.from('staff_roles').select('name, label').order('name'),
+    service.from('staff_permission_overrides').select('user_id'),
+  ])
+
+  const roleLabels = new Map((roles ?? []).map(r => [r.name, r.label]))
+  const overrideCounts = new Map<string, number>()
+  for (const row of overrides ?? []) {
+    overrideCounts.set(row.user_id, (overrideCounts.get(row.user_id) ?? 0) + 1)
+  }
+
+  // Pending only. A used or withdrawn invitation is history, and the roster is
+  // for what is outstanding.
+  const invites = session.can('staff.invite')
+    ? (await service.from('staff_invites')
+        .select('id, email, full_name, role, expires_at, created_at')
+        .is('accepted_at', null).is('revoked_at', null)
+        .gt('expires_at', new Date().toISOString())
+        .order('created_at', { ascending: false })).data ?? []
+    : []
+
+  return {
+    staff: (staff ?? []).map(s => ({
+      userId:   s.user_id,
+      email:    session.sees('data.customer_email') ? s.email : maskEmail(s.email),
+      fullName: s.full_name,
+      jobTitle: s.job_title,
+      role:     s.role,
+      roleLabel: roleLabels.get(s.role) ?? s.role,
+      status:   s.status as 'active' | 'suspended',
+      lastSeenAt: s.last_seen_at,
+      joinedAt:   s.joined_at,
+      overrides:  overrideCounts.get(s.user_id) ?? 0,
+    })),
+    invites: invites.map(i => ({
+      id: i.id, email: i.email, fullName: i.full_name,
+      role: i.role, expiresAt: i.expires_at, createdAt: i.created_at,
+    })),
+    roles: (roles ?? []).map(r => ({ name: r.name, label: r.label })),
+  }
+}
+
+export interface AuditRow {
+  id:        string
+  actorName: string
+  action:    string
+  summary:   string | null
+  createdAt: string
+}
+
+/**
+ * The activity feed.
+ *
+ * Without `data.audit_all` a person sees their own trail only, which is the
+ * same answer the table's own policy would give. The policy is the guarantee;
+ * this is the query.
+ */
+export async function auditFeed(session: StaffSession, limit = 50): Promise<AuditRow[]> {
+  const service = await createServiceClient()
+
+  let query = service
+    .from('staff_audit_log')
+    .select('id, actor_id, action, summary, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (!session.sees('data.audit_all')) query = query.eq('actor_id', session.userId)
+
+  const { data: rows } = await query
+  const actorIds = [...new Set((rows ?? []).map(r => r.actor_id).filter(Boolean))] as string[]
+
+  const { data: people } = actorIds.length
+    ? await service.from('staff').select('user_id, full_name').in('user_id', actorIds)
+    : { data: [] }
+
+  const names = new Map((people ?? []).map(p => [p.user_id, p.full_name]))
+
+  return (rows ?? []).map(r => ({
+    id:        r.id,
+    actorName: names.get(r.actor_id ?? '') ?? 'Someone no longer on the Desk',
+    action:    r.action,
+    summary:   r.summary,
+    createdAt: r.created_at,
+  }))
+}

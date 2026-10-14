@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Owner** | Emmanuel Femi-Adejobi |
-| **Status** | Plan, nothing built |
+| **Status** | Phase 0 and phase 1 built, phase 2 part built. See section 9. |
 | **Last updated** | 14 October 2026 |
 | **Authoritative on** | Staff access, the support chat, and every internal admin surface |
 | **Lives at** | `desk.brandgauge.app`, served from this app at the `/desk` path |
@@ -85,12 +85,18 @@ One app, one deploy, two hosts.
 desk.brandgauge.app/*          ->  rewritten to /desk/*        (staff)
 brandgauge.app/*               ->  served as today             (customers and site)
 brandgauge.app/desk/*          ->  404                         (the path is not a back door)
-desk.brandgauge.app/dashboard  ->  404                         (the Desk host serves nothing else)
+desk.brandgauge.app/dashboard  ->  the Desk login, then 404      (nothing else lives here)
 ```
 
 Both rules live in `src/proxy.ts`, which already runs on every request. It reads
 `DESK_HOST` from the environment, rewrites that host onto `/desk`, and refuses the
-crossings in both directions.
+crossings in both directions. A path on the Desk host that is not a Desk route resolves
+the way any private host does: a signed-out visitor is sent to the Desk login, and once
+signed in the path 404s, because there is nothing there to serve.
+
+**The Desk has no API routes.** Every mutation is a server action, which posts to the page
+it came from and so needs no routing of its own under the rewrite. One less surface, and
+nothing to leave accidentally reachable on the main host.
 
 **Setting it up, in order:**
 
@@ -307,8 +313,11 @@ is not a sales job.
 - `src/lib/desk/` is the only code allowed to use the service client for cross-tenant
   reads. It takes the permission set and redacts by dataset key before returning rows, so
   a new screen cannot leak a field by forgetting to check.
-- The middleware refuses `/desk` to anyone with no active `staff` row before a page ever
-  renders.
+- The middleware settles the host and the session: a signed-out request to a Desk path
+  goes to `/desk/login` and never reaches a page. Whether a signed-in person is staff at
+  all is settled one step later, in the `/desk` layout, which has the database to hand and
+  can say so properly instead of bouncing them to a login they are already past. Either
+  way no page renders first.
 
 ### 3.6 Invite, suspend, remove
 
@@ -640,10 +649,14 @@ environment variable, with no code change and no migration.
   locks every call to that wrapper.
 - `usage_events`: start writing the three types the billing page already reads
   (`ai_call`, `survey_response`, `portal_view`).
-- `feature_events`: `src/proxy.ts` is the only place that sees every dashboard navigation.
-  Increment an Upstash counter there, fire and forget, and flush hourly into Postgres with
-  an Inngest job. Middleware stays fast and Postgres sees one upsert per workspace, module
-  and hour.
+- `feature_events`: a beacon mounted once in the dashboard shell reports the module on
+  each change, and the route behind it calls `record_feature_event`, a security-definer
+  function that resolves the workspace from the brand and refuses unless the caller is a
+  member. **Built this way rather than the Upstash counter in middleware first planned**,
+  for two reasons worth keeping: the volume is one row per person, module and day, so
+  Postgres never needed the buffer, and the security-definer function means this path
+  holds no service-role key and has no ownership check to forget. The beacon sends a
+  registry key, never a path, and the route drops anything that is not one.
 
 ---
 
@@ -736,20 +749,24 @@ and who touched which account. Not keystrokes.
 Everything is previewed at `<current-deployment>.vercel.app/desk` from phase 1 onward. The
 subdomain goes live whenever you want it to, and changes nothing about the code.
 
-| Phase | What | Rough size |
+| Phase | What | State |
 |---|---|---|
-| **0. Instrumentation** | `ai_calls`, `feature_events`, write `usage_events`, `staff_audit_log`, the Upstash plus Inngest flush | 1 session. Useful alone: the day `callAi` logs tokens we know what the product costs to run. |
-| **1. Staff access and shell** | `staff`, `staff_roles`, `role_permissions`, overrides, invites, the three SQL functions, `requireStaff`, `src/lib/desk/`, the host rewrite in `proxy.ts`, `/desk/login`, the invite and accept flow, the Desk shell and nav | 2 sessions. Nothing else can be built until a staff member can sign in. |
-| **2. Super Admin** | Roster, invite, person page, permissions and roles editors, activity, audit feed | 1 to 2 sessions. Early on purpose: you need to be able to let someone in before there is anything for them to do. |
-| **3. Accounts** | List, detail, timeline, connectors, usage, with dataset redaction | 2 sessions |
-| **4. Support chat** | Tables, service route, the private attachment bucket, the widget in the app, on the site and on every free tool, live presence, the Desk inbox, Resend out and in | 3 sessions. The biggest single piece. |
-| **5. Leads** | Move the lead desk across, retire `lead_desk_admins`, the nightly signed-up join | half a session |
-| **6. Money** | `subscriptions`, `invoices`, manual entry, the Paystack handler left unregistered, revenue screens | 1 to 2 sessions |
-| **7. Impersonation** | `impersonation_sessions`, request, approve, the read-only server guard, the banner, the sweep job, the history on both sides | 1 to 2 sessions. Last, because it is the one feature where a shortcut is a breach. |
-| **8. Adoption** | Module registry, the recommendation engine, the blocked list | 1 to 2 sessions |
-| **9. Later** | AI reply assist, Slack notifications, 2FA on staff accounts | unscheduled |
+| **0. Instrumentation** | `ai_calls`, `feature_events`, `usage_events` writes, `staff_audit_log`, the module registry and the beacon | **Built**, 14 Oct 2026 |
+| **1. Staff access and shell** | `staff`, `staff_roles`, `role_permissions`, overrides, invites, `is_staff` / `is_super_admin` / `staff_can` / `staff_permissions`, `requireStaff`, `src/lib/desk/`, the host rewrite, `/desk/login`, invite and accept, the Desk shell and the overview | **Built**, 14 Oct 2026 |
+| **2. Super Admin** | Roster, invite, suspend, remove, role change, the audit feed. Still to do: the person page, the permissions and roles editors, the per-person activity | **Part built** |
+| **3. Accounts** | List, detail, timeline, connectors, usage, with dataset redaction | Next |
+| **4. Support chat** | Tables, service route, the private attachment bucket, the widget in the app, on the site and on every free tool, live presence, the Desk inbox, Resend out and in | To do, 3 sessions |
+| **5. Leads** | Move the lead desk across, retire `lead_desk_admins`, the nightly signed-up join | To do |
+| **6. Money** | `subscriptions`, `invoices`, manual entry, the Paystack handler left unregistered, revenue screens | To do |
+| **7. Impersonation** | `impersonation_sessions`, request, approve, the read-only server guard, the banner, the sweep job, the history on both sides | To do, last on purpose |
+| **8. Adoption** | The recommendation engine and the blocked list, on top of the registry phase 0 shipped | To do |
+| **9. Later** | AI reply assist, Slack notifications, 2FA on staff accounts | Unscheduled |
 
-Phase 0 cannot move. Phases 1 and 2 are one piece of work in practice.
+**Before the Desk can be opened**, two things have to happen outside the code: run
+`supabase db push` to apply the two migrations, and sign in once as
+`adebusuyiadejobi@gmail.com` on the main app if that account does not exist yet, because
+the migration seeds the first super admin by matching that address in `auth.users` and
+does nothing if it is not there yet. Re-running the migration after signing up picks it up.
 
 ---
 
