@@ -35,7 +35,8 @@ superseded; if you find a copy, it is history, not the spec.
 This repo's `docs/` folder also holds supporting working docs that are **not** the PRD set:
 `industry-fit-strategy.md`, `funnel-signals-explained.md`, `to-100-percent-build-list.md`,
 `scoreboard-and-leads.md`, `brand-icons.md`, `motion-amendments.md`,
-`design-system-update-brief.md`, `connector-setup-guide.md`.
+`design-system-update-brief.md`, `connector-setup-guide.md`,
+`free-tools-acquisition-plan.md`.
 
 ## Commands
 - `npm run dev` — local dev server (Next.js + Turbopack).
@@ -52,6 +53,10 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 - `npm run icons` / `npm run icons:check` — build the sprite from
   `brand/icons/currentcolor`, and fail when a glyph the product asks for was
   never drawn.
+- `npm run tools:check` — exercise the Free Tools libraries offline. Compiles them
+  standalone with the AI, press and database calls stubbed, so no key and no network are
+  needed, and covers the SSRF screening in `fetch-public.ts`, the HTML reader, every
+  engine's evidence guards, and the navigation and RLS wiring the type checker cannot see.
 - `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
   mocked platform responses. Real calls cost X credit and burn Instagram's
   hashtag quota, so every branch is covered offline instead.
@@ -125,7 +130,11 @@ Upstash Redis for cache / rate-limit / OAuth state.
   verify. It is guarded instead by an IP rate limit and a cache, both of which fail open. Its
   tables (`public_scans`, `leads`, `lead_desk_admins`) are the one place RLS does not scope to a
   workspace: a lead belongs to BrandGauge, so they scope to the `is_lead_desk()` allowlist and
-  are written by the service role only. See `docs/scoreboard-and-leads.md`.
+  are written by the service role only. See `docs/scoreboard-and-leads.md`. The free-tool
+  tables (`tool_runs`, `tool_events`, `tool_campaigns`, `tool_placements`, `tool_visits`)
+  follow the same pattern for the same reason, with one addition: once a run or campaign is
+  claimed they are also readable by the workspace that claimed it. `tool_responses` holds
+  personal data and scopes to that workspace only, never to the lead desk.
 - Brands carry a `brand_type` (fmcg | fintech | venue | b2b_saas | marketplace |
   beverage_alcohol | b2b_distribution | agency). Any new funnel/BHI signal, nav item, or connector
   recommendation MUST branch on `brand_type` (see `src/lib/industry-config.ts` and
@@ -149,6 +158,47 @@ filtered only by an id taken from the request body/params is a cross-tenant hole
 of bug was found and fixed across `brands/[id]` DELETE, `event/visual-scan`, and
 `ai/survey-analysis` on 2026-07-11). The safe pattern: fetch/verify the row through the RLS
 client first (or add `.eq('brand_id', <active brand>)`), then do service-role work.
+
+## Free Tools and product-led acquisition
+Five public tools run for a visitor who has signed up for nothing and connected nothing:
+the PR Scoreboard at `/scoreboard` (predates the rest, keeps its route and its own markup),
+plus `/tools/competitor-tracker`, `/tools/market-demand`, `/tools/offline-tracker` and
+`/tools/campaign-audit`. The directory is `/tools`. See `docs/free-tools-acquisition-plan.md`.
+
+- `src/lib/tools/registry.ts` is the single source for the nav dropdown, the directory and
+  the end-of-report suggestion. A sixth tool is one entry plus a page. The nav label is
+  exactly **Free Tools**.
+- A visitor-supplied URL is fetched ONLY through `fetchPublic` in
+  `src/lib/tools/fetch-public.ts`. It screens DNS against the private ranges before the
+  socket opens and follows redirects by hand so every hop is screened. Do not add a plain
+  `fetch` of a public URL to an open endpoint.
+- Anonymous analyses live in `tool_runs`. The visitor gets 32 random bytes; the table stores
+  only the SHA-256. Never write personal data into a run: the report URL is shareable
+  precisely because there is none.
+- Claiming (`/tools/claim`, `src/lib/tools/import.ts`) must leave the destination module
+  populated. Never send someone to an empty dashboard, and never make them retype something
+  a tool already knows. `next` survives the whole auth round trip and is checked by
+  `safeNext` in `src/lib/safe-next.ts`.
+- Every finding carries a provenance: `observed`, `estimated`, `interpreted` or
+  `recommended` (`src/lib/tools/report.ts`), and the UI renders each differently. An AI
+  reading must never be presented as a measurement. A finding with no evidence is dropped,
+  not softened.
+- Never invent a search volume, growth rate, keyword difficulty, CPC, traffic estimate,
+  market share, reach figure or revenue impact in these tools. Where a licensed provider is
+  missing (`SERPAPI_KEY`), the demand finder reports a content gap and says no search data
+  was measured. Where a check did not run (`PAGESPEED_API_KEY` / PSI quota), the audit says
+  so instead of substituting an opinion.
+- The audit has no overall score, by decision: there is no conversion data to calibrate one.
+- Offline-tracker slugs are printed on billboards and can never be reissued. `mintSlug`
+  checks `print_placements`, `ooh_sites` and `tool_placements`, and `/go/[slug]` resolves all
+  three in that order. Claiming a campaign moves the row (sets `workspace_id`/`brand_id`)
+  rather than copying it.
+- Campaign enquiries (`tool_responses`) are refused without consent, store the exact wording
+  the person agreed to, and are the one table here the lead desk cannot read.
+- Acquisition events go to `tool_events` (first-party; `posthog-js` is a dependency and is
+  imported nowhere). The founder's funnel is `/dashboard/leads/funnel`, behind the same
+  `lead_desk_admins` allowlist as the lead desk.
+- Beta is free. Do not add a trial, an expiry, a paywall or an upgrade prompt to any of this.
 
 ## Active brand lookup (critical, always use this)
 ALWAYS use `getActiveBrandId(supabase)` or `getActiveBrand<T>(supabase, 'col1, col2')`
@@ -341,5 +391,9 @@ by review tooling; when it is, open a PR and leave it for me unless I say otherw
 - Several connectors are code-complete but inert pending credentials (HubSpot, Google Ads,
   YouTube, TikTok, SerpAPI/Geo-Lift, the WhatsApp Cloud API env vars). Verify the specific env
   var before promising a feature works end to end.
+- The free tools degrade rather than break on a missing credential: `SERPAPI_KEY` gates
+  search evidence in the Market Demand Gap Finder, and `PAGESPEED_API_KEY` only raises the
+  PageSpeed quota (the API answers keyless at a low rate). Both are stated in the report when
+  absent; neither blocks the tool.
 - Board-grade AI runs on Sonnet 4.6 by decision (confirmed 2026-07-11), not Opus. The tier
   mapping in `src/lib/ai/client.ts` is correct; do not "upgrade" it without being asked.

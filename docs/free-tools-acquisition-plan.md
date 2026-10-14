@@ -75,7 +75,7 @@ and `is_lead_desk()` read, plus a workspace-member read once claimed.
 | 3 | Market Demand Gap Finder (public + beta workspace) | Done |
 | 4 | Offline Campaign Tracker (links, QR, redirect analytics, response forms) | Done |
 | 5 | Campaign Conversion Audit (public + improvement plan workspace) | Done |
-| 6 | Cross-tool QA, regression on PR Scoreboard, docs | Not started |
+| 6 | Cross-tool QA, regression on PR Scoreboard, docs | Done |
 
 ## 5. Credentials and operational status
 
@@ -114,7 +114,7 @@ work, and a sixth tool is one registry entry away.
 
 `npm run tools:check` exercises the Free Tools libraries offline, in the shape the repo
 already uses for `metrics:check` and `seeds:check`: the modules are compiled standalone with
-the AI and press calls stubbed, so no key and no network are needed. 161 checks cover the SSRF
+the AI and press calls stubbed, so no key and no network are needed. 214 checks cover the SSRF
 screening, the HTML reader against a fixture page, `findSectionLinks`, the registry's
 invariants, `safeNext`, and the competitor classifier's source guard (a citation it cannot
 point at, an undated page demoted off a change claim, malformed JSON, the three-finding cap),
@@ -122,7 +122,11 @@ the demand finder's guards (an opportunity with no citable evidence dropped, a d
 demoted to a content gap when no search provider answered, the market-code mapping), and the
 offline tracker's UTM handling, slug generation and bot filtering (a WhatsApp link preview is
 not a visit), and the audit's measured checks, its ordering, and the rule that a model's reading
-of page copy can never be labelled as measured.
+of page copy can never be labelled as measured. A wiring block covers the regressions a type
+error cannot catch: a tool in the dropdown with no page behind it, the nav label drifting from
+"Free Tools", the PR Scoreboard's route moving, a dashboard module shipped without a product
+tour or a nav entry, `/go` losing one of its three lookups, and any new table missing RLS or
+granting anon access.
 
 It has already caught one real hole: an IPv4-mapped IPv6 address reaches `screenHost` in hex
 form, because the WHATWG URL parser serialises `::ffff:10.0.0.1` as `::ffff:a00:1`, so the
@@ -135,7 +139,24 @@ migration has not been applied, and every live-source path is therefore verified
 fixtures and stubs rather than against the real thing. Driving the real flow needs a
 deployment, or a session whose network policy allows those hosts.
 
-## 9. Worklog
+## 9. Known issues found on the way
+
+**The `notifications` RLS policy was broken and is fixed here.** Migration
+`20260628000001` wrote `using (is_workspace_member(brand_id))`, and that helper takes a
+*workspace* id, so the predicate was false for every row and every caller: no signed-in user
+has ever been able to read a notification. Two existing jobs (volume surge, campaign target
+monitor) have been writing rows nothing could read, and the one query that reads the table
+(`dashboard/brand-equity`) has always come back empty. It surfaced because the competitor
+watchlist alerts write to the same table. Fixed in `20261014110000_fix_notifications_rls.sql`
+with the standard shape: resolve the workspace through the brand.
+
+**There is no notification-centre UI.** `NotificationBell` is a static button with a
+`hasUnread` prop and nothing lists notifications. So a watchlist alert is a readable row that
+the dashboard can query, and the place a marketer actually sees new competitor moves is the
+watchlist timeline, which separates new from baseline. Nothing in the product claims an alert
+is delivered anywhere it is not.
+
+## 10. Worklog
 
 - **14 Oct 2026 — Phase 0.** Audit complete, this document written.
 - **14 Oct 2026 — Phase 1.** Registry, `/tools` directory, Free Tools dropdown (plus the
@@ -143,6 +164,12 @@ deployment, or a session whose network policy allows those hosts.
   reader, provenance-aware report components, claim flow, and `next` carried through the whole
   auth round trip behind `safeNext`. Migration `20261014090000_free_tools.sql` written, not yet
   applied.
+- **14 Oct 2026 — Phase 6.** Founder funnel views (`free_tool_funnel`,
+  `free_tool_qualified_accounts`, both `security_invoker`) and the page at
+  `/dashboard/leads/funnel` behind the lead-desk allowlist; nightly retention job for
+  unclaimed runs; the PR Scoreboard wired into the same event taxonomy and given the shared
+  contextual suggestion without touching its route, its API or its markup; wiring regression
+  checks; CLAUDE.md updated to match the code; the `notifications` RLS bug above fixed.
 - **14 Oct 2026 — Phase 5.** Campaign Conversion Audit: PageSpeed Insights wrapper that keeps
   lab and real-user field data apart, deterministic markup, CTA, local-readiness and tracking
   checks, a model reading of the copy that is always provenance `interpreted`, public page, and

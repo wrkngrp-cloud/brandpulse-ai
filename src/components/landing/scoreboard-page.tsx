@@ -10,6 +10,9 @@ import {
   ArrowRightIcon as ArrowRight, AlertIcon, ExternalLinkIcon, CheckIcon,
 } from '@/components/brand/icon'
 import type { Scoreboard } from '@/lib/press/scoreboard'
+import { Icon } from '@/components/brand/icon'
+import { nextTool } from '@/lib/tools/registry'
+import { trackTool, useToolAnalytics } from '@/components/tools/use-tool-analytics'
 
 const naira = (n: number) =>
   n >= 1_000_000 ? `₦${(n / 1_000_000).toFixed(1)}m`
@@ -27,6 +30,12 @@ const REG_LABEL: Record<string, string> = {
 }
 
 export function ScoreboardPage() {
+  /* The scoreboard predates the shared tool infrastructure and keeps its own
+     markup and its own API route, which both work. What it gains here is the
+     same funnel the other four report into, so the founder's view covers all
+     five rather than four, and the one contextual suggestion at the foot. */
+  useToolAnalytics({ event: 'free_tool_viewed', toolId: 'pr-scoreboard' })
+
   const [brand, setBrand] = useState('')
   const [rivals, setRivals] = useState(['', '', ''])
   const [category, setCategory] = useState('')
@@ -37,6 +46,7 @@ export function ScoreboardPage() {
   async function run(e: React.FormEvent) {
     e.preventDefault()
     setBusy(true); setError(null); setBoard(null)
+    trackTool({ event: 'free_tool_started', toolId: 'pr-scoreboard' })
     try {
       const res = await fetch('/api/scoreboard/scan', {
         method: 'POST',
@@ -46,6 +56,15 @@ export function ScoreboardPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'That did not work.')
       setBoard(data)
+      trackTool({
+        event: 'free_tool_completed', toolId: 'pr-scoreboard',
+        props: {
+          // Mentions found is what makes a scan a delivered result rather
+          // than an honest "nobody wrote about any of you".
+          mentions: data.brands?.reduce((n: number, b: { mentionCount: number }) => n + b.mentionCount, 0) ?? 0,
+          feedOk: Boolean(data.feedOk),
+        },
+      })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'That did not work.')
     } finally {
@@ -250,6 +269,7 @@ export function ScoreboardPage() {
           {/* No board, no ask. Offering to watch this every Monday off a read
               that failed is a promise made on nothing. */}
           {board.feedOk && <GapAndCapture board={board} />}
+          <NextTool />
         </>
       )}
 
@@ -365,6 +385,31 @@ function GapAndCapture({ board }: { board: Scoreboard & { scanId?: string } }) {
             Start free in beta <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
+      </div>
+    </section>
+  )
+}
+
+/**
+ * One suggestion, after the ask rather than competing with it.
+ *
+ * The line comes from the registry, so adding a sixth tool changes what is
+ * suggested here without touching this file.
+ */
+function NextTool() {
+  const next = nextTool('pr-scoreboard')
+  if (!next) return null
+  return (
+    <section className="mx-auto max-w-4xl px-6 pb-20">
+      <div className="border-t pt-8" style={{ borderColor: 'var(--lp-line)' }}>
+        <p className="text-[13.5px]" style={{ color: 'var(--lp-mut)' }}>{next.line}</p>
+        <Link href={next.tool.route}
+          onClick={() => trackTool({ event: 'free_tool_result_engaged', toolId: 'pr-scoreboard', props: { to: next.tool.id } })}
+          className="mt-2.5 inline-flex items-center gap-2 text-[14px] font-medium"
+          style={{ color: 'var(--tx-flare)' }}>
+          <Icon name={next.tool.icon} className="h-4 w-4" />
+          {next.tool.name} <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     </section>
   )

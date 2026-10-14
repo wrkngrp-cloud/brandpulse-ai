@@ -18,7 +18,7 @@
  *
  * Run: npm run tools:check
  */
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
 const OUT = `${process.env.TMPDIR ?? '/tmp'}/bg-free-tools`
@@ -563,6 +563,78 @@ console.log('\n── audit vocabulary is complete')
 ok('a label per area',     vocab.AUDIT_AREAS.every(a => vocab.AREA_LABEL[a]))
 ok('a label per status',   vocab.FINDING_STATUS.every(s => vocab.FINDING_STATUS_LABEL[s]))
 ok('a label per objective',vocab.CAMPAIGN_OBJECTIVES.every(o => vocab.OBJECTIVE_LABEL[o]))
+
+
+/* ── Wiring. These are the regressions that do not show up in a type error:
+      a tool in the dropdown with no page behind it, a renamed nav label, a
+      dashboard module with no product tour, the PR Scoreboard's route moving. */
+console.log('\n── navigation and routing wiring')
+
+const routeFile = route => {
+  const base = `src/app${route}`
+  return ['page.tsx', 'route.ts'].some(f => existsSync(`${base}/${f}`))
+}
+for (const tool of registry.FREE_TOOLS) {
+  ok(`${tool.name} has a page at ${tool.route}`, routeFile(tool.route))
+}
+ok('the /tools directory exists',               routeFile('/tools'))
+ok('the claim landing page exists',             routeFile('/tools/claim'))
+ok('the PR Scoreboard keeps /scoreboard',       routeFile('/scoreboard'))
+ok('/tools/pr-scoreboard alias exists',         routeFile('/tools/pr-scoreboard'))
+ok('the scoreboard scan API is untouched',      routeFile('/api/scoreboard/scan'))
+ok('the scoreboard lead API is untouched',      routeFile('/api/scoreboard/lead'))
+ok('the public response page exists',           existsSync('src/app/respond/[campaignId]/page.tsx'))
+
+const nav = readFileSync('src/components/landing/landing-page.tsx', 'utf8')
+const menu = readFileSync('src/components/landing/free-tools-menu.tsx', 'utf8')
+ok('the nav renders the Free Tools menu',   nav.includes('<FreeToolsMenu />'))
+ok('and its mobile variant',                nav.includes('<FreeToolsMenu mobile />'))
+ok('the label is exactly "Free Tools"',     /&gt;\s*Free Tools\s*&lt;|>\s*Free Tools\s*</.test(menu))
+ok('the old singular label is gone',        !/>\s*Free tool\s*</.test(nav))
+ok('the dropdown heading reads "Free intelligence tools"', menu.includes('Free intelligence tools'))
+ok('the menu is driven by the registry',    menu.includes("from '@/lib/tools/registry'"))
+ok('the directory is driven by the registry',
+   readFileSync('src/components/landing/tools-directory.tsx', 'utf8').includes("from '@/lib/tools/registry'"))
+ok('the directory headline is the agreed one',
+   readFileSync('src/components/landing/tools-directory.tsx', 'utf8').includes('Better marketing decisions start here.'))
+
+// Every dashboard module these tools open into needs a product tour and a nav
+// entry, which CLAUDE.md requires of any new module.
+const tours = readFileSync('src/lib/tour-definitions.ts', 'utf8')
+const navRail = readFileSync('src/components/dashboard/dashboard-nav.tsx', 'utf8')
+const meta = readFileSync('src/components/dashboard/page-meta.ts', 'utf8')
+for (const [route, module] of [
+  ['/dashboard/competitive/watchlist', 'competitor_watchlist'],
+  ['/dashboard/opportunities',         'opportunities'],
+  ['/dashboard/offline-tracker',       'offline_tracker'],
+  ['/dashboard/campaign-audit',        'campaign_audit'],
+]) {
+  ok(`${route} exists`,            routeFile(route))
+  ok(`${route} maps to a tour`,    tours.includes(`'${route}':`) && tours.includes(`${module}: [`))
+  ok(`${route} is in the nav`,     navRail.includes(`href: '${route}'`))
+  ok(`${route} has page meta`,     meta.includes(`'${route}':`))
+}
+
+// The redirect namespace is shared. If /go stops looking in tool_placements,
+// every printed QR code from this tool silently breaks.
+const go = readFileSync('src/app/go/[slug]/route.ts', 'utf8')
+ok('/go resolves tool placements',   go.includes("from('tool_placements')"))
+ok('/go still resolves print placements', go.includes("from('print_placements')"))
+ok('/go still resolves OOH sites',   go.includes("from('ooh_sites')"))
+ok('/go records a visit',            go.includes('recordVisit'))
+
+// Every anonymous table must carry RLS, and none of them may open anon access.
+const migration = readFileSync('supabase/migrations/20261014090000_free_tools.sql', 'utf8')
+for (const table of [
+  'tool_runs', 'tool_events', 'tool_campaigns', 'tool_placements', 'tool_visits',
+  'tool_responses', 'competitor_moves', 'competitor_watches',
+  'acquisition_opportunities', 'page_audits', 'page_audit_findings',
+]) {
+  ok(`${table} enables RLS`, migration.includes(`alter table ${table} enable row level security`))
+}
+ok('no policy is granted to anon', !/to\s+anon/i.test(migration))
+ok('enquiries are not readable by the lead desk',
+   !/create policy tool_responses_read[\s\S]{0,200}is_lead_desk/.test(migration))
 
 console.log(`\n${fail === 0 ? 'PASS' : 'FAIL'} — ${pass} checks passed, ${fail} failed\n`)
 process.exit(fail === 0 ? 0 : 1)

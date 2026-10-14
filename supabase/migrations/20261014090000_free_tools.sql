@@ -433,3 +433,72 @@ set search_path = public as $$
          unique_visits = unique_visits + case when p_unique then 1 else 0 end
    where id = p_placement_id;
 $$;
+
+-- ── The founder's funnel ─────────────────────────────────────────────────────
+--
+-- One row per tool per day. The whole point of a first-party events table is
+-- that the anonymous half and the signed-in half of a journey join on the same
+-- run id, so this view can count a visitor through to an activated workspace
+-- without a vendor's identity stitching.
+--
+-- security_invoker so the view is read with the caller's own privileges rather
+-- than the definer's: tool_events is readable only by is_lead_desk(), and that
+-- must stay true through the view.
+create or replace view free_tool_funnel
+with (security_invoker = true) as
+select
+  e.tool_id,
+  date_trunc('day', e.created_at)::date                                     as day,
+  count(distinct case when e.event = 'free_tool_viewed'        then coalesce(e.visitor_id, e.id::text) end) as visitors,
+  count(distinct case when e.event = 'free_tool_started'       then e.run_id end)                           as started,
+  count(distinct case when e.event = 'free_tool_completed'     then e.run_id end)                           as completed,
+  -- A meaningful result is a completed run that actually produced something:
+  -- a report with findings, links generated, a campaign created. A run that
+  -- finished by saying "we could not establish anything" is honest and is not
+  -- a delivered result, so it is counted separately.
+  count(distinct case when e.event = 'free_tool_completed'
+                       and coalesce((e.props->>'moves')::int, (e.props->>'opportunities')::int,
+                                    (e.props->>'findings')::int, (e.props->>'placements')::int, 0) > 0
+                      then e.run_id end)                                                                     as meaningful,
+  count(distinct case when e.event = 'free_tool_result_viewed' then e.run_id end)                           as results_viewed,
+  count(distinct case when e.event = 'free_tool_result_engaged' then coalesce(e.visitor_id, e.id::text) end) as results_engaged,
+  count(distinct case when e.event = 'beta_cta_clicked'        then coalesce(e.visitor_id, e.id::text) end) as cta_clicked,
+  count(distinct case when e.event = 'beta_workspace_activated' then e.workspace_id end)                    as workspaces_activated,
+  count(distinct case when e.event = 'first_value_received'    then e.workspace_id end)                     as first_value,
+  count(distinct case when e.event = 'beta_feature_used'       then e.workspace_id end)                     as workspaces_using_features
+from tool_events e
+where e.tool_id is not null
+group by e.tool_id, date_trunc('day', e.created_at)::date;
+
+comment on view free_tool_funnel is
+  'Per-tool, per-day acquisition funnel for the free tools. Read by the lead desk only, through tool_events RLS.';
+
+-- Which companies arrived through which tool. A lead who researched a
+-- competitor and then activated a watchlist is a stronger signal than one who
+-- filled in a form, which is why this joins on behaviour rather than on a
+-- questionnaire.
+create or replace view free_tool_qualified_accounts
+with (security_invoker = true) as
+select
+  r.tool_id,
+  r.id                                         as run_id,
+  r.inputs                                     as tool_inputs,
+  r.status,
+  r.created_at                                 as ran_at,
+  r.claimed_at,
+  w.id                                         as workspace_id,
+  w.name                                       as workspace_name,
+  b.name                                       as brand_name,
+  b.website_url,
+  b.industry,
+  b.brand_type,
+  (select count(*) from tool_events e
+    where e.workspace_id = w.id and e.event = 'beta_feature_used')          as features_used,
+  (select max(e.created_at) from tool_events e where e.workspace_id = w.id) as last_seen_at
+from tool_runs r
+left join workspaces w on w.id = r.workspace_id
+left join brands     b on b.id = r.brand_id
+where r.claimed_at is not null;
+
+comment on view free_tool_qualified_accounts is
+  'Claimed free-tool runs with the workspace and brand they became. Lead desk only.';
