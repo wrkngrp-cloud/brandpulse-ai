@@ -54,9 +54,10 @@ behind them does not exist.
 
 ---
 
-## 2. Decisions to lock before building
+## 2. Locked decisions
 
-Same spirit as PRD Document 5 Part B. Decide these once.
+Same spirit as PRD Document 5 Part B. All of these are settled. Changing one is a
+deliberate act, not a tidy-up.
 
 | Decision | Why |
 |---|---|
@@ -69,7 +70,10 @@ Same spirit as PRD Document 5 Part B. Decide these once.
 | We reach our customers by three channels only: email, the in-app notification bell, and the chat widget in the product and on the site | `whatsapp_contacts` holds the *tenant's* customers under the tenant's consent. Messaging them from our admin tool would break the NDPR gate and the Model A consent regime. Not a grey area. |
 | Every cross-tenant read and every staff action writes an audit row | The tool bypasses RLS on purpose. The log is what makes that defensible. |
 | The Desk uses the existing token layer and primitives | No second design system, no new UI dependency. |
-| Impersonation is deferred, and if built: read-only, time-boxed, consented, banner, audited | The alternative, staff silently browsing customer data, is hard to explain afterwards. |
+| Live chat, with staffed hours shown honestly | Decided. A real conversation while the customer is still on the page is worth more than any ticket form. The widget shows who is on and what the reply time is when nobody is, so the promise matches the staffing. |
+| Impersonation is built, with a consent gate: the customer approves, the session is read-only, time-boxed and audited, and the tenant UI carries a banner throughout | Decided. Section 7 has the mechanism. Staff silently browsing customer data is the thing the gate exists to prevent. |
+| Chat attachments are allowed, in a private bucket with signed URLs | Decided. A screenshot usually ends the diagnosis in one message. Unlike `brand-assets` and `campaign-creatives`, this bucket is not public: a support screenshot can hold anything. |
+| The widget appears on every free public tool, scoreboard included | Decided. Highest-intent stranger traffic we have. The `source` field keeps that queue separable from paying customers. |
 
 ---
 
@@ -142,7 +146,7 @@ create table staff (
 
 -- Roles are templates over permission keys, editable in the Desk.
 create table staff_roles (
-  name        text primary key,          -- 'support' | 'finance' | 'engineer' | 'admin' | 'super_admin'
+  name        text primary key,          -- 'support' | 'bizdev' | 'finance' | 'engineer' | 'admin' | 'super_admin'
   label       text not null,
   description text,
   is_system   boolean not null default false   -- system roles cannot be deleted
@@ -244,7 +248,7 @@ Two groups in one namespace, so the Desk can show them as two lists.
 
 | Module | Keys |
 |---|---|
-| Accounts | `accounts.view`, `accounts.note`, `accounts.message`, `accounts.plan_change` |
+| Accounts | `accounts.view`, `accounts.note`, `accounts.message`, `accounts.plan_change`, `accounts.impersonate` |
 | Support | `support.view`, `support.reply`, `support.assign`, `support.close` |
 | Leads | `leads.view`, `leads.edit`, `leads.export` |
 | Usage | `usage.view` |
@@ -270,25 +274,30 @@ redaction happens in the data layer rather than in the component.
 
 ### 3.4 Default role templates
 
-Seeded by migration, editable afterwards in the Desk.
+Six roles seeded by migration, editable afterwards in the Desk. **Business development**
+(`bizdev`) owns the pipeline: the whole lead desk, accounts with notes and outbound
+messages, adoption so they can see what an account is not using, plan and price visible
+but not editable, and no customer content, because reading a customer's survey responses
+is not a sales job.
 
-| | support | finance | engineer | admin | super_admin |
-|---|---|---|---|---|---|
-| Accounts: view / note / message | yes | view | view | yes | all |
-| Accounts: change plan | no | yes | no | yes | all |
-| Support: view / reply / assign / close | yes | no | view | yes | all |
-| Leads | view, edit | no | no | all | all |
-| Usage | yes | yes | yes | yes | all |
-| Revenue | no | view, edit, export | no | view | all |
-| Adoption | yes | no | yes | yes | all |
-| Ops | no | no | yes | yes | all |
-| Staff management | no | no | no | no | yes |
-| `data.customer_email` | yes | yes | yes | yes | yes |
-| `data.customer_phone` | no | no | no | yes | yes |
-| `data.customer_content` | yes | no | yes | yes | yes |
-| `data.ai_cost` | no | yes | yes | yes | yes |
-| `data.revenue_figures` | no | yes | no | yes | yes |
-| `data.audit_all` | no | no | no | no | yes |
+| | support | bizdev | finance | engineer | admin | super_admin |
+|---|---|---|---|---|---|---|
+| Accounts: view / note / message | yes | yes | view | view | yes | all |
+| Accounts: change plan | no | no | yes | no | yes | all |
+| Accounts: impersonate | no | no | no | yes | yes | all |
+| Support: view / reply / assign / close | yes | view, reply | no | view | yes | all |
+| Leads | view, edit | all | no | no | all | all |
+| Usage | yes | yes | yes | yes | yes | all |
+| Revenue | no | view | view, edit, export | no | view | all |
+| Adoption | yes | yes | no | yes | yes | all |
+| Ops | no | no | no | yes | yes | all |
+| Staff management | no | no | no | no | no | yes |
+| `data.customer_email` | yes | yes | yes | yes | yes | yes |
+| `data.customer_phone` | no | yes | no | no | yes | yes |
+| `data.customer_content` | yes | no | no | yes | yes | yes |
+| `data.ai_cost` | no | no | yes | yes | yes | yes |
+| `data.revenue_figures` | no | yes | yes | no | yes | yes |
+| `data.audit_all` | no | no | no | no | no | yes |
 
 ### 3.5 Enforcement, in one place
 
@@ -401,8 +410,10 @@ create table support_conversations (
                 check (priority in ('low','normal','high','urgent')),
   assigned_to   uuid references auth.users(id) on delete set null,
   -- Where they were standing when they asked. The single most useful support field.
+  -- Where the thread started. 'tool' covers the free public tools beyond the
+  -- scoreboard, so that queue stays separable from paying customers.
   source        text not null default 'app'
-                check (source in ('app','site','scoreboard','email')),
+                check (source in ('app','site','scoreboard','tool','email')),
   page_url      text,
   user_agent    text,
   first_response_at timestamptz,
@@ -446,9 +457,20 @@ reachable. Same posture as the survey and ambassador routes.
 - **Context packet.** When a signed-in user opens a thread we attach workspace, brand,
   `brand_type`, plan, current BHI and the page they were on. The agent sees it in the Desk
   beside the first message, so nobody has to ask "which account is this".
-- **Office hours and expectations.** If nobody is on, the widget says when we will reply
-  and takes an email address. A promise we keep beats a chat bubble that implies someone
-  is watching at 2am.
+- **Live, with honest presence.** Staff presence comes from `staff.last_seen_at` inside a
+  5-minute window, filtered to people holding `support.reply`. On, the widget says someone
+  is here and shows the agent's name and photo once they join. Off, it says when we will
+  reply, takes an email address, and the thread waits in the inbox. The widget never
+  implies someone is watching at 2am.
+- **Live means live.** Customer messages arrive over Realtime and so do ours. Typing
+  indicators and read receipts go on a Realtime broadcast channel keyed by conversation,
+  not in Postgres, because nobody needs a durable record of a typing indicator.
+- **Attachments.** Images and PDFs up to 10MB, in a private `support-attachments` bucket.
+  Uploads go through `/api/support/attachment` on the service client, which checks either
+  the session or the visitor token, writes the path into `support_messages.attachments`,
+  and never trusts a path supplied by the client. Reads are 60-second signed URLs minted
+  per view. The bucket is private, in contrast to the two existing public buckets, because
+  a support screenshot can contain anything.
 - **Email fallback.** Staff reply lands as an in-app message if they are signed in, and as
   a Resend email if the thread has been quiet for 10 minutes or came from the site.
   Replies to that email come back into the thread through a Resend inbound webhook,
@@ -600,6 +622,17 @@ All five get RLS. `ai_calls`, `feature_events`, `subscriptions` and `invoices` a
 by workspace members for their own rows (the billing page needs them) and by staff through
 `is_staff()`. Writes are service role only.
 
+**Paystack subscriptions: built, not connected.** The handler ships with the tables, at
+`/api/billing/paystack/webhook`, separate from `/api/webhooks/paystack`, which is the
+tenant's own customer payments and a different job entirely. It verifies the HMAC sha512
+signature against `PAYSTACK_SECRET_KEY` with `crypto.timingSafeEqual`, fails closed when
+that variable is unset, and handles `subscription.create`, `subscription.disable`,
+`charge.success`, `invoice.create`, `invoice.update` and `invoice.payment_failed`, writing
+into `subscriptions` and `invoices`. Nothing is registered in the Paystack dashboard until
+you choose to, and until then the same tables are filled by hand from the Desk, so the
+revenue screens work from day one. Switching it on later is one URL in a dashboard and one
+environment variable, with no code change and no migration.
+
 **Where the events come from:**
 
 - `ai_calls`: inside `callAi`, after the Anthropic call returns, reading `resp.usage`.
@@ -614,7 +647,62 @@ by workspace members for their own rows (the billing page needs them) and by sta
 
 ---
 
-## 7. Super Admin
+## 7. Impersonation, with the consent gate
+
+Read-only, asked for, time-boxed, visible, logged. Five properties, each one load-bearing.
+
+```sql
+create table impersonation_sessions (
+  id            uuid primary key default gen_random_uuid(),
+  staff_id      uuid not null references auth.users(id) on delete cascade,
+  workspace_id  uuid not null references workspaces(id) on delete cascade,
+  -- Who approved, and the thread or ticket the request came out of.
+  requested_for uuid references auth.users(id) on delete set null,
+  conversation_id uuid references support_conversations(id) on delete set null,
+  reason        text not null,
+  status        text not null default 'pending'
+                check (status in ('pending','approved','declined','active','ended','expired')),
+  approved_by   uuid references auth.users(id) on delete set null,
+  approved_at   timestamptz,
+  started_at    timestamptz,
+  -- Hard stop. Nothing extends a session; staff ask again.
+  expires_at    timestamptz,
+  ended_at      timestamptz,
+  pages_viewed  integer not null default 0,
+  created_at    timestamptz not null default now()
+);
+create index idx_imp_ws on impersonation_sessions(workspace_id, created_at desc);
+```
+
+**The flow.**
+
+1. Staff asks from the account page or a support thread, holding
+   `accounts.impersonate`, and types a reason. No reason, no request.
+2. The customer gets it in two places: the chat thread it came from, and a notification
+   in their product. The request names the person, their reason, and the 30-minute
+   window. An owner or admin of the workspace approves or declines. Nobody else can.
+3. On approval the session goes `active` and staff get a read-only view of that
+   workspace's dashboard, scoped by a server-side session that resolves the active
+   workspace to theirs. The Desk never hands the browser a customer token.
+4. **Read-only is enforced server-side, not by hiding buttons.** While a session is
+   active, every mutating route refuses the request. The check sits in the same place that
+   resolves the impersonation, so a route cannot opt out of it by being new.
+5. A banner sits at the top of every page for the whole session, naming the staff member
+   and the time left, with an End button that the customer can press. Staff see the same
+   banner. Nobody is in any doubt about what is happening.
+6. It ends on the customer's End, on the staff member's End, or at `expires_at`, whichever
+   comes first. An Inngest job sweeps anything stranded.
+7. Every page view writes an audit row with the path. The account page shows the whole
+   history of who looked, when, why, and with whose approval. The customer can see that
+   list too, which is the part that makes the feature honest.
+
+**Two refusals in the code.** No impersonation without an approval row, so there is no
+super-admin override for "just this once". And a session cannot be opened on a workspace
+with no owner or admin who could have approved it.
+
+---
+
+## 8. Super Admin
 
 A section of the Desk at `/desk/staff`, gated on the `staff.*` keys, which only the
 super_admin role holds by default.
@@ -643,7 +731,7 @@ and who touched which account. Not keystrokes.
 
 ---
 
-## 8. Build order
+## 9. Build order
 
 Everything is previewed at `<current-deployment>.vercel.app/desk` from phase 1 onward. The
 subdomain goes live whenever you want it to, and changes nothing about the code.
@@ -654,26 +742,33 @@ subdomain goes live whenever you want it to, and changes nothing about the code.
 | **1. Staff access and shell** | `staff`, `staff_roles`, `role_permissions`, overrides, invites, the three SQL functions, `requireStaff`, `src/lib/desk/`, the host rewrite in `proxy.ts`, `/desk/login`, the invite and accept flow, the Desk shell and nav | 2 sessions. Nothing else can be built until a staff member can sign in. |
 | **2. Super Admin** | Roster, invite, person page, permissions and roles editors, activity, audit feed | 1 to 2 sessions. Early on purpose: you need to be able to let someone in before there is anything for them to do. |
 | **3. Accounts** | List, detail, timeline, connectors, usage, with dataset redaction | 2 sessions |
-| **4. Support chat** | Tables, service route, widget in app and site, Desk inbox, Resend out and in | 2 to 3 sessions. The biggest single piece. |
+| **4. Support chat** | Tables, service route, the private attachment bucket, the widget in the app, on the site and on every free tool, live presence, the Desk inbox, Resend out and in | 3 sessions. The biggest single piece. |
 | **5. Leads** | Move the lead desk across, retire `lead_desk_admins`, the nightly signed-up join | half a session |
-| **6. Money** | `subscriptions`, `invoices`, manual entry, revenue screens | 1 session |
-| **7. Adoption** | Module registry, the recommendation engine, the blocked list | 1 to 2 sessions |
-| **8. Later** | AI reply assist, Slack notifications, 2FA on staff accounts, impersonation if we decide to | unscheduled |
+| **6. Money** | `subscriptions`, `invoices`, manual entry, the Paystack handler left unregistered, revenue screens | 1 to 2 sessions |
+| **7. Impersonation** | `impersonation_sessions`, request, approve, the read-only server guard, the banner, the sweep job, the history on both sides | 1 to 2 sessions. Last, because it is the one feature where a shortcut is a breach. |
+| **8. Adoption** | Module registry, the recommendation engine, the blocked list | 1 to 2 sessions |
+| **9. Later** | AI reply assist, Slack notifications, 2FA on staff accounts | unscheduled |
 
 Phase 0 cannot move. Phases 1 and 2 are one piece of work in practice.
 
 ---
 
-## 9. Open questions
+## 10. What is settled, and what is left
 
-1. Live chat or a stated reply time at launch? Live chat with nobody watching it is worse
-   than a form that says "within 4 hours".
-2. Does revenue go in by hand before Paystack subscriptions exist, or do we wait?
-3. Impersonation: defer, or build it with the consent gate?
-4. Who is invited at launch, and on which roles?
-5. Chat attachments, yes or no? Screenshots make support far better and mean a Storage
-   bucket with its own access rules.
-6. Does the widget appear on `/scoreboard`? That is our highest-intent stranger traffic and
-   also our noisiest.
-7. Two-factor on staff accounts: at launch, or once there are more than three of us?
+**Settled, 14 October 2026.** Live chat rather than a reply form. The widget on the
+product, the marketing site, the scoreboard and every free tool we build after it. Chat
+attachments, in a private bucket. Impersonation built with the consent gate. Six staff
+roles with business development among them. The Desk on `desk.brandgauge.app`, previewed
+at `/desk` on the deployment we already have live. Paystack subscription handling built
+and left unregistered until you connect it.
+
+**Left open.**
+
+1. Staffed hours. The widget tells the truth about presence either way, but somebody has
+   to decide what the promise is when nobody is on: 4 hours, same working day, or next
+   working day.
+2. Who is invited at launch, and on which roles.
+3. Two-factor on staff accounts: at launch, or once there are more than three of us?
    Supabase supports TOTP, so it is a settings page rather than a build.
+4. Whether a lead who never signs up should be reachable from the chat widget after the
+   thread closes, which is a marketing consent question before it is a build question.
