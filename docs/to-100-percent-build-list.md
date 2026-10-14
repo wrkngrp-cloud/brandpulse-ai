@@ -49,6 +49,34 @@ Getting every vertical to 100% requires three layers of work: shared platform wo
 
 ---
 
+### 1.8 Paystack webhook, live
+The handler exists at `src/app/api/webhooks/paystack/route.ts` and verifies an HMAC sha512
+signature against the per-brand secret in `webhook_configs`. Nothing has ever been
+configured against it: no brand has saved a secret key, and the webhook URL has never been
+set in a Paystack dashboard. So purchase events from Paystack are a code path, not a data
+source. To make it real:
+
+- Set the webhook URL (`{APP_URL}/api/webhooks/paystack`) in the Paystack dashboard and
+  confirm a test `charge.success` lands in `purchase_events`
+- Show the webhook URL with a copy button on the Paystack connector card, next to the
+  secret-key field, so a brand can finish the setup without being told the URL in an email
+- Replace the `computed === signature` comparison with `crypto.timingSafeEqual`, matching
+  how the Flutterwave and Meta handlers compare secrets
+- The handler currently decrypts every brand's Paystack secret and tries each one until an
+  HMAC matches, which is one decrypt per connected brand per event. Carry the brand id in
+  the webhook URL as a path segment or signed query param, then verify against that brand's
+  secret alone
+- Handle `charge.failed` and `refund.processed` as well, so a refunded purchase stops
+  counting as revenue in the funnel
+- Flutterwave has the same gap: same card, same URL treatment, same test
+
+Separate from this, and not the same job: **BrandGauge's own subscription billing** on
+Paystack. That is deferred until post-beta and is specified in `docs/internal-tool-plan.md`
+section 6, which defines the `subscriptions` and `invoices` tables the eventual webhook
+writes into. This item is only about a brand's own customer payments feeding their funnel.
+
+---
+
 ## Layer 2 — Per-vertical connectors
 *New external data sources. One connector per row.*
 
@@ -282,7 +310,7 @@ For all of these, we build a **First-Party Data Connector** pattern: brand gener
 
 | Layer | Items | Estimated effort |
 |---|---|---|
-| Layer 1 — Shared platform | 7 items | 3–4 weeks |
+| Layer 1 — Shared platform | 8 items | 3–4 weeks |
 | Layer 2 — Connectors | 11 connectors | 4–5 weeks (parallel with Layer 1) |
 | Layer 3 — Fintech | 8 signal additions + 2 tables + 1 module | 2–3 weeks |
 | Layer 3 — Creator/SaaS | 6 signal additions + 2 tables | 2–3 weeks |
