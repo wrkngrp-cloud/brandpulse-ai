@@ -12,7 +12,8 @@
     "seeds:check": "node scripts/validate-seeds.mjs",
     "demo:check": "node scripts/check-demo-rows.mjs",
     "metrics:check": "node scripts/check-post-metrics.mjs",
-    "desk:check": "node scripts/check-desk-access.mjs"
+    "desk:check": "node scripts/check-desk-access.mjs",
+    "desk:sql": "./scripts/check-desk-sql.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

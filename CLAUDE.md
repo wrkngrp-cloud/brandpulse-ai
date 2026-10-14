@@ -57,6 +57,12 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
   signatures against forgery and cross-thread replay, module-path resolution, and
   email masking. A typo in a role template grants nothing and raises nothing, which
   is why it is checked rather than trusted.
+- `npm run desk:sql` — apply every migration to a throwaway local Postgres and
+  exercise the half of the Desk that lives in SQL: `staff_can` precedence, RLS on
+  the staff, telemetry and chat tables, the security-definer grants, and the
+  support triggers. Needs a local postgres and nothing else, no Supabase project
+  and no credentials. 53 assertions. It fails the run when any of them regresses,
+  which is checked by breaking a policy on purpose rather than assumed.
 - `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
   mocked platform responses. Real calls cost X credit and burn Instagram's
   hashtag quota, so every branch is covered offline instead.
@@ -337,7 +343,7 @@ is the spec. Rules that are easy to break without noticing:
 - **Permissions.** `staff_can(key)` in SQL, `session.can(key)` in app code, both resolving
   deny override → grant override → role template, with `super_admin` holding everything.
   Add a key to `src/lib/desk/permissions.ts` AND to the `super_admin` seed, then run
-  `npm run desk:check`.
+  `npm run desk:check` and `npm run desk:sql`.
 - **Access is invite-only.** No signup route on the Desk host, no OAuth button. A correct
   password is not access: the login action signs the session out again if there is no
   active `staff` row. Nobody can act on their own staff row, and the last active
@@ -357,7 +363,7 @@ A change is done only when all of the following hold:
 3. For any DB change, the migration is written, enables RLS with a workspace policy, and
    `supabase migration list` shows it as the only pending item before you push.
    For a change to Desk permissions, the support chat or the module registry,
-   `npm run desk:check` passes.
+   `npm run desk:check` and `npm run desk:sql` pass.
 4. For any user-triggered route using the service client, ownership is verified per "Data access".
 5. For a new dashboard module, the product tour (`data-tour` + tour definition + topbar trigger)
    is wired.

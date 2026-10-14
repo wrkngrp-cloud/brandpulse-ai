@@ -762,6 +762,15 @@ subdomain goes live whenever you want it to, and changes nothing about the code.
 | **8. Adoption** | The recommendation engine and the blocked list, on top of the registry phase 0 shipped | To do |
 | **9. Later** | AI reply assist, Slack notifications, 2FA on staff accounts | Unscheduled |
 
+**The migration set does not replay from empty.** Found while building the SQL check:
+`20260615000002_influencer_profiles.sql` alters `influencers`, which is created eight days
+later in `20260623000000_phase3_tables.sql`. It applies fine against the live database,
+where the table already existed by then, and fails against an empty one. So a new staging
+project cannot be built from `supabase/migrations` as it stands, and nor could a restore.
+`scripts/check-desk-sql.sh` skips that one file and says so. The fix is to renumber it
+after the table it depends on, or to guard it, and it is worth doing before the first time
+somebody needs a second environment in a hurry.
+
 **Before the Desk can be opened**, two things have to happen outside the code: run
 `supabase db push` to apply the three migrations, and sign in once as
 `adebusuyiadejobi@gmail.com` on the main app if that account does not exist yet, because
