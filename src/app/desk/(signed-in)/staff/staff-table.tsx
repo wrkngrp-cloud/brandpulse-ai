@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { setStaffRole, setStaffStatus, removeStaff } from './actions'
 import { ShieldIcon } from '@/components/brand/icon'
 import type { StaffRow } from '@/lib/desk/data'
@@ -39,11 +40,11 @@ export function StaffTable({
           return (
             <li key={row.userId} className="flex flex-wrap items-center gap-4 px-4 py-3">
               <div className="min-w-48 flex-1">
-                <p className="flex items-center gap-2 text-sm font-medium">
+                <Link href={`/desk/staff/${row.userId}`} className="bg-press flex items-center gap-2 text-sm font-medium">
                   {row.fullName}
                   {row.role === 'super_admin' && <ShieldIcon className="size-3.5 text-tx-3" />}
                   {isSelf && <span className="bg-label text-[0.6rem] text-tx-3">You</span>}
-                </p>
+                </Link>
                 <p className="text-xs text-tx-3">
                   {row.email}
                   {row.jobTitle ? ` · ${row.jobTitle}` : ''}

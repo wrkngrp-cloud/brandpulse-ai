@@ -1,4 +1,5 @@
 import { createServiceClient } from '@/lib/supabase/server'
+import { ALL_PERMISSIONS } from './permissions'
 import type { StaffSession } from './auth'
 
 /**
@@ -211,4 +212,101 @@ export async function auditFeed(session: StaffSession, limit = 50): Promise<Audi
     summary:   r.summary,
     createdAt: r.created_at,
   }))
+}
+
+// ── One person ───────────────────────────────────────────────────────────────
+
+export interface PermissionState {
+  permission: string
+  /** Where the current answer comes from, so "why can she see this" is one glance. */
+  source: 'role' | 'granted' | 'denied' | 'none'
+  held:   boolean
+}
+
+export interface StaffPerson {
+  userId:      string
+  email:       string
+  fullName:    string
+  jobTitle:    string | null
+  phone:       string | null
+  timezone:    string
+  role:        string
+  roleLabel:   string
+  status:      'active' | 'suspended'
+  invitedAt:   string | null
+  joinedAt:    string | null
+  lastSeenAt:  string | null
+  permissions: Map<string, PermissionState>
+  activity:    AuditRow[]
+  stats:       { actions7: number; actions30: number }
+}
+
+export async function staffPerson(
+  session: StaffSession, userId: string,
+): Promise<StaffPerson | null> {
+  const service = await createServiceClient()
+
+  const { data: person } = await service
+    .from('staff')
+    .select('user_id, email, full_name, job_title, phone, timezone, role, status, invited_at, joined_at, last_seen_at')
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (!person) return null
+
+  const since7  = new Date(Date.now() -  7 * 86_400_000).toISOString()
+  const since30 = new Date(Date.now() - 30 * 86_400_000).toISOString()
+
+  const [{ data: roleRow }, { data: rolePerms }, { data: overrides }, actions7, actions30, { data: recent }] =
+    await Promise.all([
+      service.from('staff_roles').select('label').eq('name', person.role).maybeSingle(),
+      service.from('role_permissions').select('permission').eq('role', person.role),
+      service.from('staff_permission_overrides').select('permission, effect').eq('user_id', userId),
+      service.from('staff_audit_log').select('*', { count: 'exact', head: true })
+        .eq('actor_id', userId).gte('created_at', since7),
+      service.from('staff_audit_log').select('*', { count: 'exact', head: true })
+        .eq('actor_id', userId).gte('created_at', since30),
+      service.from('staff_audit_log')
+        .select('id, action, summary, created_at')
+        .eq('actor_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(25),
+    ])
+
+  const fromRole = new Set((rolePerms ?? []).map(r => r.permission))
+  const overrideMap = new Map((overrides ?? []).map(o => [o.permission, o.effect as 'grant' | 'deny']))
+  const isSuper = person.role === 'super_admin'
+
+  const permissions = new Map<string, PermissionState>()
+  for (const key of ALL_PERMISSIONS) {
+    const override = overrideMap.get(key)
+    // Same precedence as staff_can, written once more in TypeScript because
+    // this screen has to explain the answer and not only report it.
+    const state: PermissionState =
+      override === 'deny'  ? { permission: key, source: 'denied',  held: false }
+      : override === 'grant' ? { permission: key, source: 'granted', held: true }
+      : isSuper || fromRole.has(key) ? { permission: key, source: 'role', held: true }
+      : { permission: key, source: 'none', held: false }
+    permissions.set(key, state)
+  }
+
+  return {
+    userId:    person.user_id,
+    email:     session.sees('data.customer_email') ? person.email : maskEmail(person.email),
+    fullName:  person.full_name,
+    jobTitle:  person.job_title,
+    phone:     session.sees('data.customer_phone') ? person.phone : (person.phone ? MASKED : null),
+    timezone:  person.timezone,
+    role:      person.role,
+    roleLabel: roleRow?.label ?? person.role,
+    status:    person.status as 'active' | 'suspended',
+    invitedAt: person.invited_at,
+    joinedAt:  person.joined_at,
+    lastSeenAt: person.last_seen_at,
+    permissions,
+    activity: (recent ?? []).map(r => ({
+      id: r.id, actorName: person.full_name,
+      action: r.action, summary: r.summary, createdAt: r.created_at,
+    })),
+    stats: { actions7: actions7.count ?? 0, actions30: actions30.count ?? 0 },
+  }
 }
