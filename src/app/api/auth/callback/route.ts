@@ -1,12 +1,13 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { safeNext } from '@/lib/safe-next'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code       = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
   const type       = searchParams.get('type') as 'recovery' | 'signup' | null
-  const next       = searchParams.get('next') ?? '/dashboard'
+  const next       = safeNext(searchParams.get('next'))
 
   const supabase = await createClient()
 
@@ -54,7 +55,13 @@ export async function GET(request: NextRequest) {
           })
         }
 
-        return NextResponse.redirect(`${origin}/onboarding`)
+        /* New Google user from a free tool: onboarding runs first, because a
+           report needs a brand to attach to, and then hands them on to their
+           own report rather than a cold dashboard. */
+        const onward = next === '/dashboard'
+          ? `${origin}/onboarding`
+          : `${origin}/onboarding?next=${encodeURIComponent(next)}`
+        return NextResponse.redirect(onward)
       }
     }
 

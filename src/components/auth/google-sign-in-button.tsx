@@ -19,9 +19,12 @@ function GoogleIcon({ className }: { className?: string }) {
 
 interface GoogleSignInButtonProps {
   className?: string
+  /** Where to land after the OAuth round trip. The free tools pass a report
+   *  token here, so it has to survive Google and the auth callback. */
+  next?: string
 }
 
-export function GoogleSignInButton({ className }: GoogleSignInButtonProps) {
+export function GoogleSignInButton({ className, next }: GoogleSignInButtonProps) {
   const [loading, setLoading] = useState(false)
 
   async function handleClick() {
@@ -31,7 +34,9 @@ export function GoogleSignInButton({ className }: GoogleSignInButtonProps) {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${appUrl}/api/auth/callback`,
+        redirectTo: next
+          ? `${appUrl}/api/auth/callback?next=${encodeURIComponent(next)}`
+          : `${appUrl}/api/auth/callback`,
         queryParams: { access_type: 'offline', prompt: 'consent' },
       },
     })

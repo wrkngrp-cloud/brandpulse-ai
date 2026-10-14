@@ -1,6 +1,7 @@
 'use client'
 
-import { useActionState, useState, useTransition, useEffect, useCallback } from 'react'
+import { Suspense, useActionState, useState, useTransition, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { completeOnboarding, type OnboardingData } from './actions'
 import type { BrandInferResult } from '@/app/api/ai/brand-infer/route'
 import { Button } from '@/components/ui/button'
@@ -67,7 +68,13 @@ const defaultData: OnboardingData = {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+/* `next` is read from the query string, so the body needs a Suspense
+   boundary around it. */
 export default function OnboardingPage() {
+  return <Suspense fallback={null}><Onboarding /></Suspense>
+}
+
+function Onboarding() {
   const [screen, setScreen]   = useState<Screen>('industry')
   const [brandName, setBrandName] = useState('')
   const [websiteUrl, setWebsiteUrl] = useState('')
@@ -78,6 +85,33 @@ export default function OnboardingPage() {
   const [msgIdx, setMsgIdx]   = useState(0)
   const [state, action]       = useActionState(completeOnboarding, null)
   const [isPending, startTransition] = useTransition()
+
+  /* Where to go when brand setup finishes. Someone who arrived from a free
+     tool carries their report token here, and goes back to their own work
+     rather than to the dashboard. */
+  const nextPath = useSearchParams().get('next') ?? ''
+
+  /* And they do not retype their website. The free tool already has it, so
+     the field is prefilled from the run and the inference that follows reads
+     the same site. The fetch is by token, which is the only thing that can
+     read a run, and it carries no personal data. */
+  useEffect(() => {
+    const token = /^\/tools\/claim\?token=(.+)$/.exec(nextPath)?.[1]
+    if (!token) return
+    let live = true
+    fetch(`/api/tools/run/${encodeURIComponent(decodeURIComponent(token))}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then((run: { inputs?: Record<string, unknown> } | null) => {
+        if (!live || !run?.inputs) return
+        const inputs = run.inputs
+        const site = ['yourWebsite', 'website', 'companyWebsite', 'pageUrl', 'destinationUrl']
+          .map(k => inputs[k])
+          .find((v): v is string => typeof v === 'string' && v.length > 3)
+        if (site) setWebsiteUrl(prev => prev || site)
+      })
+      .catch(() => { /* prefill is a courtesy, not a requirement */ })
+    return () => { live = false }
+  }, [nextPath])
 
   // Cycle loading messages while analysing
   useEffect(() => {
@@ -169,6 +203,7 @@ export default function OnboardingPage() {
     startTransition(() => {
       const fd = new FormData()
       fd.set('payload', JSON.stringify(data))
+      if (nextPath) fd.set('next', nextPath)
       action(fd)
     })
   }

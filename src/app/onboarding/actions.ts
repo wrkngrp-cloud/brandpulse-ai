@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { safeNext } from '@/lib/safe-next'
 
 const onboardingSchema = z.object({
   websiteUrl: z.string().optional().default(''),
@@ -84,5 +85,7 @@ export async function completeOnboarding(
 
   if (error) return { error: error.message }
 
-  redirect('/dashboard')
+  // A free-tool visitor goes back to their own report, now that a brand
+  // exists for it to attach to. Everyone else goes to the dashboard.
+  redirect(safeNext(formData.get('next')))
 }

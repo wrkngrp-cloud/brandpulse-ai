@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { safeNext } from '@/lib/safe-next'
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -64,7 +65,15 @@ export async function signup(_prev: AuthState, formData: FormData): Promise<Auth
     name: '',
   })
 
-  redirect('/onboarding')
+  /* A visitor who came from a free tool carries their report through as
+     `next`. Onboarding still runs — a brand has to exist before a report can
+     be attached to one — but it is handed the destination so they land back on
+     their own work rather than on a cold dashboard. */
+  const next = formData.get('next')
+  const onward = typeof next === 'string' && next.trim()
+    ? `/onboarding?next=${encodeURIComponent(safeNext(next))}`
+    : '/onboarding'
+  redirect(onward)
 }
 
 export async function login(_prev: AuthState, formData: FormData): Promise<AuthState> {
@@ -86,7 +95,11 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
   // Returning users (including demo accounts) always land on /dashboard;
   // dashboard/layout.tsx is the single source of truth that bounces
   // genuinely incomplete accounts (abandoned signup) back to /onboarding.
-  redirect('/dashboard')
+  //
+  // The exception is an existing customer arriving from a free tool: they
+  // already have a workspace, so they go straight to claiming their report
+  // rather than being told to create a second account.
+  redirect(safeNext(formData.get('next')))
 }
 
 export async function logout() {

@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { safeNext } from '@/lib/safe-next'
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -30,7 +31,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
   if (user && (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/signup'))) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    /* Honour `next`. A signed-in marketer who finishes a free tool and clicks
+       "continue in BrandGauge" arrives here with their report token in `next`;
+       bouncing them to /dashboard threw the report away and asked them to
+       start again. Checked against open redirects by safeNext. */
+    const next = safeNext(request.nextUrl.searchParams.get('next'))
+    return NextResponse.redirect(new URL(next, request.url))
   }
 
   return supabaseResponse

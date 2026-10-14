@@ -1,10 +1,12 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 
-import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun } from '@/components/brand/icon'
+import { ArrowRightIcon as ArrowRight, MoonIcon as Moon, SunIcon as Sun, MenuIcon, XIcon } from '@/components/brand/icon'
+import { FreeToolsMenu } from './free-tools-menu'
 import { VideoHero } from './video-hero'
 import { ProductCards } from './product-cards'
 import { AiScene, darkSceneVars, lightSceneVars } from './scenes'
@@ -69,6 +71,16 @@ export function Wordmark({ height = 22 }: { height?: number }) {
  * the right shape for a page whose hero now runs edge to edge.
  */
 export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
+  /* The bar had no mobile menu at all: every link was `hidden md:flex`, so a
+     phone got the lockup, the mode toggle and "Start free". Five free tools
+     need a way in from a phone, and the rest of the nav may as well come with
+     them. */
+  const pathname = usePathname()
+  /* Stored as the path it was opened on rather than a boolean, so following a
+     link closes it without an effect that sets state during render. */
+  const [menuAt, setMenuAt] = useState<string | null>(null)
+  const menu = menuAt !== null && menuAt === pathname
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b" style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-glass)' }}>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
@@ -80,9 +92,14 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
           <Link href="/features" className="transition-opacity hover:opacity-60">Features</Link>
           <Link href="/use-cases" className="transition-opacity hover:opacity-60">Industries</Link>
           <Link href="/#builtforhere" className="transition-opacity hover:opacity-60">Why us</Link>
-          <Link href="/scoreboard" className="transition-opacity hover:opacity-60" style={{ color: 'var(--tx-flare)' }}>Free tool</Link>
+          <FreeToolsMenu />
         </nav>
         <div className="flex items-center gap-2.5">
+          <button onClick={() => setMenuAt(menu ? null : pathname)} aria-label={menu ? 'Close menu' : 'Open menu'} aria-expanded={menu}
+            className="flex h-9 w-9 items-center justify-center rounded-sm border bg-press md:hidden"
+            style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)' }}>
+            {menu ? <XIcon className="h-4 w-4" /> : <MenuIcon className="h-4 w-4" />}
+          </button>
           <button onClick={onToggle} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
             className="flex h-9 w-9 items-center justify-center rounded-sm border bg-press"
             style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)' }}>
@@ -100,6 +117,18 @@ export function Nav({ dark, onToggle }: { dark: boolean; onToggle: () => void })
           </Link>
         </div>
       </div>
+
+      {menu && (
+        <nav className="border-t md:hidden" style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-glass)' }}>
+          <Link href="/#tour" className="block px-6 py-3 text-[13px] font-medium bg-press" style={{ color: 'var(--lp-ink)' }}>Product</Link>
+          <Link href="/features" className="block px-6 py-3 text-[13px] font-medium bg-press" style={{ color: 'var(--lp-ink)' }}>Features</Link>
+          <Link href="/use-cases" className="block px-6 py-3 text-[13px] font-medium bg-press" style={{ color: 'var(--lp-ink)' }}>Industries</Link>
+          <Link href="/#builtforhere" className="block px-6 py-3 text-[13px] font-medium bg-press" style={{ color: 'var(--lp-ink)' }}>Why us</Link>
+          <FreeToolsMenu mobile />
+          <Link href="/auth/login" className="block border-t px-6 py-3.5 text-[13px] font-medium bg-press"
+            style={{ borderColor: 'var(--lp-line)', color: 'var(--lp-ink)' }}>Sign in</Link>
+        </nav>
+      )}
     </header>
   )
 }
@@ -614,6 +643,7 @@ export function Footer() {
         <div className="flex gap-6 text-[12px]" style={{ color: 'var(--lp-mut)' }}>
           <Link href="/features" className="transition-opacity hover:opacity-60">Features</Link>
           <Link href="/use-cases" className="transition-opacity hover:opacity-60">Industries</Link>
+          <Link href="/tools" className="transition-opacity hover:opacity-60">Free Tools</Link>
           <Link href="/privacy-policy" className="transition-opacity hover:opacity-60">Privacy</Link>
           <a href="mailto:hello@brandgauge.app" className="transition-opacity hover:opacity-60">Contact</a>
         </div>

@@ -106,6 +106,7 @@ function DemoTile({
 function LoginContent() {
   const [state, action, pending] = useActionState(login, null)
   const searchParams = useSearchParams()
+  const nextPath = searchParams.get('next') ?? ''
   const linkExpired  = searchParams.get('error') === 'link_expired'
 
   const emailRef    = useRef<HTMLInputElement>(null)
@@ -186,7 +187,7 @@ function LoginContent() {
             <h1 className="text-2xl font-medium mb-1">Welcome back</h1>
             <p className="text-sm text-muted-foreground mb-6">Sign in to your workspace</p>
 
-            <GoogleSignInButton />
+            <GoogleSignInButton next={nextPath || undefined} />
 
             <div className="relative my-5">
               <div className="absolute inset-0 flex items-center">
@@ -198,6 +199,9 @@ function LoginContent() {
             </div>
 
             <form ref={formRef} id="email-login-form" action={action} className="space-y-4">
+              {/* An existing customer arriving from a free tool continues to
+                  their report instead of the dashboard. */}
+              <input type="hidden" name="next" value={nextPath} />
               {linkExpired && (
                 <p className="text-sm text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2 px-3 py-2 rounded-lg">
                   That reset link has expired. Request a new one below.
