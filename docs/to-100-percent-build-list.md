@@ -71,9 +71,13 @@ source. To make it real:
 - Flutterwave has the same gap: same card, same URL treatment, same test
 
 Separate from this, and not the same job: **BrandGauge's own subscription billing** on
-Paystack. That is deferred until post-beta and is specified in `docs/internal-tool-plan.md`
-section 6, which defines the `subscriptions` and `invoices` tables the eventual webhook
-writes into. This item is only about a brand's own customer payments feeding their funnel.
+Paystack. The tables (`subscriptions`, `invoices`) and the handler
+(`/api/billing/paystack/webhook`) are built as of 18 October 2026 and deliberately
+unregistered: nothing points at that URL and the Desk fills the same tables by hand
+meanwhile. Switching it on is one URL in the Paystack dashboard plus `PAYSTACK_SECRET_KEY`,
+with no code change and no migration. It verifies with `crypto.timingSafeEqual`, fails
+closed with no key, and is idempotent on `provider_ref` so a retry cannot double the MRR.
+This item is only about a brand's own customer payments feeding their funnel.
 
 ---
 

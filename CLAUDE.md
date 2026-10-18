@@ -77,7 +77,7 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
   exercise the half of the Desk that lives in SQL: `staff_can` precedence, RLS on
   the staff, telemetry and chat tables, the security-definer grants, and the
   support triggers. Needs a local postgres and nothing else, no Supabase project
-  and no credentials. 56 assertions. It fails the run when any of them regresses,
+  and no credentials. 62 assertions. It fails the run when any of them regresses,
   which is checked by breaking a policy on purpose rather than assumed.
 - `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
   mocked platform responses. Real calls cost X credit and burn Instagram's

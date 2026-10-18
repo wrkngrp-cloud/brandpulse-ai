@@ -382,3 +382,58 @@ select 'the service role resolves a member address' as check,
        (select count(*)::text from auth_emails_for_user_ids(
           array['aaaaaaaa-0000-0000-0000-000000000003'::uuid])), '1' as want;
 reset role;
+
+\echo '── revenue: two gates, not one'
+reset role;
+insert into subscriptions (workspace_id, plan, status, amount_ngn, interval, provider)
+values ('bbbbbbbb-0000-0000-0000-000000000001', 'growth', 'active', 299000, 'month', 'manual');
+
+-- A second support member, with no overrides on them, so the role alone
+-- decides. The support role holds neither revenue.view nor
+-- data.revenue_figures.
+insert into auth.users (id, email) values
+  ('aaaaaaaa-0000-0000-0000-000000000005', 'chidi@brandgauge.app') on conflict do nothing;
+insert into staff (user_id, email, full_name, role, status, joined_at) values
+  ('aaaaaaaa-0000-0000-0000-000000000005', 'chidi@brandgauge.app', 'Chidi Eze', 'support', 'active', now())
+on conflict do nothing;
+
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000005';
+select 'the support role alone sees no subscriptions' as check,
+       (select count(*)::text from subscriptions), '0' as want;
+
+-- Ada is on the same role but was granted revenue.view by an override earlier
+-- in this file. That the grant reaches row-level security, and not only
+-- staff_can(), is the thing worth asserting.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000001';
+select 'a grant override reaches RLS' as check,
+       (select count(*)::text from subscriptions), '1' as want;
+
+-- The customer sees their own, because the billing page will need it.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select 'the customer sees their own subscription' as check,
+       (select count(*)::text from subscriptions), '1' as want;
+
+do $$
+begin
+  update subscriptions set amount_ngn = 1;
+  if (select amount_ngn from subscriptions limit 1) = 1 then
+    raise notice 'FAIL: a customer changed what they are charged';
+  else
+    raise notice 'ok: a customer could not change what they are charged';
+  end if;
+end $$;
+
+-- A customer in another workspace sees nothing.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000004';
+select 'another workspace sees no subscriptions' as check,
+       (select count(*)::text from subscriptions), '0' as want;
+
+-- The super admin holds revenue.view and revenue.edit.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000002';
+select 'the super admin reads it' as check,
+       (select count(*)::text from subscriptions), '1' as want
+union all
+select 'and the amount is intact',
+       (select amount_ngn::text from subscriptions limit 1), '299000';
+reset role;
