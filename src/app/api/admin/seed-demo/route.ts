@@ -4,6 +4,7 @@ import { TOKENS } from '@/lib/brand-tokens'
 import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
+import { seedCoveragePack } from '@/lib/demo/coverage-pack'
 import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
 import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
@@ -2951,6 +2952,15 @@ Cost efficiency was strong: at â‚¦3,483 per qualified lead against a target of â
     mmmOutcomes: 184000,
     mmmSummary: 'Trade and distribution still carry the largest share of measured outcomes, which is what an FMCG brand in this market should expect. OOH is the strongest paid channel per naira. Radio is under-spent relative to the outcomes it returns in the North.',
     mmmRecommendations: ['Shift roughly 15% of TV into radio for the Northern flight', 'Hold OOH spend: it is the best-performing paid channel per naira', 'Trade activation returns most when it runs in the four weeks before the festive peak'],
+    base: BASE,
+  })
+
+  /* Modules the first pack left empty: review reputation, the
+     regulatory record, commerce and product signal, creator posts,
+     email sends the mix model weighs, and the notification centre. */
+  await seedCoveragePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'Jara Foods Ltd', brandType: 'fmcg',
+    campaignIds: [camp1Id, camp2Id, camp3Id],
     base: BASE,
   })
 

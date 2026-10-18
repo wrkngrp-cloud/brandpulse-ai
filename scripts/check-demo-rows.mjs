@@ -71,7 +71,7 @@ try {
   // Only module-pack's own graph. Files that import through the '@/' alias
   // (bhi-series) cannot be compiled standalone; the project type-check covers
   // those, and validate-seeds checks their row literals.
-  const GRAPH = ['module-pack.ts', 'modules.ts', 'digital-performance.ts', 'seasonality.ts']
+  const GRAPH = ['module-pack.ts', 'coverage-pack.ts', 'modules.ts', 'digital-performance.ts', 'seasonality.ts']
     .map(f => join(ROOT, 'src/lib/demo', f))
   execFileSync('npx', ['tsc',
     ...GRAPH,
@@ -93,7 +93,30 @@ const captured = []
 function fakeSb() {
   return {
     from(table) {
+      // coverage-pack reads its parents (influencers, events) before writing
+      // children, so the fake has to answer a select/eq chain as well as an
+      // insert. Returning rows here is what exercises the child inserts at all.
+      const PARENTS = {
+        influencers: [
+          { id: 'aaaaaaaa-0000-4000-8000-000000000001', handle: '@demo_one', platform: 'instagram' },
+          { id: 'aaaaaaaa-0000-4000-8000-000000000002', handle: 'demo_two',  platform: 'tiktok' },
+          { id: 'aaaaaaaa-0000-4000-8000-000000000003', handle: '@demo3',    platform: 'twitter' },
+        ],
+        events: [
+          { id: 'bbbbbbbb-0000-4000-8000-000000000001' },
+          { id: 'bbbbbbbb-0000-4000-8000-000000000002' },
+        ],
+      }
       const builder = {
+        select() {
+          const res = { data: PARENTS[table] ?? [], error: null }
+          const chain = {
+            eq: () => chain,
+            single: () => Promise.resolve({ data: res.data[0] ?? null, error: null }),
+            then: (f, r) => Promise.resolve(res).then(f, r),
+          }
+          return chain
+        },
         insert(rows) {
           captured.push({ table, rows: Array.isArray(rows) ? rows : [rows] })
           const res = { data: { id: '00000000-0000-4000-8000-0000000000aa' }, error: null }
@@ -110,6 +133,9 @@ function fakeSb() {
 }
 
 const { seedModulePack } = await import(pathToFileURL(emitted).href)
+const coverageFile = walk(out).filter(f => f.endsWith('coverage-pack.js'))[0]
+if (!coverageFile) { console.error('coverage-pack.js not emitted'); process.exit(1) }
+const { seedCoveragePack } = await import(pathToFileURL(coverageFile).href)
 
 const CONFIGS = [
   { name: 'Jara Foods (fmcg)',      brandType: 'fmcg' },
@@ -131,6 +157,14 @@ for (const cfg of CONFIGS) {
     mmmOutcomes: 1000, mmmSummary: 'summary', mmmRecommendations: ['a'],
     base: new Date('2026-09-19T00:00:00Z'),
   })
+
+  await seedCoveragePack(fakeSb(), {
+    brandId: '11111111-1111-4111-8111-111111111111',
+    workspaceId: '22222222-2222-4222-8222-222222222222',
+    brandName: cfg.name, brandType: cfg.brandType,
+    campaignIds: ['33333333-3333-4333-8333-333333333333'],
+    base: new Date('2026-09-19T00:00:00Z'),
+  })
 }
 
 rmSync(out, { recursive: true, force: true })
@@ -150,7 +184,7 @@ for (const { table, rows } of captured) {
   }
 }
 
-console.log(`ran seedModulePack for ${CONFIGS.length} verticals`)
+console.log(`ran seedModulePack + seedCoveragePack for ${CONFIGS.length} verticals`)
 console.log(`captured ${captured.length} inserts, ${[...perTable.values()].reduce((a, b) => a + b, 0)} rows\n`)
 for (const [t, n] of [...perTable].sort()) console.log(`  ${String(n).padStart(5)}  ${t}`)
 

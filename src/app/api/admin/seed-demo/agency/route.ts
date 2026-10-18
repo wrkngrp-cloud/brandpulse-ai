@@ -4,6 +4,7 @@ import { TOKENS } from '@/lib/brand-tokens'
 import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
+import { seedCoveragePack } from '@/lib/demo/coverage-pack'
 import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
 import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
@@ -760,6 +761,15 @@ export async function POST(req: NextRequest) {
     mmmOutcomes: 38,
     mmmSummary: 'New business comes from trade-press visibility and referral, not from paid media. Referral produces the most wins on the smallest spend, which is the number to protect when budgets tighten.',
     mmmRecommendations: ['Protect the trade-press retainer: it is the top of the new-business funnel', 'Formalise the referral path, it is currently informal and still the best channel', 'Awards spend is worth keeping only where the category matches a target sector'],
+    base: BASE,
+  })
+
+  /* Modules the first pack left empty: review reputation, the
+     regulatory record, commerce and product signal, creator posts,
+     email sends the mix model weighs, and the notification centre. */
+  await seedCoveragePack(sb, {
+    brandId, workspaceId: wsId, brandName: 'Pinnacle Media', brandType: 'agency',
+    campaignIds: [camp1Id, camp2Id, camp3Id],
     base: BASE,
   })
 

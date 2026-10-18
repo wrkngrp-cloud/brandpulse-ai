@@ -48,13 +48,13 @@ export async function POST(request: NextRequest) {
     { data: socialData },
     { data: eventLeadData },
     { data: sdkData },
-    { data: emailConnectors },
+    { data: emailData },
   ] = await Promise.all([
     supabase.from('radio_schedules')
       .select('spots_aired, net_cost')
       .eq('brand_id', brand.id)
       .gte('spot_date', cutoffDate),
-    supabase.from('tv_spots')
+    supabase.from('tv_schedules')
       .select('spots_aired, net_cost')
       .eq('brand_id', brand.id)
       .gte('spot_date', cutoffDate),
@@ -76,24 +76,22 @@ export async function POST(request: NextRequest) {
       .select('event_type, value')
       .eq('brand_id', brand.id)
       .gte('occurred_at', cutoffISO),
-    supabase.from('email_connectors')
-      .select('id')
-      .eq('brand_id', brand.id),
+    supabase.from('email_campaign_snapshots')
+      .select('open_rate, click_rate, recipients')
+      .eq('brand_id', brand.id)
+      .gte('send_date', cutoffDate),
   ])
 
-  // Email snapshots (via connector)
-  const connectorIds = (emailConnectors ?? []).map(c => c.id)
-  const { data: emailData } = connectorIds.length > 0
-    ? await supabase.from('email_campaign_snapshots')
-        .select('open_rate, click_rate, recipient_count')
-        .in('connector_id', connectorIds)
-        .gte('sent_at', cutoffISO)
-    : { data: [] }
-
-  // Event leads (count leads captured across all events for this brand)
+  // Event leads. There is no event_leads table; a captured lead is an
+  // interaction, and the Events module counts the same two types
+  // (src/app/dashboard/events/[id]/page.tsx), so MMM agrees with it.
   const eventIds = (eventLeadData ?? []).map(e => e.id)
   const { data: leadsData } = eventIds.length > 0
-    ? await supabase.from('event_leads').select('id').in('event_id', eventIds)
+    ? await supabase.from('event_interactions')
+        .select('id')
+        .in('event_id', eventIds)
+        .in('interaction_type', ['new_lead', 'new_customer'])
+        .gte('occurred_at', cutoffISO)
     : { data: [] }
 
   // ── Aggregate raw activity units per channel ───────────────────────────────
@@ -136,8 +134,8 @@ export async function POST(request: NextRequest) {
   }
   // Email: opens + clicks weighted
   for (const e of (emailData ?? [])) {
-    const recipients = e.recipient_count ?? 0
-    email.activity += Math.round(recipients * ((e.open_rate ?? 0) + (e.click_rate ?? 0)))
+    const recipients = e.recipients ?? 0
+    email.activity += Math.round(recipients * ((e.open_rate ?? 0) + (e.click_rate ?? 0)) / 100)
   }
 
   // ── Normalise to contribution % with effectiveness weighting ───────────────
