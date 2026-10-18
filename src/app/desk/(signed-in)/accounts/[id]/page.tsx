@@ -5,8 +5,10 @@ import { accountDetail } from '@/lib/desk/accounts'
 import { adoptionForBrand, adoptionHeadline } from '@/lib/desk/adoption'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { ArrowLeftIcon, BuildingIcon, ConnectIcon, HistoryIcon, UsersIcon } from '@/components/brand/icon'
+import { sessionsForWorkspace } from '@/lib/desk/impersonation'
 import { changePlan } from './actions'
 import { NoteBox } from './note-box'
+import { AccessRequest } from './access-request'
 import { cn } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
@@ -34,6 +36,7 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
   const primaryBrand = account.brands[0]
   const adoption = primaryBrand ? await adoptionForBrand(session, primaryBrand.id) : null
   const headline = adoption ? adoptionHeadline(adoption) : null
+  const accessSessions = await sessionsForWorkspace(session, account.workspaceId)
 
   const limits = account.planLimits
   const callsAgainstLimit = limits && limits.aiCallsMo > 0
@@ -151,6 +154,18 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
           )}
 
           {session.can('accounts.note') && <NoteBox workspaceId={account.workspaceId} />}
+
+          {session.can('accounts.impersonate') && (
+            <AccessRequest
+              workspaceId={account.workspaceId}
+              accountName={account.name}
+              sessions={accessSessions.map(s => ({
+                id: s.id, staffName: s.staffName, reason: s.reason, status: s.status,
+                createdAt: s.createdAt, endedAt: s.endedAt, endedBy: s.endedBy,
+                pagesViewed: s.pagesViewed, expiresAt: s.expiresAt,
+              }))}
+            />
+          )}
 
           {account.notes.length > 0 && (
             <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-card">

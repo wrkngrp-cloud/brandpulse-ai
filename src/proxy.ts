@@ -59,6 +59,43 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
+  /**
+   * Impersonation is read-only, and this is where that is true.
+   *
+   * An approved session adds the staff member to workspace_members on the
+   * viewer role, so the product's own row-level security shows them the data
+   * and no read path had to be rewritten. Nothing in the schema makes 'viewer'
+   * read-only, so the guarantee lives here instead: while a session is live,
+   * anything that is not a GET or a HEAD is refused, and every /api/ path is
+   * refused outright.
+   *
+   * One check in one place, which a new route cannot opt out of by being new.
+   * It rests on one assumption worth stating: that nothing in this app mutates
+   * on a GET. Server actions post, and every write route is a POST, PATCH or
+   * DELETE.
+   */
+  if (user && !pathname.startsWith('/desk')) {
+    let impersonating: string | null = null
+    try {
+      const { data } = await supabase.rpc('active_impersonation', { p_staff: user.id })
+      impersonating = (data as string | null) ?? null
+    } catch {
+      // If we cannot tell, let the request through. The alternative is locking
+      // a real customer out of their own account on a transient error.
+      impersonating = null
+    }
+
+    if (impersonating) {
+      const isRead = request.method === 'GET' || request.method === 'HEAD'
+      if (!isRead || pathname.startsWith('/api/')) {
+        return new NextResponse(
+          'This is a read-only session. End it to make changes.',
+          { status: 403 },
+        )
+      }
+    }
+  }
+
   // The Desk. A signed-out visitor gets the login page; whether a signed-in
   // one is staff at all is settled in the /desk layout, which has the database
   // to hand and can say so properly rather than bouncing them.

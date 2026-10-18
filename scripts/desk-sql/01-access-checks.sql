@@ -437,3 +437,129 @@ union all
 select 'and the amount is intact',
        (select amount_ngn::text from subscriptions limit 1), '299000';
 reset role;
+
+\echo '── impersonation: the consent gate'
+reset role;
+-- Ada asks to look at the customer's workspace.
+insert into impersonation_sessions (id, staff_id, workspace_id, reason, status)
+values ('eeeeeeee-0000-0000-0000-000000000001',
+        'aaaaaaaa-0000-0000-0000-000000000001',
+        'bbbbbbbb-0000-0000-0000-000000000001',
+        'They say the funnel is empty and I want to see what they see.',
+        'pending');
+
+select 'nothing is granted by asking' as check,
+       (select count(*)::text from workspace_members
+         where workspace_id = 'bbbbbbbb-0000-0000-0000-000000000001'
+           and user_id = 'aaaaaaaa-0000-0000-0000-000000000001'), '0' as want
+union all
+select 'and no session is live',
+       (select coalesce(active_impersonation('aaaaaaaa-0000-0000-0000-000000000001')::text, 'none')), 'none';
+
+\echo '── a staff member cannot approve their own request'
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000001';
+update impersonation_sessions
+   set status = 'approved', approved_at = now(),
+       expires_at = now() + interval '30 minutes', membership_granted = true
+ where id = 'eeeeeeee-0000-0000-0000-000000000001';
+
+select 'the request is still pending' as check,
+       (select status from impersonation_sessions where id = 'eeeeeeee-0000-0000-0000-000000000001'),
+       'pending' as want;
+
+do $$
+begin
+  insert into workspace_members (workspace_id, user_id, role)
+  values ('bbbbbbbb-0000-0000-0000-000000000001',
+          'aaaaaaaa-0000-0000-0000-000000000001', 'viewer');
+  raise notice 'FAIL: a staff member added themselves to a customer workspace';
+exception when insufficient_privilege then
+  raise notice 'ok: a staff member could not add themselves to a workspace';
+end $$;
+
+\echo '── the customer approving is what grants it'
+-- Done on the service client in the app, after checking the approver is an
+-- owner or admin. Here: the effect of that approval.
+reset role;
+update impersonation_sessions
+   set status = 'approved', approved_by = 'aaaaaaaa-0000-0000-0000-000000000003',
+       approved_at = now(), expires_at = now() + interval '30 minutes',
+       membership_granted = true
+ where id = 'eeeeeeee-0000-0000-0000-000000000001';
+insert into workspace_members (workspace_id, user_id, role)
+values ('bbbbbbbb-0000-0000-0000-000000000001',
+        'aaaaaaaa-0000-0000-0000-000000000001', 'viewer');
+
+select 'the session reads as live' as check,
+       (select active_impersonation('aaaaaaaa-0000-0000-0000-000000000001')::text),
+       'bbbbbbbb-0000-0000-0000-000000000001' as want;
+
+-- And the product's own RLS now shows them the account, which is the whole
+-- mechanism: no read path was rewritten for this feature.
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000001';
+select 'the staff member can now read the brand' as check,
+       (select count(*)::text from brands
+         where workspace_id = 'bbbbbbbb-0000-0000-0000-000000000001'), '1' as want;
+
+\echo '── ending it takes the access away again'
+reset role;
+select end_impersonation('eeeeeeee-0000-0000-0000-000000000001', 'customer');
+
+select 'the membership is gone' as check,
+       (select count(*)::text from workspace_members
+         where workspace_id = 'bbbbbbbb-0000-0000-0000-000000000001'
+           and user_id = 'aaaaaaaa-0000-0000-0000-000000000001'), '0' as want
+union all
+select 'the session reads as over',
+       (select coalesce(active_impersonation('aaaaaaaa-0000-0000-0000-000000000001')::text, 'none')), 'none'
+union all
+select 'and is recorded as ended by the customer',
+       (select status || '/' || ended_by from impersonation_sessions
+         where id = 'eeeeeeee-0000-0000-0000-000000000001'), 'ended/customer';
+
+\echo '── the clock closes a session even with no sweep'
+insert into impersonation_sessions (id, staff_id, workspace_id, reason, status, approved_at, expires_at, membership_granted)
+values ('eeeeeeee-0000-0000-0000-000000000002',
+        'aaaaaaaa-0000-0000-0000-000000000005',
+        'bbbbbbbb-0000-0000-0000-000000000001',
+        'A session nobody closed.', 'active', now() - interval '2 hours',
+        now() - interval '90 minutes', true);
+
+select 'an expired session is not live' as check,
+       (select coalesce(active_impersonation('aaaaaaaa-0000-0000-0000-000000000005')::text, 'none')),
+       'none' as want;
+
+\echo '── a stranger cannot end somebody else session'
+insert into impersonation_sessions (id, staff_id, workspace_id, reason, status, approved_at, expires_at)
+values ('eeeeeeee-0000-0000-0000-000000000003',
+        'aaaaaaaa-0000-0000-0000-000000000001',
+        'bbbbbbbb-0000-0000-0000-000000000001',
+        'A live session.', 'active', now(), now() + interval '20 minutes');
+
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000004';  -- another workspace's owner
+
+-- They cannot even see the session, which is the first line of defence.
+select 'an unrelated user cannot see the session' as check,
+       (select count(*)::text from impersonation_sessions
+         where id = 'eeeeeeee-0000-0000-0000-000000000003'), '0' as want;
+
+select end_impersonation('eeeeeeee-0000-0000-0000-000000000003', 'customer');
+
+-- Read back as the owner of the database, because RLS hides the row from the
+-- user who just tried: the point is that their attempt changed nothing.
+reset role;
+select 'and their attempt changed nothing' as check,
+       (select status from impersonation_sessions where id = 'eeeeeeee-0000-0000-0000-000000000003'),
+       'active' as want;
+set role authenticated;
+
+-- The customer whose account it is can.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select end_impersonation('eeeeeeee-0000-0000-0000-000000000003', 'customer');
+select 'the account owner can end it' as check,
+       (select status from impersonation_sessions where id = 'eeeeeeee-0000-0000-0000-000000000003'),
+       'ended' as want;
+reset role;
