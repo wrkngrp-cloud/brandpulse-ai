@@ -13,6 +13,8 @@ import { GlobalTourButton }   from '@/components/tours/global-tour-button'
 import { UserDropdown }       from './user-dropdown'
 import { MobileNav }          from './mobile-nav'
 import { CommandPalette }     from './command-palette'
+import { ModuleBeacon }       from './module-beacon'
+import { ChatWidget }         from '@/components/support/chat-widget'
 import { cn }                 from '@/lib/utils'
 import type { BrandOption }   from './brand-switcher'
 import { BrandLockup } from '@/components/brand/logo'
@@ -67,6 +69,12 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
 
       {/* Global command palette — ⌘K anywhere */}
       <CommandPalette />
+
+      {/* Records which module is open, for adoption reporting. Renders nothing. */}
+      <ModuleBeacon />
+
+      {/* Support chat. Signed in, so the thread carries their account with it. */}
+      <ChatWidget source="app" />
 
       {/* Desktop sidebar */}
       <Sidebar
