@@ -29,6 +29,7 @@ import { developerHealthSync }         from '@/lib/inngest/functions/developer-h
 import { hubspotDailySync }            from '@/lib/inngest/functions/hubspot-daily-sync'
 import { googleAdsDailySync }          from '@/lib/inngest/functions/google-ads-daily-sync'
 import { impersonationSweep }         from '@/lib/inngest/functions/impersonation-sweep'
+import { leadSignupMatch }            from '@/lib/inngest/functions/lead-signup-match'
 import { competitorWatchCheck }        from '@/lib/inngest/functions/competitor-watch-check'
 import { toolRunRetention }            from '@/lib/inngest/functions/tool-run-retention'
 
@@ -57,5 +58,6 @@ export const { GET, POST, PUT } = serve({
     hubspotDailySync,
     googleAdsDailySync,
     impersonationSweep,
+    leadSignupMatch,
   ],
 })

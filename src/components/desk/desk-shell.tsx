@@ -37,9 +37,9 @@ const NAV: DeskNavEntry[] = [
   { label: 'Overview', href: '/desk',          icon: LayoutGridIcon,    perm: 'accounts.view' },
   { label: 'Accounts', href: '/desk/accounts', icon: BuildingIcon,      perm: 'accounts.view' },
   { label: 'Inbox',    href: '/desk/inbox',    icon: MessageQuoteIcon,  perm: 'support.view' },
-  { label: 'Leads',    href: '/desk/leads',    icon: TrendIcon,         perm: 'leads.view',    soon: true },
+  { label: 'Leads',    href: '/desk/leads',    icon: TrendIcon,         perm: 'leads.view' },
   { label: 'Revenue',  href: '/desk/revenue',  icon: CurrencyIcon,      perm: 'revenue.view' },
-  { label: 'Ops',      href: '/desk/ops',      icon: WrenchIcon,        perm: 'ops.view',      soon: true },
+  { label: 'Ops',      href: '/desk/ops',      icon: WrenchIcon,        perm: 'ops.view' },
   { label: 'Staff',    href: '/desk/staff',    icon: UsersIcon,         perm: 'staff.view' },
 ]
 

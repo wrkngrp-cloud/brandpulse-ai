@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Owner** | Emmanuel Femi-Adejobi |
-| **Status** | Phases 0, 1, 2 and 4 built. See section 9. |
+| **Status** | Built, every phase. See section 9 for what is left inside each. |
 | **Last updated** | 14 October 2026 |
 | **Authoritative on** | Staff access, the support chat, and every internal admin surface |
 | **Lives at** | `desk.brandgauge.app`, served from this app at the `/desk` path |
@@ -751,16 +751,25 @@ subdomain goes live whenever you want it to, and changes nothing about the code.
 
 | Phase | What | State |
 |---|---|---|
-| **0. Instrumentation** | `ai_calls`, `feature_events`, `usage_events` writes, `staff_audit_log`, the module registry and the beacon | **Built**, 14 Oct 2026 |
-| **1. Staff access and shell** | `staff`, `staff_roles`, `role_permissions`, overrides, invites, `is_staff` / `is_super_admin` / `staff_can` / `staff_permissions`, `requireStaff`, `src/lib/desk/`, the host rewrite, `/desk/login`, invite and accept, the Desk shell and the overview | **Built**, 14 Oct 2026 |
-| **2. Super Admin** | Roster, invite, suspend, remove, role change, the person page, the permissions editor, per-person activity, the audit feed. Still to do: the roles editor, so a new role is still a seed rather than a screen | **Built**, 14 Oct 2026 |
-| **4. Support chat** | Tables, the four public routes, the private attachment bucket with signed references, the widget in the product, on the site and on the scoreboard, live presence, the Desk inbox and thread view with the account panel, reply by email and by the in-app bell | **Built**, 14 Oct 2026. Still to do: inbound email replies through a Resend webhook, and Realtime in place of the widget's poll for signed-in users |
-| **3. Accounts** | List, detail, timeline, connectors, usage, with dataset redaction | Next |
-| **5. Leads** | Move the lead desk across, retire `lead_desk_admins`, the nightly signed-up join | To do |
-| **6. Money** | `subscriptions`, `invoices`, manual entry, the Paystack handler left unregistered, revenue screens | To do |
-| **7. Impersonation** | `impersonation_sessions`, request, approve, the read-only server guard, the banner, the sweep job, the history on both sides | To do, last on purpose |
-| **8. Adoption** | The recommendation engine and the blocked list, on top of the registry phase 0 shipped | To do |
-| **9. Later** | AI reply assist, Slack notifications, 2FA on staff accounts | Unscheduled |
+| **0. Instrumentation** | `ai_calls`, `feature_events`, `usage_events` writes, `staff_audit_log`, the module registry and the beacon | **Built** 14 Oct |
+| **1. Staff access and shell** | The staff tables, the four SQL functions, `requireStaff`, the data layer, the host rewrite, login, invite and accept, the shell and the overview | **Built** 14 Oct |
+| **2. Super Admin** | Roster, invite, suspend, remove, role change, the person page, the permissions editor, per-person activity, the audit feed | **Built** 14 Oct. Left: a roles editor, so a new role is still a seed rather than a screen |
+| **3. Accounts** | List sorted quietest first, detail, timeline, connectors, people, usage against plan limits, notes, plan change | **Built** 18 Oct |
+| **4. Support chat** | Tables, the four public routes, signed attachment references in a private bucket, the widget in the product, on the site and on the scoreboard, live presence, the Desk inbox and thread view with the account panel, reply by email and by the bell | **Built** 14 Oct. Left: inbound email replies through a Resend webhook, and Realtime in place of the widget's poll for signed-in users |
+| **5. Leads** | `/desk/leads` on the Desk's permissions, the pipeline, the scan that opened the conversation, and the nightly job that matches a lead to the account they became | **Built** 18 Oct. Left: `/dashboard/leads` and its acquisition funnel still run on the `lead_desk_admins` allowlist; retiring that means rewriting the `leads` and `public_scans` policies and is a change of its own |
+| **6. Money** | `subscriptions`, `invoices`, manual entry, the revenue screen with gross cost, and the Paystack handler built and unregistered | **Built** 18 Oct |
+| **7. Impersonation** | Request with a reason, customer approval, the viewer membership, the middleware read-only guard, the banner both sides see, the five-minute sweep, the history the customer can read | **Built** 18 Oct |
+| **8. Adoption** | The engine, the three lists, the headline | **Built** 18 Oct |
+| **9. Ops** | Credentials and what each gates, stale connectors, AI failure rate, demo seed state, free-tool volume | **Built** 18 Oct |
+| **Later** | AI reply assist, Slack notifications, 2FA on staff accounts, a roles editor | Unscheduled |
+
+**What impersonation actually does, because it is the one worth re-reading.** An approved
+session adds the staff member to `workspace_members` on the `viewer` role, so the product's
+own row-level security shows them the data and no read path was rewritten. Read-only is not
+the viewer role, which this schema does not make read-only: it is one check in `src/proxy.ts`
+that refuses any non-GET request and every `/api/` path while `active_impersonation()`
+returns a workspace. That rests on nothing in the app mutating on a GET, which is true today
+and is now written into CLAUDE.md so it stays true.
 
 **The migration set does not replay from empty.** Found while building the SQL check:
 `20260615000002_influencer_profiles.sql` alters `influencers`, which is created eight days
