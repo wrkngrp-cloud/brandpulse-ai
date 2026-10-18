@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   const state      = searchParams.get('state')
   const oauthError = searchParams.get('error')
 
-  const appUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? ''
+  const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || ''
   const fail   = (reason: string) =>
     NextResponse.redirect(`${appUrl}/dashboard/connectors?error=${reason}`)
 

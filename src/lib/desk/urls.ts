@@ -11,6 +11,6 @@ export function deskUrl(path = ''): string {
   const suffix = path.startsWith('/') ? path : path ? `/${path}` : ''
   if (base) return `${base}${suffix}`
 
-  const app = (process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '')
+  const app = (process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || '').replace(/\/$/, '')
   return `${app}/desk${suffix}`
 }

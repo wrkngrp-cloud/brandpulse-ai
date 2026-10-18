@@ -10,7 +10,7 @@ const SCOPE = [
 ].join(' ')
 
 export async function GET() {
-  const appUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? ''
+  const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || ''
 
   if (!process.env.GOOGLE_CLIENT_ID) {
     return NextResponse.redirect(`${appUrl}/dashboard/connectors?error=ga4_not_configured`)

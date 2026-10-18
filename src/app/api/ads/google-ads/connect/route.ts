@@ -7,7 +7,7 @@ import { randomBytes }                from 'crypto'
 export const runtime = 'nodejs'
 
 const redis   = new Redis({ url: process.env.UPSTASH_REDIS_REST_URL!, token: process.env.UPSTASH_REDIS_REST_TOKEN! })
-const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
+const APP_URL = process.env.APP_URL || 'http://localhost:3000'
 const GOOGLE_AUTH = 'https://accounts.google.com/o/oauth2/v2/auth'
 
 export async function GET(req: NextRequest) {

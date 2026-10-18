@@ -10,7 +10,7 @@ function getResend() {
   resendClient ??= new Resend(process.env.RESEND_API_KEY)
   return resendClient
 }
-const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+const APP_URL = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
 
 // ── Daily cron: find panels due and fire dispatch events ─────────────────────
 export const panelDailyCheck = inngest.createFunction(

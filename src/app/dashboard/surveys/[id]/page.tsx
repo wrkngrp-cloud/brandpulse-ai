@@ -10,7 +10,7 @@ import { getTemplateLabel } from '@/lib/survey-templates'
 import type { SurveyQuestion } from '@/lib/survey-templates'
 import { Crescendo } from '@/components/brand/crescendo'
 
-const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
+const APP_URL = process.env.APP_URL || 'http://localhost:3000'
 
 const STATUS_COLOURS: Record<string, string> = {
   draft:  'bg-muted text-muted-foreground',

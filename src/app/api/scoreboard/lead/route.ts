@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
           `Their share of earned reach: ${scan?.share_of_reach ?? '—'}%`,
           `Wants the weekly email: ${wantsWeekly ? 'yes' : 'no'}`,
           '',
-          `Work it here: ${process.env.APP_URL ?? ''}/dashboard/leads`,
+          `Work it here: ${process.env.APP_URL || ''}/dashboard/leads`,
         ].join('\n'),
       })
     } catch (err) {

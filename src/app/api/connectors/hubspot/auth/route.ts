@@ -8,7 +8,7 @@ const HUBSPOT_AUTH_URL = 'https://app.hubspot.com/oauth/authorize'
 const SCOPE = 'crm.objects.contacts.read'
 
 export async function GET() {
-  const appUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? ''
+  const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || ''
 
   if (!process.env.HUBSPOT_CLIENT_ID) {
     return NextResponse.redirect(`${appUrl}/dashboard/connectors?error=hubspot_not_configured`)

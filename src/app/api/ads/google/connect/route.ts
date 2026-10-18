@@ -10,7 +10,7 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 })
 
-const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
+const APP_URL = process.env.APP_URL || 'http://localhost:3000'
 
 export async function GET() {
   if (!process.env.GOOGLE_ADS_CLIENT_ID) {

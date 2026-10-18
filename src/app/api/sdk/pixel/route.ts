@@ -4,7 +4,7 @@ import { getActiveBrandId } from '@/lib/active-brand'
 
 // Snippet URLs must point at a host we control today; APP_URL flips them to the
 // custom domain at cutover without customers re-installing anything old-URL-based.
-const SDK_BASE = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+const SDK_BASE = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://brandpulse-ai-tau.vercel.app'
 
 function buildSnippet(pixelId: string): string {
   return `;(function(w,d,s,id){

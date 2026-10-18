@@ -13,7 +13,7 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { PAGE_META } from '@/components/dashboard/page-meta'
 import { Crescendo } from '@/components/brand/crescendo'
 
-const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
 // ── Perception dimensions (q2–q9) ───────────────────────────────────────────
 const PERCEPTION_DIMENSIONS = [

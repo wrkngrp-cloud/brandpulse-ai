@@ -60,7 +60,7 @@ export default async function OohPage() {
       : null,
   }))
 
-  const defaultUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const defaultUrl = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
   const appUrl = brand.ooh_redirect_domain
     ? `https://${brand.ooh_redirect_domain}`
     : defaultUrl

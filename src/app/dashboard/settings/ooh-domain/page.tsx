@@ -17,7 +17,7 @@ export default async function OohDomainPage() {
 
   if (!brand) redirect('/onboarding')
 
-  const appUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const appUrl = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
   const appHost = new URL(appUrl).hostname  // e.g. brandpulse-ai-tau.vercel.app
 
   return (
