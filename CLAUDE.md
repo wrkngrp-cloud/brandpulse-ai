@@ -77,7 +77,7 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
   exercise the half of the Desk that lives in SQL: `staff_can` precedence, RLS on
   the staff, telemetry and chat tables, the security-definer grants, and the
   support triggers. Needs a local postgres and nothing else, no Supabase project
-  and no credentials. 53 assertions. It fails the run when any of them regresses,
+  and no credentials. 74 assertions. It fails the run when any of them regresses,
   which is checked by breaking a policy on purpose rather than assumed.
 - `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
   mocked platform responses. Real calls cost X credit and burn Instagram's
@@ -397,10 +397,12 @@ is the spec. Rules that are easy to break without noticing:
 - **One gate.** `requireStaff(permission?, audit?)` from `src/lib/desk/auth.ts` at the top of
   every Desk page and action. It is the only way to get a staff record, so a screen that
   skips it renders nothing. Reads are audited as well as writes.
-- **One data layer.** `src/lib/desk/data.ts` is the only place allowed to use the service
-  client for cross-tenant reads, and it applies dataset redaction (`data.customer_email`,
-  `data.ai_cost`, `data.revenue_figures`, `data.customer_content`, `data.audit_all`) before
-  returning rows. Never redact in a component.
+- **One data layer.** The modules under `src/lib/desk/` (`data.ts`, `accounts.ts`,
+  `adoption.ts`) are the only place allowed to use the service client for cross-tenant
+  reads, and they apply dataset redaction (`data.customer_email`, `data.ai_cost`,
+  `data.revenue_figures`, `data.customer_content`, `data.audit_all`) before returning rows.
+  Never redact in a component, and never reach for the service client from a Desk page or
+  action.
 - **Permissions.** `staff_can(key)` in SQL, `session.can(key)` in app code, both resolving
   deny override → grant override → role template, with `super_admin` holding everything.
   Add a key to `src/lib/desk/permissions.ts` AND to the `super_admin` seed, then run
@@ -410,8 +412,17 @@ is the spec. Rules that are easy to break without noticing:
   active `staff` row. Nobody can act on their own staff row, and the last active
   super admin cannot be suspended, removed or moved off the role. The first super admin is
   seeded by migration, never by a route.
-- `lead_desk_admins` and `is_lead_desk()` still exist and still guard `/dashboard/leads`.
-  They retire when the lead desk moves into the Desk.
+- **Impersonation is read-only, and the middleware is why.** An approved session adds the
+  staff member to `workspace_members` on the `viewer` role, so the product's own RLS does
+  the scoping and no read path was rewritten. Nothing in this schema makes `viewer`
+  read-only, so `src/proxy.ts` refuses any non-GET request and every `/api/` path while
+  `active_impersonation()` returns a workspace. That rests on one assumption: nothing in
+  this app mutates on a GET. If you ever add a GET that writes, it has to be excluded there
+  or it becomes a hole. A session needs a customer approval row, expires on the clock
+  whether or not the sweep runs, and `end_impersonation()` is what takes the membership
+  away.
+- `lead_desk_admins` and `is_lead_desk()` still exist and still guard `/dashboard/leads`
+  and `/dashboard/leads/funnel`. They retire when the lead desk moves into the Desk.
 
 ## Voice for any user-facing copy (hard rule)
 Warm, confident, plain English. Active voice. Connection before sales. No jargon. No em dashes.

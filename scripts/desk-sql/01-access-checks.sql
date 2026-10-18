@@ -330,3 +330,236 @@ set role service_role;
 select 'service role resolves an address' as check,
        (auth_user_id_for_email('boss@brandgauge.app') is not null)::text, 'true' as want;
 reset role;
+
+\echo '── account notes'
+reset role;
+insert into staff_notes (workspace_id, author_id, body) values
+  ('bbbbbbbb-0000-0000-0000-000000000001',
+   'aaaaaaaa-0000-0000-0000-000000000001',
+   'The agency does their posting, not the brand team.');
+
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000001';  -- Ada, support (accounts.view)
+select 'support reads an account note' as check,
+       (select count(*)::text from staff_notes), '1' as want;
+
+do $$
+begin
+  insert into staff_notes (workspace_id, author_id, body)
+  values ('bbbbbbbb-0000-0000-0000-000000000001', auth.uid(), 'written by support');
+  raise notice 'ok: support wrote a note (accounts.note is on the role)';
+exception when insufficient_privilege then
+  raise notice 'FAIL: support could not write a note';
+end $$;
+
+-- A note is ours, not the tenant's. The customer has no policy at all here,
+-- so this is not a redaction question: the rows are simply not reachable.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';  -- the customer
+select 'the customer sees no notes' as check,
+       (select count(*)::text from staff_notes), '0' as want;
+
+do $$
+begin
+  insert into staff_notes (workspace_id, body)
+  values ('bbbbbbbb-0000-0000-0000-000000000001', 'written by a customer');
+  raise notice 'FAIL: a customer wrote a staff note';
+exception when insufficient_privilege then
+  raise notice 'ok: a customer writing a staff note was refused';
+end $$;
+
+\echo '── reading addresses back from ids'
+do $$
+begin
+  perform auth_emails_for_user_ids(array['aaaaaaaa-0000-0000-0000-000000000003'::uuid]);
+  raise notice 'FAIL: a signed-in user read addresses across tenants';
+exception when insufficient_privilege then
+  raise notice 'ok: the bulk address lookup was refused';
+end $$;
+
+reset role;
+set role service_role;
+select 'the service role resolves a member address' as check,
+       (select count(*)::text from auth_emails_for_user_ids(
+          array['aaaaaaaa-0000-0000-0000-000000000003'::uuid])), '1' as want;
+reset role;
+
+\echo '── revenue: two gates, not one'
+reset role;
+insert into subscriptions (workspace_id, plan, status, amount_ngn, interval, provider)
+values ('bbbbbbbb-0000-0000-0000-000000000001', 'growth', 'active', 299000, 'month', 'manual');
+
+-- A second support member, with no overrides on them, so the role alone
+-- decides. The support role holds neither revenue.view nor
+-- data.revenue_figures.
+insert into auth.users (id, email) values
+  ('aaaaaaaa-0000-0000-0000-000000000005', 'chidi@brandgauge.app') on conflict do nothing;
+insert into staff (user_id, email, full_name, role, status, joined_at) values
+  ('aaaaaaaa-0000-0000-0000-000000000005', 'chidi@brandgauge.app', 'Chidi Eze', 'support', 'active', now())
+on conflict do nothing;
+
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000005';
+select 'the support role alone sees no subscriptions' as check,
+       (select count(*)::text from subscriptions), '0' as want;
+
+-- Ada is on the same role but was granted revenue.view by an override earlier
+-- in this file. That the grant reaches row-level security, and not only
+-- staff_can(), is the thing worth asserting.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000001';
+select 'a grant override reaches RLS' as check,
+       (select count(*)::text from subscriptions), '1' as want;
+
+-- The customer sees their own, because the billing page will need it.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select 'the customer sees their own subscription' as check,
+       (select count(*)::text from subscriptions), '1' as want;
+
+do $$
+begin
+  update subscriptions set amount_ngn = 1;
+  if (select amount_ngn from subscriptions limit 1) = 1 then
+    raise notice 'FAIL: a customer changed what they are charged';
+  else
+    raise notice 'ok: a customer could not change what they are charged';
+  end if;
+end $$;
+
+-- A customer in another workspace sees nothing.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000004';
+select 'another workspace sees no subscriptions' as check,
+       (select count(*)::text from subscriptions), '0' as want;
+
+-- The super admin holds revenue.view and revenue.edit.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000002';
+select 'the super admin reads it' as check,
+       (select count(*)::text from subscriptions), '1' as want
+union all
+select 'and the amount is intact',
+       (select amount_ngn::text from subscriptions limit 1), '299000';
+reset role;
+
+\echo '── impersonation: the consent gate'
+reset role;
+-- Ada asks to look at the customer's workspace.
+insert into impersonation_sessions (id, staff_id, workspace_id, reason, status)
+values ('eeeeeeee-0000-0000-0000-000000000001',
+        'aaaaaaaa-0000-0000-0000-000000000001',
+        'bbbbbbbb-0000-0000-0000-000000000001',
+        'They say the funnel is empty and I want to see what they see.',
+        'pending');
+
+select 'nothing is granted by asking' as check,
+       (select count(*)::text from workspace_members
+         where workspace_id = 'bbbbbbbb-0000-0000-0000-000000000001'
+           and user_id = 'aaaaaaaa-0000-0000-0000-000000000001'), '0' as want
+union all
+select 'and no session is live',
+       (select coalesce(active_impersonation('aaaaaaaa-0000-0000-0000-000000000001')::text, 'none')), 'none';
+
+\echo '── a staff member cannot approve their own request'
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000001';
+update impersonation_sessions
+   set status = 'approved', approved_at = now(),
+       expires_at = now() + interval '30 minutes', membership_granted = true
+ where id = 'eeeeeeee-0000-0000-0000-000000000001';
+
+select 'the request is still pending' as check,
+       (select status from impersonation_sessions where id = 'eeeeeeee-0000-0000-0000-000000000001'),
+       'pending' as want;
+
+do $$
+begin
+  insert into workspace_members (workspace_id, user_id, role)
+  values ('bbbbbbbb-0000-0000-0000-000000000001',
+          'aaaaaaaa-0000-0000-0000-000000000001', 'viewer');
+  raise notice 'FAIL: a staff member added themselves to a customer workspace';
+exception when insufficient_privilege then
+  raise notice 'ok: a staff member could not add themselves to a workspace';
+end $$;
+
+\echo '── the customer approving is what grants it'
+-- Done on the service client in the app, after checking the approver is an
+-- owner or admin. Here: the effect of that approval.
+reset role;
+update impersonation_sessions
+   set status = 'approved', approved_by = 'aaaaaaaa-0000-0000-0000-000000000003',
+       approved_at = now(), expires_at = now() + interval '30 minutes',
+       membership_granted = true
+ where id = 'eeeeeeee-0000-0000-0000-000000000001';
+insert into workspace_members (workspace_id, user_id, role)
+values ('bbbbbbbb-0000-0000-0000-000000000001',
+        'aaaaaaaa-0000-0000-0000-000000000001', 'viewer');
+
+select 'the session reads as live' as check,
+       (select active_impersonation('aaaaaaaa-0000-0000-0000-000000000001')::text),
+       'bbbbbbbb-0000-0000-0000-000000000001' as want;
+
+-- And the product's own RLS now shows them the account, which is the whole
+-- mechanism: no read path was rewritten for this feature.
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000001';
+select 'the staff member can now read the brand' as check,
+       (select count(*)::text from brands
+         where workspace_id = 'bbbbbbbb-0000-0000-0000-000000000001'), '1' as want;
+
+\echo '── ending it takes the access away again'
+reset role;
+select end_impersonation('eeeeeeee-0000-0000-0000-000000000001', 'customer');
+
+select 'the membership is gone' as check,
+       (select count(*)::text from workspace_members
+         where workspace_id = 'bbbbbbbb-0000-0000-0000-000000000001'
+           and user_id = 'aaaaaaaa-0000-0000-0000-000000000001'), '0' as want
+union all
+select 'the session reads as over',
+       (select coalesce(active_impersonation('aaaaaaaa-0000-0000-0000-000000000001')::text, 'none')), 'none'
+union all
+select 'and is recorded as ended by the customer',
+       (select status || '/' || ended_by from impersonation_sessions
+         where id = 'eeeeeeee-0000-0000-0000-000000000001'), 'ended/customer';
+
+\echo '── the clock closes a session even with no sweep'
+insert into impersonation_sessions (id, staff_id, workspace_id, reason, status, approved_at, expires_at, membership_granted)
+values ('eeeeeeee-0000-0000-0000-000000000002',
+        'aaaaaaaa-0000-0000-0000-000000000005',
+        'bbbbbbbb-0000-0000-0000-000000000001',
+        'A session nobody closed.', 'active', now() - interval '2 hours',
+        now() - interval '90 minutes', true);
+
+select 'an expired session is not live' as check,
+       (select coalesce(active_impersonation('aaaaaaaa-0000-0000-0000-000000000005')::text, 'none')),
+       'none' as want;
+
+\echo '── a stranger cannot end somebody else session'
+insert into impersonation_sessions (id, staff_id, workspace_id, reason, status, approved_at, expires_at)
+values ('eeeeeeee-0000-0000-0000-000000000003',
+        'aaaaaaaa-0000-0000-0000-000000000001',
+        'bbbbbbbb-0000-0000-0000-000000000001',
+        'A live session.', 'active', now(), now() + interval '20 minutes');
+
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000004';  -- another workspace's owner
+
+-- They cannot even see the session, which is the first line of defence.
+select 'an unrelated user cannot see the session' as check,
+       (select count(*)::text from impersonation_sessions
+         where id = 'eeeeeeee-0000-0000-0000-000000000003'), '0' as want;
+
+select end_impersonation('eeeeeeee-0000-0000-0000-000000000003', 'customer');
+
+-- Read back as the owner of the database, because RLS hides the row from the
+-- user who just tried: the point is that their attempt changed nothing.
+reset role;
+select 'and their attempt changed nothing' as check,
+       (select status from impersonation_sessions where id = 'eeeeeeee-0000-0000-0000-000000000003'),
+       'active' as want;
+set role authenticated;
+
+-- The customer whose account it is can.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select end_impersonation('eeeeeeee-0000-0000-0000-000000000003', 'customer');
+select 'the account owner can end it' as check,
+       (select status from impersonation_sessions where id = 'eeeeeeee-0000-0000-0000-000000000003'),
+       'ended' as want;
+reset role;

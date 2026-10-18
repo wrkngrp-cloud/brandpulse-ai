@@ -2,6 +2,7 @@ import { redirect }         from 'next/navigation'
 import { cookies }           from 'next/headers'
 import { createClient }      from '@/lib/supabase/server'
 import { DashboardShell }    from '@/components/dashboard/dashboard-shell'
+import { ImpersonationBanner } from '@/components/dashboard/impersonation-banner'
 import { AiCommand }         from './ai-command'
 import { PrePostWidget }     from './pre-post-widget'
 import type { BrandOption }  from '@/components/dashboard/brand-switcher'
@@ -47,6 +48,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <>
+      {/* Runs for the whole of a read-only session, on both sides. Renders
+          nothing the rest of the time. */}
+      <ImpersonationBanner />
+
       <DashboardShell
         userName={userName}
         userEmail={userEmail}
