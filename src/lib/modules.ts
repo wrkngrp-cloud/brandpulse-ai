@@ -24,28 +24,51 @@ export interface ModuleDef {
   path:   string
   group:  'core' | 'intelligence' | 'campaigns' | 'creative' | 'research' | 'planning' | 'retention' | 'exec'
   signal?: 'awareness' | 'perception' | 'consideration' | 'action' | 'loyalty' | 'advocacy'
+  /**
+   * The BHI component this module most directly feeds, where it feeds one.
+   *
+   * Named separately from `signal` rather than translated from it, because the
+   * funnel stages and the BHI components are two different vocabularies and
+   * mapping one onto the other would quietly invent correspondences. A module
+   * with no entry here is not scored lower for being unimportant; it simply
+   * does not move the index, and the adoption engine says so.
+   */
+  bhi?: 'awareness' | 'salience' | 'sentiment' | 'perception' | 'culturalResonance' | 'blendedSov' | 'emv'
+  /**
+   * What has to exist before this module can show anything.
+   *
+   * Only stated where there is a real table dependency. An empty entry means
+   * nothing is known to be missing, which is a weaker claim than "ready" and
+   * the honest one: a module can also be empty because nobody has used it.
+   */
+  requires?: { label: string; tables: string[] }
 }
 
 export const MODULES: ModuleDef[] = [
   { key: 'overview',      label: 'Overview',           path: '/dashboard',                    group: 'core' },
-  { key: 'sentiment',     label: 'Sentiment',          path: '/dashboard/sentiment',           group: 'core',          signal: 'perception' },
+  { key: 'sentiment',     label: 'Sentiment',          path: '/dashboard/sentiment',           group: 'core',          signal: 'perception',    bhi: 'sentiment',
+    requires: { label: 'a connected social account', tables: ['social_connections'] } },
   { key: 'brand_health',  label: 'Brand Health',       path: '/dashboard/brand-equity',        group: 'core' },
-  { key: 'content',       label: 'Content',            path: '/dashboard/content',             group: 'core',          signal: 'awareness' },
+  { key: 'content',       label: 'Content',            path: '/dashboard/content',             group: 'core',          signal: 'awareness',
+    requires: { label: 'a connected social account', tables: ['social_connections'] } },
   { key: 'funnel',        label: 'Funnel',             path: '/dashboard/funnel',              group: 'core' },
 
-  { key: 'competitive',   label: 'Competitive',        path: '/dashboard/competitive',         group: 'intelligence',  signal: 'consideration' },
-  { key: 'marketplace',   label: 'Marketplace',        path: '/dashboard/marketplace',         group: 'intelligence',  signal: 'action' },
-  { key: 'cultural',      label: 'Cultural Insights',  path: '/dashboard/cultural',            group: 'intelligence',  signal: 'perception' },
+  { key: 'competitive',   label: 'Competitive',        path: '/dashboard/competitive',         group: 'intelligence',  signal: 'consideration', bhi: 'blendedSov',
+    requires: { label: 'at least one competitor named', tables: ['competitors'] } },
+  { key: 'marketplace',   label: 'Marketplace',        path: '/dashboard/marketplace',         group: 'intelligence',  signal: 'action',
+    requires: { label: 'marketplace products added', tables: ['marketplace_products'] } },
+  { key: 'cultural',      label: 'Cultural Insights',  path: '/dashboard/cultural',            group: 'intelligence',  signal: 'perception',    bhi: 'culturalResonance' },
   { key: 'field_intel',   label: 'Field Intelligence', path: '/dashboard/field-intelligence',  group: 'intelligence',  signal: 'action' },
-  { key: 'pr',            label: 'PR Tracking',        path: '/dashboard/pr',                  group: 'intelligence',  signal: 'awareness' },
+  { key: 'pr',            label: 'PR Tracking',        path: '/dashboard/pr',                  group: 'intelligence',  signal: 'awareness',     bhi: 'awareness' },
   { key: 'youtube',       label: 'YouTube',            path: '/dashboard/youtube',             group: 'intelligence',  signal: 'awareness' },
   { key: 'ai_visibility', label: 'AI Visibility',      path: '/dashboard/ai-visibility',       group: 'intelligence',  signal: 'awareness' },
 
   { key: 'campaigns',     label: 'All Campaigns',      path: '/dashboard/campaigns',           group: 'campaigns' },
-  { key: 'digital',       label: 'Digital Ads',        path: '/dashboard/digital',             group: 'campaigns',     signal: 'action' },
-  { key: 'influencers',   label: 'Influencers',        path: '/dashboard/influencers',         group: 'campaigns',     signal: 'awareness' },
-  { key: 'ooh',           label: 'Out of Home',        path: '/dashboard/ooh',                 group: 'campaigns',     signal: 'awareness' },
-  { key: 'events',        label: 'Events & Activation',path: '/dashboard/events',              group: 'campaigns',     signal: 'action' },
+  { key: 'digital',       label: 'Digital Ads',        path: '/dashboard/digital',             group: 'campaigns',     signal: 'action',        bhi: 'awareness',
+    requires: { label: 'a connected ad account', tables: ['digital_ad_accounts'] } },
+  { key: 'influencers',   label: 'Influencers',        path: '/dashboard/influencers',         group: 'campaigns',     signal: 'awareness',     bhi: 'emv' },
+  { key: 'ooh',           label: 'Out of Home',        path: '/dashboard/ooh',                 group: 'campaigns',     signal: 'awareness',     bhi: 'awareness' },
+  { key: 'events',        label: 'Events & Activation',path: '/dashboard/events',              group: 'campaigns',     signal: 'action',        bhi: 'awareness' },
   { key: 'radio',         label: 'Radio',              path: '/dashboard/radio',               group: 'campaigns',     signal: 'awareness' },
   { key: 'tv',            label: 'TV',                 path: '/dashboard/tv',                  group: 'campaigns',     signal: 'awareness' },
   { key: 'print',         label: 'Print',              path: '/dashboard/print',               group: 'campaigns',     signal: 'awareness' },
@@ -55,11 +78,12 @@ export const MODULES: ModuleDef[] = [
   { key: 'pre_post',      label: 'Pre-Post Intel',     path: '/dashboard/pre-post',            group: 'creative' },
   { key: 'creative',      label: 'Creative Analysis',  path: '/dashboard/creative',            group: 'creative' },
 
-  { key: 'surveys',       label: 'All Surveys',        path: '/dashboard/surveys',             group: 'research',      signal: 'perception' },
+  { key: 'surveys',       label: 'All Surveys',        path: '/dashboard/surveys',             group: 'research',      signal: 'perception',    bhi: 'salience' },
   { key: 'nps',           label: 'NPS Tracker',        path: '/dashboard/surveys/nps',         group: 'research',      signal: 'advocacy' },
-  { key: 'panels',        label: 'Tracking Panels',    path: '/dashboard/surveys/panels',      group: 'research',      signal: 'perception' },
+  { key: 'panels',        label: 'Tracking Panels',    path: '/dashboard/surveys/panels',      group: 'research',      signal: 'perception',    bhi: 'perception' },
 
-  { key: 'mmm',           label: 'Media Mix',          path: '/dashboard/mmm',                 group: 'planning' },
+  { key: 'mmm',           label: 'Media Mix',          path: '/dashboard/mmm',                 group: 'planning',
+    requires: { label: 'digital performance data', tables: ['digital_performance_daily'] } },
   { key: 'geo_lift',      label: 'Geo-Lift',           path: '/dashboard/geo-lift',            group: 'planning' },
   { key: 'budget',        label: 'Budget & Pacing',    path: '/dashboard/budget',              group: 'planning' },
 

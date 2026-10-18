@@ -330,3 +330,55 @@ set role service_role;
 select 'service role resolves an address' as check,
        (auth_user_id_for_email('boss@brandgauge.app') is not null)::text, 'true' as want;
 reset role;
+
+\echo '── account notes'
+reset role;
+insert into staff_notes (workspace_id, author_id, body) values
+  ('bbbbbbbb-0000-0000-0000-000000000001',
+   'aaaaaaaa-0000-0000-0000-000000000001',
+   'The agency does their posting, not the brand team.');
+
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000001';  -- Ada, support (accounts.view)
+select 'support reads an account note' as check,
+       (select count(*)::text from staff_notes), '1' as want;
+
+do $$
+begin
+  insert into staff_notes (workspace_id, author_id, body)
+  values ('bbbbbbbb-0000-0000-0000-000000000001', auth.uid(), 'written by support');
+  raise notice 'ok: support wrote a note (accounts.note is on the role)';
+exception when insufficient_privilege then
+  raise notice 'FAIL: support could not write a note';
+end $$;
+
+-- A note is ours, not the tenant's. The customer has no policy at all here,
+-- so this is not a redaction question: the rows are simply not reachable.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';  -- the customer
+select 'the customer sees no notes' as check,
+       (select count(*)::text from staff_notes), '0' as want;
+
+do $$
+begin
+  insert into staff_notes (workspace_id, body)
+  values ('bbbbbbbb-0000-0000-0000-000000000001', 'written by a customer');
+  raise notice 'FAIL: a customer wrote a staff note';
+exception when insufficient_privilege then
+  raise notice 'ok: a customer writing a staff note was refused';
+end $$;
+
+\echo '── reading addresses back from ids'
+do $$
+begin
+  perform auth_emails_for_user_ids(array['aaaaaaaa-0000-0000-0000-000000000003'::uuid]);
+  raise notice 'FAIL: a signed-in user read addresses across tenants';
+exception when insufficient_privilege then
+  raise notice 'ok: the bulk address lookup was refused';
+end $$;
+
+reset role;
+set role service_role;
+select 'the service role resolves a member address' as check,
+       (select count(*)::text from auth_emails_for_user_ids(
+          array['aaaaaaaa-0000-0000-0000-000000000003'::uuid])), '1' as want;
+reset role;

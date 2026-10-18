@@ -8,6 +8,7 @@ create schema if not exists extensions;
 create table if not exists auth.users (
   id    uuid primary key default gen_random_uuid(),
   email text unique,
+  last_sign_in_at timestamptz,
   raw_app_meta_data  jsonb default '{}'::jsonb,
   raw_user_meta_data jsonb default '{}'::jsonb,
   created_at timestamptz default now()
@@ -59,6 +60,15 @@ do $$ begin
   create role supabase_realtime_admin; exception when duplicate_object then null; end $$;
 
 grant usage on schema public to anon, authenticated, service_role;
+
+-- Real Supabase grants the API roles usage on the auth schema, so auth.uid()
+-- is callable from a policy and from ordinary SQL. Without this the harness
+-- diverges from production in a way that matters: a policy that calls
+-- auth.uid() directly, rather than through a security-definer function, would
+-- fail here for a reason that does not exist in the real database, and a test
+-- could pass or fail for the wrong reason.
+grant usage on schema auth to anon, authenticated, service_role;
+grant select on auth.users to service_role;
 
 -- Realtime publication, which some migrations add tables to.
 do $$ begin
