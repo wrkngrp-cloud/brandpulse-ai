@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { Resend } from 'resend'
 import { createServiceClient } from '@/lib/supabase/server'
+import { deskUrl } from '@/lib/desk/urls'
 
 export const runtime = 'nodejs'
 export const maxDuration = 20
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
           `Their share of earned reach: ${scan?.share_of_reach ?? '—'}%`,
           `Wants the weekly email: ${wantsWeekly ? 'yes' : 'no'}`,
           '',
-          `Work it here: ${process.env.APP_URL || ''}/dashboard/leads`,
+          `Work it here: ${deskUrl('/leads')}`,
         ].join('\n'),
       })
     } catch (err) {

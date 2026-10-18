@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { requireStaff } from '@/lib/desk/auth'
 import { leadsSummary } from '@/lib/desk/leads'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -26,6 +27,14 @@ export default async function DeskLeadsPage() {
         title={`${summary.total} captured`}
         subtitle={`${summary.new7} this week · ${summary.signedUp} went on to open an account`}
         icon={TrendIcon}
+        actions={
+          <Link
+            href="/desk/leads/funnel"
+            className="bg-press rounded-md border border-line px-2.5 py-1 text-xs text-tx-2"
+          >
+            Free tool funnel
+          </Link>
+        }
       />
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

@@ -5,11 +5,14 @@ import type { StaffSession } from './auth'
 /**
  * The lead desk, in the Desk.
  *
- * The same rows the founder's lead desk at /dashboard/leads has always shown,
- * read here through the Desk's permission model instead of the
- * lead_desk_admins allowlist. Both exist for now: retiring the old one means
- * rewriting the leads and public_scans policies and the acquisition funnel
- * page the free tools added, which is a change of its own.
+ * The only lead desk. /dashboard/leads and its funnel are gone as of
+ * 18 October: they checked `lead_desk_admins`, a table nothing has ever
+ * inserted into, so they bounced everyone to /dashboard from the day they
+ * shipped and the rows below were readable by nobody.
+ *
+ * Access is `leads.view` to read and `leads.edit` to work the pipeline, which
+ * the business development role holds, so a BDM can be invited to follow up
+ * without being made a founder.
  */
 
 export interface LeadRow {

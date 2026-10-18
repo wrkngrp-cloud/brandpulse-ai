@@ -30,7 +30,7 @@ behind them does not exist.
 
 | Thing | Where | Use to us |
 |---|---|---|
-| Allowlist access pattern | `lead_desk_admins`, `is_lead_desk()`, `/dashboard/leads` | The shape the staff table copies. Already the one sanctioned non-workspace RLS scope. |
+| Allowlist access pattern | `lead_desk_admins`, `is_lead_desk()`, `/dashboard/leads` | The shape the staff table copied. Both were dropped on 18 October once the Desk took the lead desk over: nothing had ever inserted a row, so the old desk never worked. |
 | Leads with context | `leads`, `public_scans` | The prospect side of the inbox. Scan, rivals, share of reach, status. |
 | Transactional email | Resend, in six Inngest jobs | Outbound mail and email fallback for chat. |
 | In-app messaging | `notifications` table plus the bell | Staff can put a message inside a customer's product with one insert. |
@@ -64,7 +64,7 @@ deliberate act, not a tidy-up.
 | The Desk answers on its own host, `desk.brandgauge.app`, served from this one app and one deploy | A separate deployment means a second copy of the service client, `TOKEN_ENCRYPTION_KEY`, the Supabase factories and the Inngest registry. Host routing gives the separation that matters (own URL, own login, own session cookie, nothing about the Desk reachable from the customer app) at the cost of one middleware rule. See section 2b. |
 | The Desk is invite-only with its own login, email and password, no Google button, no signup route | Staff access is granted by a person, never self-served. A signup form on the Desk host is the whole security model undone. |
 | Permissions are per module action and per dataset, not a fixed role | A support agent needs the account timeline and not the revenue figures. Finance needs the revenue and not the customer's survey text. Roles are templates over the same permission keys, so a new role is configuration rather than a deploy. |
-| Staff access is an allowlist in the same shape as `is_lead_desk()` | Document 5 warns against a third RLS pattern copied from the lead desk. `is_staff()` is the same security-definer, fixed `search_path` form. `lead_desk_admins` folds into it. |
+| Staff access is an allowlist in the same shape the lead desk used | Document 5 warns against a third RLS pattern. `is_staff()` is the same security-definer, fixed `search_path` form `is_lead_desk()` had, and `lead_desk_admins` folded into `staff` before being dropped. |
 | We build the support chat, we do not buy one | It is our own data, in our own tables, joinable to the account. A hosted widget cannot show the agent that this brand's BHI is 41 and their Meta connector expired on Tuesday. |
 | Anonymous chat goes through a service-role route holding a visitor token | Same mechanism as `/survey/[id]`, `/ambassador/[token]` and `/go/[slug]`. Anon RLS is never opened on the chat tables. |
 | We reach our customers by three channels only: email, the in-app notification bell, and the chat widget in the product and on the site | `whatsapp_contacts` holds the *tenant's* customers under the tenant's consent. Messaging them from our admin tool would break the NDPR gate and the Model A consent regime. Not a grey area. |
@@ -242,9 +242,9 @@ set search_path = public as $$
 $$;
 ```
 
-`is_lead_desk()` and `lead_desk_admins` fold into this. The existing lead desk check
-becomes `staff_can('leads.view')`, and the old table is dropped in the same migration
-after its rows are copied across.
+`is_lead_desk()` and `lead_desk_admins` folded into this and were dropped on 18 October
+in `20261018094000_retire_lead_desk_admins.sql`. The lead desk check is now
+`staff_can('leads.view')`.
 
 ### 3.3 Permission keys
 
@@ -528,7 +528,7 @@ time per thread, which is also how staff performance gets measured in Super Admi
 
 ### 5.3 Leads
 
-Extend `/dashboard/leads` rather than replace it, and move it under `/desk/leads`.
+Moved to `/desk/leads`, and `/dashboard/leads` is deleted.
 One real gap to close: `signed_up` is a manual boolean, so a nightly job joins
 `leads.email` against `auth.users` and sets it. Then conversion by referrer and by
 scanned category is a number rather than a feeling.
@@ -756,7 +756,7 @@ subdomain goes live whenever you want it to, and changes nothing about the code.
 | **2. Super Admin** | Roster, invite, suspend, remove, role change, the person page, the permissions editor, per-person activity, the audit feed | **Built** 14 Oct. Left: a roles editor, so a new role is still a seed rather than a screen |
 | **3. Accounts** | List sorted quietest first, detail, timeline, connectors, people, usage against plan limits, notes, plan change | **Built** 18 Oct |
 | **4. Support chat** | Tables, the four public routes, signed attachment references in a private bucket, the widget in the product, on the site and on the scoreboard, live presence, the Desk inbox and thread view with the account panel, reply by email and by the bell | **Built** 14 Oct. Left: inbound email replies through a Resend webhook, and Realtime in place of the widget's poll for signed-in users |
-| **5. Leads** | `/desk/leads` on the Desk's permissions, the pipeline, the scan that opened the conversation, and the nightly job that matches a lead to the account they became | **Built** 18 Oct. Left: `/dashboard/leads` and its acquisition funnel still run on the `lead_desk_admins` allowlist; retiring that means rewriting the `leads` and `public_scans` policies and is a change of its own |
+| **5. Leads** | `/desk/leads` on the Desk's permissions, the pipeline, the scan that opened the conversation, the acquisition funnel at `/desk/leads/funnel`, and the nightly job that matches a lead to the account they became. `/dashboard/leads` deleted and `lead_desk_admins` dropped | **Built** 18 Oct |
 | **6. Money** | `subscriptions`, `invoices`, manual entry, the revenue screen with gross cost, and the Paystack handler built and unregistered | **Built** 18 Oct |
 | **7. Impersonation** | Request with a reason, customer approval, the viewer membership, the middleware read-only guard, the banner both sides see, the five-minute sweep, the history the customer can read | **Built** 18 Oct |
 | **8. Adoption** | The engine, the three lists, the headline | **Built** 18 Oct |

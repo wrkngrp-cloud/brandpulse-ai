@@ -18,8 +18,9 @@
  *     email_connectors, app_store_configs, youtube_api_configs ...) hold real
  *     encrypted OAuth tokens. A fake token is worse than none: sync jobs would
  *     pick it up and fail against the provider.
- *   leads, lead_desk_admins belong to BrandGauge rather than to a tenant, and
- *     are written by the service role only. See docs/scoreboard-and-leads.md.
+ *   leads belongs to BrandGauge rather than to a tenant, is written by the
+ *     service role only, and is read in the Desk through staff_can('leads.view').
+ *     See docs/scoreboard-and-leads.md.
  *   ab_events needs an experiment and a variant, and experiments are not
  *     seeded by any account yet.
  *   sentiment_disputes needs a real auth user id, and a dispute is a rare

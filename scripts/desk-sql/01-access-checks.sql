@@ -563,3 +563,57 @@ select 'the account owner can end it' as check,
        (select status from impersonation_sessions where id = 'eeeeeeee-0000-0000-0000-000000000003'),
        'ended' as want;
 reset role;
+
+\echo '── the lead desk, on the Desk permissions'
+reset role;
+insert into public_scans (id, brand_name, competitors, share_of_reach, mentions_found)
+values ('ffffffff-0000-0000-0000-000000000001', 'Jara', '["Indomie","Dangote"]'::jsonb, 8.4, 37);
+insert into leads (email, name, scan_id, source, status)
+values ('buyer@jara.test', 'A Buyer', 'ffffffff-0000-0000-0000-000000000001', 'scoreboard', 'new');
+
+select 'the old allowlist is gone' as check,
+       (select count(*)::text from pg_tables
+         where schemaname = 'public' and tablename = 'lead_desk_admins'), '0' as want
+union all
+select 'and so is its function',
+       (select count(*)::text from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+         where n.nspname = 'public' and p.proname = 'is_lead_desk'), '0';
+
+-- Support holds leads.view and leads.edit on its role.
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000005';  -- Chidi, support, no overrides
+select 'support reads a lead' as check,
+       (select count(*)::text from leads), '1' as want
+union all
+select 'and the scan behind it',
+       (select count(*)::text from public_scans), '1';
+
+do $$
+begin
+  update leads set status = 'contacted';
+  if (select status from leads limit 1) = 'contacted' then
+    raise notice 'ok: support worked the pipeline (leads.edit is on the role)';
+  else
+    raise notice 'FAIL: support could not update a lead';
+  end if;
+end $$;
+
+-- A customer is not staff and sees none of it, which is the rule that matters:
+-- a lead belongs to BrandGauge, not to a tenant.
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select 'a customer sees no leads' as check,
+       (select count(*)::text from leads), '0' as want
+union all
+select 'and no scans',
+       (select count(*)::text from public_scans), '0';
+
+do $$
+begin
+  update leads set status = 'dead';
+  if (select count(*) from leads where status = 'dead') > 0 then
+    raise notice 'FAIL: a customer changed a lead';
+  else
+    raise notice 'ok: a customer could not change a lead';
+  end if;
+end $$;
+reset role;
