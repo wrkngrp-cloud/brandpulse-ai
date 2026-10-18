@@ -46,7 +46,7 @@ const ok = (name, cond) => eq(name, !!cond, true)
 
 // ── The permission vocabulary against the migration ──────────────────────────
 const permissions = await compile('src/lib/desk/permissions.ts', 'permissions')
-const migration = readFileSync('supabase/migrations/20261014090000_desk_staff.sql', 'utf8')
+const migration = readFileSync('supabase/migrations/20261014120000_desk_staff.sql', 'utf8')
 
 console.log('\n── Permission keys: SQL seeds against the code')
 
