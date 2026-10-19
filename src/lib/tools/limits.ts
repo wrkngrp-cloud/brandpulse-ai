@@ -23,6 +23,9 @@ export const redisAvailable = redis !== null
 /** Per-tool hourly ceilings per IP. Each of these costs one AI call and
  *  several outbound fetches, so they are tighter than the scoreboard's. */
 export const RUNS_PER_HOUR: Record<string, number> = {
+  // Two of our own AI calls plus up to three external assistant answers, so
+  // the tightest ceiling of the set.
+  'brand-gap':          4,
   'competitor-tracker': 6,
   'market-demand':      6,
   'campaign-audit':     8,

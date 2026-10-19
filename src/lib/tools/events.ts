@@ -20,6 +20,11 @@ export const TOOL_EVENTS = [
   'free_tool_completed',
   'free_tool_result_viewed',
   'free_tool_result_engaged',
+  // The gate was shown, and the gate was answered. The gap between these two
+  // is the price of asking for an address, which is the number to watch after
+  // lead capture ships.
+  'free_tool_gate_viewed',
+  'free_tool_lead_captured',
   'beta_cta_viewed',
   'beta_cta_clicked',
   'beta_signup_started',

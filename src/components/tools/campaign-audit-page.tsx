@@ -9,6 +9,8 @@ import { trackTool, useToolAnalytics } from './use-tool-analytics'
 import { CAMPAIGN_OBJECTIVES, OBJECTIVE_LABEL, type CampaignObjective } from '@/lib/tools/audit-vocab'
 import type { CampaignAuditResult } from '@/lib/tools/campaign-audit'
 import type { CoverageNote } from '@/lib/tools/report'
+import type { Withheld } from '@/lib/tools/gate'
+import { GateCleared, ResultGate } from './result-gate'
 
 interface Response {
   token?: string
@@ -17,6 +19,8 @@ interface Response {
   result?: CampaignAuditResult
   failureNote?: string
   coverage?: CoverageNote[]
+  gated?: boolean
+  withheld?: Withheld
   error?: string
 }
 
@@ -39,6 +43,10 @@ export function CampaignAuditPage() {
   const [step, setStep] = useState(0)
   const [res, setRes] = useState<Response | null>(null)
   const [error, setError] = useState<string | null>(null)
+  /* The unlocked result arrives from the unlock endpoint rather than being
+     revealed client-side: the preview never contained it. */
+  const [unlocked, setUnlocked] = useState<CampaignAuditResult | null>(null)
+  const [unlockedEmail, setUnlockedEmail] = useState<string | undefined>()
 
   useEffect(() => {
     if (!busy) return
@@ -73,8 +81,10 @@ export function CampaignAuditPage() {
     } finally { setBusy(false) }
   }
 
-  const report = res?.status === 'complete' ? res.result?.report : undefined
-  const perf = res?.result?.performance
+  const shown = unlocked ?? res?.result
+  const report = res?.status === 'complete' ? shown?.report : undefined
+  const isGated = Boolean(res?.gated) && !unlocked
+  const perf = shown?.performance
 
   return (
     <MarketingShell>
@@ -105,7 +115,7 @@ export function CampaignAuditPage() {
           <PrivacyNote>
             We load your page the way a visitor would and measure it. We never submit a form, and
             never follow a link that looks like it would place an order, take a payment or cancel
-            anything. No account, and no email asked for.
+            anything. No account, and we ask for an email after the audit, not before it.
           </PrivacyNote>
         </form>
 
@@ -131,7 +141,7 @@ export function CampaignAuditPage() {
         )}
       </div>
 
-      {report && res?.result && (
+      {report && shown && res && (
         <div className="mt-12">
           {/* Measured numbers, above the findings and clearly separated from
               the model's reading of the copy. */}
@@ -172,6 +182,21 @@ export function CampaignAuditPage() {
               runToken={res.token ?? null}
               ctaHeadline="Turn these findings into an improvement plan, and verify your fixes."
               ctaBody="In BrandGauge every finding becomes a task with a status, your audit history is kept, and re-running the audit shows what you actually fixed. Compare the page against a competitor's, and keep the before and after."
+              gated={isGated}
+              gate={
+                isGated
+                  ? <ResultGate
+                      toolId="campaign-audit"
+                      runToken={res.token ?? null}
+                      withheld={res.withheld ?? { findings: 0, nextAction: true, limitations: true }}
+                      onUnlocked={(result, email) => {
+                        setUnlocked(result as CampaignAuditResult)
+                        setUnlockedEmail(email)
+                        trackTool({ event: 'free_tool_result_engaged', toolId: 'campaign-audit', props: { action: 'unlocked' } })
+                      }}
+                    />
+                  : unlocked ? <GateCleared email={unlockedEmail} /> : null
+              }
               ctaPrimary="Build my campaign improvement plan"
             />
           </div>

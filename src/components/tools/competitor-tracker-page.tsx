@@ -8,6 +8,8 @@ import { ReportView } from './tool-report'
 import { trackTool, useToolAnalytics } from './use-tool-analytics'
 import type { CompetitorTrackerResult } from '@/lib/tools/competitor-tracker'
 import type { CoverageNote } from '@/lib/tools/report'
+import type { Withheld } from '@/lib/tools/gate'
+import { GateCleared, ResultGate } from './result-gate'
 
 interface Response {
   token?: string
@@ -16,6 +18,8 @@ interface Response {
   result?: CompetitorTrackerResult
   failureNote?: string
   coverage?: CoverageNote[]
+  gated?: boolean
+  withheld?: Withheld
   error?: string
 }
 
@@ -37,6 +41,10 @@ export function CompetitorTrackerPage() {
   const [step, setStep] = useState(0)
   const [res, setRes] = useState<Response | null>(null)
   const [error, setError] = useState<string | null>(null)
+  /* The unlocked result arrives from the unlock endpoint rather than being
+     revealed client-side: the preview never contained it. */
+  const [unlocked, setUnlocked] = useState<CompetitorTrackerResult | null>(null)
+  const [unlockedEmail, setUnlockedEmail] = useState<string | undefined>()
 
   /* The step list is honest about what the server is doing, in the order it
      does it, but it cannot know the exact moment each finishes — one request,
@@ -72,7 +80,9 @@ export function CompetitorTrackerPage() {
     }
   }
 
-  const report = res?.status === 'complete' ? res.result?.report : undefined
+  const shown = unlocked ?? res?.result
+  const report = res?.status === 'complete' ? shown?.report : undefined
+  const isGated = Boolean(res?.gated) && !unlocked
 
   return (
     <MarketingShell>
@@ -102,8 +112,8 @@ export function CompetitorTrackerPage() {
               disabled={yourWebsite.trim().length < 4 || competitorWebsite.trim().length < 4} />
           </div>
           <PrivacyNote>
-            We fetch two public web pages and a public news feed. Nothing of yours is connected,
-            nothing is posted anywhere, and we do not ask for an email to show you the result.
+            We fetch two public web pages and a public news feed. Nothing of yours is connected and
+            nothing is posted anywhere. We ask for an email after the brief, not before it.
           </PrivacyNote>
         </form>
 
@@ -144,14 +154,29 @@ export function CompetitorTrackerPage() {
         )}
       </div>
 
-      {report && res?.result && (
+      {report && shown && res && (
         <div className="mt-12">
           <ReportView
             report={report}
             toolId="competitor-tracker"
             runToken={res.token ?? null}
-            ctaHeadline={`Want to know when ${res.result.competitor.name} makes another important move?`}
-            ctaBody={`Track their products, pricing, partnerships and public announcements with BrandGauge. ${res.result.competitor.name} goes onto a watchlist with everything above saved as the starting baseline, so the next change is the thing you hear about rather than old news.`}
+            ctaHeadline={`Want to know when ${shown.competitor.name} makes another important move?`}
+            ctaBody={`Track their products, pricing, partnerships and public announcements with BrandGauge. ${shown.competitor.name} goes onto a watchlist with everything above saved as the starting baseline, so the next change is the thing you hear about rather than old news.`}
+              gated={isGated}
+              gate={
+                isGated
+                  ? <ResultGate
+                      toolId="competitor-tracker"
+                      runToken={res.token ?? null}
+                      withheld={res.withheld ?? { findings: 0, nextAction: true, limitations: true }}
+                      onUnlocked={(result, email) => {
+                        setUnlocked(result as CompetitorTrackerResult)
+                        setUnlockedEmail(email)
+                        trackTool({ event: 'free_tool_result_engaged', toolId: 'competitor-tracker', props: { action: 'unlocked' } })
+                      }}
+                    />
+                  : unlocked ? <GateCleared email={unlockedEmail} /> : null
+              }
             ctaPrimary="Start monitoring this competitor"
           />
         </div>

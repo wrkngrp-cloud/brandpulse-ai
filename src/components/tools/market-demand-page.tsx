@@ -8,6 +8,8 @@ import { ReportView } from './tool-report'
 import { trackTool, useToolAnalytics } from './use-tool-analytics'
 import type { MarketDemandResult } from '@/lib/tools/market-demand'
 import type { CoverageNote } from '@/lib/tools/report'
+import type { Withheld } from '@/lib/tools/gate'
+import { GateCleared, ResultGate } from './result-gate'
 
 interface Response {
   token?: string
@@ -16,6 +18,8 @@ interface Response {
   result?: MarketDemandResult
   failureNote?: string
   coverage?: CoverageNote[]
+  gated?: boolean
+  withheld?: Withheld
   error?: string
 }
 
@@ -38,6 +42,10 @@ export function MarketDemandPage() {
   const [step, setStep] = useState(0)
   const [res, setRes] = useState<Response | null>(null)
   const [error, setError] = useState<string | null>(null)
+  /* The unlocked result arrives from the unlock endpoint rather than being
+     revealed client-side: the preview never contained it. */
+  const [unlocked, setUnlocked] = useState<MarketDemandResult | null>(null)
+  const [unlockedEmail, setUnlockedEmail] = useState<string | undefined>()
 
   useEffect(() => {
     if (!busy) return
@@ -69,7 +77,9 @@ export function MarketDemandPage() {
     } finally { setBusy(false) }
   }
 
-  const report = res?.status === 'complete' ? res.result?.report : undefined
+  const shown = unlocked ?? res?.result
+  const report = res?.status === 'complete' ? shown?.report : undefined
+  const isGated = Boolean(res?.gated) && !unlocked
 
   return (
     <MarketingShell>
@@ -101,7 +111,7 @@ export function MarketDemandPage() {
             disabled={website.trim().length < 4 || market.trim().length < 2} />
           <PrivacyNote>
             We read your public website and look up public search results. Nothing of yours is
-            connected, and we do not ask for an email to show you the report.
+            connected. We ask for an email after the report, not before it.
           </PrivacyNote>
         </form>
 
@@ -142,7 +152,7 @@ export function MarketDemandPage() {
         )}
       </div>
 
-      {report && res?.result && (
+      {report && shown && res && (
         <div className="mt-12">
           {/* What the research understood about the business, shown back before
               the opportunities. If we read it wrong, the reader needs to know
@@ -151,23 +161,23 @@ export function MarketDemandPage() {
             <div className="rounded-sm border p-6" style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-chip)' }}>
               <p className="bg-label" style={{ color: 'var(--lp-mut)' }}>What we understood about you</p>
               <p className="mt-2.5 text-[14px] font-medium" style={{ color: 'var(--lp-ink)' }}>
-                {res.result.business.name} · {res.result.business.category} · {res.result.business.market}
+                {shown.business.name} · {shown.business.category} · {shown.business.market}
               </p>
-              {res.result.business.products.length > 0 && (
+              {shown.business.products.length > 0 && (
                 <p className="mt-2 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
-                  Sells: {res.result.business.products.join(', ')}
+                  Sells: {shown.business.products.join(', ')}
                 </p>
               )}
-              {res.result.business.customers.length > 0 && (
+              {shown.business.customers.length > 0 && (
                 <p className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
-                  Buyers: {res.result.business.customers.join(', ')}
+                  Buyers: {shown.business.customers.join(', ')}
                 </p>
               )}
-              {res.result.searched.length > 0 && (
+              {shown.searched.length > 0 && (
                 <>
                   <p className="bg-label mt-5" style={{ color: 'var(--lp-mut)' }}>Searches we looked up</p>
                   <ul className="mt-2 space-y-1 text-[13px]" style={{ color: 'var(--lp-ink)' }}>
-                    {res.result.searched.map((s, i) => (
+                    {shown.searched.map((s, i) => (
                       <li key={i}>
                         “{s.query}”
                         <span style={{ color: s.youRanked ? 'var(--pos)' : 'var(--tx-flare)' }}>
@@ -178,7 +188,7 @@ export function MarketDemandPage() {
                   </ul>
                 </>
               )}
-              {!res.result.provider && (
+              {!shown.provider && (
                 <p className="mt-4 text-[12.5px] leading-relaxed" style={{ color: 'var(--lp-mut)' }}>
                   No licensed search data was used on this run, so nothing in this report claims a
                   search volume or a ranking. The gaps below are read off your own pages.
@@ -194,6 +204,21 @@ export function MarketDemandPage() {
               runToken={res.token ?? null}
               ctaHeadline="Turn these opportunities into an actionable customer acquisition plan."
               ctaBody="BrandGauge imports every opportunity above with its evidence, lets you prioritise them, mark what is planned and what is done, and generate a summary your team can work from. The research comes with you."
+              gated={isGated}
+              gate={
+                isGated
+                  ? <ResultGate
+                      toolId="market-demand"
+                      runToken={res.token ?? null}
+                      withheld={res.withheld ?? { findings: 0, nextAction: true, limitations: true }}
+                      onUnlocked={(result, email) => {
+                        setUnlocked(result as MarketDemandResult)
+                        setUnlockedEmail(email)
+                        trackTool({ event: 'free_tool_result_engaged', toolId: 'market-demand', props: { action: 'unlocked' } })
+                      }}
+                    />
+                  : unlocked ? <GateCleared email={unlockedEmail} /> : null
+              }
               ctaPrimary="Build my acquisition opportunity plan"
             />
           </div>

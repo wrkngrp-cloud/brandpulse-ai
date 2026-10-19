@@ -54,6 +54,15 @@ const files = {
   'campaign-audit.ts':     ['src/lib/tools/campaign-audit.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
       "import { callAi, extractJson } from './ai-stub'")],
+  'leads.ts':              ['src/lib/tools/leads.ts', s => s
+    .replace("import { createServiceClient } from '@/lib/supabase/server'",
+      "const createServiceClient = async (): Promise<any> => { throw new Error('no database in this check') }")],
+  'gate.ts':               ['src/lib/tools/gate.ts', s => s],
+  'brand-gap.ts':          ['src/lib/tools/brand-gap.ts', s => s
+    .replace("import { callAi, extractJson } from '@/lib/ai/client'",
+      "import { callAi, extractJson } from './ai-stub'")
+    .replace("from '@/lib/press/nigerian-press'", "from './press-stub'")
+    .replace("from '@/lib/ai/assistants'", "from './assistants-stub'")],
   'competitor-tracker.ts': ['src/lib/tools/competitor-tracker.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
       "import { callAi, extractJson } from './ai-stub'")
@@ -97,12 +106,19 @@ export function classifyRegulatory(_h: string) { return null }
 export type RegulatoryKind = 'notice'
 `)
 
+writeFileSync(`${OUT}/assistants-stub.ts`, `
+export type AssistantPlatform = 'chatgpt' | 'gemini' | 'perplexity'
+export const ASSISTANT_PLATFORMS: AssistantPlatform[] = ['chatgpt', 'gemini', 'perplexity']
+export function configuredAssistants(): AssistantPlatform[] { return [] }
+export async function queryAssistant(_p: AssistantPlatform, _q: string, _o?: { maxTokens?: number }): Promise<string | null> { return null }
+`)
+
 execSync(
-  `npx tsc --strict --target es2022 --module esnext --moduleResolution bundler --skipLibCheck --outDir ${OUT} ${Object.keys(files).map(f => `${OUT}/${f}`).join(' ')} ${OUT}/ai-stub.ts ${OUT}/press-stub.ts`,
+  `npx tsc --strict --target es2022 --module esnext --moduleResolution bundler --skipLibCheck --outDir ${OUT} ${Object.keys(files).map(f => `${OUT}/${f}`).join(' ')} ${OUT}/ai-stub.ts ${OUT}/press-stub.ts ${OUT}/assistants-stub.ts`,
   { stdio: 'inherit' },
 )
 // tsc emits .js; the directory has no package.json, so rename for ESM.
-for (const f of [...Object.keys(files).map(f => f.replace('.ts', '')), 'ai-stub', 'press-stub']) {
+for (const f of [...Object.keys(files).map(f => f.replace('.ts', '')), 'ai-stub', 'press-stub', 'assistants-stub']) {
   execSync(`mv ${OUT}/${f}.js ${OUT}/${f}.mjs`)
   const p = `${OUT}/${f}.mjs`
   writeFileSync(p, readFileSync(p, 'utf8').replace(/from ['"]\.\/([a-z-]+)['"]/g, "from './$1.mjs'"))
@@ -119,7 +135,10 @@ const search      = await import(`${OUT}/search-provider.mjs`)
 const offline     = await import(`${OUT}/offline-tracker.mjs`)
 const labels      = await import(`${OUT}/campaign-labels.mjs`)
 const auditMod    = await import(`${OUT}/campaign-audit.mjs`)
+const leads       = await import(`${OUT}/leads.mjs`)
+const gate        = await import(`${OUT}/gate.mjs`)
 const vocab       = await import(`${OUT}/audit-vocab.mjs`)
+const brandGap    = await import(`${OUT}/brand-gap.mjs`)
 
 let pass = 0, fail = 0
 const eq = (name, got, want) => {
@@ -245,13 +264,36 @@ eq('external out',   html.findSectionLinks(facts, [/wa\.me/i], 2), [])
 
 // ── The registry, which the nav and the directory both read ─────────────────
 console.log('\n── registry')
-eq('five tools',        registry.FREE_TOOLS.length, 5)
-eq('ids unique',        new Set(registry.FREE_TOOLS.map(t => t.id)).size, 5)
-eq('routes unique',     new Set(registry.FREE_TOOLS.map(t => t.route)).size, 5)
+const routeFile = route => {
+  const base = `src/app${route}`
+  return ['page.tsx', 'route.ts'].some(f => existsSync(`${base}/${f}`))
+}
+// Counts are not asserted: the lineup changes as tools are added and retired,
+// and a test that has to be edited every time one moves is a test that gets
+// edited rather than read. The invariants below are what must always hold.
+const listed = registry.FREE_TOOLS
+ok('at least three tools are listed', listed.length >= 3)
+ok('everything in FREE_TOOLS is listed', listed.every(t => t.listed))
+eq('listed ids unique',    new Set(listed.map(t => t.id)).size, listed.length)
+eq('listed routes unique', new Set(listed.map(t => t.route)).size, listed.length)
 eq('scoreboard route',  registry.toolById('pr-scoreboard').route, '/scoreboard')
-ok('every route absolute', registry.FREE_TOOLS.every(t => t.route.startsWith('/')))
-ok('every tool has a blurb and a CTA', registry.FREE_TOOLS.every(t => t.blurb && t.cta && t.detail))
-eq('grouped covers all', registry.toolsByCategory().reduce((n, g) => n + g.tools.length, 0), 5)
+ok('every route absolute', listed.every(t => t.route.startsWith('/')))
+ok('every tool has a blurb and a CTA', listed.every(t => t.blurb && t.cta && t.detail))
+eq('grouped covers every listed tool',
+   registry.toolsByCategory().reduce((n, g) => n + g.tools.length, 0), listed.length)
+
+// A retired tool keeps its identity so the lead desk and the funnel can still
+// name it, and keeps its page so a link someone holds still resolves. What it
+// loses is its place in the lineup.
+const retired = registry.TOOL_IDS.filter(id => !listed.some(t => t.id === id))
+ok('the offline tracker is retired from the lineup', retired.includes('offline-tracker'))
+for (const id of retired) {
+  const tool = registry.toolById(id)
+  ok(`${id} still resolves by id`, Boolean(tool) && tool.listed === false)
+  ok(`${id} keeps its page`, routeFile(tool.route))
+  ok(`${id} is not suggested to anyone`,
+     listed.every(t => registry.nextTool(t.id)?.tool.id !== id))
+}
 ok('next tool for every tool', registry.FREE_TOOLS.every(t => {
   const n = registry.nextTool(t.id)
   return n && n.tool.id !== t.id && n.line.length > 10
@@ -570,10 +612,6 @@ ok('a label per objective',vocab.CAMPAIGN_OBJECTIVES.every(o => vocab.OBJECTIVE_
       dashboard module with no product tour, the PR Scoreboard's route moving. */
 console.log('\n── navigation and routing wiring')
 
-const routeFile = route => {
-  const base = `src/app${route}`
-  return ['page.tsx', 'route.ts'].some(f => existsSync(`${base}/${f}`))
-}
 for (const tool of registry.FREE_TOOLS) {
   ok(`${tool.name} has a page at ${tool.route}`, routeFile(tool.route))
 }
@@ -635,6 +673,171 @@ for (const table of [
 ok('no policy is granted to anon', !/to\s+anon/i.test(migration))
 ok('enquiries are not readable by the lead desk',
    !/create policy tool_responses_read[\s\S]{0,200}is_lead_desk/.test(migration))
+
+
+// ── Lead capture: a later run must never cost us data ───────────────────────
+console.log('\n── fillBlanks: blanks are filled, nothing is overwritten')
+eq('fills a missing name',
+   leads.fillBlanks({ name: null, role: 'CMO or marketing director' }, { name: 'Ada', role: null }),
+   { name: 'Ada' })
+eq('never overwrites a name already there',
+   leads.fillBlanks({ name: 'Ada Obi' }, { name: 'A' }), {})
+// The bug this exists for: a second, sparser form once erased the first one's
+// answers, because an empty field sends an explicit null.
+eq('a blank second form erases nothing',
+   leads.fillBlanks({ name: 'Ada Obi', role: 'Brand manager', company: 'Acme' },
+                    { name: null, role: null, company: null }), {})
+eq('fills several blanks at once',
+   leads.fillBlanks({ name: null, company: null, role: 'Brand manager' },
+                    { name: 'Ada', company: 'Acme', role: 'Founder or MD' }),
+   { name: 'Ada', company: 'Acme' })
+eq('empty string counts as a blank incoming value',
+   leads.fillBlanks({ name: null }, { name: '' }), {})
+
+console.log('\n── company is derived from the website, not asked for')
+eq('from the competitor tool inputs',
+   leads.companyFromInputs({ yourWebsite: 'https://acme.ng/about', competitorWebsite: 'https://rival.ng' }),
+   { company: 'Acme', website: 'https://acme.ng' })
+eq('from an audited page', leads.companyFromInputs({ pageUrl: 'https://shop.jara.com.ng/offer?x=1' }).company, 'Shop')
+eq('www is stripped', leads.companyFromInputs({ website: 'https://www.acme.ng' }).company, 'Acme')
+eq('nothing to go on', leads.companyFromInputs({ market: 'Nigeria' }), { company: null, website: null })
+
+console.log('\n── the gate withholds on the server, not in the browser')
+const fullReport = {
+  title: 'T', summary: 'S',
+  findings: [
+    { title: 'first', provenance: 'observed', confidence: 'high', evidence: [{ sourceUrl: 'https://a.ng' }] },
+    { title: 'second', provenance: 'observed', confidence: 'high', evidence: [{ sourceUrl: 'https://b.ng' }] },
+    { title: 'third', provenance: 'observed', confidence: 'high', evidence: [{ sourceUrl: 'https://c.ng' }] },
+  ],
+  nextAction: 'do the thing',
+  coverage: [{ source: 'the press', read: true }],
+  limitations: ['one', 'two'],
+  generatedAt: '2026-10-18T00:00:00.000Z',
+}
+const preview = gate.gateReport(fullReport, false)
+eq('one finding survives',        preview.report.findings.length, 1)
+eq('and it is the strongest',     preview.report.findings[0].title, 'first')
+eq('with its evidence intact',    preview.report.findings[0].evidence[0].sourceUrl, 'https://a.ng')
+eq('two withheld',                preview.withheld.findings, 2)
+eq('the next action is withheld', preview.report.nextAction, undefined)
+eq('the limitations are withheld',preview.report.limitations, [])
+// Coverage stays: it is the proof the work happened, and it names what we
+// could not read, which is honest on either side of the gate.
+eq('coverage stays',              preview.report.coverage.length, 1)
+eq('the summary stays',           preview.report.summary, 'S')
+
+const open_ = gate.gateReport(fullReport, true)
+eq('unlocked keeps everything',   [open_.report.findings.length, open_.report.limitations.length, open_.gated],
+   [3, 2, false])
+
+console.log('\n── and the machine arrays are trimmed with it')
+const result = { report: fullReport, moves: [{ a: 1 }, { a: 2 }, { a: 3 }], competitor: { name: 'Rival' } }
+const gatedResult = gate.gateResult('competitor-tracker', result, false)
+eq('moves trimmed to match the preview', gatedResult.result.moves.length, 1)
+eq('other fields untouched', gatedResult.result.competitor.name, 'Rival')
+eq('unlocked leaves the array alone',
+   gate.gateResult('competitor-tracker', result, true).result.moves.length, 3)
+eq('opportunities trimmed too',
+   gate.gateResult('market-demand', { report: fullReport, opportunities: [1, 2, 3] }, false).result.opportunities.length, 1)
+eq('audit findings trimmed too',
+   gate.gateResult('campaign-audit', { report: fullReport, findings: [1, 2, 3, 4] }, false).result.findings.length, 1)
+
+console.log('\n── every tool in the lineup has gate copy')
+ok('copy for each listed tool', registry.FREE_TOOLS.every(t => {
+  const c = gate.GATE_COPY[t.id]
+  return c && typeof c.headline === 'function' && c.body && c.monitoring && c.button
+}))
+ok('the headline counts what is actually withheld',
+   gate.GATE_COPY['competitor-tracker'].headline({ findings: 2 }).includes('2'))
+ok('and reads naturally for one',
+   !gate.GATE_COPY['competitor-tracker'].headline({ findings: 1 }).includes('1 more verified moves'))
+
+// ── Brand Perception Gap ────────────────────────────────────────────────────
+console.log('\n── the brand gap only writes down what a page actually says')
+const sitePage = {
+  url: 'https://jara.ng', title: 'Jara Foods', description: null, canonical: null, lang: 'en',
+  text: 'Jara Foods makes affordable soups for busy Lagos families. We believe good food should never be a luxury. Every pack is cooked the way your mother would.',
+  textLength: 160, headings: [], links: [], ctas: [], forms: [], images: 0, imagesWithoutAlt: 0,
+  hasViewportMeta: true, trackers: [], scriptCount: 0, inlineStyleBlocks: 0, bytes: 1000,
+}
+aiStub.setNextResponse(JSON.stringify({
+  audience: 'busy Lagos families',
+  promise: 'affordable soups',
+  category: 'Food & Beverage',
+  values: [
+    { label: 'Affordability', quote: 'We believe good food should never be a luxury.' },
+    // Invented: nowhere on the page. Must be dropped rather than softened.
+    { label: 'Sustainability', quote: 'Every pack is carbon neutral by 2027.' },
+  ],
+  voiceAdjectives: ['warm', 'plain'],
+  tone: 'Warm and direct',
+  segments: [{ name: 'Lagos households', demographics: '25-45', geography: 'Lagos' }],
+}))
+const stated = await brandGap.readStated({ name: 'Jara Foods', market: 'Nigeria', pages: [sitePage] })
+eq('a quoted value survives',        stated.values.map(v => v.label), ['Affordability'])
+eq('an unquoted value is dropped',   stated.values.length, 1)
+eq('the quote keeps its source',     stated.values[0].sourceUrl, 'https://jara.ng')
+eq('audience and promise recorded',  [stated.audience, stated.promise], ['busy Lagos families', 'affordable soups'])
+eq('a known category is kept',       stated.category, 'Food & Beverage')
+
+aiStub.setNextResponse(JSON.stringify({ category: 'Other', values: [] }))
+const vague = await brandGap.readStated({ name: 'X', market: 'Nigeria', pages: [sitePage] })
+eq('"Other" is not a category',      vague.category, null)
+eq('an empty read stays empty',      [vague.audience, vague.values.length], [null, 0])
+
+console.log('\n── and only names a gap an outside source supports')
+const press = [{ title: 'Jara Foods expands', link: 'https://punchng.com/jara', pubDate: 'Mon, 06 Oct 2026 09:00:00 GMT', snippet: 'Jara Foods is best known for its speed of delivery across Lagos.' }]
+aiStub.setNextResponse(JSON.stringify({
+  described: [
+    { source: 1, attribute: 'Fast delivery', quote: 'best known for its speed of delivery' },
+    // A source index that does not exist. Dropped on the way back.
+    { source: 9, attribute: 'Premium pricing', quote: 'invented' },
+  ],
+  divergences: [
+    { kind: 'unclaimed', stated: '', described: 'Fast delivery', significance: 's', recommendation: 'r', sources: [1], confidence: 'high' },
+    // An outside claim citing nothing is an opinion. Dropped.
+    { kind: 'contradicted', stated: 'Affordable', described: 'Expensive', significance: 's', recommendation: 'r', sources: [], confidence: 'high' },
+    // Absence is evidenced by their own words, so this one survives with the
+    // site quote attached.
+    { kind: 'missing', stated: 'Affordability', described: '', significance: 's', recommendation: 'r', sources: [], confidence: 'bogus' },
+  ],
+}))
+const gap = await brandGap.readGap({ name: 'Jara Foods', market: 'Nigeria', stated, press, answers: [] })
+eq('a cited attribute survives',        gap.traits.map(t => t.attribute), ['Fast delivery'])
+eq('an invented source index is gone',  gap.traits.length, 1)
+eq('kinds that survive',                gap.divergences.map(d => d.kind), ['unclaimed', 'missing'])
+eq('the uncited contradiction is gone', gap.divergences.filter(d => d.kind === 'contradicted').length, 0)
+eq('absence cites their own words',     gap.divergences[1].evidence[0].sourceName, 'Their own website')
+eq('a nonsense confidence is normalised', gap.divergences[1].confidence, 'medium')
+eq('press evidence keeps its link',     gap.divergences[0].evidence[0].sourceUrl, 'https://punchng.com/jara')
+
+console.log('\n── an assistant answer is evidence with no address, never a fake link')
+aiStub.setNextResponse(JSON.stringify({
+  described: [{ source: 1, attribute: 'A fintech', quote: 'Jara Foods is often described as a fintech' }],
+  divergences: [{ kind: 'contradicted', stated: 'A food brand', described: 'A fintech', significance: 's', recommendation: 'r', sources: [1], confidence: 'medium' }],
+}))
+const fromAssistant = await brandGap.readGap({
+  name: 'Jara Foods', market: 'Nigeria', stated, press: [],
+  answers: ['Jara Foods is often described as a fintech operating in Lagos.'],
+})
+eq('the attribute is recorded',      fromAssistant.traits[0].attribute, 'A fintech')
+eq('with no invented URL',           fromAssistant.traits[0].sourceUrl, null)
+eq('and no invented URL on the card', fromAssistant.divergences[0].evidence[0].sourceUrl, undefined)
+// The platform is never named anywhere a visitor can read it.
+ok('the model is never named', !JSON.stringify(fromAssistant).match(/gpt|gemini|perplexity|claude|sonar/i))
+
+console.log('\n── an assistant that does not know the brand is not a description')
+for (const refusal of [
+  'I do not know this brand.',
+  "I don't have information about a company called Jara Foods.",
+  'I could not find any record of this brand.',
+  'Jara Foods does not appear to be a well-known company.',
+]) ok(`filtered: "${refusal.slice(0, 32)}"`, brandGap.looksLikeNotKnown(refusal))
+for (const answer of [
+  'Jara Foods is a Lagos food brand known for affordable soups.',
+  'It is best known for fast delivery. I would describe it as practical.',
+]) ok(`kept: "${answer.slice(0, 32)}"`, !brandGap.looksLikeNotKnown(answer))
 
 console.log(`\n${fail === 0 ? 'PASS' : 'FAIL'} — ${pass} checks passed, ${fail} failed\n`)
 process.exit(fail === 0 ? 0 : 1)

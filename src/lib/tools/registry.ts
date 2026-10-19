@@ -14,14 +14,14 @@ import type { BrandIconName } from '@/components/brand/icon'
  * permanent redirect, so the directory's own URL shape stays predictable.)
  */
 
-export type ToolCategory = 'competitive' | 'market' | 'campaign'
+export type ToolCategory = 'brand' | 'competitive' | 'market' | 'campaign'
 
 /** Built: live and doing real work. Credentialed: live, but one named source
  *  needs an env var before it can measure rather than infer. */
 export type ToolStatus = 'built' | 'credentialed'
 
 export interface FreeTool {
-  id:        'pr-scoreboard' | 'competitor-tracker' | 'market-demand' | 'offline-tracker' | 'campaign-audit'
+  id:        'pr-scoreboard' | 'brand-gap' | 'competitor-tracker' | 'market-demand' | 'offline-tracker' | 'campaign-audit'
   name:      string
   /** One line, benefit-led, for the dropdown and the directory card. */
   blurb:     string
@@ -33,15 +33,25 @@ export interface FreeTool {
   category:  ToolCategory
   status:    ToolStatus
   order:     number
+  /**
+   * Is this tool part of the public lineup?
+   *
+   * An unlisted tool keeps its page, its API and its data — a link someone
+   * already holds has to keep working — but it is out of the nav dropdown,
+   * the directory, the sitemap and the end-of-report suggestion. That is the
+   * difference between retiring an acquisition lever and deleting a feature.
+   */
+  listed:    boolean
 }
 
 export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; blurb: string }> = {
+  brand:       { label: 'Brand intelligence',       blurb: 'Whether the market describes you the way you describe yourself.' },
   competitive: { label: 'Competitive intelligence', blurb: 'Who else is in the room, and what they just did.' },
   market:      { label: 'Market intelligence',      blurb: 'Where the customers are that you are not reaching.' },
   campaign:    { label: 'Campaign intelligence',    blurb: 'Whether the money you spend lands.' },
 }
 
-export const FREE_TOOLS: FreeTool[] = [
+const ALL_TOOLS: FreeTool[] = [
   {
     id:       'pr-scoreboard',
     name:     'PR Scoreboard',
@@ -53,6 +63,20 @@ export const FREE_TOOLS: FreeTool[] = [
     category: 'competitive',
     status:   'built',
     order:    1,
+    listed:   true,
+  },
+  {
+    id:       'brand-gap',
+    name:     'Brand Perception Gap',
+    blurb:    'See whether the market describes you the way you do.',
+    detail:   'Reads the positioning on your own site, then reads how the Nigerian press and an AI assistant actually describe you, and names the distance between the two. Your website, your brand name, nothing else.',
+    cta:      'Find my perception gap',
+    icon:     'bg-git-fork',
+    route:    '/tools/brand-gap',
+    category: 'brand',
+    status:   'credentialed',
+    order:    2,
+    listed:   true,
   },
   {
     id:       'competitor-tracker',
@@ -64,7 +88,8 @@ export const FREE_TOOLS: FreeTool[] = [
     route:    '/tools/competitor-tracker',
     category: 'competitive',
     status:   'built',
-    order:    2,
+    order:    3,
+    listed:   true,
   },
   {
     id:       'market-demand',
@@ -76,7 +101,8 @@ export const FREE_TOOLS: FreeTool[] = [
     route:    '/tools/market-demand',
     category: 'market',
     status:   'credentialed',
-    order:    3,
+    order:    4,
+    listed:   true,
   },
   {
     id:       'offline-tracker',
@@ -88,7 +114,20 @@ export const FREE_TOOLS: FreeTool[] = [
     route:    '/tools/offline-tracker',
     category: 'campaign',
     status:   'built',
-    order:    4,
+    order:    5,
+    /* Retired from the lineup on 18 October 2026, and kept reachable.
+       Two reasons, and the second is the stronger one. Nobody scans a QR code
+       on a billboard on Third Mainland Bridge at speed, and nobody stops
+       walking to type a vanity link, which is why this repo's own locked
+       decision already makes QR a secondary toggle that is off by default for
+       OOH. But even with perfect scanning it was the wrong free tool: it is
+       the only one that ends with assets rather than a finding, so a visitor
+       leaves with homework instead of an insight. Time to value is the whole
+       game at the top of a funnel.
+       The page, the /go resolution, the tables and the dashboard module all
+       stay: links already generated must keep resolving, and the OOH
+       measurement rethink may want this plumbing back. */
+    listed:   false,
   },
   {
     id:       'campaign-audit',
@@ -100,15 +139,21 @@ export const FREE_TOOLS: FreeTool[] = [
     route:    '/tools/campaign-audit',
     category: 'campaign',
     status:   'built',
-    order:    5,
+    order:    6,
+    listed:   true,
   },
 ]
 
-export const TOOL_IDS = FREE_TOOLS.map(t => t.id)
+/** The public lineup: the nav, the directory and the sitemap read this. */
+export const FREE_TOOLS: FreeTool[] = ALL_TOOLS.filter(t => t.listed).sort((a, b) => a.order - b.order)
+
+export const TOOL_IDS = ALL_TOOLS.map(t => t.id)
 export type ToolId = FreeTool['id']
 
+/** Resolves unlisted tools too, so a retired tool still has a name on the
+ *  lead desk and in the founder's funnel. */
 export function toolById(id: string): FreeTool | undefined {
-  return FREE_TOOLS.find(t => t.id === id)
+  return ALL_TOOLS.find(t => t.id === id)
 }
 
 export function toolsByCategory(): Array<{ category: ToolCategory; label: string; blurb: string; tools: FreeTool[] }> {
@@ -128,7 +173,8 @@ export function toolsByCategory(): Array<{ category: ToolCategory; label: string
  * clutter competing with the beta call to action. One suggestion, never more.
  */
 const NEXT_TOOL: Record<ToolId, { id: ToolId; line: string }> = {
-  'pr-scoreboard':      { id: 'competitor-tracker', line: 'Want to know what these competitors are doing beyond earned media?' },
+  'pr-scoreboard':      { id: 'brand-gap',          line: 'The press has its own words for you. Do they match the ones on your website?' },
+  'brand-gap':          { id: 'competitor-tracker', line: 'That is how the market reads you. Now, what are your competitors actually doing?' },
   'competitor-tracker': { id: 'pr-scoreboard',      line: 'Want to see who is winning the press in this category?' },
   'market-demand':      { id: 'campaign-audit',     line: 'Before you send traffic to these pages, check whether they are ready for it.' },
   'offline-tracker':    { id: 'campaign-audit',     line: 'Your links point somewhere. Is that page ready to convert the people who arrive?' },
@@ -138,5 +184,6 @@ const NEXT_TOOL: Record<ToolId, { id: ToolId; line: string }> = {
 export function nextTool(after: ToolId): { tool: FreeTool; line: string } | null {
   const pick = NEXT_TOOL[after]
   const tool = pick && toolById(pick.id)
-  return tool ? { tool, line: pick.line } : null
+  // Never point a visitor at a tool that is no longer in the lineup.
+  return tool && tool.listed ? { tool, line: pick.line } : null
 }
