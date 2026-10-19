@@ -173,12 +173,29 @@ client first (or add `.eq('brand_id', <active brand>)`), then do service-role wo
 ## Free Tools and product-led acquisition
 Five public tools run for a visitor who has signed up for nothing and connected nothing:
 the PR Scoreboard at `/scoreboard` (predates the rest, keeps its route and its own markup),
-plus `/tools/competitor-tracker`, `/tools/market-demand`, `/tools/offline-tracker` and
-`/tools/campaign-audit`. The directory is `/tools`. See `docs/free-tools-acquisition-plan.md`.
+plus `/tools/brand-gap`, `/tools/competitor-tracker`, `/tools/market-demand` and
+`/tools/campaign-audit`. The directory is `/tools`. `/tools/offline-tracker` is built and
+retired: unlisted since 18 October 2026, still reachable, still resolving its printed slugs.
+See `docs/free-tools-acquisition-plan.md`.
 
 - `src/lib/tools/registry.ts` is the single source for the nav dropdown, the directory and
-  the end-of-report suggestion. A sixth tool is one entry plus a page. The nav label is
-  exactly **Free Tools**.
+  the end-of-report suggestion. Another tool is one entry plus a page. The nav label is
+  exactly **Free Tools**. `listed: false` retires a tool from the lineup without deleting it:
+  the page, the API and the data stay, and `toolById` still resolves it so the lead desk has
+  a name for it.
+- The result is gated on an email, on the server, in `src/lib/tools/gate.ts`. The gate comes
+  **after** the work and after one complete finding with its source; the withheld findings
+  are trimmed out of the payload, so nothing in dev tools contradicts what the page says.
+  Three fields only: email, name, role. The company is derived from the website the tool
+  already has. `src/lib/tools/leads.ts` reads before it writes, never overwrites first-touch
+  `source`, and never blanks a field an earlier run filled.
+- The Brand Perception Gap reads a brand's stated identity off its own pages against how the
+  press and an AI assistant describe it. Our own generation still goes through `callAi`; the
+  external assistants in `src/lib/ai/assistants.ts` are the thing being measured, shared with
+  the AI Visibility job, and never named in any UI. An assistant answer has no `sourceUrl`,
+  so `Evidence.sourceUrl` is optional and the card renders that source named but unlinked.
+  Its claim importer fills only the brand fields that are empty, and never overwrites a
+  category, a set of values or a tone the marketer configured.
 - A visitor-supplied URL is fetched ONLY through `fetchPublic` in
   `src/lib/tools/fetch-public.ts`. It screens DNS against the private ranges before the
   socket opens and follows redirects by hand so every hop is screened. Do not add a plain

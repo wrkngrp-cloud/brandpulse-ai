@@ -26,7 +26,9 @@ export function ResultGate({
   toolId: ToolId
   runToken: string | null
   withheld: Withheld
-  onUnlocked: (result: unknown) => void
+  /** The email comes back too, so the acknowledgement can name the inbox
+   *  the copy went to rather than saying "your inbox". */
+  onUnlocked: (result: unknown, email: string) => void
 }) {
   const copy = GATE_COPY[toolId]
 
@@ -61,7 +63,7 @@ export function ResultGate({
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'That did not send.')
-      onUnlocked(data.result)
+      onUnlocked(data.result, email.trim())
     } catch (err) {
       setError(err instanceof Error ? err.message : 'That did not send.')
     } finally { setBusy(false) }

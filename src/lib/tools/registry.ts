@@ -14,14 +14,14 @@ import type { BrandIconName } from '@/components/brand/icon'
  * permanent redirect, so the directory's own URL shape stays predictable.)
  */
 
-export type ToolCategory = 'competitive' | 'market' | 'campaign'
+export type ToolCategory = 'brand' | 'competitive' | 'market' | 'campaign'
 
 /** Built: live and doing real work. Credentialed: live, but one named source
  *  needs an env var before it can measure rather than infer. */
 export type ToolStatus = 'built' | 'credentialed'
 
 export interface FreeTool {
-  id:        'pr-scoreboard' | 'competitor-tracker' | 'market-demand' | 'offline-tracker' | 'campaign-audit'
+  id:        'pr-scoreboard' | 'brand-gap' | 'competitor-tracker' | 'market-demand' | 'offline-tracker' | 'campaign-audit'
   name:      string
   /** One line, benefit-led, for the dropdown and the directory card. */
   blurb:     string
@@ -45,6 +45,7 @@ export interface FreeTool {
 }
 
 export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; blurb: string }> = {
+  brand:       { label: 'Brand intelligence',       blurb: 'Whether the market describes you the way you describe yourself.' },
   competitive: { label: 'Competitive intelligence', blurb: 'Who else is in the room, and what they just did.' },
   market:      { label: 'Market intelligence',      blurb: 'Where the customers are that you are not reaching.' },
   campaign:    { label: 'Campaign intelligence',    blurb: 'Whether the money you spend lands.' },
@@ -65,6 +66,19 @@ const ALL_TOOLS: FreeTool[] = [
     listed:   true,
   },
   {
+    id:       'brand-gap',
+    name:     'Brand Perception Gap',
+    blurb:    'See whether the market describes you the way you do.',
+    detail:   'Reads the positioning on your own site, then reads how the Nigerian press and an AI assistant actually describe you, and names the distance between the two. Your website, your brand name, nothing else.',
+    cta:      'Find my perception gap',
+    icon:     'bg-git-fork',
+    route:    '/tools/brand-gap',
+    category: 'brand',
+    status:   'credentialed',
+    order:    2,
+    listed:   true,
+  },
+  {
     id:       'competitor-tracker',
     name:     'Competitor Move Tracker',
     blurb:    'Know what your competitors are doing.',
@@ -74,7 +88,7 @@ const ALL_TOOLS: FreeTool[] = [
     route:    '/tools/competitor-tracker',
     category: 'competitive',
     status:   'built',
-    order:    2,
+    order:    3,
     listed:   true,
   },
   {
@@ -87,7 +101,7 @@ const ALL_TOOLS: FreeTool[] = [
     route:    '/tools/market-demand',
     category: 'market',
     status:   'credentialed',
-    order:    3,
+    order:    4,
     listed:   true,
   },
   {
@@ -100,7 +114,7 @@ const ALL_TOOLS: FreeTool[] = [
     route:    '/tools/offline-tracker',
     category: 'campaign',
     status:   'built',
-    order:    4,
+    order:    5,
     /* Retired from the lineup on 18 October 2026, and kept reachable.
        Two reasons, and the second is the stronger one. Nobody scans a QR code
        on a billboard on Third Mainland Bridge at speed, and nobody stops
@@ -125,7 +139,7 @@ const ALL_TOOLS: FreeTool[] = [
     route:    '/tools/campaign-audit',
     category: 'campaign',
     status:   'built',
-    order:    5,
+    order:    6,
     listed:   true,
   },
 ]
@@ -159,7 +173,8 @@ export function toolsByCategory(): Array<{ category: ToolCategory; label: string
  * clutter competing with the beta call to action. One suggestion, never more.
  */
 const NEXT_TOOL: Record<ToolId, { id: ToolId; line: string }> = {
-  'pr-scoreboard':      { id: 'competitor-tracker', line: 'Want to know what these competitors are doing beyond earned media?' },
+  'pr-scoreboard':      { id: 'brand-gap',          line: 'The press has its own words for you. Do they match the ones on your website?' },
+  'brand-gap':          { id: 'competitor-tracker', line: 'That is how the market reads you. Now, what are your competitors actually doing?' },
   'competitor-tracker': { id: 'pr-scoreboard',      line: 'Want to see who is winning the press in this category?' },
   'market-demand':      { id: 'campaign-audit',     line: 'Before you send traffic to these pages, check whether they are ready for it.' },
   'offline-tracker':    { id: 'campaign-audit',     line: 'Your links point somewhere. Is that page ready to convert the people who arrive?' },

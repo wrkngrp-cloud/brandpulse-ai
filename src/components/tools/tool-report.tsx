@@ -183,13 +183,21 @@ export function FindingCard({ finding }: { finding: Finding }) {
                      a report stops being evidence. */
                   <p className="text-[13px] leading-relaxed" style={{ color: 'var(--lp-ink)' }}>“{e.quote}”</p>
                 )}
-                <a href={e.sourceUrl} target="_blank" rel="noopener noreferrer nofollow"
-                  className="mt-1 inline-flex max-w-full items-center gap-1.5 text-[12px] underline-offset-2 hover:underline"
-                  style={{ color: 'var(--tx-flare)' }}>
-                  <ExternalLinkIcon className="h-3 w-3 shrink-0" />
-                  <span className="truncate">{e.sourceName ?? hostOf(e.sourceUrl)}</span>
-                  {e.publishedAt && <span style={{ color: 'var(--lp-mut)' }}>· {e.publishedAt}</span>}
-                </a>
+                {e.sourceUrl ? (
+                  <a href={e.sourceUrl} target="_blank" rel="noopener noreferrer nofollow"
+                    className="mt-1 inline-flex max-w-full items-center gap-1.5 text-[12px] underline-offset-2 hover:underline"
+                    style={{ color: 'var(--tx-flare)' }}>
+                    <ExternalLinkIcon className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{e.sourceName ?? hostOf(e.sourceUrl)}</span>
+                    {e.publishedAt && <span style={{ color: 'var(--lp-mut)' }}>· {e.publishedAt}</span>}
+                  </a>
+                ) : (
+                  /* A source with no address. Named, not linked, and never
+                     dressed up as a link that goes nowhere. */
+                  <p className="mt-1 text-[12px]" style={{ color: 'var(--lp-mut)' }}>
+                    {e.sourceName ?? 'Source not published'}
+                  </p>
+                )}
               </li>
             ))}
           </ul>

@@ -113,7 +113,7 @@ async function sendReportEmail(to: string, toolId: ToolId, report: ToolReport | 
     return [
       `${i + 1}. ${f.title}`,
       f.significance ? `   ${f.significance}` : null,
-      source ? `   Source: ${source.sourceName ?? source.sourceUrl}  ${source.sourceUrl}` : null,
+      source ? `   Source: ${[source.sourceName, source.sourceUrl].filter(Boolean).join('  ')}` : null,
     ].filter(Boolean).join('\n')
   }).join('\n\n')
 

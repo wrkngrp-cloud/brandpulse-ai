@@ -115,7 +115,7 @@ export function CampaignAuditPage() {
           <PrivacyNote>
             We load your page the way a visitor would and measure it. We never submit a form, and
             never follow a link that looks like it would place an order, take a payment or cancel
-            anything. No account, and no email asked for.
+            anything. No account, and we ask for an email after the audit, not before it.
           </PrivacyNote>
         </form>
 
@@ -189,8 +189,9 @@ export function CampaignAuditPage() {
                       toolId="campaign-audit"
                       runToken={res.token ?? null}
                       withheld={res.withheld ?? { findings: 0, nextAction: true, limitations: true }}
-                      onUnlocked={result => {
+                      onUnlocked={(result, email) => {
                         setUnlocked(result as CampaignAuditResult)
+                        setUnlockedEmail(email)
                         trackTool({ event: 'free_tool_result_engaged', toolId: 'campaign-audit', props: { action: 'unlocked' } })
                       }}
                     />

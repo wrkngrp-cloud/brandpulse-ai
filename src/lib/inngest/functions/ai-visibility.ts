@@ -1,6 +1,7 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
+import { queryAssistant, ASSISTANT_PLATFORMS, type AssistantPlatform } from '@/lib/ai/assistants'
 
 interface Brand {
   id: string
@@ -61,69 +62,6 @@ Return ONLY this JSON (no preamble):
       `Best ${category} for Nigerians — what do you recommend?`,
     ]
   }
-}
-
-async function queryPlatform(
-  platform: 'chatgpt' | 'gemini' | 'perplexity',
-  question: string,
-): Promise<string | null> {
-  try {
-    if (platform === 'chatgpt') {
-      const key = process.env.OPENAI_API_KEY
-      if (!key) return null
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: question }],
-          max_tokens: 400,
-        }),
-      })
-      if (!res.ok) return null
-      const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> }
-      return data.choices?.[0]?.message?.content ?? null
-    }
-
-    if (platform === 'gemini') {
-      const key = process.env.GOOGLE_AI_API_KEY
-      if (!key) return null
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: question }] }],
-            generationConfig: { maxOutputTokens: 400 },
-          }),
-        }
-      )
-      if (!res.ok) return null
-      const data = await res.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> }
-      return data.candidates?.[0]?.content?.parts?.[0]?.text ?? null
-    }
-
-    if (platform === 'perplexity') {
-      const key = process.env.PERPLEXITY_API_KEY
-      if (!key) return null
-      const res = await fetch('https://api.perplexity.ai/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
-        body: JSON.stringify({
-          model: 'sonar',
-          messages: [{ role: 'user', content: question }],
-          max_tokens: 400,
-        }),
-      })
-      if (!res.ok) return null
-      const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> }
-      return data.choices?.[0]?.message?.content ?? null
-    }
-  } catch {
-    return null
-  }
-  return null
 }
 
 async function analyzeResponse(
@@ -227,7 +165,7 @@ async function runVisibilityCheck(brandId: string) {
   if (!brand) return { error: 'Brand not found' }
 
   const weekOf = mondayOf(new Date())
-  const PLATFORMS: Array<'chatgpt' | 'gemini' | 'perplexity'> = ['chatgpt', 'gemini', 'perplexity']
+  const PLATFORMS: AssistantPlatform[] = ASSISTANT_PLATFORMS
 
   const questions = await generateQuestions(brand as Brand)
   const checks: CheckResult[] = []
@@ -236,7 +174,7 @@ async function runVisibilityCheck(brandId: string) {
   for (const platform of PLATFORMS) {
     let platformActive = false
     for (const question of questions) {
-      const response = await queryPlatform(platform, question)
+      const response = await queryAssistant(platform, question)
       if (response === null) continue
       platformActive = true
 

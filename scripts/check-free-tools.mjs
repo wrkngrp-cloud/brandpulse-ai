@@ -58,6 +58,11 @@ const files = {
     .replace("import { createServiceClient } from '@/lib/supabase/server'",
       "const createServiceClient = async (): Promise<any> => { throw new Error('no database in this check') }")],
   'gate.ts':               ['src/lib/tools/gate.ts', s => s],
+  'brand-gap.ts':          ['src/lib/tools/brand-gap.ts', s => s
+    .replace("import { callAi, extractJson } from '@/lib/ai/client'",
+      "import { callAi, extractJson } from './ai-stub'")
+    .replace("from '@/lib/press/nigerian-press'", "from './press-stub'")
+    .replace("from '@/lib/ai/assistants'", "from './assistants-stub'")],
   'competitor-tracker.ts': ['src/lib/tools/competitor-tracker.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
       "import { callAi, extractJson } from './ai-stub'")
@@ -101,12 +106,19 @@ export function classifyRegulatory(_h: string) { return null }
 export type RegulatoryKind = 'notice'
 `)
 
+writeFileSync(`${OUT}/assistants-stub.ts`, `
+export type AssistantPlatform = 'chatgpt' | 'gemini' | 'perplexity'
+export const ASSISTANT_PLATFORMS: AssistantPlatform[] = ['chatgpt', 'gemini', 'perplexity']
+export function configuredAssistants(): AssistantPlatform[] { return [] }
+export async function queryAssistant(_p: AssistantPlatform, _q: string, _o?: { maxTokens?: number }): Promise<string | null> { return null }
+`)
+
 execSync(
-  `npx tsc --strict --target es2022 --module esnext --moduleResolution bundler --skipLibCheck --outDir ${OUT} ${Object.keys(files).map(f => `${OUT}/${f}`).join(' ')} ${OUT}/ai-stub.ts ${OUT}/press-stub.ts`,
+  `npx tsc --strict --target es2022 --module esnext --moduleResolution bundler --skipLibCheck --outDir ${OUT} ${Object.keys(files).map(f => `${OUT}/${f}`).join(' ')} ${OUT}/ai-stub.ts ${OUT}/press-stub.ts ${OUT}/assistants-stub.ts`,
   { stdio: 'inherit' },
 )
 // tsc emits .js; the directory has no package.json, so rename for ESM.
-for (const f of [...Object.keys(files).map(f => f.replace('.ts', '')), 'ai-stub', 'press-stub']) {
+for (const f of [...Object.keys(files).map(f => f.replace('.ts', '')), 'ai-stub', 'press-stub', 'assistants-stub']) {
   execSync(`mv ${OUT}/${f}.js ${OUT}/${f}.mjs`)
   const p = `${OUT}/${f}.mjs`
   writeFileSync(p, readFileSync(p, 'utf8').replace(/from ['"]\.\/([a-z-]+)['"]/g, "from './$1.mjs'"))
@@ -126,6 +138,7 @@ const auditMod    = await import(`${OUT}/campaign-audit.mjs`)
 const leads       = await import(`${OUT}/leads.mjs`)
 const gate        = await import(`${OUT}/gate.mjs`)
 const vocab       = await import(`${OUT}/audit-vocab.mjs`)
+const brandGap    = await import(`${OUT}/brand-gap.mjs`)
 
 let pass = 0, fail = 0
 const eq = (name, got, want) => {
@@ -739,6 +752,92 @@ ok('the headline counts what is actually withheld',
    gate.GATE_COPY['competitor-tracker'].headline({ findings: 2 }).includes('2'))
 ok('and reads naturally for one',
    !gate.GATE_COPY['competitor-tracker'].headline({ findings: 1 }).includes('1 more verified moves'))
+
+// ── Brand Perception Gap ────────────────────────────────────────────────────
+console.log('\n── the brand gap only writes down what a page actually says')
+const sitePage = {
+  url: 'https://jara.ng', title: 'Jara Foods', description: null, canonical: null, lang: 'en',
+  text: 'Jara Foods makes affordable soups for busy Lagos families. We believe good food should never be a luxury. Every pack is cooked the way your mother would.',
+  textLength: 160, headings: [], links: [], ctas: [], forms: [], images: 0, imagesWithoutAlt: 0,
+  hasViewportMeta: true, trackers: [], scriptCount: 0, inlineStyleBlocks: 0, bytes: 1000,
+}
+aiStub.setNextResponse(JSON.stringify({
+  audience: 'busy Lagos families',
+  promise: 'affordable soups',
+  category: 'Food & Beverage',
+  values: [
+    { label: 'Affordability', quote: 'We believe good food should never be a luxury.' },
+    // Invented: nowhere on the page. Must be dropped rather than softened.
+    { label: 'Sustainability', quote: 'Every pack is carbon neutral by 2027.' },
+  ],
+  voiceAdjectives: ['warm', 'plain'],
+  tone: 'Warm and direct',
+  segments: [{ name: 'Lagos households', demographics: '25-45', geography: 'Lagos' }],
+}))
+const stated = await brandGap.readStated({ name: 'Jara Foods', market: 'Nigeria', pages: [sitePage] })
+eq('a quoted value survives',        stated.values.map(v => v.label), ['Affordability'])
+eq('an unquoted value is dropped',   stated.values.length, 1)
+eq('the quote keeps its source',     stated.values[0].sourceUrl, 'https://jara.ng')
+eq('audience and promise recorded',  [stated.audience, stated.promise], ['busy Lagos families', 'affordable soups'])
+eq('a known category is kept',       stated.category, 'Food & Beverage')
+
+aiStub.setNextResponse(JSON.stringify({ category: 'Other', values: [] }))
+const vague = await brandGap.readStated({ name: 'X', market: 'Nigeria', pages: [sitePage] })
+eq('"Other" is not a category',      vague.category, null)
+eq('an empty read stays empty',      [vague.audience, vague.values.length], [null, 0])
+
+console.log('\n── and only names a gap an outside source supports')
+const press = [{ title: 'Jara Foods expands', link: 'https://punchng.com/jara', pubDate: 'Mon, 06 Oct 2026 09:00:00 GMT', snippet: 'Jara Foods is best known for its speed of delivery across Lagos.' }]
+aiStub.setNextResponse(JSON.stringify({
+  described: [
+    { source: 1, attribute: 'Fast delivery', quote: 'best known for its speed of delivery' },
+    // A source index that does not exist. Dropped on the way back.
+    { source: 9, attribute: 'Premium pricing', quote: 'invented' },
+  ],
+  divergences: [
+    { kind: 'unclaimed', stated: '', described: 'Fast delivery', significance: 's', recommendation: 'r', sources: [1], confidence: 'high' },
+    // An outside claim citing nothing is an opinion. Dropped.
+    { kind: 'contradicted', stated: 'Affordable', described: 'Expensive', significance: 's', recommendation: 'r', sources: [], confidence: 'high' },
+    // Absence is evidenced by their own words, so this one survives with the
+    // site quote attached.
+    { kind: 'missing', stated: 'Affordability', described: '', significance: 's', recommendation: 'r', sources: [], confidence: 'bogus' },
+  ],
+}))
+const gap = await brandGap.readGap({ name: 'Jara Foods', market: 'Nigeria', stated, press, answers: [] })
+eq('a cited attribute survives',        gap.traits.map(t => t.attribute), ['Fast delivery'])
+eq('an invented source index is gone',  gap.traits.length, 1)
+eq('kinds that survive',                gap.divergences.map(d => d.kind), ['unclaimed', 'missing'])
+eq('the uncited contradiction is gone', gap.divergences.filter(d => d.kind === 'contradicted').length, 0)
+eq('absence cites their own words',     gap.divergences[1].evidence[0].sourceName, 'Their own website')
+eq('a nonsense confidence is normalised', gap.divergences[1].confidence, 'medium')
+eq('press evidence keeps its link',     gap.divergences[0].evidence[0].sourceUrl, 'https://punchng.com/jara')
+
+console.log('\n── an assistant answer is evidence with no address, never a fake link')
+aiStub.setNextResponse(JSON.stringify({
+  described: [{ source: 1, attribute: 'A fintech', quote: 'Jara Foods is often described as a fintech' }],
+  divergences: [{ kind: 'contradicted', stated: 'A food brand', described: 'A fintech', significance: 's', recommendation: 'r', sources: [1], confidence: 'medium' }],
+}))
+const fromAssistant = await brandGap.readGap({
+  name: 'Jara Foods', market: 'Nigeria', stated, press: [],
+  answers: ['Jara Foods is often described as a fintech operating in Lagos.'],
+})
+eq('the attribute is recorded',      fromAssistant.traits[0].attribute, 'A fintech')
+eq('with no invented URL',           fromAssistant.traits[0].sourceUrl, null)
+eq('and no invented URL on the card', fromAssistant.divergences[0].evidence[0].sourceUrl, undefined)
+// The platform is never named anywhere a visitor can read it.
+ok('the model is never named', !JSON.stringify(fromAssistant).match(/gpt|gemini|perplexity|claude|sonar/i))
+
+console.log('\n── an assistant that does not know the brand is not a description')
+for (const refusal of [
+  'I do not know this brand.',
+  "I don't have information about a company called Jara Foods.",
+  'I could not find any record of this brand.',
+  'Jara Foods does not appear to be a well-known company.',
+]) ok(`filtered: "${refusal.slice(0, 32)}"`, brandGap.looksLikeNotKnown(refusal))
+for (const answer of [
+  'Jara Foods is a Lagos food brand known for affordable soups.',
+  'It is best known for fast delivery. I would describe it as practical.',
+]) ok(`kept: "${answer.slice(0, 32)}"`, !brandGap.looksLikeNotKnown(answer))
 
 console.log(`\n${fail === 0 ? 'PASS' : 'FAIL'} — ${pass} checks passed, ${fail} failed\n`)
 process.exit(fail === 0 ? 0 : 1)

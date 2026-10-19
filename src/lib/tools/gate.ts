@@ -98,6 +98,7 @@ export function gateResult<T extends Record<string, unknown>>(
 
 /** Which arrays on each tool's result hold the findings themselves. */
 const MACHINE_ARRAYS: Partial<Record<ToolId, string[]>> = {
+  'brand-gap':          ['divergences'],
   'competitor-tracker': ['moves'],
   'market-demand':      ['opportunities'],
   'campaign-audit':     ['findings'],
@@ -119,6 +120,14 @@ export interface GateCopy {
 }
 
 export const GATE_COPY: Record<ToolId, GateCopy> = {
+  'brand-gap': {
+    headline: w => w.findings === 1
+      ? 'One more gap between what you say and what the market says back'
+      : `${w.findings} more gaps between what you say and what the market says back`,
+    body: 'We will send the full reading to your inbox, with what each source actually said, so you can put it in front of whoever owns your messaging.',
+    monitoring: 'Read my brand again in a quarter and tell me whether the gap closed.',
+    button: 'Send me the full reading',
+  },
   'competitor-tracker': {
     headline: w => w.findings === 1
       ? 'One more verified move, and what to do about it'

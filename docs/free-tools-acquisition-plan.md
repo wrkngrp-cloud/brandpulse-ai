@@ -1,8 +1,11 @@
 # Free Tools & product-led acquisition — living plan
 
 Started 14 October 2026. This is the resumable record for the Free Tools ecosystem:
-five public tools that solve a marketing problem before anyone creates an account,
+five listed public tools that solve a marketing problem before anyone creates an account,
 and a continuation path into BrandGauge Beta that keeps the work the visitor already did.
+The lineup is the PR Scoreboard, the Brand Perception Gap, the Competitor Move Tracker, the
+Market Demand Gap Finder and the Campaign Conversion Audit. The Offline Campaign Tracker is
+built, retired from the lineup and still reachable; see Phase 8 in the worklog.
 
 Beta is free. Nothing in here implements billing, trials, expiry dates or paywalls.
 Stripe code elsewhere in the repo stays untouched and unconfigured.
@@ -47,7 +50,17 @@ Stripe code elsewhere in the repo stays untouched and unconfigured.
    provenance kind: `observed`, `estimated`, `interpreted` or `recommended`. Where a
    licensed provider is missing, the tool reports a visibility gap and says so, and never
    fabricates a search volume.
-6. **SSRF-safe public fetching.** `src/lib/tools/fetch-public.ts` is the only way these
+6. **An external assistant is evidence, never a generator.** The Brand Perception Gap asks
+   ChatGPT, Gemini or Perplexity (whichever keys exist) how they describe a brand, and reads
+   the answer as a public description of that brand. This is the AI Visibility exception in
+   CLAUDE.md used for exactly what it is for. Our own output still comes from `callAi` only,
+   the platform is never named in any UI, and an assistant answer carries no `sourceUrl`
+   because none exists: the card renders it as a named, unlinked quote rather than a fake
+   link. Shared in `src/lib/ai/assistants.ts`, which the AI Visibility job now also uses.
+7. **A free tool never overwrites a configured brand.** The gap tool's claim importer fills
+   only the brand fields that are empty, names what it filled, and says so plainly when the
+   brand was already complete and nothing was written.
+8. **SSRF-safe public fetching.** `src/lib/tools/fetch-public.ts` is the only way these
    tools touch a visitor-supplied URL: scheme allowlist, DNS resolution with private-range
    rejection, manual redirect following with re-validation, byte cap, timeout.
 
@@ -76,11 +89,15 @@ and `is_lead_desk()` read, plus a workspace-member read once claimed.
 | 4 | Offline Campaign Tracker (links, QR, redirect analytics, response forms) | Done |
 | 5 | Campaign Conversion Audit (public + improvement plan workspace) | Done |
 | 6 | Cross-tool QA, regression on PR Scoreboard, docs | Done |
+| 7 | Email gate after the result, lead trail across tools, scoreboard folded into the same capture, demo rows for the desk | Done |
+| 8 | Offline Campaign Tracker retired from the lineup, Brand Perception Gap built in its place | Done |
 
 ## 5. Credentials and operational status
 
 | Capability | Gate | State |
 | --- | --- | --- |
+| Brand gap: stated identity + press | none (public pages, Google News RSS) | Fully implemented |
+| Brand gap: how AI assistants describe you | any of `OPENAI_API_KEY`, `GOOGLE_AI_API_KEY`, `PERPLEXITY_API_KEY` | Implemented; with none set the reading is press-only and the coverage list says so |
 | Competitor press + announcements | none (Google News RSS, public pages) | Fully implemented |
 | Competitor move classification | `ANTHROPIC_API_KEY` | Fully implemented |
 | Demand-gap search evidence | `SERPAPI_KEY` | Implemented; without the key the report switches to a labelled visibility gap and says no search volume was measured |
@@ -102,12 +119,12 @@ and `is_lead_desk()` read, plus a workspace-member read once claimed.
 ## 7. Acceptance criteria
 
 Per tool: public page renders, inputs validate, backend does real work, findings carry
-evidence, failures degrade gracefully, no signup gates the promised value, the CTA registers,
+evidence, failures degrade gracefully, no signup gates the promised value, and the email gate sits after a complete, sourced finding rather than before it, the CTA registers,
 the run survives registration, the matching dashboard module opens populated, no connector is
 mandatory, events are recorded.
 
 Ecosystem: "Free Tool" is now "Free Tools", it is a dropdown, PR Scoreboard still works at
-`/scoreboard`, all five tools appear in the dropdown and in `/tools`, desktop and mobile both
+`/scoreboard`, every listed tool appears in the dropdown and in `/tools`, desktop and mobile both
 work, and a sixth tool is one registry entry away.
 
 ## 8. Testing
@@ -143,12 +160,18 @@ deployment, or a session whose network policy allows those hosts.
 
 So the next session does not go looking for it, or rebuild it by accident:
 
-- **The migrations are written and not applied.** `20261014090000_free_tools.sql` and
-  `20261014110000_fix_notifications_rls.sql` are both pending. Nothing in the free-tool surface
-  works until they are. On a machine with CLI access: `supabase migration list`, expect exactly
-  those two, then `supabase db push`. From a Claude Code cloud session, where `db push` cannot
-  open a Postgres connection: `npm run db:pending` to see the plan, then `npm run db:apply`.
-  Both paths write the same ledger, so it does not matter which is used.
+- **Three migrations are written and not applied.** `20261014090000_free_tools.sql` and
+  `20261014110000_fix_notifications_rls.sql` are applied. Still pending:
+  `20261018090000_tool_lead_capture.sql` (widens `leads_source_check`, adds `leads.role` and
+  `leads.website`, creates `lead_tool_runs`, adds the two gate events),
+  `20261019090000_scoreboard_lead_trail.sql` (backfills `lead_tool_runs` from existing
+  scoreboard leads) and `20261019100000_demo_leads.sql` (adds `leads.is_demo`). Lead capture
+  and the desk's trail do not work until they are. On a machine with CLI access:
+  `supabase migration list`, expect exactly those three, then `supabase db push`. From a
+  Claude Code cloud session, where `db push` cannot open a Postgres connection:
+  `npm run db:pending` to see the plan, then `npm run db:apply`. Both paths write the same
+  ledger, so it does not matter which is used.
+
 - **Content opportunity briefs and an in-workspace research refresh** for the demand finder.
   The workspace imports, prioritises, tracks and summarises opportunities; it does not yet
   generate a content brief per opportunity, and re-running the research means re-running the
@@ -181,6 +204,29 @@ is delivered anywhere it is not.
 
 ## 10. Worklog
 
+- **19 Oct 2026 — Phase 8.** Brand Perception Gap built at `/tools/brand-gap`, in a new
+  `brand` category that leads the directory. Two passes: what the brand says about itself,
+  read off its homepage and its about and values pages, where every value must carry a quote
+  that actually appears in the text we fetched; then how the press and an AI assistant
+  describe it, and the divergences between the two. Four kinds, and only one of them
+  (`missing`, a claim nobody repeats) may cite no outside source, because absence is
+  evidenced by their own words. Everything else without a valid source index is dropped.
+  The external assistant query moved to `src/lib/ai/assistants.ts` and the AI Visibility job
+  now shares it. `Evidence.sourceUrl` became optional for the one source that has no
+  address; the card renders it named and unlinked. Claiming fills only the empty fields on
+  the brand and says which. 269 offline checks, up from 245.
+- **19 Oct 2026 — Phase 7, part two.** The PR Scoreboard's lead form routed through the
+  shared `captureLead`, so it joins the trail instead of keeping its own upsert; a role
+  dropdown added to it; `20261019090000_scoreboard_lead_trail.sql` backfills the existing
+  scoreboard leads into `lead_tool_runs`; and the desk can seed and purge six demo rows so
+  the trail block can be seen before real leads arrive.
+- **18 Oct 2026 — Phase 7, part one.** The email gate: `src/lib/tools/gate.ts` trims the
+  report and the machine arrays on the server, so the withheld findings never reach the
+  browser. Three fields (email, name, role); company is derived from the website the tool
+  already has. `captureLead` reads before it writes, never changes first-touch `source`, and
+  never blanks a field an earlier run filled. The Offline Campaign Tracker was unlisted the
+  same day: QR on a Lagos billboard is not a measurement, and it was the only tool that ended
+  with homework rather than a finding. Its page, API, tables and `/go` resolution all stay.
 - **14 Oct 2026 — Phase 0.** Audit complete, this document written.
 - **14 Oct 2026 — Phase 1.** Registry, `/tools` directory, Free Tools dropdown (plus the
   marketing nav's first mobile menu), `tool_runs` / `tool_events`, SSRF-safe fetcher, HTML

@@ -111,7 +111,7 @@ export function MarketDemandPage() {
             disabled={website.trim().length < 4 || market.trim().length < 2} />
           <PrivacyNote>
             We read your public website and look up public search results. Nothing of yours is
-            connected, and we do not ask for an email to show you the report.
+            connected. We ask for an email after the report, not before it.
           </PrivacyNote>
         </form>
 
@@ -211,8 +211,9 @@ export function MarketDemandPage() {
                       toolId="market-demand"
                       runToken={res.token ?? null}
                       withheld={res.withheld ?? { findings: 0, nextAction: true, limitations: true }}
-                      onUnlocked={result => {
+                      onUnlocked={(result, email) => {
                         setUnlocked(result as MarketDemandResult)
+                        setUnlockedEmail(email)
                         trackTool({ event: 'free_tool_result_engaged', toolId: 'market-demand', props: { action: 'unlocked' } })
                       }}
                     />

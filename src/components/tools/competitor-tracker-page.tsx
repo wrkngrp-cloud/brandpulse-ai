@@ -112,8 +112,8 @@ export function CompetitorTrackerPage() {
               disabled={yourWebsite.trim().length < 4 || competitorWebsite.trim().length < 4} />
           </div>
           <PrivacyNote>
-            We fetch two public web pages and a public news feed. Nothing of yours is connected,
-            nothing is posted anywhere, and we do not ask for an email to show you the result.
+            We fetch two public web pages and a public news feed. Nothing of yours is connected and
+            nothing is posted anywhere. We ask for an email after the brief, not before it.
           </PrivacyNote>
         </form>
 
@@ -169,8 +169,9 @@ export function CompetitorTrackerPage() {
                       toolId="competitor-tracker"
                       runToken={res.token ?? null}
                       withheld={res.withheld ?? { findings: 0, nextAction: true, limitations: true }}
-                      onUnlocked={result => {
+                      onUnlocked={(result, email) => {
                         setUnlocked(result as CompetitorTrackerResult)
+                        setUnlockedEmail(email)
                         trackTool({ event: 'free_tool_result_engaged', toolId: 'competitor-tracker', props: { action: 'unlocked' } })
                       }}
                     />
