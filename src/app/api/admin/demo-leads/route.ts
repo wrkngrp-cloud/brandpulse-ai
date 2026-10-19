@@ -8,22 +8,18 @@ export const maxDuration = 30
 /**
  * Seed and remove the lead desk's demo rows.
  *
- * Authorised by the lead desk allowlist rather than ADMIN_SECRET, because the
- * person who should be able to do this is exactly the person already allowed
- * to read the desk — and that way the buttons can live on the page instead of
- * the operation needing a secret in a terminal.
- *
- * The check is the same shape the desk page uses: read lead_desk_admins
- * through the RLS client, where the policy only returns the caller's own row.
- * A non-admin sees nothing and is refused.
+ * Authorised by the same permission the lead desk page itself checks, rather
+ * than ADMIN_SECRET, because the person who should be able to do this is
+ * exactly the person already allowed to read the desk — and that way the
+ * buttons can live on the page instead of the operation needing a secret in a
+ * terminal. A non-holder is refused.
  */
 async function assertLeadDesk(): Promise<string | null> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
-  const { data: admin } = await supabase
-    .from('lead_desk_admins').select('user_id').eq('user_id', user.id).maybeSingle()
-  return admin ? user.id : null
+  const { data: canView } = await supabase.rpc('staff_can', { perm: 'leads.view' })
+  return canView ? user.id : null
 }
 
 export async function POST() {
