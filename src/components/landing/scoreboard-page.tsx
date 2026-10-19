@@ -12,6 +12,7 @@ import {
 import type { Scoreboard } from '@/lib/press/scoreboard'
 import { Icon } from '@/components/brand/icon'
 import { nextTool } from '@/lib/tools/registry'
+import { LEAD_ROLES } from '@/lib/tools/gate'
 import { trackTool, useToolAnalytics } from '@/components/tools/use-tool-analytics'
 
 const naira = (n: number) =>
@@ -290,6 +291,10 @@ function GapAndCapture({ board }: { board: Scoreboard & { scanId?: string } }) {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [company, setCompany] = useState('')
+  /* The one thing a BDM cannot infer from a website, and the one that decides
+     who picks up the call. Matches the field the other four tools ask for, so
+     the desk reads the same across all five. */
+  const [role, setRole] = useState('')
   const [weekly, setWeekly] = useState(true)
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -302,7 +307,7 @@ function GapAndCapture({ board }: { board: Scoreboard & { scanId?: string } }) {
       const res = await fetch('/api/scoreboard/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name: name || undefined, company: company || undefined, scanId: board.scanId, wantsWeekly: weekly }),
+        body: JSON.stringify({ email, name: name || undefined, company: company || undefined, role: role || undefined, scanId: board.scanId, wantsWeekly: weekly }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'That did not save.')
@@ -356,6 +361,12 @@ function GapAndCapture({ board }: { board: Scoreboard & { scanId?: string } }) {
                   className="w-full rounded-sm border px-3.5 py-2.5 text-[14px] outline-none focus-visible:ring-2"
                   style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-bg)', color: 'var(--lp-ink)' }} />
               </div>
+              <select value={role} onChange={e => setRole(e.target.value)} aria-label="What you do"
+                className="w-full rounded-sm border px-3.5 py-2.5 text-[14px] outline-none focus-visible:ring-2"
+                style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-bg)', color: 'var(--lp-ink)' }}>
+                <option value="">What you do, if you like</option>
+                {LEAD_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
               <label className="flex items-start gap-2 text-[12.5px]" style={{ color: 'var(--lp-mut)' }}>
                 <input type="checkbox" checked={weekly} onChange={e => setWeekly(e.target.checked)} className="mt-0.5 accent-[var(--flare)]" />
                 Send me the Monday email. Nothing else.

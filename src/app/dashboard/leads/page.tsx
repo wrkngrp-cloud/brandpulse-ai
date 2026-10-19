@@ -31,7 +31,7 @@ export default async function LeadsPage() {
   // answer the policy would give, read through the signed-in user.
   const { data: leads } = await supabase
     .from('leads')
-    .select('id, email, name, company, status, notes, wants_weekly, signed_up, contacted_at, created_at, scan_id, public_scans(brand_name, competitors, category, share_of_reach, mentions_found)')
+    .select('id, email, name, company, role, website, is_demo, status, notes, wants_weekly, signed_up, contacted_at, created_at, scan_id, public_scans(brand_name, competitors, category, share_of_reach, mentions_found), lead_tool_runs(tool_id, inputs, headline, wants_monitoring, created_at)')
     .order('created_at', { ascending: false })
     .limit(500)
 

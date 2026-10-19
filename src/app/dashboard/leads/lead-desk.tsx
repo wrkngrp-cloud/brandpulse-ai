@@ -16,6 +16,19 @@ export interface Lead {
   signed_up: boolean
   contacted_at: string | null
   created_at: string
+  role: string | null
+  website: string | null
+  is_demo: boolean
+  /* One row per tool run, newest first. This is what turns "submitted a form"
+     into "ran the tracker on Moniepoint, then audited their own landing page,
+     and asked to be told when the competitor moves". */
+  lead_tool_runs: {
+    tool_id: string
+    inputs: Record<string, unknown>
+    headline: string | null
+    wants_monitoring: boolean
+    created_at: string
+  }[] | null
   scan_id: string | null
   public_scans: {
     brand_name: string
@@ -99,6 +112,7 @@ export function LeadDesk({ leads }: { leads: Lead[] }) {
             aria-label="Search leads"
             className="w-full rounded-sm border border-border bg-card py-2.5 pl-9 pr-3 text-sm outline-none focus-visible:ring-2" />
         </div>
+        <DemoControls hasDemo={rows.some(l => l.is_demo)} />
         <button onClick={exportCsv}
           className="flex shrink-0 items-center gap-2 rounded-sm border border-border px-3.5 py-2.5 text-[13px] font-medium bg-press">
           <ExportIcon className="h-4 w-4" /> Export CSV
@@ -141,6 +155,13 @@ export function LeadDesk({ leads }: { leads: Lead[] }) {
                   <span className="bg-label text-muted-foreground">{day(l.created_at)}</span>
                   {l.wants_weekly && <span className="rounded-sm border border-border px-2 py-0.5 text-[10px]">weekly</span>}
                   {l.signed_up && <span className="rounded-sm px-2 py-0.5 text-[10px] text-on-hot" style={{ background: 'var(--flare)' }}>signed up</span>}
+                  {/* Unmissable, because the cost of a BDM calling a person
+                      who does not exist is an embarrassing phone call. */}
+                  {l.is_demo && (
+                    <span className="rounded-sm border border-line-strong px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-tx-3">
+                      demo row
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -155,6 +176,35 @@ export function LeadDesk({ leads }: { leads: Lead[] }) {
                       <> · <span className="bg-num font-bold">{l.public_scans.share_of_reach}%</span> of the category&apos;s earned reach</>
                     )}
                   </p>
+                </div>
+              )}
+
+              {(l.lead_tool_runs ?? []).length > 0 && (
+                <div className="mt-4 rounded-sm border border-border bg-muted/40 p-4">
+                  <p className="bg-label text-muted-foreground">
+                    Tools they ran{l.role ? ` · ${l.role}` : ''}
+                  </p>
+                  <ul className="mt-2 space-y-2.5">
+                    {[...(l.lead_tool_runs ?? [])]
+                      .sort((a, b) => b.created_at.localeCompare(a.created_at))
+                      .map((run, i) => (
+                        <li key={i} className="text-[13px] leading-relaxed">
+                          <span className="font-medium">{TOOL_NAME[run.tool_id] ?? run.tool_id}</span>
+                          {subjectOf(run.inputs) && <> on <span className="font-medium">{subjectOf(run.inputs)}</span></>}
+                          <span className="text-muted-foreground">
+                            {' '}· {new Date(run.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+                          </span>
+                          {run.wants_monitoring && (
+                            <span className="ml-2 rounded-sm border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+                              wants updates
+                            </span>
+                          )}
+                          {run.headline && (
+                            <p className="mt-0.5 text-[12.5px] text-muted-foreground">{run.headline}</p>
+                          )}
+                        </li>
+                      ))}
+                  </ul>
                 </div>
               )}
 
@@ -186,5 +236,65 @@ export function LeadDesk({ leads }: { leads: Lead[] }) {
         </div>
       )}
     </div>
+  )
+}
+
+/* The desk shows the tool's product name rather than its id, and the thing
+   they pointed it at, because "Competitor Move Tracker on moniepoint.com" is
+   an opening line and "competitor-tracker" is not. */
+const TOOL_NAME: Record<string, string> = {
+  'pr-scoreboard':      'PR Scoreboard',
+  'brand-gap':          'Brand Perception Gap',
+  'competitor-tracker': 'Competitor Move Tracker',
+  'market-demand':      'Market Demand Gap Finder',
+  'offline-tracker':    'Offline Campaign Tracker',
+  'campaign-audit':     'Campaign Conversion Audit',
+}
+
+function subjectOf(inputs: Record<string, unknown>): string | null {
+  const value = ['competitorWebsite', 'pageUrl', 'website', 'yourWebsite', 'campaignName']
+    .map(key => inputs?.[key])
+    .find((v): v is string => typeof v === 'string' && v.length > 2)
+  if (!value) return null
+  try { return new URL(value).hostname.replace(/^www\./, '') } catch { return value.slice(0, 60) }
+}
+
+/**
+ * Seed and remove the demo rows, for looking at an empty desk before any real
+ * leads arrive.
+ *
+ * The route behind these checks the lead desk allowlist itself, so the
+ * buttons carry no secret and a non-admin who finds the endpoint is refused.
+ * Removing is offered only when there is something to remove, so the desk
+ * does not advertise a demo mode it is not in.
+ */
+function DemoControls({ hasDemo }: { hasDemo: boolean }) {
+  const [busy, setBusy] = useState(false)
+
+  async function call(method: 'POST' | 'DELETE') {
+    setBusy(true)
+    try {
+      const res = await fetch('/api/admin/demo-leads', { method })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'That did not work.')
+      toast.success(method === 'POST'
+        ? `${data.leads} demo leads with ${data.runs} tool runs. Reloading.`
+        : `${data.removed} demo leads removed. Reloading.`)
+      window.location.reload()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'That did not work.')
+    } finally { setBusy(false) }
+  }
+
+  return hasDemo ? (
+    <button onClick={() => call('DELETE')} disabled={busy}
+      className="flex shrink-0 items-center gap-2 rounded-sm border border-border px-3.5 py-2.5 text-[13px] font-medium bg-press disabled:opacity-50">
+      Remove demo rows
+    </button>
+  ) : (
+    <button onClick={() => call('POST')} disabled={busy}
+      className="flex shrink-0 items-center gap-2 rounded-sm border border-border px-3.5 py-2.5 text-[13px] font-medium bg-press disabled:opacity-50">
+      Add demo rows
+    </button>
   )
 }

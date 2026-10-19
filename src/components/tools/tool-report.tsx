@@ -18,7 +18,7 @@ import { trackTool } from './use-tool-analytics'
  */
 
 export function ReportView({
-  report, toolId, runToken, ctaHeadline, ctaBody, ctaPrimary,
+  report, toolId, runToken, ctaHeadline, ctaBody, ctaPrimary, gated = false, gate,
 }: {
   report: ToolReport
   toolId: ToolId
@@ -27,6 +27,10 @@ export function ReportView({
   ctaHeadline: string
   ctaBody: string
   ctaPrimary: string
+  /** True while the report is a preview and the rest is behind the email gate. */
+  gated?: boolean
+  /** The gate itself, or the acknowledgement once it has been answered. */
+  gate?: React.ReactNode
 }) {
   const next = nextTool(toolId)
 
@@ -108,14 +112,22 @@ export function ReportView({
         )}
       </section>
 
+      {gate}
+
       {/* ── Continue in BrandGauge ─────────────────────────────────── */}
-      <BetaContinuation
-        toolId={toolId} runToken={runToken}
-        headline={ctaHeadline} body={ctaBody} primary={ctaPrimary}
-      />
+      {/* Suppressed while the report is a preview. The email ask and the
+          sign-up ask compete for the same moment, and offering both is how
+          neither gets answered. Once the gate is cleared this is the only
+          thing left to do. */}
+      {!gated && (
+        <BetaContinuation
+          toolId={toolId} runToken={runToken}
+          headline={ctaHeadline} body={ctaBody} primary={ctaPrimary}
+        />
+      )}
 
       {/* ── One contextual tool suggestion, after the CTA ──────────── */}
-      {next && (
+      {!gated && next && (
         <section className="mt-12 border-t pt-8" style={{ borderColor: 'var(--lp-line)' }}>
           <p className="text-[13.5px]" style={{ color: 'var(--lp-mut)' }}>{next.line}</p>
           <Link href={next.tool.route}
@@ -171,13 +183,21 @@ export function FindingCard({ finding }: { finding: Finding }) {
                      a report stops being evidence. */
                   <p className="text-[13px] leading-relaxed" style={{ color: 'var(--lp-ink)' }}>“{e.quote}”</p>
                 )}
-                <a href={e.sourceUrl} target="_blank" rel="noopener noreferrer nofollow"
-                  className="mt-1 inline-flex max-w-full items-center gap-1.5 text-[12px] underline-offset-2 hover:underline"
-                  style={{ color: 'var(--tx-flare)' }}>
-                  <ExternalLinkIcon className="h-3 w-3 shrink-0" />
-                  <span className="truncate">{e.sourceName ?? hostOf(e.sourceUrl)}</span>
-                  {e.publishedAt && <span style={{ color: 'var(--lp-mut)' }}>· {e.publishedAt}</span>}
-                </a>
+                {e.sourceUrl ? (
+                  <a href={e.sourceUrl} target="_blank" rel="noopener noreferrer nofollow"
+                    className="mt-1 inline-flex max-w-full items-center gap-1.5 text-[12px] underline-offset-2 hover:underline"
+                    style={{ color: 'var(--tx-flare)' }}>
+                    <ExternalLinkIcon className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{e.sourceName ?? hostOf(e.sourceUrl)}</span>
+                    {e.publishedAt && <span style={{ color: 'var(--lp-mut)' }}>· {e.publishedAt}</span>}
+                  </a>
+                ) : (
+                  /* A source with no address. Named, not linked, and never
+                     dressed up as a link that goes nowhere. */
+                  <p className="mt-1 text-[12px]" style={{ color: 'var(--lp-mut)' }}>
+                    {e.sourceName ?? 'Source not published'}
+                  </p>
+                )}
               </li>
             ))}
           </ul>

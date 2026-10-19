@@ -27,6 +27,7 @@ export interface ImportOutcome {
 
 export async function importRun(run: ToolRun, brandId: string): Promise<ImportOutcome> {
   switch (run.toolId) {
+    case 'brand-gap':          return importBrandGap(run, brandId)
     case 'competitor-tracker': return importCompetitorTracker(run, brandId)
     case 'market-demand':      return importMarketDemand(run, brandId)
     case 'offline-tracker':    return importOfflineTracker(run, brandId)
@@ -35,6 +36,79 @@ export async function importRun(run: ToolRun, brandId: string): Promise<ImportOu
     default:
       return { destination: '/dashboard/pr', note: 'Your press scan is on the board.' }
   }
+}
+
+/* ── Brand Perception Gap ───────────────────────────────────────────────────
+   The draft profile fills the brand's empty fields and nothing else. This is
+   the one importer whose destination is a brand somebody may already have
+   configured, and a free tool that overwrites a marketer's own category, their
+   values or their segments with an inference off a homepage would be the worst
+   thing in this whole feature. So every field is written only where the column
+   is empty, the name is never touched, and a brand that is already filled in
+   gets nothing written and is told so. */
+async function importBrandGap(run: ToolRun, brandId: string): Promise<ImportOutcome> {
+  const result = run.result as {
+    brand?: { name?: string; website?: string }
+    profile?: {
+      category?: string | null
+      brandValues?: string[]
+      brandVoice?: { adjectives?: string[]; tone?: string }
+      targetSegments?: Array<{ name: string; demographics: string; geography: string }>
+    }
+  } | null
+
+  const profile = result?.profile
+  if (!profile) return { destination: '/dashboard/settings/brand', note: 'Your brand profile is ready to fill in.' }
+
+  const svc = await createServiceClient()
+  const { data: brand } = await svc
+    .from('brands')
+    .select('category, brand_values, brand_voice, target_segments, website_url')
+    .eq('id', brandId).single()
+
+  const voice = (brand?.brand_voice ?? {}) as { adjectives?: unknown; tone?: unknown }
+  const patch: Record<string, unknown> = {}
+  const filled: string[] = []
+
+  if (!brand?.category && profile.category) {
+    patch.category = profile.category
+    filled.push('category')
+  }
+  if (!(brand?.brand_values as string[] | null)?.length && profile.brandValues?.length) {
+    patch.brand_values = profile.brandValues
+    filled.push('values')
+  }
+  if (!(brand?.target_segments as unknown[] | null)?.length && profile.targetSegments?.length) {
+    patch.target_segments = profile.targetSegments
+    filled.push('audience')
+  }
+  if (!Array.isArray(voice.adjectives) && !voice.tone && (profile.brandVoice?.adjectives?.length || profile.brandVoice?.tone)) {
+    patch.brand_voice = {
+      adjectives:       profile.brandVoice?.adjectives ?? [],
+      tone:             profile.brandVoice?.tone ?? '',
+      dos:              [],
+      donts:            [],
+      signaturePhrases: [],
+    }
+    filled.push('tone of voice')
+  }
+  if (!brand?.website_url && result?.brand?.website) {
+    patch.website_url = result.brand.website
+  }
+
+  if (Object.keys(patch).length) await svc.from('brands').update(patch).eq('id', brandId)
+
+  return {
+    destination: '/dashboard/settings/brand',
+    note: filled.length
+      ? `We filled in your ${listOf(filled)} from what your website says. Check it, change anything we read wrong, and save.`
+      : 'Your brand profile was already filled in, so we left it exactly as you had it.',
+  }
+}
+
+function listOf(items: string[]): string {
+  if (items.length === 1) return items[0]
+  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
 }
 
 /* ── Competitor Move Tracker ────────────────────────────────────────────────
