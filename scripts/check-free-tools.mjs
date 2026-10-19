@@ -623,6 +623,23 @@ ok('the scoreboard scan API is untouched',      routeFile('/api/scoreboard/scan'
 ok('the scoreboard lead API is untouched',      routeFile('/api/scoreboard/lead'))
 ok('the public response page exists',           existsSync('src/app/respond/[campaignId]/page.tsx'))
 
+/* captureLead writes the tool id straight into leads.source, so a tool the
+   check constraint does not list is a 500 the first time somebody unlocks
+   that tool's report. This is exactly how brand-gap and pr-scoreboard were
+   both missing from it. */
+const sourceCheck = readFileSync('supabase/migrations/20261018094000_tool_lead_capture.sql', 'utf8')
+  .split('leads_source_check check (source in (')[1]?.split('))')[0] ?? ''
+for (const id of registry.TOOL_IDS) {
+  ok(`leads.source accepts "${id}"`, sourceCheck.includes(`'${id}'`))
+}
+ok('and still accepts the board\'s older "scoreboard"', sourceCheck.includes("'scoreboard'"))
+
+// The desk names every tool it can be shown, retired ones included.
+const desk = readFileSync('src/app/dashboard/leads/lead-desk.tsx', 'utf8')
+for (const id of registry.TOOL_IDS) {
+  ok(`the lead desk has a name for "${id}"`, new RegExp(`'${id}':\\s*'`).test(desk))
+}
+
 const nav = readFileSync('src/components/landing/landing-page.tsx', 'utf8')
 const menu = readFileSync('src/components/landing/free-tools-menu.tsx', 'utf8')
 ok('the nav renders the Free Tools menu',   nav.includes('<FreeToolsMenu />'))

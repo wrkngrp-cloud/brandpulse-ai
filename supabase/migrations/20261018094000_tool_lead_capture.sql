@@ -20,12 +20,16 @@
 
 -- ── The lead, enriched ───────────────────────────────────────────────────────
 
--- The five tool ids join the existing sources. Dropping and re-adding is the
--- only way to widen a check constraint.
+-- Every tool id joins the existing sources, because captureLead writes the
+-- tool id straight into `source`. 'pr-scoreboard' is the registry's id and
+-- 'scoreboard' is what the board wrote before it shared this path, so both
+-- are allowed and the old rows keep their value. Dropping and re-adding is
+-- the only way to widen a check constraint.
 alter table leads drop constraint if exists leads_source_check;
 alter table leads add constraint leads_source_check check (source in (
   'scoreboard', 'landing', 'other',
-  'competitor-tracker', 'market-demand', 'offline-tracker', 'campaign-audit'
+  'pr-scoreboard', 'brand-gap', 'competitor-tracker', 'market-demand',
+  'offline-tracker', 'campaign-audit'
 ));
 
 -- Role and seniority, asked for once at the point of capture. This is the one

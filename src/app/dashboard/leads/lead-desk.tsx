@@ -244,6 +244,7 @@ export function LeadDesk({ leads }: { leads: Lead[] }) {
    an opening line and "competitor-tracker" is not. */
 const TOOL_NAME: Record<string, string> = {
   'pr-scoreboard':      'PR Scoreboard',
+  'brand-gap':          'Brand Perception Gap',
   'competitor-tracker': 'Competitor Move Tracker',
   'market-demand':      'Market Demand Gap Finder',
   'offline-tracker':    'Offline Campaign Tracker',
