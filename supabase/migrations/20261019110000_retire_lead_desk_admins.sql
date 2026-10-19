@@ -18,6 +18,10 @@
 -- `tool_responses` is untouched. It holds personal data from campaign
 -- enquiries and scopes to the workspace that owns the campaign, never to the
 -- lead desk. That was deliberate and this migration does not widen it.
+--
+-- Renumbered from 20261018094000 to clear a collision: the free-tool lead
+-- gate took that timestamp on main the same day. This one has to run after it
+-- anyway, because it repoints a policy that migration creates.
 
 -- ── The lead capture tables ──────────────────────────────────────────────────
 drop policy if exists public_scans_read on public_scans;
@@ -59,6 +63,12 @@ create policy tool_visits_read on tool_visits for select
   using (staff_can('leads.view') or exists (
     select 1 from tool_campaigns c join brands b on b.id = c.brand_id
     where c.id = campaign_id and is_workspace_member(b.workspace_id)));
+
+-- The free-tool lead gate (20261018094000_tool_lead_capture.sql) added one
+-- more, on the table that holds a lead's trail through the tools. Same move.
+drop policy if exists lead_tool_runs_read on lead_tool_runs;
+create policy lead_tool_runs_read on lead_tool_runs
+  for select using (staff_can('leads.view'));
 
 -- ── And the allowlist itself ─────────────────────────────────────────────────
 -- Dropped last, once nothing refers to it. Any row that was ever in here was

@@ -579,6 +579,15 @@ select 'and so is its function',
        (select count(*)::text from pg_proc p join pg_namespace n on n.oid = p.pronamespace
          where n.nspname = 'public' and p.proname = 'is_lead_desk'), '0';
 
+-- The trail through the free tools, added by the lead gate and repointed by
+-- the retirement migration. A lead's trail is as much the lead desk's as the
+-- lead is.
+insert into lead_tool_runs (lead_id, tool_id, inputs, headline, wants_monitoring)
+select id, 'competitor-tracker',
+       '{"competitorWebsite":"https://moniepoint.com"}'::jsonb,
+       'Three pricing changes in thirty days.', true
+from leads limit 1;
+
 -- Support holds leads.view and leads.edit on its role.
 set role authenticated;
 set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000005';  -- Chidi, support, no overrides
@@ -586,7 +595,10 @@ select 'support reads a lead' as check,
        (select count(*)::text from leads), '1' as want
 union all
 select 'and the scan behind it',
-       (select count(*)::text from public_scans), '1';
+       (select count(*)::text from public_scans), '1'
+union all
+select 'and their trail through the tools',
+       (select count(*)::text from lead_tool_runs), '1';
 
 do $$
 begin
@@ -605,7 +617,10 @@ select 'a customer sees no leads' as check,
        (select count(*)::text from leads), '0' as want
 union all
 select 'and no scans',
-       (select count(*)::text from public_scans), '0';
+       (select count(*)::text from public_scans), '0'
+union all
+select 'and no tool trail',
+       (select count(*)::text from lead_tool_runs), '0';
 
 do $$
 begin

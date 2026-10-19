@@ -6,6 +6,7 @@ import { finishRun, hashIp, ipOf, startRun } from '@/lib/tools/runs'
 import { recordEvent } from '@/lib/tools/events'
 import { cacheGet, cacheKey, cacheSet, CACHE_TTL, withinRateLimit } from '@/lib/tools/limits'
 import { normaliseUrl } from '@/lib/tools/fetch-public'
+import { gateResult } from '@/lib/tools/gate'
 
 export const runtime = 'nodejs'
 // PageSpeed Insights on a slow page genuinely takes most of a minute, and a
@@ -53,7 +54,8 @@ export async function POST(req: NextRequest) {
     if (cached) {
       await finishRun({ id: run.id, status: 'complete', result: cached, coverage: { cached: true, sources: cached.coverage } })
       await recordEvent({ event: 'free_tool_completed', toolId: 'campaign-audit', runId: run.id, visitorId, props: { cached: true, findings: cached.findings.length } })
-      return NextResponse.json({ token: run.token, runId: run.id, status: 'complete', result: cached })
+      const gatedCache = gateResult('campaign-audit', cached as unknown as Record<string, unknown>, false)
+      return NextResponse.json({ token: run.token, runId: run.id, status: 'complete', ...gatedCache })
     }
 
     const outcome = await runCampaignAudit({
@@ -80,7 +82,12 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    return NextResponse.json({ token: run.token, runId: run.id, status: 'complete', result: outcome.result })
+    /* The full result is stored against the run; the response is the
+       preview. Trimming here rather than in the page is the difference
+       between a gate and a blur: the withheld findings never leave the
+       server, so nothing in dev tools contradicts what the page says. */
+    const gated = gateResult('campaign-audit', outcome.result as unknown as Record<string, unknown>, false)
+    return NextResponse.json({ token: run.token, runId: run.id, status: 'complete', ...gated })
   } catch (err) {
     console.error('[campaign-audit] run failed:', err)
     await finishRun({

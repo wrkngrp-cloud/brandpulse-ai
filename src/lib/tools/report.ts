@@ -20,7 +20,13 @@ export type Confidence = 'high' | 'medium' | 'low'
 export interface Evidence {
   /** What the source actually said. Verbatim, never paraphrased into a claim. */
   quote?:     string
-  sourceUrl:  string
+  /**
+   * Optional, for the one source that genuinely has no address: an answer an
+   * AI assistant gave when we asked it about a brand. Inventing a URL for
+   * that would be the worst kind of fake citation, so the field is absent and
+   * the card renders the quote unlinked under its source name.
+   */
+  sourceUrl?: string
   sourceName?: string
   publishedAt?: string | null
 }

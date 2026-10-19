@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { requireStaff } from '@/lib/desk/auth'
-import { leadsSummary } from '@/lib/desk/leads'
+import { leadsSummary, TOOL_NAME } from '@/lib/desk/leads'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { TrendIcon } from '@/components/brand/icon'
-import { updateLead } from './actions'
+import { updateLead, seedDemoLeads, removeDemoLeads } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,15 +25,39 @@ export default async function DeskLeadsPage() {
       <PageHeader
         eyebrow="Leads"
         title={`${summary.total} captured`}
-        subtitle={`${summary.new7} this week · ${summary.signedUp} went on to open an account`}
+        subtitle={[
+          `${summary.new7} this week`,
+          `${summary.signedUp} went on to open an account`,
+          summary.demoRows > 0 ? `${summary.demoRows} seeded` : null,
+        ].filter(Boolean).join(' · ')}
         icon={TrendIcon}
         actions={
-          <Link
-            href="/desk/leads/funnel"
-            className="bg-press rounded-md border border-line px-2.5 py-1 text-xs text-tx-2"
-          >
-            Free tool funnel
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Seeding is for looking at a working desk before real leads
+                arrive. Removing is only offered when there is something to
+                remove, so the desk does not advertise a demo mode it is not
+                in. */}
+            {canEdit && (
+              <form action={seedDemoLeads}>
+                <button type="submit" className="bg-press rounded-md border border-line px-2.5 py-1 text-xs text-tx-2">
+                  Seed demo rows
+                </button>
+              </form>
+            )}
+            {canEdit && summary.demoRows > 0 && (
+              <form action={removeDemoLeads}>
+                <button type="submit" className="bg-press rounded-md border border-line px-2.5 py-1 text-xs text-neg">
+                  Remove demo rows
+                </button>
+              </form>
+            )}
+            <Link
+              href="/desk/leads/funnel"
+              className="bg-press rounded-md border border-line px-2.5 py-1 text-xs text-tx-2"
+            >
+              Free tool funnel
+            </Link>
+          </div>
         }
       />
 
@@ -70,11 +94,20 @@ export default async function DeskLeadsPage() {
                     {lead.wantsWeekly && (
                       <span className="bg-label ml-2 text-[0.6rem] text-tx-3">Weekly email</span>
                     )}
+                    {/* Unmissable, because the cost of calling a person who
+                        does not exist is an embarrassing phone call. */}
+                    {lead.isDemo && (
+                      <span className="bg-label ml-2 rounded-sm border border-line-strong px-1.5 py-0.5 text-[0.6rem] text-tx-3">
+                        Demo row
+                      </span>
+                    )}
                   </p>
                   <p className="text-xs text-tx-3">
                     {lead.email}
+                    {lead.role ? ` · ${lead.role}` : ''}
                     {lead.company ? ` · ${lead.company}` : ''}
-                    {` · from ${lead.source}`}
+                    {lead.website ? ` · ${lead.website}` : ''}
+                    {` · from ${TOOL_NAME[lead.source] ?? lead.source}`}
                     {` · ${when(lead.createdAt)}`}
                   </p>
                 </div>
@@ -115,6 +148,30 @@ export default async function DeskLeadsPage() {
                   )}
                   .
                 </p>
+              )}
+
+              {/* The trail through the tools, which is the difference between
+                  "submitted a form" and knowing what they were trying to find
+                  out. Kept when the free-tool lead gate moved in here. */}
+              {lead.toolRuns.length > 0 && (
+                <div className="mt-2 rounded-xl border border-line bg-shell p-2.5">
+                  <p className="bg-label text-[0.6rem] text-tx-3">Tools they ran</p>
+                  <ul className="mt-1.5 space-y-1.5">
+                    {lead.toolRuns.map((run, i) => (
+                      <li key={`${run.toolId}-${i}`} className="text-xs">
+                        <span className="font-medium">{TOOL_NAME[run.toolId] ?? run.toolId}</span>
+                        {run.subject && <> on <span className="font-medium">{run.subject}</span></>}
+                        <span className="text-tx-3"> · {when(run.createdAt)}</span>
+                        {run.wantsMonitoring && (
+                          <span className="bg-label ml-2 text-[0.6rem] text-tx-3">Wants updates</span>
+                        )}
+                        {run.headline && (
+                          <p className="mt-0.5 text-[0.7rem] text-tx-3">{run.headline}</p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
 
               {lead.notes && <p className="mt-1.5 text-xs text-tx-2">{lead.notes}</p>}
