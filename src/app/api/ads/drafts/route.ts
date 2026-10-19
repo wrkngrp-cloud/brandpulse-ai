@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { z } from 'zod'
 
 export const runtime = 'nodejs'
@@ -49,33 +50,20 @@ export async function POST(request: NextRequest) {
   }
 
   const data = parsed.data
-  const serviceClient = await createServiceClient()
 
-  // Resolve brand
-  const { data: member } = await serviceClient
-    .from('workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!member) {
-    return NextResponse.json({ error: 'No workspace found' }, { status: 400 })
-  }
-
-  const { data: brand } = await serviceClient
-    .from('brands')
-    .select('id')
-    .eq('workspace_id', member.workspace_id)
-    .single()
-
-  if (!brand) {
+  // Resolve brand via the active-brand helper, which honours the
+  // active_brand_id cookie instead of guessing a brand from the workspace.
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) {
     return NextResponse.json({ error: 'No brand found' }, { status: 400 })
   }
+
+  const serviceClient = await createServiceClient()
 
   const { data: draft, error: insertErr } = await serviceClient
     .from('ad_drafts')
     .insert({
-      brand_id:            brand.id,
+      brand_id:            brandId,
       created_by:          user.id,
       platform:            data.platform,
       campaign_name:       data.campaign_name       ?? null,

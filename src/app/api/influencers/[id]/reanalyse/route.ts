@@ -7,6 +7,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { callAi } from '@/lib/ai/client'
 
 export async function POST(
@@ -18,11 +19,13 @@ export async function POST(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name, category, brand_values, target_segments')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{
+    id: string
+    name: string
+    category: string | null
+    brand_values: unknown
+    target_segments: unknown
+  }>(supabase, 'id, name, category, brand_values, target_segments')
   if (!brand) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
 
   const { data: influencer } = await supabase

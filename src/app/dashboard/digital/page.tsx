@@ -14,6 +14,7 @@ import type { SpendDataPoint, FunnelData, FrequencyPoint } from './digital-chart
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getActiveBrand } from '@/lib/active-brand'
 import { generateDigitalDays } from '@/lib/demo/digital-performance'
+import { activeImpersonationFor } from '@/lib/desk/impersonation'
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter'
 import { TourTrigger } from '@/components/tours/tour-trigger'
 import {
@@ -206,19 +207,28 @@ export default async function DigitalPage({
     'demo@bridgercrm.brandgauge.app',
     'demo@pinnaclemedia.brandgauge.app',
   ]
-  const isDemoUser  = DEMO_EMAILS.includes(user?.email ?? '')
-  const hasRealData = perfRows.length > 0
-  const isDemo      = !hasRealData && isDemoUser
+  const isDemoUser    = DEMO_EMAILS.includes(user?.email ?? '')
+  const hasRealData   = perfRows.length > 0
+  const impersonating = user ? await activeImpersonationFor(user.id) : null
+  const isDemo        = !hasRealData && isDemoUser && !impersonating
 
   // Seed inline rather than POSTing to our own API. That fetch carried no
   // session cookie and no admin secret, so it answered 401 every time and this
   // module stayed empty for every demo account. Doing it here also means the
   // rows exist before this render finishes, so the page paints with data
   // instead of showing an empty state until a refresh.
+  //
+  // Never runs during an impersonation session: the Desk's read-only
+  // guarantee for impersonation rests on "nothing in this app mutates on a
+  // GET" (see src/proxy.ts), and this is a GET-triggered service-role write.
+  // A staff member browsing a demo workspace just sees it as not-yet-synced
+  // instead of triggering the seed.
   if (isDemo && brandId) {
     const service = await createServiceClient()
     const rows = generateDigitalDays(brandId, brandName)
-    const { error } = await service.from('digital_performance_daily').insert(rows)
+    const { error } = await service
+      .from('digital_performance_daily')
+      .upsert(rows, { onConflict: 'brand_id,platform,date,campaign_id,adset_id', ignoreDuplicates: true })
     if (!error) {
       const { data: fresh } = await supabase
         .from('digital_performance_daily')
@@ -372,7 +382,7 @@ export default async function DigitalPage({
 
   const PLATFORMS = [
     { key: 'meta',     label: 'Meta Ads',     description: 'Facebook & Instagram campaigns', connectHref: '/api/ads/meta/connect',     available: true  },
-    { key: 'google',   label: 'Google Ads',   description: 'Search, Display & Shopping',     connectHref: '/api/ads/google/connect',   available: true  },
+    { key: 'google',   label: 'Google Ads',   description: 'Search, Display & Shopping',     connectHref: '/api/ads/google-ads/connect', available: true  },
     { key: 'twitter',  label: 'X (Twitter)',  description: 'Promoted posts and campaigns',   connectHref: '/api/ads/twitter/connect',  available: true  },
     { key: 'tiktok',   label: 'TikTok Ads',   description: 'Short-form video advertising',   connectHref: '#',                        available: false },
     { key: 'linkedin', label: 'LinkedIn Ads', description: 'B2B and professional audiences', connectHref: '#',                        available: false },
