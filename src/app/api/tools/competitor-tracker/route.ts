@@ -5,6 +5,7 @@ import { finishRun, hashIp, ipOf, startRun } from '@/lib/tools/runs'
 import { recordEvent } from '@/lib/tools/events'
 import { cacheGet, cacheKey, cacheSet, CACHE_TTL, withinRateLimit } from '@/lib/tools/limits'
 import { normaliseUrl } from '@/lib/tools/fetch-public'
+import { gateResult } from '@/lib/tools/gate'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -64,7 +65,8 @@ export async function POST(req: NextRequest) {
       // to nobody: this is the duplicate-analysis detection, not a shortcut.
       await finishRun({ id: run.id, status: 'complete', result: cached, coverage: { cached: true, sources: cached.report.coverage } })
       await recordEvent({ event: 'free_tool_completed', toolId: 'competitor-tracker', runId: run.id, visitorId, props: { cached: true, moves: cached.moves.length } })
-      return NextResponse.json({ token: run.token, runId: run.id, status: 'complete', result: cached })
+      const gatedCache = gateResult('competitor-tracker', cached as unknown as Record<string, unknown>, false)
+      return NextResponse.json({ token: run.token, runId: run.id, status: 'complete', ...gatedCache })
     }
 
     const outcome = await runCompetitorTracker({
@@ -90,7 +92,12 @@ export async function POST(req: NextRequest) {
       props: { moves: outcome.result.moves.length, competitor: outcome.result.competitor.name },
     })
 
-    return NextResponse.json({ token: run.token, runId: run.id, status: 'complete', result: outcome.result })
+    /* The full result is stored against the run; the response is the
+       preview. Trimming here rather than in the page is the difference
+       between a gate and a blur: the withheld findings never leave the
+       server, so nothing in dev tools contradicts what the page says. */
+    const gated = gateResult('competitor-tracker', outcome.result as unknown as Record<string, unknown>, false)
+    return NextResponse.json({ token: run.token, runId: run.id, status: 'complete', ...gated })
   } catch (err) {
     console.error('[competitor-tracker] run failed:', err)
     await finishRun({

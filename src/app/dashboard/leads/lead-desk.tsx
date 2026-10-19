@@ -16,6 +16,18 @@ export interface Lead {
   signed_up: boolean
   contacted_at: string | null
   created_at: string
+  role: string | null
+  website: string | null
+  /* One row per tool run, newest first. This is what turns "submitted a form"
+     into "ran the tracker on Moniepoint, then audited their own landing page,
+     and asked to be told when the competitor moves". */
+  lead_tool_runs: {
+    tool_id: string
+    inputs: Record<string, unknown>
+    headline: string | null
+    wants_monitoring: boolean
+    created_at: string
+  }[] | null
   scan_id: string | null
   public_scans: {
     brand_name: string
@@ -158,6 +170,35 @@ export function LeadDesk({ leads }: { leads: Lead[] }) {
                 </div>
               )}
 
+              {(l.lead_tool_runs ?? []).length > 0 && (
+                <div className="mt-4 rounded-sm border border-border bg-muted/40 p-4">
+                  <p className="bg-label text-muted-foreground">
+                    Tools they ran{l.role ? ` · ${l.role}` : ''}
+                  </p>
+                  <ul className="mt-2 space-y-2.5">
+                    {[...(l.lead_tool_runs ?? [])]
+                      .sort((a, b) => b.created_at.localeCompare(a.created_at))
+                      .map((run, i) => (
+                        <li key={i} className="text-[13px] leading-relaxed">
+                          <span className="font-medium">{TOOL_NAME[run.tool_id] ?? run.tool_id}</span>
+                          {subjectOf(run.inputs) && <> on <span className="font-medium">{subjectOf(run.inputs)}</span></>}
+                          <span className="text-muted-foreground">
+                            {' '}· {new Date(run.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
+                          </span>
+                          {run.wants_monitoring && (
+                            <span className="ml-2 rounded-sm border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+                              wants updates
+                            </span>
+                          )}
+                          {run.headline && (
+                            <p className="mt-0.5 text-[12.5px] text-muted-foreground">{run.headline}</p>
+                          )}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 {STATUSES.map(s => (
                   <button key={s} onClick={() => patch(l.id, { status: s })} disabled={pending}
@@ -187,4 +228,23 @@ export function LeadDesk({ leads }: { leads: Lead[] }) {
       )}
     </div>
   )
+}
+
+/* The desk shows the tool's product name rather than its id, and the thing
+   they pointed it at, because "Competitor Move Tracker on moniepoint.com" is
+   an opening line and "competitor-tracker" is not. */
+const TOOL_NAME: Record<string, string> = {
+  'pr-scoreboard':      'PR Scoreboard',
+  'competitor-tracker': 'Competitor Move Tracker',
+  'market-demand':      'Market Demand Gap Finder',
+  'offline-tracker':    'Offline Campaign Tracker',
+  'campaign-audit':     'Campaign Conversion Audit',
+}
+
+function subjectOf(inputs: Record<string, unknown>): string | null {
+  const value = ['competitorWebsite', 'pageUrl', 'website', 'yourWebsite', 'campaignName']
+    .map(key => inputs?.[key])
+    .find((v): v is string => typeof v === 'string' && v.length > 2)
+  if (!value) return null
+  try { return new URL(value).hostname.replace(/^www\./, '') } catch { return value.slice(0, 60) }
 }

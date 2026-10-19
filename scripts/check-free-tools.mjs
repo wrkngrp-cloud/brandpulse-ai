@@ -245,13 +245,36 @@ eq('external out',   html.findSectionLinks(facts, [/wa\.me/i], 2), [])
 
 // ── The registry, which the nav and the directory both read ─────────────────
 console.log('\n── registry')
-eq('five tools',        registry.FREE_TOOLS.length, 5)
-eq('ids unique',        new Set(registry.FREE_TOOLS.map(t => t.id)).size, 5)
-eq('routes unique',     new Set(registry.FREE_TOOLS.map(t => t.route)).size, 5)
+const routeFile = route => {
+  const base = `src/app${route}`
+  return ['page.tsx', 'route.ts'].some(f => existsSync(`${base}/${f}`))
+}
+// Counts are not asserted: the lineup changes as tools are added and retired,
+// and a test that has to be edited every time one moves is a test that gets
+// edited rather than read. The invariants below are what must always hold.
+const listed = registry.FREE_TOOLS
+ok('at least three tools are listed', listed.length >= 3)
+ok('everything in FREE_TOOLS is listed', listed.every(t => t.listed))
+eq('listed ids unique',    new Set(listed.map(t => t.id)).size, listed.length)
+eq('listed routes unique', new Set(listed.map(t => t.route)).size, listed.length)
 eq('scoreboard route',  registry.toolById('pr-scoreboard').route, '/scoreboard')
-ok('every route absolute', registry.FREE_TOOLS.every(t => t.route.startsWith('/')))
-ok('every tool has a blurb and a CTA', registry.FREE_TOOLS.every(t => t.blurb && t.cta && t.detail))
-eq('grouped covers all', registry.toolsByCategory().reduce((n, g) => n + g.tools.length, 0), 5)
+ok('every route absolute', listed.every(t => t.route.startsWith('/')))
+ok('every tool has a blurb and a CTA', listed.every(t => t.blurb && t.cta && t.detail))
+eq('grouped covers every listed tool',
+   registry.toolsByCategory().reduce((n, g) => n + g.tools.length, 0), listed.length)
+
+// A retired tool keeps its identity so the lead desk and the funnel can still
+// name it, and keeps its page so a link someone holds still resolves. What it
+// loses is its place in the lineup.
+const retired = registry.TOOL_IDS.filter(id => !listed.some(t => t.id === id))
+ok('the offline tracker is retired from the lineup', retired.includes('offline-tracker'))
+for (const id of retired) {
+  const tool = registry.toolById(id)
+  ok(`${id} still resolves by id`, Boolean(tool) && tool.listed === false)
+  ok(`${id} keeps its page`, routeFile(tool.route))
+  ok(`${id} is not suggested to anyone`,
+     listed.every(t => registry.nextTool(t.id)?.tool.id !== id))
+}
 ok('next tool for every tool', registry.FREE_TOOLS.every(t => {
   const n = registry.nextTool(t.id)
   return n && n.tool.id !== t.id && n.line.length > 10
@@ -570,10 +593,6 @@ ok('a label per objective',vocab.CAMPAIGN_OBJECTIVES.every(o => vocab.OBJECTIVE_
       dashboard module with no product tour, the PR Scoreboard's route moving. */
 console.log('\n── navigation and routing wiring')
 
-const routeFile = route => {
-  const base = `src/app${route}`
-  return ['page.tsx', 'route.ts'].some(f => existsSync(`${base}/${f}`))
-}
 for (const tool of registry.FREE_TOOLS) {
   ok(`${tool.name} has a page at ${tool.route}`, routeFile(tool.route))
 }
