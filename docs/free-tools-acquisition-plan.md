@@ -162,7 +162,9 @@ So the next session does not go looking for it, or rebuild it by accident:
 
 - **Three migrations are written and not applied.** `20261014090000_free_tools.sql` and
   `20261014110000_fix_notifications_rls.sql` are applied. Still pending:
-  `20261018090000_tool_lead_capture.sql` (widens `leads_source_check`, adds `leads.role` and
+  `20261018094000_tool_lead_capture.sql` (renamed from `…18090000…` on 19 October: main had
+  shipped `20261018090000_desk_accounts.sql` on the same timestamp, and the ledger keys on
+  that timestamp, so two migrations could not share one. Widens `leads_source_check`, adds `leads.role` and
   `leads.website`, creates `lead_tool_runs`, adds the two gate events),
   `20261019090000_scoreboard_lead_trail.sql` (backfills `lead_tool_runs` from existing
   scoreboard leads) and `20261019100000_demo_leads.sql` (adds `leads.is_demo`). Lead capture
