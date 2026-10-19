@@ -54,6 +54,10 @@ const files = {
   'campaign-audit.ts':     ['src/lib/tools/campaign-audit.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
       "import { callAi, extractJson } from './ai-stub'")],
+  'leads.ts':              ['src/lib/tools/leads.ts', s => s
+    .replace("import { createServiceClient } from '@/lib/supabase/server'",
+      "const createServiceClient = async (): Promise<any> => { throw new Error('no database in this check') }")],
+  'gate.ts':               ['src/lib/tools/gate.ts', s => s],
   'competitor-tracker.ts': ['src/lib/tools/competitor-tracker.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
       "import { callAi, extractJson } from './ai-stub'")
@@ -119,6 +123,8 @@ const search      = await import(`${OUT}/search-provider.mjs`)
 const offline     = await import(`${OUT}/offline-tracker.mjs`)
 const labels      = await import(`${OUT}/campaign-labels.mjs`)
 const auditMod    = await import(`${OUT}/campaign-audit.mjs`)
+const leads       = await import(`${OUT}/leads.mjs`)
+const gate        = await import(`${OUT}/gate.mjs`)
 const vocab       = await import(`${OUT}/audit-vocab.mjs`)
 
 let pass = 0, fail = 0
@@ -654,6 +660,85 @@ for (const table of [
 ok('no policy is granted to anon', !/to\s+anon/i.test(migration))
 ok('enquiries are not readable by the lead desk',
    !/create policy tool_responses_read[\s\S]{0,200}is_lead_desk/.test(migration))
+
+
+// ── Lead capture: a later run must never cost us data ───────────────────────
+console.log('\n── fillBlanks: blanks are filled, nothing is overwritten')
+eq('fills a missing name',
+   leads.fillBlanks({ name: null, role: 'CMO or marketing director' }, { name: 'Ada', role: null }),
+   { name: 'Ada' })
+eq('never overwrites a name already there',
+   leads.fillBlanks({ name: 'Ada Obi' }, { name: 'A' }), {})
+// The bug this exists for: a second, sparser form once erased the first one's
+// answers, because an empty field sends an explicit null.
+eq('a blank second form erases nothing',
+   leads.fillBlanks({ name: 'Ada Obi', role: 'Brand manager', company: 'Acme' },
+                    { name: null, role: null, company: null }), {})
+eq('fills several blanks at once',
+   leads.fillBlanks({ name: null, company: null, role: 'Brand manager' },
+                    { name: 'Ada', company: 'Acme', role: 'Founder or MD' }),
+   { name: 'Ada', company: 'Acme' })
+eq('empty string counts as a blank incoming value',
+   leads.fillBlanks({ name: null }, { name: '' }), {})
+
+console.log('\n── company is derived from the website, not asked for')
+eq('from the competitor tool inputs',
+   leads.companyFromInputs({ yourWebsite: 'https://acme.ng/about', competitorWebsite: 'https://rival.ng' }),
+   { company: 'Acme', website: 'https://acme.ng' })
+eq('from an audited page', leads.companyFromInputs({ pageUrl: 'https://shop.jara.com.ng/offer?x=1' }).company, 'Shop')
+eq('www is stripped', leads.companyFromInputs({ website: 'https://www.acme.ng' }).company, 'Acme')
+eq('nothing to go on', leads.companyFromInputs({ market: 'Nigeria' }), { company: null, website: null })
+
+console.log('\n── the gate withholds on the server, not in the browser')
+const fullReport = {
+  title: 'T', summary: 'S',
+  findings: [
+    { title: 'first', provenance: 'observed', confidence: 'high', evidence: [{ sourceUrl: 'https://a.ng' }] },
+    { title: 'second', provenance: 'observed', confidence: 'high', evidence: [{ sourceUrl: 'https://b.ng' }] },
+    { title: 'third', provenance: 'observed', confidence: 'high', evidence: [{ sourceUrl: 'https://c.ng' }] },
+  ],
+  nextAction: 'do the thing',
+  coverage: [{ source: 'the press', read: true }],
+  limitations: ['one', 'two'],
+  generatedAt: '2026-10-18T00:00:00.000Z',
+}
+const preview = gate.gateReport(fullReport, false)
+eq('one finding survives',        preview.report.findings.length, 1)
+eq('and it is the strongest',     preview.report.findings[0].title, 'first')
+eq('with its evidence intact',    preview.report.findings[0].evidence[0].sourceUrl, 'https://a.ng')
+eq('two withheld',                preview.withheld.findings, 2)
+eq('the next action is withheld', preview.report.nextAction, undefined)
+eq('the limitations are withheld',preview.report.limitations, [])
+// Coverage stays: it is the proof the work happened, and it names what we
+// could not read, which is honest on either side of the gate.
+eq('coverage stays',              preview.report.coverage.length, 1)
+eq('the summary stays',           preview.report.summary, 'S')
+
+const open_ = gate.gateReport(fullReport, true)
+eq('unlocked keeps everything',   [open_.report.findings.length, open_.report.limitations.length, open_.gated],
+   [3, 2, false])
+
+console.log('\n── and the machine arrays are trimmed with it')
+const result = { report: fullReport, moves: [{ a: 1 }, { a: 2 }, { a: 3 }], competitor: { name: 'Rival' } }
+const gatedResult = gate.gateResult('competitor-tracker', result, false)
+eq('moves trimmed to match the preview', gatedResult.result.moves.length, 1)
+eq('other fields untouched', gatedResult.result.competitor.name, 'Rival')
+eq('unlocked leaves the array alone',
+   gate.gateResult('competitor-tracker', result, true).result.moves.length, 3)
+eq('opportunities trimmed too',
+   gate.gateResult('market-demand', { report: fullReport, opportunities: [1, 2, 3] }, false).result.opportunities.length, 1)
+eq('audit findings trimmed too',
+   gate.gateResult('campaign-audit', { report: fullReport, findings: [1, 2, 3, 4] }, false).result.findings.length, 1)
+
+console.log('\n── every tool in the lineup has gate copy')
+ok('copy for each listed tool', registry.FREE_TOOLS.every(t => {
+  const c = gate.GATE_COPY[t.id]
+  return c && typeof c.headline === 'function' && c.body && c.monitoring && c.button
+}))
+ok('the headline counts what is actually withheld',
+   gate.GATE_COPY['competitor-tracker'].headline({ findings: 2 }).includes('2'))
+ok('and reads naturally for one',
+   !gate.GATE_COPY['competitor-tracker'].headline({ findings: 1 }).includes('1 more verified moves'))
 
 console.log(`\n${fail === 0 ? 'PASS' : 'FAIL'} — ${pass} checks passed, ${fail} failed\n`)
 process.exit(fail === 0 ? 0 : 1)
