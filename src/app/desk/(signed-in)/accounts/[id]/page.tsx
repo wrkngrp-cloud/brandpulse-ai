@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireStaff } from '@/lib/desk/auth'
+import { deskHref } from '@/lib/desk/urls'
 import { accountDetail } from '@/lib/desk/accounts'
 import { adoptionForBrand, adoptionHeadline } from '@/lib/desk/adoption'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -45,7 +46,7 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="space-y-8">
-      <Link href="/desk/accounts" className="bg-press inline-flex items-center gap-1.5 text-xs text-tx-3">
+      <Link href={await deskHref('/desk/accounts')} className="bg-press inline-flex items-center gap-1.5 text-xs text-tx-3">
         <ArrowLeftIcon className="size-3.5" /> Accounts
       </Link>
 

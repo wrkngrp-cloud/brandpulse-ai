@@ -14,19 +14,18 @@ export const dynamic = 'force-dynamic'
  * checked yourself against Moniepoint and PalmPay and came out at 8%" is a
  * different opening line from "just following up".
  *
- * Access is an explicit allowlist, not a workspace role. A lead belongs to
- * BrandGauge rather than to a tenant, so `is_lead_desk()` guards the rows in
- * the database and this page checks the same table before rendering. Both,
- * deliberately: the page check is the redirect, the policy is the guarantee.
+ * Access is not a workspace role. A lead belongs to BrandGauge rather than
+ * to a tenant, so `staff_can('leads.view')` guards the rows in the database
+ * and this page checks the same thing before rendering. Both, deliberately:
+ * the page check is the redirect, the policy is the guarantee.
  */
 export default async function LeadsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: admin } = await supabase
-    .from('lead_desk_admins').select('user_id').eq('user_id', user.id).maybeSingle()
-  if (!admin) redirect('/dashboard')
+  const { data: canView } = await supabase.rpc('staff_can', { perm: 'leads.view' })
+  if (!canView) redirect('/dashboard')
 
   // RLS returns nothing to anyone not on the allowlist, so this is the same
   // answer the policy would give, read through the signed-in user.

@@ -1,4 +1,5 @@
 import { requireStaff } from '@/lib/desk/auth'
+import { onDeskHost } from '@/lib/desk/urls'
 import { createClient } from '@/lib/supabase/server'
 import { DeskShell } from '@/components/desk/desk-shell'
 
@@ -16,8 +17,10 @@ export default async function DeskAuthedLayout({ children }: { children: React.R
   const session = await requireStaff()
 
   const supabase = await createClient()
-  const { data: role } = await supabase
-    .from('staff_roles').select('label').eq('name', session.role).maybeSingle()
+  const [{ data: role }, onDesk] = await Promise.all([
+    supabase.from('staff_roles').select('label').eq('name', session.role).maybeSingle(),
+    onDeskHost(),
+  ])
 
   return (
     <DeskShell
@@ -25,6 +28,7 @@ export default async function DeskAuthedLayout({ children }: { children: React.R
       roleLabel={role?.label ?? session.role}
       permissions={[...session.permissions]}
       isSuperAdmin={session.isSuperAdmin}
+      onDesk={onDesk}
     >
       {children}
     </DeskShell>

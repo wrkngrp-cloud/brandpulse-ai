@@ -6,10 +6,9 @@ import type { StaffSession } from './auth'
  * The lead desk, in the Desk.
  *
  * The same rows the founder's lead desk at /dashboard/leads has always shown,
- * read here through the Desk's permission model instead of the
- * lead_desk_admins allowlist. Both exist for now: retiring the old one means
- * rewriting the leads and public_scans policies and the acquisition funnel
- * page the free tools added, which is a change of its own.
+ * read here through the Desk's permission model. /dashboard/leads and its
+ * funnel page check the same `leads.view` permission now that the
+ * lead_desk_admins allowlist is gone.
  */
 
 export interface LeadRow {

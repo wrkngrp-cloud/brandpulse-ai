@@ -11,10 +11,10 @@ export const dynamic = 'force-dynamic'
 /**
  * The founder's view of the free tools.
  *
- * Same access rule as the lead desk next door: an explicit allowlist, because
- * none of this belongs to a tenant. The page checks `lead_desk_admins` and the
- * views it reads are `security_invoker`, so the policy on tool_events is the
- * guarantee and this check is only the redirect.
+ * Same access rule as the lead desk next door: `staff_can('leads.view')`,
+ * because none of this belongs to a tenant. The views it reads are
+ * `security_invoker`, so the policy on tool_events is the guarantee and this
+ * check is only the redirect.
  *
  * The columns are chosen to resist the one metric that would mislead us.
  * Signups are not success: a visitor who completed a tool, received something
@@ -64,9 +64,8 @@ export default async function FunnelPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: admin } = await supabase
-    .from('lead_desk_admins').select('user_id').eq('user_id', user.id).maybeSingle()
-  if (!admin) redirect('/dashboard')
+  const { data: canView } = await supabase.rpc('staff_can', { perm: 'leads.view' })
+  if (!canView) redirect('/dashboard')
 
   const since = thirtyDaysAgo()
 

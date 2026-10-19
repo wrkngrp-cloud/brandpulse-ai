@@ -154,9 +154,9 @@ Upstash Redis for cache / rate-limit / OAuth state.
 - The public scoreboard (`/scoreboard`, `/api/scoreboard/*`) is the one open endpoint with no
   token, because it reads a public news feed and touches no tenant row: there is no caller to
   verify. It is guarded instead by an IP rate limit and a cache, both of which fail open. Its
-  tables (`public_scans`, `leads`, `lead_desk_admins`) are the one place RLS does not scope to a
-  workspace: a lead belongs to BrandGauge, so they scope to the `is_lead_desk()` allowlist and
-  are written by the service role only. See `docs/scoreboard-and-leads.md`. The free-tool
+  tables (`public_scans`, `leads`) are the one place RLS does not scope to a
+  workspace: a lead belongs to BrandGauge, so they scope to the `staff_can('leads.view')`
+  permission and are written by the service role only. See `docs/scoreboard-and-leads.md`. The free-tool
   tables (`tool_runs`, `tool_events`, `tool_campaigns`, `tool_placements`, `tool_visits`)
   follow the same pattern for the same reason, with one addition: once a run or campaign is
   claimed they are also readable by the workspace that claimed it. `tool_responses` holds
@@ -230,7 +230,7 @@ plus `/tools/competitor-tracker`, `/tools/market-demand`, `/tools/offline-tracke
   the person agreed to, and are the one table here the lead desk cannot read.
 - Acquisition events go to `tool_events` (first-party; `posthog-js` is a dependency and is
   imported nowhere). The founder's funnel is `/dashboard/leads/funnel`, behind the same
-  `lead_desk_admins` allowlist as the lead desk.
+  `staff_can('leads.view')` permission as the lead desk.
 - Beta is free. Do not add a trial, an expiry, a paywall or an upgrade prompt to any of this.
 
 ## Active brand lookup (critical, always use this)
@@ -421,8 +421,9 @@ is the spec. Rules that are easy to break without noticing:
   or it becomes a hole. A session needs a customer approval row, expires on the clock
   whether or not the sweep runs, and `end_impersonation()` is what takes the membership
   away.
-- `lead_desk_admins` and `is_lead_desk()` still exist and still guard `/dashboard/leads`
-  and `/dashboard/leads/funnel`. They retire when the lead desk moves into the Desk.
+- The lead desk's old `lead_desk_admins` allowlist and `is_lead_desk()` retired on
+  2026-10-18. `/dashboard/leads` and `/dashboard/leads/funnel` now gate on
+  `staff_can('leads.view')`, the same permission the Desk's own `/desk/leads` checks.
 
 ## Voice for any user-facing copy (hard rule)
 Warm, confident, plain English. Active voice. Connection before sales. No jargon. No em dashes.

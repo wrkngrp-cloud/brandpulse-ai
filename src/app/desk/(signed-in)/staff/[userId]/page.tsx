@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireStaff } from '@/lib/desk/auth'
+import { deskHref } from '@/lib/desk/urls'
 import { staffPerson } from '@/lib/desk/data'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { PERMISSION_GROUPS, DATASET_KEYS } from '@/lib/desk/permissions'
@@ -35,7 +36,7 @@ export default async function StaffPersonPage({
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/desk/staff" className="bg-press inline-flex items-center gap-1.5 text-xs text-tx-3">
+        <Link href={await deskHref('/desk/staff')} className="bg-press inline-flex items-center gap-1.5 text-xs text-tx-3">
           <ArrowLeftIcon className="size-3.5" /> All staff
         </Link>
       </div>

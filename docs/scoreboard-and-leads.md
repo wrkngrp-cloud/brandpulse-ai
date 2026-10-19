@@ -34,20 +34,16 @@ still got something true and free, which is the point.
 ## Setting it up
 
 **Apply the migration.** `supabase/migrations/20260914090000_lead_capture.sql`
-adds `public_scans`, `leads` and `lead_desk_admins`. Run `supabase migration
+adds `public_scans` and `leads`. Run `supabase migration
 list` first and confirm it is the only pending item, then `supabase db push`.
 
-**Give the EA access.** Access is an explicit allowlist, not a workspace role,
-because a lead belongs to BrandGauge and not to a tenant. They sign up normally
-at `/auth/signup`, then add their row with the service role:
+**Give the EA access.** Access is a Desk permission (`leads.view`), not a
+workspace role, because a lead belongs to BrandGauge and not to a tenant.
+Invite them to the Desk (`desk.brandgauge.app`) on a role that holds
+`leads.view` — `support`, `bizdev` and `admin` all carry it by default.
 
-```sql
-insert into lead_desk_admins (user_id, email, note)
-select id, email, 'EA' from auth.users where email = 'their@address.com';
-```
-
-They will then see `/dashboard/leads`. Anyone not on that list gets redirected,
-and RLS returns them nothing even if they call the API directly.
+They will then see `/dashboard/leads`. Anyone without the permission gets
+redirected, and RLS returns them nothing even if they call the API directly.
 
 **Environment.**
 

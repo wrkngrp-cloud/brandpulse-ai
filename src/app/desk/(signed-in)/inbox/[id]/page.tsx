@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireStaff } from '@/lib/desk/auth'
+import { deskHref } from '@/lib/desk/urls'
 import { deskThread } from '@/lib/desk/data'
 import { createServiceClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -36,7 +37,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="space-y-6">
-      <Link href="/desk/inbox" className="bg-press inline-flex items-center gap-1.5 text-xs text-tx-3">
+      <Link href={await deskHref('/desk/inbox')} className="bg-press inline-flex items-center gap-1.5 text-xs text-tx-3">
         <ArrowLeftIcon className="size-3.5" /> Inbox
       </Link>
 

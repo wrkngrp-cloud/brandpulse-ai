@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { requireStaff } from '@/lib/desk/auth'
+import { onDeskHost } from '@/lib/desk/urls'
+import { stripDeskPrefix } from '@/lib/desk/desk-path'
 import { accountList } from '@/lib/desk/accounts'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { BuildingIcon } from '@/components/brand/icon'
@@ -36,10 +38,15 @@ export default async function AccountsPage({
   })
 
   const quiet = rows.filter(r => !r.lastActiveAt).length
+  const onDesk = await onDeskHost()
+  const sortHref = (key: string) => {
+    const mainHostHref = key === 'quiet' ? '/desk/accounts' : `/desk/accounts?sort=${key}`
+    return onDesk ? stripDeskPrefix(mainHostHref) : mainHostHref
+  }
 
   const tab = (key: string, label: string) => (
     <Link
-      href={key === 'quiet' ? '/desk/accounts' : `/desk/accounts?sort=${key}`}
+      href={sortHref(key)}
       className={cn('bg-press rounded-md border border-line px-2.5 py-1 text-xs',
         (sort ?? 'quiet') === key ? 'bg-shell text-tx' : 'text-tx-2')}
     >
