@@ -18,6 +18,7 @@ export interface Lead {
   created_at: string
   role: string | null
   website: string | null
+  is_demo: boolean
   /* One row per tool run, newest first. This is what turns "submitted a form"
      into "ran the tracker on Moniepoint, then audited their own landing page,
      and asked to be told when the competitor moves". */
@@ -111,6 +112,7 @@ export function LeadDesk({ leads }: { leads: Lead[] }) {
             aria-label="Search leads"
             className="w-full rounded-sm border border-border bg-card py-2.5 pl-9 pr-3 text-sm outline-none focus-visible:ring-2" />
         </div>
+        <DemoControls hasDemo={rows.some(l => l.is_demo)} />
         <button onClick={exportCsv}
           className="flex shrink-0 items-center gap-2 rounded-sm border border-border px-3.5 py-2.5 text-[13px] font-medium bg-press">
           <ExportIcon className="h-4 w-4" /> Export CSV
@@ -153,6 +155,13 @@ export function LeadDesk({ leads }: { leads: Lead[] }) {
                   <span className="bg-label text-muted-foreground">{day(l.created_at)}</span>
                   {l.wants_weekly && <span className="rounded-sm border border-border px-2 py-0.5 text-[10px]">weekly</span>}
                   {l.signed_up && <span className="rounded-sm px-2 py-0.5 text-[10px] text-on-hot" style={{ background: 'var(--flare)' }}>signed up</span>}
+                  {/* Unmissable, because the cost of a BDM calling a person
+                      who does not exist is an embarrassing phone call. */}
+                  {l.is_demo && (
+                    <span className="rounded-sm border border-line-strong px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-tx-3">
+                      demo row
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -247,4 +256,44 @@ function subjectOf(inputs: Record<string, unknown>): string | null {
     .find((v): v is string => typeof v === 'string' && v.length > 2)
   if (!value) return null
   try { return new URL(value).hostname.replace(/^www\./, '') } catch { return value.slice(0, 60) }
+}
+
+/**
+ * Seed and remove the demo rows, for looking at an empty desk before any real
+ * leads arrive.
+ *
+ * The route behind these checks the lead desk allowlist itself, so the
+ * buttons carry no secret and a non-admin who finds the endpoint is refused.
+ * Removing is offered only when there is something to remove, so the desk
+ * does not advertise a demo mode it is not in.
+ */
+function DemoControls({ hasDemo }: { hasDemo: boolean }) {
+  const [busy, setBusy] = useState(false)
+
+  async function call(method: 'POST' | 'DELETE') {
+    setBusy(true)
+    try {
+      const res = await fetch('/api/admin/demo-leads', { method })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'That did not work.')
+      toast.success(method === 'POST'
+        ? `${data.leads} demo leads with ${data.runs} tool runs. Reloading.`
+        : `${data.removed} demo leads removed. Reloading.`)
+      window.location.reload()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'That did not work.')
+    } finally { setBusy(false) }
+  }
+
+  return hasDemo ? (
+    <button onClick={() => call('DELETE')} disabled={busy}
+      className="flex shrink-0 items-center gap-2 rounded-sm border border-border px-3.5 py-2.5 text-[13px] font-medium bg-press disabled:opacity-50">
+      Remove demo rows
+    </button>
+  ) : (
+    <button onClick={() => call('POST')} disabled={busy}
+      className="flex shrink-0 items-center gap-2 rounded-sm border border-border px-3.5 py-2.5 text-[13px] font-medium bg-press disabled:opacity-50">
+      Add demo rows
+    </button>
+  )
 }

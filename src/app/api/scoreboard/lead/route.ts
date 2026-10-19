@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { Resend } from 'resend'
 import { createServiceClient } from '@/lib/supabase/server'
+import { captureLead } from '@/lib/tools/leads'
+import { LEAD_ROLES } from '@/lib/tools/gate'
 
 export const runtime = 'nodejs'
 export const maxDuration = 20
@@ -24,6 +26,7 @@ const Body = z.object({
   name:        z.string().trim().max(80).optional(),
   company:     z.string().trim().max(120).optional(),
   scanId:      z.string().uuid().optional(),
+  role:        z.enum(LEAD_ROLES).optional(),
   wantsWeekly: z.boolean().default(false),
 })
 
@@ -35,24 +38,47 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'That email does not look right.' }, { status: 400 })
   }
-  const { email, name, company, scanId, wantsWeekly } = parsed.data
+  const { email, name, company, scanId, role, wantsWeekly } = parsed.data
 
   const svc = await createServiceClient()
 
-  // Someone scanning a second category is the same person, not a new lead.
-  // Keep the newest scan against them and never downgrade a status the desk
-  // has already moved on.
-  const { error } = await svc.from('leads').upsert({
-    email,
-    name:         name ?? null,
-    company:      company ?? null,
-    scan_id:      scanId ?? null,
-    source:       'scoreboard',
-    wants_weekly: wantsWeekly,
-  }, { onConflict: 'email' })
+  /* Through the same capture as the other four tools, rather than its own
+     upsert. That buys three things the hand-rolled version did not have: a
+     row in lead_tool_runs so the scoreboard appears in the desk's trail
+     alongside everything else, first-touch source that a later tool cannot
+     overwrite, and blanks that never erase a name given earlier. */
+  const scan = scanId
+    ? (await svc.from('public_scans')
+        .select('brand_name, competitors, category, share_of_reach, mentions_found')
+        .eq('id', scanId).maybeSingle()).data
+    : null
 
-  if (error) {
-    console.error('[scoreboard] could not save the lead:', error.message)
+  const headline = scan
+    ? scan.share_of_reach != null
+      ? `${scan.brand_name} held ${scan.share_of_reach}% of the category's earned reach`
+      : `${scan.brand_name}: ${scan.mentions_found ?? 0} press mentions found`
+    : null
+
+  const captured = await captureLead({
+    runId:   null,
+    scanId:  scanId ?? null,
+    toolId:  'pr-scoreboard',
+    email,
+    name,
+    company,
+    role,
+    inputs:  scan
+      ? { brand: scan.brand_name, competitors: scan.competitors, category: scan.category }
+      : {},
+    headline,
+    wantsMonitoring: wantsWeekly,
+    consentText: wantsWeekly
+      ? 'I agree that BrandGauge may email me this scoreboard every Monday and contact me about BrandGauge.'
+      : 'I agree that BrandGauge may contact me about BrandGauge.',
+  })
+
+  if (!captured.ok) {
+    console.error('[scoreboard] could not save the lead')
     return NextResponse.json({ error: 'We could not save that. Try again.' }, { status: 500 })
   }
 

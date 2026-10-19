@@ -19,10 +19,18 @@ import type { ToolReport } from './report'
  */
 
 export interface CaptureArgs {
-  runId:     string
+  /** Null for the PR Scoreboard, whose result is a public_scans row rather
+   *  than a tool_run. The inputs snapshot is the record in that case. */
+  runId:     string | null
   toolId:    ToolId
+  /** Scoreboard only: the scan they were looking at, kept on the lead for the
+   *  existing desk block that reads it. */
+  scanId?:   string | null
   email:     string
   name?:     string
+  /** Only the scoreboard asks for this outright. Everywhere else it is
+   *  derived from the website, which is why the form has three fields. */
+  company?:  string | null
   role?:     string
   /** What they typed into the tool. Copied here because the run is purged
    *  after thirty days and the desk row should outlive it. */
@@ -86,7 +94,10 @@ export type CaptureOutcome =
 
 export async function captureLead(args: CaptureArgs): Promise<CaptureOutcome> {
   const svc = await createServiceClient()
-  const { company, website } = companyFromInputs(args.inputs)
+  const derived = companyFromInputs(args.inputs)
+  // A typed company beats a guess off the domain.
+  const company = args.company?.trim() || derived.company
+  const website = derived.website
   const role = LEAD_ROLES.includes(args.role as LeadRole) ? args.role : null
 
   /* Read before write, rather than upsert.
@@ -120,6 +131,9 @@ export async function captureLead(args: CaptureArgs): Promise<CaptureOutcome> {
       website,
       role:    role ?? null,
     })
+    // The scan is the exception to fill-blanks: the desk's scoreboard block
+    // shows the most recent scan on purpose, so a newer one replaces it.
+    if (args.scanId) patch.scan_id = args.scanId
     if (Object.keys(patch).length) {
       await svc.from('leads').update(patch).eq('id', existing.id)
     }
@@ -134,6 +148,8 @@ export async function captureLead(args: CaptureArgs): Promise<CaptureOutcome> {
         website,
         role,
         source:  args.toolId,
+        ...(args.scanId ? { scan_id: args.scanId } : {}),
+        ...(args.wantsMonitoring && args.toolId === 'pr-scoreboard' ? { wants_weekly: true } : {}),
       })
       .select('id')
       .single()
@@ -156,6 +172,21 @@ export async function captureLead(args: CaptureArgs): Promise<CaptureOutcome> {
   }
 
   const lead = { id: leadId }
+
+  /* The scoreboard has no run id, so the unique index cannot protect it from
+     a repeat. Guarding on the same scan keeps a second submission of the same
+     board from adding a second trail row. */
+  if (!args.runId) {
+    const { data: already } = await svc
+      .from('lead_tool_runs')
+      .select('id')
+      .eq('lead_id', lead.id)
+      .eq('tool_id', args.toolId)
+      .eq('inputs', JSON.stringify(args.inputs))
+      .limit(1)
+      .maybeSingle()
+    if (already) return { ok: true, leadId: lead.id, alreadyCaptured: Boolean(existing) }
+  }
 
   const { error: runError } = await svc.from('lead_tool_runs').upsert({
     lead_id:          lead.id,
