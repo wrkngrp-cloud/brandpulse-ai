@@ -115,7 +115,7 @@ export async function forgotPassword(_prev: AuthState, formData: FormData): Prom
   }
 
   const supabase = await createClient()
-  const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
+  const APP_URL = process.env.APP_URL || 'http://localhost:3000'
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${APP_URL}/api/auth/callback?next=/auth/reset-password`,

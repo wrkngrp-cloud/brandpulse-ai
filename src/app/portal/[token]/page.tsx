@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 export default async function PortalPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
 
-  const baseUrl = process.env.APP_URL ?? 'http://localhost:3000'
+  const baseUrl = process.env.APP_URL || 'http://localhost:3000'
   const res = await fetch(`${baseUrl}/api/portal/view?token=${encodeURIComponent(token)}&range=30d`, {
     cache: 'no-store',
   })

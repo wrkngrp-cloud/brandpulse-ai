@@ -93,7 +93,7 @@ export default async function ConnectorsPage() {
     }
   }
 
-  const appUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? ''
+  const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || ''
 
   const industry = brand?.industry || getIndustryFromCategory(brand?.category ?? '') as IndustryId
   const industryMeta   = INDUSTRY_META[industry as IndustryId]

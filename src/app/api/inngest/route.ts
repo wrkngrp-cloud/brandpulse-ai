@@ -28,6 +28,8 @@ import { b2bReviewSync }               from '@/lib/inngest/functions/b2b-review-
 import { developerHealthSync }         from '@/lib/inngest/functions/developer-health-sync'
 import { hubspotDailySync }            from '@/lib/inngest/functions/hubspot-daily-sync'
 import { googleAdsDailySync }          from '@/lib/inngest/functions/google-ads-daily-sync'
+import { impersonationSweep }         from '@/lib/inngest/functions/impersonation-sweep'
+import { leadSignupMatch }            from '@/lib/inngest/functions/lead-signup-match'
 import { competitorWatchCheck }        from '@/lib/inngest/functions/competitor-watch-check'
 import { toolRunRetention }            from '@/lib/inngest/functions/tool-run-retention'
 
@@ -55,5 +57,7 @@ export const { GET, POST, PUT } = serve({
     developerHealthSync,
     hubspotDailySync,
     googleAdsDailySync,
+    impersonationSweep,
+    leadSignupMatch,
   ],
 })

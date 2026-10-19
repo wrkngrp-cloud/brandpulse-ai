@@ -581,7 +581,7 @@ export default async function DigitalPage({
             <strong>Valid OAuth Redirect URIs</strong>:
           </p>
           <code className="block text-xs bg-shell dark:bg-shell/40 px-3 py-1.5 rounded bg-num">
-            {process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'}/api/ads/meta/callback
+            {process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'}/api/ads/meta/callback
           </code>
           <p className="text-xs text-tx-2 dark:text-tx-2">
             Also ensure your app has <strong>Marketing API</strong> enabled and that{' '}

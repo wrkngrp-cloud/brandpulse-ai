@@ -10,7 +10,7 @@ import { DebriefPromptCard }   from '@/components/events/debrief-prompt-card'
 import { VisualMentions }      from '@/components/events/visual-mentions'
 import { Crescendo } from '@/components/brand/crescendo'
 
-const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })

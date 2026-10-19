@@ -65,7 +65,7 @@ export default async function OohSitePage({
 
   const { getActiveBrand } = await import('@/lib/active-brand')
   const brand = await getActiveBrand<{ ooh_redirect_domain: string | null }>(supabase, 'ooh_redirect_domain')
-  const defaultUrl = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const defaultUrl = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
   const appUrl     = brand?.ooh_redirect_domain
     ? `https://${brand.ooh_redirect_domain}`
     : defaultUrl

@@ -14,7 +14,9 @@
     "metrics:check": "node scripts/check-post-metrics.mjs",
     "tools:check": "node scripts/check-free-tools.mjs",
     "db:pending": "node scripts/apply-migrations.mjs",
-    "db:apply": "node scripts/apply-migrations.mjs --apply"
+    "db:apply": "node scripts/apply-migrations.mjs --apply",
+    "desk:check": "node scripts/check-desk-access.mjs",
+    "desk:sql": "./scripts/check-desk-sql.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

@@ -96,7 +96,7 @@ export const scoreboardWeekly = inngest.createFunction(
             ? `A regulator was named ${board.regulatory.length} time${board.regulatory.length > 1 ? 's' : ''} this week. Details on the board.`
             : '',
           '',
-          `The full board: ${process.env.APP_URL ?? 'https://brandgauge.app'}/scoreboard`,
+          `The full board: ${process.env.APP_URL || 'https://brandgauge.app'}/scoreboard`,
           '',
           'Press is one signal. Sentiment in Pidgin, Yoruba, Igbo and Hausa, share of voice,',
           'what AI says about you and what your offline spend returned are in the product,',

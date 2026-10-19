@@ -12,7 +12,7 @@ function getResend() {
   return resendClient
 }
 
-const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+const APP_URL = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
 
 export async function sendSurveyEmails(
   surveyId: string,

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   const secret = process.env.META_APP_SECRET
   if (!secret) return NextResponse.json({ error: 'Not configured' }, { status: 500 })
 
-  const APP_URL = process.env.APP_URL ?? 'https://brandpulse-ai-tau.vercel.app'
+  const APP_URL = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
 
   let signedRequest: string | null = null
 
