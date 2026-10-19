@@ -627,7 +627,7 @@ ok('the public response page exists',           existsSync('src/app/respond/[cam
    check constraint does not list is a 500 the first time somebody unlocks
    that tool's report. This is exactly how brand-gap and pr-scoreboard were
    both missing from it. */
-const sourceCheck = readFileSync('supabase/migrations/20261018094000_tool_lead_capture.sql', 'utf8')
+const sourceCheck = readFileSync('supabase/migrations/20261019110000_fix_lead_source_and_event_check.sql', 'utf8')
   .split('leads_source_check check (source in (')[1]?.split('))')[0] ?? ''
 for (const id of registry.TOOL_IDS) {
   ok(`leads.source accepts "${id}"`, sourceCheck.includes(`'${id}'`))
