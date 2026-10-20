@@ -64,6 +64,11 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 - `npm run icons` / `npm run icons:check` — build the sprite from
   `brand/icons/currentcolor`, and fail when a glyph the product asks for was
   never drawn.
+- `npm run favicon` / `npm run favicon:check` — cut the browser tab icon from
+  `brand/logo/brandgauge-mark-mono-ink.svg`, and fail when the generated files
+  have drifted from the mark. The mark is never redrawn for this, only reframed
+  square and recoloured onto a Paper plane; the duotone is not used because the
+  design system forbids it below 24px.
 - `npm run tools:check` — exercise the Free Tools libraries offline. Compiles them
   standalone with the AI, press and database calls stubbed, so no key and no network are
   needed, and covers the SSRF screening in `fetch-public.ts`, the HTML reader, every
@@ -399,7 +404,11 @@ a hex, an `rgb()`, an `oklch()` or a Tailwind palette class — there are none l
   spinners and anything that loops, numbers counting up, hover lift, per-element
   fade-and-slide-up, and animating top, left, width or height.
 - **Logo.** Use the SVGs in `brand/logo/` through `src/components/brand/logo.tsx`. Never
-  redraw the mark, simplify it, or rebuild the needle from ratios.
+  redraw the mark, simplify it, or rebuild the needle from ratios. The browser tab icon is
+  generated from the mark by `npm run favicon`, never hand-drawn: it reframes the supplied
+  paths square on a Paper plane and takes the mono variant, because the duotone is banned
+  below 24px. `src/app/icon.svg`, `apple-icon.png` and `favicon.ico` are build output, so
+  edit the mark or the script rather than the files.
 - Ship a screen only when it passes the audit in section 12 of the design system.
 
 ## The Desk (our internal tool)
