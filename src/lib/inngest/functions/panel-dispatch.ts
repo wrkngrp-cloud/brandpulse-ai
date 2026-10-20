@@ -65,7 +65,6 @@ export const panelDispatch = inngest.createFunction(
     const survey = await step.run('create-survey', async () => {
       const { data, error } = await supabase.from('surveys').insert({
         brand_id:    panel.brand_id,
-        workspace_id: panel.workspace_id,
         name:        `${panel.name} — ${new Date().toLocaleDateString('en-NG', { month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}`,
         type:        panel.template_key,
         status:      'active',

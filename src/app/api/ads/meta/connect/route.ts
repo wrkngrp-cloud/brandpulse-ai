@@ -28,11 +28,18 @@ export async function GET(req: NextRequest) {
   const returnTo = req.nextUrl.searchParams.get('return_to') ?? 'digital'
 
   const state = randomBytes(16).toString('hex')
-  await redis.set(
-    `adsoauth:${state}`,
-    { userId: user.id, platform: 'meta', brandId, returnTo },
-    { ex: 600 },
-  )
+  try {
+    await redis.set(
+      `adsoauth:${state}`,
+      { userId: user.id, platform: 'meta', brandId, returnTo },
+      { ex: 600 },
+    )
+  } catch {
+    // The CSRF state has nowhere safe to live without Redis — fail the
+    // connect attempt cleanly rather than send the user into an OAuth flow
+    // the callback can never verify.
+    return NextResponse.redirect(`${APP_URL}/dashboard/connectors?error=connections_unavailable`)
+  }
 
   const redirectUri = `${APP_URL}/api/ads/meta/callback`
 

@@ -44,12 +44,13 @@ export async function GET(
     return NextResponse.redirect(`${APP_URL}/dashboard?error=oauth_cancelled&reason=${encodeURIComponent(reason)}`)
   }
 
-  // Verify state and retrieve session data
-  const session = await redis.get<{ userId: string; platform: string; verifier?: string; brandId: string }>(`oauth:${state}`)
+  // Verify state and retrieve session data. A Redis error means it can't be
+  // verified either way, which is the same outcome as missing: refuse.
+  const session = await redis.get<{ userId: string; platform: string; verifier?: string; brandId: string }>(`oauth:${state}`).catch(() => null)
   if (!session || session.platform !== platform) {
     return NextResponse.redirect(`${APP_URL}/dashboard?error=oauth_invalid_state`)
   }
-  await redis.del(`oauth:${state}`)
+  await redis.del(`oauth:${state}`).catch(() => { /* best-effort cleanup */ })
 
   const { brandId } = session
   const redirectUri = `${APP_URL}/api/social/callback/${platform}`

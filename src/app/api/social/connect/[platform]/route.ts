@@ -28,50 +28,57 @@ export async function GET(
   const state = randomBytes(16).toString('hex')
   const redirectUri = `${APP_URL}/api/social/callback/${platform}`
 
-  switch (platform) {
-    case 'facebook': {
-      await redis.set(`oauth:${state}`, { userId: user.id, platform, brandId }, { ex: 600 })
+  try {
+    switch (platform) {
+      case 'facebook': {
+        await redis.set(`oauth:${state}`, { userId: user.id, platform, brandId }, { ex: 600 })
 
-      const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth')
-      authUrl.searchParams.set('client_id', process.env.META_APP_ID ?? '')
-      authUrl.searchParams.set('redirect_uri', redirectUri)
-      authUrl.searchParams.set('scope', 'public_profile,pages_show_list,pages_read_engagement')
-      authUrl.searchParams.set('state', state)
-      authUrl.searchParams.set('response_type', 'code')
+        const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth')
+        authUrl.searchParams.set('client_id', process.env.META_APP_ID ?? '')
+        authUrl.searchParams.set('redirect_uri', redirectUri)
+        authUrl.searchParams.set('scope', 'public_profile,pages_show_list,pages_read_engagement')
+        authUrl.searchParams.set('state', state)
+        authUrl.searchParams.set('response_type', 'code')
 
-      return NextResponse.redirect(authUrl.toString())
+        return NextResponse.redirect(authUrl.toString())
+      }
+
+      case 'instagram': {
+        await redis.set(`oauth:${state}`, { userId: user.id, platform, brandId }, { ex: 600 })
+
+        const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth')
+        authUrl.searchParams.set('client_id', process.env.META_APP_ID ?? '')
+        authUrl.searchParams.set('redirect_uri', redirectUri)
+        authUrl.searchParams.set('scope', 'public_profile,pages_show_list,pages_read_engagement,instagram_basic,instagram_manage_insights')
+        authUrl.searchParams.set('state', state)
+        authUrl.searchParams.set('response_type', 'code')
+
+        return NextResponse.redirect(authUrl.toString())
+      }
+
+      case 'twitter': {
+        const { verifier, challenge } = generatePKCE()
+        await redis.set(`oauth:${state}`, { userId: user.id, platform, verifier, brandId }, { ex: 600 })
+
+        const authUrl = new URL('https://x.com/i/oauth2/authorize')
+        authUrl.searchParams.set('response_type', 'code')
+        authUrl.searchParams.set('client_id', process.env.TWITTER_CLIENT_ID ?? '')
+        authUrl.searchParams.set('redirect_uri', redirectUri)
+        authUrl.searchParams.set('scope', 'tweet.read users.read offline.access')
+        authUrl.searchParams.set('state', state)
+        authUrl.searchParams.set('code_challenge', challenge)
+        authUrl.searchParams.set('code_challenge_method', 'S256')
+
+        return NextResponse.redirect(authUrl.toString())
+      }
+
+      default:
+        return NextResponse.json({ error: 'Unsupported platform' }, { status: 400 })
     }
-
-    case 'instagram': {
-      await redis.set(`oauth:${state}`, { userId: user.id, platform, brandId }, { ex: 600 })
-
-      const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth')
-      authUrl.searchParams.set('client_id', process.env.META_APP_ID ?? '')
-      authUrl.searchParams.set('redirect_uri', redirectUri)
-      authUrl.searchParams.set('scope', 'public_profile,pages_show_list,pages_read_engagement,instagram_basic,instagram_manage_insights')
-      authUrl.searchParams.set('state', state)
-      authUrl.searchParams.set('response_type', 'code')
-
-      return NextResponse.redirect(authUrl.toString())
-    }
-
-    case 'twitter': {
-      const { verifier, challenge } = generatePKCE()
-      await redis.set(`oauth:${state}`, { userId: user.id, platform, verifier, brandId }, { ex: 600 })
-
-      const authUrl = new URL('https://x.com/i/oauth2/authorize')
-      authUrl.searchParams.set('response_type', 'code')
-      authUrl.searchParams.set('client_id', process.env.TWITTER_CLIENT_ID ?? '')
-      authUrl.searchParams.set('redirect_uri', redirectUri)
-      authUrl.searchParams.set('scope', 'tweet.read users.read offline.access')
-      authUrl.searchParams.set('state', state)
-      authUrl.searchParams.set('code_challenge', challenge)
-      authUrl.searchParams.set('code_challenge_method', 'S256')
-
-      return NextResponse.redirect(authUrl.toString())
-    }
-
-    default:
-      return NextResponse.json({ error: 'Unsupported platform' }, { status: 400 })
+  } catch {
+    // The CSRF state has nowhere safe to live without Redis — fail the
+    // connect attempt cleanly rather than send the user into an OAuth flow
+    // the callback can never verify.
+    return NextResponse.redirect(`${APP_URL}/dashboard/content?error=connections_unavailable`)
   }
 }

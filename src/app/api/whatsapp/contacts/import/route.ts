@@ -34,7 +34,12 @@ export async function POST(req: NextRequest) {
                     lines[0]?.toLowerCase().includes('name')
   const dataLines = hasHeader ? lines.slice(1) : lines
 
-  const contacts: { brand_id: string; phone_e164: string; name: string | null }[] = []
+  // whatsapp_opted_in is never set true here: a CSV upload is not consent,
+  // it is a phone list. A contact only becomes eligible for a send once
+  // something actually collects consent (e.g. a reply-based opt-in), which
+  // does not exist yet — the send route's NDPR gate would otherwise be
+  // checking a flag nothing ever earned.
+  const contacts: { brand_id: string; phone_e164: string; name: string | null; whatsapp_opted_in: boolean }[] = []
   const skipped: string[] = []
 
   for (const line of dataLines) {
@@ -53,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     const normalised = normalisePhone(phone)
     if (!normalised) { skipped.push(line); continue }
-    contacts.push({ brand_id: brandId, phone_e164: normalised, name: name || null })
+    contacts.push({ brand_id: brandId, phone_e164: normalised, name: name || null, whatsapp_opted_in: false })
   }
 
   if (contacts.length === 0) {

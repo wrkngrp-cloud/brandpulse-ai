@@ -1,0 +1,12 @@
+-- whatsapp_contacts.whatsapp_opted_in defaulted to true, and nothing in the
+-- app ever set it to true deliberately: the CSV import at
+-- /api/whatsapp/contacts/import relied entirely on that default, and the
+-- only other writer is the STOP-reply webhook, which only ever sets it to
+-- false. So every imported phone number was treated as consented with no
+-- consent collected, which is exactly what the NDPR gate documented in
+-- CLAUDE.md ("check whatsapp_opted_in = true ... before ANY send") exists to
+-- prevent. Fail closed: a contact needs a real opt-in signal before a send
+-- is allowed to reach them. New rows now default to not opted in; existing
+-- rows are left alone, since flipping another brand's already-imported data
+-- is a decision for a human, not a migration.
+alter table whatsapp_contacts alter column whatsapp_opted_in set default false;

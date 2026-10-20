@@ -51,11 +51,11 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const session = await redis.get<{ userId: string; platform: string; brandId: string }>(`adsoauth:${state}`)
+  const session = await redis.get<{ userId: string; platform: string; brandId: string }>(`adsoauth:${state}`).catch(() => null)
   if (!session || session.platform !== 'tiktok') {
     return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=invalid_state`)
   }
-  await redis.del(`adsoauth:${state}`)
+  await redis.del(`adsoauth:${state}`).catch(() => { /* best-effort cleanup */ })
 
   const { brandId } = session
   const supabase = await createServiceClient()

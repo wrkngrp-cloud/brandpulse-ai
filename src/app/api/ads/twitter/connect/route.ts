@@ -35,12 +35,19 @@ export async function GET() {
   const callbackUrl = `${APP_URL}/api/ads/twitter/callback`
   const stateToken  = randomBytes(16).toString('hex')
 
-  // Store user mapping keyed by state (we'll use oauth_token after redirect)
-  await redis.set(
-    `adsoauth:${stateToken}`,
-    { userId: user.id, platform: 'twitter', brandId },
-    { ex: 600 }
-  )
+  // Store user mapping keyed by state (we'll use oauth_token after redirect).
+  // The CSRF state has nowhere safe to live without Redis — fail the connect
+  // attempt cleanly rather than send the user into a flow the callback can
+  // never verify.
+  try {
+    await redis.set(
+      `adsoauth:${stateToken}`,
+      { userId: user.id, platform: 'twitter', brandId },
+      { ex: 600 }
+    )
+  } catch {
+    return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=connections_unavailable`)
+  }
 
   // OAuth 1.0a request token
   const oauthParams = {
@@ -87,7 +94,11 @@ export async function GET() {
   }
 
   // Store state → oauth_token mapping so callback can look it up
-  await redis.set(`twitter_oauth_token:${oauthToken}`, stateToken, { ex: 600 })
+  try {
+    await redis.set(`twitter_oauth_token:${oauthToken}`, stateToken, { ex: 600 })
+  } catch {
+    return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=connections_unavailable`)
+  }
 
   return NextResponse.redirect(
     `https://api.twitter.com/oauth/authorize?oauth_token=${oauthToken}`

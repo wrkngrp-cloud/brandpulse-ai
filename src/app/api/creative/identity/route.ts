@@ -24,7 +24,9 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { success } = await ratelimit.limit(`creative-identity:${user.id}`)
+  // Rate limiting is a safeguard, not the feature — a Redis outage must not
+  // take this analysis down with it.
+  const { success } = await ratelimit.limit(`creative-identity:${user.id}`).catch(() => ({ success: true }))
   if (!success) return NextResponse.json({ error: 'Rate limit exceeded. Try again shortly.' }, { status: 429 })
 
   const body = await req.json().catch(() => null)
