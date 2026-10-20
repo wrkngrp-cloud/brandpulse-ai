@@ -45,31 +45,15 @@ export async function GET(
   }
 
   // Verify state and retrieve session data
-  const session = await redis.get<{ userId: string; platform: string; verifier?: string }>(`oauth:${state}`)
+  const session = await redis.get<{ userId: string; platform: string; verifier?: string; brandId: string }>(`oauth:${state}`)
   if (!session || session.platform !== platform) {
     return NextResponse.redirect(`${APP_URL}/dashboard?error=oauth_invalid_state`)
   }
   await redis.del(`oauth:${state}`)
 
+  const { brandId } = session
   const redirectUri = `${APP_URL}/api/social/callback/${platform}`
   const supabase = await createServiceClient()
-
-  // Find brand_id for this user
-  const { data: member } = await supabase
-    .from('workspace_members')
-    .select('workspace_id')
-    .eq('user_id', session.userId)
-    .single()
-
-  if (!member) return NextResponse.redirect(`${APP_URL}/dashboard?error=no_workspace`)
-
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .eq('workspace_id', member.workspace_id)
-    .single()
-
-  if (!brand) return NextResponse.redirect(`${APP_URL}/dashboard?error=no_brand`)
 
   try {
     switch (platform) {
@@ -87,7 +71,7 @@ export async function GET(
         if (page) {
           // Store the PAGE access token — required for fetching page posts
           await supabase.from('social_connections').upsert({
-            brand_id: brand.id,
+            brand_id: brandId,
             platform: 'facebook',
             account_id: page.id,
             account_name: page.name,
@@ -99,7 +83,7 @@ export async function GET(
           // No pages found — store user-level token as fallback so connection isn't lost
           const user = await getMetaUserId(access_token)
           await supabase.from('social_connections').upsert({
-            brand_id: brand.id,
+            brand_id: brandId,
             platform: 'facebook',
             account_id: user.id,
             account_name: user.name,
@@ -149,7 +133,7 @@ export async function GET(
           console.log('[instagram-oauth] /me?fields=instagram_business_account response:', JSON.stringify(igDirectData))
           if (igDirectData.instagram_business_account?.id) {
             await supabase.from('social_connections').upsert({
-              brand_id: brand.id,
+              brand_id: brandId,
               platform: 'instagram',
               account_id: igDirectData.instagram_business_account.id,
               account_name: igDirectData.instagram_business_account.name ?? user.name,
@@ -172,7 +156,7 @@ export async function GET(
           }
           // NPE page — auto-discovery failed. Store token temporarily and ask user for their Page ID.
           const pendingKey = randomBytes(16).toString('hex')
-          await redis.set(`ig-pending:${pendingKey}`, { accessToken: access_token, userId: session.userId }, { ex: 600 })
+          await redis.set(`ig-pending:${pendingKey}`, { accessToken: access_token, userId: session.userId, brandId }, { ex: 600 })
           return NextResponse.redirect(`${APP_URL}/dashboard/content?action=needs-page-id&key=${pendingKey}`)
         }
 
@@ -188,7 +172,7 @@ export async function GET(
 
         // Store long-lived user token — Instagram Graph API /media endpoint uses user tokens
         await supabase.from('social_connections').upsert({
-          brand_id: brand.id,
+          brand_id: brandId,
           platform: 'instagram',
           account_id: igId,
           account_name: user.name,
@@ -205,7 +189,7 @@ export async function GET(
         const twitterUser = await getTwitterUserId(tokens.access_token)
 
         await supabase.from('social_connections').upsert({
-          brand_id: brand.id,
+          brand_id: brandId,
           platform: 'twitter',
           account_id: twitterUser.id,
           account_name: `@${twitterUser.username}`,

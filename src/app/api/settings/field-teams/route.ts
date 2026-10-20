@@ -1,5 +1,6 @@
 import { type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 
 export async function GET() {
   const supabase = await createClient()
@@ -22,11 +23,9 @@ export async function POST(request: NextRequest) {
 
   const supabase = await createClient()
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, workspace_id')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{ id: string; workspace_id: string }>(
+    supabase, 'id, workspace_id',
+  )
 
   if (!brand) return Response.json({ error: 'No brand found' }, { status: 400 })
 

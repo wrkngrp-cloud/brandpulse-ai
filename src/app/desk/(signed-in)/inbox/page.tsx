@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { requireStaff } from '@/lib/desk/auth'
+import { deskHref } from '@/lib/desk/urls'
 import { supportInbox } from '@/lib/desk/data'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { MessageQuoteIcon } from '@/components/brand/icon'
@@ -23,6 +24,10 @@ export default async function InboxPage({
 
   const rows = await supportInbox(session, showAll ? 'all' : 'open')
   const waiting = rows.filter(r => r.waitingOnUs).length
+  const [inboxHref, inboxAllHref] = await Promise.all([
+    deskHref('/desk/inbox'),
+    deskHref('/desk/inbox?status=all'),
+  ])
 
   return (
     <div className="space-y-6">
@@ -38,14 +43,14 @@ export default async function InboxPage({
         actions={
           <div className="flex gap-1 text-xs">
             <Link
-              href="/desk/inbox"
+              href={inboxHref}
               className={cn('bg-press rounded-md border px-2.5 py-1',
                 showAll ? 'border-line text-tx-2' : 'border-line bg-shell text-tx')}
             >
               Open
             </Link>
             <Link
-              href="/desk/inbox?status=all"
+              href={inboxAllHref}
               className={cn('bg-press rounded-md border px-2.5 py-1',
                 showAll ? 'border-line bg-shell text-tx' : 'border-line text-tx-2')}
             >

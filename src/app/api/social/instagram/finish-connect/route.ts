@@ -18,12 +18,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing key or pageId' }, { status: 400 })
   }
 
-  const pending = await redis.get<{ accessToken: string; userId: string }>(`ig-pending:${key}`)
+  const pending = await redis.get<{ accessToken: string; userId: string; brandId: string }>(`ig-pending:${key}`)
   if (!pending) {
     return NextResponse.json({ error: 'Session expired. Please connect Instagram again.' }, { status: 400 })
   }
 
-  const { accessToken, userId } = pending
+  const { accessToken, brandId } = pending
 
   // Fetch the page and its linked Instagram Business Account
   const pageRes = await fetch(
@@ -62,24 +62,8 @@ export async function POST(request: NextRequest) {
 
   const supabase = await createServiceClient()
 
-  const { data: member } = await supabase
-    .from('workspace_members')
-    .select('workspace_id')
-    .eq('user_id', userId)
-    .single()
-
-  if (!member) return NextResponse.json({ error: 'Workspace not found' }, { status: 400 })
-
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .eq('workspace_id', member.workspace_id)
-    .single()
-
-  if (!brand) return NextResponse.json({ error: 'Brand not found' }, { status: 400 })
-
   await supabase.from('social_connections').upsert({
-    brand_id: brand.id,
+    brand_id: brandId,
     platform: 'instagram',
     account_id: pageData.instagram_business_account.id,
     account_name: pageData.name ?? `Page ${pageId}`,

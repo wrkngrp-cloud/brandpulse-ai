@@ -46,6 +46,7 @@ export function ToolField({
   hint?: string
   inputMode?: 'url' | 'text' | 'email' | 'tel'
 }) {
+  const hintId = hint ? `${id}-hint` : undefined
   return (
     <div>
       <label htmlFor={id} className="bg-label block" style={{ color: 'var(--lp-mut)' }}>{label}</label>
@@ -53,10 +54,11 @@ export function ToolField({
         id={id} type={type} value={value} required={required} inputMode={inputMode}
         onChange={e => onChange(e.target.value)} placeholder={placeholder}
         autoComplete="off" autoCapitalize="none" spellCheck={false}
+        aria-describedby={hintId}
         className="mt-2 w-full rounded-sm border px-4 py-3 text-[15px] outline-none focus-visible:ring-2"
         style={{ borderColor: 'var(--lp-line)', background: 'var(--lp-card)', color: 'var(--lp-ink)' }}
       />
-      {hint && <p className="mt-1.5 text-[12px]" style={{ color: 'var(--lp-mut)' }}>{hint}</p>}
+      {hint && <p id={hintId} className="mt-1.5 text-[12px]" style={{ color: 'var(--lp-mut)' }}>{hint}</p>}
     </div>
   )
 }
@@ -94,10 +96,17 @@ export function ToolSubmit({
   )
 }
 
-/** The three-step explanation, shown only before the first run. */
+/** The three-step explanation, shown only before the first run.
+ *
+ *  pt-10 is load-bearing: the form above ends on PrivacyNote, which carries
+ *  no bottom margin of its own (the form's `space-y-4` only spaces siblings,
+ *  not after the last one), so without it this section's "How it reads"
+ *  label sits flush against the privacy line above it. The scoreboard page
+ *  avoids this by giving its own hero section a trailing `pb-10` instead;
+ *  same gap, asserted here since every other tool shares this component. */
 export function HowItReads({ steps }: { steps: [string, string][] }) {
   return (
-    <TickReveal className="mx-auto max-w-4xl px-6 pb-24">
+    <TickReveal className="mx-auto max-w-4xl px-6 pt-10 pb-24">
       <Tick as="p" className="bg-label" style={{ color: 'var(--lp-mut)' }}>How it reads</Tick>
       <div className="mt-6 space-y-5">
         {steps.map(([title, body], i) => (

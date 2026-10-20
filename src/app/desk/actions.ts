@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getStaffSession, writeAudit, requestIpHash } from '@/lib/desk/auth'
+import { deskHref } from '@/lib/desk/urls'
 import { hashInviteToken, tokenHashMatches } from '@/lib/desk/invites'
 import { z } from 'zod'
 
@@ -63,7 +64,7 @@ export async function deskLogin(_prev: DeskAuthState, formData: FormData): Promi
   await writeAudit({ actorId: data.user.id, action: 'desk.signin', summary: `${staff.full_name} signed in` })
 
   const next = formData.get('next')
-  redirect(typeof next === 'string' && next.startsWith('/desk') ? next : '/desk')
+  redirect(await deskHref(typeof next === 'string' && next.startsWith('/desk') ? next : '/desk'))
 }
 
 export async function deskSignOut(): Promise<void> {
@@ -73,7 +74,7 @@ export async function deskSignOut(): Promise<void> {
   if (session) {
     await writeAudit({ actorId: session.userId, action: 'desk.signout', summary: `${session.fullName} signed out` })
   }
-  redirect('/desk/login')
+  redirect(await deskHref('/desk/login'))
 }
 
 // ── Invitations ──────────────────────────────────────────────────────────────
@@ -184,8 +185,8 @@ export async function acceptInvite(_prev: DeskAuthState, formData: FormData): Pr
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: invite.email, password,
     })
-    if (!signInError) redirect('/desk')
+    if (!signInError) redirect(await deskHref('/desk'))
   }
 
-  redirect('/desk/login?accepted=1')
+  redirect(await deskHref('/desk/login?accepted=1'))
 }

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createHash } from 'node:crypto'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { deskHref } from './urls'
 import type { Permission } from './permissions'
 
 /**
@@ -97,8 +98,8 @@ export async function requireStaff(
   audit?: { action: string; targetType?: string; targetId?: string; workspaceId?: string; summary?: string },
 ): Promise<StaffSession> {
   const session = await getStaffSession()
-  if (!session) redirect('/desk/login')
-  if (perm && !session.can(perm)) redirect('/desk?denied=' + encodeURIComponent(perm))
+  if (!session) redirect(await deskHref('/desk/login'))
+  if (perm && !session.can(perm)) redirect(await deskHref('/desk?denied=' + encodeURIComponent(perm)))
 
   if (audit) {
     await writeAudit({

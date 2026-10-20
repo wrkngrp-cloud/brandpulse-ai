@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { deskSignOut } from '@/app/desk/actions'
+import { stripDeskPrefix } from '@/lib/desk/desk-path'
 import { BrandLockup } from '@/components/brand/logo'
 import { cn } from '@/lib/utils'
 import {
@@ -44,20 +45,26 @@ const NAV: DeskNavEntry[] = [
 ]
 
 export function DeskShell({
-  children, fullName, roleLabel, permissions, isSuperAdmin,
+  children, fullName, roleLabel, permissions, isSuperAdmin, onDesk,
 }: {
   children:    React.ReactNode
   fullName:    string
   roleLabel:   string
   permissions: string[]
   isSuperAdmin: boolean
+  /** True once DESK_HOST is live and this render is answering on it, so every
+   *  nav link has to lose the `/desk` prefix the same way `deskHref` does
+   *  server-side — this component can't call that itself, it has no
+   *  `headers()` to ask. */
+  onDesk: boolean
 }) {
   const pathname = usePathname()
   const held = new Set(permissions)
   const visible = NAV.filter(entry => isSuperAdmin || held.has(entry.perm))
+  const hrefFor = (mainHostHref: string) => onDesk ? stripDeskPrefix(mainHostHref) : mainHostHref
 
   const isActive = (href: string) =>
-    href === '/desk' ? pathname === '/desk' : pathname.startsWith(href)
+    href === '/desk' || href === '/' ? pathname === href : pathname.startsWith(href)
 
   return (
     <div className="min-h-screen bg-shell">
@@ -87,8 +94,10 @@ export function DeskShell({
 
         <nav className="mx-auto max-w-7xl overflow-x-auto px-4">
           <ul className="flex gap-1">
-            {visible.map(({ label, href, icon: Icon, soon }) => (
-              <li key={href}>
+            {visible.map(({ label, href: mainHostHref, icon: Icon, soon }) => {
+              const href = hrefFor(mainHostHref)
+              return (
+              <li key={mainHostHref}>
                 {soon ? (
                   <span
                     className="-mb-px flex cursor-default items-center gap-2 border-b-2 border-transparent px-3 py-2.5 text-sm whitespace-nowrap text-tx-3"
@@ -113,7 +122,8 @@ export function DeskShell({
                   </Link>
                 )}
               </li>
-            ))}
+              )
+            })}
             {isSuperAdmin && (
               <li className="ml-auto flex items-center gap-1.5 py-2.5 pl-3 text-tx-3">
                 <ShieldIcon className="size-3.5" />

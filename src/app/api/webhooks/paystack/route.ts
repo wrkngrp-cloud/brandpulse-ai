@@ -27,13 +27,16 @@ export async function POST(request: NextRequest) {
 
   // Find the brand whose secret matches the HMAC signature
   let matchedBrandId: string | null = null
+  const sigBuf = Buffer.from(signature)
   for (const config of configs) {
     const secret = decrypt(config.secret_key)
     const computed = crypto
       .createHmac('sha512', secret)
       .update(body)
       .digest('hex')
-    if (computed === signature) {
+    const computedBuf = Buffer.from(computed)
+    const match = computedBuf.length === sigBuf.length && crypto.timingSafeEqual(computedBuf, sigBuf)
+    if (match) {
       matchedBrandId = config.brand_id
       break
     }

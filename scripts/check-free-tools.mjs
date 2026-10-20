@@ -18,7 +18,7 @@
  *
  * Run: npm run tools:check
  */
-import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, readdirSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
 const OUT = `${process.env.TMPDIR ?? '/tmp'}/bg-free-tools`
@@ -627,7 +627,7 @@ ok('the public response page exists',           existsSync('src/app/respond/[cam
    check constraint does not list is a 500 the first time somebody unlocks
    that tool's report. This is exactly how brand-gap and pr-scoreboard were
    both missing from it. */
-const sourceCheck = readFileSync('supabase/migrations/20261018094000_tool_lead_capture.sql', 'utf8')
+const sourceCheck = readFileSync('supabase/migrations/20261019110000_fix_lead_source_and_event_check.sql', 'utf8')
   .split('leads_source_check check (source in (')[1]?.split('))')[0] ?? ''
 for (const id of registry.TOOL_IDS) {
   ok(`leads.source accepts "${id}"`, sourceCheck.includes(`'${id}'`))
@@ -639,6 +639,29 @@ ok('and still accepts the board\'s older "scoreboard"', sourceCheck.includes("'s
 const desk = readFileSync('src/lib/desk/leads.ts', 'utf8')
 for (const id of registry.TOOL_IDS) {
   ok(`the lead desk has a name for "${id}"`, new RegExp(`'${id}':\\s*'`).test(desk))
+}
+
+/* lead_tool_runs is defined across two files now: the original create table
+   and whatever reconciliation migration widened it afterward. Reading both as
+   text and checking against what the callers actually reference is what
+   catches a table that drifted from its own callers before the database does -
+   this exact gap cost a 500 on every gate submission and the whole lead desk
+   page once, caught only by hand. */
+const leadsLib  = readFileSync('src/lib/tools/leads.ts', 'utf8')
+const migrationsDir = 'supabase/migrations'
+const leadToolRunsSchema = readdirSync(migrationsDir)
+  .filter(f => /_(tool_lead_capture|reconcile_lead_tool_runs)\.sql$/.test(f))
+  .map(f => readFileSync(`${migrationsDir}/${f}`, 'utf8'))
+  .join('\n')
+
+const runsUpsertBlock = leadsLib.match(/\.from\('lead_tool_runs'\)\.upsert\(\{([\s\S]*?)\}, \{/)?.[1] ?? ''
+const upsertCols = [...runsUpsertBlock.matchAll(/^\s*(\w+):/gm)].map(m => m[1])
+const embeddedCols = desk.match(/lead_tool_runs\(([^)]+)\)/)?.[1]
+  .split(',').map(s => s.trim()) ?? []
+
+for (const col of new Set([...upsertCols, ...embeddedCols])) {
+  ok(`lead_tool_runs has a column for "${col}" (leads.ts / the Desk lead query)`,
+    new RegExp(`\\b${col}\\b`).test(leadToolRunsSchema))
 }
 
 const nav = readFileSync('src/components/landing/landing-page.tsx', 'utf8')

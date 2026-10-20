@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { Redis } from '@upstash/redis'
 import { randomBytes, createHmac } from 'crypto'
 
@@ -27,13 +28,17 @@ export async function GET() {
     return NextResponse.redirect(`${APP_URL}/login`)
   }
 
+  // Capture active brand so the callback doesn't need to guess for multi-brand workspaces
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.redirect(`${APP_URL}/onboarding`)
+
   const callbackUrl = `${APP_URL}/api/ads/twitter/callback`
   const stateToken  = randomBytes(16).toString('hex')
 
   // Store user mapping keyed by state (we'll use oauth_token after redirect)
   await redis.set(
     `adsoauth:${stateToken}`,
-    { userId: user.id, platform: 'twitter' },
+    { userId: user.id, platform: 'twitter', brandId },
     { ex: 600 }
   )
 
