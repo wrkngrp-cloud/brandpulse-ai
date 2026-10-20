@@ -288,22 +288,22 @@ export function ProductCards() {
           too short. The scroll distance for the whole pan to run is
           `viewportHeight - <tracked height>`, so measuring the ~400px-tall
           rail itself capped the run at roughly a half-viewport of scrolling,
-          against 1760px of cards to get through. A few lines of wheel input
-          covered it. This sentinel sits where the rail ends and has almost no
-          height of its own, so the window opens to nearly a full viewport of
-          scroll instead - the pan still starts the instant the rail is fully
-          in view, exactly as before, it just has room to breathe afterward. */}
-      <div ref={railBox} aria-hidden className="h-px" />
+          against 1760px of cards to get through - a few lines of wheel input
+          covered it.
 
-      {/* Progress 1 fires the instant this sentinel's top reaches the top of
-          the screen, and the section used to end barely past that point -
-          the nav row below plus the section's own bottom padding, maybe
-          200px, nowhere near enough to sit with the last card ("A briefing
-          written every Monday") before the next section arrived. This is
-          dwell time, not a new section: the crescendo is already lit full
-          and the rail has already stopped moving, so it costs nothing but
-          scroll distance. */}
-      <div aria-hidden className="h-[60vh]" />
+          A near-zero sentinel overcorrected the other way: nothing here is
+          sticky, by design (that is the scroll-jacked version this component
+          already tried once and rejected), so the rail scrolls past at the
+          same rate as everything else regardless of how long the window is.
+          Stretching the window to nearly a full viewport meant the pan was
+          still running after the rail itself had scrolled out of view -
+          the crescendo kept lighting over an empty band, including the last
+          card nobody was still looking at. 280px gives a window of roughly
+          half a viewport: enough for the run to slow down noticeably without
+          outlasting the rail's own time on screen. Tune this number against
+          the rail's actual behaviour, not the other way around. */}
+      <div ref={railBox} aria-hidden className="h-[280px]" />
+      <div aria-hidden className="h-[20vh]" />
 
       {/* Where you are in the run, and the two ways to move through it that do
           not need a trackpad. */}
