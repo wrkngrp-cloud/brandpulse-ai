@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { z } from 'zod'
 
 const socialUrlSchema = z.object({
@@ -32,20 +33,16 @@ export async function POST(request: NextRequest) {
 
   const { name, handle, platform, category, followers, profile_url, social_urls, profile_data, brand_fit } = parsed.data
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .single()
+  const brandId = await getActiveBrandId(supabase)
 
-  if (!brand) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
+  if (!brandId) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
 
   const cleanHandle = handle.replace(/^@/, '')
 
   const { data: influencer, error } = await supabase
     .from('influencers')
     .insert({
-      brand_id:     brand.id,
+      brand_id:     brandId,
       name,
       handle:       cleanHandle,
       platform,

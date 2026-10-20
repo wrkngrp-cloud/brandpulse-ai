@@ -43,30 +43,15 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const session = await redis.get<{ userId: string; platform: string }>(`adsoauth:${state}`)
+  const session = await redis.get<{ userId: string; platform: string; brandId: string }>(`adsoauth:${state}`)
   if (!session || session.platform !== 'linkedin') {
     return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=invalid_state`)
   }
   await redis.del(`adsoauth:${state}`)
 
+  const { brandId } = session
   const supabase    = await createServiceClient()
   const redirectUri = `${APP_URL}/api/ads/linkedin/callback`
-
-  const { data: member } = await supabase
-    .from('workspace_members')
-    .select('workspace_id')
-    .eq('user_id', session.userId)
-    .single()
-
-  if (!member) return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=no_workspace`)
-
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .eq('workspace_id', member.workspace_id)
-    .single()
-
-  if (!brand) return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=no_brand`)
 
   try {
     // Exchange code for access token
@@ -121,7 +106,7 @@ export async function GET(request: NextRequest) {
       .from('digital_ad_accounts')
       .upsert(
         {
-          brand_id:      brand.id,
+          brand_id:      brandId,
           platform:      'linkedin',
           account_id:    firstAccountId ?? 'linkedin-ads',
           account_name:  accountName,

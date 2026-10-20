@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { Redis } from '@upstash/redis'
 import { randomBytes } from 'crypto'
 import { generatePKCE } from '@/lib/social/twitter'
@@ -19,13 +20,17 @@ export async function GET(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  // Capture active brand so the callback doesn't need to guess for multi-brand workspaces
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.json({ error: 'No active brand' }, { status: 404 })
+
   const { platform } = await params
   const state = randomBytes(16).toString('hex')
   const redirectUri = `${APP_URL}/api/social/callback/${platform}`
 
   switch (platform) {
     case 'facebook': {
-      await redis.set(`oauth:${state}`, { userId: user.id, platform }, { ex: 600 })
+      await redis.set(`oauth:${state}`, { userId: user.id, platform, brandId }, { ex: 600 })
 
       const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth')
       authUrl.searchParams.set('client_id', process.env.META_APP_ID ?? '')
@@ -38,7 +43,7 @@ export async function GET(
     }
 
     case 'instagram': {
-      await redis.set(`oauth:${state}`, { userId: user.id, platform }, { ex: 600 })
+      await redis.set(`oauth:${state}`, { userId: user.id, platform, brandId }, { ex: 600 })
 
       const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth')
       authUrl.searchParams.set('client_id', process.env.META_APP_ID ?? '')
@@ -52,7 +57,7 @@ export async function GET(
 
     case 'twitter': {
       const { verifier, challenge } = generatePKCE()
-      await redis.set(`oauth:${state}`, { userId: user.id, platform, verifier }, { ex: 600 })
+      await redis.set(`oauth:${state}`, { userId: user.id, platform, verifier, brandId }, { ex: 600 })
 
       const authUrl = new URL('https://x.com/i/oauth2/authorize')
       authUrl.searchParams.set('response_type', 'code')

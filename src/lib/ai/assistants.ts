@@ -29,6 +29,24 @@ export function configuredAssistants(): AssistantPlatform[] {
   return ASSISTANT_PLATFORMS.filter(p => Boolean(process.env[KEY_FOR[p]]))
 }
 
+// Every call here runs inside Promise.all alongside its sibling platforms, so
+// one stalled provider must not be able to hang the whole batch past the
+// route's maxDuration — a plain fetch with no signal can hang indefinitely on
+// a dead connection, and a function killed by the platform's time limit never
+// reaches its own catch block, so the caller gets a closed connection instead
+// of a JSON error. Mirrors the timeout fetchPublic already applies.
+const ASSISTANT_TIMEOUT_MS = 20_000
+
+async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), ASSISTANT_TIMEOUT_MS)
+  try {
+    return await fetch(url, { ...init, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 export async function queryAssistant(
   platform: AssistantPlatform,
   question: string,
@@ -39,7 +57,7 @@ export async function queryAssistant(
     if (platform === 'chatgpt') {
       const key = process.env.OPENAI_API_KEY
       if (!key) return null
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      const res = await fetchWithTimeout('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
         body: JSON.stringify({
@@ -56,7 +74,7 @@ export async function queryAssistant(
     if (platform === 'gemini') {
       const key = process.env.GOOGLE_AI_API_KEY
       if (!key) return null
-      const res = await fetch(
+      const res = await fetchWithTimeout(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
         {
           method: 'POST',
@@ -75,7 +93,7 @@ export async function queryAssistant(
     if (platform === 'perplexity') {
       const key = process.env.PERPLEXITY_API_KEY
       if (!key) return null
-      const res = await fetch('https://api.perplexity.ai/chat/completions', {
+      const res = await fetchWithTimeout('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
         body: JSON.stringify({

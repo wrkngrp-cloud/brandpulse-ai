@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { z } from 'zod'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -112,11 +113,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'File exceeds 5 MB limit' }, { status: 400 })
   }
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, workspace_id')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{ id: string; workspace_id: string }>(
+    supabase, 'id, workspace_id',
+  )
   if (!brand) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
 
   const text = await file.text()
