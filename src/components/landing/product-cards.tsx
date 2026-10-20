@@ -8,27 +8,30 @@ import { SHOTS, ProductShotFrame, type ProductShot } from './product-shots'
 /**
  * The product section, as cards.
  *
- * The first version was a sticky track driven by vertical scroll: the page
- * froze, panels slid sideways, and each panel drew a re-creation of a dashboard
- * rather than the screen itself. Both halves were wrong. Scroll-jacking takes
- * the scrollbar off the reader, and a re-creation is a mockup, which is the one
- * thing the eyebrow above it promises this is not.
+ * The first version was a sticky track driven by vertical scroll, abandoned
+ * for a version that panned itself as the section crossed the viewport with
+ * nothing pinned: no scrollbar capture, never frozen. That version had a real
+ * bug underneath the design choice, not just inside it - the pan's own timing
+ * window was measured against the rail's rendered height, which capped it at
+ * roughly half a viewport regardless of screen size, so the run finished in a
+ * couple of wheel ticks and the cards were gone before anyone had read one.
+ * Widening that window could only trade one failure for the other: a short
+ * window skips past the cards, a long one keeps panning after they have
+ * already scrolled out of view, because nothing was holding them in place
+ * either way. There is no window length that fixes an unpinned rail.
  *
- * The second was a grid. Honest, and inert.
+ * So this is the first version again, done on purpose rather than by
+ * accident: the heading, rail and crescendo pin for a fixed scroll distance
+ * while the page keeps moving under them, same as any sticky element - nobody
+ * loses the scrollbar, nothing freezes, and now each card gets to actually be
+ * read before the next one arrives. You can also pan by hand at any point,
+ * and the moment anyone does, by wheel, drag, touch or arrow, the auto-drive
+ * stands down for good and the rail is theirs.
  *
- * This is the third: a rail that pans itself as the section crosses the
- * viewport, and that you can also pan by hand. Both, and that is the point.
- * Waiting for a reader to discover a control and work through five cards one
- * click at a time is how a section gets skipped, so scroll moves it for them.
- * But the moment anyone touches it, by wheel, drag, key or arrow, the
- * auto-drive stands down for good and the rail is theirs. Nothing is ever
- * wrestled back, and the page's own scrollbar is never captured: the section
- * travels normally, the track just moves sideways while it does.
- *
- * What makes it the brand's rather than any rail on the web is what sits under
- * it. Position in the run is drawn as a crescendo, the same arc of ticks as
- * the mark, lit cold to hot as you pan. Getting to the end of the product is a
- * reading reaching full.
+ * What makes it the brand's rather than any rail on the web is what sits
+ * under it. Position in the run is drawn as a crescendo, the same arc of
+ * ticks as the mark, lit cold to hot as you pan. Getting to the end of the
+ * product is a reading reaching full.
  *
  * Card widths stay uneven for the same reason the grid spans were: a catalogue
  * of equal boxes says every one of these carries equal weight, and they do not.
@@ -111,14 +114,20 @@ function RailCrescendo({ progress }: { progress: number }) {
   )
 }
 
+/** How long the pin lasts, in scroll pixels, once the content sticks. Fixed
+ *  rather than tied to the rail's own horizontal span: the cards barely get
+ *  narrower across screen widths, but the viewport someone is reading this on
+ *  varies far more, and the pin only has to outlast a comfortable read, not
+ *  match the cards pixel for pixel. */
+const PIN_SCROLL_PX = 1400
+
 export function ProductCards() {
   const rail = useRef<HTMLDivElement>(null)
-  /* A plain wrapper around the rail, used only as the scroll window's target.
-     Measuring the scroller itself would mean asking an element that scrolls
-     horizontally where it sits vertically, which works but reads as a trap
-     waiting to be stepped in. */
-  const railBox = useRef<HTMLDivElement>(null)
-  const section = useRef<HTMLElement>(null)
+  /* The track is the section itself: its height is the sticky content's own
+     height plus PIN_SCROLL_PX, so position: sticky has somewhere to hold
+     while the page keeps moving. The sticky div is what actually pins. */
+  const track = useRef<HTMLDivElement>(null)
+  const sticky = useRef<HTMLDivElement>(null)
   const [progress, setProgress] = useState(0)
   const [ends, setEnds] = useState({ start: true, end: false })
   /* Once true, scroll stops driving the rail for the rest of the session. A
@@ -148,38 +157,56 @@ export function ProductCards() {
     setEnds({ start: el.scrollLeft < 8, end: el.scrollLeft > span - 8 })
   }, [])
 
+  /* Whether the pin can hold at all, and how tall the track needs to be if
+     so. Measured rather than guessed: the sticky content's own height moves
+     with copy length and viewport width, and a track shorter than that
+     height cannot pin for any distance. On a viewport shorter than the
+     content - a landscape phone, mainly - there is no position where
+     sticky can show all of it at once, so this falls back to a plain,
+     unpinned section instead of clipping anything. Swiping the rail by hand
+     is the obvious gesture there anyway. */
+  const [trackHeight, setTrackHeight] = useState<number | null>(null)
+  const [canPin, setCanPin] = useState(true)
+  const measureTrack = useCallback(() => {
+    const content = sticky.current
+    if (!content) return
+    const h = content.getBoundingClientRect().height
+    /* No safety margin here on purpose: a laptop at ~870px tall is the
+       common case this has to work on, not the exception, and the content
+       is ~860px. Losing the pin on any viewport a few px short of the
+       content defeats the point for most real screens, not just the rare
+       short one. */
+    setCanPin(h <= window.innerHeight)
+    setTrackHeight(h + PIN_SCROLL_PX)
+  }, [])
+
   useEffect(() => {
     measure()
+    measureTrack()
     window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  }, [measure])
+    window.addEventListener('resize', measureTrack)
+    return () => {
+      window.removeEventListener('resize', measure)
+      window.removeEventListener('resize', measureTrack)
+    }
+  }, [measure, measureTrack])
 
-  /* The rail's own progress through the viewport, mapped onto scrollLeft.
-     Scroll position is the value on display here, which is the one case the
-     motion law allows it to drive anything.
+  /* The track's own progress through the viewport, mapped onto the rail's
+     scrollLeft. Scroll position is the value on display here, which is the
+     one case the motion law allows it to drive anything.
 
-     The window is the rail's, not the section's, and that is the whole fix.
-     It used to run from `start end` on the section, which is the earliest
-     anchor there is: progress started the instant the section's top edge
-     appeared at the bottom of the screen, a full viewport before you could
-     read anything. Measured at 1440x900 that put the run 66% complete by the
-     time the rail was fully visible, so the first cards had already gone
-     past. That is exactly what it looked like.
-
-     Progress 0 is the moment the rail is completely in view (its bottom edge
-     reaching the bottom of the screen) and progress 1 is read off the
-     sentinel below it rather than the rail's own top edge, which is what
-     gives the run somewhere to happen: that first fix made the window
-     honest, but honest and short are different problems. Tracking the rail's
-     own ~400px box capped the scroll distance at `viewport height - 400px`
-     regardless of screen size, against 1760px of cards - a couple of wheel
-     ticks covered the whole run. The sentinel is near-zero height, so the
-     window opens to nearly a full viewport of scroll instead, and the run
-     still lands before the section scrolls off screen because the section
-     itself is taller than that. */
+     This used to be measured against the rail itself rather than the track,
+     which is the bug underneath two earlier attempts at this same number.
+     Nothing was pinned then, so the rail scrolled past at a fixed rate no
+     matter how the window was sized: too short a window skipped past the
+     cards before anyone read one, too long a one kept panning after they had
+     already scrolled out of view. Tracking the track instead of the rail
+     only works because the track is tall by exactly PIN_SCROLL_PX more than
+     the content pinned inside it - 'start start' to 'end end' on that
+     element is precisely the scroll distance the pin lasts. */
   const { scrollYProgress } = useScroll({
-    target: railBox,
-    offset: ['end end', 'start start'],
+    target: track,
+    offset: ['start start', 'end end'],
   })
   /* Written straight from raw progress, one trackpad flick would still
      teleport the rail even with the longer window. The spring gives it the
@@ -188,13 +215,7 @@ export function ProductCards() {
   const drive = useSpring(scrollYProgress, { stiffness: 110, damping: 26, restDelta: 0.0005 })
   useMotionValueEvent(drive, 'change', v => {
     const el = rail.current
-    if (!el || taken.current || reduce) return
-    /* Those two anchors are only in that order while the rail is shorter than
-       the viewport. It is 395px tall against any real screen, but a landscape
-       phone can be shorter than that, and there the window inverts and the
-       rail would pan backwards. Leave it to the reader instead: swiping a rail
-       is the obvious gesture on the device where this happens. */
-    if (el.clientHeight > window.innerHeight - 40) return
+    if (!el || taken.current || reduce || !canPin) return
     const span = el.scrollWidth - el.clientWidth
     if (span <= 0) return
     const to = Math.round(Math.max(0, Math.min(span, v * span)))
@@ -224,8 +245,8 @@ export function ProductCards() {
     const el = rail.current
     if (!el) return
     takeOver()
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: reduce ? 'auto' : 'smooth' })
+    const reduceNow = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: reduceNow ? 'auto' : 'smooth' })
   }
 
   return (
@@ -233,84 +254,87 @@ export function ProductCards() {
        light screenshots on light paper disappeared into it: the mat has to be a
        different plane, not a different shade of the same one. `--lp-band` is
        the one value that holds in both modes, so this section reads the same
-       whichever way the toggle is set. */
+       whichever way the toggle is set. The background sits on the track
+       rather than the sticky content, so it still fills the whole pinned
+       scroll distance rather than just the content's own height. */
     /* The hairline is not decoration. The band is a permanent ink plane, so on
        Paper it announces itself and on Ink it sits two steps off the ground
        and all but disappears. Elevation in this system is a one-pixel line, so
        the band draws one and reads as a plane in both modes. */
-    <section ref={section} id="tour" aria-label="Product" className="scroll-mt-24 border-y border-line-inv py-28" style={{ background: 'var(--lp-band)' }}>
-      <div className="mx-auto max-w-6xl px-6">
-        <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>Inside BrandGauge</p>
-        <h2 className="mt-3 max-w-2xl text-3xl font-medium leading-tight tracking-tight sm:text-4xl"
-          style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
-          This is your Monday morning.
-        </h2>
-        <p className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--tx-inv-2)' }}>
-          One page tells you where the brand stands, what moved it last week, and what it cost
-          to move. No exports, no chasing four dashboards before a 10am meeting.
-        </p>
-      </div>
+    <section
+      ref={track}
+      id="tour"
+      aria-label="Product"
+      className="scroll-mt-24 relative border-y border-line-inv"
+      style={{ background: 'var(--lp-band)', height: canPin && trackHeight ? trackHeight : undefined }}
+    >
+      {/* py-16 rather than the standard py-28: every pixel here counts
+          directly against canPin's budget, and the pinned content does not
+          need as much breathing room as a normal static section gets - it is
+          never competing with whatever comes right before or after it the
+          way a scrolling section is. */}
+      <div ref={sticky} className={canPin ? 'sticky top-0 py-16' : 'py-16'}>
+        <div className="mx-auto max-w-6xl px-6">
+          <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>Inside BrandGauge</p>
+          <h2 className="mt-3 max-w-2xl text-3xl font-medium leading-tight tracking-tight sm:text-4xl"
+            style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
+            This is your Monday morning.
+          </h2>
+          <p className="mt-4 max-w-xl text-[14px] leading-relaxed" style={{ color: 'var(--tx-inv-2)' }}>
+            One page tells you where the brand stands, what moved it last week, and what it cost
+            to move. No exports, no chasing four dashboards before a 10am meeting.
+          </p>
+        </div>
 
-      {/* The rail bleeds off the right edge so it reads as a run that continues,
-          rather than a row that happens to end where the container does. */}
-      <div className="mt-12">
-      <div
-        ref={rail}
-        onScroll={onScroll}
-        tabIndex={0}
-        role="group"
-        aria-label="Product screens, pan sideways"
-        className={`flex gap-5 overflow-x-auto scroll-pl-6 pb-2 pl-6 pr-6 [&::-webkit-scrollbar]:hidden lg:scroll-pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] ${manual ? 'snap-x snap-mandatory' : ''}`}
-        style={{ scrollbarWidth: 'none' }}
-      >
-        {CARDS.map(card => (
-          <article
-            key={card.shot.src}
-            className={`flex shrink-0 snap-start flex-col overflow-hidden rounded-sm border border-line-inv ${card.width}`}
-          >
-            <ProductShotFrame shot={card.shot} className="border-b border-line-inv" />
-            <div className="flex flex-1 flex-col p-6">
-              <h3 className="text-xl font-medium tracking-tight"
-                style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
-                {card.title}
-              </h3>
-              <p className="mt-3 max-w-[62ch] text-[13.5px] leading-relaxed" style={{ color: 'var(--tx-inv-2)' }}>
-                {card.body}
-              </p>
-            </div>
-          </article>
-        ))}
-      </div>
-      </div>
+        {/* The rail bleeds off the right edge so it reads as a run that continues,
+            rather than a row that happens to end where the container does. */}
+        <div className="mt-12">
+        <div
+          ref={rail}
+          onScroll={onScroll}
+          tabIndex={0}
+          role="group"
+          aria-label="Product screens, pan sideways"
+          className={`flex gap-5 overflow-x-auto scroll-pl-6 pb-2 pl-6 pr-6 [&::-webkit-scrollbar]:hidden lg:scroll-pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] ${manual ? 'snap-x snap-mandatory' : ''}`}
+          style={{ scrollbarWidth: 'none' }}
+        >
+          {CARDS.map(card => (
+            <article
+              key={card.shot.src}
+              className={`flex shrink-0 snap-start flex-col overflow-hidden rounded-sm border border-line-inv ${card.width}`}
+            >
+              <ProductShotFrame shot={card.shot} className="border-b border-line-inv" />
+              <div className="flex flex-1 flex-col p-6">
+                <h3 className="text-xl font-medium tracking-tight"
+                  style={{ fontFamily: 'var(--font)', color: 'var(--lp-band-ink)' }}>
+                  {card.title}
+                </h3>
+                <p className="mt-3 max-w-[62ch] text-[13.5px] leading-relaxed" style={{ color: 'var(--tx-inv-2)' }}>
+                  {card.body}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+        </div>
 
-      {/* A sentinel, not a wrapper: `useScroll` below reads this element's own
-          box, and that box used to BE the rail, which is what made the window
-          too short. The scroll distance for the whole pan to run is
-          `viewportHeight - <tracked height>`, so measuring the ~400px-tall
-          rail itself capped the run at roughly a half-viewport of scrolling,
-          against 1760px of cards to get through. A few lines of wheel input
-          covered it. This sentinel sits where the rail ends and has almost no
-          height of its own, so the window opens to nearly a full viewport of
-          scroll instead - the pan still starts the instant the rail is fully
-          in view, exactly as before, it just has room to breathe afterward. */}
-      <div ref={railBox} aria-hidden className="h-px" />
-
-      {/* Where you are in the run, and the two ways to move through it that do
-          not need a trackpad. */}
-      <div className="mx-auto mt-6 flex max-w-6xl items-center gap-5 px-6">
-        <RailCrescendo progress={progress} />
-        <span className="bg-label ml-auto hidden sm:block" style={{ color: 'var(--tx-inv-2)' }}>Pan</span>
-        <div className="flex gap-2">
-          <button type="button" onClick={() => step(-1)} disabled={ends.start} aria-label="Previous screens"
-            className="flex h-9 w-9 items-center justify-center rounded-sm border border-line-inv bg-press disabled:opacity-35"
-            style={{ color: 'var(--lp-band-ink)' }}>
-            <ArrowLeftIcon className="h-4 w-4" />
-          </button>
-          <button type="button" onClick={() => step(1)} disabled={ends.end} aria-label="More screens"
-            className="flex h-9 w-9 items-center justify-center rounded-sm border border-line-inv bg-press disabled:opacity-35"
-            style={{ color: 'var(--lp-band-ink)' }}>
-            <ArrowRightIcon className="h-4 w-4" />
-          </button>
+        {/* Where you are in the run, and the two ways to move through it that do
+            not need a trackpad. */}
+        <div className="mx-auto mt-6 flex max-w-6xl items-center gap-5 px-6">
+          <RailCrescendo progress={progress} />
+          <span className="bg-label ml-auto hidden sm:block" style={{ color: 'var(--tx-inv-2)' }}>Pan</span>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => step(-1)} disabled={ends.start} aria-label="Previous screens"
+              className="flex h-9 w-9 items-center justify-center rounded-sm border border-line-inv bg-press disabled:opacity-35"
+              style={{ color: 'var(--lp-band-ink)' }}>
+              <ArrowLeftIcon className="h-4 w-4" />
+            </button>
+            <button type="button" onClick={() => step(1)} disabled={ends.end} aria-label="More screens"
+              className="flex h-9 w-9 items-center justify-center rounded-sm border border-line-inv bg-press disabled:opacity-35"
+              style={{ color: 'var(--lp-band-ink)' }}>
+              <ArrowRightIcon className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </section>
