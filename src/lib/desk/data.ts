@@ -322,6 +322,22 @@ export interface InboxRow {
   waitingOnUs:   boolean
   preview:       string
   assignedTo:    string | null
+  assignedToId:  string | null
+  /** When the customer's unanswered message landed. Null unless waiting on us. */
+  waitingSince:  string | null
+  /** Minutes from the thread opening to our first reply. Null if we never have. */
+  firstResponseMins: number | null
+}
+
+/** The named queues down the side of the inbox. */
+export type InboxView = 'unassigned' | 'mine' | 'open' | 'snoozed' | 'closed' | 'all'
+
+export interface InboxCounts {
+  unassigned: number
+  mine:       number
+  open:       number
+  snoozed:    number
+  closed:     number
 }
 
 /**
@@ -333,7 +349,7 @@ export interface InboxRow {
  * what a person means when they ask what is outstanding.
  */
 export async function supportInbox(
-  session: StaffSession, status: 'open' | 'all' = 'open',
+  session: StaffSession, view: InboxView = 'open',
 ): Promise<InboxRow[]> {
   const service = await createServiceClient()
 
@@ -341,14 +357,14 @@ export async function supportInbox(
     .from('support_conversations')
     .select(`
       id, name, email, subject, status, source, page_url, assigned_to,
-      last_message_at, created_at,
+      first_response_at, last_message_at, created_at,
       workspaces ( name, plan ),
       brands ( brand_type )
     `)
     .order('last_message_at', { ascending: false })
     .limit(200)
 
-  if (status === 'open') query = query.in('status', ['open', 'pending'])
+  query = applyView(query, view, session.userId)
 
   const { data: rows } = await query
   if (!rows?.length) return []
@@ -398,14 +414,69 @@ export async function supportInbox(
       lastMessageAt: row.last_message_at,
       createdAt:     row.created_at,
       waitingOnUs:   last?.author_type === 'customer',
+      // Only meaningful while they are waiting. Showing an age on a thread we
+      // have already answered would read as a backlog that is not there.
+      waitingSince:  last?.author_type === 'customer' ? row.last_message_at : null,
+      firstResponseMins: row.first_response_at
+        ? Math.max(0, Math.round(
+            (new Date(row.first_response_at).getTime() - new Date(row.created_at).getTime()) / 60000,
+          ))
+        : null,
       // The preview is the customer's words, which is customer content. A role
       // without that key sees that a thread exists and not what it says.
       preview: canSeeContent
         ? (last?.body ?? '').slice(0, 140)
         : 'Message hidden on your role',
-      assignedTo: names.get(row.assigned_to ?? '') ?? null,
+      assignedTo:   names.get(row.assigned_to ?? '') ?? null,
+      assignedToId: row.assigned_to ?? null,
     }
   }).sort((a, b) => Number(b.waitingOnUs) - Number(a.waitingOnUs))
+}
+
+/**
+ * One view's filter, in one place.
+ *
+ * Shared by the list and the counts so a queue can never show a number that
+ * disagrees with the rows under it.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function applyView(query: any, view: InboxView, userId: string) {
+  switch (view) {
+    case 'unassigned': return query.in('status', ['open', 'pending']).is('assigned_to', null)
+    case 'mine':       return query.in('status', ['open', 'pending']).eq('assigned_to', userId)
+    case 'snoozed':    return query.eq('status', 'snoozed')
+    case 'closed':     return query.eq('status', 'closed')
+    case 'all':        return query
+    case 'open':
+    default:           return query.in('status', ['open', 'pending'])
+  }
+}
+
+/**
+ * What each queue is carrying.
+ *
+ * Head counts rather than reading the rows, so the badge beside a view costs
+ * one cheap query each and does not depend on the 200-row page the list reads.
+ */
+export async function inboxCounts(session: StaffSession): Promise<InboxCounts> {
+  const service = await createServiceClient()
+  const count = (view: InboxView) =>
+    applyView(
+      service.from('support_conversations').select('id', { count: 'exact', head: true }),
+      view, session.userId,
+    )
+
+  const [unassigned, mine, open, snoozed, closed] = await Promise.all([
+    count('unassigned'), count('mine'), count('open'), count('snoozed'), count('closed'),
+  ])
+
+  return {
+    unassigned: unassigned.count ?? 0,
+    mine:       mine.count ?? 0,
+    open:       open.count ?? 0,
+    snoozed:    snoozed.count ?? 0,
+    closed:     closed.count ?? 0,
+  }
 }
 
 export interface DeskThread {
@@ -420,6 +491,8 @@ export interface DeskThread {
   assignedTo: string | null
   /** The raw id as well as the name, so the assign control can show the truth. */
   assignedToId: string | null
+  /** Minutes from the thread opening to our first reply. Null if we never have. */
+  firstResponseMins: number | null
   /** The account behind the thread, so nobody has to ask which one this is. */
   account: {
     workspaceId: string
@@ -446,7 +519,7 @@ export async function deskThread(session: StaffSession, id: string): Promise<Des
 
   const { data: conv } = await service
     .from('support_conversations')
-    .select('id, name, email, status, source, page_url, user_agent, created_at, assigned_to, workspace_id, brand_id')
+    .select('id, name, email, status, source, page_url, user_agent, created_at, first_response_at, assigned_to, workspace_id, brand_id')
     .eq('id', id)
     .maybeSingle()
   if (!conv) return null
@@ -511,6 +584,11 @@ export async function deskThread(session: StaffSession, id: string): Promise<Des
     createdAt: conv.created_at,
     assignedTo:   names.get(conv.assigned_to ?? '') ?? null,
     assignedToId: conv.assigned_to ?? null,
+    firstResponseMins: conv.first_response_at
+      ? Math.max(0, Math.round(
+          (new Date(conv.first_response_at).getTime() - new Date(conv.created_at).getTime()) / 60000,
+        ))
+      : null,
     account,
     messages: await Promise.all((rows ?? []).map(async row => ({
       id:     row.id,

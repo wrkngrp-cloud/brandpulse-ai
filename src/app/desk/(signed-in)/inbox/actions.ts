@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { sendMail, emailConfigured } from '@/lib/email/send'
 import { createServiceClient } from '@/lib/supabase/server'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
+import { supportInbox, inboxCounts, type InboxRow, type InboxCounts, type InboxView } from '@/lib/desk/data'
 import { z } from 'zod'
 
 export type ReplyState = { error?: string; ok?: boolean; warning?: string } | null
@@ -173,4 +174,29 @@ export async function assignThread(formData: FormData): Promise<void> {
   })
   revalidatePath(`/desk/inbox/${id}`)
   revalidatePath('/desk/inbox')
+}
+
+/**
+ * The queue, re-read.
+ *
+ * The inbox keeps its list mounted while you move between threads, so a Next
+ * layout renders it once and never again and revalidatePath cannot reach it.
+ * The shell calls this instead: on a Realtime change, on a view change, and
+ * when a tab comes back to the front.
+ *
+ * It is a server action rather than a route because the Desk has no API
+ * routes, and requireStaffOrNull is the same gate every other entry point
+ * uses, so a signed-out or suspended tab gets nothing rather than stale rows.
+ */
+export async function loadInbox(
+  view: InboxView,
+): Promise<{ rows: InboxRow[]; counts: InboxCounts } | null> {
+  const session = await requireStaffOrNull('support.view')
+  if (!session) return null
+
+  const [rows, counts] = await Promise.all([
+    supportInbox(session, view),
+    inboxCounts(session),
+  ])
+  return { rows, counts }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { MessageQuoteIcon, XIcon, SendIcon, ImageIcon, FileIcon } from '@/components/brand/icon'
 import { Working } from '@/components/brand/working'
 import { cn } from '@/lib/utils'
@@ -46,6 +47,8 @@ interface PendingFile {
 }
 
 const POLL_MS = 5000
+/** The safety net once Realtime is carrying the thread. */
+const POLL_SLOW_MS = 30000
 
 export function ChatWidget({ source = 'site', replyPromise = 'within 4 working hours' }: {
   source?: Source
@@ -89,12 +92,45 @@ export function ChatWidget({ source = 'site', replyPromise = 'within 4 working h
     void load().finally(() => setLoading(false))
   }, [thread, load])
 
-  // A stranger has no Realtime identity to subscribe with, so the panel polls
-  // while it is open and stops the moment it closes.
+  /**
+   * Catching a reply.
+   *
+   * A signed-in customer has an identity Realtime can scope to, so they get
+   * their own thread pushed to them and the poll drops to a slow safety net
+   * for anything the socket misses. A stranger carries only an httpOnly
+   * cookie, which Realtime cannot authenticate with, so they keep the poll.
+   *
+   * Either way it runs only while the panel is open.
+   */
   useEffect(() => {
     if (!open || !thread) return
-    const timer = setInterval(() => { void load() }, POLL_MS)
-    return () => clearInterval(timer)
+
+    const supabase = createClient()
+    let live = false
+    let queued: ReturnType<typeof setTimeout> | null = null
+    const settle = () => {
+      if (queued) clearTimeout(queued)
+      queued = setTimeout(() => { void load() }, 250)
+    }
+
+    const channel = supabase
+      .channel(`support-thread-${thread.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'support_messages',
+        filter: `conversation_id=eq.${thread.id}`,
+      }, settle)
+      .subscribe((status: string) => { live = status === 'SUBSCRIBED' })
+
+    // The socket is the fast path and this is the floor under it: often enough
+    // that a dropped subscription is not a dropped conversation, rare enough
+    // that a signed-in tab is not polling every five seconds for nothing.
+    const timer = setInterval(() => { void load() }, live ? POLL_SLOW_MS : POLL_MS)
+
+    return () => {
+      if (queued) clearTimeout(queued)
+      clearInterval(timer)
+      supabase.removeChannel(channel)
+    }
   }, [open, thread, load])
 
   useEffect(() => {

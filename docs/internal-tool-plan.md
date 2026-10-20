@@ -527,6 +527,40 @@ funnel empty" answers itself before the agent types.
 
 ---
 
+### The inbox is one screen
+
+`/desk/inbox` is a layout, not a page. The queue renders in the layout and every
+conversation renders inside it, so moving between threads keeps the list, the counts and
+your place in it. A conversation is the middle pane rather than a page of its own, which is
+why it carries no back link and no title bar.
+
+That shape has one consequence worth knowing before changing anything here: a Next layout
+is not re-run when the route inside it changes, so `revalidatePath('/desk/inbox')` cannot
+refresh the queue. The list owns its own data instead. The server renders the first page,
+then Realtime says when something changed and the `loadInbox` server action re-reads it,
+debounced, because a reply writes a message and the trigger touches the conversation and
+that is two changes for one event. A tab coming back to the front re-reads as well, since a
+sleeping tab drops its socket.
+
+The conversation beside it uses `router.refresh()` rather than fetching for itself.
+Attachment links are signed per view and expire in a minute, and signing needs the service
+role, so re-running the server component keeps that on the server and means one code path
+produces a message rather than two that can disagree. Next 16 merges the refreshed payload
+without resetting client state, which is what lets the queue keep its scroll and its cursor
+through it.
+
+Views are Unassigned, Mine, Open, Snoozed, Closed and Everything, each with a count. One
+`applyView` builds the filter for both the rows and the counts, so a badge can never
+disagree with the list under it.
+
+Two numbers the schema has always captured and nothing showed: how long a customer has been
+waiting, on every row that is waiting on us, and how long we took to reply first, on the
+thread. `first_response_at` is written by the trigger on the first non-internal staff
+message.
+
+`j` and `k` move, `Enter` opens. Ignored while the focus is in a field, or the reply box
+would swallow every `j`.
+
 ## 5. The Desk
 
 ### 5.1 Accounts
