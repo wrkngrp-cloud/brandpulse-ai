@@ -58,12 +58,14 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  // Verify and consume the CSRF state from Redis
-  const session = await redis.get<RedisState>(`adsoauth:${state}`)
+  // Verify and consume the CSRF state from Redis. A Redis error means the
+  // state can't be verified either way, which is the same outcome as the
+  // state being missing: refuse rather than guess.
+  const session = await redis.get<RedisState>(`adsoauth:${state}`).catch(() => null)
   if (!session || session.platform !== 'meta') {
     return NextResponse.redirect(`${APP_URL}/dashboard/connectors?error=invalid_state`)
   }
-  await redis.del(`adsoauth:${state}`)
+  await redis.del(`adsoauth:${state}`).catch(() => { /* best-effort cleanup */ })
 
   const { brandId, returnTo } = session
   const supabase = await createServiceClient()

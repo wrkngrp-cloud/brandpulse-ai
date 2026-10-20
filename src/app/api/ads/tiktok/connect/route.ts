@@ -30,11 +30,15 @@ export async function GET() {
 
   const state = randomBytes(16).toString('hex')
 
-  await redis.set(
-    `adsoauth:${state}`,
-    { userId: user.id, platform: 'tiktok', brandId },
-    { ex: 600 }
-  )
+  try {
+    await redis.set(
+      `adsoauth:${state}`,
+      { userId: user.id, platform: 'tiktok', brandId },
+      { ex: 600 }
+    )
+  } catch {
+    return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=connections_unavailable`)
+  }
 
   const redirectUri = `${APP_URL}/api/ads/tiktok/callback`
 

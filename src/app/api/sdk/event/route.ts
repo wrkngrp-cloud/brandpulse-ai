@@ -57,9 +57,10 @@ export async function POST(request: NextRequest) {
 
   const { pixel_id, event_type, value, session_id, page_url, referrer, metadata } = parsed.data
 
-  // Rate limit by pixel_id (skipped if Upstash is not configured)
+  // Rate limit by pixel_id (skipped if Upstash is not configured). A Redis
+  // outage must not take pixel ingestion down with it.
   if (ratelimit) {
-    const { success } = await ratelimit.limit(pixel_id)
+    const { success } = await ratelimit.limit(pixel_id).catch(() => ({ success: true }))
     if (!success) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },

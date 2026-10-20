@@ -21,7 +21,10 @@ export interface BrandContext {
 
 export async function buildBrandContext(brandId: string): Promise<BrandContext> {
   const cacheKey = `brand_context:${brandId}`
-  const cached = await redis.get<BrandContext>(cacheKey)
+  // Redis is a cache here, not a source of truth — every AI feature that
+  // builds a brand context depends on this function, so a Redis outage must
+  // degrade to an uncached DB read, never take the feature down.
+  const cached = await redis.get<BrandContext>(cacheKey).catch(() => null)
   if (cached) return cached
 
   const supabase = await createServiceClient()
@@ -55,7 +58,7 @@ export async function buildBrandContext(brandId: string): Promise<BrandContext> 
     brandVoice: data.brand_voice ?? {},
   }
 
-  await redis.set(cacheKey, ctx, { ex: TTL_SECONDS })
+  await redis.set(cacheKey, ctx, { ex: TTL_SECONDS }).catch(() => { /* cache write is an optimisation, not required */ })
   return ctx
 }
 

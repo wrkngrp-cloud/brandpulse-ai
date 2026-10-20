@@ -70,18 +70,19 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  // Look up state token from oauth_token
-  const stateToken = await redis.get<string>(`twitter_oauth_token:${oauthToken}`)
+  // Look up state token from oauth_token. A Redis error means it can't be
+  // verified either way, which is the same outcome as missing: refuse.
+  const stateToken = await redis.get<string>(`twitter_oauth_token:${oauthToken}`).catch(() => null)
   if (!stateToken) {
     return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=invalid_state`)
   }
-  await redis.del(`twitter_oauth_token:${oauthToken}`)
+  await redis.del(`twitter_oauth_token:${oauthToken}`).catch(() => { /* best-effort cleanup */ })
 
-  const session = await redis.get<{ userId: string; platform: string; brandId: string }>(`adsoauth:${stateToken}`)
+  const session = await redis.get<{ userId: string; platform: string; brandId: string }>(`adsoauth:${stateToken}`).catch(() => null)
   if (!session || session.platform !== 'twitter') {
     return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=invalid_state`)
   }
-  await redis.del(`adsoauth:${stateToken}`)
+  await redis.del(`adsoauth:${stateToken}`).catch(() => { /* best-effort cleanup */ })
 
   const { brandId } = session
   const supabase = await createServiceClient()

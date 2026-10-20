@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing key or pageId' }, { status: 400 })
   }
 
-  const pending = await redis.get<{ accessToken: string; userId: string; brandId: string }>(`ig-pending:${key}`)
+  const pending = await redis.get<{ accessToken: string; userId: string; brandId: string }>(`ig-pending:${key}`).catch(() => null)
   if (!pending) {
     return NextResponse.json({ error: 'Session expired. Please connect Instagram again.' }, { status: 400 })
   }
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     connected_at: new Date().toISOString(),
   }, { onConflict: 'brand_id,platform,account_id' })
 
-  await redis.del(`ig-pending:${key}`)
+  await redis.del(`ig-pending:${key}`).catch(() => { /* best-effort cleanup; the key expires on its own TTL anyway */ })
 
   return NextResponse.json({ ok: true })
 }
