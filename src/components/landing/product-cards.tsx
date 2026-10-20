@@ -171,7 +171,12 @@ export function ProductCards() {
     const content = sticky.current
     if (!content) return
     const h = content.getBoundingClientRect().height
-    setCanPin(h < window.innerHeight - 40)
+    /* No safety margin here on purpose: a laptop at ~870px tall is the
+       common case this has to work on, not the exception, and the content
+       is ~860px. Losing the pin on any viewport a few px short of the
+       content defeats the point for most real screens, not just the rare
+       short one. */
+    setCanPin(h <= window.innerHeight)
     setTrackHeight(h + PIN_SCROLL_PX)
   }, [])
 
@@ -263,7 +268,12 @@ export function ProductCards() {
       className="scroll-mt-24 relative border-y border-line-inv"
       style={{ background: 'var(--lp-band)', height: canPin && trackHeight ? trackHeight : undefined }}
     >
-      <div ref={sticky} className={canPin ? 'sticky top-0 py-28' : 'py-28'}>
+      {/* py-16 rather than the standard py-28: every pixel here counts
+          directly against canPin's budget, and the pinned content does not
+          need as much breathing room as a normal static section gets - it is
+          never competing with whatever comes right before or after it the
+          way a scrolling section is. */}
+      <div ref={sticky} className={canPin ? 'sticky top-0 py-16' : 'py-16'}>
         <div className="mx-auto max-w-6xl px-6">
           <p className="text-[11px]" style={{ color: 'var(--danfo)' }}>Inside BrandGauge</p>
           <h2 className="mt-3 max-w-2xl text-3xl font-medium leading-tight tracking-tight sm:text-4xl"
