@@ -56,6 +56,9 @@ const CREDENTIALS: { name: string; gates: string; blocking: boolean }[] = [
   { name: 'ADMIN_SECRET',           gates: 'The demo seed endpoints', blocking: true },
   { name: 'UPSTASH_REDIS_REST_URL', gates: 'Caching, rate limits and OAuth state', blocking: false },
   { name: 'DESK_HOST',              gates: 'Serving the Desk on its own hostname', blocking: false },
+  // Blocking, because without it deskUrl() returns a bare path and every link
+  // we put in an email is unopenable: staff invitations above all.
+  { name: 'NEXT_PUBLIC_DESK_URL',   gates: 'Desk links inside emails, including staff invites', blocking: true },
   { name: 'PAYSTACK_SECRET_KEY',    gates: 'Our own subscription billing webhook', blocking: false },
   { name: 'OPENAI_API_KEY',         gates: 'ChatGPT in the AI Visibility Tracker', blocking: false },
   { name: 'GOOGLE_AI_API_KEY',      gates: 'Gemini in the AI Visibility Tracker', blocking: false },
