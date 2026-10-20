@@ -418,6 +418,8 @@ export interface DeskThread {
   userAgent: string | null
   createdAt: string
   assignedTo: string | null
+  /** The raw id as well as the name, so the assign control can show the truth. */
+  assignedToId: string | null
   /** The account behind the thread, so nobody has to ask which one this is. */
   account: {
     workspaceId: string
@@ -507,7 +509,8 @@ export async function deskThread(session: StaffSession, id: string): Promise<Des
     pageUrl:   conv.page_url,
     userAgent: conv.user_agent,
     createdAt: conv.created_at,
-    assignedTo: names.get(conv.assigned_to ?? '') ?? null,
+    assignedTo:   names.get(conv.assigned_to ?? '') ?? null,
+    assignedToId: conv.assigned_to ?? null,
     account,
     messages: await Promise.all((rows ?? []).map(async row => ({
       id:     row.id,

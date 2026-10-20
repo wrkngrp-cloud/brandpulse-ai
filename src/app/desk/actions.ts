@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { getStaffSession, writeAudit, requestIpHash } from '@/lib/desk/auth'
+import { getStaffSession, writeAudit, requestIpHash, markPresent } from '@/lib/desk/auth'
 import { deskHref } from '@/lib/desk/urls'
 import { hashInviteToken, tokenHashMatches } from '@/lib/desk/invites'
 import { z } from 'zod'
@@ -222,4 +222,22 @@ export async function acceptInvite(_prev: DeskAuthState, formData: FormData): Pr
   }
 
   redirect(await deskHref('/desk/login?linked=1'))
+}
+
+/**
+ * "I am still here."
+ *
+ * The Desk shell calls this on a timer. Without it, presence only moves when
+ * somebody navigates, and the one screen where staff sit still for minutes at
+ * a time is the one where being seen as present matters most: reading a thread
+ * and waiting for the customer to type makes no requests at all, so the widget
+ * would decide nobody was around and start asking for an email address in the
+ * middle of a live conversation.
+ *
+ * markPresent goes through the same throttle every page uses, so a tab left
+ * open overnight is one row update every two minutes and nothing else. A
+ * signed-out or suspended tab writes nothing.
+ */
+export async function touchPresence(): Promise<void> {
+  await markPresent()
 }

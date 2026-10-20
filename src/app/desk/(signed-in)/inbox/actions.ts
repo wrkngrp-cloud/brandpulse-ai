@@ -24,6 +24,13 @@ const replySchema = z.object({
  *
  * An internal note takes none of that. It is a note between us on the thread,
  * and the policy keeps it off the customer's side.
+ *
+ * The email does not invite a reply into the thread, because there is nothing
+ * on the receiving end: no inbound handler exists, and `source = 'email'` is a
+ * value nothing writes. It used to say a reply would come straight back here,
+ * so a customer who answered by email was answering into a mailbox while the
+ * thread still read as waiting on them. Until inbound is built, the email
+ * points them at the chat.
  */
 export async function replyToThread(_prev: ReplyState, formData: FormData): Promise<ReplyState> {
   const internal = formData.get('internal') === 'on'
@@ -106,7 +113,7 @@ export async function replyToThread(_prev: ReplyState, formData: FormData): Prom
 
 ${body}
 
-Reply to this email and it goes straight back to the same conversation.
+To carry on, open the chat on BrandGauge and your whole conversation is there.
 
 ${session.fullName}
 BrandGauge`,

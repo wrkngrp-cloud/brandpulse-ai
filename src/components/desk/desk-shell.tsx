@@ -10,6 +10,7 @@ import {
   LayoutGridIcon, BuildingIcon, MessageQuoteIcon, UsersIcon,
   CurrencyIcon, TrendIcon, WrenchIcon, ShieldIcon, LogoutIcon,
 } from '@/components/brand/icon'
+import { PresenceBeat } from './presence-beat'
 
 /**
  * The Desk's own shell.
@@ -134,6 +135,7 @@ export function DeskShell({
         </nav>
       </header>
 
+      <PresenceBeat />
       <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
     </div>
   )

@@ -51,8 +51,11 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
             {session.can('support.assign') && (
               <form action={assignThread} className="flex items-center gap-1.5">
                 <input type="hidden" name="conversation_id" value={thread.id} />
+                {/* The current assignee, not a blank. Defaulting to empty
+                    meant pressing Assign without touching the control quietly
+                    unassigned the thread. */}
                 <select
-                  name="assigned_to" defaultValue=""
+                  name="assigned_to" defaultValue={thread.assignedToId ?? ''}
                   className="h-8 rounded-md border border-line bg-paper px-2 text-xs"
                 >
                   <option value="">Unassigned</option>
