@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { Resend } from 'resend'
+import { sendMail, emailConfigured } from '@/lib/email/send'
 import { captureLead, headlineFrom } from '@/lib/tools/leads'
 import { gateResult, LEAD_ROLES } from '@/lib/tools/gate'
 import { runByToken, hashIp, ipOf } from '@/lib/tools/runs'
@@ -93,16 +93,8 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ status: 'complete', gated: false, result })
 }
 
-let resend: Resend | null = null
-function client(): Resend | null {
-  if (!process.env.RESEND_API_KEY) return null
-  resend ??= new Resend(process.env.RESEND_API_KEY)
-  return resend
-}
-
 async function sendReportEmail(to: string, toolId: ToolId, report: ToolReport | undefined, token: string) {
-  const mailer = client()
-  if (!mailer || !report) return
+  if (!emailConfigured() || !report) return
 
   const tool = toolById(toolId)
   const base = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://brandgauge.app').replace(/\/$/, '')
@@ -134,10 +126,13 @@ async function sendReportEmail(to: string, toolId: ToolId, report: ToolReport | 
     'You are getting this because you asked us to send it. We will not add you to anything else.',
   ].filter(v => v !== null).join('\n')
 
-  await mailer.emails.send({
+  const mail = await sendMail({
     from: 'BrandGauge <hello@brandgauge.app>',
     to,
     subject: report.title,
     text: body,
   })
+  // The report is already on screen, so a refused email is not an error for
+  // the visitor. It is thrown so the caller's own logging records it.
+  if (!mail.sent) throw new Error(mail.reason)
 }

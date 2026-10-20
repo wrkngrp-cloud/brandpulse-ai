@@ -1,16 +1,9 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
-import { Resend } from 'resend'
+import { sendMail, emailConfigured } from '@/lib/email/send'
 import { TOKENS } from '@/lib/brand-tokens'
 
-// Constructed lazily: the Resend SDK throws when the key is absent, and building
-// the app should not require a mail credential.
-let resendClient: Resend | null = null
-function getResend() {
-  resendClient ??= new Resend(process.env.RESEND_API_KEY)
-  return resendClient
-}
 const APP_URL = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
 
 function thirtyDaysAgo() {
@@ -115,9 +108,9 @@ Return JSON only:
         .filter(u => userIds.includes(u.id) && u.email)
         .map(u => u.email!)
 
-      if (!adminEmails.length || !process.env.RESEND_API_KEY) continue
+      if (!adminEmails.length || !emailConfigured()) continue
 
-      await getResend().emails.send({
+      await sendMail({
         from:    'BrandGauge <reports@brandgauge.app>',
         to:      adminEmails,
         subject: `Monthly brand report — ${brand.name} — ${month}`,
@@ -133,9 +126,12 @@ Return JSON only:
           <p style="margin:28px 0;"><a href="${APP_URL}/dashboard/brand-equity" style="display:inline-block;background:${TOKENS.tx};color:${TOKENS.paper};text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">View full report</a></p>
           <p style="font-size:12px;color:${TOKENS.tx3};border-top:1px solid ${TOKENS.shell};padding-top:16px;">BrandGauge · Unsubscribe from monthly reports in Settings</p>
         </div>`,
-      }).catch(() => null)
-
-      sent++
+      }).then(mail => {
+        // Only a message Resend accepted counts. Before this, the tally
+        // counted attempts and the job reported a full run on a dead key.
+        if (mail.sent) sent++
+        else console.error(`[scheduled-reports] ${brand.name} not sent: ${mail.reason}`)
+      })
     }
 
     return { sent }
@@ -210,9 +206,9 @@ export const weeklyDigestCron = inngest.createFunction(
         .filter(u => userIds.includes(u.id) && u.email)
         .map(u => u.email!)
 
-      if (!emails.length || !process.env.RESEND_API_KEY) continue
+      if (!emails.length || !emailConfigured()) continue
 
-      await getResend().emails.send({
+      await sendMail({
         from:    'BrandGauge <digest@brandgauge.app>',
         to:      emails,
         subject: `Your week in brand — ${brand.name}`,
@@ -237,9 +233,12 @@ export const weeklyDigestCron = inngest.createFunction(
           <p style="margin:24px 0;"><a href="${APP_URL}/dashboard" style="display:inline-block;background:${TOKENS.tx};color:${TOKENS.paper};text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">Open dashboard</a></p>
           <p style="font-size:12px;color:${TOKENS.tx3};border-top:1px solid ${TOKENS.shell};padding-top:16px;">BrandGauge · Manage digest preferences in Settings</p>
         </div>`,
-      }).catch(() => null)
-
-      sent++
+      }).then(mail => {
+        // Only a message Resend accepted counts. Before this, the tally
+        // counted attempts and the job reported a full run on a dead key.
+        if (mail.sent) sent++
+        else console.error(`[scheduled-reports] ${brand.name} not sent: ${mail.reason}`)
+      })
     }
 
     return { sent }

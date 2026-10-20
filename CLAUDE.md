@@ -77,7 +77,7 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
   exercise the half of the Desk that lives in SQL: `staff_can` precedence, RLS on
   the staff, telemetry and chat tables, the security-definer grants, and the
   support triggers. Needs a local postgres and nothing else, no Supabase project
-  and no credentials. 74 assertions. It fails the run when any of them regresses,
+  and no credentials. 82 assertions. It fails the run when any of them regresses,
   which is checked by breaking a policy on purpose rather than assumed.
 - `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
   mocked platform responses. Real calls cost X credit and burn Instagram's
@@ -154,13 +154,13 @@ Upstash Redis for cache / rate-limit / OAuth state.
 - The public scoreboard (`/scoreboard`, `/api/scoreboard/*`) is the one open endpoint with no
   token, because it reads a public news feed and touches no tenant row: there is no caller to
   verify. It is guarded instead by an IP rate limit and a cache, both of which fail open. Its
-  tables (`public_scans`, `leads`) are the one place RLS does not scope to a
-  workspace: a lead belongs to BrandGauge, so they scope to the `staff_can('leads.view')`
-  permission and are written by the service role only. See `docs/scoreboard-and-leads.md`. The free-tool
-  tables (`tool_runs`, `tool_events`, `tool_campaigns`, `tool_placements`, `tool_visits`)
-  follow the same pattern for the same reason, with one addition: once a run or campaign is
-  claimed they are also readable by the workspace that claimed it. `tool_responses` holds
-  personal data and scopes to that workspace only, never to the lead desk.
+  tables (`public_scans`, `leads`) are the one place RLS does not scope to a workspace: a lead
+  belongs to BrandGauge, so they scope to `staff_can('leads.view')` and are written by the
+  service role only. See `docs/scoreboard-and-leads.md`. The free-tool tables (`tool_runs`,
+  `tool_events`, `tool_campaigns`, `tool_placements`, `tool_visits`) follow the same pattern
+  for the same reason, with one addition: once a run or campaign is claimed they are also
+  readable by the workspace that claimed it. `tool_responses` holds personal data and scopes
+  to that workspace only, never to the lead desk.
 - Every AI call goes through `callAi`, which logs tokens, cost and latency to `ai_calls`
   and a counter to `usage_events`. Pass `meta` (`workspaceId`, `brandId`, `userId`,
   `feature`) at every call site so the call is attributed; without it the row lands under
@@ -246,8 +246,8 @@ See `docs/free-tools-acquisition-plan.md`.
 - Campaign enquiries (`tool_responses`) are refused without consent, store the exact wording
   the person agreed to, and are the one table here the lead desk cannot read.
 - Acquisition events go to `tool_events` (first-party; `posthog-js` is a dependency and is
-  imported nowhere). The founder's funnel is `/dashboard/leads/funnel`, behind the same
-  `staff_can('leads.view')` permission as the lead desk.
+  imported nowhere). The funnel is `/desk/leads/funnel`, on `leads.view` like the rest of
+  the lead desk.
 - Beta is free. Do not add a trial, an expiry, a paywall or an upgrade prompt to any of this.
 
 ## Active brand lookup (critical, always use this)
@@ -420,6 +420,13 @@ is the spec. Rules that are easy to break without noticing:
   `data.revenue_figures`, `data.customer_content`, `data.audit_all`) before returning rows.
   Never redact in a component, and never reach for the service client from a Desk page or
   action.
+- **Email.** Every email in the product goes out through `sendMail` in
+  `src/lib/email/send.ts`, and callers act on what it returns. Never call
+  `resend.emails.send()` directly: the SDK resolves with `{ data: null, error }` when the
+  API refuses a message, so a try/catch around it catches nothing and the code reports a
+  send that never happened. That bug shipped at eleven call sites and is why staff
+  invitations said "sent" while Resend was rejecting the sending domain. A Desk screen
+  shows the reason; a background job logs it and does not count the send.
 - **Permissions.** `staff_can(key)` in SQL, `session.can(key)` in app code, both resolving
   deny override → grant override → role template, with `super_admin` holding everything.
   Add a key to `src/lib/desk/permissions.ts` AND to the `super_admin` seed, then run
@@ -438,9 +445,12 @@ is the spec. Rules that are easy to break without noticing:
   or it becomes a hole. A session needs a customer approval row, expires on the clock
   whether or not the sweep runs, and `end_impersonation()` is what takes the membership
   away.
-- The lead desk's old `lead_desk_admins` allowlist and `is_lead_desk()` retired on
-  2026-10-18. `/dashboard/leads` and `/dashboard/leads/funnel` now gate on
-  `staff_can('leads.view')`, the same permission the Desk's own `/desk/leads` checks.
+- **There is one lead desk, and it is `/desk/leads`.** `lead_desk_admins` and
+  `is_lead_desk()` were dropped on 18 October: nothing had ever inserted a row into that
+  table, so the function returned false for every caller and both `/dashboard/leads` and
+  its funnel bounced everyone to `/dashboard` from the day they shipped. Lead access is
+  `leads.view` to read and `leads.edit` to work the pipeline, which `bizdev` holds. Do not
+  reintroduce a second allowlist.
 
 ## Voice for any user-facing copy (hard rule)
 Warm, confident, plain English. Active voice. Connection before sales. No jargon. No em dashes.

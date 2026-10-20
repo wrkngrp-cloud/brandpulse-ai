@@ -634,8 +634,9 @@ for (const id of registry.TOOL_IDS) {
 }
 ok('and still accepts the board\'s older "scoreboard"', sourceCheck.includes("'scoreboard'"))
 
-// The desk names every tool it can be shown, retired ones included.
-const desk = readFileSync('src/app/dashboard/leads/lead-desk.tsx', 'utf8')
+// The desk names every tool it can be shown, retired ones included. The map
+// moved to the Desk's data layer when /dashboard/leads retired on 19 October.
+const desk = readFileSync('src/lib/desk/leads.ts', 'utf8')
 for (const id of registry.TOOL_IDS) {
   ok(`the lead desk has a name for "${id}"`, new RegExp(`'${id}':\\s*'`).test(desk))
 }
@@ -647,7 +648,6 @@ for (const id of registry.TOOL_IDS) {
    this exact gap cost a 500 on every gate submission and the whole lead desk
    page once, caught only by hand. */
 const leadsLib  = readFileSync('src/lib/tools/leads.ts', 'utf8')
-const leadsPage = readFileSync('src/app/dashboard/leads/page.tsx', 'utf8')
 const migrationsDir = 'supabase/migrations'
 const leadToolRunsSchema = readdirSync(migrationsDir)
   .filter(f => /_(tool_lead_capture|reconcile_lead_tool_runs)\.sql$/.test(f))
@@ -656,11 +656,11 @@ const leadToolRunsSchema = readdirSync(migrationsDir)
 
 const runsUpsertBlock = leadsLib.match(/\.from\('lead_tool_runs'\)\.upsert\(\{([\s\S]*?)\}, \{/)?.[1] ?? ''
 const upsertCols = [...runsUpsertBlock.matchAll(/^\s*(\w+):/gm)].map(m => m[1])
-const embeddedCols = leadsPage.match(/lead_tool_runs\(([^)]+)\)/)?.[1]
+const embeddedCols = desk.match(/lead_tool_runs\(([^)]+)\)/)?.[1]
   .split(',').map(s => s.trim()) ?? []
 
 for (const col of new Set([...upsertCols, ...embeddedCols])) {
-  ok(`lead_tool_runs has a column for "${col}" (leads.ts / the lead desk page)`,
+  ok(`lead_tool_runs has a column for "${col}" (leads.ts / the Desk lead query)`,
     new RegExp(`\\b${col}\\b`).test(leadToolRunsSchema))
 }
 

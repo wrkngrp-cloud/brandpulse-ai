@@ -1,6 +1,6 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
-import { Resend } from 'resend'
+import { sendMail, emailConfigured } from '@/lib/email/send'
 import { runScoreboard } from '@/lib/press/scoreboard'
 
 /**
@@ -16,9 +16,6 @@ import { runScoreboard } from '@/lib/press/scoreboard'
  * Two rules, both of them the promise rather than the mechanics. Only leads
  * with `wants_weekly` are written to, and a lead marked dead is left alone.
  */
-
-let resend: Resend | null = null
-const getResend = () => (resend ??= new Resend(process.env.RESEND_API_KEY))
 
 const naira = (n: number) =>
   n >= 1_000_000 ? `NGN ${(n / 1_000_000).toFixed(1)}m` : `NGN ${Math.round(n / 1_000)}k`
@@ -43,7 +40,7 @@ export const scoreboardWeekly = inngest.createFunction(
     step:   { run: <T>(name: string, fn: () => Promise<T>) => Promise<T> }
     logger: { info: (msg: string, ...args: unknown[]) => void }
   }) => {
-    if (!process.env.RESEND_API_KEY) {
+    if (!emailConfigured()) {
       logger.info('scoreboard-weekly: no RESEND_API_KEY, nothing sent')
       return { sent: 0 }
     }
@@ -105,12 +102,18 @@ export const scoreboardWeekly = inngest.createFunction(
           'Reply STOP and we will not write again.',
         ].filter(Boolean).join('\n')
 
-        await getResend().emails.send({
+        const mail = await sendMail({
           from:    'BrandGauge <scoreboard@brandgauge.app>',
           to:      lead.email,
           subject: `${scan.brand_name}: ${now}% of your category's press this week`,
           text:    lines,
         })
+        // A refused email must not move the baseline or count as sent, or next
+        // week silently compares against a week nobody read.
+        if (!mail.sent) {
+          logger.info(`scoreboard-weekly: ${lead.email} not sent: ${mail.reason}`)
+          return
+        }
 
         // Move the baseline, so next week compares against this week rather
         // than against the day they first ran it.

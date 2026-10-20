@@ -18,10 +18,11 @@ import { LockIcon } from '@/components/brand/icon'
  * create or recover access without a person deciding it belongs somewhere
  * else.
  */
-export function DeskLoginForm() {
+export function DeskLoginForm({ appUrl }: { appUrl: string }) {
   const params = useSearchParams()
   const next     = params.get('next') ?? '/desk'
   const accepted = params.get('accepted') === '1'
+  const linked   = params.get('linked') === '1'
 
   const [state, formAction, pending] = useActionState<DeskAuthState, FormData>(deskLogin, null)
 
@@ -41,6 +42,30 @@ export function DeskLoginForm() {
             <p className="mb-4 rounded-xl border border-line bg-shell p-3 text-sm text-tx-2">
               Your account is set up. Sign in to get going.
             </p>
+          )}
+
+          {/* The linked case needs saying out loud. Their Desk password is the
+              BrandGauge password they already had, which we deliberately did
+              not change, and without this line the obvious guess is whatever
+              they typed on the invitation page. The reset is the product's own
+              on the main host, not a recovery route on this one. */}
+          {linked && (
+            <div className="mb-4 rounded-xl border border-line bg-shell p-3">
+              <p className="text-sm text-tx">You are in. Sign in with your BrandGauge password.</p>
+              <p className="mt-1 text-xs text-tx-2">
+                This address already had a BrandGauge account, so we kept the password you
+                already use rather than changing it.
+                {appUrl && (
+                  <>
+                    {' '}Forgotten it?{' '}
+                    <a href={`${appUrl}/auth/forgot-password`} className="underline">
+                      Reset it on BrandGauge
+                    </a>
+                    , then come back here.
+                  </>
+                )}
+              </p>
+            </div>
           )}
 
           <form action={formAction} className="space-y-4">

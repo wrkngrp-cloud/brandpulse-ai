@@ -1,14 +1,6 @@
 import { inngest } from '@/lib/inngest/client'
 import { createServiceClient } from '@/lib/supabase/server'
-import { Resend } from 'resend'
-
-// Constructed lazily: the Resend SDK throws when the key is absent, and building
-// the app should not require a mail credential.
-let resendClient: Resend | null = null
-function getResend() {
-  resendClient ??= new Resend(process.env.RESEND_API_KEY)
-  return resendClient
-}
+import { sendMail } from '@/lib/email/send'
 
 interface Target {
   id:                   string
@@ -172,7 +164,7 @@ export const campaignTargetMonitor = inngest.createFunction(
                 ?? usersData?.users?.[0]
 
               if (user?.email) {
-                await getResend().emails.send({
+                const mail = await sendMail({
                   from:    'BrandGauge <alerts@brandgauge.app>',
                   to:      user.email,
                   subject: `Campaign alert: ${title}`,
@@ -187,6 +179,9 @@ export const campaignTargetMonitor = inngest.createFunction(
                     'BrandGauge | Campaign Target Monitor',
                   ].join('\n'),
                 })
+                if (!mail.sent) {
+                  logger.warn(`[campaign-target-monitor] alert email not sent for brand ${brandId}: ${mail.reason}`)
+                }
               }
             } catch (emailErr) {
               logger.warn(`[campaign-target-monitor] Email failed for brand ${brandId}: ${String(emailErr)}`)

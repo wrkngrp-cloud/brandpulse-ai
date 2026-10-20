@@ -19,7 +19,7 @@ Stripe code elsewhere in the repo stays untouched and unconfigured.
 | Existing free tool | PR Scoreboard: page `src/app/scoreboard/page.tsx` → `ScoreboardPage`; API `POST /api/scoreboard/scan` and `POST /api/scoreboard/lead` | Preserve route and code |
 | Public press engine | `src/lib/press/nigerian-press.ts` (Google News RSS, no credentials, ten Nigerian outlets, reach/EMV tables) and `src/lib/press/scoreboard.ts` | Reuse for competitor moves |
 | Website reading | `scrapeWebsite()` inside `src/app/api/ai/brand-infer/route.ts` — plain `fetch` + strip tags, no SSRF guard, authenticated route only | Do **not** reuse as-is; new hardened fetcher for public tools |
-| Anonymous lead data | `public_scans`, `leads`, `lead_desk_admins` + `is_lead_desk()` (migration `20260914090000_lead_capture.sql`). The one place RLS scopes to an allowlist instead of a workspace | Reuse pattern exactly |
+| Anonymous lead data | `public_scans`, `leads` (migration `20260914090000_lead_capture.sql`). The one place RLS scopes to an allowlist instead of a workspace. Since 18 October that allowlist is the Desk's: `staff_can('leads.view')` | Reuse pattern exactly |
 | Link tracking | `GET /go/[slug]` resolves `print_placements` then `ooh_sites`, logs a visit, forwards UTMs, 302 | Extend with a third lookup |
 | QR | `qrcode.react` already a dependency | Reuse |
 | AI | `callAi({ tier })` + `extractJson` in `src/lib/ai/client.ts`. Tiers: cultural / structural / chat / boardGrade | Reuse, structural tier |
@@ -76,7 +76,7 @@ Migration `supabase/migrations/20261014090000_free_tools.sql`:
 - `page_audits` / `page_audit_findings` — campaign audit workspace, workspace-scoped.
 
 RLS: workspace tables use `is_workspace_member()`. Anonymous tables are service-role write
-and `is_lead_desk()` read, plus a workspace-member read once claimed.
+and a `staff_can('leads.view')` read, plus a workspace-member read once claimed.
 
 ## 4. Phases and status
 
@@ -104,7 +104,7 @@ and `is_lead_desk()` read, plus a workspace-member read once claimed.
 | Landing-page performance | `PAGESPEED_API_KEY` optional; PageSpeed Insights also answers keyless at low quota | Implemented; without an answer the audit runs its HTML, CTA, local-readiness and tracking checks and states that it makes no claim about speed |
 | Offline tracking links + QR | none | Fully implemented |
 | Rate limiting / caching | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Implemented, fails open |
-| Lead desk visibility | row in `lead_desk_admins` | Existing mechanism |
+| Lead desk visibility | a Desk invite holding `leads.view` | Existing mechanism |
 
 ## 6. Risks
 
@@ -237,7 +237,7 @@ is delivered anywhere it is not.
   applied.
 - **14 Oct 2026 — Phase 6.** Founder funnel views (`free_tool_funnel`,
   `free_tool_qualified_accounts`, both `security_invoker`) and the page at
-  `/dashboard/leads/funnel` behind the lead-desk allowlist; nightly retention job for
+  `/desk/leads/funnel` behind `leads.view`; nightly retention job for
   unclaimed runs; the PR Scoreboard wired into the same event taxonomy and given the shared
   contextual suggestion without touching its route, its API or its markup; wiring regression
   checks; CLAUDE.md updated to match the code; the `notifications` RLS bug above fixed.

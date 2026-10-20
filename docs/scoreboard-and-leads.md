@@ -1,7 +1,7 @@
 # The press scoreboard, and what happens to a lead
 
 A free tool at `/scoreboard` that anyone can run without an account, and the
-desk at `/dashboard/leads` where the addresses it captures are worked.
+desk at `/desk/leads` where the addresses it captures are worked.
 
 ## Why it is shaped this way
 
@@ -33,17 +33,27 @@ still got something true and free, which is the point.
 
 ## Setting it up
 
-**Apply the migration.** `supabase/migrations/20260914090000_lead_capture.sql`
-adds `public_scans` and `leads`. Run `supabase migration
-list` first and confirm it is the only pending item, then `supabase db push`.
+**Apply the migrations.** `20260914090000_lead_capture.sql` adds `public_scans`
+and `leads`. `20261018094000_retire_lead_desk_admins.sql` moves them onto the
+Desk's permissions and drops the old allowlist. Run `supabase migration list`
+first and confirm what is pending, then `supabase db push` (or `npm run
+db:apply` from a cloud session).
 
-**Give the EA access.** Access is a Desk permission (`leads.view`), not a
-workspace role, because a lead belongs to BrandGauge and not to a tenant.
-Invite them to the Desk (`desk.brandgauge.app`) on a role that holds
-`leads.view` — `support`, `bizdev` and `admin` all carry it by default.
+**Give someone access.** Invite them to the Desk at `/desk/staff` on the
+**business development** role, which holds `leads.view`, `leads.edit` and
+`leads.export`. They read the desk at `/desk/leads` and the acquisition funnel
+at `/desk/leads/funnel`.
 
-They will then see `/dashboard/leads`. Anyone without the permission gets
-redirected, and RLS returns them nothing even if they call the API directly.
+Access is still an allowlist rather than a workspace role, because a lead
+belongs to BrandGauge and not to a tenant. It is just the staff allowlist now
+instead of a second one of its own.
+
+**A note on the first version of this.** Until 18 October access ran on a
+`lead_desk_admins` table, and nothing ever inserted a row into it: not a
+migration, not a route, not a seed. So `is_lead_desk()` was false for every
+caller, `/dashboard/leads` redirected everyone to `/dashboard`, and the policies
+on `leads` and `public_scans` were readable by nobody. The lead desk never
+worked. Both pages are gone and the table is dropped.
 
 **Environment.**
 

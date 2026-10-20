@@ -1,15 +1,12 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { Resend } from 'resend'
+import { sendMail, emailConfigured } from '@/lib/email/send'
 import { createServiceClient } from '@/lib/supabase/server'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
 import { z } from 'zod'
 
-export type ReplyState = { error?: string; ok?: boolean } | null
-
-let resend: Resend | null = null
-const getResend = () => (resend ??= new Resend(process.env.RESEND_API_KEY))
+export type ReplyState = { error?: string; ok?: boolean; warning?: string } | null
 
 const replySchema = z.object({
   conversation_id: z.string().uuid(),
@@ -97,14 +94,14 @@ export async function replyToThread(_prev: ReplyState, formData: FormData): Prom
   const activeRecently = conv.last_message_at
     && Date.now() - new Date(conv.last_message_at).getTime() < 10 * 60 * 1000
 
-  if (conv.email && !activeRecently && process.env.RESEND_API_KEY) {
-    try {
-      await getResend().emails.send({
-        from:     'BrandGauge <support@brandgauge.app>',
-        to:       conv.email,
-        subject:  'Re: your message to BrandGauge',
-        replyTo:  'support@brandgauge.app',
-        text:
+  let emailed: boolean | null = null
+  if (conv.email && !activeRecently && emailConfigured()) {
+    const mail = await sendMail({
+      from:     'BrandGauge <support@brandgauge.app>',
+      to:       conv.email,
+      subject:  'Re: your message to BrandGauge',
+      replyTo:  'support@brandgauge.app',
+      text:
 `${conv.name ? `Hi ${conv.name.split(' ')[0]},` : 'Hi,'}
 
 ${body}
@@ -113,14 +110,16 @@ Reply to this email and it goes straight back to the same conversation.
 
 ${session.fullName}
 BrandGauge`,
-      })
-    } catch {
-      // Same rule. The reply is in the thread either way.
-    }
+    })
+    // The reply is in the thread either way, so a refused email does not fail
+    // the action. It is reported back so the person who wrote it knows the
+    // customer may not have seen it in their inbox.
+    emailed = mail.sent
   }
 
   revalidatePath(`/desk/inbox/${conversation_id}`)
   revalidatePath('/desk/inbox')
+  if (emailed === false) return { ok: true, warning: 'Your reply is in the thread, but the email did not go out.' }
   return { ok: true }
 }
 

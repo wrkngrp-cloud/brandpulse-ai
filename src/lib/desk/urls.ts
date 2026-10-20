@@ -19,6 +19,18 @@ export function deskUrl(path = ''): string {
 }
 
 /**
+ * Whether deskUrl can produce a link that works outside the browser.
+ *
+ * With neither NEXT_PUBLIC_DESK_URL nor an app URL set, deskUrl returns a bare
+ * path, which is fine in a page and useless in an email. An invitation that
+ * mails a relative link looks sent and cannot be opened, so the caller checks
+ * first and says what is missing.
+ */
+export function deskUrlIsAbsolute(): boolean {
+  return deskUrl('/').startsWith('http')
+}
+
+/**
  * True when this request landed on the Desk's own host rather than the main
  * one. `src/proxy.ts` decides this the same way, from the same variable; this
  * is the server-component/action side of that same question.

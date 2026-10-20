@@ -14,6 +14,12 @@ export const dynamic = 'force-dynamic'
  *
  * The page shows the address the invitation was sent to and does not let it be
  * edited. An invitation is for a person, not a form someone can retarget.
+ *
+ * It also asks, before rendering, whether that address already has a
+ * BrandGauge account. If it does, accepting links the two and leaves the
+ * existing password alone, so asking for a new one here would take a password
+ * and discard it, and the person would be unable to sign in with the thing
+ * they just typed. The form needs to know which case it is in.
  */
 export default async function InvitePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params
@@ -24,6 +30,12 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     .select('email, full_name, role, expires_at, accepted_at, revoked_at, staff_roles(label)')
     .eq('token_hash', hashInviteToken(token))
     .maybeSingle()
+
+  // Only when the invitation is good: no reason to run an email-to-id lookup
+  // for a link that is already spent.
+  const { data: existingId } = invite
+    ? await service.rpc('auth_user_id_for_email', { p_email: invite.email })
+    : { data: null }
 
   const problem =
     !invite                                      ? 'This invitation link is not valid.'
@@ -49,6 +61,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
             token={token}
             email={invite!.email}
             suggestedName={invite!.full_name ?? ''}
+            hasAccount={Boolean(existingId)}
             roleLabel={
               (invite as unknown as { staff_roles?: { label?: string } }).staff_roles?.label
               ?? invite!.role
