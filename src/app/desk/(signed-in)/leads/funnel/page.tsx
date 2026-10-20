@@ -4,6 +4,7 @@ import { requireStaff } from '@/lib/desk/auth'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { MarketIcon, ArrowRightIcon } from '@/components/brand/icon'
 import { FREE_TOOLS, toolById } from '@/lib/tools/registry'
+import { DeskLink } from '@/components/desk/desk-link'
 
 export const metadata = { title: 'Free tool funnel | The Desk' }
 export const dynamic = 'force-dynamic'
@@ -101,10 +102,10 @@ export default async function FunnelPage() {
         subtitle="Last thirty days. Visitors through to workspaces that actually used something, per tool."
         icon={MarketIcon}
         actions={
-          <Link href="/desk/leads"
+          <DeskLink href="/desk/leads"
             className="flex items-center gap-1.5 rounded-sm border border-line px-3.5 py-2 text-[13px] font-medium text-tx bg-press">
             Lead desk <ArrowRightIcon className="h-3.5 w-3.5" />
-          </Link>
+          </DeskLink>
         }
       />
 

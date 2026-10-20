@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
-import { useRouter, useSelectedLayoutSegment } from 'next/navigation'
+import { useSelectedLayoutSegment } from 'next/navigation'
+import { DeskLink, useDeskRouter } from '@/components/desk/desk-link'
 import { createClient } from '@/lib/supabase/client'
 import { loadInbox } from './actions'
 import type { InboxRow, InboxCounts, InboxView } from '@/lib/desk/data'
@@ -56,7 +56,7 @@ export function InboxShell({
   initialView:   InboxView
   children:      React.ReactNode
 }) {
-  const router = useRouter()
+  const router = useDeskRouter()
   // The [id] segment, so the list can mark the open thread without the parent
   // needing to know the route shape.
   const openId = useSelectedLayoutSegment()
@@ -184,7 +184,7 @@ export function InboxShell({
           <ul ref={listRef} className="min-h-0 flex-1 divide-y divide-line overflow-y-auto">
             {rows.map((row, index) => (
               <li key={row.id}>
-                <Link
+                <DeskLink
                   href={`/desk/inbox/${row.id}`}
                   onClick={() => setCursor(index)}
                   className={cn(
@@ -216,7 +216,7 @@ export function InboxShell({
                       row.assignedTo ? `with ${row.assignedTo}` : null,
                     ].filter(Boolean).join(' · ')}
                   </p>
-                </Link>
+                </DeskLink>
               </li>
             ))}
           </ul>

@@ -1,9 +1,9 @@
-import Link from 'next/link'
 import { requireStaff } from '@/lib/desk/auth'
 import { leadsSummary, TOOL_NAME } from '@/lib/desk/leads'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { TrendIcon } from '@/components/brand/icon'
 import { updateLead, seedDemoLeads, removeDemoLeads } from './actions'
+import { DeskLink } from '@/components/desk/desk-link'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,12 +51,12 @@ export default async function DeskLeadsPage() {
                 </button>
               </form>
             )}
-            <Link
+            <DeskLink
               href="/desk/leads/funnel"
               className="bg-press rounded-md border border-line px-2.5 py-1 text-xs text-tx-2"
             >
               Free tool funnel
-            </Link>
+            </DeskLink>
           </div>
         }
       />

@@ -418,6 +418,14 @@ is the spec. Rules that are easy to break without noticing:
 - **Host routing.** `src/proxy.ts` rewrites `DESK_HOST` onto `/desk`. With `DESK_HOST` set,
   `/desk` on the main host 404s; with it unset, `/desk` answers there so the Desk can be
   previewed on a deployment URL. The Desk host serves nothing but the Desk.
+- **Never write a `/desk/...` link by hand.** The middleware strips the prefix on the Desk
+  host and then 404s anything that still carries it, so a hand-written `/desk/inbox/<id>`
+  works on a preview and returns "Not found" on the live host. Use `<DeskLink>` or
+  `useDeskRouter()` from `src/components/desk/desk-link.tsx` in a client component, and
+  `deskHref()` in a server one; all three take the `/desk/...` path and resolve it for the
+  host in front of them. Six links had this wrong on 20 October, covering every account,
+  every staff member, the leads funnel and every conversation. `npm run desk:check` fails
+  when a raw one comes back.
 - **The Desk has no API routes.** Every mutation is a server action. Do not add
   `src/app/desk/api/**`.
 - **One gate.** `requireStaff(permission?, audit?)` from `src/lib/desk/auth.ts` at the top of
