@@ -1,0 +1,5 @@
+Introducing BrandGauge: see your brand the way the street sees it.
+
+It reads what your customers actually wrote, in Pidgin, Yoruba, Igbo and Hausa, counts the
+billboards and field activations global tools ignore, and hands you one number you can defend
+in a budget meeting.

@@ -45,3 +45,8 @@ next-env.d.ts
 video/node_modules/
 video/out/
 .remotion/
+
+# /brag video output (generated; sources and the render are tracked)
+brag-output/composition/node_modules/
+brag-output/composition/.hyperframes/
+brag-output/composition/assets/audio-data.json
