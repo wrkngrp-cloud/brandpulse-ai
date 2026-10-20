@@ -166,19 +166,23 @@ export function ProductCards() {
      time the rail was fully visible, so the first cards had already gone
      past. That is exactly what it looked like.
 
-     Now progress 0 is the moment the rail is completely in view (its bottom
-     edge reaching the bottom of the screen) and progress 1 is the moment it
-     starts to leave (its top edge reaching the top). Nothing moves before you
-     can see all of it, and the whole run lands while the section is still on
-     screen. */
+     Progress 0 is the moment the rail is completely in view (its bottom edge
+     reaching the bottom of the screen) and progress 1 is read off the
+     sentinel below it rather than the rail's own top edge, which is what
+     gives the run somewhere to happen: that first fix made the window
+     honest, but honest and short are different problems. Tracking the rail's
+     own ~400px box capped the scroll distance at `viewport height - 400px`
+     regardless of screen size, against 1760px of cards - a couple of wheel
+     ticks covered the whole run. The sentinel is near-zero height, so the
+     window opens to nearly a full viewport of scroll instead, and the run
+     still lands before the section scrolls off screen because the section
+     itself is taller than that. */
   const { scrollYProgress } = useScroll({
     target: railBox,
     offset: ['end end', 'start start'],
   })
-  /* The window is the rail's height against the viewport's, so on a short
-     screen it is short: 505px of scroll at 1440x900, but only 325px at
-     1280x720, against 1760px of cards. Written straight from raw progress
-     that makes one trackpad flick teleport the rail. The spring gives it the
+  /* Written straight from raw progress, one trackpad flick would still
+     teleport the rail even with the longer window. The spring gives it the
      system's own settle instead, so a fast scroll arrives rather than jumps.
      It never overshoots, which is the needle's rule as much as the rail's. */
   const drive = useSpring(scrollYProgress, { stiffness: 110, damping: 26, restDelta: 0.0005 })
@@ -249,7 +253,7 @@ export function ProductCards() {
 
       {/* The rail bleeds off the right edge so it reads as a run that continues,
           rather than a row that happens to end where the container does. */}
-      <div ref={railBox} className="mt-12">
+      <div className="mt-12">
       <div
         ref={rail}
         onScroll={onScroll}
@@ -278,6 +282,18 @@ export function ProductCards() {
         ))}
       </div>
       </div>
+
+      {/* A sentinel, not a wrapper: `useScroll` below reads this element's own
+          box, and that box used to BE the rail, which is what made the window
+          too short. The scroll distance for the whole pan to run is
+          `viewportHeight - <tracked height>`, so measuring the ~400px-tall
+          rail itself capped the run at roughly a half-viewport of scrolling,
+          against 1760px of cards to get through. A few lines of wheel input
+          covered it. This sentinel sits where the rail ends and has almost no
+          height of its own, so the window opens to nearly a full viewport of
+          scroll instead - the pan still starts the instant the rail is fully
+          in view, exactly as before, it just has room to breathe afterward. */}
+      <div ref={railBox} aria-hidden className="h-px" />
 
       {/* Where you are in the run, and the two ways to move through it that do
           not need a trackpad. */}
