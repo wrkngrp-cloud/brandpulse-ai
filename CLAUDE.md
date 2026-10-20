@@ -420,6 +420,13 @@ is the spec. Rules that are easy to break without noticing:
   `data.revenue_figures`, `data.customer_content`, `data.audit_all`) before returning rows.
   Never redact in a component, and never reach for the service client from a Desk page or
   action.
+- **Email.** Every email in the product goes out through `sendMail` in
+  `src/lib/email/send.ts`, and callers act on what it returns. Never call
+  `resend.emails.send()` directly: the SDK resolves with `{ data: null, error }` when the
+  API refuses a message, so a try/catch around it catches nothing and the code reports a
+  send that never happened. That bug shipped at eleven call sites and is why staff
+  invitations said "sent" while Resend was rejecting the sending domain. A Desk screen
+  shows the reason; a background job logs it and does not count the send.
 - **Permissions.** `staff_can(key)` in SQL, `session.can(key)` in app code, both resolving
   deny override → grant override → role template, with `super_admin` holding everything.
   Add a key to `src/lib/desk/permissions.ts` AND to the `super_admin` seed, then run

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { Resend } from 'resend'
+import { sendMail, emailConfigured } from '@/lib/email/send'
 import { createServiceClient } from '@/lib/supabase/server'
 import { deskUrl } from '@/lib/desk/urls'
 import { captureLead } from '@/lib/tools/leads'
@@ -30,9 +30,6 @@ const Body = z.object({
   role:        z.enum(LEAD_ROLES).optional(),
   wantsWeekly: z.boolean().default(false),
 })
-
-let resend: Resend | null = null
-const getResend = () => (resend ??= new Resend(process.env.RESEND_API_KEY))
 
 export async function POST(req: NextRequest) {
   const parsed = Body.safeParse(await req.json().catch(() => null))
@@ -86,7 +83,7 @@ export async function POST(req: NextRequest) {
   // Tell the desk while it is warm. A lead followed up the same day is a
   // different lead from one found in a table next week.
   const alertTo = process.env.LEAD_ALERT_EMAIL
-  if (alertTo && process.env.RESEND_API_KEY) {
+  if (alertTo && emailConfigured()) {
     try {
       const { data: scan } = scanId
         ? await svc.from('public_scans')
@@ -95,7 +92,7 @@ export async function POST(req: NextRequest) {
         : { data: null }
 
       const rivals = Array.isArray(scan?.competitors) ? (scan!.competitors as string[]).join(', ') : '—'
-      await getResend().emails.send({
+      await sendMail({
         from:    'BrandGauge <leads@brandgauge.app>',
         to:      alertTo.split(',').map(s => s.trim()),
         subject: `New scoreboard lead: ${company || name || email}`,

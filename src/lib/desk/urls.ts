@@ -14,3 +14,15 @@ export function deskUrl(path = ''): string {
   const app = (process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || '').replace(/\/$/, '')
   return `${app}/desk${suffix}`
 }
+
+/**
+ * Whether deskUrl can produce a link that works outside the browser.
+ *
+ * With neither NEXT_PUBLIC_DESK_URL nor an app URL set, deskUrl returns a bare
+ * path, which is fine in a page and useless in an email. An invitation that
+ * mails a relative link looks sent and cannot be opened, so the caller checks
+ * first and says what is missing.
+ */
+export function deskUrlIsAbsolute(): boolean {
+  return deskUrl('/').startsWith('http')
+}

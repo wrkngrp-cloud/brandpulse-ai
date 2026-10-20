@@ -1,15 +1,8 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
-import { Resend } from 'resend'
+import { sendMail } from '@/lib/email/send'
 import { TOKENS } from '@/lib/brand-tokens'
 
-// Constructed lazily: the Resend SDK throws when the key is absent, and building
-// the app should not require a mail credential.
-let resendClient: Resend | null = null
-function getResend() {
-  resendClient ??= new Resend(process.env.RESEND_API_KEY)
-  return resendClient
-}
 const APP_URL = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
 
 // ── Daily cron: find panels due and fire dispatch events ─────────────────────
@@ -86,7 +79,7 @@ export const panelDispatch = inngest.createFunction(
           batches.push(panel.recipient_emails.slice(i, i + 50))
         }
         for (const batch of batches) {
-          await getResend().emails.send({
+          const mail = await sendMail({
             from:    `${brandName} <surveys@brandgauge.app>`,
             to:      batch,
             subject: `${brandName} — ${panel.name} (${new Date().toLocaleDateString('en-NG', { month: 'long', timeZone: 'Africa/Lagos' })})`,
@@ -96,6 +89,10 @@ export const panelDispatch = inngest.createFunction(
               <p style="font-size:13px;color:${TOKENS.tx3};margin-top:32px;border-top:1px solid ${TOKENS.shell};padding-top:16px;">Powered by BrandGauge</p>
             </div>`,
           })
+          // Throwing fails the step, which is what we want: Inngest retries it,
+          // and a panel that never went out shows as a failed run instead of a
+          // successful one.
+          if (!mail.sent) throw new Error(`panel invitations not sent: ${mail.reason}`)
         }
       })
     }

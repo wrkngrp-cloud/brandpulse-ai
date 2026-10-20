@@ -42,6 +42,7 @@ export function ReplyBox({ conversationId }: { conversationId: string }) {
       </div>
 
       {state?.error && <p className="text-xs text-neg" role="alert">{state.error}</p>}
+      {state?.warning && <p className="text-xs text-tx-2" role="status">{state.warning}</p>}
     </form>
   )
 }

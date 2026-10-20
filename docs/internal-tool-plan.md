@@ -32,7 +32,7 @@ behind them does not exist.
 |---|---|---|
 | Allowlist access pattern | `lead_desk_admins`, `is_lead_desk()`, `/dashboard/leads` | The shape the staff table copied. Both were dropped on 18 October once the Desk took the lead desk over: nothing had ever inserted a row, so the old desk never worked. |
 | Leads with context | `leads`, `public_scans` | The prospect side of the inbox. Scan, rivals, share of reach, status. |
-| Transactional email | Resend, in six Inngest jobs | Outbound mail and email fallback for chat. |
+| Transactional email | Resend, through `sendMail` in `src/lib/email/send.ts` | Outbound mail and email fallback for chat. Every send in the product goes through it, because the SDK reports refusals in its return value rather than throwing. |
 | In-app messaging | `notifications` table plus the bell | Staff can put a message inside a customer's product with one insert. |
 | Realtime | Supabase Realtime, used in `src/components/events/live-dashboard.tsx` | Live chat transport for signed-in users. |
 | Industry logic | `brand_type` on `brands`, `industry-config.ts`, `BRAND_TYPE_WEIGHTS` in `bhi.ts` | Makes "what should they be using" a calculation. |
@@ -324,6 +324,20 @@ is not a sales job.
 **Invite.** Super admin enters email, full name, role. We create a `staff_invites` row
 with a hashed single-use token and a 72-hour expiry, and send the link with Resend from our
 own template, so the copy follows the Voice rule like any other message we send.
+
+The send goes through `sendMail` in `src/lib/email/send.ts`, and the screen reports what
+actually happened. This matters because the Resend SDK does not throw when the API refuses
+a message: `emails.send()` resolves with `{ data: null, error }`, so a try/catch around it
+catches nothing and the invitation reports itself as sent. Every pending invitation
+therefore carries two more buttons. **Send again** mints a fresh token and mails it.
+**Get link** mints one and shows it, for handing over another way. Both replace whatever
+link went out before, so an invitation has exactly one live link at a time, and taking one
+is audited (`staff.invite_resent`, `staff.invite_link_shown`).
+
+Two environment variables have to be right or no invitation can arrive: `RESEND_API_KEY`,
+and `NEXT_PUBLIC_DESK_URL` so the link in the email is absolute. The sending domain also
+has to be verified in Resend, or it answers `invalid_from_address` and nothing goes out.
+`deliverInvite` refuses to mail a relative link rather than sending a dead one.
 
 **Accept.** The link opens `/desk/invite/[token]`. The page shows the address it was sent
 to, and asks for a password, job title and timezone. The accept route, on the service
