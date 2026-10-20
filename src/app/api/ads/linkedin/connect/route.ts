@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { Redis } from '@upstash/redis'
 import { randomBytes } from 'crypto'
 
@@ -23,11 +24,15 @@ export async function GET() {
     return NextResponse.redirect(`${APP_URL}/login`)
   }
 
+  // Capture active brand so the callback doesn't need to guess for multi-brand workspaces
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return NextResponse.redirect(`${APP_URL}/onboarding`)
+
   const state = randomBytes(16).toString('hex')
 
   await redis.set(
     `adsoauth:${state}`,
-    { userId: user.id, platform: 'linkedin' },
+    { userId: user.id, platform: 'linkedin', brandId },
     { ex: 600 }
   )
 

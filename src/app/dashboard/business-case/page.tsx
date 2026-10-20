@@ -94,9 +94,14 @@ export default async function BusinessCasePage() {
   const totalSpend       = totalBudget
   const activeCampaigns  = (campaigns ?? []).filter(c => c.status === 'active').length
 
+  // NPS is promoters minus detractors as a share of all responses, never a
+  // mean of the raw 0-10 scores — averaging those scores is a different,
+  // much milder-looking number that is not the Net Promoter Score.
   const npsScores        = (npsData ?? []).map(r => r.score ?? 0)
+  const npsPromoters     = npsScores.filter(s => s >= 9).length
+  const npsDetractors    = npsScores.filter(s => s <= 6).length
   const avgNps           = npsScores.length > 0
-    ? npsScores.reduce((a, b) => a + b, 0) / npsScores.length
+    ? ((npsPromoters - npsDetractors) / npsScores.length) * 100
     : null
 
   const avgSentiment     = sentimentTrend && sentimentTrend.length > 0

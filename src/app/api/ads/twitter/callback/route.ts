@@ -77,29 +77,14 @@ export async function GET(request: NextRequest) {
   }
   await redis.del(`twitter_oauth_token:${oauthToken}`)
 
-  const session = await redis.get<{ userId: string; platform: string }>(`adsoauth:${stateToken}`)
+  const session = await redis.get<{ userId: string; platform: string; brandId: string }>(`adsoauth:${stateToken}`)
   if (!session || session.platform !== 'twitter') {
     return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=invalid_state`)
   }
   await redis.del(`adsoauth:${stateToken}`)
 
+  const { brandId } = session
   const supabase = await createServiceClient()
-
-  const { data: member } = await supabase
-    .from('workspace_members')
-    .select('workspace_id')
-    .eq('user_id', session.userId)
-    .single()
-
-  if (!member) return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=no_workspace`)
-
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .eq('workspace_id', member.workspace_id)
-    .single()
-
-  if (!brand) return NextResponse.redirect(`${APP_URL}/dashboard/digital?error=no_brand`)
 
   try {
     // Step 3: Exchange oauth_token + oauth_verifier for access token
@@ -162,7 +147,7 @@ export async function GET(request: NextRequest) {
       .from('digital_ad_accounts')
       .upsert(
         {
-          brand_id:      brand.id,
+          brand_id:      brandId,
           platform:      'twitter',
           account_id:    firstAccountId ?? tokenData.user_id ?? 'twitter-ads',
           account_name:  accountName,

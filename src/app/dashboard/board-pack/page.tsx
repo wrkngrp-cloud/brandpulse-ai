@@ -97,9 +97,15 @@ export default async function BoardPackPage() {
   const totalBudget     = allCampaigns.reduce((s, c) => s + (c.total_budget ?? 0), 0)
   const topCampaign     = activeCampaigns[0]?.name ?? allCampaigns[0]?.name ?? null
 
-  const npsScores = (npsRows ?? []).map(r => r.score ?? 0)
-  const avgNps    = npsScores.length > 0
-    ? Math.round(npsScores.reduce((a, b) => a + b, 0) / npsScores.length)
+  // NPS is promoters minus detractors as a share of all responses, never a
+  // mean of the raw 0-10 scores — averaging those scores is a different,
+  // much milder-looking number that is not the Net Promoter Score.
+  const npsScores   = (npsRows ?? []).map(r => r.score ?? 0)
+  const npsTotal    = npsScores.length
+  const npsPromoters  = npsScores.filter(s => s >= 9).length
+  const npsDetractors = npsScores.filter(s => s <= 6).length
+  const avgNps = npsTotal > 0
+    ? Math.round(((npsPromoters - npsDetractors) / npsTotal) * 100)
     : null
 
   return (
