@@ -339,6 +339,20 @@ and `NEXT_PUBLIC_DESK_URL` so the link in the email is absolute. The sending dom
 has to be verified in Resend, or it answers `invalid_from_address` and nothing goes out.
 `deliverInvite` refuses to mail a relative link rather than sending a dead one.
 
+**Accept, when the address is new to us.** The form asks for a password and the
+account is created with it, `email_confirm: true`, and the person is signed straight in.
+
+**Accept, when the address already has a BrandGauge account.** The two are linked and the
+existing password is left exactly as it is, because somebody may be both a customer and
+staff and taking over their password reaches into their other account. The invite page asks
+`auth_user_id_for_email` before it renders, so this form shows no password field at all and
+says which password to use; it used to ask for one either way and then discard it, which
+left the person unable to sign in with the thing they had just typed and nothing saying why.
+If that existing account was never email-confirmed, accepting confirms it, since an
+unconfirmed address cannot sign in at all and the invitation would otherwise grant access
+nobody could reach. The login page carries the same note on `?linked=1`, with a link to the
+product's own reset on the main host. The Desk still has no reset of its own, by decision.
+
 **Accept.** The link opens `/desk/invite/[token]`. The page shows the address it was sent
 to, and asks for a password, job title and timezone. The accept route, on the service
 client, checks the hash, the expiry and that it has not been used, then creates the auth
