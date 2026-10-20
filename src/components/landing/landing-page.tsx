@@ -384,6 +384,12 @@ const DIFFS = [
  * will hand over four brand names. So the cheapest possible commitment goes
  * here, between the argument and the ask, and it is a real thing rather than a
  * teaser: the whole board, priced, no account.
+ *
+ * The scoreboard stays the one featured here even now that five more tools
+ * exist: naming four brands is a cheaper ask than handing over a website, so
+ * it is still the right front door for a stranger. The line under the button
+ * is what stops this card reading as the only free tool BrandGauge has,
+ * which is what it said when there was only the one.
  */
 function FreeTool() {
   return (
@@ -403,11 +409,15 @@ function FreeTool() {
             outlet, and tell you your share of the earned reach in your category and what it would
             have cost to buy. Nothing to connect. Nothing of yours goes anywhere.
           </Tick>
-          <Tick className="mt-8">
+          <Tick className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
             <Link href="/scoreboard"
               className="inline-flex items-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-bold text-on-hot bg-press"
               style={{ background: 'var(--flare)' }}>
               Run the scoreboard <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/tools" className="inline-flex items-center gap-1.5 text-[14px] font-medium"
+              style={{ color: 'var(--tx-flare)' }}>
+              See all six free tools <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </Tick>
         </div>
