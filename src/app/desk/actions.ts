@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { getStaffSession, writeAudit, requestIpHash } from '@/lib/desk/auth'
+import { getStaffSession, writeAudit, requestIpHash, markPresent } from '@/lib/desk/auth'
 import { deskHref } from '@/lib/desk/urls'
 import { hashInviteToken, tokenHashMatches } from '@/lib/desk/invites'
 import { z } from 'zod'
@@ -79,10 +79,18 @@ export async function deskSignOut(): Promise<void> {
 
 // ── Invitations ──────────────────────────────────────────────────────────────
 
+/**
+ * The password is optional here, and the form decides whether to ask.
+ *
+ * An address that already has a BrandGauge account keeps its own password, so
+ * that form renders no password field and this schema must accept its absence.
+ * The required-ness is checked below, against which case we are actually in,
+ * rather than by the shape of the request.
+ */
 const acceptSchema = z.object({
   token:     z.string().min(10),
   full_name: z.string().min(2, 'Enter your full name'),
-  password:  z.string().min(12, 'Use at least 12 characters'),
+  password:  z.string().min(12, 'Use at least 12 characters').optional(),
   job_title: z.string().max(80).optional(),
   timezone:  z.string().max(64).optional(),
 })
@@ -104,7 +112,7 @@ export async function acceptInvite(_prev: DeskAuthState, formData: FormData): Pr
   const parsed = acceptSchema.safeParse({
     token:     formData.get('token'),
     full_name: formData.get('full_name'),
-    password:  formData.get('password'),
+    password:  formData.get('password') || undefined,
     job_title: formData.get('job_title') || undefined,
     timezone:  formData.get('timezone') || undefined,
   })
@@ -133,6 +141,10 @@ export async function acceptInvite(_prev: DeskAuthState, formData: FormData): Pr
   let createdAccount = false
 
   if (!userId) {
+    // No account yet, so a password is the one thing we cannot do without.
+    if (!password) {
+      return { fieldErrors: { password: ['Choose a password of at least 12 characters'] } }
+    }
     const { data: created, error: createError } = await service.auth.admin.createUser({
       email:         invite.email,
       password,
@@ -140,10 +152,23 @@ export async function acceptInvite(_prev: DeskAuthState, formData: FormData): Pr
       user_metadata: { full_name },
     })
     if (createError || !created.user) {
-      return { error: 'Could not set up this account. Ask for a fresh invitation.' }
+      // Say which refusal it was. "Ask for a fresh invitation" is wrong advice
+      // for a password the project's own rules rejected, and a fresh link will
+      // fail the same way.
+      return { error: `Could not set up this account: ${createError?.message ?? 'the account was not created'}.` }
     }
     userId = created.user.id
     createdAccount = true
+  } else {
+    // Linking an account that already exists. If that address was never
+    // confirmed (signed up for the product and never clicked the email), its
+    // password cannot be used to sign in at all, so linking it would hand
+    // somebody Desk access they can never reach. A super admin deciding they
+    // are staff settles the address, so confirm it here.
+    const { data: existing } = await service.auth.admin.getUserById(userId)
+    if (existing?.user && !existing.user.email_confirmed_at) {
+      await service.auth.admin.updateUserById(userId, { email_confirm: true })
+    }
   }
 
   const { error: staffError } = await service.from('staff').insert({
@@ -179,14 +204,40 @@ export async function acceptInvite(_prev: DeskAuthState, formData: FormData): Pr
 
   // A brand new account can be signed straight in, because the password in
   // front of us is the one just set. A linked account cannot: we never knew
-  // their password and are not about to ask for it here.
-  if (createdAccount) {
+  // their password and are not about to ask for it here, so it goes to the
+  // login page with a note saying which password to use.
+  if (createdAccount && password) {
     const supabase = await createClient()
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: invite.email, password,
     })
-    if (!signInError) redirect(await deskHref('/desk'))
+    if (signInError) {
+      // The account and the staff row both exist at this point, so this is not
+      // a failure to set up. It is a failure to sign in with a password that
+      // was just accepted, which should not happen and must not be swallowed:
+      // the person would be sent to a login screen their password does not open.
+      return { error: `Your account is set up, but signing in failed: ${signInError.message}. Try the login page.` }
+    }
+    redirect(await deskHref('/desk'))
   }
 
-  redirect(await deskHref('/desk/login?accepted=1'))
+  redirect(await deskHref('/desk/login?linked=1'))
+}
+
+/**
+ * "I am still here."
+ *
+ * The Desk shell calls this on a timer. Without it, presence only moves when
+ * somebody navigates, and the one screen where staff sit still for minutes at
+ * a time is the one where being seen as present matters most: reading a thread
+ * and waiting for the customer to type makes no requests at all, so the widget
+ * would decide nobody was around and start asking for an email address in the
+ * middle of a live conversation.
+ *
+ * markPresent goes through the same throttle every page uses, so a tab left
+ * open overnight is one row update every two minutes and nothing else. A
+ * signed-out or suspended tab writes nothing.
+ */
+export async function touchPresence(): Promise<void> {
+  await markPresent()
 }

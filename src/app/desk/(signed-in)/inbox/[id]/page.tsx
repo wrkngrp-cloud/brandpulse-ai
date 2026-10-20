@@ -1,13 +1,11 @@
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireStaff } from '@/lib/desk/auth'
-import { deskHref } from '@/lib/desk/urls'
 import { deskThread } from '@/lib/desk/data'
 import { createServiceClient } from '@/lib/supabase/server'
-import { PageHeader } from '@/components/dashboard/page-header'
-import { ArrowLeftIcon, MessageQuoteIcon, FileIcon } from '@/components/brand/icon'
+import { FileIcon } from '@/components/brand/icon'
 import { setThreadStatus, assignThread } from '../actions'
 import { ReplyBox } from './reply-box'
+import { ThreadLive } from './thread-live'
 import { cn } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
@@ -19,6 +17,10 @@ export const dynamic = 'force-dynamic'
  * than buying it. A hosted widget can show the message; it cannot show that
  * this brand's health index is 41, that they are on growth, and that they have
  * made two AI calls in a month. Most questions answer themselves from that.
+ *
+ * This renders inside the inbox layout, so the queue is already on screen and
+ * there is no back link or page title here: the conversation is the middle
+ * pane, not a page of its own.
  */
 export default async function ThreadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -37,54 +39,61 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="space-y-6">
-      <Link href={await deskHref('/desk/inbox')} className="bg-press inline-flex items-center gap-1.5 text-xs text-tx-3">
-        <ArrowLeftIcon className="size-3.5" /> Inbox
-      </Link>
+      <ThreadLive conversationId={thread.id} />
 
-      <PageHeader
-        eyebrow={thread.account?.workspaceName ?? 'No account yet'}
-        title={thread.name ?? thread.email ?? 'Someone on the site'}
-        subtitle={[thread.email, thread.pageUrl].filter(Boolean).join(' · ')}
-        icon={MessageQuoteIcon}
-        actions={
-          <div className="flex flex-wrap items-center gap-2">
-            {session.can('support.assign') && (
-              <form action={assignThread} className="flex items-center gap-1.5">
-                <input type="hidden" name="conversation_id" value={thread.id} />
-                <select
-                  name="assigned_to" defaultValue=""
-                  className="h-8 rounded-md border border-line bg-paper px-2 text-xs"
-                >
-                  <option value="">Unassigned</option>
-                  {(team ?? []).map(person => (
-                    <option key={person.user_id} value={person.user_id}>{person.full_name}</option>
-                  ))}
-                </select>
-                <button type="submit" className="bg-press rounded-md border border-line px-2 py-1 text-xs">
-                  Assign
-                </button>
-              </form>
-            )}
-            {session.can('support.close') && (
-              <form action={setThreadStatus} className="flex items-center gap-1.5">
-                <input type="hidden" name="conversation_id" value={thread.id} />
-                <select
-                  name="status" defaultValue={thread.status}
-                  className="h-8 rounded-md border border-line bg-paper px-2 text-xs"
-                >
-                  <option value="open">Open</option>
-                  <option value="pending">Pending</option>
-                  <option value="snoozed">Snoozed</option>
-                  <option value="closed">Closed</option>
-                </select>
-                <button type="submit" className="bg-press rounded-md border border-line px-2 py-1 text-xs">
-                  Save
-                </button>
-              </form>
-            )}
-          </div>
-        }
-      />
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line pb-3">
+        <div className="min-w-0">
+          <p className="bg-label text-[0.7rem] text-tx-3">
+            {thread.account?.workspaceName ?? 'No account yet'}
+          </p>
+          <h1 className="truncate text-base font-bold">
+            {thread.name ?? thread.email ?? 'Someone on the site'}
+          </h1>
+          <p className="truncate text-xs text-tx-3">
+            {[thread.email, thread.pageUrl].filter(Boolean).join(' · ')}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {session.can('support.assign') && (
+            <form action={assignThread} className="flex items-center gap-1.5">
+              <input type="hidden" name="conversation_id" value={thread.id} />
+              {/* The current assignee, not a blank. Defaulting to empty meant
+                  pressing Assign without touching the control quietly
+                  unassigned the thread. */}
+              <select
+                name="assigned_to" defaultValue={thread.assignedToId ?? ''}
+                className="h-8 rounded-md border border-line bg-paper px-2 text-xs"
+              >
+                <option value="">Unassigned</option>
+                {(team ?? []).map(person => (
+                  <option key={person.user_id} value={person.user_id}>{person.full_name}</option>
+                ))}
+              </select>
+              <button type="submit" className="bg-press rounded-md border border-line px-2 py-1 text-xs">
+                Assign
+              </button>
+            </form>
+          )}
+          {session.can('support.close') && (
+            <form action={setThreadStatus} className="flex items-center gap-1.5">
+              <input type="hidden" name="conversation_id" value={thread.id} />
+              <select
+                name="status" defaultValue={thread.status}
+                className="h-8 rounded-md border border-line bg-paper px-2 text-xs"
+              >
+                <option value="open">Open</option>
+                <option value="pending">Pending</option>
+                <option value="snoozed">Snoozed</option>
+                <option value="closed">Closed</option>
+              </select>
+              <button type="submit" className="bg-press rounded-md border border-line px-2 py-1 text-xs">
+                Save
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_18rem]">
         <div className="space-y-4">
@@ -176,6 +185,17 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
               day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
             })} />
             <Fact label="Came from" value={thread.source} />
+            {/* Captured by the trigger on the first staff reply since the table
+                was written, and shown nowhere until now. It is the one number
+                that says whether support is working. */}
+            <Fact
+              label="First reply"
+              value={thread.firstResponseMins === null
+                ? 'Not yet'
+                : thread.firstResponseMins < 60
+                  ? `${thread.firstResponseMins} min`
+                  : `${Math.round(thread.firstResponseMins / 60)} h`}
+            />
             <Fact label="Page" value={thread.pageUrl ?? 'Not recorded'} />
             <Fact label="Assigned" value={thread.assignedTo ?? 'Nobody'} />
           </dl>

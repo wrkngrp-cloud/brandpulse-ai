@@ -10,7 +10,9 @@ export const runtime = 'nodejs'
  * POST rather than GET because it may mint the visitor cookie, and because the
  * widget polls it for strangers, who have no Realtime identity to subscribe
  * with. A signed-in customer gets the first load from here and then live
- * updates over Realtime, which RLS scopes to their own thread.
+ * updates over Realtime, which RLS scopes to their own thread. The tables are
+ * on the publication as of 20261020090000; before that this paragraph
+ * described an intention and every reader polled.
  *
  * Nothing in the body identifies the caller. The thread is resolved from the
  * session or from the httpOnly cookie, both of which a caller cannot forge.

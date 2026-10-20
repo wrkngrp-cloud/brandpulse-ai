@@ -1,18 +1,15 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { Resend } from 'resend'
 import { createServiceClient } from '@/lib/supabase/server'
+import { sendMail } from '@/lib/email/send'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
 import { newInviteToken, inviteExpiry, INVITE_TTL_HOURS } from '@/lib/desk/invites'
-import { deskUrl } from '@/lib/desk/urls'
+import { deskUrl, deskUrlIsAbsolute } from '@/lib/desk/urls'
 import { ALL_PERMISSIONS } from '@/lib/desk/permissions'
 import { z } from 'zod'
 
 export type StaffActionState = { error?: string; ok?: string } | null
-
-let resend: Resend | null = null
-const getResend = () => (resend ??= new Resend(process.env.RESEND_API_KEY))
 
 const inviteSchema = z.object({
   email:     z.string().email('Enter a valid email address'),
@@ -23,10 +20,10 @@ const inviteSchema = z.object({
 /**
  * Inviting someone to the Desk.
  *
- * Writes the invitation, then sends the link. If the email fails to send the
- * invitation still exists and the page shows it as pending with a resend
- * button, which is better than losing the row and leaving the inviter unsure
- * whether anything happened.
+ * Writes the invitation, then sends the link. If the email is refused the
+ * invitation still stands and the page shows it as pending with a button to
+ * send again and a button to copy the link, which is better than losing the
+ * row and leaving the inviter unsure whether anything happened.
  */
 export async function inviteStaff(_prev: StaffActionState, formData: FormData): Promise<StaffActionState> {
   const session = await requireStaffOrNull('staff.invite')
@@ -73,38 +70,148 @@ export async function inviteStaff(_prev: StaffActionState, formData: FormData): 
   })
 
   const link = deskUrl(`/invite/${token}`)
+  const result = await deliverInvite({ email, fullName: full_name, invitedBy: session.fullName, link })
 
-  if (!process.env.RESEND_API_KEY) {
-    revalidatePath('/desk/staff')
-    return { ok: `Invitation created. No email key is set, so send this link yourself: ${link}` }
+  revalidatePath('/desk/staff')
+  if (result.sent) return { ok: `Invitation sent to ${email}.` }
+  return { ok: `Invitation created, but the email did not go out: ${result.reason}. Copy the link below and send it yourself.` }
+}
+
+/**
+ * The invitation email itself, shared by inviting and re-sending.
+ *
+ * Separate because the link has to reach the person one way or another: when
+ * the send is refused the caller still has the invitation and shows the link on
+ * the page, so a missing key or an unverified domain slows the day down instead
+ * of stopping it.
+ */
+async function deliverInvite(
+  { email, fullName, invitedBy, link }: { email: string; fullName: string; invitedBy: string; link: string },
+) {
+  if (!deskUrlIsAbsolute()) {
+    return {
+      sent: false as const,
+      configured: false,
+      reason: 'NEXT_PUBLIC_DESK_URL is not set on this deployment, so the link in the email would not open',
+    }
   }
 
-  try {
-    await getResend().emails.send({
-      from:    'BrandGauge <desk@brandgauge.app>',
-      to:      email,
-      subject: 'Your BrandGauge Desk access',
-      text:
-`Hi ${full_name.split(' ')[0]},
+  return sendMail({
+    from:    'BrandGauge <desk@brandgauge.app>',
+    to:      email,
+    subject: 'Your BrandGauge Desk access',
+    text:
+`Hi ${fullName.split(' ')[0]},
 
-${session.fullName} has given you access to the BrandGauge Desk, the tool we use to see how our customers are doing and to answer them.
+${invitedBy} has given you access to the BrandGauge Desk, the tool we use to see how our customers are doing and to answer them.
 
 Set your password and you are in:
 ${link}
 
-The link works once and expires in ${INVITE_TTL_HOURS} hours. If it runs out, ask ${session.fullName} for a new one.
+The link works once and expires in ${INVITE_TTL_HOURS} hours. If it runs out, ask ${invitedBy} for a new one.
 
 See you in there.
 BrandGauge`,
-    })
-  } catch {
-    revalidatePath('/desk/staff')
-    return { ok: `Invitation created, but the email did not send. Send this link yourself: ${link}` }
-  }
+  })
+}
+
+/**
+ * Re-sending an invitation.
+ *
+ * It mints a fresh token rather than mailing the old one, because the old hash
+ * is all we hold and the link in the first email may already be in a spam
+ * folder somewhere. The clock restarts with it.
+ */
+export async function resendInvite(_prev: StaffActionState, formData: FormData): Promise<StaffActionState> {
+  const session = await requireStaffOrNull('staff.invite')
+  if (!session) return { error: 'You do not have permission to invite people.' }
+
+  const id = String(formData.get('invite_id') ?? '')
+  if (!id) return { error: 'No invitation to send.' }
+
+  const service = await createServiceClient()
+  const { data: invite } = await service
+    .from('staff_invites')
+    .select('id, email, full_name')
+    .eq('id', id)
+    .is('accepted_at', null)
+    .is('revoked_at', null)
+    .maybeSingle()
+  if (!invite) return { error: 'That invitation has already been used or withdrawn.' }
+
+  const { token, hash } = newInviteToken()
+  const { error: updateError } = await service
+    .from('staff_invites')
+    .update({ token_hash: hash, expires_at: inviteExpiry() })
+    .eq('id', id)
+  if (updateError) return { error: 'Could not refresh the invitation.' }
+
+  const link = deskUrl(`/invite/${token}`)
+  const result = await deliverInvite({
+    email: invite.email,
+    fullName: invite.full_name ?? invite.email,
+    invitedBy: session.fullName,
+    link,
+  })
+
+  await writeAudit({
+    actorId: session.userId,
+    action:  'staff.invite_resent',
+    targetType: 'staff_invite',
+    targetId:   invite.email,
+    summary: `Sent ${invite.email} a fresh invitation link`,
+    meta: { delivered: result.sent },
+  })
 
   revalidatePath('/desk/staff')
-  return { ok: `Invitation sent to ${email}.` }
+  if (result.sent) return { ok: `A fresh link is on its way to ${invite.email}.` }
+  return { ok: `New link ready, but the email did not go out: ${result.reason}. Copy it below and send it yourself.` }
 }
+
+/**
+ * The link for an invitation that has to be handed over by another route.
+ *
+ * The stored hash cannot be reversed, so showing a link means minting a new
+ * token, which invalidates whatever went out before. That is the honest trade:
+ * one live link per invitation, and the person holding the Desk decides how it
+ * travels.
+ */
+export async function inviteLink(_prev: StaffActionState, formData: FormData): Promise<StaffActionState> {
+  const session = await requireStaffOrNull('staff.invite')
+  if (!session) return { error: 'You do not have permission to invite people.' }
+
+  const id = String(formData.get('invite_id') ?? '')
+  if (!id) return { error: 'No invitation to link.' }
+
+  const service = await createServiceClient()
+  const { data: invite } = await service
+    .from('staff_invites')
+    .select('id, email')
+    .eq('id', id)
+    .is('accepted_at', null)
+    .is('revoked_at', null)
+    .maybeSingle()
+  if (!invite) return { error: 'That invitation has already been used or withdrawn.' }
+
+  const { token, hash } = newInviteToken()
+  const { error: updateError } = await service
+    .from('staff_invites')
+    .update({ token_hash: hash, expires_at: inviteExpiry() })
+    .eq('id', id)
+  if (updateError) return { error: 'Could not refresh the invitation.' }
+
+  await writeAudit({
+    actorId: session.userId,
+    action:  'staff.invite_link_shown',
+    targetType: 'staff_invite',
+    targetId:   invite.email,
+    summary: `Took a fresh invitation link for ${invite.email} to send by hand`,
+  })
+
+  revalidatePath('/desk/staff')
+  return { ok: deskUrl(`/invite/${token}`) }
+}
+
 
 export async function revokeInvite(formData: FormData): Promise<void> {
   const session = await requireStaffOrNull('staff.invite')

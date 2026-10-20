@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { randomBytes, createHash } from 'node:crypto'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 
 /**
  * The support chat, server side.
@@ -163,8 +164,14 @@ export async function getOrCreateThread(opts: {
     if (user) {
       email = user.email ?? null
       name  = (user.user_metadata?.full_name as string | undefined) ?? null
-      const { data: brand } = await supabase
-        .from('brands').select('id, workspace_id').limit(1).maybeSingle()
+      // The brand they are actually looking at, not whichever row came back
+      // first. A multi-brand workspace asking a question about one brand was
+      // getting the thread stamped with another, which put the wrong brand's
+      // health and type on the Desk's account panel and sent our reply's
+      // notification to the wrong brand's bell.
+      const brand = await getActiveBrand<{ id: string; workspace_id: string }>(
+        supabase, 'id, workspace_id',
+      )
       if (brand) { brandId = brand.id; workspaceId = brand.workspace_id }
     }
 

@@ -6,6 +6,7 @@ import { accountList } from '@/lib/desk/accounts'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { BuildingIcon } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
+import { DeskLink } from '@/components/desk/desk-link'
 
 export const dynamic = 'force-dynamic'
 
@@ -97,9 +98,9 @@ export default async function AccountsPage({
               {sorted.map(row => (
                 <tr key={row.workspaceId}>
                   <td className="px-4 py-2.5">
-                    <Link href={`/desk/accounts/${row.workspaceId}`} className="bg-press font-medium">
+                    <DeskLink href={`/desk/accounts/${row.workspaceId}`} className="bg-press font-medium">
                       {row.name}
-                    </Link>
+                    </DeskLink>
                     <p className="text-xs text-tx-3">
                       {row.brands.length === 0
                         ? 'no brand yet'

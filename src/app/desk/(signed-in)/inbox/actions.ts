@@ -1,15 +1,13 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { Resend } from 'resend'
+import { sendMail, emailConfigured } from '@/lib/email/send'
 import { createServiceClient } from '@/lib/supabase/server'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
+import { supportInbox, inboxCounts, type InboxRow, type InboxCounts, type InboxView } from '@/lib/desk/data'
 import { z } from 'zod'
 
-export type ReplyState = { error?: string; ok?: boolean } | null
-
-let resend: Resend | null = null
-const getResend = () => (resend ??= new Resend(process.env.RESEND_API_KEY))
+export type ReplyState = { error?: string; ok?: boolean; warning?: string } | null
 
 const replySchema = z.object({
   conversation_id: z.string().uuid(),
@@ -27,6 +25,13 @@ const replySchema = z.object({
  *
  * An internal note takes none of that. It is a note between us on the thread,
  * and the policy keeps it off the customer's side.
+ *
+ * The email does not invite a reply into the thread, because there is nothing
+ * on the receiving end: no inbound handler exists, and `source = 'email'` is a
+ * value nothing writes. It used to say a reply would come straight back here,
+ * so a customer who answered by email was answering into a mailbox while the
+ * thread still read as waiting on them. Until inbound is built, the email
+ * points them at the chat.
  */
 export async function replyToThread(_prev: ReplyState, formData: FormData): Promise<ReplyState> {
   const internal = formData.get('internal') === 'on'
@@ -97,30 +102,32 @@ export async function replyToThread(_prev: ReplyState, formData: FormData): Prom
   const activeRecently = conv.last_message_at
     && Date.now() - new Date(conv.last_message_at).getTime() < 10 * 60 * 1000
 
-  if (conv.email && !activeRecently && process.env.RESEND_API_KEY) {
-    try {
-      await getResend().emails.send({
-        from:     'BrandGauge <support@brandgauge.app>',
-        to:       conv.email,
-        subject:  'Re: your message to BrandGauge',
-        replyTo:  'support@brandgauge.app',
-        text:
+  let emailed: boolean | null = null
+  if (conv.email && !activeRecently && emailConfigured()) {
+    const mail = await sendMail({
+      from:     'BrandGauge <support@brandgauge.app>',
+      to:       conv.email,
+      subject:  'Re: your message to BrandGauge',
+      replyTo:  'support@brandgauge.app',
+      text:
 `${conv.name ? `Hi ${conv.name.split(' ')[0]},` : 'Hi,'}
 
 ${body}
 
-Reply to this email and it goes straight back to the same conversation.
+To carry on, open the chat on BrandGauge and your whole conversation is there.
 
 ${session.fullName}
 BrandGauge`,
-      })
-    } catch {
-      // Same rule. The reply is in the thread either way.
-    }
+    })
+    // The reply is in the thread either way, so a refused email does not fail
+    // the action. It is reported back so the person who wrote it knows the
+    // customer may not have seen it in their inbox.
+    emailed = mail.sent
   }
 
   revalidatePath(`/desk/inbox/${conversation_id}`)
   revalidatePath('/desk/inbox')
+  if (emailed === false) return { ok: true, warning: 'Your reply is in the thread, but the email did not go out.' }
   return { ok: true }
 }
 
@@ -167,4 +174,29 @@ export async function assignThread(formData: FormData): Promise<void> {
   })
   revalidatePath(`/desk/inbox/${id}`)
   revalidatePath('/desk/inbox')
+}
+
+/**
+ * The queue, re-read.
+ *
+ * The inbox keeps its list mounted while you move between threads, so a Next
+ * layout renders it once and never again and revalidatePath cannot reach it.
+ * The shell calls this instead: on a Realtime change, on a view change, and
+ * when a tab comes back to the front.
+ *
+ * It is a server action rather than a route because the Desk has no API
+ * routes, and requireStaffOrNull is the same gate every other entry point
+ * uses, so a signed-out or suspended tab gets nothing rather than stale rows.
+ */
+export async function loadInbox(
+  view: InboxView,
+): Promise<{ rows: InboxRow[]; counts: InboxCounts } | null> {
+  const session = await requireStaffOrNull('support.view')
+  if (!session) return null
+
+  const [rows, counts] = await Promise.all([
+    supportInbox(session, view),
+    inboxCounts(session),
+  ])
+  return { rows, counts }
 }

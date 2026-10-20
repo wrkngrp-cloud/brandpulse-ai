@@ -29,25 +29,32 @@ alter table leads add column if not exists website text;
 -- tool's run actually lives in — `tool_runs` for the four newer tools,
 -- `public_scans` for the scoreboard, which predates `tool_runs` and keeps its
 -- own table — never both, and never neither.
+-- The shape here is the reconciled one, which 20261019120000 also arrives at
+-- by altering whatever ran. Both files have to describe the same table: this
+-- one already ran on the live database and is never re-applied, while a
+-- replay from empty runs this one and then finds 20261019120000 a no-op. When
+-- they disagreed, 20261019090000 inserted into columns that did not exist yet
+-- and no fresh database could be built from this set at all. Read
+-- 20261019120000 for why each of these is the way it is.
 create table if not exists lead_tool_runs (
-  id          uuid primary key default gen_random_uuid(),
-  lead_id     uuid not null references leads(id) on delete cascade,
-  tool_id     text not null
-              check (tool_id in ('pr-scoreboard','competitor-tracker',
-                     'market-demand','offline-tracker','campaign-audit')),
-  run_id      uuid references tool_runs(id) on delete set null,
-  scan_id     uuid references public_scans(id) on delete set null,
-  created_at  timestamptz not null default now(),
-  constraint lead_tool_runs_one_run check (
-    (run_id is not null)::int + (scan_id is not null)::int = 1
-  )
+  id               uuid primary key default gen_random_uuid(),
+  lead_id          uuid not null references leads(id) on delete cascade,
+  tool_id          text not null,
+  run_id           uuid references tool_runs(id) on delete set null,
+  scan_id          uuid references public_scans(id) on delete set null,
+  inputs           jsonb not null default '{}'::jsonb,
+  headline         text,
+  wants_monitoring boolean not null default false,
+  consent_text     text,
+  created_at       timestamptz not null default now()
 );
 
 create index if not exists idx_lead_tool_runs_lead on lead_tool_runs(lead_id, created_at desc);
 -- A visitor re-running the same tool before converting must not duplicate the
--- trail; a second run of the same tool is still its own row.
+-- trail; a second run of the same tool is still its own row. No predicate on
+-- this one: PostgREST cannot infer a partial index as an ON CONFLICT target.
 create unique index if not exists idx_lead_tool_runs_lead_run
-  on lead_tool_runs(lead_id, run_id) where run_id is not null;
+  on lead_tool_runs(lead_id, run_id);
 create unique index if not exists idx_lead_tool_runs_lead_scan
   on lead_tool_runs(lead_id, scan_id) where scan_id is not null;
 

@@ -100,14 +100,14 @@ export function CampaignAuditPage() {
             placeholder="yourbrand.com/offer" required inputMode="url"
             hint="The exact address your ads point at, including any path." />
           <div className="grid gap-3 sm:grid-cols-3">
-            <ToolSelect id="ca-obj" label="What the campaign is buying" value={objective}
+            <ToolSelect id="ca-obj" label="What it's buying" value={objective}
               onChange={v => setObjective(v as CampaignObjective | '')}
               options={[
                 { value: '', label: 'Not sure yet' },
                 ...CAMPAIGN_OBJECTIVES.map(o => ({ value: o, label: OBJECTIVE_LABEL[o] })),
               ]} />
             <ToolField id="ca-market" label="Market" value={market} onChange={setMarket} placeholder="Nigeria" />
-            <ToolField id="ca-comp" label="A competitor page, if you like" value={competitor}
+            <ToolField id="ca-comp" label="A competitor, if you like" value={competitor}
               onChange={setCompetitor} placeholder="competitor.com/offer" inputMode="url" />
           </div>
           <ToolSubmit busy={busy} busyLabel="Auditing the page" label="Audit my landing page"

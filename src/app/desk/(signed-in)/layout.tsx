@@ -2,6 +2,7 @@ import { requireStaff } from '@/lib/desk/auth'
 import { onDeskHost } from '@/lib/desk/urls'
 import { createClient } from '@/lib/supabase/server'
 import { DeskShell } from '@/components/desk/desk-shell'
+import { DeskHostProvider } from '@/components/desk/desk-link'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,7 +31,7 @@ export default async function DeskAuthedLayout({ children }: { children: React.R
       isSuperAdmin={session.isSuperAdmin}
       onDesk={onDesk}
     >
-      {children}
+      <DeskHostProvider onDesk={onDesk}>{children}</DeskHostProvider>
     </DeskShell>
   )
 }

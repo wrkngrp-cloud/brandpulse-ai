@@ -171,13 +171,33 @@ export async function requestIpHash(): Promise<string | null> {
 
 /**
  * Presence, which the chat widget reads to decide whether to promise a live
- * reply. Throttled to five minutes so a busy session is one write, not one per
- * page.
+ * reply.
+ *
+ * The throttle has to be shorter than the window that counts as online, or
+ * there is no margin at all: both were five minutes, so a staff member whose
+ * last write was 5:01 ago read as offline until their next page load. In a
+ * live chat that is the normal case rather than an edge one, because reading a
+ * thread and waiting for the customer to type makes no requests. So the write
+ * is every two minutes against a five-minute window, and the Desk shell pings
+ * `touchPresence` on a timer so sitting still still counts as being here.
  */
+const PRESENCE_WRITE_AFTER_MS = 2 * 60 * 1000
+
+/**
+ * Record that this staff member is here, for a caller that is not a page.
+ *
+ * The Desk shell's heartbeat. It resolves the session the same way every other
+ * entry point does, so a signed-out or suspended tab writes nothing.
+ */
+export async function markPresent(): Promise<void> {
+  const session = await getStaffSession()
+  if (session) await touchLastSeen(session.userId)
+}
+
 async function touchLastSeen(userId: string): Promise<void> {
   try {
     const service = await createServiceClient()
-    const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString()
+    const cutoff = new Date(Date.now() - PRESENCE_WRITE_AFTER_MS).toISOString()
     await service
       .from('staff')
       .update({ last_seen_at: new Date().toISOString() })

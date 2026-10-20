@@ -1,4 +1,5 @@
 import { requireStaff } from '@/lib/desk/auth'
+import { emailConfigured } from '@/lib/email/send'
 import { staffRoster } from '@/lib/desk/data'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { UsersIcon } from '@/components/brand/icon'
@@ -35,7 +36,7 @@ export default async function StaffPage() {
       {session.can('staff.invite') && <InviteForm roles={roles} />}
 
       {invites.length > 0 && session.can('staff.invite') && (
-        <PendingInvites invites={invites} />
+        <PendingInvites invites={invites} canSend={emailConfigured()} />
       )}
 
       <StaffTable

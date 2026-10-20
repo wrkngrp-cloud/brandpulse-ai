@@ -144,5 +144,47 @@ eq('the local part is hidden',  redact.maskEmail('emmanuel@brandgauge.app'), 'e\
 eq('a null address is empty',   redact.maskEmail(null), '')
 eq('junk without an @ is fully masked', redact.maskEmail('not-an-email'), '\u2022\u2022\u2022')
 
+// ── Links across the two hosts ───────────────────────────────────────────────
+//
+// The Desk answers on a deployment URL at /desk/... and on its own hostname
+// with that prefix stripped, and src/proxy.ts 404s anything still carrying it
+// there. So a link written as "/desk/inbox/<id>" works on a preview and
+// returns "Not found" on the live host, which is the bug that hides from
+// every check that is not this one: by 20 October six of them had shipped,
+// covering every account, every staff member, the leads funnel and every
+// conversation in the inbox.
+//
+// DeskLink and useDeskRouter resolve the prefix for whichever host is
+// serving. This fails the run when a raw one comes back.
+console.log('\n── Desk links resolve for both hosts')
+
+const deskFiles = execSync(
+  "find 'src/app/desk' 'src/components/desk' -type f \\( -name '*.tsx' -o -name '*.ts' \\)",
+  { encoding: 'utf8' },
+).trim().split('\n').filter(Boolean)
+
+// What is wrong is the receiver, not the string: DeskLink and useDeskRouter
+// are handed exactly this path and resolve it. So a bare next/link with a
+// /desk href is always wrong, and a router.push is wrong only where the
+// router did not come from useDeskRouter.
+const RAW_NEXT_LINK = /<Link\b[\s\S]{0,200}?href=\{?["'`]\/desk\//
+const RAW_PUSH      = /router\.push\(\s*[`'"]\/desk\//
+
+const offenders = deskFiles.filter(file => {
+  // desk-link.tsx is where the resolution lives.
+  if (file.endsWith('desk-link.tsx')) return false
+  const code = readFileSync(file, 'utf8')
+  if (RAW_NEXT_LINK.test(code)) return true
+  return RAW_PUSH.test(code) && !code.includes('useDeskRouter')
+})
+
+ok(`no raw /desk link survives${offenders.length ? `: ${offenders.join(', ')}` : ''}`,
+  offenders.length === 0)
+
+const deskLink = readFileSync('src/components/desk/desk-link.tsx', 'utf8')
+ok('DeskLink strips the prefix on the Desk host', deskLink.includes('stripDeskPrefix'))
+ok('and the provider is fed by the signed-in layout',
+  readFileSync('src/app/desk/(signed-in)/layout.tsx', 'utf8').includes('DeskHostProvider'))
+
 console.log(`\n${fail === 0 ? '✓' : '✗'} ${pass} passed, ${fail} failed\n`)
 process.exit(fail === 0 ? 0 : 1)

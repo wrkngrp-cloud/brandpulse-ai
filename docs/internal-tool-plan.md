@@ -30,9 +30,9 @@ behind them does not exist.
 
 | Thing | Where | Use to us |
 |---|---|---|
-| Allowlist access pattern | `lead_desk_admins`, `is_lead_desk()`, `/dashboard/leads` | The shape the staff table copies. Already the one sanctioned non-workspace RLS scope. |
+| Allowlist access pattern | `lead_desk_admins`, `is_lead_desk()`, `/dashboard/leads` | The shape the staff table copied. Both were dropped on 18 October once the Desk took the lead desk over: nothing had ever inserted a row, so the old desk never worked. |
 | Leads with context | `leads`, `public_scans` | The prospect side of the inbox. Scan, rivals, share of reach, status. |
-| Transactional email | Resend, in six Inngest jobs | Outbound mail and email fallback for chat. |
+| Transactional email | Resend, through `sendMail` in `src/lib/email/send.ts` | Outbound mail and email fallback for chat. Every send in the product goes through it, because the SDK reports refusals in its return value rather than throwing. |
 | In-app messaging | `notifications` table plus the bell | Staff can put a message inside a customer's product with one insert. |
 | Realtime | Supabase Realtime, used in `src/components/events/live-dashboard.tsx` | Live chat transport for signed-in users. |
 | Industry logic | `brand_type` on `brands`, `industry-config.ts`, `BRAND_TYPE_WEIGHTS` in `bhi.ts` | Makes "what should they be using" a calculation. |
@@ -64,7 +64,7 @@ deliberate act, not a tidy-up.
 | The Desk answers on its own host, `desk.brandgauge.app`, served from this one app and one deploy | A separate deployment means a second copy of the service client, `TOKEN_ENCRYPTION_KEY`, the Supabase factories and the Inngest registry. Host routing gives the separation that matters (own URL, own login, own session cookie, nothing about the Desk reachable from the customer app) at the cost of one middleware rule. See section 2b. |
 | The Desk is invite-only with its own login, email and password, no Google button, no signup route | Staff access is granted by a person, never self-served. A signup form on the Desk host is the whole security model undone. |
 | Permissions are per module action and per dataset, not a fixed role | A support agent needs the account timeline and not the revenue figures. Finance needs the revenue and not the customer's survey text. Roles are templates over the same permission keys, so a new role is configuration rather than a deploy. |
-| Staff access is an allowlist in the same shape as `is_lead_desk()` | Document 5 warns against a third RLS pattern copied from the lead desk. `is_staff()` is the same security-definer, fixed `search_path` form. `lead_desk_admins` folds into it. |
+| Staff access is an allowlist in the same shape the lead desk used | Document 5 warns against a third RLS pattern. `is_staff()` is the same security-definer, fixed `search_path` form `is_lead_desk()` had, and `lead_desk_admins` folded into `staff` before being dropped. |
 | We build the support chat, we do not buy one | It is our own data, in our own tables, joinable to the account. A hosted widget cannot show the agent that this brand's BHI is 41 and their Meta connector expired on Tuesday. |
 | Anonymous chat goes through a service-role route holding a visitor token | Same mechanism as `/survey/[id]`, `/ambassador/[token]` and `/go/[slug]`. Anon RLS is never opened on the chat tables. |
 | We reach our customers by three channels only: email, the in-app notification bell, and the chat widget in the product and on the site | `whatsapp_contacts` holds the *tenant's* customers under the tenant's consent. Messaging them from our admin tool would break the NDPR gate and the Model A consent regime. Not a grey area. |
@@ -242,9 +242,9 @@ set search_path = public as $$
 $$;
 ```
 
-`is_lead_desk()` and `lead_desk_admins` fold into this. The existing lead desk check
-becomes `staff_can('leads.view')`, and the old table is dropped in the same migration
-after its rows are copied across.
+`is_lead_desk()` and `lead_desk_admins` folded into this and were dropped on 18 October
+in `20261018094000_retire_lead_desk_admins.sql`. The lead desk check is now
+`staff_can('leads.view')`.
 
 ### 3.3 Permission keys
 
@@ -324,6 +324,34 @@ is not a sales job.
 **Invite.** Super admin enters email, full name, role. We create a `staff_invites` row
 with a hashed single-use token and a 72-hour expiry, and send the link with Resend from our
 own template, so the copy follows the Voice rule like any other message we send.
+
+The send goes through `sendMail` in `src/lib/email/send.ts`, and the screen reports what
+actually happened. This matters because the Resend SDK does not throw when the API refuses
+a message: `emails.send()` resolves with `{ data: null, error }`, so a try/catch around it
+catches nothing and the invitation reports itself as sent. Every pending invitation
+therefore carries two more buttons. **Send again** mints a fresh token and mails it.
+**Get link** mints one and shows it, for handing over another way. Both replace whatever
+link went out before, so an invitation has exactly one live link at a time, and taking one
+is audited (`staff.invite_resent`, `staff.invite_link_shown`).
+
+Two environment variables have to be right or no invitation can arrive: `RESEND_API_KEY`,
+and `NEXT_PUBLIC_DESK_URL` so the link in the email is absolute. The sending domain also
+has to be verified in Resend, or it answers `invalid_from_address` and nothing goes out.
+`deliverInvite` refuses to mail a relative link rather than sending a dead one.
+
+**Accept, when the address is new to us.** The form asks for a password and the
+account is created with it, `email_confirm: true`, and the person is signed straight in.
+
+**Accept, when the address already has a BrandGauge account.** The two are linked and the
+existing password is left exactly as it is, because somebody may be both a customer and
+staff and taking over their password reaches into their other account. The invite page asks
+`auth_user_id_for_email` before it renders, so this form shows no password field at all and
+says which password to use; it used to ask for one either way and then discard it, which
+left the person unable to sign in with the thing they had just typed and nothing saying why.
+If that existing account was never email-confirmed, accepting confirms it, since an
+unconfirmed address cannot sign in at all and the invitation would otherwise grant access
+nobody could reach. The login page carries the same note on `?linked=1`, with a link to the
+product's own reset on the main host. The Desk still has no reset of its own, by decision.
 
 **Accept.** The link opens `/desk/invite/[token]`. The page shows the address it was sent
 to, and asks for a password, job title and timezone. The accept route, on the service
@@ -499,6 +527,40 @@ funnel empty" answers itself before the agent types.
 
 ---
 
+### The inbox is one screen
+
+`/desk/inbox` is a layout, not a page. The queue renders in the layout and every
+conversation renders inside it, so moving between threads keeps the list, the counts and
+your place in it. A conversation is the middle pane rather than a page of its own, which is
+why it carries no back link and no title bar.
+
+That shape has one consequence worth knowing before changing anything here: a Next layout
+is not re-run when the route inside it changes, so `revalidatePath('/desk/inbox')` cannot
+refresh the queue. The list owns its own data instead. The server renders the first page,
+then Realtime says when something changed and the `loadInbox` server action re-reads it,
+debounced, because a reply writes a message and the trigger touches the conversation and
+that is two changes for one event. A tab coming back to the front re-reads as well, since a
+sleeping tab drops its socket.
+
+The conversation beside it uses `router.refresh()` rather than fetching for itself.
+Attachment links are signed per view and expire in a minute, and signing needs the service
+role, so re-running the server component keeps that on the server and means one code path
+produces a message rather than two that can disagree. Next 16 merges the refreshed payload
+without resetting client state, which is what lets the queue keep its scroll and its cursor
+through it.
+
+Views are Unassigned, Mine, Open, Snoozed, Closed and Everything, each with a count. One
+`applyView` builds the filter for both the rows and the counts, so a badge can never
+disagree with the list under it.
+
+Two numbers the schema has always captured and nothing showed: how long a customer has been
+waiting, on every row that is waiting on us, and how long we took to reply first, on the
+thread. `first_response_at` is written by the trigger on the first non-internal staff
+message.
+
+`j` and `k` move, `Enter` opens. Ignored while the focus is in a field, or the reply box
+would swallow every `j`.
+
 ## 5. The Desk
 
 ### 5.1 Accounts
@@ -528,7 +590,7 @@ time per thread, which is also how staff performance gets measured in Super Admi
 
 ### 5.3 Leads
 
-Extend `/dashboard/leads` rather than replace it, and move it under `/desk/leads`.
+Moved to `/desk/leads`, and `/dashboard/leads` is deleted.
 One real gap to close: `signed_up` is a manual boolean, so a nightly job joins
 `leads.email` against `auth.users` and sets it. Then conversion by referrer and by
 scanned category is a number rather than a feeling.
@@ -756,7 +818,7 @@ subdomain goes live whenever you want it to, and changes nothing about the code.
 | **2. Super Admin** | Roster, invite, suspend, remove, role change, the person page, the permissions editor, per-person activity, the audit feed | **Built** 14 Oct. Left: a roles editor, so a new role is still a seed rather than a screen |
 | **3. Accounts** | List sorted quietest first, detail, timeline, connectors, people, usage against plan limits, notes, plan change | **Built** 18 Oct |
 | **4. Support chat** | Tables, the four public routes, signed attachment references in a private bucket, the widget in the product, on the site and on the scoreboard, live presence, the Desk inbox and thread view with the account panel, reply by email and by the bell | **Built** 14 Oct. Left: inbound email replies through a Resend webhook, and Realtime in place of the widget's poll for signed-in users |
-| **5. Leads** | `/desk/leads` on the Desk's permissions, the pipeline, the scan that opened the conversation, and the nightly job that matches a lead to the account they became | **Built** 18 Oct. Left: `/dashboard/leads` and its acquisition funnel still run on the `lead_desk_admins` allowlist; retiring that means rewriting the `leads` and `public_scans` policies and is a change of its own |
+| **5. Leads** | `/desk/leads` on the Desk's permissions, the pipeline, the scan that opened the conversation, the acquisition funnel at `/desk/leads/funnel`, and the nightly job that matches a lead to the account they became. `/dashboard/leads` deleted and `lead_desk_admins` dropped | **Built** 18 Oct |
 | **6. Money** | `subscriptions`, `invoices`, manual entry, the revenue screen with gross cost, and the Paystack handler built and unregistered | **Built** 18 Oct |
 | **7. Impersonation** | Request with a reason, customer approval, the viewer membership, the middleware read-only guard, the banner both sides see, the five-minute sweep, the history the customer can read | **Built** 18 Oct |
 | **8. Adoption** | The engine, the three lists, the headline | **Built** 18 Oct |

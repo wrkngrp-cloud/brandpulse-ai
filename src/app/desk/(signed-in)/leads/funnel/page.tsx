@@ -1,20 +1,25 @@
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
+import { requireStaff } from '@/lib/desk/auth'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { MarketIcon, ArrowRightIcon } from '@/components/brand/icon'
 import { FREE_TOOLS, toolById } from '@/lib/tools/registry'
+import { DeskLink } from '@/components/desk/desk-link'
 
-export const metadata = { title: 'Free tool funnel | BrandGauge' }
+export const metadata = { title: 'Free tool funnel | The Desk' }
 export const dynamic = 'force-dynamic'
 
 /**
- * The founder's view of the free tools.
+ * The acquisition funnel.
  *
- * Same access rule as the lead desk next door: `staff_can('leads.view')`,
- * because none of this belongs to a tenant. The views it reads are
- * `security_invoker`, so the policy on tool_events is the guarantee and this
- * check is only the redirect.
+ * Moved here from /dashboard/leads/funnel on 18 October. It used to check
+ * `lead_desk_admins`, a table nothing ever inserted into, so it bounced
+ * everyone to /dashboard from the day it shipped. Now it is `leads.view` like
+ * the rest of the lead desk, which the business development role holds.
+ *
+ * The views it reads are `security_invoker`, so the policy on `tool_events` is
+ * the guarantee; it is read on the service client here because the Desk's own
+ * gate has already run and staff are not workspace members.
  *
  * The columns are chosen to resist the one metric that would mislead us.
  * Signups are not success: a visitor who completed a tool, received something
@@ -60,12 +65,10 @@ function thirtyDaysAgo(): string {
 }
 
 export default async function FunnelPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login')
-
-  const { data: canView } = await supabase.rpc('staff_can', { perm: 'leads.view' })
-  if (!canView) redirect('/dashboard')
+  await requireStaff('leads.view', {
+    action: 'leads.funnel_view', summary: 'Opened the free tool funnel',
+  })
+  const supabase = await createServiceClient()
 
   const since = thirtyDaysAgo()
 
@@ -99,10 +102,10 @@ export default async function FunnelPage() {
         subtitle="Last thirty days. Visitors through to workspaces that actually used something, per tool."
         icon={MarketIcon}
         actions={
-          <Link href="/dashboard/leads"
+          <DeskLink href="/desk/leads"
             className="flex items-center gap-1.5 rounded-sm border border-line px-3.5 py-2 text-[13px] font-medium text-tx bg-press">
             Lead desk <ArrowRightIcon className="h-3.5 w-3.5" />
-          </Link>
+          </DeskLink>
         }
       />
 

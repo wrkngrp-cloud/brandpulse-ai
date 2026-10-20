@@ -64,6 +64,11 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 - `npm run icons` / `npm run icons:check` — build the sprite from
   `brand/icons/currentcolor`, and fail when a glyph the product asks for was
   never drawn.
+- `npm run favicon` / `npm run favicon:check` — cut the browser tab icon from
+  `brand/logo/brandgauge-mark-mono-ink.svg`, and fail when the generated files
+  have drifted from the mark. The mark is never redrawn for this, only reframed
+  square and recoloured onto a Paper plane; the duotone is not used because the
+  design system forbids it below 24px.
 - `npm run tools:check` — exercise the Free Tools libraries offline. Compiles them
   standalone with the AI, press and database calls stubbed, so no key and no network are
   needed, and covers the SSRF screening in `fetch-public.ts`, the HTML reader, every
@@ -77,7 +82,7 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
   exercise the half of the Desk that lives in SQL: `staff_can` precedence, RLS on
   the staff, telemetry and chat tables, the security-definer grants, and the
   support triggers. Needs a local postgres and nothing else, no Supabase project
-  and no credentials. 74 assertions. It fails the run when any of them regresses,
+  and no credentials. 82 assertions. It fails the run when any of them regresses,
   which is checked by breaking a policy on purpose rather than assumed.
 - `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
   mocked platform responses. Real calls cost X credit and burn Instagram's
@@ -154,13 +159,13 @@ Upstash Redis for cache / rate-limit / OAuth state.
 - The public scoreboard (`/scoreboard`, `/api/scoreboard/*`) is the one open endpoint with no
   token, because it reads a public news feed and touches no tenant row: there is no caller to
   verify. It is guarded instead by an IP rate limit and a cache, both of which fail open. Its
-  tables (`public_scans`, `leads`) are the one place RLS does not scope to a
-  workspace: a lead belongs to BrandGauge, so they scope to the `staff_can('leads.view')`
-  permission and are written by the service role only. See `docs/scoreboard-and-leads.md`. The free-tool
-  tables (`tool_runs`, `tool_events`, `tool_campaigns`, `tool_placements`, `tool_visits`)
-  follow the same pattern for the same reason, with one addition: once a run or campaign is
-  claimed they are also readable by the workspace that claimed it. `tool_responses` holds
-  personal data and scopes to that workspace only, never to the lead desk.
+  tables (`public_scans`, `leads`) are the one place RLS does not scope to a workspace: a lead
+  belongs to BrandGauge, so they scope to `staff_can('leads.view')` and are written by the
+  service role only. See `docs/scoreboard-and-leads.md`. The free-tool tables (`tool_runs`,
+  `tool_events`, `tool_campaigns`, `tool_placements`, `tool_visits`) follow the same pattern
+  for the same reason, with one addition: once a run or campaign is claimed they are also
+  readable by the workspace that claimed it. `tool_responses` holds personal data and scopes
+  to that workspace only, never to the lead desk.
 - Every AI call goes through `callAi`, which logs tokens, cost and latency to `ai_calls`
   and a counter to `usage_events`. Pass `meta` (`workspaceId`, `brandId`, `userId`,
   `feature`) at every call site so the call is attributed; without it the row lands under
@@ -246,8 +251,8 @@ See `docs/free-tools-acquisition-plan.md`.
 - Campaign enquiries (`tool_responses`) are refused without consent, store the exact wording
   the person agreed to, and are the one table here the lead desk cannot read.
 - Acquisition events go to `tool_events` (first-party; `posthog-js` is a dependency and is
-  imported nowhere). The founder's funnel is `/dashboard/leads/funnel`, behind the same
-  `staff_can('leads.view')` permission as the lead desk.
+  imported nowhere). The funnel is `/desk/leads/funnel`, on `leads.view` like the rest of
+  the lead desk.
 - Beta is free. Do not add a trial, an expiry, a paywall or an upgrade prompt to any of this.
 
 ## Active brand lookup (critical, always use this)
@@ -399,7 +404,11 @@ a hex, an `rgb()`, an `oklch()` or a Tailwind palette class — there are none l
   spinners and anything that loops, numbers counting up, hover lift, per-element
   fade-and-slide-up, and animating top, left, width or height.
 - **Logo.** Use the SVGs in `brand/logo/` through `src/components/brand/logo.tsx`. Never
-  redraw the mark, simplify it, or rebuild the needle from ratios.
+  redraw the mark, simplify it, or rebuild the needle from ratios. The browser tab icon is
+  generated from the mark by `npm run favicon`, never hand-drawn: it reframes the supplied
+  paths square on a Paper plane and takes the mono variant, because the duotone is banned
+  below 24px. `src/app/icon.svg`, `apple-icon.png` and `favicon.ico` are build output, so
+  edit the mark or the script rather than the files.
 - Ship a screen only when it passes the audit in section 12 of the design system.
 
 ## The Desk (our internal tool)
@@ -409,6 +418,14 @@ is the spec. Rules that are easy to break without noticing:
 - **Host routing.** `src/proxy.ts` rewrites `DESK_HOST` onto `/desk`. With `DESK_HOST` set,
   `/desk` on the main host 404s; with it unset, `/desk` answers there so the Desk can be
   previewed on a deployment URL. The Desk host serves nothing but the Desk.
+- **Never write a `/desk/...` link by hand.** The middleware strips the prefix on the Desk
+  host and then 404s anything that still carries it, so a hand-written `/desk/inbox/<id>`
+  works on a preview and returns "Not found" on the live host. Use `<DeskLink>` or
+  `useDeskRouter()` from `src/components/desk/desk-link.tsx` in a client component, and
+  `deskHref()` in a server one; all three take the `/desk/...` path and resolve it for the
+  host in front of them. Six links had this wrong on 20 October, covering every account,
+  every staff member, the leads funnel and every conversation. `npm run desk:check` fails
+  when a raw one comes back.
 - **The Desk has no API routes.** Every mutation is a server action. Do not add
   `src/app/desk/api/**`.
 - **One gate.** `requireStaff(permission?, audit?)` from `src/lib/desk/auth.ts` at the top of
@@ -420,6 +437,13 @@ is the spec. Rules that are easy to break without noticing:
   `data.revenue_figures`, `data.customer_content`, `data.audit_all`) before returning rows.
   Never redact in a component, and never reach for the service client from a Desk page or
   action.
+- **Email.** Every email in the product goes out through `sendMail` in
+  `src/lib/email/send.ts`, and callers act on what it returns. Never call
+  `resend.emails.send()` directly: the SDK resolves with `{ data: null, error }` when the
+  API refuses a message, so a try/catch around it catches nothing and the code reports a
+  send that never happened. That bug shipped at eleven call sites and is why staff
+  invitations said "sent" while Resend was rejecting the sending domain. A Desk screen
+  shows the reason; a background job logs it and does not count the send.
 - **Permissions.** `staff_can(key)` in SQL, `session.can(key)` in app code, both resolving
   deny override → grant override → role template, with `super_admin` holding everything.
   Add a key to `src/lib/desk/permissions.ts` AND to the `super_admin` seed, then run
@@ -438,9 +462,12 @@ is the spec. Rules that are easy to break without noticing:
   or it becomes a hole. A session needs a customer approval row, expires on the clock
   whether or not the sweep runs, and `end_impersonation()` is what takes the membership
   away.
-- The lead desk's old `lead_desk_admins` allowlist and `is_lead_desk()` retired on
-  2026-10-18. `/dashboard/leads` and `/dashboard/leads/funnel` now gate on
-  `staff_can('leads.view')`, the same permission the Desk's own `/desk/leads` checks.
+- **There is one lead desk, and it is `/desk/leads`.** `lead_desk_admins` and
+  `is_lead_desk()` were dropped on 18 October: nothing had ever inserted a row into that
+  table, so the function returned false for every caller and both `/dashboard/leads` and
+  its funnel bounced everyone to `/dashboard` from the day they shipped. Lead access is
+  `leads.view` to read and `leads.edit` to work the pipeline, which `bizdev` holds. Do not
+  reintroduce a second allowlist.
 
 ## Voice for any user-facing copy (hard rule)
 Warm, confident, plain English. Active voice. Connection before sales. No jargon. No em dashes.
