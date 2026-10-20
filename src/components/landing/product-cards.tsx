@@ -295,6 +295,16 @@ export function ProductCards() {
           in view, exactly as before, it just has room to breathe afterward. */}
       <div ref={railBox} aria-hidden className="h-px" />
 
+      {/* Progress 1 fires the instant this sentinel's top reaches the top of
+          the screen, and the section used to end barely past that point -
+          the nav row below plus the section's own bottom padding, maybe
+          200px, nowhere near enough to sit with the last card ("A briefing
+          written every Monday") before the next section arrived. This is
+          dwell time, not a new section: the crescendo is already lit full
+          and the rail has already stopped moving, so it costs nothing but
+          scroll distance. */}
+      <div aria-hidden className="h-[60vh]" />
+
       {/* Where you are in the run, and the two ways to move through it that do
           not need a trackpad. */}
       <div className="mx-auto mt-6 flex max-w-6xl items-center gap-5 px-6">
