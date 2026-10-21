@@ -111,7 +111,7 @@ export function ContactsClient({ totalCount, optedInCount, contacts }: Props) {
         <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
 
         <div className="rounded-lg bg-shell dark:bg-shell/20 border border-line dark:border-line p-3 text-xs text-tx-2 dark:text-tx-2 leading-relaxed">
-          <strong>NDPR reminder:</strong> Only import numbers from people who have explicitly opted in to receive WhatsApp messages from your brand. Contacts who reply "STOP" are automatically removed.
+          <strong>NDPR reminder:</strong> A CSV upload is a phone list, not consent, so an import never marks anyone as opted in. A contact only receives a message once they text <span className="bg-num">START</span> to your WhatsApp number — ask for that reply through another channel first (SMS, a sign-up form, in person). Anyone who later replies <span className="bg-num">STOP</span> is removed automatically.
         </div>
       </div>
 
