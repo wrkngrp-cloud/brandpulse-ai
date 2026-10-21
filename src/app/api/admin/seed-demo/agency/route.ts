@@ -220,15 +220,21 @@ export async function POST(req: NextRequest) {
   await sb.from('brand_health_snapshots').insert(bhiRows)
 
   /* ── 8. SOV snapshots ─────────────────────────────────────────────────── */
+  // brand_volume is derived from social_sov so the Content page's recomputed
+  // mention-count % matches the stored social_sov the SOV Over Time chart plots.
   const sovRows = []
   for (let d = 175; d >= 0; d -= 7) {
     const ss = sentScore(d); const t = ss / 100
+    const socialSov = +(12+t*10+Math.sin(d*0.3)*1.5).toFixed(1)
+    const competitorVolumes = { "Noah's Ark": Math.round(4000-t*500), "X3M Ideas": Math.round(3500+Math.sin(d*0.1)*300) }
+    const competitorTotal = Object.values(competitorVolumes).reduce((a, b) => a + b, 0)
+    const brandVolume = Math.round(competitorTotal * (socialSov / (100 - socialSov)))
     sovRows.push({
       brand_id: brandId, snapshot_date: dAgo(d),
-      social_sov: +(12+t*10+Math.sin(d*0.3)*1.5).toFixed(1),
+      social_sov: socialSov,
       paid_sov: +(10+t*8).toFixed(1), blended_sov: +(13+t*9).toFixed(1),
       esov: 0,
-      competitor_data: { brand_volume: Math.round(3000+t*2000), competitor_volumes: { "Noah's Ark": Math.round(4000-t*500), "X3M Ideas": Math.round(3500+Math.sin(d*0.1)*300) } },
+      competitor_data: { brand_volume: brandVolume, competitor_volumes: competitorVolumes },
     })
   }
   await sb.from('sov_snapshots').insert(sovRows)
