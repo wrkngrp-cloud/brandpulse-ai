@@ -257,13 +257,24 @@ export async function POST(req: NextRequest) {
   await sb.from('brand_health_snapshots').insert(bhiRows)
 
   /* ── 8. SOV snapshots — every 7 days, 180 days ───────────────────────── */
+  // competitor_data.brand_volume is derived from social_sov (not an independent
+  // guess), so recomputing the % from mention counts on the Content page
+  // matches the stored social_sov the SOV Over Time chart plots. That's the
+  // same guarantee the real crawl-mentions job gives production brands.
   const sovRows = []
   for (let d = 175; d >= 0; d -= 7) {
     const ss = sentScore(d)
     const t  = ss / 100
+    const socialSov = +(18 + t * 12 + Math.sin(d * 0.2) * 1.5).toFixed(1)
+    const competitorVolumes = {
+      'ChowMate':      Math.round(9000 - t * 2000),
+      'NutriNg Foods': Math.round(3000 + Math.sin(d * 0.1) * 500),
+    }
+    const competitorTotal = Object.values(competitorVolumes).reduce((a, b) => a + b, 0)
+    const brandVolume = Math.round(competitorTotal * (socialSov / (100 - socialSov)))
     sovRows.push({
       brand_id: brandId, snapshot_date: dAgo(d),
-      social_sov:  +(18 + t * 12 + Math.sin(d * 0.2) * 1.5).toFixed(1),
+      social_sov:  socialSov,
       paid_sov:    +(12 + t * 9).toFixed(1),
       ooh_sov:     +(8  + t * 5).toFixed(1),
       press_sov:   +(5  + t * 4).toFixed(1),
@@ -271,11 +282,8 @@ export async function POST(req: NextRequest) {
       blended_sov: +(16 + t * 10).toFixed(1),
       esov:        +((16 + t * 10) - 14.7).toFixed(2),
       competitor_data: {
-        brand_volume:       Math.round(8000 + t * 4000),
-        competitor_volumes: {
-          'ChowMate':      Math.round(9000 - t * 2000),
-          'NutriNg Foods': Math.round(3000 + Math.sin(d * 0.1) * 500),
-        },
+        brand_volume:       brandVolume,
+        competitor_volumes: competitorVolumes,
       },
     })
   }

@@ -286,24 +286,30 @@ export async function POST(req: NextRequest) {
   await sb.from('brand_health_snapshots').insert(bhiRows)
 
   /* ── 8. SOV snapshots — weekly, 25 snapshots ─────────────────────────── */
+  // brand_volume is derived from social_sov so the Content page's recomputed
+  // mention-count % matches the stored social_sov the SOV Over Time chart plots.
   const sovRows = []
   for (let d = 175; d >= 7; d -= 7) {
     const ss = sentScore(d)
+    const socialSov = +(8 + (ss / 100) * 7 + Math.sin(d * 0.25) * 1.0).toFixed(1)
+    const competitorVolumes = {
+      'HubSpot Nigeria':       Math.round(8000 - (ss / 100) * 1000),
+      'Zoho CRM':              Math.round(6000 - (ss / 100) * 800),
+      'Salesforce Essentials': Math.round(4000 + Math.sin(d * 0.1) * 300),
+    }
+    const competitorTotal = Object.values(competitorVolumes).reduce((a, b) => a + b, 0)
+    const brandVolume = Math.round(competitorTotal * (socialSov / (100 - socialSov)))
     sovRows.push({
       brand_id: brandId, snapshot_date: dAgo(d),
-      social_sov:  +(8 + (ss / 100) * 7 + Math.sin(d * 0.25) * 1.0).toFixed(1),
+      social_sov:  socialSov,
       paid_sov:    +(6 + (ss / 100) * 5).toFixed(1),
       press_sov:   +(4 + (ss / 100) * 3).toFixed(1),
       search_sov:  +(9 + (ss / 100) * 6).toFixed(1),
       blended_sov: +(8 + (ss / 100) * 6).toFixed(1),
       esov:        +((8 + (ss / 100) * 6) - 12.0).toFixed(2),
       competitor_data: {
-        brand_volume: Math.round(3000 + (ss / 100) * 2000),
-        competitor_volumes: {
-          'HubSpot Nigeria':       Math.round(8000 - (ss / 100) * 1000),
-          'Zoho CRM':              Math.round(6000 - (ss / 100) * 800),
-          'Salesforce Essentials': Math.round(4000 + Math.sin(d * 0.1) * 300),
-        },
+        brand_volume: brandVolume,
+        competitor_volumes: competitorVolumes,
       },
     })
   }
