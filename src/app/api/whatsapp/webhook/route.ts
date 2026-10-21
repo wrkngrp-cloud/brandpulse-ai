@@ -71,7 +71,15 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Inbound messages — handle STOP opt-out
+      // Inbound messages — handle STOP opt-out and START opt-in.
+      //
+      // START is the only real consent signal this product collects. A CSV
+      // import is a phone list, not consent — see /api/whatsapp/contacts/import
+      // — so a contact stays not-opted-in until they take this action
+      // themselves. This mirrors the existing STOP handling exactly,
+      // including its scoping: the WABA is one shared number across every
+      // brand (CLAUDE.md "Model A"), so a reply can only be matched by phone
+      // number, not by which brand's campaign prompted it.
       for (const msg of value.messages ?? []) {
         if (msg.type === 'text') {
           const text = (msg.text?.body ?? '').trim().toUpperCase()
@@ -79,6 +87,11 @@ export async function POST(req: NextRequest) {
             const phone = '+' + msg.from
             await service.from('whatsapp_contacts')
               .update({ whatsapp_opted_in: false, opted_out_at: new Date().toISOString() })
+              .eq('phone_e164', phone)
+          } else if (text === 'START' || text === 'SUBSCRIBE' || text === 'JOIN') {
+            const phone = '+' + msg.from
+            await service.from('whatsapp_contacts')
+              .update({ whatsapp_opted_in: true, opted_in_at: new Date().toISOString(), opted_out_at: null })
               .eq('phone_e164', phone)
           }
         }
