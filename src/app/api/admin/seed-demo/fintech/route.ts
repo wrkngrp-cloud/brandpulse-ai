@@ -410,6 +410,22 @@ export async function POST(req: NextRequest) {
     })))
   }
 
+  /* ── 13b. Survey tracking panels ──────────────────────────────────────── */
+  await sb.from('survey_panels').insert({
+    brand_id: brandId, workspace_id: wsId,
+    name: 'PocketPay Monthly Awareness Check', template_key: 'awareness_check',
+    cadence: 'monthly', active: true,
+    last_run_at: tsAgo(14, 9), next_run_at: tsAgo(-16, 9),
+    recipient_emails: ['growth@pocketpay.ng', 'marketing@pocketpay.ng'],
+  })
+  await sb.from('survey_panels').insert({
+    brand_id: brandId, workspace_id: wsId,
+    name: 'PocketPay Quarterly NPS Pulse', template_key: 'nps_basic',
+    cadence: 'quarterly', active: false,
+    last_run_at: tsAgo(80, 9),
+    recipient_emails: ['growth@pocketpay.ng'],
+  })
+
   /* ── 14. Cultural resonance scores ───────────────────────────────────── */
   const crsInserts = []
   for (let w = 0; w < 10; w++) {
@@ -423,6 +439,22 @@ export async function POST(req: NextRequest) {
     })
   }
   await sb.from('cultural_resonance_scores').insert(crsInserts)
+
+  /* ── 14b. Geo-Lift study ────────────────────────────────────────────────── */
+  const ppMakeWeekly = (weeks: number, baseT: number, baseC: number, liftPct: number) =>
+    Array.from({ length: weeks }, (_, i) => ({
+      week: dAgo((weeks - i) * 7),
+      treatment_index: Math.round(baseT + (liftPct * i / weeks) * baseT * 0.01 + Math.sin(i * 0.9) * 2),
+      control_index:   Math.round(baseC + Math.sin(i * 1.1) * 1.5),
+    }))
+  await sb.from('geo_lift_studies').insert({
+    brand_id: brandId, campaign_id: camp1Id,
+    treatment_city: 'Lagos', control_city: 'Ibadan', keyword: 'PocketPay',
+    study_start: dAgo(90), study_end: dAgo(20),
+    lift_pct: 14.1, confidence: 90.4, correlation: 0.8310, status: 'complete',
+    weekly_data: ppMakeWeekly(10, 64, 48, 14.1),
+    ai_interpretation: 'The Refer & Earn push produced a 14.1% incremental branded search uplift in Lagos against the Ibadan control, with confidence clearing the 90% threshold. The lift tracks closely with the referral campaign’s payout spikes.',
+  })
 
   /* ── 15. Competitive briefings ────────────────────────────────────────── */
   for (let w = 0; w < 4; w++) {

@@ -791,6 +791,22 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     await sb.from('survey_responses').insert(respInserts)
   }
 
+  /* ── 13b. Survey tracking panels ──────────────────────────────────────── */
+  await sb.from('survey_panels').insert({
+    brand_id: brandId, workspace_id: wsId,
+    name: 'Bridger CRM Monthly Awareness Check', template_key: 'awareness_check',
+    cadence: 'monthly', active: true,
+    last_run_at: tsAgo(14, 9), next_run_at: tsAgo(-16, 9),
+    recipient_emails: ['growth@bridgercrm.com', 'cs@bridgercrm.com'],
+  })
+  await sb.from('survey_panels').insert({
+    brand_id: brandId, workspace_id: wsId,
+    name: 'Bridger CRM Quarterly NPS Pulse', template_key: 'nps',
+    cadence: 'quarterly', active: false,
+    last_run_at: tsAgo(80, 9),
+    recipient_emails: ['growth@bridgercrm.com'],
+  })
+
   /* ── 14. NPS records for chart data ──────────────────────────────────── */
   const npsRecordInserts = Array.from({ length: 50 }, (_, i) => {
     const r = (Math.sin(i * 7.1) + 1) / 2
@@ -1004,6 +1020,22 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     }
   }
   await sb.from('cultural_resonance_scores').insert(crsInserts)
+
+  /* ── 16b. Geo-Lift study ────────────────────────────────────────────────── */
+  const brMakeWeekly = (weeks: number, baseT: number, baseC: number, liftPct: number) =>
+    Array.from({ length: weeks }, (_, i) => ({
+      week: dAgo((weeks - i) * 7),
+      treatment_index: Math.round(baseT + (liftPct * i / weeks) * baseT * 0.01 + Math.sin(i * 0.9) * 2),
+      control_index:   Math.round(baseC + Math.sin(i * 1.1) * 1.5),
+    }))
+  await sb.from('geo_lift_studies').insert({
+    brand_id: brandId, campaign_id: camp2Id,
+    treatment_city: 'Lagos', control_city: 'Abuja', keyword: 'Bridger CRM',
+    study_start: dAgo(90), study_end: dAgo(20),
+    lift_pct: 12.7, confidence: 88.9, correlation: 0.8015, status: 'complete',
+    weekly_data: brMakeWeekly(10, 58, 46, 12.7),
+    ai_interpretation: 'The Enterprise Tier launch drove a 12.7% incremental branded search uplift in Lagos versus the Abuja control. The lift builds steadily through the launch window, consistent with the LinkedIn and webinar push driving top-of-funnel awareness.',
+  })
 
   /* ── 17. Manual metrics (SaaS-specific) — 6 months, oldest first ──────── */
   // Canonical commercial keys: mrr, total_spend, new_customers (newly won

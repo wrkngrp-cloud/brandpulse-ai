@@ -403,6 +403,22 @@ export async function POST(req: NextRequest) {
     await sb.from('survey_responses').insert(recs.map(n => ({ survey_id: npsS.id, quality_flag: 'ok', answers: { q1: n.score }, collected_at: n.created_at })))
   }
 
+  /* ── 13b. Survey tracking panels ──────────────────────────────────────── */
+  await sb.from('survey_panels').insert({
+    brand_id: brandId, workspace_id: wsId,
+    name: 'Pinnacle Monthly Client Pulse', template_key: 'awareness_check',
+    cadence: 'monthly', active: true,
+    last_run_at: tsAgo(14, 9), next_run_at: tsAgo(-16, 9),
+    recipient_emails: ['accounts@pinnaclemedia.ng', 'ceo@pinnaclemedia.ng'],
+  })
+  await sb.from('survey_panels').insert({
+    brand_id: brandId, workspace_id: wsId,
+    name: 'Pinnacle Quarterly NPS Pulse', template_key: 'nps_basic',
+    cadence: 'quarterly', active: false,
+    last_run_at: tsAgo(80, 9),
+    recipient_emails: ['accounts@pinnaclemedia.ng'],
+  })
+
   /* ── 14. Cultural resonance + competitive briefings ───────────────────── */
   const crsInserts = []
   for (let w = 0; w < 12; w++) {
