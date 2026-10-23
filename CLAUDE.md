@@ -36,7 +36,8 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
 `industry-fit-strategy.md`, `funnel-signals-explained.md`, `to-100-percent-build-list.md`,
 `scoreboard-and-leads.md`, `brand-icons.md`, `motion-amendments.md`,
 `design-system-update-brief.md`, `connector-setup-guide.md`,
-`free-tools-acquisition-plan.md`, `internal-tool-plan.md`.
+`free-tools-acquisition-plan.md`, `internal-tool-plan.md`,
+`revenue-attribution-plan.md`.
 
 ## Commands
 - `npm run dev` — local dev server (Next.js + Turbopack).
