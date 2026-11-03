@@ -9,13 +9,14 @@
  */
 
 export type MoveCategory =
-  | 'product_launch' | 'product_change' | 'pricing'
+  | 'product_launch' | 'product_change' | 'pricing' | 'campaign'
   | 'partnership' | 'expansion' | 'positioning' | 'company'
 
 export const MOVE_LABEL: Record<MoveCategory, string> = {
   product_launch: 'Product launch',
   product_change: 'Product change',
   pricing:        'Pricing or offer',
+  campaign:       'Campaign',
   partnership:    'Partnership',
   expansion:      'Geographic expansion',
   positioning:    'Positioning change',

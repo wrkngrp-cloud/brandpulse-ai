@@ -3,12 +3,14 @@ import { z } from 'zod'
 import { runCompetitorTracker, type CompetitorTrackerResult } from '@/lib/tools/competitor-tracker'
 import { finishRun, hashIp, ipOf, startRun } from '@/lib/tools/runs'
 import { recordEvent } from '@/lib/tools/events'
-import { cacheGet, cacheKey, cacheSet, CACHE_TTL, withinRateLimit } from '@/lib/tools/limits'
+import { cacheGet, cacheKey, cacheSet, CACHE_TTL, withinDailyBudget, withinRateLimit, X_DAILY_RUNS } from '@/lib/tools/limits'
 import { normaliseUrl } from '@/lib/tools/fetch-public'
 import { gateResult } from '@/lib/tools/gate'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60
+// Press, outlet feeds, the App Store and X run in parallel, then up to six
+// article reads, then one AI call.
+export const maxDuration = 90
 
 /**
  * The public competitor analysis.
@@ -55,7 +57,7 @@ export async function POST(req: NextRequest) {
   const run = await startRun({ toolId: 'competitor-tracker', inputs, req, ipHash })
   await recordEvent({ event: 'free_tool_started', toolId: 'competitor-tracker', runId: run.id, visitorId, props: { market: market ?? '' } })
 
-  const key = cacheKey('competitor-tracker', [yours.hostname, theirs.hostname, market])
+  const key = cacheKey('competitor-tracker:v2', [yours.hostname, theirs.hostname, market])
   const cached = await cacheGet<CompetitorTrackerResult>(key)
 
   try {
@@ -73,6 +75,7 @@ export async function POST(req: NextRequest) {
       yourWebsite: yours.toString(),
       competitorWebsite: theirs.toString(),
       market: market ?? null,
+      xBudgetOk: process.env.TWITTER_BEARER_TOKEN ? await withinDailyBudget('x-search', X_DAILY_RUNS) : false,
     })
 
     if (!outcome.ok) {

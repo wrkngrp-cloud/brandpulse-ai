@@ -1,6 +1,6 @@
 import { createHash } from 'crypto'
 import { createServiceClient } from '@/lib/supabase/server'
-import { fetchGoogleNewsRss, pressQuery, parsePubDate } from '@/lib/press/nigerian-press'
+import { fetchGoogleNewsRss, newestFirst, pressQuery, parsePubDate, recentQuery } from '@/lib/press/nigerian-press'
 import { fetchPublic, robotsDisallows, pathAllowed } from './fetch-public'
 import { findSectionLinks, readPage } from './html'
 import { runCompetitorTracker } from './competitor-tracker'
@@ -61,13 +61,15 @@ export async function checkWatch(watch: WatchRow): Promise<WatchCheck> {
   const seen = new Set((known ?? []).map(k => k.fingerprint as string))
 
   // ── 1. Press, since the last check ──────────────────────────────────────
-  const feed = await fetchGoogleNewsRss(pressQuery(watch.competitor_name))
+  // Narrowed to a fortnight before Google ranks it, or relevance ranking hands
+  // back last year's launch as this week's news.
+  const feed = await fetchGoogleNewsRss(recentQuery(pressQuery(watch.competitor_name), 14))
   if (!feed.ok) {
     out.errors.push(`press feed unavailable: ${feed.error ?? 'unknown'}`)
   }
 
   const firstWord = watch.competitor_name.toLowerCase().split(/\s+/)[0]
-  const fresh = feed.items.filter(i => i.title.toLowerCase().includes(firstWord))
+  const fresh = newestFirst(feed.items.filter(i => i.title.toLowerCase().includes(firstWord)))
 
   for (const item of fresh.slice(0, 12)) {
     const fp = moveFingerprint('company', item.link, item.title)

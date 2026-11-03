@@ -46,6 +46,29 @@ export async function withinRateLimit(tool: string, ipHash: string): Promise<{ a
   }
 }
 
+/**
+ * A site-wide daily allowance for a source that bills per read, such as X
+ * search. The per-IP ceiling stops one visitor; this stops the bill. Each
+ * call that returns true has spent one unit. Fails open with the rest of this
+ * file: without Redis there is no counter, and the per-IP limit still stands.
+ */
+export async function withinDailyBudget(name: string, limit: number): Promise<boolean> {
+  if (!redis) return true
+  try {
+    const key = `tool:budget:${name}:${new Date().toISOString().slice(0, 10)}`
+    const n = await redis.incr(key)
+    if (n === 1) await redis.expire(key, 60 * 60 * 26)
+    return n <= limit
+  } catch (err) {
+    console.error(`[tools] budget counter unavailable for ${name}, allowing:`, err)
+    return true
+  }
+}
+
+/** Competitor briefs per day that may search X. Each spends about twenty post
+ *  reads of X credit. Override with X_TOOL_DAILY_RUNS. */
+export const X_DAILY_RUNS = Number(process.env.X_TOOL_DAILY_RUNS) > 0 ? Number(process.env.X_TOOL_DAILY_RUNS) : 100
+
 export async function cacheGet<T>(key: string): Promise<T | null> {
   if (!redis) return null
   try { return await redis.get<T>(key) } catch { return null }

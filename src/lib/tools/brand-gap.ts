@@ -1,5 +1,5 @@
 import { callAi, extractJson } from '@/lib/ai/client'
-import { fetchGoogleNewsRss, pressQuery, publicationFromUrl, parsePubDate, type RssItem } from '@/lib/press/nigerian-press'
+import { fetchGoogleNewsRss, newestFirst, pressQuery, publicationFromUrl, parsePubDate, recentQuery, type RssItem } from '@/lib/press/nigerian-press'
 import { configuredAssistants, queryAssistant } from '@/lib/ai/assistants'
 import { fetchPublic, failureSentence, normaliseUrl, robotsDisallows, pathAllowed } from './fetch-public'
 import { findSectionLinks, readPage, type PageFacts } from './html'
@@ -36,6 +36,9 @@ import type { CoverageNote, Evidence, Finding, ToolReport } from './report'
  * figure or a sentiment percentage. Nothing here is measured in numbers,
  * because nothing here can be.
  */
+
+/** How far back the press read goes. */
+const PRESS_DAYS = 90
 
 export type DivergenceKind = 'missing' | 'contradicted' | 'unclaimed' | 'aligned'
 
@@ -180,14 +183,16 @@ export async function runBrandGap(input: BrandGapInput): Promise<BrandGapOutcome
 
   /* ── 2. What the market says ───────────────────────────────────────────
      The press first, in two reads: the ten Nigerian outlets, and a wider
-     query for a brand whose coverage never reaches a Nigerian masthead. */
+     query for a brand whose coverage never reaches a Nigerian masthead.
+     Narrowed to the last 90 days: perception is what the market says now, and
+     unbounded the feed ranks by relevance, which surfaces old stories. */
   const [nigerian, general] = await Promise.all([
-    fetchGoogleNewsRss(pressQuery(name)),
-    fetchGoogleNewsRss(`"${name}" ${market}`),
+    fetchGoogleNewsRss(recentQuery(pressQuery(name), PRESS_DAYS)),
+    fetchGoogleNewsRss(recentQuery(`"${name}" ${market}`, PRESS_DAYS)),
   ])
 
   coverage.push({
-    source: 'Nigerian business press',
+    source: `Nigerian business press, last ${PRESS_DAYS} days`,
     read: nigerian.ok,
     note: nigerian.ok ? undefined : 'The news feed did not answer, so press coverage is missing from this reading.',
   })
@@ -199,7 +204,7 @@ export async function runBrandGap(input: BrandGapInput): Promise<BrandGapOutcome
 
   const first = name.toLowerCase().split(/\s+/)[0]
   const seen = new Set<string>()
-  const press: RssItem[] = [...nigerian.items, ...general.items].filter(item => {
+  const press: RssItem[] = newestFirst([...nigerian.items, ...general.items]).filter(item => {
     const key = item.link.split('?')[0]
     if (seen.has(key)) return false
     seen.add(key)

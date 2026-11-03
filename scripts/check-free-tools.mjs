@@ -63,6 +63,8 @@ const files = {
       "import { callAi, extractJson } from './ai-stub'")
     .replace("from '@/lib/press/nigerian-press'", "from './press-stub'")
     .replace("from '@/lib/ai/assistants'", "from './assistants-stub'")],
+  'app-store.ts':          ['src/lib/tools/app-store.ts', s => s],
+  'x-activity.ts':         ['src/lib/tools/x-activity.ts', s => s],
   'competitor-tracker.ts': ['src/lib/tools/competitor-tracker.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
       "import { callAi, extractJson } from './ai-stub'")
@@ -87,10 +89,14 @@ export function extractJson<T>(raw: string): T {
 }
 `)
 writeFileSync(`${OUT}/press-stub.ts`, `
-export interface RssItem { title: string; link: string; pubDate: string; snippet: string }
+export interface RssItem { title: string; link: string; pubDate: string; snippet: string; body?: string }
 export interface FeedRead { items: RssItem[]; ok: boolean; error?: string }
 export async function fetchGoogleNewsRss(_q: string, _signal?: AbortSignal): Promise<FeedRead> { return { items: [], ok: true } }
+export async function fetchOutletSearch(_t: string, _o?: { days?: number; timeoutMs?: number }): Promise<{ items: RssItem[]; outletsRead: number }> { return { items: [], outletsRead: 0 } }
 export function pressQuery(name: string): string { return name }
+export function recentQuery(q: string, days: number): string { return q + ' when:' + days + 'd' }
+export function newestFirst<T extends { pubDate: string }>(items: T[]): T[] { return [...items].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()) }
+export function isWithinDays(_p: string, _d: number): boolean { return true }
 export function publicationFromUrl(url: string): string {
   try { return new URL(url).hostname.replace('www.', '') } catch { return 'Unknown' }
 }
@@ -321,7 +327,7 @@ eq('press source attached',       [moves[0].sourceUrl, moves[0].sourceKind], ['h
 eq('press date attached',         moves[0].publishedAt, '2026-10-06')
 ok('fingerprint present',         /^[0-9a-f]{40}$/.test(moves[0].fingerprint))
 
-console.log('\n── classifyMoves: an undated page cannot carry a change claim')
+console.log('\n── classifyMoves: their website is context, never a source')
 aiStub.setNextResponse(JSON.stringify({ moves: [
   { source: 2, category: 'product_launch', headline: 'They just launched a card', significance: 's', implication: 'i', quote: 'q', confidence: 'high' },
 ] }))
@@ -329,10 +335,52 @@ moves = await tracker.classifyMoves({
   ...base,
   sectionPages: [{ url: 'https://rival.ng/pricing', facts: compFacts, kind: 'pricing' }],
 })
-eq('launch demoted to positioning', moves[0].category, 'positioning')
-eq('site source kind',              moves[0].sourceKind, 'site_page')
-eq('confidence capped',             moves[0].confidence, 'medium')
-eq('no date claimed',               moves[0].publishedAt, null)
+eq('a pricing page has no number to cite', moves.length, 0)
+eq('no dated sources, no model call, no moves',
+   (await tracker.classifyMoves({ ...base, press: [] })).length, 0)
+
+console.log('\n── classifyMoves: app releases and their own X posts are dated sources')
+const release = { appName: 'Rival', version: '5.2.0', releasedAt: '2026-10-28', notes: 'You can now split bills with friends.', url: 'https://apps.apple.com/ng/app/rival/id1' }
+const ownPost = { id: '42', text: 'Our #RivalRaya campaign is live. Win N1m.', createdAt: '2026-11-01T10:00:00.000Z', username: 'rivalng', url: 'https://x.com/rivalng/status/42', likes: 10, reposts: 3 }
+aiStub.setNextResponse(JSON.stringify({ moves: [
+  { source: 1, category: 'pricing',  headline: 'Fee rise',     confidence: 'high' },
+  { source: 2, category: 'product_launch', headline: 'Bill splitting', confidence: 'high' },
+  { source: 3, category: 'campaign', headline: 'Raya campaign', confidence: 'high' },
+] }))
+moves = await tracker.classifyMoves({ ...base, appRelease: release, xOwn: [ownPost] })
+eq('three dated sources cited', moves.length, 3)
+eq('newest first', moves.map(m => m.headline), ['Raya campaign', 'Bill splitting', 'Fee rise'])
+eq('campaign category kept', moves[0].category, 'campaign')
+eq('own post is an announcement', [moves[0].sourceKind, moves[0].sourceUrl, moves[0].publishedAt], ['announcement', 'https://x.com/rivalng/status/42', '2026-11-01'])
+eq('release note dated', [moves[1].sourceKind, moves[1].publishedAt], ['announcement', '2026-10-28'])
+const aboutPost = { ...ownPost, id: '43', username: 'someone', url: 'https://x.com/someone/status/43' }
+aiStub.setNextResponse(JSON.stringify({ moves: [{ source: 2, category: 'campaign', headline: 'Chatter', confidence: 'high' }] }))
+eq('posts about them are not citable', (await tracker.classifyMoves({ ...base, xAbout: [aboutPost] })).length, 0)
+
+console.log('\n── app store: generic notes and picking their app')
+const appStore = await import(`${OUT}/app-store.mjs`)
+ok('bug fixes is generic', appStore.isGenericNote('Bug fixes and performance improvements.'))
+ok('short is generic', appStore.isGenericNote('Minor updates'))
+ok('long filler is generic', appStore.isGenericNote('We update the app regularly to make it better for you. This version includes bug fixes and performance improvements.'))
+ok('a real change is kept', !appStore.isGenericNote('You can now pay electricity bills and buy data bundles straight from the home screen.'))
+const apps = [
+  { trackName: 'Rival Games', sellerName: 'Other Ltd', sellerUrl: 'https://other.com' },
+  { trackName: 'Rival - Banking', sellerName: 'Rival Ltd', sellerUrl: 'https://www.rival.ng/' },
+]
+eq('matched by website', appStore.pickTheirApp(apps, 'Rival', 'rival.ng')?.sellerName, 'Rival Ltd')
+eq('matched by seller name', appStore.pickTheirApp([{ trackName: 'X', sellerName: 'Rival Ltd' }], 'Rival', 'nope.ng')?.sellerName, 'Rival Ltd')
+eq('no match is null', appStore.pickTheirApp([{ trackName: 'Other', sellerName: 'Other' }], 'Rival', 'rival.ng'), null)
+
+console.log('\n── x: handle from their homepage, and the search parse')
+const xa = await import(`${OUT}/x-activity.mjs`)
+eq('x.com handle', xa.findXHandle({ links: [{ href: 'https://x.com/share?u=1', text: '' }, { href: 'https://x.com/RivalNG', text: '' }] }), 'RivalNG')
+eq('twitter.com handle', xa.findXHandle({ links: [{ href: 'https://twitter.com/@rival_ng?lang=en', text: '' }] }), 'rival_ng')
+eq('intent link ignored', xa.findXHandle({ links: [{ href: 'https://twitter.com/intent/tweet?text=x', text: '' }] }), null)
+const parsed = xa.parseSearch({ data: [{ id: '1', text: 't', created_at: '2026-11-01T00:00:00Z', author_id: 'u1', public_metrics: { like_count: 5, retweet_count: 2 } }], includes: { users: [{ id: 'u1', username: 'rivalng' }] } })
+eq('post url built', parsed[0].url, 'https://x.com/rivalng/status/1')
+eq('metrics read', [parsed[0].likes, parsed[0].reposts], [5, 2])
+delete process.env.TWITTER_BEARER_TOKEN
+eq('no token, no call', (await xa.fetchXActivity({ name: 'Rival', handle: 'rivalng', budgetOk: true })).ok, false)
 
 console.log('\n── classifyMoves: malformed and empty answers')
 aiStub.setNextResponse('not json at all')
@@ -348,7 +396,7 @@ eq('unknown confidence falls back', moves[0].confidence, 'medium')
 aiStub.setNextResponse(JSON.stringify({ moves: Array.from({ length: 9 }, (_, i) => (
   { source: 1, category: 'pricing', headline: `Move ${i}`, confidence: 'low' }
 )) }))
-eq('capped at three', (await tracker.classifyMoves(base)).length, 3)
+eq('capped at five', (await tracker.classifyMoves(base)).length, 5)
 
 
 // ── The demand finder's evidence guards ─────────────────────────────────────
