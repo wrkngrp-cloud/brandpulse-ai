@@ -19,14 +19,14 @@ export interface CheckinMetric {
 }
 
 export const CHECKIN_METRICS: Record<BrandType, CheckinMetric> = {
-  fintech:          { key: 'wk_new_accounts', label: 'New accounts',     question: 'How many new accounts did you get last week?',         example: 'e.g. 4210' },
-  fmcg:             { key: 'wk_sales',        label: 'Units sold',       question: 'How many units did you sell last week?',                example: 'e.g. 18500' },
-  beverage_alcohol: { key: 'wk_cases',        label: 'Cases sold',       question: 'How many cases did you sell last week?',                example: 'e.g. 920' },
-  venue:            { key: 'wk_bookings',     label: 'Bookings',         question: 'How many bookings or covers did you have last week?',   example: 'e.g. 640' },
-  b2b_saas:         { key: 'wk_signups',      label: 'New sign-ups',     question: 'How many new sign-ups or trials did you get last week?', example: 'e.g. 85' },
-  marketplace:      { key: 'wk_orders',       label: 'Orders',           question: 'How many orders went through last week?',              example: 'e.g. 3100' },
-  b2b_distribution: { key: 'wk_orders',       label: 'Orders',           question: 'How many orders did you fulfil last week?',            example: 'e.g. 410' },
-  agency:           { key: 'wk_leads',        label: 'New client leads', question: 'How many new client leads came in last week?',         example: 'e.g. 12' },
+  fintech:          { key: 'wk_new_accounts', label: 'New accounts',     question: 'How many new accounts did you get last week?',         example: '4210' },
+  fmcg:             { key: 'wk_sales',        label: 'Units sold',       question: 'How many units did you sell last week?',                example: '18500' },
+  beverage_alcohol: { key: 'wk_cases',        label: 'Cases sold',       question: 'How many cases did you sell last week?',                example: '920' },
+  venue:            { key: 'wk_bookings',     label: 'Bookings',         question: 'How many bookings or covers did you have last week?',   example: '640' },
+  b2b_saas:         { key: 'wk_signups',      label: 'New sign-ups',     question: 'How many new sign-ups or trials did you get last week?', example: '85' },
+  marketplace:      { key: 'wk_orders',       label: 'Orders',           question: 'How many orders went through last week?',              example: '3100' },
+  b2b_distribution: { key: 'wk_orders',       label: 'Orders',           question: 'How many orders did you fulfil last week?',            example: '410' },
+  agency:           { key: 'wk_leads',        label: 'New client leads', question: 'How many new client leads came in last week?',         example: '12' },
 }
 
 export function checkinMetricFor(brandType: string | null | undefined): CheckinMetric {
