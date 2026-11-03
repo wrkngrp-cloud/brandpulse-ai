@@ -1,4 +1,10 @@
-import type { BrandType } from '@/lib/bhi'
+// The eight scoring verticals, repeated here so this file has no imports and
+// the demo generators can compile it standalone. build.ts checks at compile
+// time that this list and BrandType in src/lib/bhi.ts stay identical.
+export type BriefBrandType =
+  | 'fmcg' | 'fintech' | 'venue' | 'b2b_saas' | 'marketplace'
+  | 'beverage_alcohol' | 'b2b_distribution' | 'agency'
+type BrandType = BriefBrandType
 
 /**
  * The Monday Brief's weekly check-in: which number each kind of brand is
