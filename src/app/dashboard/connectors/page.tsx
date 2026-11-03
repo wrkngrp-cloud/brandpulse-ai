@@ -32,9 +32,14 @@ export default async function ConnectorsPage() {
 
   const brand = await getActiveBrand<{ id: string; name: string; category: string | null; industry: string | null }>(supabase, 'id, name, category, industry')
 
-  const { data: connections } = await supabase
-    .from('social_connections')
-    .select('platform, account_name, sync_status, last_synced_at')
+  // This brand's connections only. RLS returns every brand in the workspace,
+  // so without the filter Brand B showed Brand A's X as connected.
+  const { data: connections } = brand?.id
+    ? await supabase
+        .from('social_connections')
+        .select('platform, account_name, sync_status, last_synced_at')
+        .eq('brand_id', brand.id)
+    : { data: [] }
 
   let ga4Connection:    GA4ConnectionData | null  = null
   let metaAdsAccount:  MetaAdsAccountData | null  = null

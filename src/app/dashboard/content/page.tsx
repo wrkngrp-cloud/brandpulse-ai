@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { ContentTableClient } from './content-table-client'
 import { SovWidgetClient } from './sov-widget-client'
 import { SocialConnectCard } from '@/components/dashboard/social-connect-card'
@@ -18,6 +19,10 @@ import { PAGE_META } from '@/components/dashboard/page-meta'
 
 async function ContentData({ days }: { days: number }) {
   const supabase = await createClient()
+  // Every query below is for the active brand. They had no brand filter, so
+  // in a multi-brand workspace this page mixed every brand's posts,
+  // connections, competitors and share of voice together.
+  const brandId = (await getActiveBrandId(supabase)) ?? ''
 
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - days)
@@ -28,24 +33,29 @@ async function ContentData({ days }: { days: number }) {
       supabase
         .from('social_posts')
         .select('id,platform,content,content_type,reach,impressions,likes,comments,shares,engagement_rate,funnel_stage,ai_performance_score,posted_at')
+        .eq('brand_id', brandId)
         .gte('posted_at', cutoffStr)
         .order('posted_at', { ascending: false })
         .limit(500),
       supabase
         .from('social_connections')
-        .select('platform,account_name,sync_status,last_synced_at'),
+        .select('platform,account_name,sync_status,last_synced_at')
+        .eq('brand_id', brandId),
       supabase
         .from('competitors')
-        .select('id,name'),
+        .select('id,name')
+        .eq('brand_id', brandId),
       supabase
         .from('sov_snapshots')
         .select('social_sov,competitor_data')
+        .eq('brand_id', brandId)
         .order('snapshot_date', { ascending: false })
         .limit(1)
         .maybeSingle(),
       supabase
         .from('sov_snapshots')
         .select('snapshot_date,social_sov')
+        .eq('brand_id', brandId)
         .gte('snapshot_date', cutoffStr)
         .order('snapshot_date', { ascending: true })
         .limit(180),
