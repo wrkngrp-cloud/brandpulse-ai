@@ -60,6 +60,19 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
     }
   }
 
+  async function handleDisconnect() {
+    if (!confirm('Remove your app store details? We stop pulling reviews.')) return
+    setLoading('save')
+    try {
+      const res = await fetch('/api/connectors/app-store/configure', { method: 'DELETE' })
+      if (!res.ok) { toast.error('Could not remove it. Try again.'); return }
+      toast.success('App store details removed.')
+      setConfig(null)
+    } finally {
+      setLoading(null)
+    }
+  }
+
   async function handleSync() {
     setLoading('sync')
     try {
@@ -146,6 +159,14 @@ export function AppStoreConnectCard({ config: initialConfig }: AppStoreConnectCa
           >
             <RefreshCw className={cn('h-3.5 w-3.5', loading === 'sync' && '')} />
             {loading === 'sync' ? 'Queuing...' : 'Sync now'}
+          </button>
+          <button
+            type="button"
+            onClick={handleDisconnect}
+            disabled={loading !== null}
+            className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'text-xs text-tx-2 ml-2')}
+          >
+            Remove
           </button>
         </div>
       ) : (

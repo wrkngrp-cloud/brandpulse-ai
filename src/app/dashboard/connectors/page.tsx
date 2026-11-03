@@ -52,7 +52,7 @@ export default async function ConnectorsPage() {
   if (brand?.id) {
     const [ga4Res, metaAdsRes, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
       supabase.from('ga4_connections').select('id, property_id, property_name, last_synced_at').eq('brand_id', brand.id).maybeSingle(),
-      supabase.from('digital_ad_accounts').select('id, account_name, ad_account_id, sync_status, last_synced_at').eq('brand_id', brand.id).eq('platform', 'meta').maybeSingle(),
+      supabase.from('digital_ad_accounts').select('id, account_name, ad_account_id, sync_status, last_synced_at, last_error').eq('brand_id', brand.id).eq('platform', 'meta').maybeSingle(),
       supabase.from('webhook_configs').select('provider').eq('brand_id', brand.id),
       supabase.from('app_store_configs').select('apple_app_id, google_pkg_name').eq('brand_id', brand.id).maybeSingle(),
       supabase.from('app_reviews').select('rating').eq('brand_id', brand.id).order('reviewed_at', { ascending: false }).limit(30),

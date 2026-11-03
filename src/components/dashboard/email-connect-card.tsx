@@ -84,6 +84,19 @@ function ProviderCard({
     }
   }
 
+  async function handleDisconnect() {
+    if (!confirm(`Disconnect ${label}? We stop syncing it and delete the key.`)) return
+    setLoading('save')
+    try {
+      const res = await fetch(apiUrl, { method: 'DELETE' })
+      if (!res.ok) { toast.error(`Could not disconnect ${label}. Try again.`); return }
+      toast.success(`${label} disconnected.`)
+      setConnected(false)
+    } finally {
+      setLoading(null)
+    }
+  }
+
   async function handleSync() {
     setLoading('sync')
     try {
@@ -128,6 +141,13 @@ function ProviderCard({
             className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'text-xs')}
           >
             Update key
+          </button>
+          <button
+            onClick={handleDisconnect}
+            disabled={loading !== null}
+            className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'text-xs text-tx-2')}
+          >
+            Disconnect
           </button>
         </div>
       ) : (

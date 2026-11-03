@@ -13,6 +13,7 @@ export interface MetaAdsAccountData {
   ad_account_id:  string | null
   sync_status:    string
   last_synced_at: string | null
+  last_error?:    string | null
 }
 
 interface Props {
@@ -85,7 +86,18 @@ export function MetaAdsConnectCard({ account: initialAccount }: Props) {
           </div>
           <div>
             <p className="text-sm font-semibold">Meta Ads</p>
-            {account ? (
+            {account && account.sync_status === 'error' ? (
+              <div className="mt-0.5 space-y-0.5">
+                <p className="text-xs text-tx-flare font-medium">Sync failing</p>
+                <p className="text-xs text-muted-foreground">
+                  {account.account_name ?? account.ad_account_id ?? 'Your ad account'}: the last sync did not go through.
+                  {/* Error 190 is Meta's expired-login code. */}
+                  {account.last_error && /190|expired|session/i.test(account.last_error)
+                    ? ' Your Meta login has expired. Reconnect to keep your numbers flowing.'
+                    : ' Reconnect to fix it. If it keeps failing, message us from the help button.'}
+                </p>
+              </div>
+            ) : account ? (
               <div className="flex items-center gap-1.5 mt-0.5">
                 <CheckCircle2 className="h-3 w-3 text-pos" />
                 <p className="text-xs text-muted-foreground">
@@ -103,7 +115,15 @@ export function MetaAdsConnectCard({ account: initialAccount }: Props) {
           </div>
         </div>
 
-        {account ? (
+        {account?.sync_status === 'error' ? (
+          <a
+            href="/api/ads/meta/connect?return_to=connectors"
+            className={cn(buttonVariants({ size: 'sm' }), 'shrink-0 inline-flex items-center gap-1.5')}
+          >
+            <Zap className="h-3.5 w-3.5" />
+            Reconnect
+          </a>
+        ) : account ? (
           <button
             onClick={disconnect}
             disabled={loading === 'disconnect'}

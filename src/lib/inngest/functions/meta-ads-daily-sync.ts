@@ -271,6 +271,13 @@ export const metaAdsDailySync = inngest.createFunction(
 
             if (upsertErr) {
               logger.error(`Failed to upsert insights for account ${account.id}: ${upsertErr.message}`)
+              // Recorded, so the card says the sync failed instead of looking
+              // like a sync that simply has not run yet.
+              await supabase.from('digital_ad_accounts').update({
+                sync_status: 'error',
+                last_error:  `Saving the results failed: ${upsertErr.message.slice(0, 400)}`,
+                updated_at:  new Date().toISOString(),
+              }).eq('id', account.id)
               return
             }
           }
