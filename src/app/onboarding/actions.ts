@@ -5,6 +5,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { safeNext } from '@/lib/safe-next'
 import { GOAL_IDS } from '@/lib/goals'
+import { brandTypeForIndustry } from '@/lib/bhi'
 
 const onboardingSchema = z.object({
   websiteUrl: z.string().optional().default(''),
@@ -54,22 +55,21 @@ export async function completeOnboarding(
   }
 
   const d = parsed.data
-  const service = await createServiceClient()
 
-  const { data: brand } = await service
+  // The blank brand signup made for this user, found through RLS so it can
+  // only be one of their own. This used to read the user's workspace with
+  // .single(), which errors for anyone in two workspaces, and then said
+  // "Brand record not found".
+  const { data: brand } = await supabase
     .from('brands')
     .select('id')
-    .eq('workspace_id',
-      (await service
-        .from('workspace_members')
-        .select('workspace_id')
-        .eq('user_id', user.id)
-        .single()
-      ).data?.workspace_id ?? ''
-    )
-    .single()
+    .eq('name', '')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
-  if (!brand) return { error: 'Brand record not found.' }
+  if (!brand) return { error: 'We could not find the brand to set up. Sign out and in again, then try once more.' }
+  const service = await createServiceClient()
 
   const { error } = await service
     .from('brands')
@@ -77,6 +77,8 @@ export async function completeOnboarding(
       name:             d.brandName,
       website_url:      d.websiteUrl || null,
       industry:         d.industry,
+      // The scoring vertical. Never set before, so every brand scored as FMCG.
+      brand_type:       brandTypeForIndustry(d.industry),
       category:         d.category,
       brand_values:     d.brandValues,
       brand_voice:      d.brandVoice,

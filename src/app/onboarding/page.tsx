@@ -167,7 +167,9 @@ function Onboarding() {
         brandName,
         industry:        d.industry,
         focusGoals:      d.focusGoals,
-        category:        result.category || 'Other',
+        // Their own industry pick wins. Research used to overwrite it, so a
+        // brand that chose Fintech came back as "Other".
+        category:        d.category || result.category || 'Other',
         brandValues:     result.brandValues ?? [],
         brandVoice:      {
           adjectives:       result.brandVoice?.adjectives ?? [],
