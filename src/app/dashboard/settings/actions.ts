@@ -3,6 +3,9 @@
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { revalidatePath } from 'next/cache'
+import { getActiveBrandId } from '@/lib/active-brand'
+import { GOAL_IDS } from '@/lib/goals'
 
 export type SettingsState = { error?: string; success?: boolean } | null
 
@@ -155,5 +158,40 @@ export async function updateBrand(
   }).eq('id', brand.id)
 
   if (error) return { error: error.message }
+  return { success: true }
+}
+
+// ── Modules: what this brand chose to see ──────────────────────────────────
+
+const focusSchema = z.object({
+  goals:   z.array(z.enum(GOAL_IDS)).max(GOAL_IDS.length),
+  showAll: z.boolean(),
+})
+
+/** Saves which modules the active brand's sidebar shows. Runs on the RLS
+ *  client: brands_all already limits it to the caller's own workspace. */
+export async function saveModuleFocus(input: { goals: string[]; showAll: boolean }): Promise<SettingsState> {
+  const parsed = focusSchema.safeParse(input)
+  if (!parsed.success) return { error: 'That choice did not save. Try again.' }
+  const { goals, showAll } = parsed.data
+  if (!showAll && goals.length === 0) return { error: 'Pick at least one, or show every module.' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'You are signed out. Sign in and try again.' }
+
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return { error: 'We could not find your brand.' }
+
+  const { error } = await supabase
+    .from('brands')
+    .update({ focus_goals: [...new Set(goals)], show_all_modules: showAll })
+    .eq('id', brandId)
+  if (error) {
+    console.error('[settings] saveModuleFocus failed:', error.message)
+    return { error: 'This setting is not switched on for your account yet. Check back soon.' }
+  }
+
+  revalidatePath('/dashboard', 'layout')
   return { success: true }
 }

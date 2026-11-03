@@ -12,6 +12,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
   DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import type { ModuleFocus } from '@/lib/goals'
 import { DashboardNav } from './dashboard-nav'
 import { BrandSwitcher } from './brand-switcher'
 import type { BrandOption } from './brand-switcher'
@@ -122,9 +123,10 @@ interface SidebarProps {
   brands?:       BrandOption[]
   activeBrandId?: string | null
   industry?:     string | null
+  focus?:        ModuleFocus | null
 }
 
-export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, brands = [], activeBrandId = null, industry = null }: SidebarProps) {
+export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, brands = [], activeBrandId = null, industry = null, focus = null }: SidebarProps) {
   const [hovering, setHovering] = useState(false)
   const pathname = usePathname()
 
@@ -178,7 +180,7 @@ export function Sidebar({ pinned, onToggle, userName, userEmail, brandName, bran
 
       {/* ── Navigation ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 px-2.5">
-        <DashboardNav expanded={expanded} industry={industry} />
+        <DashboardNav expanded={expanded} industry={industry} focus={focus} />
       </div>
 
       {/* ── Ask AI CTA ─────────────────────────────────────────── */}

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { safeNext } from '@/lib/safe-next'
+import { GOAL_IDS } from '@/lib/goals'
 
 const onboardingSchema = z.object({
   websiteUrl: z.string().optional().default(''),
@@ -30,6 +31,7 @@ const onboardingSchema = z.object({
     demographics: z.string().optional(),
     geography: z.string().optional(),
   })).default([]),
+  focusGoals: z.array(z.enum(GOAL_IDS)).default([]),
 })
 
 export type OnboardingData = z.infer<typeof onboardingSchema>
@@ -84,6 +86,18 @@ export async function completeOnboarding(
     .eq('id', brand.id)
 
   if (error) return { error: error.message }
+
+  /* What they came to do. A separate write so that, before the focus
+     migration is applied, a missing column costs the focused sidebar and not
+     the whole of onboarding: the brand is saved either way, and the full
+     sidebar is the fallback. */
+  if (d.focusGoals.length) {
+    const { error: focusError } = await service
+      .from('brands')
+      .update({ focus_goals: d.focusGoals, show_all_modules: false })
+      .eq('id', brand.id)
+    if (focusError) console.error('[onboarding] could not save focus goals:', focusError.message)
+  }
 
   // A free-tool visitor goes back to their own report, now that a brand
   // exists for it to attach to. Everyone else goes to the dashboard.
