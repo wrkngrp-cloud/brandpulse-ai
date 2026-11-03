@@ -1,8 +1,9 @@
 import { createServiceClient } from '@/lib/supabase/server'
-import { fetchTwitterUserMentions, fetchTwitterKeywordMentions, refreshTwitterToken } from '@/lib/social/twitter'
+import { fetchTwitterUserMentions, fetchTwitterKeywordMentions } from '@/lib/social/twitter'
 import { fetchInstagramHashtagMentions, fetchInstagramTaggedMedia } from '@/lib/social/instagram'
 import { classifySentiment } from '@/lib/ai/classify-sentiment'
-import { decrypt, encrypt } from '@/lib/crypto'
+import { twitterRefresher } from '@/lib/social/twitter-token'
+import { decrypt } from '@/lib/crypto'
 
 export interface CrawlResult {
   mentionsFound: number
@@ -74,7 +75,7 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
   // ── 1. Get connected social accounts ──────────────────────────────────────
   const { data: connections } = await supabase
     .from('social_connections')
-    .select('platform, account_id, access_token, refresh_token, account_name')
+    .select('id, platform, account_id, access_token, refresh_token, account_name')
     .eq('brand_id', brandId)
     .eq('sync_status', 'active')
 
@@ -90,20 +91,17 @@ export async function runCrawl(brandId: string, runId?: string): Promise<CrawlRe
     try {
       let accessToken = decrypt(twitterConn.access_token)
 
-      // Attempt fetch; on 401 try one token refresh then retry
+      // Attempt fetch; on 401 refresh once and retry. The two fetches below run
+      // in parallel, and X refresh tokens are single use, so they share one
+      // refresh rather than each spending the same token.
+      const refresh = twitterRefresher(supabase, twitterConn)
       const withRefresh = async <T>(fn: () => Promise<T>): Promise<T> => {
         return fn().catch(async (err: unknown) => {
           const msg = err instanceof Error ? err.message : ''
           const isExpired = (msg.includes('401') || msg.includes('auth error')) && !msg.includes('X_CREDITS_DEPLETED')
           if (!isExpired || !twitterConn.refresh_token) throw err
 
-          const refreshed = await refreshTwitterToken(decrypt(twitterConn.refresh_token))
-          accessToken = refreshed.access_token
-          await supabase.from('social_connections').update({
-            access_token: encrypt(refreshed.access_token),
-            ...(refreshed.refresh_token ? { refresh_token: encrypt(refreshed.refresh_token) } : {}),
-          }).eq('brand_id', brandId).eq('platform', 'twitter')
-
+          accessToken = await refresh()
           return fn()
         })
       }

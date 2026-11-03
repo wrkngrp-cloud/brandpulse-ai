@@ -1,6 +1,6 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
-import { sendMail } from '@/lib/email/send'
+import { sendEach } from '@/lib/email/send'
 import { TOKENS } from '@/lib/brand-tokens'
 
 const APP_URL = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
@@ -73,26 +73,21 @@ export const panelDispatch = inngest.createFunction(
 
     if (panel.recipient_emails?.length > 0) {
       await step.run('send-emails', async () => {
-        const batches: string[][] = []
-        for (let i = 0; i < panel.recipient_emails.length; i += 50) {
-          batches.push(panel.recipient_emails.slice(i, i + 50))
-        }
-        for (const batch of batches) {
-          const mail = await sendMail({
-            from:    `${brandName} <surveys@brandgauge.app>`,
-            to:      batch,
-            subject: `${brandName} — ${panel.name} (${new Date().toLocaleDateString('en-NG', { month: 'long', timeZone: 'Africa/Lagos' })})`,
+        // One email per person, so no recipient sees the rest of the panel.
+        const result = await sendEach({
+          from:    `${brandName} <surveys@brandgauge.app>`,
+          subject: `${brandName}: ${panel.name} (${new Date().toLocaleDateString('en-NG', { month: 'long', timeZone: 'Africa/Lagos' })})`,
             html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:${TOKENS.tx};">
               <p style="font-size:15px;line-height:1.6;">${brandName} is running its ${panel.cadence} tracking survey. It takes less than 2 minutes.</p>
               <p style="margin:28px 0;"><a href="${surveyUrl}" style="display:inline-block;background:${TOKENS.tx};color:${TOKENS.paper};text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;">Take the survey</a></p>
               <p style="font-size:13px;color:${TOKENS.tx3};margin-top:32px;border-top:1px solid ${TOKENS.shell};padding-top:16px;">Powered by BrandGauge</p>
             </div>`,
-          })
-          // Throwing fails the step, which is what we want: Inngest retries it,
-          // and a panel that never went out shows as a failed run instead of a
-          // successful one.
-          if (!mail.sent) throw new Error(`panel invitations not sent: ${mail.reason}`)
-        }
+        }, panel.recipient_emails)
+        // Throwing fails the step, which is what we want: Inngest retries it,
+        // and a panel that never went out shows as a failed run instead of a
+        // successful one. A retry re-sends the whole list, so a partial send
+        // is logged with its count first.
+        if ('reason' in result) throw new Error(`panel invitations: ${result.sent} sent, ${result.failed} not sent: ${result.reason}`)
       })
     }
 
