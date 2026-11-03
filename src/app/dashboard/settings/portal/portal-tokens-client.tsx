@@ -92,14 +92,14 @@ export function PortalTokensClient({ tokens: initial, brands, plan, portalLimit,
         <p className="eyebrow mb-1">Settings</p>
         <h1 className="h-display text-[26px] leading-none">Client Portal</h1>
         <p className="mt-1.5 text-[13px] text-tx-2 max-w-xl">
-          Create read-only shareable links for clients to view brand performance data. No login required. Your {plan} plan supports {portalLimit === -1 ? 'unlimited' : portalLimit} portal link{portalLimit === 1 ? '' : 's'}.
+          Create read-only shareable links for clients to view brand performance data. No login required. During the beta you can make as many as you need.
         </p>
       </div>
 
       {/* Create form */}
       {atLimit ? (
         <div className="rounded-xl border border-dashed p-5 text-center">
-          <p className="text-[13px] text-muted-foreground">You've reached your portal link limit.</p>
+          <p className="text-[13px] text-muted-foreground">You&apos;ve reached your portal link limit.</p>
           <Button variant="outline" size="sm" className="mt-3" onClick={() => window.location.href = '/dashboard/settings/billing'}>
             Upgrade to add more
           </Button>

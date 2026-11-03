@@ -12,15 +12,16 @@ export default async function PortalSettingsPage() {
     supabase.from('workspaces').select('plan').limit(1).maybeSingle(),
   ])
 
-  const { data: planRow } = await supabase
-    .from('plan_limits').select('portal_links').eq('plan', workspace?.plan ?? 'starter').maybeSingle()
 
   return (
     <PortalTokensClient
       tokens={(tokens ?? []) as unknown as Parameters<typeof PortalTokensClient>[0]['tokens']}
       brands={brands ?? []}
       plan={workspace?.plan ?? 'starter'}
-      portalLimit={planRow?.portal_links ?? 0}
+      // Beta is free and has no limits. The starter plan row said 0, which
+      // made the portal unusable behind an "Upgrade" button. Plans come back
+      // with billing, after the beta.
+      portalLimit={-1}
       appUrl={process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'}
     />
   )

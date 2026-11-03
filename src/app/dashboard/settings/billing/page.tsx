@@ -1,8 +1,13 @@
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { BillingClient } from './billing-client'
 import { PLAN_DISPLAY } from '@/lib/stripe'
 
 export default async function BillingPage() {
+  // Beta is free: no trial, no prices, no upgrade prompts. The page stays in
+  // the codebase for when billing returns (on Paystack), but nobody reaches
+  // it now. It showed "Trialing" and ₦299k/₦699k upgrade buttons.
+  redirect('/dashboard/settings/profile')
   const supabase = await createClient()
 
   const [{ data: workspace }, { data: usageThisMonth }] = await Promise.all([
