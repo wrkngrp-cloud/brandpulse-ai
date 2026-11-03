@@ -1,12 +1,10 @@
 import { createHash } from 'crypto'
 import { callAi, extractJson } from '@/lib/ai/client'
-import {
-  fetchGoogleNewsRss, fetchOutletSearch, isWithinDays, newestFirst, pressQuery, publicationFromUrl,
-  parsePubDate, recentQuery, type RssItem,
-} from '@/lib/press/nigerian-press'
+import { publicationFromUrl, parsePubDate, type RssItem } from '@/lib/press/nigerian-press'
+import { readRecentPress } from './press-reader'
 import { fetchPublic, failureSentence, normaliseUrl, rootHost, robotsDisallows, pathAllowed } from './fetch-public'
 import { absolute, findSectionLinks, readPage, type PageFacts } from './html'
-import { fetchAppStoreRelease, type AppRelease } from './app-store'
+import { fetchAppStoreRelease, findAppLinks, type AppRelease } from './app-store'
 import { fetchXActivity, findXHandle, type XPost } from './x-activity'
 import type { CoverageNote, Finding, ToolReport } from './report'
 import { MOVE_LABEL, type MoveCategory } from './moves'
@@ -19,7 +17,8 @@ import { MOVE_LABEL, type MoveCategory } from './moves'
  * has to be what changed recently, and every source that can be cited is
  * dated: thirty days of Nigerian business press (Google News narrowed to the
  * window, plus the outlets' own feeds for the article text), the competitor's
- * latest App Store release notes, and their own posts on X this week. Their
+ * latest App Store release notes when their own site links to an app (so an
+ * FMCG brand with no app is never checked), and their own posts on X this week. Their
  * website is read as context, so the model can tell new from known, and is
  * never cited as a move. Nothing scraped that asks not to be.
  *
@@ -109,20 +108,6 @@ export type TrackerOutcome =
   | { ok: true; result: CompetitorTrackerResult }
   | { ok: false; reason: 'bad_competitor_url' | 'competitor_unreadable' | 'no_evidence'; note: string; coverage: CoverageNote[] }
 
-/** A press story, from Google News or from the outlet's own feed. */
-export type PressSource = RssItem & { origin: 'google' | 'outlet' }
-
-/** Read the article behind a press link, when we can. Google News links are a
- *  script-driven redirect a server cannot follow, so a read that ends on
- *  news.google.com is treated as no read. */
-async function readArticle(link: string): Promise<string | null> {
-  const res = await fetchPublic(link, { timeoutMs: 6_000, maxBytes: 1_500_000 })
-  if (!res.ok) return null
-  try { if (new URL(res.url).hostname.endsWith('news.google.com')) return null } catch { return null }
-  const facts = readPage(res.body, res.url)
-  return facts.text.length > 200 ? facts.text.slice(0, 3000) : null
-}
-
 export async function runCompetitorTracker(input: TrackerInput): Promise<TrackerOutcome> {
   const compUrl = normaliseUrl(input.competitorWebsite)
   const yourUrl = normaliseUrl(input.yourWebsite)
@@ -150,37 +135,34 @@ export async function runCompetitorTracker(input: TrackerInput): Promise<Tracker
   coverage.push({ source: `${compUrl.hostname} homepage, for what they already offer`, read: true })
 
   const competitorName = nameFrom(compFacts, compHome.url)
-  const handle = findXHandle({ links: compFacts.links.map(l => ({ ...l, href: absolute(l.href, compHome.url) ?? l.href })) })
+  const links = compFacts.links.map(l => ({ ...l, href: absolute(l.href, compHome.url) ?? l.href }))
+  const handle = findXHandle({ links })
 
   // ── 2. Everything dated, at once ──────────────────────────────────────────
-  // Press through Google (narrowed to the window before it ranks), press
-  // straight from the outlets (with article text), their latest app release,
+  // Press (Google narrowed to the window, plus the outlets' own feeds for the
+  // article text), their latest app release if their site links to an app,
   // and this week on X. None of these depends on another.
   const origin = new URL(compHome.url).origin
-  const [disallows, nigerian, general, outlets, app, x] = await Promise.all([
+  const [disallows, pressRead, app, x] = await Promise.all([
     robotsDisallows(origin),
-    fetchGoogleNewsRss(recentQuery(pressQuery(competitorName), WINDOW_DAYS)),
-    fetchGoogleNewsRss(recentQuery(`"${competitorName}"${input.market ? ` ${input.market}` : ''}`, WINDOW_DAYS)),
-    fetchOutletSearch(competitorName, { days: WINDOW_DAYS }),
-    fetchAppStoreRelease({ name: competitorName, host: compUrl.hostname, days: WINDOW_DAYS }),
+    readRecentPress({ name: competitorName, market: input.market, days: WINDOW_DAYS }),
+    fetchAppStoreRelease({ links: findAppLinks({ links }), days: WINDOW_DAYS }),
     fetchXActivity({ name: competitorName, handle, budgetOk: input.xBudgetOk ?? true }),
   ])
+  const press = pressRead.items
+  const pressOk = pressRead.googleOk || pressRead.outletsRead > 0
 
   coverage.push({
     source: `Nigerian business press, last ${WINDOW_DAYS} days`,
-    read: nigerian.ok || outlets.outletsRead > 0,
-    note: nigerian.ok || outlets.outletsRead > 0 ? undefined : 'The news feeds did not answer, so press coverage is missing from this brief.',
+    read: pressOk,
+    note: pressOk ? undefined : 'The news feeds did not answer, so press coverage is missing from this brief.',
   })
   coverage.push({
     source: 'Wider business news',
-    read: general.ok,
-    note: general.ok ? undefined : 'The news feed did not answer.',
+    read: pressRead.generalOk,
+    note: pressRead.generalOk ? undefined : 'The news feed did not answer.',
   })
-  coverage.push({
-    source: 'App Store release notes',
-    read: app.ok,
-    note: app.note ? `${app.note} Google Play is not read yet.` : 'Google Play is not read yet.',
-  })
+  coverage.push({ source: 'App store release notes', read: app.checked && app.ok, note: app.note })
   coverage.push({
     source: `X, last ${X_WINDOW_DAYS} days${handle ? ` (@${handle} and posts about them)` : ''}`,
     read: x.ok,
@@ -201,34 +183,6 @@ export async function runCompetitorTracker(input: TrackerInput): Promise<Tracker
     const kind: 'pricing' | 'news' = PRICING_PATTERNS.some(p => p.test(candidate)) ? 'pricing' : 'news'
     const res = await fetchPublic(candidate, { timeoutMs: 6_000 })
     if (res.ok) sectionPages.push({ url: res.url, facts: readPage(res.body, res.url), kind })
-  }))
-
-  // Outlet items first: they carry the article and a direct link, so when the
-  // same story comes back from both, that is the copy worth keeping.
-  const first = competitorName.toLowerCase().split(/\s+/)[0]
-  const seenTitles = new Set<string>()
-  const seenLinks = new Set<string>()
-  const pressAll: PressSource[] = [
-    ...outlets.items.map(i => ({ ...i, origin: 'outlet' as const })),
-    ...[...nigerian.items, ...general.items].map(i => ({ ...i, origin: 'google' as const })),
-  ].filter(item => {
-    if (!isWithinDays(item.pubDate, WINDOW_DAYS)) return false
-    const link = item.link.split('?')[0]
-    // Google appends " - Publication" to a headline; strip it to match.
-    const title = item.title.replace(/\s+-\s+[^-]+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
-    if (seenLinks.has(link) || seenTitles.has(title)) return false
-    seenLinks.add(link); seenTitles.add(title)
-    if (item.origin === 'outlet') return true
-    // A Google story has to actually name them. Google News is generous with
-    // adjacent coverage and a brief full of near-misses is worse than a short one.
-    return item.title.toLowerCase().includes(first)
-  })
-  const press = newestFirst(pressAll).slice(0, 20)
-
-  // The few newest stories without text: try for the article itself.
-  await Promise.all(press.filter(p => !p.body).slice(0, 6).map(async p => {
-    const text = await readArticle(p.link)
-    if (text) p.body = text
   }))
 
   // ── 3. Your site, for the "what this means for you" half ──────────────────
@@ -498,7 +452,7 @@ function buildReport(args: {
     nextAction,
     coverage,
     limitations: [
-      `This reads public sources only: the business press, ${competitorName}'s App Store listing and their posts on X. It cannot see their ad spend, their traffic, their revenue or anything they have not published.`,
+      `This reads public sources only: the business press, ${competitorName}'s posts on X, and their App Store release notes when their website links to an app. It cannot see their ad spend, their traffic, their revenue or anything they have not published.`,
       'Only dated sources can be cited. Their website is read to tell new from already known, never as evidence of a move.',
       `Press covers the last ${WINDOW_DAYS} days and X the last ${X_WINDOW_DAYS}. A move written up under a parent company name may be missing.`,
       'Nigerian press comes from ten national outlets. It is a good read of the national press and not a complete one. Google Play release notes are not read yet.',

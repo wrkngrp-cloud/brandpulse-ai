@@ -64,6 +64,8 @@ const files = {
     .replace("from '@/lib/press/nigerian-press'", "from './press-stub'")
     .replace("from '@/lib/ai/assistants'", "from './assistants-stub'")],
   'app-store.ts':          ['src/lib/tools/app-store.ts', s => s],
+  'press-reader.ts':       ['src/lib/tools/press-reader.ts', s => s
+    .replace("from '@/lib/press/nigerian-press'", "from './press-stub'")],
   'x-activity.ts':         ['src/lib/tools/x-activity.ts', s => s],
   'competitor-tracker.ts': ['src/lib/tools/competitor-tracker.ts', s => s
     .replace("import { callAi, extractJson } from '@/lib/ai/client'",
@@ -96,7 +98,7 @@ export async function fetchOutletSearch(_t: string, _o?: { days?: number; timeou
 export function pressQuery(name: string): string { return name }
 export function recentQuery(q: string, days: number): string { return q + ' when:' + days + 'd' }
 export function newestFirst<T extends { pubDate: string }>(items: T[]): T[] { return [...items].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()) }
-export function isWithinDays(_p: string, _d: number): boolean { return true }
+export function isWithinDays(p: string, d: number): boolean { const t = new Date(p).getTime(); return !Number.isNaN(t) && Date.now() - t <= d * 86400000 }
 export function publicationFromUrl(url: string): string {
   try { return new URL(url).hostname.replace('www.', '') } catch { return 'Unknown' }
 }
@@ -357,19 +359,36 @@ const aboutPost = { ...ownPost, id: '43', username: 'someone', url: 'https://x.c
 aiStub.setNextResponse(JSON.stringify({ moves: [{ source: 2, category: 'campaign', headline: 'Chatter', confidence: 'high' }] }))
 eq('posts about them are not citable', (await tracker.classifyMoves({ ...base, xAbout: [aboutPost] })).length, 0)
 
-console.log('\n── app store: generic notes and picking their app')
+console.log('\n── app store: only checked when their own site links to an app')
 const appStore = await import(`${OUT}/app-store.mjs`)
 ok('bug fixes is generic', appStore.isGenericNote('Bug fixes and performance improvements.'))
 ok('short is generic', appStore.isGenericNote('Minor updates'))
 ok('long filler is generic', appStore.isGenericNote('We update the app regularly to make it better for you. This version includes bug fixes and performance improvements.'))
 ok('a real change is kept', !appStore.isGenericNote('You can now pay electricity bills and buy data bundles straight from the home screen.'))
-const apps = [
-  { trackName: 'Rival Games', sellerName: 'Other Ltd', sellerUrl: 'https://other.com' },
-  { trackName: 'Rival - Banking', sellerName: 'Rival Ltd', sellerUrl: 'https://www.rival.ng/' },
-]
-eq('matched by website', appStore.pickTheirApp(apps, 'Rival', 'rival.ng')?.sellerName, 'Rival Ltd')
-eq('matched by seller name', appStore.pickTheirApp([{ trackName: 'X', sellerName: 'Rival Ltd' }], 'Rival', 'nope.ng')?.sellerName, 'Rival Ltd')
-eq('no match is null', appStore.pickTheirApp([{ trackName: 'Other', sellerName: 'Other' }], 'Rival', 'rival.ng'), null)
+eq('apple and play links found', appStore.findAppLinks({ links: [
+  { href: 'https://apps.apple.com/ng/app/rival-bank/id1234567890', text: '' },
+  { href: 'https://play.google.com/store/apps/details?id=ng.rival.app&hl=en', text: '' },
+] }), { appleId: '1234567890', playPackage: 'ng.rival.app' })
+eq('an FMCG site with no app links', appStore.findAppLinks({ links: [{ href: 'https://jarafoods.ng/products', text: '' }, { href: 'https://instagram.com/jarafoods', text: '' }] }), { appleId: null, playPackage: null })
+let appRead = await appStore.fetchAppStoreRelease({ links: { appleId: null, playPackage: null }, days: 30 })
+eq('no app link, no app store call', [appRead.checked, appRead.release], [false, null])
+appRead = await appStore.fetchAppStoreRelease({ links: { appleId: null, playPackage: 'ng.rival.app' }, days: 30 })
+ok('play only is said plainly', !appRead.checked && /Google Play/.test(appRead.note))
+
+console.log('\n── press reader: recent, de-duplicated, about them')
+const pr = await import(`${OUT}/press-reader.mjs`)
+const day = n => new Date(Date.now() - n * 86400000).toUTCString()
+const merged = pr.mergePress({ name: 'Rival', days: 30, limit: 10,
+  outlet: [{ title: 'Rival cuts fees for traders', link: 'https://techcabal.com/rival-fees', pubDate: day(2), snippet: '', body: 'Rival cut fees.' }],
+  google: [
+    { title: 'Rival cuts fees for traders - TechCabal', link: 'https://news.google.com/a1', pubDate: day(2), snippet: '' },
+    { title: 'Rival opens Abuja office', link: 'https://news.google.com/a2', pubDate: day(1), snippet: '' },
+    { title: 'Rival launched in 2019', link: 'https://news.google.com/a3', pubDate: day(400), snippet: '' },
+    { title: 'Fintech roundup', link: 'https://news.google.com/a4', pubDate: day(1), snippet: '' },
+    { title: 'Rival undated', link: 'https://news.google.com/a5', pubDate: '', snippet: '' },
+  ] })
+eq('newest first, duplicates and old gone', merged.map(m => m.title), ['Rival opens Abuja office', 'Rival cuts fees for traders'])
+eq('the outlet copy with text wins', merged[1].origin, 'outlet')
 
 console.log('\n── x: handle from their homepage, and the search parse')
 const xa = await import(`${OUT}/x-activity.mjs`)
@@ -379,6 +398,9 @@ eq('intent link ignored', xa.findXHandle({ links: [{ href: 'https://twitter.com/
 const parsed = xa.parseSearch({ data: [{ id: '1', text: 't', created_at: '2026-11-01T00:00:00Z', author_id: 'u1', public_metrics: { like_count: 5, retweet_count: 2 } }], includes: { users: [{ id: 'u1', username: 'rivalng' }] } })
 eq('post url built', parsed[0].url, 'https://x.com/rivalng/status/1')
 eq('metrics read', [parsed[0].likes, parsed[0].reposts], [5, 2])
+process.env.TWITTER_BEARER_TOKEN = 'not-a-real-token'
+const noBudget = await xa.fetchXActivity({ name: 'Rival', handle: 'rivalng', budgetOk: false })
+ok('no budget, no call, and it says why', !noBudget.ok && /allowance/.test(noBudget.note))
 delete process.env.TWITTER_BEARER_TOKEN
 eq('no token, no call', (await xa.fetchXActivity({ name: 'Rival', handle: 'rivalng', budgetOk: true })).ok, false)
 
@@ -915,6 +937,18 @@ eq('with no invented URL',           fromAssistant.traits[0].sourceUrl, null)
 eq('and no invented URL on the card', fromAssistant.divergences[0].evidence[0].sourceUrl, undefined)
 // The platform is never named anywhere a visitor can read it.
 ok('the model is never named', !JSON.stringify(fromAssistant).match(/gpt|gemini|perplexity|claude|sonar/i))
+
+console.log('\n── a post on X about them is linked, dated evidence')
+aiStub.setNextResponse(JSON.stringify({
+  described: [{ source: 1, attribute: 'Slow delivery', quote: 'waited three days' }],
+  divergences: [{ kind: 'contradicted', stated: 'Fast delivery', described: 'Slow delivery', significance: 's', recommendation: 'r', sources: [1], confidence: 'low' }],
+}))
+const fromX = await brandGap.readGap({
+  name: 'Jara Foods', market: 'Nigeria', stated, press: [], answers: [],
+  posts: [{ id: '9', text: 'Ordered from Jara Foods and waited three days for soup. Never again.', createdAt: '2026-11-02T08:00:00.000Z', username: 'ada', url: 'https://x.com/ada/status/9', likes: 1, reposts: 0 }],
+})
+eq('social trait recorded', [fromX.traits[0].kind, fromX.traits[0].sourceUrl, fromX.traits[0].publishedAt], ['social', 'https://x.com/ada/status/9', '2026-11-02'])
+eq('card links the post', fromX.divergences[0].evidence[0].sourceName, 'X, @ada')
 
 console.log('\n── an assistant that does not know the brand is not a description')
 for (const refusal of [

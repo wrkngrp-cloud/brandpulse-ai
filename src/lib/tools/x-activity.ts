@@ -98,14 +98,14 @@ const REASON: Record<'credit' | 'auth' | 'error', string> = {
   error:  'X search did not answer, so this week on X is missing from the brief.',
 }
 
-export async function fetchXActivity(args: { name: string; handle: string | null; budgetOk: boolean }): Promise<XRead> {
+export async function fetchXActivity(args: { name: string; handle: string | null; budgetOk: boolean; skipOwn?: boolean }): Promise<XRead> {
   const bearer = process.env.TWITTER_BEARER_TOKEN
   if (!bearer) return { ok: false, own: [], about: [], handle: args.handle, note: 'X search is not configured on this deployment.' }
   if (!args.budgetOk) return { ok: false, own: [], about: [], handle: args.handle, note: 'Today\'s X search allowance for the free tools is used up. Run it again tomorrow for this week on X.' }
 
   const quoted = `"${args.name.replace(/"/g, '')}"`
   const [own, about] = await Promise.all([
-    args.handle ? search(`from:${args.handle} -is:retweet`, bearer) : Promise.resolve<SearchOutcome>({ ok: true, posts: [] }),
+    args.handle && !args.skipOwn ? search(`from:${args.handle} -is:retweet`, bearer) : Promise.resolve<SearchOutcome>({ ok: true, posts: [] }),
     search(`${quoted}${args.handle ? ` -from:${args.handle}` : ''} -is:retweet`, bearer),
   ])
 
@@ -116,7 +116,7 @@ export async function fetchXActivity(args: { name: string; handle: string | null
     about:  about.ok ? about.posts : [],
     handle: args.handle,
     note:   failed && !failed.ok ? REASON[failed.reason]
-      : !args.handle ? 'We could not find their X account on their homepage, so only posts about them were read.'
+      : !args.handle && !args.skipOwn ? 'We could not find their X account on their homepage, so only posts about them were read.'
       : undefined,
   }
 }
