@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { z } from 'zod'
 import { sendMail, emailConfigured } from '@/lib/email/send'
 import { captureLead, headlineFrom } from '@/lib/tools/leads'
@@ -86,8 +86,11 @@ export async function POST(req: NextRequest) {
 
   // The emailed copy is the reason the address is worth giving, so a failure
   // to send is logged and never blocks the unlock: they can already read it.
-  void sendReportEmail(d.email, run.toolId, report, d.token).catch(err =>
-    console.error('[tools] report email failed:', err))
+  // after() keeps the function alive until the send finishes. A bare `void`
+  // promise could be frozen by the platform the moment this response went
+  // out, so the visitor's copy of their report sometimes never left.
+  after(() => sendReportEmail(d.email, run.toolId, report, d.token).catch(err =>
+    console.error('[tools] report email failed:', err)))
 
   const { result } = gateResult(run.toolId, run.result as Record<string, unknown>, true)
   return NextResponse.json({ status: 'complete', gated: false, result })

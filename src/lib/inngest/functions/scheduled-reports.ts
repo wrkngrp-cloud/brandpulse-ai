@@ -2,6 +2,7 @@ import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
 import { sendMail, emailConfigured } from '@/lib/email/send'
+import { workspaceRecipients } from '@/lib/email/recipients'
 import { TOKENS } from '@/lib/brand-tokens'
 
 const APP_URL = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
@@ -93,20 +94,9 @@ Return JSON only:
         result = JSON.parse(cleaned)
       } catch { continue }
 
-      // Find workspace admin to email
-      const { data: members } = await supabase
-        .from('workspace_members')
-        .select('user_id, role')
-        .eq('workspace_id', brand.workspace_id)
-        .in('role', ['owner', 'admin'])
-
-      if (!members?.length) continue
-
-      const userIds = members.map(m => m.user_id)
-      const { data: { users } } = await supabase.auth.admin.listUsers()
-      const adminEmails = users
-        .filter(u => userIds.includes(u.id) && u.email)
-        .map(u => u.email!)
+      // The workspace's owners and admins, looked up by id. listUsers()
+      // returned one page of 50, so past 50 users some owners got nothing.
+      const adminEmails = await workspaceRecipients(supabase, brand.workspace_id)
 
       if (!adminEmails.length || !emailConfigured()) continue
 
@@ -193,18 +183,8 @@ export const weeklyDigestCron = inngest.createFunction(
         `<li style="margin-bottom:6px;font-size:13px;">${a.message ?? a.alert_type}</li>`
       ).join('')
 
-      const { data: members } = await supabase
-        .from('workspace_members')
-        .select('user_id, role')
-        .eq('workspace_id', brand.workspace_id)
-
-      if (!members?.length) continue
-
-      const userIds = members.map(m => m.user_id)
-      const { data: { users } } = await supabase.auth.admin.listUsers()
-      const emails = users
-        .filter(u => userIds.includes(u.id) && u.email)
-        .map(u => u.email!)
+      // Everyone on the team, except staff on a read-only session (viewer).
+      const emails = await workspaceRecipients(supabase, brand.workspace_id, ['owner', 'admin', 'member', 'analyst'])
 
       if (!emails.length || !emailConfigured()) continue
 

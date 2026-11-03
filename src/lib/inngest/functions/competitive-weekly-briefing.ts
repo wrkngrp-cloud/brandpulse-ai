@@ -1,7 +1,8 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
-import { sendMail } from '@/lib/email/send'
+import { sendEach } from '@/lib/email/send'
+import { brandRecipients } from '@/lib/email/recipients'
 
 export const competitiveWeeklyBriefing = inngest.createFunction(
   {
@@ -180,15 +181,13 @@ Return ONLY valid JSON — no markdown fences — in this exact shape:
 
         const svc = await createServiceClient()
 
-        // Get the brand's owner email via auth admin API
-        const { data: usersData } = await svc.auth.admin.listUsers()
-        const userRecord = usersData?.users?.find(u =>
-          u.email && u.user_metadata?.brand_id === brand.id
-        ) ?? usersData?.users?.[0] ?? null
-
-        if (!userRecord?.email) {
-          logger.info(`[competitive-weekly-briefing] no email for brand ${brand.id}`)
-          return { skipped: 'no user email' }
+        // The brand's own owners and admins. This used to fall back to the
+        // first user in the whole system, which sent every brand's briefing
+        // to one BrandGauge inbox.
+        const recipients = await brandRecipients(svc, brand.id)
+        if (!recipients.length) {
+          logger.info(`[competitive-weekly-briefing] no owner or admin email for brand ${brand.id}`)
+          return { skipped: 'no recipient' }
         }
 
         const content = briefingResult as {
@@ -216,22 +215,20 @@ Return ONLY valid JSON — no markdown fences — in this exact shape:
           'BrandGauge | View full briefing at your dashboard',
         ].join('\n')
 
-        const mail = await sendMail({
+        const mail = await sendEach({
           from:    'BrandGauge <briefings@brandgauge.app>',
-          to:      userRecord.email,
-          subject: `Your weekly competitive briefing — ${brand.name}`,
+          subject: `Your weekly competitive briefing: ${brand.name}`,
           text:    emailBody,
-        })
+        }, recipients)
 
-        // The SDK answers with an error rather than throwing, so the step has
-        // to read it. Otherwise the log said "email sent" for a message Resend
-        // had refused.
-        if (!mail.sent) {
-          logger.warn(`[competitive-weekly-briefing] not sent to ${userRecord.email}: ${mail.reason}`)
-          return { sent: false, email: userRecord.email }
+        // A refused send is read, not assumed. Otherwise the log said "email
+        // sent" for a message Resend had refused.
+        if ('reason' in mail) {
+          logger.warn(`[competitive-weekly-briefing] ${mail.sent} of ${recipients.length} sent for brand ${brand.id}: ${mail.reason}`)
+          return { sent: mail.sent > 0, count: mail.sent }
         }
-        logger.info(`[competitive-weekly-briefing] email sent to ${userRecord.email} for brand ${brand.name}`)
-        return { sent: true, email: userRecord.email }
+        logger.info(`[competitive-weekly-briefing] sent to ${mail.sent} people for brand ${brand.name}`)
+        return { sent: true, count: mail.sent }
       }).then(result => {
         if ((result as { sent?: boolean })?.sent) sent++
       }).catch(err => {

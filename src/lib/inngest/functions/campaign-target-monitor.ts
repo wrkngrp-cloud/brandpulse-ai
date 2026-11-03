@@ -1,6 +1,7 @@
 import { inngest } from '@/lib/inngest/client'
 import { createServiceClient } from '@/lib/supabase/server'
-import { sendMail } from '@/lib/email/send'
+import { sendEach } from '@/lib/email/send'
+import { brandRecipients } from '@/lib/email/recipients'
 
 interface Target {
   id:                   string
@@ -159,14 +160,12 @@ export const campaignTargetMonitor = inngest.createFunction(
 
             // Email
             try {
-              const { data: usersData } = await supabase.auth.admin.listUsers()
-              const user = usersData?.users?.find(u => u.user_metadata?.brand_id === brandId)
-                ?? usersData?.users?.[0]
-
-              if (user?.email) {
-                const mail = await sendMail({
+              // The brand's own owners and admins, never the first user in
+              // the system, which is where every alert used to go.
+              const recipients = await brandRecipients(supabase, brandId)
+              if (recipients.length) {
+                const mail = await sendEach({
                   from:    'BrandGauge <alerts@brandgauge.app>',
-                  to:      user.email,
                   subject: `Campaign alert: ${title}`,
                   text:    [
                     title,
@@ -178,8 +177,8 @@ export const campaignTargetMonitor = inngest.createFunction(
                     '-- ',
                     'BrandGauge | Campaign Target Monitor',
                   ].join('\n'),
-                })
-                if (!mail.sent) {
+                }, recipients)
+                if ('reason' in mail) {
                   logger.warn(`[campaign-target-monitor] alert email not sent for brand ${brandId}: ${mail.reason}`)
                 }
               }
