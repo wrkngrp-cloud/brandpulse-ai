@@ -2,6 +2,7 @@ import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { sendEach } from '@/lib/email/send'
 import { TOKENS } from '@/lib/brand-tokens'
+import { TEMPLATE_MAP, type SurveyType } from '@/lib/survey-templates'
 
 const APP_URL = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
 
@@ -56,13 +57,21 @@ export const panelDispatch = inngest.createFunction(
     if (!panel || !panel.active) return { skipped: true }
 
     const survey = await step.run('create-survey', async () => {
+      // Every panel round used to fail here: 'active' is not a status the
+      // surveys table allows ('draft','live','closed'), and the public page
+      // only serves 'live'. The round also had no questions, so even a
+      // corrected status would have sent people to an empty survey.
+      const template = TEMPLATE_MAP[panel.template_key as SurveyType]
+      if (!template) throw new Error(`panel ${panel.id} uses unknown template '${panel.template_key}'`)
       const { data, error } = await supabase.from('surveys').insert({
-        brand_id:    panel.brand_id,
-        name:        `${panel.name} — ${new Date().toLocaleDateString('en-NG', { month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}`,
-        type:        panel.template_key,
-        status:      'active',
-        is_panel:    true,
-        panel_id:    panel.id,
+        brand_id:        panel.brand_id,
+        name:            `${panel.name}: ${new Date().toLocaleDateString('en-NG', { month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' })}`,
+        type:            panel.template_key,
+        questions:       template.questions,
+        deploy_channels: ['email', 'link'],
+        status:          'live',
+        is_panel:        true,
+        panel_id:        panel.id,
       }).select('id').single()
       if (error) throw new Error(error.message)
       return data
