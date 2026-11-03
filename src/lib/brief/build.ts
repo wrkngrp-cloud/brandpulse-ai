@@ -1,5 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { callAi, extractJson } from '@/lib/ai/client'
+import type { BrandType } from '@/lib/bhi'
+import type { BriefBrandType } from './metrics'
 import { checkinMetricFor, addDays, weekLabel, MOMENT_KINDS, type MomentKind } from './metrics'
 
 /**
@@ -21,32 +23,8 @@ import { checkinMetricFor, addDays, weekLabel, MOMENT_KINDS, type MomentKind } f
  *   No invented figure. The model may only restate numbers from the list.
  */
 
-export type CauseLabel = 'moved_together' | 'tested' | 'no_clear_cause'
-
-export interface BriefSource { id: string; kind: string; title: string; date: string; url?: string }
-
-export interface BriefContent {
-  weekStart:  string
-  weekLabel:  string
-  metric: {
-    key: string; label: string; isIndex: boolean
-    value: number; previous: number; changePct: number | null
-    history: { week: string; value: number }[]
-  }
-  headline:   string
-  summary:    string
-  causes:     { text: string; label: CauseLabel; sources: BriefSource[] }[]
-  watchNext:  string | null
-  counts:     { campaigns: number; moments: number; press: number; competitorMoves: number }
-  generatedAt: string
-}
-
-export interface NeedsNumbers {
-  weekStart: string
-  weekLabel: string
-  metric:    { key: string; label: string; question: string }
-  missing:   'last_week' | 'week_before'
-}
+import type { BriefContent, BriefSource, NeedsNumbers } from './types'
+export type { BriefContent, BriefSource, NeedsNumbers, CauseLabel } from './types'
 
 export type BriefOutcome =
   | { status: 'ready'; content: BriefContent }
@@ -258,3 +236,9 @@ export function sanitiseCauses(
     return [{ text, label: 'moved_together', sources: cited }]
   })
 }
+
+// Compile-time guard: the brand types metrics.ts repeats must match bhi.ts
+// exactly, in both directions, or this stops type-checking.
+type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false
+const _brandTypesMatch: Same<BrandType, BriefBrandType> = true
+void _brandTypesMatch

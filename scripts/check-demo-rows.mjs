@@ -71,7 +71,7 @@ try {
   // Only module-pack's own graph. Files that import through the '@/' alias
   // (bhi-series) cannot be compiled standalone; the project type-check covers
   // those, and validate-seeds checks their row literals.
-  const GRAPH = ['module-pack.ts', 'coverage-pack.ts', 'modules.ts', 'digital-performance.ts', 'seasonality.ts']
+  const GRAPH = ['module-pack.ts', 'coverage-pack.ts', 'brief-pack.ts', 'modules.ts', 'digital-performance.ts', 'seasonality.ts']
     .map(f => join(ROOT, 'src/lib/demo', f))
   execFileSync('npx', ['tsc',
     ...GRAPH,
@@ -136,6 +136,9 @@ const { seedModulePack } = await import(pathToFileURL(emitted).href)
 const coverageFile = walk(out).filter(f => f.endsWith('coverage-pack.js'))[0]
 if (!coverageFile) { console.error('coverage-pack.js not emitted'); process.exit(1) }
 const { seedCoveragePack } = await import(pathToFileURL(coverageFile).href)
+const briefFile = walk(out).filter(f => f.endsWith('brief-pack.js'))[0]
+if (!briefFile) { console.error('brief-pack.js not emitted'); process.exit(1) }
+const { seedBriefPack } = await import(pathToFileURL(briefFile).href)
 
 const CONFIGS = [
   { name: 'Jara Foods (fmcg)',      brandType: 'fmcg' },
@@ -172,6 +175,15 @@ rmSync(out, { recursive: true, force: true })
 /* ── check every captured row ────────────────────────────────────────────── */
 const bad = []
 const perTable = new Map()
+// The Monday Brief pack, for every vertical it can be asked about, with a
+// fixed "now" so the week maths is exercised the same way on every run.
+for (const brandType of ['fmcg', 'fintech', 'venue', 'b2b_saas', 'marketplace', 'beverage_alcohol', 'b2b_distribution', 'agency']) {
+  await seedBriefPack(fakeSb(), {
+    brandId: '11111111-1111-4111-8111-111111111111', brandName: 'Demo', brandType,
+    competitors: ['Comp A'], now: new Date('2026-11-02T09:00:00Z'),
+  })
+}
+
 for (const { table, rows } of captured) {
   perTable.set(table, (perTable.get(table) ?? 0) + rows.length)
   if (!schema.has(table)) { bad.push(`table '${table}' does not exist`); continue }
@@ -184,7 +196,7 @@ for (const { table, rows } of captured) {
   }
 }
 
-console.log(`ran seedModulePack + seedCoveragePack for ${CONFIGS.length} verticals`)
+console.log(`ran seedModulePack + seedCoveragePack for ${CONFIGS.length} verticals, seedBriefPack for 8`)
 console.log(`captured ${captured.length} inserts, ${[...perTable.values()].reduce((a, b) => a + b, 0)} rows\n`)
 for (const [t, n] of [...perTable].sort()) console.log(`  ${String(n).padStart(5)}  ${t}`)
 

@@ -5,6 +5,7 @@ import { demoSentiment } from '@/lib/demo/seasonality'
 import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
 import { seedCoveragePack } from '@/lib/demo/coverage-pack'
+import { seedBriefPack } from '@/lib/demo/brief-pack'
 import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
 import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
@@ -1401,6 +1402,10 @@ Recommend Chike Okonkwo for the Enterprise Demo Day ambassador team given his ex
     campaignIds: [camp1Id, camp2Id, camp3Id],
     base: BASE,
   })
+
+  /* The Monday Brief: eight weeks of the weekly number, three moments and
+     last week's brief, so the dashboard home opens on a finished answer. */
+  await seedBriefPack(sb, { brandId, brandName: 'Bridger CRM', brandType: 'b2b_saas', competitors: ['HubSpot Nigeria'] })
 
   return NextResponse.json({
     success: writeErrors.length === 0,
