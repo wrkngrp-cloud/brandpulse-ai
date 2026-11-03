@@ -6,6 +6,7 @@ import { trackErrors, summariseErrors } from '@/lib/demo/track-errors'
 import { seedModulePack } from '@/lib/demo/module-pack'
 import { seedCoveragePack } from '@/lib/demo/coverage-pack'
 import { seedBriefPack } from '@/lib/demo/brief-pack'
+import { TEMPLATE_BY_ID } from '@/lib/widget-catalog'
 import { monthLabel, quarterLabel, yearLabel } from '@/lib/demo/seasonality'
 import { bhiSnapshotRows } from '@/lib/demo/bhi-series'
 import { BRAND_TYPE_WEIGHTS } from '@/lib/bhi'
@@ -902,6 +903,14 @@ export async function POST(req: NextRequest) {
   /* The Monday Brief: eight weeks of the weekly number, three moments and
      last week's brief, so the dashboard home opens on a finished answer. */
   await seedBriefPack(sb, { brandId, brandName: 'PocketPay', brandType: 'fintech', competitors: ['OPay'] })
+
+  /* The dashboard template, chosen in advance. Without a row the home page
+     opens on the "pick a template" screen, which is the first thing a
+     prospect would see in a demo. */
+  await sb.from('user_dashboard_prefs').insert({
+    user_id: userId, brand_id: brandId, template: 'fintech_growth',
+    widget_ids: TEMPLATE_BY_ID['fintech_growth']?.widgetIds ?? [],
+  })
 
   return NextResponse.json({
     success: writeErrors.length === 0,
