@@ -82,6 +82,13 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
       position: 'bottom',
     },
     {
+      id:       'monday-brief',
+      title:    'Your Monday Brief',
+      body:     'Every Monday, one answer: what moved in your numbers last week, and what moved with it. Type last week\u2019s total here, add anything you did that is not a campaign, and pick the hour it lands. Copy the link to forward it to your boss.',
+      target:   '[data-tour="monday-brief"]',
+      position: 'bottom',
+    },
+    {
       id:       'quick-actions',
       title:    'Start something new',
       body:     'Pin an OOH site, create an event, launch a consumer survey or run a quick pre-post content check without leaving this page.',

@@ -32,6 +32,7 @@ import { impersonationSweep }         from '@/lib/inngest/functions/impersonatio
 import { leadSignupMatch }            from '@/lib/inngest/functions/lead-signup-match'
 import { competitorWatchCheck }        from '@/lib/inngest/functions/competitor-watch-check'
 import { toolRunRetention }            from '@/lib/inngest/functions/tool-run-retention'
+import { mondayBriefScheduler, mondayBriefGenerate } from '@/lib/inngest/functions/monday-brief'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -39,6 +40,7 @@ export const maxDuration = 300
 export const { GET, POST, PUT } = serve({
   client: inngest,
   functions: [
+    mondayBriefScheduler, mondayBriefGenerate,
     syncSocialPosts, crawlMentions, eventRoiReport, eventVisualDetect,
     oohSearchUplift, competitiveWeeklyBriefing, ga4DailySync, appReviewSync,
     metaAdsDailySync, commercialMetricsRollup, prCrawl, scoreboardWeekly, geoLiftStudy, campaignTargetMonitor,
