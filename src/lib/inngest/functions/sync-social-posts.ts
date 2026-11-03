@@ -2,7 +2,8 @@ import { inngest } from '@/lib/inngest/client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { decrypt } from '@/lib/crypto'
 import { fetchInstagramPosts, fetchFacebookPosts, type MetaPost } from '@/lib/social/meta'
-import { fetchTwitterPosts, refreshTwitterToken, type TwitterPost } from '@/lib/social/twitter'
+import { fetchTwitterPosts, type TwitterPost } from '@/lib/social/twitter'
+import { twitterRefresher } from '@/lib/social/twitter-token'
 
 type AnyPost = MetaPost | TwitterPost
 
@@ -110,18 +111,17 @@ async function fetchPostsForPlatform(
     case 'facebook':
       return fetchFacebookPosts(accountId, accessToken, since)
     case 'twitter': {
+      // X access tokens last two hours, so a nightly job always needs a fresh
+      // one. twitterRefresher saves the rotated refresh token, which this used
+      // to throw away, killing the connection from the second night.
       if (conn.refresh_token) {
         try {
           const supabase = await createServiceClient()
-          const refreshed = await refreshTwitterToken(decrypt(conn.refresh_token))
-          const { encrypt } = await import('@/lib/crypto')
-          await supabase
-            .from('social_connections')
-            .update({ access_token: encrypt(refreshed.access_token) })
-            .eq('id', conn.id)
-          return fetchTwitterPosts(accountId, refreshed.access_token, since)
-        } catch {
-          // Fall through to use existing token
+          const fresh = await twitterRefresher(supabase, conn)()
+          return fetchTwitterPosts(accountId, fresh, since)
+        } catch (err) {
+          console.error('[sync-social-posts] X token refresh failed:', err instanceof Error ? err.message : err)
+          // Fall through to the stored token, in case it is still valid.
         }
       }
       return fetchTwitterPosts(accountId, accessToken, since)

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { MenuIcon as Menu, XIcon as X } from '@/components/brand/icon'
 import { usePathname } from 'next/navigation'
 import { DashboardNav } from './dashboard-nav'
+import type { ModuleFocus } from '@/lib/goals'
 import { cn } from '@/lib/utils'
 import { BrandLockup } from '@/components/brand/logo'
 
@@ -12,9 +13,11 @@ interface MobileNavProps {
   userName?:  string
   userEmail?: string
   brandName?: string
+  industry?:  string | null
+  focus?:     ModuleFocus | null
 }
 
-export function MobileNav({ userName = '', userEmail = '', brandName = '' }: MobileNavProps) {
+export function MobileNav({ userName = '', userEmail = '', brandName = '', industry = null, focus = null }: MobileNavProps) {
   const [open, setOpen]         = useState(false)
   const [mounted, setMounted]   = useState(false)
   const pathname                = usePathname()
@@ -60,7 +63,7 @@ export function MobileNav({ userName = '', userEmail = '', brandName = '' }: Mob
 
         {/* Nav */}
         <div className="flex-1 overflow-y-auto py-2 px-2.5">
-          <DashboardNav expanded={true} />
+          <DashboardNav expanded={true} industry={industry} focus={focus} />
         </div>
 
         {/* Bottom user info */}

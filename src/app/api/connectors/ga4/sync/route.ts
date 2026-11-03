@@ -1,38 +1,14 @@
 import { NextResponse }                from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { encrypt, decrypt }           from '@/lib/crypto'
+import { ga4AccessToken, type Ga4ConnectionRow } from '@/lib/shared-access/ga4-token'
 import { getActiveBrandId }           from '@/lib/active-brand'
 
 interface GA4MetricValue { value: string }
 interface GA4Row         { metricValues: GA4MetricValue[] }
 interface GA4Response    { totals?: GA4Row[]; error?: { message: string } }
 
-interface TokenRefreshResponse {
-  access_token: string
-  expires_in:   number
-  error?:       string
-}
-
 export const runtime    = 'nodejs'
 export const maxDuration = 30
-
-async function refreshAccessToken(
-  refreshToken: string
-): Promise<{ access_token: string; expires_in: number } | null> {
-  const res = await fetch('https://oauth2.googleapis.com/token', {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body:    new URLSearchParams({
-      refresh_token: refreshToken,
-      client_id:     process.env.GOOGLE_CLIENT_ID!,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-      grant_type:    'refresh_token',
-    }),
-  })
-  const data = (await res.json()) as TokenRefreshResponse
-  if (!res.ok || data.error) return null
-  return { access_token: data.access_token, expires_in: data.expires_in }
-}
 
 export async function POST() {
   const supabase = await createClient()
@@ -42,35 +18,32 @@ export async function POST() {
   const brandId = await getActiveBrandId(supabase)
   if (!brandId) return NextResponse.json({ error: 'No brand found' }, { status: 404 })
 
-  const { data: connection } = await supabase
+  type Row = Ga4ConnectionRow & { property_id: string }
+  const first = await supabase
     .from('ga4_connections')
-    .select('id, property_id, access_token, refresh_token, token_expiry')
+    .select('id, property_id, access_token, refresh_token, token_expiry, auth_mode, access_status')
     .eq('brand_id', brandId)
-    .single()
+    .returns<Row[]>()
+    .maybeSingle()
+  let connection = first.data
+  if (first.error) {
+    ;({ data: connection } = await supabase
+      .from('ga4_connections')
+      .select('id, property_id, access_token, refresh_token, token_expiry')
+      .eq('brand_id', brandId)
+      .returns<Row[]>()
+      .maybeSingle())
+  }
 
   if (!connection) {
     return NextResponse.json({ error: 'GA4 not connected' }, { status: 404 })
   }
 
-  let accessToken = decrypt(connection.access_token)
-
-  // Refresh token if expired (or within 2 minutes of expiry)
-  const expiry = connection.token_expiry ? new Date(connection.token_expiry).getTime() : 0
-  if (connection.refresh_token && Date.now() > expiry - 120_000) {
-    const refreshed = await refreshAccessToken(decrypt(connection.refresh_token))
-    if (refreshed) {
-      accessToken = refreshed.access_token
-      const newExpiry = new Date(Date.now() + refreshed.expires_in * 1000).toISOString()
-      await supabase
-        .from('ga4_connections')
-        .update({
-          access_token: encrypt(refreshed.access_token),
-          token_expiry: newExpiry,
-          updated_at:   new Date().toISOString(),
-        })
-        .eq('brand_id', brandId)
-    }
+  if (connection.auth_mode === 'shared' && connection.access_status !== 'active') {
+    return NextResponse.json({ error: 'BrandGauge is still checking this connection. It starts syncing once confirmed.' }, { status: 409 })
   }
+  const accessToken = await ga4AccessToken(connection, supabase)
+  if (!accessToken) return NextResponse.json({ error: 'GA4 could not be read. Reconnect it and try again.' }, { status: 502 })
 
   const ga4Res = await fetch(
     `https://analyticsdata.googleapis.com/v1beta/properties/${connection.property_id}:runReport`,

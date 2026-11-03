@@ -11,11 +11,16 @@ export const dynamic = 'force-dynamic'
 export default async function ConnectionsSettingsPage() {
   const supabase = await createClient()
 
-  const { data: connections } = await supabase
-    .from('social_connections')
-    .select('platform, account_name, sync_status, last_synced_at')
-
   const brandId = await getActiveBrandId(supabase)
+
+  // This brand's connections only. RLS returns every brand in the workspace,
+  // so without the filter Brand B showed Brand A's X as connected.
+  const { data: connections } = brandId
+    ? await supabase
+        .from('social_connections')
+        .select('platform, account_name, sync_status, last_synced_at')
+        .eq('brand_id', brandId)
+    : { data: [] }
 
   let ga4Connection: GA4ConnectionData | null = null
   let paymentStatus: PaymentConfigStatus = { paystack: false, flutterwave: false }
@@ -29,6 +34,12 @@ export default async function ConnectionsSettingsPage() {
       .eq('brand_id', brandId)
       .maybeSingle()
     ga4Connection = ga4Data ?? null
+    // A shared-access request still waiting for our check is not connected.
+    // Its own read, so before that migration the missing column costs nothing.
+    const { data: ga4Pending } = await supabase
+      .from('ga4_connections').select('id').eq('brand_id', brandId)
+      .eq('auth_mode', 'shared').neq('access_status', 'active').maybeSingle()
+    if (ga4Pending) ga4Connection = null
 
     const { data: webhookConfigs } = await supabase
       .from('webhook_configs')

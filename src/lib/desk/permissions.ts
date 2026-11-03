@@ -63,6 +63,7 @@ export const PERMISSION_GROUPS = [
       ['ops.view',    'See connector and job health'],
       ['ops.run_job', 'Re-run a background job'],
       ['ops.reseed',  'Rebuild the demo accounts'],
+      ['ops.approve_access', 'Confirm a brand shared its GA4 or Meta access with us'],
     ],
   },
   {

@@ -15,6 +15,7 @@ import { MobileNav }          from './mobile-nav'
 import { CommandPalette }     from './command-palette'
 import { ModuleBeacon }       from './module-beacon'
 import { ChatWidget }         from '@/components/support/chat-widget'
+import type { ModuleFocus } from '@/lib/goals'
 import { cn }                 from '@/lib/utils'
 import type { BrandOption }   from './brand-switcher'
 import { BrandLockup } from '@/components/brand/logo'
@@ -29,9 +30,10 @@ interface DashboardShellProps {
   brands?:       BrandOption[]
   activeBrandId?: string | null
   industry?:     string | null
+  focus?:        ModuleFocus | null
 }
 
-export function DashboardShell({ children, userName, userEmail, brandName, brands = [], activeBrandId = null, industry = null }: DashboardShellProps) {
+export function DashboardShell({ children, userName, userEmail, brandName, brands = [], activeBrandId = null, industry = null, focus = null }: DashboardShellProps) {
   const pathname = usePathname()
 
   // Default pinned=true (expanded sidebar), hydrate from localStorage
@@ -86,6 +88,7 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
         brands={brands}
         activeBrandId={activeBrandId}
         industry={industry}
+        focus={focus}
       />
 
       {/* Content column */}
@@ -101,7 +104,7 @@ export function DashboardShell({ children, userName, userEmail, brandName, brand
 
           {/* Mobile: hamburger + brand mark */}
           <div className="flex items-center gap-2.5 md:hidden">
-            <MobileNav userName={userName} userEmail={userEmail} brandName={brandName} />
+            <MobileNav userName={userName} userEmail={userEmail} brandName={brandName} industry={industry} focus={focus} />
             <div className="flex items-center gap-2">
               <BrandLockup height={18} />
             </div>

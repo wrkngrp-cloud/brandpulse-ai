@@ -1,6 +1,6 @@
 'use server'
 
-import { sendMail } from '@/lib/email/send'
+import { sendEach } from '@/lib/email/send'
 import { createClient } from '@/lib/supabase/server'
 import { TOKENS } from '@/lib/brand-tokens'
 
@@ -55,23 +55,19 @@ export async function sendSurveyEmails(
     </div>
   `
 
-  // Send in batches of 50 (Resend limit per call)
-  const batches = []
-  for (let i = 0; i < emails.length; i += 50) {
-    batches.push(emails.slice(i, i + 50))
+  // One email per person. A shared `to` showed every customer the others'
+  // addresses; sendEach keeps each invitation private.
+  const result = await sendEach({
+    from: `${brandName} <surveys@brandgauge.app>`,
+    subject,
+    html,
+  }, emails)
+  if ('reason' in result) {
+    return { error: result.sent
+      ? `${result.sent} of ${result.sent + result.failed} invitations went out, then sending stopped: ${result.reason}.`
+      : `The invitations did not go out: ${result.reason}.` }
   }
-
-  let sent = 0
-  for (const batch of batches) {
-    const mail = await sendMail({
-      from: `${brandName} <surveys@brandgauge.app>`,
-      to:   batch,
-      subject,
-      html,
-    })
-    if (!mail.sent) return { error: `The invitations did not go out: ${mail.reason}.` }
-    sent += batch.length
-  }
+  const sent = result.sent
 
   return { sent }
 }

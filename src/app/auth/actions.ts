@@ -16,7 +16,9 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 })
 
-export type AuthState = { error?: string; fieldErrors?: Record<string, string[]> } | null
+export type AuthState = { error?: string; fieldErrors?: Record<string, string[]>; unconfirmedEmail?: string } | null
+
+const appUrl = () => process.env.APP_URL || 'http://localhost:3000'
 
 export async function signup(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const raw = {
@@ -33,14 +35,34 @@ export async function signup(_prev: AuthState, formData: FormData): Promise<Auth
   const { name, email, password } = parsed.data
   const supabase = await createClient()
 
+  /* A visitor who came from a free tool carries their report through as
+     `next`. Onboarding still runs (a brand has to exist before a report can
+     be attached to one), but it is handed the destination so they land back on
+     their own work rather than on a cold dashboard. The same destination rides
+     on the confirmation link, so confirming the email does not lose it. */
+  const next = formData.get('next')
+  const onward = typeof next === 'string' && next.trim()
+    ? `/onboarding?next=${encodeURIComponent(safeNext(next))}`
+    : '/onboarding'
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: name } },
+    options: {
+      data: { full_name: name },
+      emailRedirectTo: `${appUrl()}/api/auth/callback?next=${encodeURIComponent(onward)}`,
+    },
   })
 
   if (error) return { error: error.message }
-  if (!data.user) return { error: 'Signup failed — please try again.' }
+  if (!data.user) return { error: 'Signup did not go through. Please try again.' }
+
+  // Supabase answers a signup for an address that already has an account with
+  // a user that has no identities, so it never reveals who is registered. Do
+  // not build a second workspace for them; send them to the same screen.
+  if (!data.user.identities?.length) {
+    redirect(`/auth/check-email?email=${encodeURIComponent(email)}`)
+  }
 
   // Use service role to create workspace + member + blank brand
   // (RLS is not satisfied until the user has a session, so we bypass with service role)
@@ -65,15 +87,25 @@ export async function signup(_prev: AuthState, formData: FormData): Promise<Auth
     name: '',
   })
 
-  /* A visitor who came from a free tool carries their report through as
-     `next`. Onboarding still runs — a brand has to exist before a report can
-     be attached to one — but it is handed the destination so they land back on
-     their own work rather than on a cold dashboard. */
-  const next = formData.get('next')
-  const onward = typeof next === 'string' && next.trim()
-    ? `/onboarding?next=${encodeURIComponent(safeNext(next))}`
-    : '/onboarding'
+  // With email confirmation on there is no session yet, and sending them to
+  // /onboarding bounced them to a "Welcome back, sign in" page with no word
+  // about the email they had just been sent.
+  if (!data.session) redirect(`/auth/check-email?email=${encodeURIComponent(email)}`)
   redirect(onward)
+}
+
+/** Send the confirmation email again, from the check-your-email screen. */
+export async function resendConfirmation(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const email = formData.get('email')
+  if (typeof email !== 'string' || !email.includes('@')) return { error: 'Enter the email you signed up with.' }
+  const supabase = await createClient()
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+    options: { emailRedirectTo: `${appUrl()}/api/auth/callback?next=${encodeURIComponent('/onboarding')}` },
+  })
+  if (error) return { error: error.message }
+  return { error: '__sent__' }
 }
 
 export async function login(_prev: AuthState, formData: FormData): Promise<AuthState> {
@@ -89,7 +121,15 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword(parsed.data)
-  if (error) return { error: error.message }
+  if (error) {
+    if (error.code === 'email_not_confirmed' || /not confirmed/i.test(error.message)) {
+      return {
+        error: 'Confirm your email first. We sent you a link when you signed up.',
+        unconfirmedEmail: parsed.data.email,
+      }
+    }
+    return { error: error.message }
+  }
 
   // Login never routes to onboarding directly — only signup does that.
   // Returning users (including demo accounts) always land on /dashboard;

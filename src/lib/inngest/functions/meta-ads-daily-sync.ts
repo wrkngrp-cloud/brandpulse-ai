@@ -2,6 +2,7 @@ import { inngest } from '@/lib/inngest/client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { decrypt, encrypt } from '@/lib/crypto'
 import { getLongLivedToken } from '@/lib/social/meta'
+import { metaSystemToken } from '@/lib/shared-access/meta'
 
 const GRAPH = 'https://graph.facebook.com/v21.0'
 
@@ -54,11 +55,28 @@ export const metaAdsDailySync = inngest.createFunction(
     const supabase = await createServiceClient()
 
     // Fetch all active Meta ad accounts across all brands
-    const { data: accounts } = await supabase
+    // The shared-access columns, falling back to the older shape until that
+    // migration is applied, so the sync never stops for want of a column.
+    type Account = {
+      id: string; brand_id: string; ad_account_id: string | null
+      access_token: string | null; refresh_token: string | null; token_expiry: string | null
+      auth_mode?: string | null; access_status?: string | null
+    }
+    const first = await supabase
       .from('digital_ad_accounts')
-      .select('id, brand_id, ad_account_id, access_token, refresh_token, token_expiry')
+      .select('id, brand_id, ad_account_id, access_token, refresh_token, token_expiry, auth_mode, access_status')
       .eq('platform', 'meta')
       .neq('sync_status', 'disconnected')
+      .returns<Account[]>()
+    let accounts = first.data
+    if (first.error) {
+      ;({ data: accounts } = await supabase
+        .from('digital_ad_accounts')
+        .select('id, brand_id, ad_account_id, access_token, refresh_token, token_expiry')
+        .eq('platform', 'meta')
+        .neq('sync_status', 'disconnected')
+        .returns<Account[]>())
+    }
 
     if (!accounts?.length) {
       logger.info('No Meta ad accounts to sync')
@@ -70,10 +88,24 @@ export const metaAdsDailySync = inngest.createFunction(
     for (const account of accounts) {
       await step.run(`sync-meta-${account.id}`, async () => {
         try {
-          let accessToken = decrypt(account.access_token)
+          // Shared through Business Manager: read with our system user, and
+          // only once BrandGauge has confirmed who shared it.
+          const shared = account.auth_mode === 'shared'
+          if (shared && account.access_status !== 'active') {
+            logger.info(`Meta account ${account.id} skipped: shared access not yet approved`)
+            return
+          }
+          const sharedToken = shared ? metaSystemToken() : null
+          if (shared && !sharedToken) {
+            logger.warn(`Meta account ${account.id} is shared but META_SYSTEM_USER_TOKEN is not set`)
+            return
+          }
+          if (!shared && !account.access_token) return
+          let accessToken = sharedToken ?? decrypt(account.access_token!)
 
-          // Refresh token if expiring within 7 days
-          if (account.token_expiry) {
+          // Refresh token if expiring within 7 days. A system user token does
+          // not expire, so a shared account never refreshes.
+          if (!shared && account.token_expiry) {
             const expiryMs     = new Date(account.token_expiry).getTime()
             const sevenDaysMs  = 7 * 24 * 60 * 60 * 1000
             const shouldRefresh = expiryMs - Date.now() < sevenDaysMs
@@ -239,6 +271,13 @@ export const metaAdsDailySync = inngest.createFunction(
 
             if (upsertErr) {
               logger.error(`Failed to upsert insights for account ${account.id}: ${upsertErr.message}`)
+              // Recorded, so the card says the sync failed instead of looking
+              // like a sync that simply has not run yet.
+              await supabase.from('digital_ad_accounts').update({
+                sync_status: 'error',
+                last_error:  `Saving the results failed: ${upsertErr.message.slice(0, 400)}`,
+                updated_at:  new Date().toISOString(),
+              }).eq('id', account.id)
               return
             }
           }

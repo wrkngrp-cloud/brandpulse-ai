@@ -632,3 +632,107 @@ begin
   end if;
 end $$;
 reset role;
+
+-- ── Shared (agency-style) data access ───────────────────────────────────────
+-- BrandGauge's own Google and Meta identities can read every account shared
+-- with them, so a customer may ask for one but only staff (service role) may
+-- switch it on. Customer 0003 owns brand cccc..01; rival 0004 owns cccc..02.
+reset role;
+create or replace function pg_temp.attempt(stmt text) returns text
+language plpgsql as $$
+begin
+  execute stmt;
+  return 'ok';
+exception when others then
+  return 'refused';
+end $$;
+grant execute on function pg_temp.attempt(text) to authenticated, service_role;
+grant select, insert, update, delete on all tables in schema public to authenticated, service_role;
+alter role service_role bypassrls;
+
+\echo '── shared access: as the customer'
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select 'customer requests shared GA4 (pending)' as check,
+       pg_temp.attempt($q$insert into ga4_connections (brand_id, property_id, auth_mode, access_status)
+         values ('cccccccc-0000-0000-0000-000000000001', '312345678', 'shared', 'pending')$q$) as got, 'ok' as want
+union all select 'customer cannot insert it already active',
+       pg_temp.attempt($q$insert into digital_ad_accounts (brand_id, platform, account_id, ad_account_id, auth_mode, access_status)
+         values ('cccccccc-0000-0000-0000-000000000001', 'meta', 'act_1', 'act_1', 'shared', 'active')$q$), 'refused'
+union all select 'customer cannot approve their own request',
+       pg_temp.attempt($q$update ga4_connections set access_status = 'active' where property_id = '312345678'$q$), 'refused'
+union all select 'customer cannot re-point it at another property',
+       pg_temp.attempt($q$update ga4_connections set property_id = '999999999' where property_id = '312345678'$q$), 'refused'
+union all select 'customer can still touch harmless fields',
+       pg_temp.attempt($q$update ga4_connections set last_synced_at = now() where property_id = '312345678'$q$), 'ok';
+-- A separate statement: one statement cannot see rows its own calls wrote.
+select 'status is still pending' as check,
+       (select access_status from ga4_connections where property_id = '312345678') as got, 'pending' as want;
+
+\echo '── shared access: a second brand cannot claim the same property'
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000004';
+select 'rival cannot claim a property already requested' as check,
+       pg_temp.attempt($q$insert into ga4_connections (brand_id, property_id, auth_mode, access_status)
+         values ('cccccccc-0000-0000-0000-000000000002', '312345678', 'shared', 'pending')$q$) as got, 'refused' as want
+union all select 'rival cannot see the request',
+       (select count(*)::text from ga4_connections where property_id = '312345678'), '0';
+
+\echo '── shared access: staff approve through the service role'
+reset role;
+set role service_role;
+select 'service role approves' as check,
+       pg_temp.attempt($q$update ga4_connections set access_status = 'active' where property_id = '312345678'$q$) as got, 'ok' as want;
+select 'now active' as check,
+       (select access_status from ga4_connections where property_id = '312345678') as got, 'active' as want;
+reset role;
+
+\echo '── shared access: an approved row still cannot be re-pointed by the customer'
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select 'customer cannot swap an approved property' as check,
+       pg_temp.attempt($q$update ga4_connections set property_id = '888888888' where property_id = '312345678'$q$) as got, 'refused' as want
+union all select 'customer can withdraw (delete) it',
+       pg_temp.attempt($q$delete from ga4_connections where property_id = '312345678'$q$), 'ok';
+reset role;
+
+-- ── The Monday Brief ────────────────────────────────────────────────────────
+-- Moments are the brand's own to write; briefs are written by the weekly job
+-- (service role) and only read by the brand's members.
+\echo '── monday brief: moments and briefs'
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select 'member adds a moment' as check,
+       pg_temp.attempt($q$insert into brand_moments (brand_id, happened_on, kind, title)
+         values ('cccccccc-0000-0000-0000-000000000001', '2026-10-28', 'launch', 'Savings vault')$q$) as got, 'ok' as want
+union all select 'a moment kind outside the list is refused',
+       pg_temp.attempt($q$insert into brand_moments (brand_id, happened_on, kind, title)
+         values ('cccccccc-0000-0000-0000-000000000001', '2026-10-28', 'rumour', 'x y')$q$), 'refused'
+union all select 'member cannot write a brief themselves',
+       pg_temp.attempt($q$insert into weekly_briefs (brand_id, week_start, status)
+         values ('cccccccc-0000-0000-0000-000000000001', '2026-10-26', 'ready')$q$), 'refused'
+union all select 'brief hour outside 5 to 12 is refused',
+       pg_temp.attempt($q$update brands set brief_hour = 3 where id = 'cccccccc-0000-0000-0000-000000000001'$q$), 'refused';
+
+reset role;
+set role service_role;
+select 'the weekly job writes a brief' as check,
+       pg_temp.attempt($q$insert into weekly_briefs (brand_id, week_start, status, content)
+         values ('cccccccc-0000-0000-0000-000000000001', '2026-10-26', 'ready', '{"headline":"x"}')$q$) as got, 'ok' as want;
+select 'share token is 64 hex characters' as check,
+       (select (share_token ~ '^[0-9a-f]{64}$')::text from weekly_briefs where week_start = '2026-10-26') as got, 'true' as want;
+reset role;
+
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select 'member reads their brief' as check,
+       (select count(*)::text from weekly_briefs where week_start = '2026-10-26') as got, '1' as want
+union all select 'member cannot edit a brief',
+       pg_temp.attempt($q$update weekly_briefs set status = 'needs_numbers' where week_start = '2026-10-26'$q$), 'ok';
+select 'and the edit changed nothing' as check,
+       (select status from weekly_briefs where week_start = '2026-10-26') as got, 'ready' as want;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000004';
+select 'another workspace cannot read the brief' as check,
+       (select count(*)::text from weekly_briefs where week_start = '2026-10-26') as got, '0' as want
+union all select 'or the moment',
+       (select count(*)::text from brand_moments where title = 'Savings vault'), '0';
+reset role;

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { runBrandGap, type BrandGapResult } from '@/lib/tools/brand-gap'
 import { finishRun, hashIp, ipOf, startRun } from '@/lib/tools/runs'
 import { recordEvent } from '@/lib/tools/events'
-import { cacheGet, cacheKey, cacheSet, CACHE_TTL, withinRateLimit } from '@/lib/tools/limits'
+import { cacheGet, cacheKey, cacheSet, CACHE_TTL, withinRateLimit, withinDailyBudget, X_DAILY_RUNS } from '@/lib/tools/limits'
 import { normaliseUrl } from '@/lib/tools/fetch-public'
 import { gateResult } from '@/lib/tools/gate'
 
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   const run = await startRun({ toolId: 'brand-gap', inputs, req, ipHash })
   await recordEvent({ event: 'free_tool_started', toolId: 'brand-gap', runId: run.id, visitorId, props: { market: market ?? '' } })
 
-  const key = cacheKey('brand-gap', [brandName, site.hostname, market])
+  const key = cacheKey('brand-gap:v2', [brandName, site.hostname, market])
   const cached = await cacheGet<BrandGapResult>(key)
 
   try {
@@ -70,7 +70,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ token: run.token, runId: run.id, status: 'complete', ...gatedCache })
     }
 
-    const outcome = await runBrandGap({ brandName, website: site.toString(), market: market ?? null })
+    const outcome = await runBrandGap({
+      brandName, website: site.toString(), market: market ?? null,
+      xBudgetOk: process.env.TWITTER_BEARER_TOKEN ? await withinDailyBudget('x-search', X_DAILY_RUNS) : false,
+    })
 
     if (!outcome.ok) {
       /* Three of the four refusals are findings rather than faults: nothing

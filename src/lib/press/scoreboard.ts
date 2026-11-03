@@ -13,8 +13,8 @@
  * to do.
  */
 import {
-  classifyRegulatory, emvFor, fetchGoogleNewsRss, parsePubDate,
-  pressQuery, publicationFromUrl, reachFor, type RegulatoryKind,
+  classifyRegulatory, emvFor, fetchGoogleNewsRss, newestFirst, parsePubDate,
+  pressQuery, publicationFromUrl, reachFor, recentQuery, type RegulatoryKind,
 } from './nigerian-press'
 
 export interface Mention {
@@ -67,13 +67,16 @@ const MAX_PER_BRAND = 25
  *  that says it could not read the feed beats a spinner that never stops. */
 const FEED_TIMEOUT_MS = 8_000
 
-async function boardFor(name: string, isSubject: boolean, since: number): Promise<{
+async function boardFor(name: string, isSubject: boolean, since: number, days: number): Promise<{
   board: Omit<BrandBoard, 'shareOfReach'>
   flags: RegulatoryFlag[]
   ok: boolean
 }> {
-  const read = await fetchGoogleNewsRss(pressQuery(name), AbortSignal.timeout(FEED_TIMEOUT_MS))
-  const items = read.items
+  // Narrowed to the window before Google ranks it. Unbounded, the feed ranks
+  // by relevance and fills its slots with older stories we then discard, so a
+  // brand with plenty of coverage this month was undercounted.
+  const read = await fetchGoogleNewsRss(recentQuery(pressQuery(name), days), AbortSignal.timeout(FEED_TIMEOUT_MS))
+  const items = newestFirst(read.items)
   if (!read.ok) console.error(`[scoreboard] feed read failed for "${name}": ${read.error}`)
   const seen = new Set<string>()
   const mentions: Mention[] = []
@@ -119,7 +122,7 @@ export async function runScoreboard(
   // One request per brand, in parallel. Four RSS fetches, no API key, about a
   // second in total.
   const results = await Promise.all(
-    names.map((n, i) => boardFor(n, i === 0, since)),
+    names.map((n, i) => boardFor(n, i === 0, since, days)),
   )
 
   const totalReach = results.reduce((s, r) => s + r.board.totalReach, 0)

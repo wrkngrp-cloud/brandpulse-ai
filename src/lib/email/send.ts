@@ -72,3 +72,49 @@ export async function sendMail(payload: CreateEmailOptions): Promise<MailResult>
     return { sent: false, configured: true, reason }
   }
 }
+
+export type BulkResult =
+  | { sent: number; failed: 0 }
+  | { sent: number; failed: number; reason: string; configured: boolean }
+
+/**
+ * One message, sent separately to each person on a list.
+ *
+ * Never put a list of outside recipients in one `to`. Every address in that
+ * header is shown to every recipient, so a survey invitation to 50 customers
+ * handed each of them the other 49 addresses. That is a data exposure under
+ * the NDPR, and it shipped in both survey senders. This sends one email per
+ * address through Resend's batch endpoint, up to 100 per call, so nobody sees
+ * anybody else.
+ *
+ * It stops at the first refused chunk and reports how many went out before
+ * it, so a caller can say "40 of 120 sent" rather than "sent" or "failed".
+ */
+export async function sendEach(
+  base: Omit<CreateEmailOptions, 'to' | 'cc' | 'bcc' | 'attachments' | 'scheduledAt'>,
+  recipients: string[],
+): Promise<BulkResult> {
+  const to = [...new Set(recipients.map(r => r.trim().toLowerCase()).filter(Boolean))]
+  if (!to.length) return { sent: 0, failed: 0 }
+  if (!emailConfigured()) {
+    return { sent: 0, failed: to.length, configured: false, reason: 'no RESEND_API_KEY is set, so no email can go out' }
+  }
+
+  let sent = 0
+  for (let i = 0; i < to.length; i += 100) {
+    const chunk = to.slice(i, i + 100)
+    try {
+      const { error } = await mailer().batch.send(chunk.map(address => ({ ...base, to: address } as CreateEmailOptions)))
+      if (error) {
+        console.error('[email] batch refused', { subject: base.subject, count: chunk.length, code: error.name, message: error.message })
+        return { sent, failed: to.length - sent, configured: true, reason: explain(error.name, error.message) }
+      }
+      sent += chunk.length
+    } catch (err) {
+      const reason = err instanceof Error ? err.message : 'the request to Resend failed'
+      console.error('[email] batch threw', { subject: base.subject, count: chunk.length, reason })
+      return { sent, failed: to.length - sent, configured: true, reason }
+    }
+  }
+  return { sent, failed: 0 }
+}

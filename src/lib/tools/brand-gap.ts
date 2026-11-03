@@ -1,8 +1,10 @@
 import { callAi, extractJson } from '@/lib/ai/client'
-import { fetchGoogleNewsRss, pressQuery, publicationFromUrl, parsePubDate, type RssItem } from '@/lib/press/nigerian-press'
+import { publicationFromUrl, parsePubDate, type RssItem } from '@/lib/press/nigerian-press'
 import { configuredAssistants, queryAssistant } from '@/lib/ai/assistants'
 import { fetchPublic, failureSentence, normaliseUrl, robotsDisallows, pathAllowed } from './fetch-public'
-import { findSectionLinks, readPage, type PageFacts } from './html'
+import { absolute, findSectionLinks, readPage, type PageFacts } from './html'
+import { readRecentPress } from './press-reader'
+import { fetchXActivity, findXHandle, type XPost } from './x-activity'
 import type { CoverageNote, Evidence, Finding, ToolReport } from './report'
 
 /**
@@ -15,9 +17,11 @@ import type { CoverageNote, Evidence, Finding, ToolReport } from './report'
  *                we fetched, and a quote that does not appear in the text we
  *                read is dropped before it reaches the report.
  *
- *   Described  — who the market says you are, read off the Nigerian press and
- *                off what an AI assistant answers when asked about you. Both
- *                are public descriptions of the brand that the brand did not
+ *   Described  — who the market says you are, read off the last 90 days of
+ *                Nigerian press (with the article text where the outlet's
+ *                feed carries it), what people posted about you on X this
+ *                week, and what an AI assistant answers when asked about you.
+ *                All of these are public descriptions the brand did not
  *                write, which is the only half of this that counts as outside
  *                evidence.
  *
@@ -36,6 +40,9 @@ import type { CoverageNote, Evidence, Finding, ToolReport } from './report'
  * figure or a sentiment percentage. Nothing here is measured in numbers,
  * because nothing here can be.
  */
+
+/** How far back the press read goes. */
+const PRESS_DAYS = 90
 
 export type DivergenceKind = 'missing' | 'contradicted' | 'unclaimed' | 'aligned'
 
@@ -67,7 +74,7 @@ export interface StatedIdentity {
 export interface DescribedTrait {
   attribute:   string
   quote:       string
-  kind:        'press' | 'assistant'
+  kind:        'press' | 'assistant' | 'social'
   sourceUrl:   string | null
   sourceName:  string
   publishedAt: string | null
@@ -107,6 +114,8 @@ export interface BrandGapInput {
   brandName: string
   website:   string
   market?:   string | null
+  /** Whether today's X allowance has room. The route holds the counter. */
+  xBudgetOk?: boolean
 }
 
 export type BrandGapOutcome =
@@ -179,33 +188,35 @@ export async function runBrandGap(input: BrandGapInput): Promise<BrandGapOutcome
   }
 
   /* ── 2. What the market says ───────────────────────────────────────────
-     The press first, in two reads: the ten Nigerian outlets, and a wider
-     query for a brand whose coverage never reaches a Nigerian masthead. */
-  const [nigerian, general] = await Promise.all([
-    fetchGoogleNewsRss(pressQuery(name)),
-    fetchGoogleNewsRss(`"${name}" ${market}`),
+     The last 90 days of press, newest first, with the article text where we
+     can get it: perception is what the market says now, and a headline alone
+     says little about who a brand is. Then this week on X, where customers
+     describe a brand in their own words. Their own posts are excluded: that
+     is the stated half again. */
+  const ownHandle = findXHandle({ links: homeFacts.links.map(l => ({ ...l, href: absolute(l.href, home.url) ?? l.href })) })
+  const [pressRead, x] = await Promise.all([
+    readRecentPress({ name, market, days: PRESS_DAYS }),
+    fetchXActivity({ name, handle: ownHandle, budgetOk: input.xBudgetOk ?? true, skipOwn: true }),
   ])
+  const press = pressRead.items
+  const pressOk = pressRead.googleOk || pressRead.outletsRead > 0
+  const posts = x.about.filter(p => p.text.replace(/https?:\/\/\S+/g, '').trim().length >= 40)
 
   coverage.push({
-    source: 'Nigerian business press',
-    read: nigerian.ok,
-    note: nigerian.ok ? undefined : 'The news feed did not answer, so press coverage is missing from this reading.',
+    source: `Nigerian business press, last ${PRESS_DAYS} days`,
+    read: pressOk,
+    note: pressOk ? undefined : 'The news feeds did not answer, so press coverage is missing from this reading.',
   })
   coverage.push({
     source: 'Wider business news',
-    read: general.ok,
-    note: general.ok ? undefined : 'The news feed did not answer.',
+    read: pressRead.generalOk,
+    note: pressRead.generalOk ? undefined : 'The news feed did not answer.',
   })
-
-  const first = name.toLowerCase().split(/\s+/)[0]
-  const seen = new Set<string>()
-  const press: RssItem[] = [...nigerian.items, ...general.items].filter(item => {
-    const key = item.link.split('?')[0]
-    if (seen.has(key)) return false
-    seen.add(key)
-    // A story that does not name them describes somebody else.
-    return item.title.toLowerCase().includes(first)
-  }).slice(0, 20)
+  coverage.push({
+    source: 'What people posted about you on X, last 7 days',
+    read: x.ok,
+    note: x.ok ? undefined : x.note,
+  })
 
   // Then the assistants, asked the plainest version of the question a buyer
   // would ask. Each configured platform answers once; none of them is named.
@@ -228,17 +239,17 @@ export async function runBrandGap(input: BrandGapInput): Promise<BrandGapOutcome
         : undefined,
   })
 
-  if (!press.length && !answers.length) {
+  if (!press.length && !answers.length && !posts.length) {
     return {
       ok: false,
       reason: 'no_description',
-      note: `We read your site and found what you say about yourselves. Then we looked for anyone else saying it, and found nothing: no press coverage naming ${name}, and no AI assistant that knows the brand. There is no perception gap here because there is no perception yet. Everything the market knows about you, it knows from pages you control, so the work is earned coverage and third-party mentions, not repositioning.`,
+      note: `We read your site and found what you say about yourselves. Then we looked for anyone else saying it, and found nothing: no recent press coverage naming ${name}, no posts about you on X this week, and no AI assistant that knows the brand. There is no perception gap here because there is no perception yet. Everything the market knows about you, it knows from pages you control, so the work is earned coverage and third-party mentions, not repositioning.`,
       coverage,
     }
   }
 
   /* ── 3. The gap ────────────────────────────────────────────────────────── */
-  const { traits, divergences } = await readGap({ name, market, stated, press, answers })
+  const { traits, divergences } = await readGap({ name, market, stated, press, answers, posts })
 
   if (!divergences.length) {
     return {
@@ -249,7 +260,7 @@ export async function runBrandGap(input: BrandGapInput): Promise<BrandGapOutcome
     }
   }
 
-  const report = buildReport({ name, host: site.hostname, stated, divergences, pressCount: press.length, assistants: answers.length, coverage })
+  const report = buildReport({ name, host: site.hostname, stated, divergences, pressCount: press.length, postCount: posts.length, assistants: answers.length, coverage })
 
   return {
     ok: true,
@@ -377,7 +388,7 @@ export async function readStated(args: { name: string; market: string; pages: Pa
 
 /* ── Pass two: the outside, and the distance ────────────────────────────── */
 
-const GAP_SYSTEM = `You are a brand strategist in Lagos. You are given what a brand says about itself, and a numbered list of outside sources: press stories, and answers an AI assistant gave when asked about the brand. Your job is to say how the outside description differs from the stated one.
+const GAP_SYSTEM = `You are a brand strategist in Lagos. You are given what a brand says about itself, and a numbered list of outside sources: recent press stories, posts people made about the brand on X this week, and answers an AI assistant gave when asked about the brand. Weight the newest sources most: the question is how the brand is described now. A single X post is one person's view; treat a pattern across several posts as stronger than any one. Your job is to say how the outside description differs from the stated one.
 
 Rules you must not break:
 
@@ -413,20 +424,27 @@ export async function readGap(args: {
   stated: StatedIdentity
   press: RssItem[]
   answers: string[]
+  posts?: XPost[]
 }): Promise<{ traits: DescribedTrait[]; divergences: Divergence[] }> {
   type Source =
     | { kind: 'press'; item: RssItem }
     | { kind: 'assistant'; text: string }
+    | { kind: 'social'; post: XPost }
 
   const sources: Source[] = [
     ...args.press.map(item => ({ kind: 'press' as const, item })),
+    ...(args.posts ?? []).slice(0, 10).map(post => ({ kind: 'social' as const, post })),
     ...args.answers.map(text => ({ kind: 'assistant' as const, text })),
   ]
 
   const listed = sources.map((s, i) => {
     const n = i + 1
     if (s.kind === 'press') {
-      return `[${n}] PRESS · ${publicationFromUrl(s.item.link)} · published ${parsePubDate(s.item.pubDate)}\nHeadline: ${s.item.title}\nExtract: ${s.item.snippet}`
+      const text = s.item.body ? `Article: ${s.item.body.slice(0, 1500)}` : `Extract: ${s.item.snippet}`
+      return `[${n}] PRESS · ${publicationFromUrl(s.item.link)} · published ${parsePubDate(s.item.pubDate)}\nHeadline: ${s.item.title}\n${text}`
+    }
+    if (s.kind === 'social') {
+      return `[${n}] POST ON X · @${s.post.username} · posted ${s.post.createdAt.slice(0, 10)}\n${s.post.text.slice(0, 400)}`
     }
     return `[${n}] AI ASSISTANT ANSWER (asked today: what is this brand, who is it for, what is it known for)\n${s.text.slice(0, 1800)}`
   }).join('\n\n')
@@ -467,6 +485,14 @@ export async function readGap(args: {
         publishedAt: parsePubDate(src.item.pubDate),
       }
     }
+    if (src.kind === 'social') {
+      return {
+        quote: src.post.text.slice(0, 240),
+        sourceUrl: src.post.url,
+        sourceName: `X, @${src.post.username}`,
+        publishedAt: src.post.createdAt.slice(0, 10),
+      }
+    }
     // No URL exists for an assistant answer, and inventing one would be the
     // worst kind of fake source. The card renders it as an unlinked quote.
     return { sourceName: 'An AI assistant, asked today', publishedAt: null }
@@ -480,9 +506,9 @@ export async function readGap(args: {
       attribute,
       quote:       (d.quote ?? '').trim().slice(0, 200),
       kind:        src.kind,
-      sourceUrl:   src.kind === 'press' ? src.item.link : null,
-      sourceName:  src.kind === 'press' ? publicationFromUrl(src.item.link) : 'An AI assistant, asked today',
-      publishedAt: src.kind === 'press' ? parsePubDate(src.item.pubDate) : null,
+      sourceUrl:   src.kind === 'press' ? src.item.link : src.kind === 'social' ? src.post.url : null,
+      sourceName:  src.kind === 'press' ? publicationFromUrl(src.item.link) : src.kind === 'social' ? `X, @${src.post.username}` : 'An AI assistant, asked today',
+      publishedAt: src.kind === 'press' ? parsePubDate(src.item.pubDate) : src.kind === 'social' ? src.post.createdAt.slice(0, 10) : null,
     }]
   }).slice(0, 8)
 
@@ -542,6 +568,7 @@ function buildReport(args: {
   stated: StatedIdentity
   divergences: Divergence[]
   pressCount: number
+  postCount: number
   assistants: number
   coverage: CoverageNote[]
 }): ToolReport {
@@ -569,7 +596,7 @@ function buildReport(args: {
   const unheard = divergences.filter(d => d.kind === 'missing').length
 
   const summary = [
-    `We read what ${name} says about itself on ${args.host}, then read ${pressCount} press ${pressCount === 1 ? 'story' : 'stories'}${assistants ? ` and ${assistants} AI assistant ${assistants === 1 ? 'answer' : 'answers'}` : ''} to see how the market describes you back.`,
+    `We read what ${name} says about itself on ${args.host}, then read ${pressCount} recent press ${pressCount === 1 ? 'story' : 'stories'}${args.postCount ? `, ${args.postCount} ${args.postCount === 1 ? 'post' : 'posts'} about you on X this week` : ''}${assistants ? ` and ${assistants} AI assistant ${assistants === 1 ? 'answer' : 'answers'}` : ''} to see how the market describes you back.`,
     unheard ? `${unheard === 1 ? 'One thing you lead with is' : `${unheard} things you lead with are`} not coming back to you from anywhere outside.` : null,
     heard ? `${heard === 1 ? 'One attribute' : `${heard} attributes`} the market gives you ${heard === 1 ? 'is' : 'are'} nowhere in your own words.` : null,
     'Each one below carries what the source actually said.',
@@ -585,7 +612,7 @@ function buildReport(args: {
       || `Take the gap above to whoever owns your messaging. The fastest fix is usually to say the thing the market already believes about you, in your own words, where a buyer reads it first.`,
     coverage: args.coverage,
     limitations: [
-      'This reads public sources only: your own website, the business press, and what an AI assistant answers. It is not research with your customers, and it cannot tell you what people think and never write down.',
+      'This reads public sources only: your own website, the last 90 days of business press, what people posted about you on X this week, and what an AI assistant answers. It is not research with your customers, and it cannot tell you what people think and never write down.',
       `Press coverage comes from a free public news feed across ten Nigerian outlets plus wider business news. It is a good read of what was written about ${name} and not a complete one.`,
       'An AI assistant describes a brand from what it was trained on and what it can retrieve. It is a useful proxy for the public description of you, and it is not a survey of your market.',
       'There are no numbers in this report because there are none to measure here. Nothing above is a share, a sentiment score or a reach figure, and none has been estimated.',

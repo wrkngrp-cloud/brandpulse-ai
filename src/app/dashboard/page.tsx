@@ -9,6 +9,7 @@ import { getIndustryFromCategory, SUGGESTED_CONNECTORS_BY_INDUSTRY, type Industr
 import { DEFAULT_WIDGET_IDS, TEMPLATE_BY_INDUSTRY } from '@/lib/widget-catalog'
 import { getTourStatuses } from '@/app/dashboard/tours/actions'
 import type { ConnectChecklistItem } from '@/components/dashboard/connect-checklist'
+import { BriefSection } from '@/components/brief/brief-section'
 
 async function DashboardContent({ days }: { days: number }) {
   const supabase = await createClient()
@@ -162,6 +163,7 @@ async function DashboardContent({ days }: { days: number }) {
 
   return (
     <OverviewClient
+      brief={<Suspense fallback={<Skeleton className="h-56 rounded-sm" />}><BriefSection /></Suspense>}
       brandName={brand?.name ?? 'Your brand'}
       category={brand?.category ?? null}
       industry={industry}

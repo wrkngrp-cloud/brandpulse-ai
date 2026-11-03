@@ -94,6 +94,11 @@ export async function GET(request: NextRequest) {
 
   const tokenExpiry = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
 
+  // A shared-access row gives way to the login, which carries its own token.
+  // Before the shared-access migration the filter names a missing column and
+  // the delete is a harmless no-op.
+  await supabase.from('ga4_connections').delete().eq('brand_id', brandId).eq('auth_mode', 'shared')
+
   const { error: dbErr } = await supabase
     .from('ga4_connections')
     .upsert(

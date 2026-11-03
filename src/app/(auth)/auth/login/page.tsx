@@ -204,12 +204,20 @@ function LoginContent() {
               <input type="hidden" name="next" value={nextPath} />
               {linkExpired && (
                 <p className="text-sm text-tx-2 bg-shell dark:bg-shell/30 dark:text-tx-2 px-3 py-2 rounded-lg">
-                  That reset link has expired. Request a new one below.
+                  That link has expired or was already used. Sign in below, or request a new one.
                 </p>
               )}
               {state?.error && (
                 <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
                   {state.error}
+                  {state.unconfirmedEmail && (
+                    <>
+                      {' '}
+                      <Link href={`/auth/check-email?email=${encodeURIComponent(state.unconfirmedEmail)}`} className="underline">
+                        Send it again
+                      </Link>
+                    </>
+                  )}
                 </p>
               )}
 

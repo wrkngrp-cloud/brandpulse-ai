@@ -6,6 +6,7 @@ import { ImpersonationBanner } from '@/components/dashboard/impersonation-banner
 import { AiCommand }         from './ai-command'
 import { PrePostWidget }     from './pre-post-widget'
 import type { BrandOption }  from '@/components/dashboard/brand-switcher'
+import { focusFrom }          from '@/lib/goals'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -46,6 +47,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const industry = (activeBrand as { industry?: string | null }).industry
     || getIndustryFromCategory((activeBrand as { category?: string | null }).category ?? '')
 
+  // Which modules this brand chose to see. Read on its own so that, before
+  // the focus migration is applied, a missing column costs the filter and
+  // nothing else: the error leaves focus null, which is the full sidebar.
+  const { data: focusRow } = await supabase
+    .from('brands')
+    .select('focus_goals, show_all_modules')
+    .eq('id', activeBrand.id)
+    .maybeSingle()
+  const focus = focusFrom(focusRow as { focus_goals?: unknown; show_all_modules?: unknown } | null)
+
   return (
     <>
       {/* Runs for the whole of a read-only session, on both sides. Renders
@@ -59,6 +70,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         brands={namedBrands as BrandOption[]}
         activeBrandId={activeBrand.id}
         industry={industry}
+        focus={focus}
       >
         {children}
       </DashboardShell>

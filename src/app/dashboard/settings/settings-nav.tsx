@@ -11,6 +11,7 @@ const SETTINGS_LINKS = [
   { label: 'Profile',            href: '/dashboard/settings/profile',      icon: User          },
   { label: 'Brands',             href: '/dashboard/settings/brands',       icon: Layers        },
   { label: 'Brand',              href: '/dashboard/settings/brand',        icon: Building2     },
+  { label: 'Modules',            href: '/dashboard/settings/modules',      icon: Layers        },
   { label: 'Connected Accounts', href: '/dashboard/settings/connections',  icon: Link2         },
   { label: 'OOH Domain',         href: '/dashboard/settings/ooh-domain',   icon: MapPin        },
   { label: 'Competitors',        href: '/dashboard/settings/competitors',   icon: Swords        },

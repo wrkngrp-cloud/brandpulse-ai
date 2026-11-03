@@ -17,6 +17,7 @@ import { AskIcon as Sparkles, DraftIcon as Draft, AlertIcon as AlertCircle } fro
 import { cn } from '@/lib/utils'
 import { TagInput, CulturalSlider, SectionCard, CATEGORIES, CULTURAL_SLIDERS } from '@/components/onboarding/brand-profile-fields'
 import { INDUSTRY_META, INDUSTRY_IDS, type IndustryId, getIndustryFromCategory } from '@/lib/industry-config'
+import { GOALS, suggestedGoals, type GoalId } from '@/lib/goals'
 
 const LOADING_MESSAGES = [
   'Reading your brand name...',
@@ -45,13 +46,13 @@ const CONFIDENCE_META: Record<string, { label: string; class: string }> = {
 function StepBadge({ step, label }: { step: number; label?: string }) {
   return (
     <p className="text-[11px] font-semibold text-tx-2">
-      Brand setup · Step {step} of 3{label ? ` · ${label}` : ''}
+      Brand setup · Step {step} of 4{label ? ` · ${label}` : ''}
     </p>
   )
 }
 
 type CulturalKey = 'community_corporate' | 'traditional_modern' | 'religious_secular' | 'mass_premium' | 'local_global'
-type Screen = 'industry' | 'identify' | 'analysing' | 'review'
+type Screen = 'industry' | 'goals' | 'identify' | 'analysing' | 'review'
 
 const defaultData: OnboardingData = {
   websiteUrl: '',
@@ -62,6 +63,7 @@ const defaultData: OnboardingData = {
   brandVoice: { adjectives: [], tone: '', dos: [], donts: [], signaturePhrases: [] },
   culturalProfile: { community_corporate: 50, traditional_modern: 50, religious_secular: 50, mass_premium: 50, local_global: 50 },
   targetSegments: [],
+  focusGoals: [],
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -160,11 +162,14 @@ function Onboarding() {
       }
       const result = await res.json() as BrandInferResult
 
-      setData({
+      setData(d => ({
         websiteUrl,
         brandName,
-        industry:        data.industry,
-        category:        result.category || 'Other',
+        industry:        d.industry,
+        focusGoals:      d.focusGoals,
+        // Their own industry pick wins. Research used to overwrite it, so a
+        // brand that chose Fintech came back as "Other".
+        category:        d.category || result.category || 'Other',
         brandValues:     result.brandValues ?? [],
         brandVoice:      {
           adjectives:       result.brandVoice?.adjectives ?? [],
@@ -185,12 +190,12 @@ function Onboarding() {
           demographics: s.demographics ?? '',
           geography:    s.geography ?? '',
         })),
-      })
+      }))
       setConfidence(result.confidence ?? 'Medium')
       setSources(result.inferenceSources ?? ['brand_name'])
     } catch {
       // Inference failed — proceed to review with empty pre-fills
-      setData({ ...defaultData, industry: data.industry, brandName, websiteUrl })
+      setData(d => ({ ...defaultData, industry: d.industry, focusGoals: d.focusGoals, brandName, websiteUrl }))
       setConfidence('Low')
       setSources(['brand_name'])
       setInferError(true)
@@ -264,18 +269,94 @@ function Onboarding() {
             className="w-full"
             size="lg"
             disabled={!data.industry}
+            data-tour="onboarding-industry-next"
             onClick={() => {
               // Pre-fill category from industry selection
               const industryMeta = INDUSTRY_META[data.industry as IndustryId]
               if (industryMeta && !data.category) {
                 patch('category', industryMeta.label)
               }
-              setScreen('identify')
+              // Start from a sensible pick for this kind of brand. One tap
+              // changes it; it only decides where the cursor starts.
+              if (!data.focusGoals.length) patch('focusGoals', suggestedGoals(data.industry))
+              setScreen('goals')
             }}
           >
-            Next: name your brand
+            Next: what you want to do
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Screen 0b: Goals ──────────────────────────────────────────────────────
+  if (screen === 'goals') {
+    const toggleGoal = (id: GoalId) => patch(
+      'focusGoals',
+      data.focusGoals.includes(id) ? data.focusGoals.filter(g => g !== id) : [...data.focusGoals, id],
+    )
+    return (
+      <div className="min-h-screen bg-muted/40 flex flex-col items-center justify-center px-4 py-12">
+        <a href="/api/auth/signout" className="fixed top-4 right-4 text-xs text-muted-foreground hover:text-foreground border rounded-sm px-3 py-1.5 bg-background/80 backdrop-blur transition-colors">Sign out</a>
+        <div className="w-full max-w-2xl space-y-8">
+          <div className="text-center space-y-2">
+            <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
+              <Draft className="h-5 w-5 text-background" />
+            </div>
+            <StepBadge step={2} />
+            <h1 className="text-2xl font-medium tracking-tight">What do you want to do first?</h1>
+            <p className="text-sm text-muted-foreground">
+              Pick one or two. We will show you only what you need for these, and you can open everything else any time.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" data-tour="onboarding-goals">
+            {GOALS.map(goal => {
+              const selected = data.focusGoals.includes(goal.id)
+              return (
+                <button
+                  key={goal.id}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => toggleGoal(goal.id)}
+                  className={cn(
+                    'relative text-left rounded-xl border p-4 transition-colors duration-150 bg-card hover:border-foreground/40 bg-press',
+                    selected ? 'border-foreground ring-2 ring-foreground/10' : 'border-border',
+                  )}
+                >
+                  {selected && (
+                    <span className="absolute top-2.5 right-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground">
+                      <Check className="h-2.5 w-2.5 text-background" />
+                    </span>
+                  )}
+                  <span className="text-[13px] font-semibold leading-snug block pr-6">{goal.label}</span>
+                  <span className="text-[11px] text-muted-foreground leading-snug mt-1 block">{goal.line}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="space-y-2">
+            <Button
+              className="w-full"
+              size="lg"
+              disabled={!data.focusGoals.length}
+              onClick={() => setScreen('identify')}
+            >
+              Next: name your brand
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full text-muted-foreground hover:text-foreground"
+              onClick={() => setScreen('industry')}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Change the kind of brand
+            </Button>
+          </div>
         </div>
       </div>
     )
@@ -291,7 +372,7 @@ function Onboarding() {
             <div className="inline-flex h-10 w-10 rounded-full bg-foreground items-center justify-center mb-2">
               <Draft className="h-5 w-5 text-background" />
             </div>
-            <StepBadge step={2} />
+            <StepBadge step={3} />
             <h1 className="text-2xl font-medium tracking-tight">Tell us who you are</h1>
             <p className="text-sm text-muted-foreground">
               We will research your brand and draft a profile for you to review in the next step.
@@ -367,7 +448,7 @@ function Onboarding() {
             <Loader2 className="h-6 w-6 text-background" />
           </div>
           <div className="space-y-2">
-            <StepBadge step={2} />
+            <StepBadge step={3} />
             <h2 className="text-lg font-medium">Drafting a profile for {brandName}</h2>
             <p className="text-sm text-muted-foreground transition-colors duration-500 min-h-[20px]">
               {LOADING_MESSAGES[msgIdx]}
@@ -404,7 +485,7 @@ function Onboarding() {
 
         {/* Header */}
         <div className="text-center space-y-1.5">
-          <StepBadge step={3} label="last one" />
+          <StepBadge step={4} label="last one" />
           <h1 className="text-2xl font-medium tracking-tight">
             {inferError ? 'Build your brand profile' : 'Check our suggestions'}
           </h1>

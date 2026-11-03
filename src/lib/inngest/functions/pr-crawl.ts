@@ -200,7 +200,10 @@ export const prCrawl = inngest.createFunction(
 
         // Build domain filter for the search query
         const domainFilter = MONITORED_DOMAINS.map(d => `site:${d}`).join(' OR ')
-        const brandQuery   = `"${brand.name}" (${domainFilter})`
+        // when:7d: unbounded, Google ranks by relevance and the top 20 we keep
+        // were often old stories. A week covers any nights the job missed;
+        // the URL check below stops repeats.
+        const brandQuery   = `"${brand.name}" (${domainFilter}) when:7d`
 
         // Fetch brand mentions
         const brandItems = await fetchGoogleNewsRss(brandQuery)
@@ -251,7 +254,7 @@ export const prCrawl = inngest.createFunction(
 
         // Process competitor mentions
         for (const competitor of (competitors ?? []).slice(0, 5)) {
-          const compQuery = `"${competitor.name}" (${domainFilter})`
+          const compQuery = `"${competitor.name}" (${domainFilter}) when:7d`
           const compItems = await fetchGoogleNewsRss(compQuery)
 
           for (const item of compItems.slice(0, 10)) {

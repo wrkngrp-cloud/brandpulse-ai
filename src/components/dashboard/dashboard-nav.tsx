@@ -8,6 +8,8 @@ import { LayoutGridIcon as LayoutDashboard, CalendarIcon as CalendarDays, Campai
 import { PrePostIcon as PrePost, AskIcon as Sparkles, ConnectIcon as Plug, AlertIcon as AlertTriangle, TrendIcon as TrendingUp, ExportIcon as FileDown, MentionsIcon as MessageCircle, GaugeIcon, MentionsIcon, FunnelIcon, OohIcon, SurveyIcon, ShareIcon, FieldIcon, CreativeIcon, MarketIcon } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
 import { isPathHidden, type IndustryId } from '@/lib/industry-config'
+import { isPathInFocus, type ModuleFocus } from '@/lib/goals'
+import { PlusIcon } from '@/components/brand/icon'
 
 // ── Architecture ──────────────────────────────────────────────────────────────
 //
@@ -78,6 +80,12 @@ const CREATIVE_LAB_SUB = [
   { label: 'Voice Builder',    href: '/dashboard/voice-builder', icon: Sparkles },
   { label: 'Pre-Post Intel',   href: '/dashboard/pre-post',      icon: PrePost  },
   { label: 'Creative Analysis',href: '/dashboard/creative',      icon: CreativeIcon },
+]
+
+const CREATIVE_MORE = [
+  { label: 'Creative Library', href: '/dashboard/creative-library', icon: BookOpen      },
+  { label: 'Fatigue Monitor',  href: '/dashboard/creative-fatigue', icon: AlertTriangle },
+  { label: 'A/B Testing',      href: '/dashboard/experiments',      icon: FlaskConical  },
 ]
 
 const SURVEY_PATHS = ['/dashboard/surveys']
@@ -295,16 +303,39 @@ function CollapsibleSection({
 
 // ── Main nav ──────────────────────────────────────────────────────────────────
 
-export function DashboardNav({ expanded = true, industry = null }: { expanded?: boolean; industry?: string | null }) {
+export function DashboardNav({ expanded = true, industry = null, focus = null }: { expanded?: boolean; industry?: string | null; focus?: ModuleFocus | null }) {
   const pathname = usePathname()
   const isActive = (href: string) =>
     href === '/dashboard' ? pathname === '/dashboard' : pathname === href || pathname.startsWith(`${href}/`)
 
-  // Filter nav entries based on industry
+  // Two filters: the industry hides what does not fit this kind of brand, and
+  // the focus hides what this brand did not choose to start with. The page
+  // being viewed always shows, so following a direct link never leaves the
+  // sidebar pointing nowhere.
   const ind = industry as IndustryId | null
-  const hide = (href: string) => isPathHidden(href, ind)
-  const filterEntries = (entries: NavEntry[]) =>
-    entries.filter(e => 'divider' in e || !hide(e.href))
+  const show = (href: string) =>
+    !isPathHidden(href, ind) && (isPathInFocus(href, focus) || isActive(href))
+  const filterEntries = (entries: NavEntry[]) => {
+    const kept = entries.filter(e => 'divider' in e || show(e.href))
+    // Drop dividers that no longer separate anything.
+    return kept.filter((e, i) => {
+      if (!('divider' in e)) return true
+      const prev = kept[i - 1]
+      const next = kept[i + 1]
+      return !!prev && !('divider' in prev) && !!next && !('divider' in next)
+    })
+  }
+  const hasLinks = (entries: NavEntry[]) => entries.some(e => !('divider' in e))
+
+  const brandHealth  = filterEntries(BRAND_HEALTH)
+  const surveys      = SURVEY_SUB.filter(s => show(s.href))
+  const intelligence = filterEntries(INTELLIGENCE)
+  const campaigns    = filterEntries(CAMPAIGNS)
+  const creativeLab  = CREATIVE_LAB_SUB.filter(s => show(s.href))
+  const creativeMore = CREATIVE_MORE.filter(s => show(s.href))
+  const measurement  = filterEntries(MEASUREMENT)
+  const growth       = filterEntries(GROWTH)
+  const reports      = filterEntries(REPORTS)
 
   return (
     <LayoutGroup>
@@ -313,52 +344,77 @@ export function DashboardNav({ expanded = true, industry = null }: { expanded?: 
         <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" active={isActive('/dashboard')} expanded={expanded} />
 
         {/* Brand Health first — the core product value: how is my brand doing? */}
-        <SectionLabel expanded={expanded}>Brand Health</SectionLabel>
-        <NavSection entries={filterEntries(BRAND_HEALTH)} isActive={isActive} expanded={expanded} />
+        {hasLinks(brandHealth) && <>
+          <SectionLabel expanded={expanded}>Brand Health</SectionLabel>
+          <NavSection entries={brandHealth} isActive={isActive} expanded={expanded} />
+        </>}
 
         {/* Research adjacent to Brand Health — both answer "what do customers think?" */}
-        <SectionLabel expanded={expanded}>Research</SectionLabel>
-        <CollapsibleSection
-          label="Surveys"
-          paths={SURVEY_PATHS}
-          sub={SURVEY_SUB}
-          icon={SurveyIcon}
-          expanded={expanded}
-          pathname={pathname}
-        />
+        {surveys.length > 0 && <>
+          <SectionLabel expanded={expanded}>Research</SectionLabel>
+          <CollapsibleSection
+            label="Surveys"
+            paths={SURVEY_PATHS}
+            sub={surveys}
+            icon={SurveyIcon}
+            expanded={expanded}
+            pathname={pathname}
+          />
+        </>}
 
-        <SectionLabel expanded={expanded}>Intelligence</SectionLabel>
-        <NavSection entries={filterEntries(INTELLIGENCE)} isActive={isActive} expanded={expanded} />
+        {hasLinks(intelligence) && <>
+          <SectionLabel expanded={expanded}>Intelligence</SectionLabel>
+          <NavSection entries={intelligence} isActive={isActive} expanded={expanded} />
+        </>}
 
         {/* CAMPAIGNS — all channels in one section */}
-        <SectionLabel expanded={expanded}>Campaigns</SectionLabel>
-        <NavSection entries={filterEntries(CAMPAIGNS)} isActive={isActive} expanded={expanded} />
+        {hasLinks(campaigns) && <>
+          <SectionLabel expanded={expanded}>Campaigns</SectionLabel>
+          <NavSection entries={campaigns} isActive={isActive} expanded={expanded} />
+        </>}
 
         {/* Creative Intelligence — voice, analysis, library, A/B testing */}
-        <SectionLabel expanded={expanded}>Creative Intelligence</SectionLabel>
-        <CollapsibleSection
-          label="Creative Lab"
-          paths={CREATIVE_LAB_PATHS}
-          sub={CREATIVE_LAB_SUB}
-          icon={CreativeIcon}
-          expanded={expanded}
-          pathname={pathname}
-        />
-        <NavItem href="/dashboard/creative-library" icon={BookOpen}      label="Creative Library"    active={isActive('/dashboard/creative-library')}  expanded={expanded} />
-        <NavItem href="/dashboard/creative-fatigue" icon={AlertTriangle}  label="Fatigue Monitor"    active={isActive('/dashboard/creative-fatigue')}  expanded={expanded} />
-        <NavItem href="/dashboard/experiments"       icon={FlaskConical}  label="A/B Testing"        active={isActive('/dashboard/experiments')}        expanded={expanded} />
+        {(creativeLab.length > 0 || creativeMore.length > 0) && <>
+          <SectionLabel expanded={expanded}>Creative Intelligence</SectionLabel>
+          {creativeLab.length > 0 && (
+            <CollapsibleSection
+              label="Creative Lab"
+              paths={CREATIVE_LAB_PATHS}
+              sub={creativeLab}
+              icon={CreativeIcon}
+              expanded={expanded}
+              pathname={pathname}
+            />
+          )}
+          {creativeMore.map(item => (
+            <NavItem key={item.href} href={item.href} icon={item.icon} label={item.label} active={isActive(item.href)} expanded={expanded} />
+          ))}
+        </>}
 
-        <SectionLabel expanded={expanded}>Measurement</SectionLabel>
-        <NavSection entries={filterEntries(MEASUREMENT)} isActive={isActive} expanded={expanded} />
+        {hasLinks(measurement) && <>
+          <SectionLabel expanded={expanded}>Measurement</SectionLabel>
+          <NavSection entries={measurement} isActive={isActive} expanded={expanded} />
+        </>}
 
-        <SectionLabel expanded={expanded}>Growth</SectionLabel>
-        <NavSection entries={filterEntries(GROWTH)} isActive={isActive} expanded={expanded} />
+        {hasLinks(growth) && <>
+          <SectionLabel expanded={expanded}>Growth</SectionLabel>
+          <NavSection entries={growth} isActive={isActive} expanded={expanded} />
+        </>}
 
-        <SectionLabel expanded={expanded}>Reports</SectionLabel>
-        <NavSection entries={REPORTS} isActive={isActive} expanded={expanded} />
+        {hasLinks(reports) && <>
+          <SectionLabel expanded={expanded}>Reports</SectionLabel>
+          <NavSection entries={reports} isActive={isActive} expanded={expanded} />
+        </>}
 
         <SectionLabel expanded={expanded}>Setup</SectionLabel>
         <NavItem href="/dashboard/connectors" icon={Plug} label="Connectors" active={isActive('/dashboard/connectors')} expanded={expanded} />
+
+        {/* Only while the sidebar is focused: the way back to everything. */}
+        {focus && (
+          <div data-tour="nav-more-modules">
+            <NavItem href="/dashboard/settings/modules" icon={PlusIcon} label="More modules" active={isActive('/dashboard/settings/modules')} expanded={expanded} />
+          </div>
+        )}
 
       </nav>
     </LayoutGroup>

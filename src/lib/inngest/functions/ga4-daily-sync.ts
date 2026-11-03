@@ -1,6 +1,6 @@
 import { inngest } from '@/lib/inngest/client'
 import { createServiceClient } from '@/lib/supabase/server'
-import { decrypt } from '@/lib/crypto'
+import { ga4AccessToken, type Ga4ConnectionRow } from '@/lib/shared-access/ga4-token'
 
 interface GA4MetricValue {
   value: string
@@ -24,9 +24,20 @@ export const ga4DailySync = inngest.createFunction(
   async ({ step, logger }) => {
     const supabase = await createServiceClient()
 
-    const { data: connections } = await supabase
+    // The shared-access columns, falling back to the older shape until that
+    // migration is applied, so the sync never stops for want of a column.
+    type Row = Ga4ConnectionRow & { brand_id: string; property_id: string }
+    const first = await supabase
       .from('ga4_connections')
-      .select('id, brand_id, property_id, access_token, refresh_token')
+      .select('id, brand_id, property_id, access_token, refresh_token, token_expiry, auth_mode, access_status')
+      .returns<Row[]>()
+    let connections = first.data
+    if (first.error) {
+      ;({ data: connections } = await supabase
+        .from('ga4_connections')
+        .select('id, brand_id, property_id, access_token, refresh_token, token_expiry')
+        .returns<Row[]>())
+    }
 
     if (!connections?.length) {
       logger.info('No GA4 connections to sync')
@@ -38,7 +49,13 @@ export const ga4DailySync = inngest.createFunction(
     for (const connection of connections) {
       await step.run(`sync-${connection.id}`, async () => {
         try {
-          const accessToken = decrypt(connection.access_token)
+          // A shared connection still waiting for BrandGauge's check reads
+          // nothing. ga4AccessToken returns null for it.
+          const accessToken = await ga4AccessToken(connection, supabase)
+          if (!accessToken) {
+            logger.info(`GA4 connection ${connection.id} skipped: no usable token or not yet approved`)
+            return
+          }
 
           const ga4Res = await fetch(
             `https://analyticsdata.googleapis.com/v1beta/properties/${connection.property_id}:runReport`,

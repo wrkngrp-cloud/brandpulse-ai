@@ -66,6 +66,10 @@ const CREDENTIALS: { name: string; gates: string; blocking: boolean }[] = [
   { name: 'WHATSAPP_ACCESS_TOKEN',  gates: 'WhatsApp sends', blocking: false },
   { name: 'WHATSAPP_PHONE_NUMBER_ID', gates: 'WhatsApp sends', blocking: false },
   { name: 'META_APP_ID',            gates: 'Meta Ads and Instagram connectors', blocking: false },
+  { name: 'GOOGLE_SERVICE_ACCOUNT_JSON', gates: 'Shared GA4 access (a brand adds us as a Viewer)', blocking: false },
+  { name: 'META_BUSINESS_ID',       gates: 'Shared Meta Ads access: the ID brands add as a partner', blocking: false },
+  { name: 'META_SYSTEM_USER_TOKEN', gates: 'Shared Meta Ads access: reads the shared ad accounts', blocking: false },
+  { name: 'META_SYSTEM_USER_ID',    gates: 'Assigning a shared ad account automatically on approval', blocking: false },
   { name: 'SERPAPI_KEY',            gates: 'Search evidence in the demand finder, and Geo-Lift', blocking: false },
   { name: 'PAGESPEED_API_KEY',      gates: 'The PageSpeed quota in the campaign audit', blocking: false },
 ]

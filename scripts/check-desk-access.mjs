@@ -18,7 +18,7 @@
  *
  * Email masking has to actually mask.
  */
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
 const OUT = process.env.TMPDIR ? `${process.env.TMPDIR}/bg-desk-check` : '/tmp/bg-desk-check'
@@ -46,7 +46,13 @@ const ok = (name, cond) => eq(name, !!cond, true)
 
 // ── The permission vocabulary against the migration ──────────────────────────
 const permissions = await compile('src/lib/desk/permissions.ts', 'permissions')
-const migration = readFileSync('supabase/migrations/20261014120000_desk_staff.sql', 'utf8')
+// Every migration, in order: a permission added after the original Desk
+// migration is seeded by its own migration, and has to count.
+const migration = readdirSync('supabase/migrations').filter(f => f.endsWith('.sql')).sort()
+  .map(f => readFileSync(`supabase/migrations/${f}`, 'utf8'))
+  .join('\n')
+  // Seed tuples may be written with a space after the comma.
+  .replace(/\('([a-z_]+)',\s+'([a-z_]+\.[a-z_]+)'\)/g, "('$1','$2')")
 
 console.log('\n── Permission keys: SQL seeds against the code')
 

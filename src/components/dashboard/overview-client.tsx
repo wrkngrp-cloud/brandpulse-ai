@@ -62,6 +62,8 @@ interface SentimentRow {
 }
 
 export interface OverviewProps {
+  /** The Monday Brief, rendered on the server and slotted in under the checklist. */
+  brief?:          React.ReactNode
   brandName:       string
   category:        string | null
   industry:        string | null
@@ -162,6 +164,7 @@ function Label({ children, className }: { children: React.ReactNode; className?:
 // ── Main ───────────────────────────────────────────────────────────────────
 
 export function OverviewClient({
+  brief = null,
   brandName,
   category,
   industry,
@@ -229,6 +232,9 @@ export function OverviewClient({
 
       {/* ── First-run setup checklist ────────────────────────────── */}
       <ConnectChecklist items={checklistItems} serverDismissed={checklistDismissed} />
+
+      {/* ── The Monday Brief: what moved last week, and why ─────── */}
+      {brief}
 
       {/* ── AI Ask hero + KPI tiles + widget controls ──────────── */}
       <DashboardHero

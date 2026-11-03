@@ -107,10 +107,27 @@ export function resolveBrandType(
   industry:  string | null | undefined,
 ): BrandType {
   if (brandType) return brandType as BrandType
-  if (industry === 'fintech')  return 'fintech'
-  if (industry === 'b2b_saas') return 'b2b_saas'
-  if (industry === 'agency')   return 'agency'
-  return 'fmcg'
+  return brandTypeForIndustry(industry)
+}
+
+/**
+ * The scoring vertical for an onboarding industry pick.
+ *
+ * Onboarding asks one of 13 industries; scoring has 8 verticals. Onboarding
+ * used to save the industry and never the vertical, and brand_type defaults
+ * to 'fmcg', so every new brand was scored as FMCG whatever it picked. Only
+ * clear matches map; anything else stays fmcg, and the marketer can change it
+ * in Settings > Brand.
+ */
+export function brandTypeForIndustry(industry: string | null | undefined): BrandType {
+  switch (industry) {
+    case 'fintech':
+    case 'insurance':  return 'fintech'
+    case 'b2b_saas':   return 'b2b_saas'
+    case 'agency':     return 'agency'
+    case 'qsr':        return 'venue'
+    default:           return 'fmcg'
+  }
 }
 
 // Per-vertical BHI weight presets. Every set sums to 100.
