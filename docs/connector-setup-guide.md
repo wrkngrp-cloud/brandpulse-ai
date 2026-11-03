@@ -136,3 +136,32 @@ Current status of each, checked directly against `vercel env ls` and the actual 
 | `YOUTUBE_API_KEY` | YouTube Intelligence |
 | `SERPAPI_KEY` | Geo-Lift search-uplift correlation |
 | *(none — already have what's needed)* | AI Visibility Tracker |
+
+## Shared access (agency-style): GA4 and Meta Ads without an OAuth login
+
+A brand shares its account with BrandGauge the way it would with an agency.
+Nothing here needs Google or Meta app verification. Every request lands
+`pending` and syncs nothing until someone with `ops.approve_access` approves
+it on the Desk (Ops). Confirm with the brand's team that the account is theirs
+first: our identities can read everything shared with them, and IDs are not
+secrets.
+
+**GA4, one-time setup on our side**
+1. Google Cloud console: create a service account (no roles needed), then
+   create a JSON key for it.
+2. Enable the Google Analytics Data API and the Google Analytics Admin API on
+   that project.
+3. Set `GOOGLE_SERVICE_ACCOUNT_JSON` to the key file contents (raw JSON or
+   base64). The Connectors page then shows its email to brands.
+
+**Meta, one-time setup on our side**
+1. In BrandGauge's Business Manager, create a system user (Employee role is
+   enough) and generate a token for our app with `ads_read`.
+2. Set `META_BUSINESS_ID` (shown to brands) and `META_SYSTEM_USER_TOKEN`.
+3. Optional: set `META_SYSTEM_USER_ID` so approval assigns the shared ad
+   account to the system user automatically. Without it, assign it by hand in
+   Business Settings, Ad accounts, before approving.
+
+Untested against live accounts as of 3 November 2026. Whether Meta lets a
+system user read a partner-shared ad account under Standard Access, before
+business verification, is the first thing to check with one real account.

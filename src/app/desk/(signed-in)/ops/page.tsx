@@ -1,5 +1,7 @@
 import { requireStaff } from '@/lib/desk/auth'
 import { opsReport } from '@/lib/desk/ops'
+import { pendingAccessRequests } from '@/lib/desk/shared-access'
+import { AccessRequests } from './access-requests'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { WrenchIcon } from '@/components/brand/icon'
 import { cn } from '@/lib/utils'
@@ -13,6 +15,7 @@ export default async function OpsPage() {
 
   const report = await opsReport(session)
   if (!report) return null
+  const access = await pendingAccessRequests(session)
 
   const missingBlocking = report.credentials.filter(c => c.blocking && !c.present)
   const missingOptional = report.credentials.filter(c => !c.blocking && !c.present)
@@ -28,6 +31,8 @@ export default async function OpsPage() {
         subtitle="The two things that go wrong quietly: a missing credential, and a connector that stopped syncing."
         icon={WrenchIcon}
       />
+
+      {access && <AccessRequests requests={access} />}
 
       {missingBlocking.length > 0 && (
         <section className="space-y-2">

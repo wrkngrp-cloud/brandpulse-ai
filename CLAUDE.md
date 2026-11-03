@@ -510,6 +510,11 @@ by review tooling; when it is, open a PR and leave it for me unless I say otherw
 - Several connectors are code-complete but inert pending credentials (HubSpot, Google Ads,
   YouTube, TikTok, SerpAPI/Geo-Lift, the WhatsApp Cloud API env vars). Verify the specific env
   var before promising a feature works end to end.
+- Shared (agency-style) GA4 and Meta Ads access is built and inert until
+  `GOOGLE_SERVICE_ACCOUNT_JSON` and `META_BUSINESS_ID` + `META_SYSTEM_USER_TOKEN` are
+  set. Requests land `pending` and only `ops.approve_access` on the Desk activates
+  them; a trigger stops a customer session doing it. See
+  `docs/connector-setup-guide.md`.
 - The free tools degrade rather than break on a missing credential: `SERPAPI_KEY` gates
   search evidence in the Market Demand Gap Finder, and `PAGESPEED_API_KEY` only raises the
   PageSpeed quota (the API answers keyless at a low rate). Both are stated in the report when

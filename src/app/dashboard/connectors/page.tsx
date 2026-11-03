@@ -12,6 +12,9 @@ import { AppStoreConnectCard, type AppStoreConfigData }     from '@/components/d
 import { EmailConnectCard, type EmailConnectorStatus }      from '@/components/dashboard/email-connect-card'
 // WhatsAppConnectCard hidden until dedicated number is configured
 import { PixelCard } from './pixel-card'
+import { SharedAccessCard, type SharedAccessState } from '@/components/dashboard/shared-access-card'
+import { googleShareEmail } from '@/lib/shared-access/google'
+import { metaBusinessId } from '@/lib/shared-access/meta'
 import { Icon, type BrandIconName, BriefcaseIcon as ShoppingCart, ArrowRightIcon as ArrowRight, UsersIcon as Users, MusicIcon as Music2 } from '@/components/brand/icon'
 import { SearchIcon as Search } from '@/components/brand/icon'
 import { buttonVariants } from '@/components/ui/button'
@@ -43,6 +46,8 @@ export default async function ConnectorsPage() {
     sources: [], totalOrders: 0, lastImportAt: null,
   }
   // whatsappStats removed — WhatsApp connector hidden during beta
+  let ga4Shared:  SharedAccessState | null = null
+  let metaShared: SharedAccessState | null = null
 
   if (brand?.id) {
     const [ga4Res, metaAdsRes, webhookRes, appRes, reviewRes, emailRes, ecomRes] = await Promise.all([
@@ -57,6 +62,22 @@ export default async function ConnectorsPage() {
 
     ga4Connection     = ga4Res.data ?? null
     metaAdsAccount    = metaAdsRes.data ?? null
+
+    // Shared (agency-style) access. Its own reads, so that before the
+    // migration the missing columns cost this card and nothing else.
+    const [ga4SharedRes, metaSharedRes] = await Promise.all([
+      supabase.from('ga4_connections').select('access_status, property_id, property_name').eq('brand_id', brand.id).eq('auth_mode', 'shared').maybeSingle(),
+      supabase.from('digital_ad_accounts').select('access_status, ad_account_id, account_name').eq('brand_id', brand.id).eq('platform', 'meta').eq('auth_mode', 'shared').maybeSingle(),
+    ])
+    if (ga4SharedRes.data) {
+      ga4Shared = { status: ga4SharedRes.data.access_status, externalId: ga4SharedRes.data.property_id, name: ga4SharedRes.data.property_name }
+      // Until we confirm it, the login card must not show it as connected.
+      if (ga4Shared.status !== 'active') ga4Connection = null
+    }
+    if (metaSharedRes.data) {
+      metaShared = { status: metaSharedRes.data.access_status, externalId: metaSharedRes.data.ad_account_id ?? '', name: metaSharedRes.data.account_name }
+      if (metaShared.status !== 'active') metaAdsAccount = null
+    }
 
     if (webhookRes.data) {
       paymentStatus = {
@@ -120,7 +141,7 @@ export default async function ConnectorsPage() {
 
       {/* Context note */}
       <div className="rounded-xl border bg-muted/20 px-4 py-3 text-[12.5px] text-muted-foreground leading-relaxed">
-        Social and GA4 connections require OAuth. Payment and email connectors use API keys or webhooks. Your keys are stored encrypted and never exposed in the UI.
+        Social connections use a login. For GA4 and Meta Ads you can log in, or share access with us the way you would with an agency. Payment and email connectors use API keys or webhooks. Your keys are stored encrypted and never exposed in the UI.
       </div>
 
       {/* Recommended for industry */}
@@ -152,7 +173,11 @@ export default async function ConnectorsPage() {
       {/* Analytics */}
       <section>
         <h2 className="text-[11px] font-medium text-muted-foreground mb-3">Web Analytics</h2>
-        <GA4ConnectCard connection={ga4Connection} />
+        <div className="space-y-3">
+          <GA4ConnectCard connection={ga4Connection} />
+          {/* Not offered alongside a login connection: one brand, one GA4 link. */}
+          {(!ga4Connection || ga4Shared) && <SharedAccessCard platform="ga4" shareWith={googleShareEmail()} current={ga4Shared} />}
+        </div>
       </section>
 
       {/* Paid Media */}
@@ -160,6 +185,7 @@ export default async function ConnectorsPage() {
         <h2 className="text-[11px] font-medium text-muted-foreground mb-3">Paid Media</h2>
         <div className="space-y-3">
           <MetaAdsConnectCard account={metaAdsAccount} />
+          {(!metaAdsAccount || metaShared) && <SharedAccessCard platform="meta" shareWith={metaBusinessId()} current={metaShared} />}
           {/* Google Ads is built (see google-ads-connect-card.tsx) but needs a
               Google Ads developer token before it can go live — see
               docs/connector-setup-guide.md. */}

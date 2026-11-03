@@ -114,6 +114,13 @@ export async function GET(request: NextRequest) {
     // account_id is the unique key per brand/platform pair — use ad account ID
     const accountIdentifier = adAccountId ?? `user-${session.userId.slice(0, 8)}`
 
+    // A shared-access row for this brand gives way to the login: the login
+    // carries its own token, so the two would only disagree. Before the
+    // shared-access migration this filter names a missing column and the
+    // delete is a harmless no-op, which is why its error is not checked.
+    await supabase.from('digital_ad_accounts').delete()
+      .eq('brand_id', brandId).eq('platform', 'meta').eq('auth_mode', 'shared')
+
     const { error: upsertErr } = await supabase
       .from('digital_ad_accounts')
       .upsert(
