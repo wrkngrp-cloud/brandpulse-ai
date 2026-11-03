@@ -160,6 +160,7 @@ export default async function BusinessCasePage() {
     >
       <Suspense fallback={<Skeleton className="h-52 rounded-2xl" />}>
         <AiExecutiveBrief
+          brandId={brand.id}
           brandName={brand.name}
           brandCategory={brand.category}
           currentBhi={currentBhi}

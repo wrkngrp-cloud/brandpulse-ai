@@ -1,6 +1,9 @@
 import { CheckIcon as CheckCircle2, BriefcaseIcon as Briefcase } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
+import { createHash } from 'crypto'
+import Link from 'next/link'
 import { callAi } from '@/lib/ai/client'
+import { cacheGet, cacheSet } from '@/lib/tools/limits'
 
 // SectionHead from business-case-client.tsx is a Client Component that
 // takes an `icon` component-type prop — Server Components can't pass a
@@ -34,6 +37,7 @@ interface AiBusinessCase {
 }
 
 interface Props {
+  brandId:        string
   brandName:      string
   brandCategory:  string | null
   currentBhi:     number | null
@@ -100,11 +104,18 @@ Respond ONLY with valid JSON (no markdown, no code fences):
 
 Budget ask amounts should be directional, based on the existing spend pattern. Keep all items under 20 words each.`
 
+    // The same numbers make the same case. Cached for a day, keyed on the
+    // prompt, so a page view no longer costs a board-grade call each time.
+    const key = `bizcase:v1:${props.brandId}:${createHash('sha256').update(prompt).digest('hex').slice(0, 32)}`
+    const cached = await cacheGet<AiBusinessCase>(key)
+    if (cached) return cached
+
     const raw = await callAi({
       tier:      'boardGrade',
-      system:    'You produce board-grade marketing investment cases backed by real data. JSON only, no commentary.',
+      system:    'You produce board-grade marketing investment cases backed by real data. JSON only, no commentary. Use only the figures given. Where a figure is N/A or zero, do not argue from it and never invent one. Never call an improvement infinite.',
       messages:  [{ role: 'user', content: prompt }],
       maxTokens: 1200,
+      meta:      { brandId: props.brandId, feature: 'business_case_brief' },
     })
 
     // Robust JSON extraction: find the outermost { … } regardless of any
@@ -116,21 +127,62 @@ Budget ask amounts should be directional, based on the existing spend pattern. K
       console.error('[business-case] No JSON object found in AI response. Raw (500):', raw.slice(0, 500))
       return null
     }
-    return JSON.parse(raw.slice(start, end + 1))
+    const parsed = JSON.parse(raw.slice(start, end + 1)) as AiBusinessCase
+    await cacheSet(key, parsed, 60 * 60 * 24)
+    return parsed
   } catch (err) {
     console.error('[business-case] AI executive brief generation failed:', err)
     return null
   }
 }
 
+/**
+ * What there is to argue from. A board-grade case written from nothing read
+ * "invest now or cede the market permanently" with invented budget asks, on a
+ * brand with no data at all. Below three of these, there is no case yet, and
+ * the page says what to add instead of asking the model to make one up.
+ */
+function evidenceFor(p: Props) {
+  return [
+    { ok: p.totalSpend > 0,                    missing: 'media spend on at least one campaign', href: '/dashboard/campaigns' },
+    { ok: p.sov != null && p.sov > 0,          missing: 'share of voice (name a competitor)',   href: '/dashboard/settings/competitors' },
+    { ok: p.avgSentiment != null,              missing: 'sentiment (connect a social account)', href: '/dashboard/connectors' },
+    { ok: p.mentions30d >= 10,                 missing: 'at least 10 brand mentions this month', href: '/dashboard/connectors' },
+    { ok: p.npsCount >= 10,                    missing: 'at least 10 survey or NPS responses',  href: '/dashboard/surveys' },
+  ]
+}
+
 export async function AiExecutiveBrief(props: Props) {
+  const evidence = evidenceFor(props)
+  const have = evidence.filter(e => e.ok).length
+  if (have < 3) {
+    return (
+      <section>
+        <SectionHead icon={Briefcase}>Executive Brief</SectionHead>
+        <div className="rounded-sm border border-line bg-card px-5 py-4 space-y-2 text-[13px]">
+          <p className="font-medium">Not enough data for a business case yet</p>
+          <p className="text-tx-2">
+            A case your board will trust needs real numbers behind it. You have {have} of the 5 signals we look for. Add {3 - have} more and the brief writes itself:
+          </p>
+          <ul className="space-y-1">
+            {evidence.filter(e => !e.ok).map(e => (
+              <li key={e.missing}>
+                <Link href={e.href} className="underline underline-offset-2">{e.missing}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
   const aiBusinessCase = await generateBusinessCase(props)
 
   if (!aiBusinessCase) {
     return (
       <div className="rounded-2xl border bg-muted/30 px-5 py-4 flex items-center gap-3 text-[13px] text-muted-foreground">
         <AlertCircle className="h-4 w-4 shrink-0 text-tx-2" />
-        <span>AI executive brief could not be generated — your brand data is all here, but there was not enough historical data to produce a board-ready narrative yet. Try again once you have at least 4 weeks of campaign and sentiment data.</span>
+        <span>The executive brief could not be written just now. Your numbers are all on this page. Refresh in a minute to try again.</span>
       </div>
     )
   }
