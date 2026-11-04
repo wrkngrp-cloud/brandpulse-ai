@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { claimRun } from '@/lib/tools/runs'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { importRun } from '@/lib/tools/import'
 import { recordEvent } from '@/lib/tools/events'
 
@@ -13,9 +14,10 @@ const Body = z.object({ token: z.string().min(20).max(200) })
 /**
  * Claim an anonymous report into the caller's workspace.
  *
- * Authenticated: the caller must be signed in, and `claimRun` reads their
- * workspace from their own membership rather than from this body, so the
- * service-role writes that follow cannot be aimed at someone else's tenant.
+ * Authenticated: the caller must be signed in, and the destination is their
+ * active brand, checked by `claimRun` against their own membership rather
+ * than taken from this body, so the service-role writes that follow cannot be
+ * aimed at someone else's tenant.
  */
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -25,7 +27,7 @@ export async function POST(req: NextRequest) {
   const parsed = Body.safeParse(await req.json().catch(() => null))
   if (!parsed.success) return NextResponse.json({ error: 'No report token.' }, { status: 400 })
 
-  const outcome = await claimRun(parsed.data.token, user.id)
+  const outcome = await claimRun(parsed.data.token, user.id, await getActiveBrandId(supabase))
   if (!outcome.ok) {
     const message = outcome.reason === 'taken'
       ? 'Another workspace has already continued this report.'

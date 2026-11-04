@@ -104,7 +104,7 @@ export default async function FunnelPage() {
       .eq('type', 'perception_audit'),
     bid
       ? supabase.from('brands').select('name, category, industry, brand_type').eq('id', bid).maybeSingle()
-      : supabase.from('brands').select('name, category, industry, brand_type').limit(1).maybeSingle(),
+      : Promise.resolve({ data: null }),
     supabase
       .from('events')
       .select('debrief')

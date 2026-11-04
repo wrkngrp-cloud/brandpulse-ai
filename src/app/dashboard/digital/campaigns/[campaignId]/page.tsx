@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { redirect, notFound } from 'next/navigation'
 import { CampaignDetailClient } from './campaign-detail-client'
 
@@ -19,11 +20,7 @@ export default async function CampaignDetailPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name, category')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{ id: string; name: string; category: string | null }>(supabase, 'id, name, category')
   if (!brand) redirect('/onboarding')
 
   const cutoff = new Date()

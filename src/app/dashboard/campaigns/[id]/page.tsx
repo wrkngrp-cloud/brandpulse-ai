@@ -1,4 +1,5 @@
 import { createClient }    from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { notFound, redirect } from 'next/navigation'
 import Link                  from 'next/link'
 import { ArrowLeftIcon as ArrowLeft } from '@/components/brand/icon'
@@ -19,11 +20,7 @@ export default async function CampaignDetailPage({
   if (!user) redirect('/auth/login')
 
   // Get brand for tenant scoping
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{ id: string }>(supabase, 'id')
 
   const { data: campaign } = await supabase
     .from('campaigns')

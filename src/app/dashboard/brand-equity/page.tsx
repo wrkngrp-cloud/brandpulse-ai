@@ -75,7 +75,7 @@ export default async function BrandEquityPage({
       .eq('quality_flag', 'ok'),
     bid
       ? supabase.from('brands').select('name, category, industry, market_share_pct, brand_type, google_place_id').eq('id', bid).maybeSingle()
-      : supabase.from('brands').select('name, category, industry, market_share_pct, brand_type, google_place_id').limit(1).maybeSingle(),
+      : Promise.resolve({ data: null }),
     supabase
       .from('brand_health_snapshots')
       .select('bhi, snapshot_date')

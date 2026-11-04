@@ -126,7 +126,7 @@ async function SentimentData({ days = 84 }: { days: number }) {
 
   const { data: brandRow } = await (bid
     ? supabase.from('brands').select('category').eq('id', bid).maybeSingle()
-    : supabase.from('brands').select('category').limit(1).maybeSingle())
+    : Promise.resolve({ data: null }))
 
   const SECTOR_MAP: Record<string, string> = {
     'fmcg':'FMCG','consumer goods':'FMCG','fintech':'Fintech','financial services':'Fintech',

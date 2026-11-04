@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { sessionsForCustomer, SESSION_MINUTES } from '@/lib/desk/impersonation'
 import { decideImpersonation, endImpersonation } from '@/lib/desk/impersonation-actions'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -22,7 +23,7 @@ export default async function AccessPage() {
   if (!user) redirect('/auth/login')
 
   // The workspace comes through RLS, so this is their own either way.
-  const { data: brand } = await supabase.from('brands').select('workspace_id').limit(1).maybeSingle()
+  const brand = await getActiveBrand<{ workspace_id: string }>(supabase, 'workspace_id')
   if (!brand) redirect('/onboarding')
 
   const { data: membership } = await supabase

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { claimRun } from '@/lib/tools/runs'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { importRun } from '@/lib/tools/import'
 import { recordEvent } from '@/lib/tools/events'
 import { toolById } from '@/lib/tools/registry'
@@ -18,7 +19,7 @@ export const dynamic = 'force-dynamic'
  *
  * A server component rather than a client page with a fetch, so the claim runs
  * before anything renders and the redirect is the whole response. Nothing here
- * takes a workspace from the URL; `claimRun` resolves it from the session.
+ * takes a workspace from the URL; the active brand comes from the session.
  */
 export default async function ClaimPage({
   searchParams,
@@ -34,7 +35,7 @@ export default async function ClaimPage({
 
   if (!token) redirect('/dashboard')
 
-  const outcome = await claimRun(token, user.id)
+  const outcome = await claimRun(token, user.id, await getActiveBrandId(supabase))
 
   if (!outcome.ok) {
     // Onboarding has not created a brand yet, so there is nowhere to put the

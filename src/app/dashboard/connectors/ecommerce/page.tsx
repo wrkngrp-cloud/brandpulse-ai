@@ -1,4 +1,5 @@
 import { createClient }  from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { redirect }       from 'next/navigation'
 import { ArrowLeftIcon as ArrowLeft } from '@/components/brand/icon'
 import Link               from 'next/link'
@@ -11,11 +12,7 @@ export default async function EcommercePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .maybeSingle()
+  const brand = await getActiveBrand<{ id: string }>(supabase, 'id')
   if (!brand) redirect('/onboarding')
 
   const { data: campaigns } = await supabase

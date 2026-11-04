@@ -39,7 +39,7 @@ async function DashboardContent({ days }: { days: number }) {
   ] = await Promise.all([
     brandId
       ? supabase.from('brands').select('id, name, category, industry, brand_type').eq('id', brandId).single()
-      : supabase.from('brands').select('id, name, category, industry, brand_type').limit(1).single(),
+      : Promise.resolve({ data: null }),
     supabase.from('user_dashboard_prefs')
       .select('template, widget_ids')
       .eq('brand_id', brandId ?? '')

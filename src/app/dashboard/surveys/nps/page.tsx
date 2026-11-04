@@ -46,11 +46,9 @@ export default async function NpsTrackerPage() {
       .select('answers, collected_at')
       .eq('quality_flag', 'ok')
       .gte('collected_at', twelveWeeksAgo.toISOString()),
-    supabase
-      .from('brands')
-      .select('name, category')
-      .limit(1)
-      .maybeSingle(),
+    bid
+      ? supabase.from('brands').select('name, category').eq('id', bid).maybeSingle()
+      : Promise.resolve({ data: null }),
     bid
       ? supabase
           .from('nps_records')

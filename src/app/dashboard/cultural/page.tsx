@@ -78,7 +78,7 @@ export default async function CulturalPage() {
   ] = await Promise.all([
     bid
       ? supabase.from('brands').select('id, name, category, cultural_profile, brand_values, target_segments, brand_voice').eq('id', bid).maybeSingle()
-      : supabase.from('brands').select('id, name, category, cultural_profile, brand_values, target_segments, brand_voice').limit(1).maybeSingle(),
+      : Promise.resolve({ data: null }),
     supabase
       .from('pre_post_analyses')
       .select('id, content_text, platform, funnel_goal, cultural_score, tone_score, engagement_score, risk_score, created_at')

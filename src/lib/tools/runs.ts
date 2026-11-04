@@ -153,15 +153,16 @@ export type ClaimOutcome =
   | { ok: false; reason: 'not_found' | 'taken' | 'no_workspace' | 'not_complete' }
 
 /**
- * Attach a run to the caller's workspace.
+ * Attach a run to the caller's active brand.
  *
- * The caller's workspace is read from their own membership, never taken from
+ * `activeBrandId` comes from `getActiveBrandId` on the caller's RLS client, and
+ * its workspace is confirmed against their own membership, never taken from
  * the request: this runs with the service role, so a workspace id in a body
  * would be a cross-tenant write. A run another workspace already holds is
  * refused; the same workspace claiming twice is idempotent, because a visitor
  * who signs in again on the same link should land in the same place.
  */
-export async function claimRun(token: string, userId: string): Promise<ClaimOutcome> {
+export async function claimRun(token: string, userId: string, activeBrandId: string | null): Promise<ClaimOutcome> {
   const svc = await createServiceClient()
 
   const { data: row } = await svc.from('tool_runs').select(SELECT).eq('token_hash', sha(token)).maybeSingle()
@@ -169,16 +170,20 @@ export async function claimRun(token: string, userId: string): Promise<ClaimOutc
   const run = toRun(row as RunRow)
   if (run.status === 'running') return { ok: false, reason: 'not_complete' }
 
+  // The destination is the caller's active brand, resolved by the caller
+  // through the RLS client. It is checked again here against their own
+  // membership, because everything after this line runs as the service role.
+  if (!activeBrandId) return { ok: false, reason: 'no_workspace' }
+  const { data: brand } = await svc
+    .from('brands').select('id, workspace_id').eq('id', activeBrandId).maybeSingle()
+  if (!brand?.id || !brand.workspace_id) return { ok: false, reason: 'no_workspace' }
+
   const { data: member } = await svc
-    .from('workspace_members').select('workspace_id').eq('user_id', userId).limit(1).maybeSingle()
+    .from('workspace_members').select('workspace_id')
+    .eq('user_id', userId).eq('workspace_id', brand.workspace_id).maybeSingle()
   if (!member?.workspace_id) return { ok: false, reason: 'no_workspace' }
 
   if (run.workspaceId && run.workspaceId !== member.workspace_id) return { ok: false, reason: 'taken' }
-
-  const { data: brand } = await svc
-    .from('brands').select('id, name').eq('workspace_id', member.workspace_id)
-    .order('created_at', { ascending: true }).limit(1).maybeSingle()
-  if (!brand?.id) return { ok: false, reason: 'no_workspace' }
 
   if (run.workspaceId === member.workspace_id && run.brandId) {
     return { ok: true, run, brandId: run.brandId, workspaceId: member.workspace_id, alreadyClaimed: true }

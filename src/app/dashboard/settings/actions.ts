@@ -127,15 +127,11 @@ export async function updateBrand(
   const d = parsed.data
   const service = await createServiceClient()
 
-  const { data: member } = await service
-    .from('workspace_members').select('workspace_id')
-    .eq('user_id', user.id).single()
-  if (!member) return { error: 'Workspace not found.' }
-
-  const { data: brand } = await service
-    .from('brands').select('id')
-    .eq('workspace_id', member.workspace_id).single()
-  if (!brand) return { error: 'Brand not found.' }
+  // The active brand resolves through the RLS client, so it is one the caller
+  // can see. The service write below is scoped to that id only, which keeps
+  // multi-brand and multi-workspace users editing the brand they are looking at.
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) return { error: 'Set up a brand before you save these settings.' }
 
   const { error } = await service.from('brands').update({
     name:                d.brandName,
@@ -155,7 +151,7 @@ export async function updateBrand(
     brand_voice:         d.brandVoice,
     cultural_profile:    d.culturalProfile,
     target_segments:     d.targetSegments,
-  }).eq('id', brand.id)
+  }).eq('id', brandId)
 
   if (error) return { error: error.message }
   return { success: true }

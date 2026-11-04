@@ -1,4 +1,5 @@
 import { createClient }    from '@/lib/supabase/server'
+import { getActiveBrand } from '@/lib/active-brand'
 import { redirect }         from 'next/navigation'
 import { OohDomainClient }  from './ooh-domain-client'
 
@@ -9,11 +10,12 @@ export default async function OohDomainPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id, name, ooh_redirect_domain, ooh_redirect_domain_verified')
-    .limit(1)
-    .single()
+  const brand = await getActiveBrand<{
+    id: string
+    name: string
+    ooh_redirect_domain: string | null
+    ooh_redirect_domain_verified: boolean | null
+  }>(supabase, 'id, name, ooh_redirect_domain, ooh_redirect_domain_verified')
 
   if (!brand) redirect('/onboarding')
 

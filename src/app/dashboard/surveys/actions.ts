@@ -1,19 +1,15 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBrandId } from '@/lib/active-brand'
 import { revalidatePath } from 'next/cache'
 import { TEMPLATE_MAP, type SurveyType } from '@/lib/survey-templates'
 
 export async function createSurvey(name: string, templateId: SurveyType = 'b2_intercept') {
   const supabase = await createClient()
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('id')
-    .limit(1)
-    .single()
-
-  if (!brand) throw new Error('No brand found')
+  const brandId = await getActiveBrandId(supabase)
+  if (!brandId) throw new Error('Set up a brand before you create a survey.')
 
   const template = TEMPLATE_MAP[templateId]
   if (!template) throw new Error('Invalid template')
@@ -21,7 +17,7 @@ export async function createSurvey(name: string, templateId: SurveyType = 'b2_in
   const { data, error } = await supabase
     .from('surveys')
     .insert({
-      brand_id:        brand.id,
+      brand_id:        brandId,
       name,
       type:            templateId,
       questions:       template.questions,
