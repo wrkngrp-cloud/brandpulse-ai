@@ -29,6 +29,13 @@ interface FacebookPagesResponse {
   error?: { message: string; code: number }
 }
 
+/** A failed save used to be ignored and still redirect to "connected". It
+ *  now throws, so the catch below sends the person to an error instead. */
+async function saved(q: PromiseLike<{ error: { message: string } | null }>): Promise<void> {
+  const { error } = await q
+  if (error) throw new Error(`could not save the connection: ${error.message}`)
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ platform: string }> }
@@ -60,7 +67,11 @@ export async function GET(
     switch (platform) {
       case 'facebook': {
         const { access_token: shortToken } = await exchangeMetaCode(code, redirectUri)
-        const { access_token } = await getLongLivedToken(shortToken)
+        const { access_token, expires_in } = await getLongLivedToken(shortToken)
+        // Who connected this, so a Meta data deletion request can find it,
+        // and when the login runs out, so we can warn before it does.
+        const metaUser = await getMetaUserId(access_token)
+        const tokenExpiresAt = expires_in ? new Date(Date.now() + expires_in * 1000).toISOString() : null
 
         // Get the user's connected Facebook Pages
         const pagesRes = await fetch(
@@ -71,35 +82,40 @@ export async function GET(
 
         if (page) {
           // Store the PAGE access token — required for fetching page posts
-          await supabase.from('social_connections').upsert({
+          await saved(supabase.from('social_connections').upsert({
             brand_id: brandId,
             platform: 'facebook',
             account_id: page.id,
             account_name: page.name,
             access_token: encrypt(page.access_token),
+            meta_user_id: metaUser.id,
+            token_expires_at: tokenExpiresAt,
             sync_status: 'active',
             connected_at: new Date().toISOString(),
-          }, { onConflict: 'brand_id,platform,account_id' })
+          }, { onConflict: 'brand_id,platform,account_id' }))
         } else {
-          // No pages found — store user-level token as fallback so connection isn't lost
-          const user = await getMetaUserId(access_token)
-          await supabase.from('social_connections').upsert({
+          // No pages found: store the user-level token so the connection isn't lost
+          const user = metaUser
+          await saved(supabase.from('social_connections').upsert({
             brand_id: brandId,
             platform: 'facebook',
             account_id: user.id,
             account_name: user.name,
             access_token: encrypt(access_token),
+            meta_user_id: metaUser.id,
+            token_expires_at: tokenExpiresAt,
             sync_status: 'active',
             connected_at: new Date().toISOString(),
-          }, { onConflict: 'brand_id,platform,account_id' })
+          }, { onConflict: 'brand_id,platform,account_id' }))
         }
         break
       }
 
       case 'instagram': {
         const { access_token: shortToken } = await exchangeMetaCode(code, redirectUri)
-        const { access_token } = await getLongLivedToken(shortToken)
+        const { access_token, expires_in } = await getLongLivedToken(shortToken)
         const user = await getMetaUserId(access_token)
+        const tokenExpiresAt = expires_in ? new Date(Date.now() + expires_in * 1000).toISOString() : null
 
         // Log granted permissions for debugging
         const permRes = await fetch(`${GRAPH}/me/permissions?access_token=${access_token}`)
@@ -133,15 +149,17 @@ export async function GET(
           const igDirectData = await igDirectRes.json() as { instagram_business_account?: { id: string; name: string } }
           console.log('[instagram-oauth] /me?fields=instagram_business_account response:', JSON.stringify(igDirectData))
           if (igDirectData.instagram_business_account?.id) {
-            await supabase.from('social_connections').upsert({
+            await saved(supabase.from('social_connections').upsert({
               brand_id: brandId,
               platform: 'instagram',
               account_id: igDirectData.instagram_business_account.id,
               account_name: igDirectData.instagram_business_account.name ?? user.name,
               access_token: encrypt(access_token),
+              meta_user_id: user.id,
+              token_expires_at: tokenExpiresAt,
               sync_status: 'active',
               connected_at: new Date().toISOString(),
-            }, { onConflict: 'brand_id,platform,account_id' })
+            }, { onConflict: 'brand_id,platform,account_id' }))
             return NextResponse.redirect(`${APP_URL}/dashboard/content?connected=instagram`)
           }
         }
@@ -172,15 +190,17 @@ export async function GET(
         }
 
         // Store long-lived user token — Instagram Graph API /media endpoint uses user tokens
-        await supabase.from('social_connections').upsert({
+        await saved(supabase.from('social_connections').upsert({
           brand_id: brandId,
           platform: 'instagram',
           account_id: igId,
           account_name: user.name,
           access_token: encrypt(access_token),
+          meta_user_id: user.id,
+          token_expires_at: tokenExpiresAt,
           sync_status: 'active',
           connected_at: new Date().toISOString(),
-        }, { onConflict: 'brand_id,platform,account_id' })
+        }, { onConflict: 'brand_id,platform,account_id' }))
         break
       }
 
@@ -189,7 +209,7 @@ export async function GET(
         const tokens = await exchangeTwitterCode(code, session.verifier, redirectUri)
         const twitterUser = await getTwitterUserId(tokens.access_token)
 
-        await supabase.from('social_connections').upsert({
+        await saved(supabase.from('social_connections').upsert({
           brand_id: brandId,
           platform: 'twitter',
           account_id: twitterUser.id,
@@ -198,7 +218,7 @@ export async function GET(
           refresh_token: tokens.refresh_token ? encrypt(tokens.refresh_token) : null,
           sync_status: 'active',
           connected_at: new Date().toISOString(),
-        }, { onConflict: 'brand_id,platform,account_id' })
+        }, { onConflict: 'brand_id,platform,account_id' }))
         break
       }
 

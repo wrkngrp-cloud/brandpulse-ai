@@ -2,7 +2,7 @@ import { NextRequest, NextResponse }  from 'next/server'
 import { createServiceClient }        from '@/lib/supabase/server'
 import { Redis }                      from '@upstash/redis'
 import { encrypt }                    from '@/lib/crypto'
-import { getLongLivedToken }          from '@/lib/social/meta'
+import { metaUserIdForToken, getLongLivedToken }          from '@/lib/social/meta'
 
 export const runtime = 'nodejs'
 
@@ -97,6 +97,8 @@ export async function GET(request: NextRequest) {
       ? new Date(Date.now() + expires_in * 1000).toISOString()
       : null
 
+    const metaUserId = await metaUserIdForToken(longToken)
+
     // Fetch ad accounts associated with this user
     const adAccountsRes  = await fetch(
       `${GRAPH}/me/adaccounts?fields=id,name,currency,account_status&access_token=${longToken}`
@@ -132,6 +134,8 @@ export async function GET(request: NextRequest) {
           access_token:  encrypt(longToken),
           token_expiry:  tokenExpiry,
           ad_account_id: adAccountId,
+          // Who connected it, for Meta data deletion requests.
+          meta_user_id:  metaUserId,
           currency,
           sync_status:   'active',
           updated_at:    new Date().toISOString(),

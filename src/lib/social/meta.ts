@@ -125,3 +125,22 @@ function mapMediaType(type: string): string {
   }
   return map[type] ?? 'image'
 }
+
+/**
+ * The app-scoped Meta user who owns a token, user or Page. Data deletion
+ * requests arrive with this id, so every Meta-sourced row records it. Uses
+ * debug_token with the app's own credentials, which answers for Page tokens
+ * too, where /me would return the Page. Null when it cannot be read.
+ */
+export async function metaUserIdForToken(token: string): Promise<string | null> {
+  const appId = process.env.META_APP_ID, secret = process.env.META_APP_SECRET
+  if (!appId || !secret) return null
+  try {
+    const res = await fetch(`${GRAPH}/debug_token?input_token=${encodeURIComponent(token)}&access_token=${appId}|${secret}`, { cache: 'no-store' })
+    if (!res.ok) return null
+    const body = await res.json() as { data?: { user_id?: string; is_valid?: boolean } }
+    return body.data?.user_id ?? null
+  } catch {
+    return null
+  }
+}
