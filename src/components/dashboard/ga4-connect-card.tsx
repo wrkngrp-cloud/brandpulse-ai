@@ -12,6 +12,8 @@ export interface GA4ConnectionData {
   property_id:    string
   property_name:  string | null
   last_synced_at: string | null
+  /** Totals over the last 30 days from ga4_daily, when there are any. */
+  last30?:        { sessions: number; activeUsers: number; keyEvents: number; days: number } | null
 }
 
 interface GA4ConnectCardProps {
@@ -65,8 +67,11 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
       const res  = await fetch('/api/connectors/ga4/sync', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) { toast.error(data.error ?? "Couldn't sync GA4. Try again."); return }
-      toast.success(`Synced. ${data.sessions?.toLocaleString()} sessions in the last 30 days.`)
-      setConnection(prev => prev ? { ...prev, last_synced_at: new Date().toISOString() } : prev)
+      toast.success(`Synced. ${Number(data.sessions ?? 0).toLocaleString('en-NG')} sessions in the last 30 days.`)
+      setConnection(prev => prev ? {
+        ...prev, last_synced_at: new Date().toISOString(),
+        last30: { sessions: data.sessions ?? 0, activeUsers: data.activeUsers ?? 0, keyEvents: data.keyEvents ?? 0, days: data.days ?? 0 },
+      } : prev)
     } catch {
       toast.error("Couldn't sync GA4. Try again.")
     } finally {
@@ -97,7 +102,7 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
           <div>
             <h3 className="text-sm font-medium">Google Analytics 4</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Pull sessions, active users and conversions from your GA4 property
+              Pull sessions, active users and key events from your GA4 property
             </p>
           </div>
         </div>
@@ -126,6 +131,18 @@ export function GA4ConnectCard({ connection: initialConnection }: GA4ConnectCard
               </div>
             )}
           </div>
+
+          {connection.last30 && connection.last30.days > 0 && (
+            <div className="grid grid-cols-3 gap-2 text-xs" aria-label="Last 30 days">
+              {([['Sessions', connection.last30.sessions], ['Active users', connection.last30.activeUsers], ['Key events', connection.last30.keyEvents]] as const).map(([label, n]) => (
+                <div key={label} className="rounded-sm border border-line px-2 py-1.5">
+                  <p className="text-tx-3">{label}</p>
+                  <p className="bg-num text-sm">{n.toLocaleString('en-NG')}</p>
+                </div>
+              ))}
+              <p className="col-span-3 text-[11px] text-tx-3">Last 30 days, from your GA4 property.</p>
+            </div>
+          )}
 
           <div className="flex gap-2">
             <button
