@@ -8,7 +8,6 @@ const CreateBody = z.object({
   template_key:     z.string().min(1),
   cadence:          z.enum(['monthly', 'quarterly']),
   recipient_emails: z.array(z.string().email()).default([]),
-  recipient_phones: z.array(z.string()).default([]),
 })
 
 function nextRunAt(cadence: 'monthly' | 'quarterly'): Date {
@@ -64,7 +63,6 @@ export async function POST(request: NextRequest) {
     template_key:     parsed.data.template_key,
     cadence:          parsed.data.cadence,
     recipient_emails: parsed.data.recipient_emails,
-    recipient_phones: parsed.data.recipient_phones,
     next_run_at:      nextRunAt(parsed.data.cadence).toISOString(),
     active:           true,
   }).select().single()

@@ -544,7 +544,7 @@ export const TOUR_DEFINITIONS: Record<string, TourStep[]> = {
     {
       id:       'panels-main',
       title:    'Your recurring panels',
-      body:     'Each panel shows its cadence, next run date, and recipient count across email and WhatsApp. Pause, resume or dispatch early at any time.',
+      body:     'Each panel shows its cadence, next run date, and email recipient count. Pause, resume or dispatch early at any time.',
       target:   '[data-tour="panels-main"]',
       position: 'bottom',
     },

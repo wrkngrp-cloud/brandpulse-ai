@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { PlusIcon as Plus, CalendarIcon as Calendar, MailIcon as Mail, PhoneIcon as Phone, PlayIcon as Play, TrashIcon as Trash2, ToggleIcon as ToggleLeft, ToggleIcon as ToggleRight } from '@/components/brand/icon'
+import { PlusIcon as Plus, CalendarIcon as Calendar, MailIcon as Mail, PlayIcon as Play, TrashIcon as Trash2, ToggleIcon as ToggleLeft, ToggleIcon as ToggleRight } from '@/components/brand/icon'
 import { Working as Loader2 } from '@/components/brand/working'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -18,7 +18,6 @@ interface Panel {
   next_run_at:      string | null
   last_run_at:      string | null
   recipient_emails: string[]
-  recipient_phones: string[]
   active:           boolean
   created_at:       string
 }
@@ -51,11 +50,9 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
   const [template, setTemplate] = useState('awareness_check')
   const [cadence, setCadence] = useState<'monthly' | 'quarterly'>('monthly')
   const [emailsRaw, setEmailsRaw] = useState('')
-  const [phonesRaw, setPhonesRaw] = useState('')
 
   async function createPanel() {
     const recipient_emails = emailsRaw.split(/[\n,;]+/).map(e => e.trim()).filter(Boolean)
-    const recipient_phones = phonesRaw.split(/[\n,;]+/).map(p => p.trim()).filter(Boolean)
     if (!name.trim()) { toast.error('Panel name is required.'); return }
 
     setSaving(true)
@@ -63,13 +60,13 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
       const res  = await fetch('/api/survey-panels', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ name: name.trim(), template_key: template, cadence, recipient_emails, recipient_phones }),
+        body:    JSON.stringify({ name: name.trim(), template_key: template, cadence, recipient_emails }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
       setPanels(prev => [data.panel, ...prev])
       setShowForm(false)
-      setName(''); setEmailsRaw(''); setPhonesRaw('')
+      setName(''); setEmailsRaw('')
       toast.success('Panel created. First dispatch scheduled.')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to create panel')
@@ -103,7 +100,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
       const res  = await fetch(`/api/survey-panels/${id}/dispatch`, { method: 'POST' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
-      toast.success('Dispatch queued — survey will be created and sent shortly.')
+      toast.success('Dispatch queued. The survey will be created and emailed shortly.')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Dispatch failed')
     } finally {
@@ -117,7 +114,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
       <PageHeader
         {...PAGE_META['/dashboard/surveys/panels']}
         title="Brand Tracking Panels"
-        subtitle="Auto-dispatch recurring surveys monthly or quarterly — with full distribution to emails and WhatsApp."
+        subtitle="Send a recurring survey to your panel by email, monthly or quarterly."
         actions={<><div className="flex items-center gap-2 shrink-0">
           <TourTrigger module="survey_panels" autoStart />
           <Button size="sm" onClick={() => setShowForm(v => !v)}>
@@ -170,7 +167,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
               </select>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 sm:col-span-2">
               <label className="text-xs text-muted-foreground">Email recipients</label>
               <textarea
                 value={emailsRaw}
@@ -181,16 +178,6 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground">WhatsApp numbers (with country code)</label>
-              <textarea
-                value={phonesRaw}
-                onChange={e => setPhonesRaw(e.target.value)}
-                rows={3}
-                placeholder="+2348012345678&#10;+2349098765432"
-                className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-background focus:outline-none resize-none bg-num"
-              />
-            </div>
           </div>
 
           <div className="flex gap-2">
@@ -268,7 +255,7 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-3.5 w-3.5 text-tx-3 shrink-0" />
                   <div>
@@ -288,13 +275,6 @@ export function SurveyPanelsClient({ brandName, initialPanels }: Props) {
                   <div>
                     <p className="text-[10px] text-muted-foreground">Emails</p>
                     <p className="text-[12px] font-medium bg-num">{panel.recipient_emails?.length ?? 0}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="h-3.5 w-3.5 text-tx-3 shrink-0" />
-                  <div>
-                    <p className="text-[10px] text-muted-foreground">WhatsApp</p>
-                    <p className="text-[12px] font-medium bg-num">{panel.recipient_phones?.length ?? 0}</p>
                   </div>
                 </div>
               </div>

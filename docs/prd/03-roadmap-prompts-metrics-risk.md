@@ -73,7 +73,7 @@ Each is a place where shipped code contradicts a stated rule. They are not featu
 
 | Defect | Where | Contradicts |
 |---|---|---|
-| WhatsApp sends through Africa's Talking | `api/surveys/[id]/send-whatsapp`, `inngest/functions/panel-dispatch.ts` | Locked decision 3 (Doc 5) |
+| WhatsApp sends through Africa's Talking | `api/surveys/[id]/send-whatsapp` (the panel dispatch path was removed 4 November 2026) | Locked decision 3 (Doc 5) |
 | A hardcoded model ID | The vision branch of `api/ai/pre-post` | "Model IDs are not written anywhere else" (Doc 2 section G) |
 | The priority feature parses with `JSON.parse` on a fence-stripped string | `api/ai/pre-post` | The parsing rule in Doc 2, AI Command Layer |
 | The pre and post widget runs on the `chat` tier | `api/ai/pre-post` | The routing table: anything touching Pidgin, Yoruba, Igbo or Hausa is `cultural` |

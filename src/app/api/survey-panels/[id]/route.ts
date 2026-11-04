@@ -6,7 +6,6 @@ const UpdateBody = z.object({
   name:             z.string().min(1).max(120).optional(),
   cadence:          z.enum(['monthly', 'quarterly']).optional(),
   recipient_emails: z.array(z.string().email()).optional(),
-  recipient_phones: z.array(z.string()).optional(),
   active:           z.boolean().optional(),
 })
 

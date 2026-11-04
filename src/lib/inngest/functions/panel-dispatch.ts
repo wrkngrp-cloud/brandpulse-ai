@@ -34,6 +34,10 @@ export const panelDailyCheck = inngest.createFunction(
 )
 
 // ── Panel dispatch: create survey instance and send to recipients ─────────────
+// Panels deliver by email and the survey's share link only. The old WhatsApp
+// step posted to Africa's Talking, which CLAUDE.md forbids; WhatsApp belongs to
+// the Meta Cloud API (Model A). `recipient_phones` stays on the table for that
+// later integration and is not read here.
 export const panelDispatch = inngest.createFunction(
   {
     id: 'panel-dispatch',
@@ -100,27 +104,6 @@ export const panelDispatch = inngest.createFunction(
       })
     }
 
-    if (panel.recipient_phones?.length > 0 && process.env.AFRICAS_TALKING_API_KEY) {
-      await step.run('send-whatsapp', async () => {
-        const message = `Hi! ${brandName} is running its ${panel.cadence} brand tracking survey. It takes less than 2 minutes:\n${surveyUrl}`
-        const batches: string[][] = []
-        for (let i = 0; i < panel.recipient_phones.length; i += 20) {
-          batches.push(panel.recipient_phones.slice(i, i + 20))
-        }
-        for (const batch of batches) {
-          await fetch('https://content.africastalking.com/version1/messaging/whatsapp', {
-            method: 'POST',
-            headers: { 'apiKey': process.env.AFRICAS_TALKING_API_KEY!, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username: process.env.AFRICAS_TALKING_USERNAME ?? 'sandbox',
-              to: batch, message,
-              from: process.env.AFRICAS_TALKING_WHATSAPP_SENDER,
-            }),
-          })
-        }
-      })
-    }
-
     await step.run('advance-schedule', async () => {
       const next = new Date()
       if (panel.cadence === 'monthly') {
@@ -139,7 +122,6 @@ export const panelDispatch = inngest.createFunction(
     return {
       surveyId:   survey.id,
       emailsSent: panel.recipient_emails?.length ?? 0,
-      phonesSent: panel.recipient_phones?.length ?? 0,
     }
   },
 )
