@@ -21,7 +21,7 @@ Current status of each, checked directly against `vercel env ls` and the actual 
 6. For **Basic access** (real production data, with a request-rate cap), Google reviews your application — this can take a few days to a few weeks.
 7. Once approved, copy the developer token (a long alphanumeric string) and give it to Claude.
 
-**Env var needed:** `GOOGLE_ADS_DEVELOPER_TOKEN`
+**Env var needed:** `GOOGLE_ADS_DEVELOPER_TOKEN`. Optional: `GOOGLE_ADS_API_VERSION` (default `v23`; check Google's sunset dates and keep it current). Known gap: a login that only reaches client accounts through a manager (MCC) account connects the first one it can read; a client picker and the `login-customer-id` header are still to build.
 
 ---
 
@@ -130,6 +130,7 @@ Current status of each, checked directly against `vercel env ls` and the actual 
 | Env var | Unlocks |
 |---|---|
 | `GOOGLE_ADS_DEVELOPER_TOKEN` | Google Ads connector |
+| `GOOGLE_ADS_API_VERSION` | Google Ads API version, e.g. `v23` (default). Google retires each version about a year after release; move it forward before the one in use is switched off. |
 | `HUBSPOT_CLIENT_ID` + `HUBSPOT_CLIENT_SECRET` | HubSpot connector |
 | `TIKTOK_ACCESS_TOKEN` + `TIKTOK_ADVERTISER_ID` | TikTok Ads (also needs more code) |
 | `WHATSAPP_PHONE_NUMBER_ID` + `WHATSAPP_BUSINESS_ACCOUNT_ID` + `WHATSAPP_ACCESS_TOKEN` + `WHATSAPP_APP_SECRET` | WhatsApp |
