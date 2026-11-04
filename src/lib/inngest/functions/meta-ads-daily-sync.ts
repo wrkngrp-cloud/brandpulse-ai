@@ -60,11 +60,11 @@ export const metaAdsDailySync = inngest.createFunction(
     type Account = {
       id: string; brand_id: string; ad_account_id: string | null
       access_token: string | null; refresh_token: string | null; token_expiry: string | null
-      auth_mode?: string | null; access_status?: string | null
+      currency?: string | null; auth_mode?: string | null; access_status?: string | null
     }
     const first = await supabase
       .from('digital_ad_accounts')
-      .select('id, brand_id, ad_account_id, access_token, refresh_token, token_expiry, auth_mode, access_status')
+      .select('id, brand_id, ad_account_id, access_token, refresh_token, token_expiry, currency, auth_mode, access_status')
       .eq('platform', 'meta')
       .neq('sync_status', 'disconnected')
       .returns<Account[]>()
@@ -72,7 +72,7 @@ export const metaAdsDailySync = inngest.createFunction(
     if (first.error) {
       ;({ data: accounts } = await supabase
         .from('digital_ad_accounts')
-        .select('id, brand_id, ad_account_id, access_token, refresh_token, token_expiry')
+        .select('id, brand_id, ad_account_id, access_token, refresh_token, token_expiry, currency')
         .eq('platform', 'meta')
         .neq('sync_status', 'disconnected')
         .returns<Account[]>())
@@ -257,7 +257,10 @@ export const metaAdsDailySync = inngest.createFunction(
               conversions,
               objective,
               actions:       Object.keys(actionsMap).length > 0 ? actionsMap : null,
-              currency:      'NGN',
+              // Meta reports spend in the ad account's own currency, which we
+              // stored at connect. Hardcoding NGN turned a $1,200 week into
+              // ₦1,200.
+              currency:      account.currency || 'NGN',
             }
           })
 

@@ -1,6 +1,7 @@
 import { inngest } from '@/lib/inngest/client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { decrypt } from '@/lib/crypto'
+import { MetaTokenError } from '@/lib/social/meta'
 import { fetchInstagramPosts, fetchFacebookPosts, type MetaPost } from '@/lib/social/meta'
 import { fetchTwitterPosts, type TwitterPost } from '@/lib/social/twitter'
 import { twitterRefresher } from '@/lib/social/twitter-token'
@@ -90,6 +91,11 @@ export const syncSocialPosts = inngest.createFunction(
           totalSynced += rows.length
         } catch (err) {
           logger.error(`Sync failed for connection ${conn.id}: ${String(err)}`)
+          // A dead Meta login: mark it so the card offers Reconnect, instead
+          // of the connection reading "active" over weeks of nothing.
+          if (err instanceof MetaTokenError) {
+            await supabase.from('social_connections').update({ sync_status: 'error' }).eq('id', conn.id)
+          }
         }
       })
     }
