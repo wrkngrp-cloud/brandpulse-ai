@@ -2,6 +2,7 @@ import { NextRequest, NextResponse }  from 'next/server'
 import { createServiceClient }        from '@/lib/supabase/server'
 import { Redis }                      from '@upstash/redis'
 import { encrypt }                    from '@/lib/crypto'
+import { holdPick }                   from '@/lib/meta/pick'
 import { metaUserIdForToken, getLongLivedToken }          from '@/lib/social/meta'
 
 export const runtime = 'nodejs'
@@ -105,16 +106,26 @@ export async function GET(request: NextRequest) {
     )
     const adAccountsData = await adAccountsRes.json() as AdAccountsResponse
 
-    // Prefer the first active account (account_status 1 = active)
-    const activeAccount = adAccountsData.data?.find(a => a.account_status === 1)
-      ?? adAccountsData.data?.[0]
+    const accounts = adAccountsData.data ?? []
+    // No ad account at all: say so. This used to save a placeholder row and
+    // report "connected", and then the sync skipped it forever.
+    if (!accounts.length) return NextResponse.redirect(returnUrl(returnTo, { error: 'no_ad_account' }))
 
-    const adAccountId = activeAccount?.id   ?? null   // "act_XXXXXXXXX" format
-    const accountName = activeAccount?.name ?? null
-    const currency    = activeAccount?.currency ?? 'NGN'
+    // More than one: let them choose, rather than taking the first.
+    if (accounts.length > 1) {
+      const key = await holdPick({
+        kind: 'meta_ads', userId: session.userId, brandId, accessToken: longToken,
+        expiresAt: tokenExpiry, metaUserId, returnTo,
+        options: accounts.map(a => ({ id: a.id, name: a.name ?? a.id, note: a.account_status === 1 ? `Active · ${a.currency ?? ''}`.trim() : 'Not active' })),
+      })
+      return NextResponse.redirect(`${APP_URL}/dashboard/connectors/choose?key=${key}`)
+    }
 
-    // account_id is the unique key per brand/platform pair — use ad account ID
-    const accountIdentifier = adAccountId ?? `user-${session.userId.slice(0, 8)}`
+    const activeAccount = accounts[0]
+    const adAccountId = activeAccount.id                // "act_XXXXXXXXX" format
+    const accountName = activeAccount.name ?? null
+    const currency    = activeAccount.currency ?? 'NGN'
+    const accountIdentifier = adAccountId
 
     // A shared-access row for this brand gives way to the login: the login
     // carries its own token, so the two would only disagree. Before the

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { Redis } from '@upstash/redis'
 import { encrypt } from '@/lib/crypto'
+import { holdPick } from '@/lib/meta/pick'
 import { randomBytes } from 'crypto'
 import {
   exchangeMetaCode, getLongLivedToken, getMetaUserId,
@@ -78,6 +79,17 @@ export async function GET(
           `${GRAPH}/me/accounts?fields=id,name,access_token,category&access_token=${access_token}`
         )
         const pagesData: FacebookPagesResponse = await pagesRes.json()
+
+        // More than one Page: let them choose, rather than connecting
+        // whichever Meta listed first.
+        if ((pagesData.data?.length ?? 0) > 1) {
+          const key = await holdPick({
+            kind: 'facebook', userId: session.userId, brandId, accessToken: access_token,
+            expiresAt: tokenExpiresAt, metaUserId: metaUser.id,
+            options: pagesData.data!.map(pg => ({ id: pg.id, name: pg.name, note: pg.category })),
+          })
+          return NextResponse.redirect(`${APP_URL}/dashboard/connectors/choose?key=${key}`)
+        }
         const page = pagesData.data?.[0]
 
         if (page) {
@@ -164,6 +176,14 @@ export async function GET(
           }
         }
 
+        if (pages.length > 1) {
+          const key = await holdPick({
+            kind: 'instagram', userId: session.userId, brandId, accessToken: access_token,
+            expiresAt: tokenExpiresAt, metaUserId: user.id,
+            options: pages.map(pg => ({ id: pg.id, name: pg.name })),
+          })
+          return NextResponse.redirect(`${APP_URL}/dashboard/connectors/choose?key=${key}`)
+        }
         const page = pages[0]
 
         if (!page) {
