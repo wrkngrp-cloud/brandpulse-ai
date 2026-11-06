@@ -54,7 +54,7 @@ Sequenced by the question each unlocks, not by phase number and not by how impre
 
 | # | Work | Unlocks the question | Effort | Blocked on |
 |---|---|---|---|---|
-| 1 | Migrate the two Africa's Talking WhatsApp paths to Meta Cloud | "Can we send at all without violating our own decision?" | Small | Nothing |
+| 1 | Build WhatsApp survey delivery on Meta Cloud (the Africa's Talking paths were removed 6 Nov 2026) | "Can we send surveys on WhatsApp at all?" | Small | The WhatsApp env vars in Doc 4 section 5.3 |
 | 2 | Wire `cultural_events` into the pre and post prompt | "Is this the wrong week to post this?" The highest-traffic AI surface currently guesses. | Small | Nothing |
 | 3 | Set `SERPAPI_KEY` | "Is our share of search rising?" The leading indicator, plus three other features. | None, it is a credential | Emmanuel |
 | 4 | Cultural resonance collection | "Why are we losing the North?" Five deferred sub-features sit behind it. | Large | Decision on Doc 1 action 4 |
@@ -73,7 +73,6 @@ Each is a place where shipped code contradicts a stated rule. They are not featu
 
 | Defect | Where | Contradicts |
 |---|---|---|
-| WhatsApp sends through Africa's Talking | `api/surveys/[id]/send-whatsapp` (the panel dispatch path was removed 4 November 2026) | Locked decision 3 (Doc 5) |
 | A hardcoded model ID | The vision branch of `api/ai/pre-post` | "Model IDs are not written anywhere else" (Doc 2 section G) |
 | The priority feature parses with `JSON.parse` on a fence-stripped string | `api/ai/pre-post` | The parsing rule in Doc 2, AI Command Layer |
 | The pre and post widget runs on the `chat` tier | `api/ai/pre-post` | The routing table: anything touching Pidgin, Yoruba, Igbo or Hausa is `cultural` |
@@ -491,7 +490,7 @@ once the product was real. **Materialised** means it happened.
 | **17** | **Two vertical taxonomies diverge** | **New.** High / Medium | Telco, insurance and healthcare currently score on FMCG weights. Mitigation: Doc 1 action 1, unowned until that decision lands. |
 | **18** | **A component carrying weight computes as null** | **New, materialised.** High / Medium | Cultural resonance is 15 percent of the default BHI and null for most brands. Mitigated by weight redistribution and a visible coverage figure, so the number is honest. Not mitigated as a product gap. |
 | **19** | **A stored score becomes incomparable with its own history** | **New, materialised.** Medium / High | Two BHI formulas ran concurrently, one writing history and one displaying. Fixed 2 September 2026 and old rows marked `formula_version = 1`. Mitigation going forward: any scoring change stamps a formula version and no chart crosses a version boundary silently. |
-| **20** | **A stated decision is contradicted by shipped code** | **New, materialised.** Medium / Medium | Four live cases in Section A.4, including one locked-decision violation. Mitigation: the locked decisions table in Doc 5 and the session discipline of reading it first. |
+| **20** | **A stated decision is contradicted by shipped code** | **New, materialised.** Medium / Medium | Live cases in Section A.4. The Africa's Talking locked-decision violation was cleared on 6 November 2026. Mitigation: the locked decisions table in Doc 5 and the session discipline of reading it first. |
 
 ---
 

@@ -191,7 +191,7 @@ feature and an Inert one.
 | `TWITTER_ADS_API_KEY`, `TWITTER_ADS_API_SECRET` | X Ads |
 | `LEAD_ALERT_EMAIL` | The email that tells the lead desk a lead arrived |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_*` | Nothing to turn on. Billing is Deferred and moving to Paystack. **Do not configure these** |
-| `AFRICAS_TALKING_*` | Nothing that should run. One code path still reads these, and it is a defect. See Doc 3 section A.4 |
+| `AFRICAS_TALKING_*` | Nothing. No code reads these since 6 November 2026; WhatsApp waits on the Meta Cloud API variables above. Remove them from Vercel if they are set |
 
 Set variables in three scopes in Vercel: development, preview, production. Never commit
 `.env*`.

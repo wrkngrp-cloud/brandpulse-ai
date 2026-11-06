@@ -256,7 +256,7 @@ gains the new pattern.
 | **Decision** | WhatsApp runs on a BrandGauge-owned WABA through Meta Cloud API v20.0. Surveys deliver by email, in-app, WhatsApp and shareable link. **No SMS. No USSD. No third-party WhatsApp gateway.** Locked 11 July 2026, when the Africa's Talking NPS path was removed. |
 | **What it means** | One send path, one consent regime, one delivery log. Users manage contacts and templates inside BrandGauge and never touch an API key. Consent is checked on `whatsapp_opted_in` before any send; inbound STOP sets it false. |
 | **Why it's locked** | A second gateway means a second consent regime, a second deliverability profile and a second failure mode to debug, for a channel whose response rate did not justify it. Owning the WABA is also what lets the product manage templates in its own UI instead of sending people elsewhere. |
-| **Watch for** | A WhatsApp send added through whatever gateway is already in `package.json`, because it is faster than waiting for Meta verification. **This is live right now**: two code paths still send through Africa's Talking (Doc 3 section A.4). Also watch for SMS returning as "a fallback", which is the same reversal with a softer word. |
+| **Watch for** | A WhatsApp send added through whatever gateway is already in `package.json`, because it is faster than waiting for Meta verification. This happened once: two code paths sent through Africa's Talking until they were removed on 6 November 2026. Also watch for SMS returning as "a fallback", which is the same reversal with a softer word. |
 
 ### LD-4: OOH attribution is a vanity link plus UTM, and QR is secondary
 
@@ -420,7 +420,7 @@ answer the one a reasonable reviewer would suggest? If not, it is a convention, 
 
 | # | Action | Owner | By | Blocking |
 |---|---|---|---|---|
-| 1 | Clear the three live locked-decision violations: the Africa's Talking WhatsApp paths (LD-3), the hardcoded model ID (LD-7), and the unbranched verticals (LD-10) | Claude Code for the first two, Emmanuel decides the third | 30 Sep 2026 | Yes |
+| 1 | Clear the live locked-decision violations: the hardcoded model ID (LD-7) and the unbranched verticals (LD-10). The Africa's Talking WhatsApp paths (LD-3) were cleared on 6 November 2026 | Claude Code for the first two, Emmanuel decides the third | 30 Sep 2026 | Yes |
 | 2 | Remove `lucide-react` so LD-15 has no loaded gun next to it | Claude Code | 30 Sep 2026 | No |
 | 3 | Fold the pending design-system amendments into `brand/DESIGN-SYSTEM.md` itself, so Part A summarises a document that is current. The amendment brief is at `docs/design-system-update-brief.md` and the motion amendments at `docs/motion-amendments.md`, both still unmerged into the contract | Emmanuel and Claude Code | 15 Oct 2026 | No, but Part A is summarising a contract with known gaps until then |
 | 4 | Add a locked decision whenever a market assumption is corrected, in this format, in the same session as the correction. A decision recorded a week later is a decision half-remembered | Whoever makes the correction | Ongoing | No |

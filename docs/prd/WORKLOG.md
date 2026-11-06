@@ -5,6 +5,21 @@ session can see what the last one decided without reading five documents to find
 
 ---
 
+## 6 November 2026: Africa's Talking removed, WhatsApp marked not available yet
+
+**Mode:** correction, code first.
+
+**What changed.** Both WhatsApp paths that posted to Africa's Talking (locked decision 3)
+are gone. Panel dispatch sends email and the share link only, and the panel form no longer
+asks for phone numbers. `POST /api/surveys/[id]/send-whatsapp` returns 501 with "not
+available yet" and sends nothing. `recipient_phones` stays on `survey_panels` for the Meta
+Cloud API integration. No code reads `AFRICAS_TALKING_*` now.
+
+**Docs updated.** Doc 2 section 8.4 note and next action 1, Doc 3 section A.4 row, next-work
+item 1 and risk 20, Doc 4 section 5.3, Doc 5 decision 3 "watch for" and next action 1.
+
+---
+
 ## 14 September 2026: v6 to v8, five documents, status marks, first decisions register
 
 **Mode:** revision, and a restructure.

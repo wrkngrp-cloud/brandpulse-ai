@@ -234,10 +234,12 @@ with response count, completion rate, NPS breakdown, AI verbatim clusters and qu
 **Delivery channels are fixed and this is a hard rule: email, in-app, WhatsApp and a
 shareable link. No SMS. No USSD.**
 
-> **Defect, open as of this version.** Two live code paths still send WhatsApp through
-> Africa's Talking rather than the Meta Cloud API: the survey WhatsApp send route and the
-> panel dispatch job. The decision (Doc 5, decision 3) is Meta Cloud only. This is code that
-> should be migrated, not a rule to relax. Doc 3 carries it as open work.
+> **WhatsApp delivery is Inert until the Meta Cloud API lands.** The two paths that sent
+> through Africa's Talking were taken out on 4 and 6 November 2026: panel dispatch now sends
+> email and the share link only, and the survey WhatsApp send route answers "not available
+> yet" and sends nothing. The panel form no longer collects phone numbers; the
+> `recipient_phones` column is kept for the Meta integration. The decision (Doc 5,
+> decision 3) is Meta Cloud only. Doc 3 carries the integration as open work.
 
 **8.5 NPS and advocacy tracker.** Digital and offline NPS unified into one trend, promoter
 archetype analysis, detractor diagnosis, a rolling chart with annotations. **Built.**
@@ -732,7 +734,7 @@ models are the thing being measured rather than the thing generating our output.
 
 | # | Action | Owner | By | Blocking |
 |---|---|---|---|---|
-| 1 | **Migrate the two Africa's Talking WhatsApp paths to the Meta Cloud API** (Section 8.4): the survey WhatsApp send route and the panel dispatch job. This is a live contradiction between locked decision 3 and shipped code. | Claude Code | 30 Sep 2026 | Yes, it violates a locked decision |
+| 1 | **Build WhatsApp survey delivery on the Meta Cloud API** (Section 8.4): the survey WhatsApp send route and panel dispatch. The Africa's Talking code was removed on 6 November 2026, so nothing violates locked decision 3 any more; WhatsApp simply does not send yet. | Claude Code | Open | No |
 | 2 | **Pin `search_path` on `is_workspace_member()`** (Section D.4). A `security definer` function that every tenant policy depends on. | Claude Code | 30 Sep 2026 | No, but cheap and security-relevant |
 | 3 | **Set `SERPAPI_KEY`.** The highest-value single variable in this document: it turns on share of search, the OOH uplift correlation, the geo-lift search arm and the Google Trends competitive source at once. Four Inert items become Built with one credential. | Emmanuel | 30 Sep 2026 | Yes, gates four features |
 | 4 | **Decide on module 9** (Section A, module 9). Fund the cultural resonance collection or lower the component weight. Five deferred sub-features sit behind that one dependency. | Emmanuel | 15 Oct 2026 | Yes |
