@@ -31,6 +31,7 @@ export const PERMISSION_GROUPS = [
       ['support.reply',  'Reply to a customer'],
       ['support.assign', 'Assign a thread'],
       ['support.close',  'Close a thread'],
+      ['support.manage_assistant', "Change the assistant's live, suggest or off mode"],
     ],
   },
   {

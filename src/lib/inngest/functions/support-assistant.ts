@@ -1,7 +1,8 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
-import { assistantMode, isWorkingTime, lagosDay, LIMITS, maxPriority, pickPersona, workingMsBetween, isPersona, type Priority } from '@/lib/support/assistant/config'
+import { isWorkingTime, lagosDay, LIMITS, maxPriority, pickPersona, workingMsBetween, isPersona, type Priority } from '@/lib/support/assistant/config'
+import { effectiveAssistantMode } from '@/lib/support/assistant/mode-db'
 import { decideTurn, typingDelayMs, type TurnMessage, type TurnContext } from '@/lib/support/assistant/engine'
 import { loadBuildPack } from '@/lib/support/assistant/knowledge'
 import { notifyStaff } from '@/lib/support/assistant/notify'
@@ -52,12 +53,13 @@ interface ConvRow {
   assistant_calls_day: string | null
   assistant_calls_today: number
   assistant_email_asked: boolean
+  assistant_name_asked: boolean
   assistant_nudged_at: string | null
   assistant_chased_at: string | null
   tags: string[] | null
 }
 
-const CONV_COLUMNS = 'id, status, priority, assigned_to, user_id, workspace_id, brand_id, email, name, source, page_url, assistant_persona, assistant_state, assistant_handoff_at, assistant_reply_count, assistant_unhelpful_count, assistant_calls_day, assistant_calls_today, assistant_email_asked, assistant_nudged_at, assistant_chased_at, tags'
+const CONV_COLUMNS = 'id, status, priority, assigned_to, user_id, workspace_id, brand_id, email, name, source, page_url, assistant_persona, assistant_state, assistant_handoff_at, assistant_reply_count, assistant_unhelpful_count, assistant_calls_day, assistant_calls_today, assistant_email_asked, assistant_name_asked, assistant_nudged_at, assistant_chased_at, tags'
 
 const VALID_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
@@ -116,7 +118,7 @@ export const supportAssistantReply = inngest.createFunction(
     const conversationId = String((event.data as { conversationId?: string }).conversationId ?? '')
     if (!conversationId) return { skipped: 'no conversation id' }
 
-    const mode = assistantMode()
+    const mode = await effectiveAssistantMode()
     if (mode === 'off') return { skipped: 'mode off' }
 
     // ── What is there to answer, and should we? ──────────────────────────────
@@ -185,6 +187,8 @@ export const supportAssistantReply = inngest.createFunction(
         customerName: conv.name,
         hasEmail: !!conv.email,
         emailAsked: conv.assistant_email_asked,
+        hasName: !!conv.name,
+        nameAsked: conv.assistant_name_asked,
         handedOff: conv.assistant_state === 'handed_off',
         handoffAt: conv.assistant_handoff_at,
         priority: (conv.priority as Priority) ?? 'normal',
@@ -235,8 +239,8 @@ export const supportAssistantReply = inngest.createFunction(
         : isHandoff ? maxPriority(conv.priority, decision.priority ?? 'normal') : (conv.priority as Priority)
 
       let reply = decision.reply
-      if (decision.wantsEmail && !/email/i.test(reply)) {
-        reply = `${reply}\n\n${loadBuildPack().macros['HND-08']}`
+      if (decision.contactMacro && !/(email|name)/i.test(reply)) {
+        reply = `${reply}\n\n${loadBuildPack().macros[decision.contactMacro]}`
       }
 
       if (decision.redact.length) {
@@ -281,8 +285,12 @@ export const supportAssistantReply = inngest.createFunction(
         priority,
       })
       if (decision.wantsEmail) update.assistant_email_asked = true
+      if (decision.wantsName) update.assistant_name_asked = true
       if (decision.capturedEmail && !fresh.conv.email && VALID_EMAIL.test(decision.capturedEmail)) {
         update.email = decision.capturedEmail.toLowerCase()
+      }
+      if (decision.capturedName && !fresh.conv.name) {
+        update.name = decision.capturedName
       }
       if (isHandoff) {
         update.assistant_state = 'handed_off'
@@ -339,7 +347,7 @@ export const supportAssistantReply = inngest.createFunction(
     if (nudgeable) {
       await step.sleep('silence', LIMITS.silenceMs)
       const nudged = await step.run('nudge', async () => {
-        if (assistantMode() !== 'live') return 'mode changed'
+        if (await effectiveAssistantMode() !== 'live') return 'mode changed'
         const fresh = await loadThread(conversationId)
         if (!fresh) return 'gone'
         const { conv: c, rows } = fresh
@@ -380,7 +388,7 @@ export const supportAssistantOverdue = inngest.createFunction(
     triggers: [{ cron: 'TZ=Africa/Lagos */5 9-17 * * 1-5' }],
   },
   async ({ step, logger }) => {
-    if (assistantMode() === 'off') return { skipped: 'mode off' }
+    if (await effectiveAssistantMode() === 'off') return { skipped: 'mode off' }
 
     const count = await step.run('sweep', async () => {
       const service = await createServiceClient()

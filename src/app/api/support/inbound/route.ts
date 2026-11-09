@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { randomBytes, createHmac, timingSafeEqual } from 'node:crypto'
 import { createServiceClient } from '@/lib/supabase/server'
 import { inngest } from '@/lib/inngest/client'
-import { assistantMode } from '@/lib/support/assistant/config'
+import { effectiveAssistantMode } from '@/lib/support/assistant/mode-db'
 
 export const runtime = 'nodejs'
 
@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
   // Same path as a chat message: the assistant decides whether to answer or
   // hand off, and a handoff is what pings staff. A failed send never loses
   // the email itself, which is already safely in the thread.
-  if (assistantMode() !== 'off') {
+  if (await effectiveAssistantMode() !== 'off') {
     try {
       await inngest.send({ name: 'support/message.received', data: { conversationId } })
     } catch (err) {

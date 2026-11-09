@@ -28,13 +28,13 @@ import { targetMinutes } from '../reply-targets'
  */
 
 export const ReplySchema = z.object({
-  reply:        z.string().min(1).max(2000),
-  macro_id:     z.string().max(20).nullable(),
-  action:       z.enum(['none', 'handoff']),
-  priority:     z.enum(['low', 'normal', 'high', 'urgent']).nullable(),
-  tags:         z.array(z.string().max(40)).max(8),
-  handoff_note: z.string().max(3000).nullable(),
-  wants_email:  z.boolean(),
+  reply:         z.string().min(1).max(2000),
+  macro_id:      z.string().max(20).nullable(),
+  action:        z.enum(['none', 'handoff']),
+  priority:      z.enum(['low', 'normal', 'high', 'urgent']).nullable(),
+  tags:          z.array(z.string().max(40)).max(8),
+  handoff_note:  z.string().max(3000).nullable(),
+  captured_name: z.string().max(80).nullable(),
 })
 export type ModelReply = z.infer<typeof ReplySchema>
 
@@ -52,6 +52,8 @@ export interface TurnContext {
   customerName: string | null
   hasEmail: boolean
   emailAsked: boolean
+  hasName: boolean
+  nameAsked: boolean
   handedOff: boolean
   handoffAt: string | null
   priority: Priority
@@ -75,6 +77,9 @@ export interface TurnDecision {
   tags: string[]
   handoffNote: string | null
   wantsEmail: boolean
+  wantsName: boolean
+  /** Which macro the job should append, or null. */
+  contactMacro: 'HND-08' | 'HND-10' | 'HND-11' | null
   /** Customer messages in this turn that hold a secret, by index into `pending`. */
   redact: number[]
   /** PND-03: raise priority and notify staff again. */
@@ -87,6 +92,8 @@ export interface TurnDecision {
   fallback: string | null
   /** An email address the customer typed in chat. */
   capturedEmail: string | null
+  /** A name the customer stated in chat, model-reported since it isn't regex-extractable. */
+  capturedName: string | null
 }
 
 export type Complete = (system: string, messages: { role: 'user' | 'assistant'; content: string }[]) => Promise<string>
@@ -131,6 +138,9 @@ export function looksLikeLead(text: string): boolean {
 const UNHELPFUL = /\b(didn'?t|did not|doesn'?t|does not|still (not|doesn'?t|isn'?t|won'?t|can'?t)|not working|same (problem|issue|error|thing)|no luck|that'?s not it|useless|not helpful|unhelpful|doesn'?t help)\b/i
 
 const EMAIL = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i
+
+/** A plausible human name, as a sanity check on the model's own captured_name report. */
+const NAME_RE = /^[a-zA-Z][a-zA-Z' -]{0,79}$/
 
 function fill(template: string, persona: string | null): string {
   return template.replace(/\[Name\]/g, persona ?? 'the BrandGauge team')
@@ -196,6 +206,7 @@ function systemPrompt(pack: BuildPack, ctx: TurnContext, pendingOnly: boolean): 
 ${who}
 Signed in: ${ctx.signedIn ? 'yes' : 'no (website visitor)'}
 Customer email on file: ${ctx.hasEmail ? 'yes' : 'no'}${ctx.emailAsked ? ' (already asked once, do not ask again)' : ''}
+Customer name on file: ${ctx.hasName ? 'yes' : 'no'}${ctx.nameAsked ? ' (already asked once, do not ask again)' : ''}
 Working hours right now (Mon to Fri, 9 AM to 5 PM Lagos): ${ctx.workingHoursNow ? 'yes' : 'no'}
 Assistant replies so far: ${ctx.replyCount}
 ${pendingOnly
@@ -218,13 +229,14 @@ ${pack.knowledge}
 - If the customer asks whether you are a person or a bot, use HUM-01; if they press for a straight answer, HUM-02 and hand off. Never claim to be human. Never call yourself a bot, an AI, a chatbot or a virtual assistant.
 - If asked what model, AI or company powers you or BrandGauge, use TEC-01 and nothing more.
 - Any interest in BrandGauge or adopting it (a demo, pricing, onboarding a team, agency or enterprise) is a lead: HND-03, action "handoff", priority "urgent", tag "lead".
+- Where it applies, end your reply with one concrete next step or one question for the customer to take — never more than one. Skip it for a short yes/no answer or a thread that is already resolved; do not force one on just to have one, and never let it push you past the word limit above.
 
 # Output
 Reply with ONE JSON object and nothing else:
-{"reply": string, "macro_id": string or null, "action": "none" or "handoff", "priority": "low" | "normal" | "high" | "urgent" or null, "tags": string[], "handoff_note": string or null, "wants_email": boolean}
+{"reply": string, "macro_id": string or null, "action": "none" or "handoff", "priority": "low" | "normal" | "high" | "urgent" or null, "tags": string[], "handoff_note": string or null, "captured_name": string or null}
 - macro_id: the section 12 id you based the reply on, or null.
 - action "handoff" whenever section 1.6 or section 2 says to pass the case over. Then set priority (section 2.3) and write handoff_note in the section 2.4 shape, from what the customer told you.
-- wants_email: true only when handing off, the customer is not signed in, no email is on file, and you have not asked before; then end the reply with the HND-08 question.
+- captured_name: if the customer states their name in this message (e.g. "I'm Tolu", "my name is..."), the name as they gave it, trimmed; otherwise null.
 - tags: short lowercase words, e.g. "feature-request", "feedback", "sales", "data-request", plus the topic.`
 }
 
@@ -247,8 +259,9 @@ function toModelMessages(thread: TurnMessage[]): { role: 'user' | 'assistant'; c
 function base(partial: Partial<TurnDecision>): TurnDecision {
   return {
     reply: '', macroId: null, action: 'none', priority: null, tags: [], handoffNote: null,
-    wantsEmail: false, redact: [], chase: false, unhelpful: false, calls: 0, fallback: null,
-    capturedEmail: null,
+    wantsEmail: false, wantsName: false, contactMacro: null,
+    redact: [], chase: false, unhelpful: false, calls: 0, fallback: null,
+    capturedEmail: null, capturedName: null,
     ...partial,
   }
 }
@@ -259,7 +272,7 @@ function base(partial: Partial<TurnDecision>): TurnDecision {
  * `thread` is every non-internal message, oldest first. `pending` is the
  * customer messages since the last reply from us, which this turn answers.
  */
-export async function decideTurn(opts: {
+async function decideTurnInner(opts: {
   pack: BuildPack
   ctx: TurnContext
   thread: TurnMessage[]
@@ -438,7 +451,10 @@ export async function decideTurn(opts: {
   const priority = !handoff ? null
     : lead ? 'urgent'
     : maxPriority(model.priority ?? MACRO_PRIORITY[macroId ?? ''] ?? 'normal', null)
-  const wantsEmail = !!handoff && model.wants_email && !ctx.signedIn && !ctx.hasEmail && !ctx.emailAsked && !capturedEmail
+  // Model-reported, since a name isn't regex-extractable the way an email is.
+  const capturedName = !ctx.hasName && model.captured_name && NAME_RE.test(model.captured_name.trim())
+    ? model.captured_name.trim()
+    : null
 
   return base({
     reply: guarded.text,
@@ -452,9 +468,50 @@ export async function decideTurn(opts: {
           tried: 'See the thread.', waitingFor: 'A reply from a person.',
         }))
       : null,
-    wantsEmail,
-    calls, unhelpful, capturedEmail,
+    calls, unhelpful, capturedEmail, capturedName,
   })
+}
+
+/**
+ * Whether to ask for a name and/or email, decided by context alone rather
+ * than a per-call model judgement — that dependency on the model noticing
+ * the overlap every time was why the ask was inconsistent. Fires on the
+ * first reply or the first handoff, whichever comes first. HND-07 is the one
+ * exclusion: asking for contact info right after a security scare reads as
+ * tone-deaf.
+ */
+function applyContactAsk(decision: TurnDecision, ctx: TurnContext): TurnDecision {
+  if (ctx.signedIn || !decision.reply || decision.macroId === 'HND-07') return decision
+  const isFirstReply = ctx.replyCount === 0
+  const isHandoffNow = decision.action === 'handoff'
+  if (!isFirstReply && !isHandoffNow) return decision
+
+  const needEmail = !ctx.hasEmail && !ctx.emailAsked && !decision.capturedEmail
+  const needName  = !ctx.hasName  && !ctx.nameAsked  && !decision.capturedName
+  if (!needEmail && !needName) return decision
+
+  return {
+    ...decision,
+    wantsEmail: needEmail,
+    wantsName:  needName,
+    contactMacro: needEmail && needName ? 'HND-10' : needEmail ? 'HND-08' : 'HND-11',
+  }
+}
+
+/**
+ * Decide this turn's reply.
+ *
+ * `thread` is every non-internal message, oldest first. `pending` is the
+ * customer messages since the last reply from us, which this turn answers.
+ */
+export async function decideTurn(opts: {
+  pack: BuildPack
+  ctx: TurnContext
+  thread: TurnMessage[]
+  pending: TurnMessage[]
+  complete: Complete
+}): Promise<TurnDecision> {
+  return applyContactAsk(await decideTurnInner(opts), opts.ctx)
 }
 
 /** 1 to 4 seconds, by length: a short "typing" pause before a live reply. */

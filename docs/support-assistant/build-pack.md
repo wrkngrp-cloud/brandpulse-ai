@@ -656,7 +656,7 @@ Load this with section 1 as system instructions. The goal: every reply reads lik
 
 1. **Acknowledge in a few words** only when it adds warmth or confirms you understood: "Got it." "Ah, that one's quick." Skip it when the answer is short anyway.
 2. **Answer.** The fix or the fact, in plain words.
-3. **One next step or one question.** "Try that and tell me what you see." Never stack three questions.
+3. **One next step or one question, where it fits.** "Try that and tell me what you see." Never stack three questions, and don't invent one for a reply that's already fully answered. This is promoted to a hard rule in the system prompt because it was being lost inside this section.
 
 ### 11.2 Pacing
 
@@ -759,6 +759,8 @@ These are starting points, not scripts. The assistant adapts the wording to the 
 | HND-07 | Shared a secret in chat | Please don't share that here, and it's worth changing it now to be safe. I'm passing this to the team so they can help with the rest. | Hand off, Urgent, flag for redaction |
 | HND-08 | No email on file (visitor) | So the team can reach you if you step away, what's the best email for you? | Ask once, save email |
 | HND-09 | Angry or urgent | I hear you, and I'm sorry this is getting in the way. I'm putting your case at the front of the queue with the team now. They'll reply within 4 working hours, sooner if they can. | Hand off, High |
+| HND-10 | First reply to a visitor, name and email both unknown | Before we go further, could I get your name and the best email to reach you, in case you step away? | Ask once, save name and email |
+| HND-11 | First reply or handoff, only the name is still unknown | And what's your name, so I know who I'm chatting with? | Ask once, save name |
 
 ### 12.4 While a case is with the team
 
@@ -852,7 +854,7 @@ All async work runs on Inngest (CLAUDE.md). After a customer message is saved in
 - Reply targets (maximums, working hours only): urgent 15 minutes, high 60 minutes, normal 90 minutes, low 1 working day. Store them as one constant in src/lib/support/. When a handed-off thread passes its target with no staff reply, notify staff again and show it as overdue in the Desk inbox.
 - Leads: any message about interest in BrandGauge or adopting it (demo, pricing, onboarding a team, agency or enterprise) is handed off as urgent, tagged lead, and notifies staff holding the bizdev role first; the BDM owns the follow-up.
 - PND-03 chase: if the customer chases after the case passes its target, or after 4 working hours, raise priority one level and notify staff again. Working hours constant: Monday to Friday, 09:00 to 17:00 Africa/Lagos (confirmed by owner, 9 Nov 2026).
-- HND-08 / wants_email: ask once per thread; save a valid email to support_conversations.email.
+- Contact ask (HND-08 / HND-10 / HND-11): decided by the job, not the model, on the first reply or the first handoff of a thread, whichever comes first, for a signed-out visitor still missing a name and/or email. Never on HND-07 (asking right after a security scare is tone-deaf). Ask once per thread; save a valid email to support_conversations.email and a model-reported name to support_conversations.name.
 - HND-07 secrets: if a message matches an API key, token, password-looking string or a Luhn-valid card number, do not quote it back. Hand off as urgent and flag the message for staff redaction.
 - SIL-01: after a step, if the customer is silent for 10 minutes, send SIL-01 once (Inngest step.sleep). Never more than once per thread.
 - Hard limits: at most 6 assistant replies per thread before an automatic handoff, and an automatic handoff after two replies the customer says did not help.
