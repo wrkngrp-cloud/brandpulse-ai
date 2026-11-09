@@ -7,6 +7,7 @@ import { setThreadStatus, assignThread } from '../actions'
 import { ReplyBox } from './reply-box'
 import { ThreadLive } from './thread-live'
 import { cn } from '@/lib/utils'
+import { SUGGESTION_HEADER, SUGGESTION_NOTES } from '@/lib/support/assistant/suggestion'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,6 +32,16 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
 
   const thread = await deskThread(session, id)
   if (!thread) notFound()
+
+  // The support assistant's latest draft (suggest mode), offered in the reply
+  // box only while it is still the newest thing on the thread: once anyone has
+  // written since, the draft answers a conversation that has moved on.
+  const latest = thread.messages[thread.messages.length - 1]
+  const suggestion = latest
+    && latest.author === 'assistant' && latest.internal
+    && latest.body.startsWith(SUGGESTION_HEADER)
+    ? latest.body.slice(SUGGESTION_HEADER.length).split(SUGGESTION_NOTES)[0].trim()
+    : null
 
   // Who a thread can be handed to: people who can actually answer it.
   const service = await createServiceClient()
@@ -115,8 +126,14 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
                     {message.author === 'customer'
                       ? thread.name ?? 'Customer'
                       : message.authorName ?? 'BrandGauge'}
+                    {message.author === 'assistant' && (
+                      <span className="bg-label ml-2 text-[0.6rem]">Assistant</span>
+                    )}
                     {message.internal && (
                       <span className="bg-label ml-2 text-[0.6rem]">Internal note</span>
+                    )}
+                    {message.needsRedaction && (
+                      <span className="bg-label ml-2 text-[0.6rem] text-tx-flare">Holds a secret, redact</span>
                     )}
                   </span>
                   <time className="bg-num" dateTime={message.createdAt}>
@@ -149,7 +166,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
           </ul>
 
           {session.can('support.reply') ? (
-            <ReplyBox conversationId={thread.id} />
+            <ReplyBox conversationId={thread.id} suggestion={suggestion} />
           ) : (
             <p className="rounded-xl border border-line bg-shell p-3 text-sm text-tx-3">
               You can read this conversation but not reply to it.
@@ -198,6 +215,16 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
             />
             <Fact label="Page" value={thread.pageUrl ?? 'Not recorded'} />
             <Fact label="Assigned" value={thread.assignedTo ?? 'Nobody'} />
+            <Fact label="Priority" value={thread.assistant.priority} />
+            {thread.assistant.handedOff && (
+              <Fact
+                label="Assistant"
+                value={thread.assistant.overdue ? 'Handed off, overdue' : 'Handed off to the team'}
+              />
+            )}
+            {thread.assistant.tags.length > 0 && (
+              <Fact label="Tags" value={thread.assistant.tags.join(', ')} />
+            )}
           </dl>
         </aside>
       </div>

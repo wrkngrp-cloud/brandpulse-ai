@@ -6,6 +6,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
 import { supportInbox, inboxCounts, type InboxRow, type InboxCounts, type InboxView } from '@/lib/desk/data'
 import { z } from 'zod'
+import { findModelNames } from '@/lib/support/assistant/guard'
 
 export type ReplyState = { error?: string; ok?: boolean; warning?: string } | null
 
@@ -26,12 +27,10 @@ const replySchema = z.object({
  * An internal note takes none of that. It is a note between us on the thread,
  * and the policy keeps it off the customer's side.
  *
- * The email does not invite a reply into the thread, because there is nothing
- * on the receiving end: no inbound handler exists, and `source = 'email'` is a
- * value nothing writes. It used to say a reply would come straight back here,
- * so a customer who answered by email was answering into a mailbox while the
- * thread still read as waiting on them. Until inbound is built, the email
- * points them at the chat.
+ * The email now does invite a reply: /api/support/inbound carries one back
+ * into this same thread. Before that route existed this comment said the
+ * opposite, because a reply would land in a mailbox nothing read while the
+ * thread still showed as waiting on the customer.
  */
 export async function replyToThread(_prev: ReplyState, formData: FormData): Promise<ReplyState> {
   const internal = formData.get('internal') === 'on'
@@ -49,6 +48,18 @@ export async function replyToThread(_prev: ReplyState, formData: FormData): Prom
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
   const { conversation_id, body } = parsed.data
+
+  // Owner decision, 9 Nov 2026: no AI model or AI company is named in the
+  // support chat, by the assistant or by staff, under any condition. The words
+  // for it are "BrandGauge's AI model". Internal notes are between us and are
+  // not checked.
+  if (!parsed.data.internal) {
+    const named = findModelNames(body)
+    if (named.length) {
+      return { error: `Replies never name an AI model or company (${named.join(', ')}). Say "BrandGauge's AI model" instead.` }
+    }
+  }
+
   const service = await createServiceClient()
 
   const { data: conv } = await service
@@ -114,7 +125,7 @@ export async function replyToThread(_prev: ReplyState, formData: FormData): Prom
 
 ${body}
 
-To carry on, open the chat on BrandGauge and your whole conversation is there.
+Just reply to this email, or open the chat on BrandGauge — either way we'll see it.
 
 ${session.fullName}
 BrandGauge`,
