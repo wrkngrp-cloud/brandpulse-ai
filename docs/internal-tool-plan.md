@@ -510,8 +510,16 @@ reachable. Same posture as the survey and ambassador routes.
   a support screenshot can contain anything.
 - **Email fallback.** Staff reply lands as an in-app message if they are signed in, and as
   a Resend email if the thread has been quiet for 10 minutes or came from the site.
-  Replies to that email come back into the thread through a Resend inbound webhook,
-  signature verified, matched on a thread id in the reply-to address.
+  Replies to that email, and any fresh email to support@ or hello@brandgauge.app, come
+  back into the thread through `/api/support/inbound`: Resend's domain-level Receiving
+  webhook (`email.received`, catch-all across brandgauge.app once its MX is live, not the
+  separate per-address Inboxes product), signature verified, matched to a conversation by
+  the sender's address rather than a reply-to trick. An allowlist in the route is what
+  keeps the two addresses feeding the one Desk inbox rather than every stray address on
+  the domain creating a conversation. privacy@brandgauge.app can receive too, now that
+  Receiving is on for the whole domain, but is deliberately left out of that allowlist:
+  whether NDPR correspondence belongs in the same queue support staff read is a decision
+  for the owner, not a default.
 - **Notifications.** A staff reply writes a `notifications` row so the bell lights up in
   the product. Staff are emailed when the support assistant hands a case over, when the
   customer chases it, and when it passes its reply target (`SUPPORT_NOTIFY_EMAIL`, plus
@@ -830,7 +838,7 @@ subdomain goes live whenever you want it to, and changes nothing about the code.
 | **1. Staff access and shell** | The staff tables, the four SQL functions, `requireStaff`, the data layer, the host rewrite, login, invite and accept, the shell and the overview | **Built** 14 Oct |
 | **2. Super Admin** | Roster, invite, suspend, remove, role change, the person page, the permissions editor, per-person activity, the audit feed | **Built** 14 Oct. Left: a roles editor, so a new role is still a seed rather than a screen |
 | **3. Accounts** | List sorted quietest first, detail, timeline, connectors, people, usage against plan limits, notes, plan change | **Built** 18 Oct |
-| **4. Support chat** | Tables, the four public routes, signed attachment references in a private bucket, the widget in the product, on the site and on the scoreboard, live presence, the Desk inbox and thread view with the account panel, reply by email and by the bell | **Built** 14 Oct. Left: inbound email replies through a Resend webhook, and Realtime in place of the widget's poll for signed-in users |
+| **4. Support chat** | Tables, the five public routes, signed attachment references in a private bucket, the widget in the product, on the site and on the scoreboard, live presence, the Desk inbox and thread view with the account panel, reply by email and by the bell, inbound email through a Resend Inboxes webhook | **Built** 14 Oct, inbound email 9 Nov. Left: Realtime in place of the widget's poll for signed-in users |
 | **5. Leads** | `/desk/leads` on the Desk's permissions, the pipeline, the scan that opened the conversation, the acquisition funnel at `/desk/leads/funnel`, and the nightly job that matches a lead to the account they became. `/dashboard/leads` deleted and `lead_desk_admins` dropped | **Built** 18 Oct |
 | **6. Money** | `subscriptions`, `invoices`, manual entry, the revenue screen with gross cost, and the Paystack handler built and unregistered | **Built** 18 Oct |
 | **7. Impersonation** | Request with a reason, customer approval, the viewer membership, the middleware read-only guard, the banner both sides see, the five-minute sweep, the history the customer can read | **Built** 18 Oct |

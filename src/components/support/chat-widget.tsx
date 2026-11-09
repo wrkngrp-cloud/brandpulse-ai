@@ -77,7 +77,7 @@ export function ChatWidget({ source = 'site', replyPromise = 'within 4 working h
       if (!res.ok) throw new Error('thread')
       setThread(await res.json())
     } catch {
-      setError('The chat is not reachable right now. Email hello@brandgauge.app and we will pick it up.')
+      setError('The chat is not reachable right now. Email support@brandgauge.app and we will pick it up.')
     }
   }, [source])
 
