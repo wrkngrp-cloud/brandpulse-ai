@@ -18,7 +18,8 @@
     "db:pending": "node scripts/apply-migrations.mjs",
     "db:apply": "node scripts/apply-migrations.mjs --apply",
     "desk:check": "node scripts/check-desk-access.mjs",
-    "desk:sql": "./scripts/check-desk-sql.sh"
+    "desk:sql": "./scripts/check-desk-sql.sh",
+    "support:eval": "tsx scripts/support-assistant-eval.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
@@ -71,6 +72,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }

@@ -6,6 +6,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
 import { supportInbox, inboxCounts, type InboxRow, type InboxCounts, type InboxView } from '@/lib/desk/data'
 import { z } from 'zod'
+import { findModelNames } from '@/lib/support/assistant/guard'
 
 export type ReplyState = { error?: string; ok?: boolean; warning?: string } | null
 
@@ -49,6 +50,18 @@ export async function replyToThread(_prev: ReplyState, formData: FormData): Prom
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
   const { conversation_id, body } = parsed.data
+
+  // Owner decision, 9 Nov 2026: no AI model or AI company is named in the
+  // support chat, by the assistant or by staff, under any condition. The words
+  // for it are "BrandGauge's AI model". Internal notes are between us and are
+  // not checked.
+  if (!parsed.data.internal) {
+    const named = findModelNames(body)
+    if (named.length) {
+      return { error: `Replies never name an AI model or company (${named.join(', ')}). Say "BrandGauge's AI model" instead.` }
+    }
+  }
+
   const service = await createServiceClient()
 
   const { data: conv } = await service

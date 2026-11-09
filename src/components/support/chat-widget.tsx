@@ -26,7 +26,7 @@ type Source = 'app' | 'site' | 'scoreboard' | 'tool'
 
 interface Message {
   id: string
-  author: 'customer' | 'staff' | 'system'
+  author: 'customer' | 'staff' | 'system' | 'assistant'
   authorName: string | null
   body: string
   attachments: { name: string; url: string | null; type: string }[]
@@ -193,7 +193,7 @@ export function ChatWidget({ source = 'site', replyPromise = 'within 4 working h
     }
   }
 
-  const unanswered = (thread?.messages ?? []).filter(m => m.author === 'staff').length
+  const unanswered = (thread?.messages ?? []).filter(m => m.author === 'staff' || m.author === 'assistant').length
 
   return (
     <>

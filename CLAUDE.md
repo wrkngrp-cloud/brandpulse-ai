@@ -82,7 +82,7 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
   exercise the half of the Desk that lives in SQL: `staff_can` precedence, RLS on
   the staff, telemetry and chat tables, the security-definer grants, and the
   support triggers. Needs a local postgres and nothing else, no Supabase project
-  and no credentials. 105 assertions. It fails the run when any of them regresses,
+  and no credentials. 115 assertions. It fails the run when any of them regresses,
   which is checked by breaking a policy on purpose rather than assumed.
 - `npm run metrics:check` — exercise `src/lib/social/post-metrics.ts` against
   mocked platform responses. Real calls cost X credit and burn Instagram's
@@ -90,6 +90,11 @@ This repo's `docs/` folder also holds supporting working docs that are **not** t
   `./scripts/check-post-metrics.sh` hits the live APIs: with no arguments it
   probes the credentials, and given post URLs or ids it reads them in one
   batched call and prints a paste-ready POST body. Both modes spend X credit.
+- `npm run support:eval` — run the support assistant's real decision code against
+  30 build-pack questions and the adversarial ones (prompt injection, model names,
+  prices, secrets, "are you a bot?"), and print a pass/fail table. Needs
+  `ANTHROPIC_API_KEY` and spends a little; `-- --offline` runs only the
+  deterministic paths and the guard, with no key and no network.
 There is no unit-test suite. Verify behaviour by type-check + lint + driving the actual
 flow (see Definition of done).
 
@@ -468,6 +473,25 @@ is the spec. Rules that are easy to break without noticing:
   its funnel bounced everyone to `/dashboard` from the day they shipped. Lead access is
   `leads.view` to read and `leads.edit` to work the pipeline, which `bizdev` holds. Do not
   reintroduce a second allowlist.
+
+## The support assistant (LD-20)
+A first-line replier in our own support chat, behind `SUPPORT_ASSISTANT_MODE`
+(`off` by default, then `suggest`, then `live`). Its spec is
+`docs/support-assistant/build-pack.md`, exported from the Claude Docs build pack;
+change the doc, then re-export, never the other way round. The logic is
+`src/lib/support/assistant/` (pure, shared with `npm run support:eval`) and the job
+is `src/lib/inngest/functions/support-assistant.ts`. Rules that are easy to break:
+- A person always wins. The job stands down on an assigned or closed thread, or when
+  a person posted in the last 30 minutes. `first_response_at` and `staffOnline()`
+  stay human-only.
+- No AI model, model family or AI company is ever named in the chat, by the assistant
+  or by staff, under any condition: it is "BrandGauge's AI model". The output guard
+  blocks it and `replyToThread` refuses a staff reply that names one.
+- It never claims to be human. A first "person or bot?" gets HUM-01, a pressed one
+  gets HUM-02 (an automated support assistant, then a handoff). Both are decided in
+  code, not by the model, so no prompt change can soften them.
+- Interest in BrandGauge or adopting it is Urgent, tagged `lead`, and emailed to
+  the bizdev role first. Reply targets live in `src/lib/support/reply-targets.ts`.
 
 ## Voice for any user-facing copy (hard rule)
 Warm, confident, plain English. Active voice. Connection before sales. No jargon. No em dashes.

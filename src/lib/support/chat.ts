@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { randomBytes, createHash } from 'node:crypto'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getActiveBrand } from '@/lib/active-brand'
+import { personaDisplayName } from '@/lib/support/assistant/config'
 
 /**
  * The support chat, server side.
@@ -23,7 +24,7 @@ const VISITOR_TTL_DAYS = 180
 
 export interface ChatMessage {
   id:        string
-  author:    'customer' | 'staff' | 'system'
+  author:    'customer' | 'staff' | 'system' | 'assistant'
   authorName: string | null
   body:      string
   attachments: { name: string; url: string | null; type: string }[]
@@ -257,10 +258,23 @@ export async function threadMessages(conversationId: string): Promise<ChatMessag
   // First name only. The customer is talking to a person, not to a directory.
   const names = new Map((people ?? []).map(p => [p.user_id, p.full_name.split(' ')[0]]))
 
+  // The support assistant shows as "<persona> from BrandGauge": one name per
+  // thread, never a staff row, so it never appears in the roster or presence.
+  const hasAssistant = (rows ?? []).some(r => r.author_type === 'assistant')
+  const { data: conv } = hasAssistant
+    ? await service.from('support_conversations').select('assistant_persona').eq('id', conversationId).maybeSingle()
+    : { data: null }
+  const assistantName = personaDisplayName(conv?.assistant_persona as string | null | undefined)
+
+  const authorName = (row: { author_type: string; author_id: string | null }) =>
+    row.author_type === 'staff' ? names.get(row.author_id ?? '') ?? 'BrandGauge'
+    : row.author_type === 'assistant' ? assistantName
+    : null
+
   return Promise.all((rows ?? []).map(async row => ({
     id:     row.id,
     author: row.author_type as ChatMessage['author'],
-    authorName: row.author_type === 'staff' ? names.get(row.author_id ?? '') ?? 'BrandGauge' : null,
+    authorName: authorName(row),
     body:   row.body,
     attachments: await signAttachments(row.attachments as AttachmentRow[]),
     createdAt: row.created_at,

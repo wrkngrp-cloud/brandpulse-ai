@@ -33,6 +33,7 @@ import { leadSignupMatch }            from '@/lib/inngest/functions/lead-signup-
 import { competitorWatchCheck }        from '@/lib/inngest/functions/competitor-watch-check'
 import { toolRunRetention }            from '@/lib/inngest/functions/tool-run-retention'
 import { mondayBriefScheduler, mondayBriefGenerate } from '@/lib/inngest/functions/monday-brief'
+import { supportAssistantReply, supportAssistantOverdue } from '@/lib/inngest/functions/support-assistant'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -61,5 +62,6 @@ export const { GET, POST, PUT } = serve({
     googleAdsDailySync,
     impersonationSweep,
     leadSignupMatch,
+    supportAssistantReply, supportAssistantOverdue,
   ],
 })

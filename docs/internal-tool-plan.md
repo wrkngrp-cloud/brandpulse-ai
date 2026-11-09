@@ -512,12 +512,25 @@ reachable. Same posture as the survey and ambassador routes.
   a Resend email if the thread has been quiet for 10 minutes or came from the site.
   Replies to that email come back into the thread through a Resend inbound webhook,
   signature verified, matched on a thread id in the reply-to address.
-- **Notifications.** A new customer message pings staff, by email now and Slack later. A
-  staff reply writes a `notifications` row so the bell lights up in the product.
-- **AI assist, Phase 5, not before.** `callAi` on the `structural` tier, reading our own
-  docs and the account's state, drafting a reply for a human to send. Suggest, never
-  auto-send, and no model name anywhere in the UI. An auto-answering bot on a product
-  people pay for to get real analysis is the wrong trade.
+- **Notifications.** A staff reply writes a `notifications` row so the bell lights up in
+  the product. Staff are emailed when the support assistant hands a case over, when the
+  customer chases it, and when it passes its reply target (`SUPPORT_NOTIFY_EMAIL`, plus
+  the bizdev role for leads). A ping on every new customer message is still not built.
+- **Support assistant (LD-20, owner decision 2026-11-08).** Replaces "AI assist,
+  suggest, never auto-send". Staged behind `SUPPORT_ASSISTANT_MODE`: `off` by default,
+  `suggest` first (a draft lands on the thread as an internal note headed "Suggested
+  reply", and the reply box offers "Use this"; a person still sends it), then `live` once
+  30 real questions pass review (the assistant posts as `author_type 'assistant'`, shown to
+  the customer as "<persona> from BrandGauge" and in the Desk with an "Assistant" label).
+  `callAi` on the `chat` tier, `feature: 'support.assistant'`, answering only from
+  `docs/support-assistant/build-pack.md`. A person always wins: the job stands down on an
+  assigned or closed thread, or when a person posted in the last 30 minutes. Handoffs write
+  the section 2.4 note, set priority, and notify staff by email (bizdev first for a lead,
+  plus `SUPPORT_NOTIFY_EMAIL`); a handed-off case past its reply target
+  (`src/lib/support/reply-targets.ts`: urgent 15, high 60, normal 90 working minutes, low
+  one working day) is marked overdue in the inbox and notified again. No model name
+  anywhere, in the UI or in the chat, by the assistant or by staff. The assistant never
+  claims to be a person (HUM-01, then HUM-02 when pressed).
 
 ### What this gives the Desk that a hosted tool cannot
 

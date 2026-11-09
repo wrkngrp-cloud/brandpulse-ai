@@ -209,6 +209,15 @@ export function InboxShell({
 
                   <p className="mt-0.5 line-clamp-1 text-xs text-tx-2">{row.preview}</p>
 
+                  {/* A case the support assistant handed over. Overdue is
+                      measured against the reply targets in working time. */}
+                  {row.handedOff && (
+                    <p className="mt-0.5 flex items-center gap-1.5 text-[0.7rem]">
+                      <span className="bg-label text-[0.6rem] text-tx-2">Handed off · {row.priority}</span>
+                      {row.overdue && <span className="bg-label text-[0.6rem] text-tx-flare">Overdue</span>}
+                    </p>
+                  )}
+
                   <p className="mt-0.5 truncate text-[0.7rem] text-tx-3">
                     {[
                       row.workspaceName ? `${row.workspaceName} · ${row.plan}` : 'No account yet',
