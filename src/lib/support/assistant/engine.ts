@@ -122,7 +122,7 @@ export function isTechQuestion(text: string): boolean {
 }
 
 /** Interest in BrandGauge or adopting it: always urgent, tagged lead, routed to the BDM. */
-const LEAD = /\b(demo|pricing|price|how much|cost|quote|onboard(ing)? (my|our|a) team|agency|enterprise|partnership|partner with|reseller|sign (us|my team) up|roll (it )?out|for (my|our) (company|team|clients)|annual plan|contract)\b/i
+const LEAD = /\b(demo|pricing|price|how much|cost|quote|discount|onboard(ing)? (my|our|a) team|agency|enterprise|partnership|partner with|reseller|sign (us|my team) up|roll (it )?out|for (my|our) (company|team|clients)|annual plan|contract)\b/i
 
 export function looksLikeLead(text: string): boolean {
   return LEAD.test(text)
@@ -433,7 +433,7 @@ export async function decideTurn(opts: {
   const macroId = model.macro_id && /^[A-Z]{3}-\d{2}$/.test(model.macro_id) ? model.macro_id : null
   const lead = macroId === 'HND-03'
     || model.tags.some(t => /^(lead|sales)$/i.test(t))
-    || (model.action === 'handoff' && looksLikeLead(latest))
+    || looksLikeLead(latest)
   const handoff = lead || model.action === 'handoff' || (macroId?.startsWith('HND-') && macroId !== 'HND-08')
   const priority = !handoff ? null
     : lead ? 'urgent'
