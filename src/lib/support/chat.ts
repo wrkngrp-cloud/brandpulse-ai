@@ -86,20 +86,17 @@ export async function staffOnline(): Promise<boolean> {
     const service = await createServiceClient()
     const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString()
 
-    const { data } = await service
-      .from('staff')
-      .select('user_id, role, status, last_seen_at')
-      .eq('status', 'active')
-      .gte('last_seen_at', cutoff)
+    // Independent of each other, so run together rather than one after the
+    // other: this query does not depend on who is actually online.
+    const [{ data }, { data: perms }] = await Promise.all([
+      service.from('staff').select('user_id, role, status, last_seen_at')
+        .eq('status', 'active').gte('last_seen_at', cutoff),
+      service.from('role_permissions').select('role').eq('permission', 'support.reply'),
+    ])
 
     if (!data?.length) return false
 
     const userIds = data.map(s => s.user_id)
-    const { data: perms } = await service
-      .from('role_permissions')
-      .select('role')
-      .eq('permission', 'support.reply')
-
     const replyRoles = new Set((perms ?? []).map(p => p.role))
     if (data.some(s => s.role === 'super_admin' || replyRoles.has(s.role))) return true
 
@@ -130,6 +127,7 @@ export async function getOrCreateThread(opts: {
   const { data: { user } } = await supabase.auth.getUser()
 
   let conversation: { id: string; status: string; email: string | null; name: string | null } | null = null
+  let isNew = false
 
   if (user) {
     const { data } = await service
@@ -192,17 +190,26 @@ export async function getOrCreateThread(opts: {
       .single()
 
     conversation = created
+    isNew = true
   }
 
   if (!conversation) throw new Error('Could not open a conversation')
+
+  // A brand-new conversation has no messages yet, so there is nothing to
+  // read; skip the round trip. The two independent reads below were
+  // previously sequential, which was most of this function's latency.
+  const [messages, online] = await Promise.all([
+    isNew ? Promise.resolve([]) : threadMessages(conversation.id),
+    staffOnline(),
+  ])
 
   return {
     id:     conversation.id,
     status: conversation.status as ChatThread['status'],
     email:  conversation.email,
     name:   conversation.name,
-    messages: await threadMessages(conversation.id),
-    staffOnline: await staffOnline(),
+    messages,
+    staffOnline: online,
   }
 }
 
