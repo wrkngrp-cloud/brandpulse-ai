@@ -48,7 +48,7 @@ export default async function InboxLayout({ children }: { children: React.ReactN
         }
       />
 
-      <InboxShell initialRows={rows} initialCounts={counts} initialView={view}>
+      <InboxShell initialRows={rows} initialCounts={counts} initialView={view} canDelete={session.can('support.delete')}>
         {children}
       </InboxShell>
     </div>

@@ -3,7 +3,7 @@ import { requireStaff } from '@/lib/desk/auth'
 import { deskThread } from '@/lib/desk/data'
 import { createServiceClient } from '@/lib/supabase/server'
 import { FileIcon } from '@/components/brand/icon'
-import { setThreadStatus, assignThread } from '../actions'
+import { setThreadStatus, assignThread, deleteConversation } from '../actions'
 import { ReplyBox } from './reply-box'
 import { ThreadLive } from './thread-live'
 import { cn } from '@/lib/utils'
@@ -100,6 +100,14 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
               </select>
               <button type="submit" className="bg-press rounded-md border border-line px-2 py-1 text-xs">
                 Save
+              </button>
+            </form>
+          )}
+          {thread.status === 'closed' && session.can('support.delete') && (
+            <form action={deleteConversation}>
+              <input type="hidden" name="conversation_id" value={thread.id} />
+              <button type="submit" className="bg-press rounded-md border border-line px-2.5 py-1 text-xs text-neg">
+                Delete
               </button>
             </form>
           )}

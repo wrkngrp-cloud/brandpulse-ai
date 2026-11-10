@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { sendMail, emailConfigured } from '@/lib/email/send'
 import { createServiceClient } from '@/lib/supabase/server'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
@@ -185,6 +186,39 @@ export async function assignThread(formData: FormData): Promise<void> {
   })
   revalidatePath(`/desk/inbox/${id}`)
   revalidatePath('/desk/inbox')
+}
+
+/**
+ * Erasing a conversation, so the inbox does not become a permanent stockpile.
+ *
+ * Closed only, checked here against the row itself rather than trusted from
+ * the form: a client is a cache, not a source of truth, and the whole point
+ * of this gate is that nothing live or waiting on a reply can be erased by a
+ * stale screen. support_messages cascades, so the thread's messages go with
+ * it; nothing else in the schema references a conversation in a way that
+ * would block the delete.
+ */
+export async function deleteConversation(formData: FormData): Promise<void> {
+  const session = await requireStaffOrNull('support.delete')
+  if (!session) return
+
+  const id = String(formData.get('conversation_id') ?? '')
+  if (!id) return
+
+  const service = await createServiceClient()
+  const { data: conversation } = await service
+    .from('support_conversations').select('status').eq('id', id).maybeSingle()
+  if (!conversation || conversation.status !== 'closed') return
+
+  await service.from('support_conversations').delete().eq('id', id)
+
+  await writeAudit({
+    actorId: session.userId, action: 'support.delete',
+    targetType: 'conversation', targetId: id,
+    summary: 'Deleted a closed conversation',
+  })
+  revalidatePath('/desk/inbox')
+  redirect('/desk/inbox')
 }
 
 /**
