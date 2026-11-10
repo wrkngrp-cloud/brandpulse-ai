@@ -1,13 +1,14 @@
 import { inngest } from '../client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { callAi } from '@/lib/ai/client'
-import { isWorkingTime, lagosDay, LIMITS, maxPriority, pickPersona, workingMsBetween, isPersona, type Priority } from '@/lib/support/assistant/config'
+import { isWorkingTime, lagosDay, LIMITS, maxPriority, pickPersona, personaDisplayName, workingMsBetween, isPersona, type Priority } from '@/lib/support/assistant/config'
 import { effectiveAssistantMode } from '@/lib/support/assistant/mode-db'
 import { decideTurn, typingDelayMs, type TurnMessage, type TurnContext } from '@/lib/support/assistant/engine'
 import { loadBuildPack } from '@/lib/support/assistant/knowledge'
 import { notifyStaff } from '@/lib/support/assistant/notify'
 import { isOverdue, targetMinutes } from '@/lib/support/reply-targets'
 import { SUGGESTION_HEADER, SUGGESTION_NOTES } from '@/lib/support/assistant/suggestion'
+import { emailReply } from '@/lib/support/customer-email'
 
 /**
  * The support assistant's reply job.
@@ -44,6 +45,9 @@ interface ConvRow {
   email: string | null
   name: string | null
   source: string
+  subject: string | null
+  inbound_address: string | null
+  last_message_at: string
   page_url: string | null
   assistant_persona: string | null
   assistant_state: string
@@ -59,7 +63,7 @@ interface ConvRow {
   tags: string[] | null
 }
 
-const CONV_COLUMNS = 'id, status, priority, assigned_to, user_id, workspace_id, brand_id, email, name, source, page_url, assistant_persona, assistant_state, assistant_handoff_at, assistant_reply_count, assistant_unhelpful_count, assistant_calls_day, assistant_calls_today, assistant_email_asked, assistant_name_asked, assistant_nudged_at, assistant_chased_at, tags'
+const CONV_COLUMNS = 'id, status, priority, assigned_to, user_id, workspace_id, brand_id, email, name, source, subject, inbound_address, last_message_at, page_url, assistant_persona, assistant_state, assistant_handoff_at, assistant_reply_count, assistant_unhelpful_count, assistant_calls_day, assistant_calls_today, assistant_email_asked, assistant_name_asked, assistant_nudged_at, assistant_chased_at, tags'
 
 const VALID_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
@@ -216,8 +220,11 @@ export const supportAssistantReply = inngest.createFunction(
 
     // A short, length-based pause before a live reply. There is no typing
     // indicator to show (none exists in the widget, and a visitor's widget
-    // polls rather than listening on Realtime), so the pause is the whole of it.
-    if (mode === 'live') await step.sleep('typing', typingDelayMs(decision.reply))
+    // polls rather than listening on Realtime), so the pause is the whole of
+    // it — and it is only for the widget's sake. An email-origin conversation
+    // has nobody watching a chat panel; simulating "typing" before an email
+    // only adds latency to a reply the customer is waiting on in their inbox.
+    if (mode === 'live' && conv.source !== 'email') await step.sleep('typing', typingDelayMs(decision.reply))
 
     // ── Write ────────────────────────────────────────────────────────────────
     const applied = await step.run('apply', async () => {
@@ -276,6 +283,15 @@ export const supportAssistantReply = inngest.createFunction(
         conversation_id: conversationId, author_type: 'assistant', author_id: null, body: reply,
       })
       if (error) throw new Error(`could not post the assistant reply: ${error.message}`)
+
+      // An email-origin conversation has no widget to show this reply in, so
+      // the bot's answer needs to go out the same way a staff reply does.
+      // Nothing to do for a widget conversation — the customer sees it live.
+      try {
+        await emailReply(fresh.conv, reply, personaDisplayName(persona))
+      } catch (err) {
+        console.error('[support-assistant] could not email the reply:', err)
+      }
 
       const tags = [...new Set([...(fresh.conv.tags ?? []), ...decision.tags])]
       Object.assign(update, {
@@ -336,7 +352,12 @@ export const supportAssistantReply = inngest.createFunction(
     if (applied.posted === false) return { mode, ...applied }
 
     // ── SIL-01: one check-in after ten quiet minutes following a step ────────
+    // "Are you still there?" is a live-chat idea — nobody is "there" on an
+    // email thread to check in on, and the nudge is never emailed, so on an
+    // email-origin conversation it would just post into a thread nobody is
+    // watching.
     const nudgeable = mode === 'live'
+      && conv.source !== 'email'
       && decision.action === 'none'
       && conv.assistant_state !== 'handed_off'
       && !conv.assistant_nudged_at

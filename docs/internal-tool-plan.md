@@ -508,18 +508,29 @@ reachable. Same posture as the survey and ambassador routes.
   and never trusts a path supplied by the client. Reads are 60-second signed URLs minted
   per view. The bucket is private, in contrast to the two existing public buckets, because
   a support screenshot can contain anything.
-- **Email fallback.** Staff reply lands as an in-app message if they are signed in, and as
-  a Resend email if the thread has been quiet for 10 minutes or came from the site.
-  Replies to that email, and any fresh email to support@ or hello@brandgauge.app, come
-  back into the thread through `/api/support/inbound`: Resend's domain-level Receiving
-  webhook (`email.received`, catch-all across brandgauge.app once its MX is live, not the
-  separate per-address Inboxes product), signature verified, matched to a conversation by
-  the sender's address rather than a reply-to trick. An allowlist in the route is what
-  keeps the two addresses feeding the one Desk inbox rather than every stray address on
-  the domain creating a conversation. privacy@brandgauge.app can receive too, now that
-  Receiving is on for the whole domain, but is deliberately left out of that allowlist:
-  whether NDPR correspondence belongs in the same queue support staff read is a decision
-  for the owner, not a default.
+- **Email fallback.** A staff or assistant reply lands as an in-app message if the customer
+  is in the widget; `src/lib/support/customer-email.ts` decides whether it also needs to
+  go out by email, the one rule used by both the staff reply action and the assistant's
+  live reply. An email-origin conversation is always emailed back — there is no widget for
+  that customer to see a reply in — everything else only once the customer has gone quiet
+  for 10 minutes. The reply goes out from whichever address they actually wrote to
+  (`inbound_address`), carries `In-Reply-To`/`References` off their message's RFC id so it
+  threads in their own mail client, and defaults to support@ for a widget-origin thread.
+  A fresh email to support@ or hello@brandgauge.app comes back into the thread through
+  `/api/support/inbound`: Resend's domain-level Receiving webhook (`email.received`,
+  catch-all across brandgauge.app once its MX is live, not the separate per-address
+  Inboxes product), signature verified. An allowlist in the route is what keeps the two
+  addresses feeding the Desk inbox rather than every stray address on the domain creating
+  a conversation. Matching is scoped to a prior email-origin conversation from the same
+  address only — a signed-in customer's in-app chat and their email stay two separate
+  threads, each labelled by source, never silently merged. A new email-origin conversation
+  is still stamped with that customer's `workspace_id` (resolved by address, never
+  `user_id`, which is what the widget keys on — setting it would pull the email thread
+  into their next in-app chat), so it shows up on the Desk's Accounts page beside their
+  other conversations without merging into any of them. privacy@brandgauge.app can receive
+  too, now that Receiving is on for the whole domain, but is deliberately left out of the
+  allowlist: whether NDPR correspondence belongs in the same queue support staff read is a
+  decision for the owner, not a default.
 - **Notifications.** A staff reply writes a `notifications` row so the bell lights up in
   the product. Staff are emailed when the support assistant hands a case over, when the
   customer chases it, and when it passes its reply target (`SUPPORT_NOTIFY_EMAIL`, plus

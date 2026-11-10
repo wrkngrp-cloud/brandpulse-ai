@@ -20,13 +20,22 @@ export const runtime = 'nodejs'
  * support staff can read is a decision someone should make on purpose, not
  * one this file should make by defaulting it in.
  *
- * A customer is matched by their From address against support_conversations,
- * the same table a signed-in customer's chat thread lives in, so a reply from
- * someone who has also used the widget lands in their existing thread rather
- * than a second one. Nobody has a visitor cookie or a session here, so the
- * table's NOT NULL constraint (visitor_token or user_id) is satisfied with a
- * random token that is never set as a cookie — it only has to exist, it is
- * never read back.
+ * A customer is matched by their From address against a PRIOR EMAIL-origin
+ * conversation only (same address, same channel) — never against a chat
+ * widget thread from the same person. Channels stay separate threads on
+ * purpose: a signed-in customer's in-app chat and their email are two
+ * different conversations in /desk/inbox, each labelled by source, so staff
+ * know which one they are answering. They still show up together for a known
+ * customer: if the From address matches a signed-in user, the new
+ * conversation is stamped with that user's workspace_id (never their
+ * user_id — that is what the widget keys on to find "your" thread, and
+ * setting it here would pull this email thread into the widget on their next
+ * visit), which is enough for the Desk's Accounts page to list it alongside
+ * their other conversations without merging anything.
+ *
+ * Nobody has a visitor cookie or a session here, so the table's NOT NULL
+ * constraint (visitor_token or user_id) is satisfied with a random token that
+ * is never set as a cookie — it only has to exist, it is never read back.
  */
 
 const EVENT_TYPE = 'email.received'
@@ -95,18 +104,24 @@ interface ReceivedEmail {
   from: string
   to: string[]
   subject: string | null
+  message_id: string | null
   text: string | null
   html: string | null
   attachments: { filename: string }[]
 }
 
 /** The webhook carries only metadata; the body is a separate fetch by design (Resend's own note: keeps the webhook body small for serverless limits). */
-async function fetchEmailBody(emailId: string): Promise<ReceivedEmail | null> {
+async function fetchEmailBody(emailId: string): Promise<{ email: ReceivedEmail } | { error: string }> {
   const res = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
     headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` },
   })
-  if (!res.ok) return null
-  return res.json()
+  if (!res.ok) {
+    // Surfaced in the 502 body below, which is what the Resend delivery log
+    // shows — the fastest way to see why without a Vercel log lookup. A
+    // restricted_api_key here means the key only has sending access.
+    return { error: `Resend ${res.status}: ${(await res.text()).slice(0, 300)}` }
+  }
+  return { email: await res.json() }
 }
 
 export async function POST(req: NextRequest) {
@@ -140,13 +155,15 @@ export async function POST(req: NextRequest) {
     .from('support_messages').select('id').eq('email_message_id', emailId).maybeSingle()
   if (dupe) return NextResponse.json({ received: true })
 
-  const email = await fetchEmailBody(emailId)
-  if (!email) {
+  const fetched = await fetchEmailBody(emailId)
+  if ('error' in fetched) {
     // Resend will retry a non-2xx. A transient failure to read our own
     // message back is worth retrying; a malformed payload is not, and never
     // gets this far.
-    return NextResponse.json({ error: 'Could not fetch the message body' }, { status: 502 })
+    console.error('[support-inbound] could not fetch the message body:', fetched.error)
+    return NextResponse.json({ error: fetched.error }, { status: 502 })
   }
+  const { email } = fetched
 
   const { email: fromAddress, name } = splitFrom(email.from)
   const attachmentNote = email.attachments?.length
@@ -158,12 +175,32 @@ export async function POST(req: NextRequest) {
     .from('support_conversations')
     .select('id')
     .eq('email', fromAddress)
+    .eq('source', 'email')
     .order('last_message_at', { ascending: false })
     .limit(1)
     .maybeSingle()
 
   let conversationId = existing?.id as string | undefined
   if (!conversationId) {
+    // Best-effort link to an existing account, for the Accounts page only —
+    // see the block comment above for why this is workspace_id and never
+    // user_id. A workspace with more than one brand is left unattributed
+    // rather than guessed at.
+    let workspaceId: string | null = null
+    let brandId: string | null = null
+    const { data: userId } = await service.rpc('auth_user_id_for_email', { p_email: fromAddress })
+    if (userId) {
+      const { data: membership } = await service
+        .from('workspace_members').select('workspace_id')
+        .eq('user_id', userId).limit(1).maybeSingle()
+      workspaceId = membership?.workspace_id ?? null
+      if (workspaceId) {
+        const { data: brands } = await service
+          .from('brands').select('id').eq('workspace_id', workspaceId).limit(2)
+        if (brands?.length === 1) brandId = brands[0].id
+      }
+    }
+
     const { data: created, error: createErr } = await service
       .from('support_conversations')
       .insert({
@@ -173,6 +210,8 @@ export async function POST(req: NextRequest) {
         subject:         email.subject,
         source:          'email',
         inbound_address: toAddress,
+        workspace_id:    workspaceId,
+        brand_id:        brandId,
       })
       .select('id')
       .single()
@@ -187,7 +226,8 @@ export async function POST(req: NextRequest) {
     conversation_id: conversationId,
     author_type:     'customer',
     body,
-    email_message_id: emailId,
+    email_message_id:     emailId,
+    email_rfc_message_id: email.message_id,
   })
   if (msgErr) {
     console.error('[support-inbound] could not post the message:', msgErr)

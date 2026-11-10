@@ -2,12 +2,12 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { sendMail, emailConfigured } from '@/lib/email/send'
 import { createServiceClient } from '@/lib/supabase/server'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
 import { supportInbox, inboxCounts, type InboxRow, type InboxCounts, type InboxView } from '@/lib/desk/data'
 import { z } from 'zod'
 import { findModelNames } from '@/lib/support/assistant/guard'
+import { emailReply } from '@/lib/support/customer-email'
 
 export type ReplyState = { error?: string; ok?: boolean; warning?: string } | null
 
@@ -65,7 +65,7 @@ export async function replyToThread(_prev: ReplyState, formData: FormData): Prom
 
   const { data: conv } = await service
     .from('support_conversations')
-    .select('id, email, name, user_id, brand_id, source, last_message_at')
+    .select('id, email, name, user_id, brand_id, source, subject, inbound_address, last_message_at')
     .eq('id', conversation_id)
     .maybeSingle()
   if (!conv) return { error: 'That conversation no longer exists.' }
@@ -109,33 +109,13 @@ export async function replyToThread(_prev: ReplyState, formData: FormData): Prom
     }
   }
 
-  // And an email, unless they were writing to us a moment ago, in which case
-  // they are still in the widget and an email is noise.
-  const activeRecently = conv.last_message_at
-    && Date.now() - new Date(conv.last_message_at).getTime() < 10 * 60 * 1000
-
-  let emailed: boolean | null = null
-  if (conv.email && !activeRecently && emailConfigured()) {
-    const mail = await sendMail({
-      from:     'BrandGauge <support@brandgauge.app>',
-      to:       conv.email,
-      subject:  'Re: your message to BrandGauge',
-      replyTo:  'support@brandgauge.app',
-      text:
-`${conv.name ? `Hi ${conv.name.split(' ')[0]},` : 'Hi,'}
-
-${body}
-
-Just reply to this email, or open the chat on BrandGauge — either way we'll see it.
-
-${session.fullName}
-BrandGauge`,
-    })
-    // The reply is in the thread either way, so a refused email does not fail
-    // the action. It is reported back so the person who wrote it knows the
-    // customer may not have seen it in their inbox.
-    emailed = mail.sent
-  }
+  // And an email, when they would not otherwise see this reply at all (an
+  // email-origin conversation, always) or have gone quiet in the widget.
+  const mail = await emailReply(conv, body, session.fullName)
+  // The reply is in the thread either way, so a refused email does not fail
+  // the action. It is reported back so the person who wrote it knows the
+  // customer may not have seen it in their inbox.
+  const emailed = mail ? mail.sent : null
 
   revalidatePath(`/desk/inbox/${conversation_id}`)
   revalidatePath('/desk/inbox')
