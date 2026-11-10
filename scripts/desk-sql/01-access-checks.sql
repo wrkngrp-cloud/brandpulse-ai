@@ -802,3 +802,41 @@ select 'a customer cannot see another thread''s assistant replies',
        (select count(*)::text from support_messages where conversation_id = 'dddddddd-0000-0000-0000-000000000009'),
        '0';
 reset role;
+
+\echo '── the assistant settings override (20261109160000)'
+-- aaaaaaaa-0000-0000-0000-000000000001 is Ada, role support: holds
+-- support.view but not support.manage_assistant. A USING clause filters rows
+-- silently rather than raising, so this is a row-count/value check, the same
+-- shape as the subscriptions checks above, not pg_temp.attempt().
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000001';
+select 'support can read the assistant mode (support.view)' as check,
+       (select count(*)::text from support_assistant_settings where id = 1), '1' as want;
+
+do $$
+begin
+  update support_assistant_settings set mode = 'live' where id = 1;
+  if (select mode from support_assistant_settings where id = 1) = 'live' then
+    raise notice 'FAIL: support changed the assistant mode without support.manage_assistant';
+  else
+    raise notice 'ok: support could not change the assistant mode';
+  end if;
+end $$;
+reset role;
+
+-- aaaaaaaa-0000-0000-0000-000000000002 is The Boss, role super_admin: holds
+-- everything, including support.manage_assistant.
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000002';
+update support_assistant_settings set mode = 'suggest' where id = 1;
+select 'super_admin can change the assistant mode' as check,
+       (select mode from support_assistant_settings where id = 1), 'suggest' as want;
+reset role;
+
+-- A customer (not staff at all) holds no support.* key, so support.view
+-- itself refuses them, the same way it refuses the subscriptions table above.
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select 'a customer (not staff) cannot read the assistant mode' as check,
+       (select count(*)::text from support_assistant_settings where id = 1), '0' as want;
+reset role;
