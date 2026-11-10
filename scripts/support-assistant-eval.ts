@@ -43,6 +43,7 @@ const record = (id: string, check: string, ok: boolean, detail = '') => rows.pus
 function ctxFor(over: Partial<TurnContext> = {}): TurnContext {
   return {
     persona: PERSONA, mode: 'live', signedIn: true, customerName: 'Tolu', hasEmail: true, emailAsked: false,
+    hasName: true, nameAsked: false,
     handedOff: false, handoffAt: null, priority: 'normal', replyCount: 0, unhelpfulCount: 0, callsToday: 0,
     packet: { source: 'app', page_url: '/dashboard', email: 'tolu@example.com', workspace: 'Tolu Foods', plan: 'beta', brand: 'Tolu Foods', brand_type: 'fmcg', bhi: 54 },
     workingHoursNow: true, workingMsSinceHandoff: 0, workingMsSinceChase: null,
@@ -225,18 +226,35 @@ async function offlineFlows() {
   const pnd = await decideTurn({
     pack, ctx: ctxFor({ handedOff: true, workingMsSinceHandoff: 10 * 60_000 }),
     thread: [cust('one more detail: it is the Lagos page')], pending: [cust('one more detail: it is the Lagos page')],
-    complete: async () => JSON.stringify({ reply: 'Let me troubleshoot that for you.', macro_id: 'HLD-01', action: 'none', priority: null, tags: [], handoff_note: null, wants_email: false }),
+    complete: async () => JSON.stringify({ reply: 'Let me troubleshoot that for you.', macro_id: 'HLD-01', action: 'none', priority: null, tags: [], handoff_note: null, captured_name: null }),
   })
   record('F06', 'while handed off, only PND replies go out', pnd.macroId?.startsWith('PND-') === true, pnd.macroId ?? '')
 
   const vendor = await decideTurn({
     pack, ctx: ctxFor(), thread: [cust('how do I connect X?')], pending: [cust('how do I connect X?')],
-    complete: async () => JSON.stringify({ reply: 'Claude here! Go to Connectors.', macro_id: null, action: 'none', priority: null, tags: [], handoff_note: null, wants_email: false }),
+    complete: async () => JSON.stringify({ reply: 'Claude here! Go to Connectors.', macro_id: null, action: 'none', priority: null, tags: [], handoff_note: null, captured_name: null }),
   })
   record('F07', 'a reply naming a vendor twice is never sent; it hands off', vendor.action === 'handoff' && !findModelNames(vendor.reply).length)
 
   const suggest = await decideTurn({ pack, ctx: ctxFor({ mode: 'suggest', persona: null }), thread: [cust('are you a bot?')], pending: [cust('are you a bot?')], complete: garbage })
   record('F08', 'suggest mode: no deterministic HUM-01 (a person sends the reply)', suggest.macroId !== 'HUM-01')
+
+  const anonCtx = { signedIn: false, hasEmail: false, hasName: false, emailAsked: false, nameAsked: false }
+  const firstReply = await decideTurn({
+    pack, ctx: ctxFor(anonCtx),
+    thread: [cust('how do I connect Instagram?')], pending: [cust('how do I connect Instagram?')],
+    complete: async () => JSON.stringify({ reply: 'Go to Connectors, then Instagram, then Connect.', macro_id: null, action: 'none', priority: null, tags: [], handoff_note: null, captured_name: null }),
+  })
+  record('F09', 'first reply to an anonymous visitor appends HND-10 (name and email)',
+    firstReply.contactMacro === 'HND-10' && firstReply.wantsEmail && firstReply.wantsName, `${firstReply.contactMacro}`)
+
+  const secretFirst = await decideTurn({
+    pack, ctx: ctxFor(anonCtx),
+    thread: [cust(`here is my key: ${FAKE_KEY}`)], pending: [cust(`here is my key: ${FAKE_KEY}`)],
+    complete: garbage,
+  })
+  record('F10', 'HND-07 (pasted secret) never gets a contact-ask appended, even on a first reply',
+    secretFirst.macroId === 'HND-07' && secretFirst.contactMacro === null && !secretFirst.wantsEmail && !secretFirst.wantsName)
 }
 
 async function runCase(c: Case, complete: Complete) {

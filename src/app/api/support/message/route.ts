@@ -5,7 +5,7 @@ import { resolveThreadId, threadMessages, hashIp } from '@/lib/support/chat'
 import { verifyAttachment } from '@/lib/support/attachments'
 import { withinLimit } from '@/lib/support/limits'
 import { inngest } from '@/lib/inngest/client'
-import { assistantMode } from '@/lib/support/assistant/config'
+import { effectiveAssistantMode } from '@/lib/support/assistant/mode-db'
 
 export const runtime = 'nodejs'
 
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
   // The support assistant answers in the background (Inngest, debounced per
   // conversation). In off mode nothing is sent and the chat behaves exactly as
   // before. A failed send never fails the customer's message.
-  if (assistantMode() !== 'off') {
+  if (await effectiveAssistantMode() !== 'off') {
     try {
       await inngest.send({ name: 'support/message.received', data: { conversationId } })
     } catch (err) {

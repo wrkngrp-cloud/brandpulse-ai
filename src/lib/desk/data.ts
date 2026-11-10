@@ -333,10 +333,13 @@ export interface InboxRow {
   handedOff:     boolean
   /** Handed off and past its reply target (src/lib/support/reply-targets.ts). */
   overdue:       boolean
+  /** The assistant is the one on this thread right now: unassigned, not handed off, open or pending. */
+  assistantActive:  boolean
+  assistantPersona: string | null
 }
 
 /** The named queues down the side of the inbox. */
-export type InboxView = 'unassigned' | 'mine' | 'open' | 'snoozed' | 'closed' | 'all'
+export type InboxView = 'unassigned' | 'mine' | 'open' | 'snoozed' | 'closed' | 'all' | 'assistant'
 
 export interface InboxCounts {
   unassigned: number
@@ -344,6 +347,7 @@ export interface InboxCounts {
   open:       number
   snoozed:    number
   closed:     number
+  assistant:  number
 }
 
 /**
@@ -364,7 +368,7 @@ export async function supportInbox(
     .select(`
       id, name, email, subject, status, source, page_url, assigned_to,
       first_response_at, last_message_at, created_at,
-      priority, assistant_state, assistant_handoff_at,
+      priority, assistant_state, assistant_handoff_at, assistant_persona,
       workspaces ( name, plan ),
       brands ( brand_type )
     `)
@@ -410,6 +414,8 @@ export async function supportInbox(
     // over is waiting on us until a person answers, whoever wrote last.
     const handedOff = row.assistant_state === 'handed_off' && row.status !== 'closed'
     const waiting   = last?.author_type === 'customer' || handedOff
+    const assistantActive = row.assistant_state === 'active' && !row.assigned_to
+      && (row.status === 'open' || row.status === 'pending')
 
     return {
       id:      row.id,
@@ -433,6 +439,8 @@ export async function supportInbox(
       priority:      row.priority ?? 'normal',
       handedOff,
       overdue:       handedOff && isOverdue(row.priority, row.assistant_handoff_at),
+      assistantActive,
+      assistantPersona: row.assistant_persona ?? null,
       firstResponseMins: row.first_response_at
         ? Math.max(0, Math.round(
             (new Date(row.first_response_at).getTime() - new Date(row.created_at).getTime()) / 60000,
@@ -463,6 +471,7 @@ function applyView(query: any, view: InboxView, userId: string) {
     case 'mine':       return query.in('status', ['open', 'pending']).eq('assigned_to', userId)
     case 'snoozed':    return query.eq('status', 'snoozed')
     case 'closed':     return query.eq('status', 'closed')
+    case 'assistant':  return query.in('status', ['open', 'pending']).is('assigned_to', null).eq('assistant_state', 'active')
     case 'all':        return query
     case 'open':
     default:           return query.in('status', ['open', 'pending'])
@@ -483,8 +492,8 @@ export async function inboxCounts(session: StaffSession): Promise<InboxCounts> {
       view, session.userId,
     )
 
-  const [unassigned, mine, open, snoozed, closed] = await Promise.all([
-    count('unassigned'), count('mine'), count('open'), count('snoozed'), count('closed'),
+  const [unassigned, mine, open, snoozed, closed, assistant] = await Promise.all([
+    count('unassigned'), count('mine'), count('open'), count('snoozed'), count('closed'), count('assistant'),
   ])
 
   return {
@@ -493,6 +502,7 @@ export async function inboxCounts(session: StaffSession): Promise<InboxCounts> {
     open:       open.count ?? 0,
     snoozed:    snoozed.count ?? 0,
     closed:     closed.count ?? 0,
+    assistant:  assistant.count ?? 0,
   }
 }
 

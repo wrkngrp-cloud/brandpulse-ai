@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils'
 
 const VIEWS: { key: InboxView; label: string; countKey?: keyof InboxCounts }[] = [
   { key: 'unassigned', label: 'Unassigned', countKey: 'unassigned' },
+  { key: 'assistant',  label: 'Bot working', countKey: 'assistant' },
   { key: 'mine',       label: 'Mine',       countKey: 'mine' },
   { key: 'open',       label: 'Open',       countKey: 'open' },
   { key: 'snoozed',    label: 'Snoozed',    countKey: 'snoozed' },
@@ -211,12 +212,18 @@ export function InboxShell({
 
                   {/* A case the support assistant handed over. Overdue is
                       measured against the reply targets in working time. */}
-                  {row.handedOff && (
+                  {row.handedOff ? (
                     <p className="mt-0.5 flex items-center gap-1.5 text-[0.7rem]">
                       <span className="bg-label text-[0.6rem] text-tx-2">Handed off · {row.priority}</span>
                       {row.overdue && <span className="bg-label text-[0.6rem] text-tx-flare">Overdue</span>}
                     </p>
-                  )}
+                  ) : row.assistantActive ? (
+                    <p className="mt-0.5 flex items-center gap-1.5 text-[0.7rem]">
+                      <span className="bg-label text-[0.6rem] text-tx-2">
+                        Bot replying{row.assistantPersona ? ` · ${row.assistantPersona}` : ''}
+                      </span>
+                    </p>
+                  ) : null}
 
                   <p className="mt-0.5 truncate text-[0.7rem] text-tx-3">
                     {[
