@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSelectedLayoutSegment } from 'next/navigation'
 import { DeskLink, useDeskRouter } from '@/components/desk/desk-link'
 import { createClient } from '@/lib/supabase/client'
-import { loadInbox } from './actions'
+import { loadInbox, deleteConversation } from './actions'
 import type { InboxRow, InboxCounts, InboxView } from '@/lib/desk/data'
 import { cn } from '@/lib/utils'
 
@@ -50,11 +50,13 @@ function ago(iso: string): string {
 }
 
 export function InboxShell({
-  initialRows, initialCounts, initialView, children,
+  initialRows, initialCounts, initialView, canDelete, children,
 }: {
   initialRows:   InboxRow[]
   initialCounts: InboxCounts
   initialView:   InboxView
+  /** support.delete: admin and super_admin only. Closed conversations only, checked again server-side. */
+  canDelete:     boolean
   children:      React.ReactNode
 }) {
   const router = useDeskRouter()
@@ -184,12 +186,13 @@ export function InboxShell({
         ) : (
           <ul ref={listRef} className="min-h-0 flex-1 divide-y divide-line overflow-y-auto">
             {rows.map((row, index) => (
-              <li key={row.id}>
+              <li key={row.id} className="relative">
                 <DeskLink
                   href={`/desk/inbox/${row.id}`}
                   onClick={() => setCursor(index)}
                   className={cn(
                     'bg-press block px-3 py-2.5',
+                    row.status === 'closed' && canDelete && 'pr-14',
                     openId === row.id && 'bg-shell',
                     cursor === index && openId !== row.id && 'bg-shell/60',
                   )}
@@ -233,6 +236,14 @@ export function InboxShell({
                     ].filter(Boolean).join(' · ')}
                   </p>
                 </DeskLink>
+                {row.status === 'closed' && canDelete && (
+                  <form action={deleteConversation} className="absolute right-2 top-2.5">
+                    <input type="hidden" name="conversation_id" value={row.id} />
+                    <button type="submit" className="bg-press rounded-sm border border-line bg-paper px-1.5 py-0.5 text-[0.65rem] text-neg">
+                      Delete
+                    </button>
+                  </form>
+                )}
               </li>
             ))}
           </ul>
