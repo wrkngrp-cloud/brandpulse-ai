@@ -20,14 +20,23 @@ export const runtime = 'nodejs'
  * support staff can read is a decision someone should make on purpose, not
  * one this file should make by defaulting it in.
  *
- * A customer is matched by their From address against a PRIOR EMAIL-origin
- * conversation only (same address, same channel) — never against a chat
- * widget thread from the same person. Channels stay separate threads on
- * purpose: a signed-in customer's in-app chat and their email are two
- * different conversations in /desk/inbox, each labelled by source, so staff
- * know which one they are answering. They still show up together for a known
- * customer: if the From address matches a signed-in user, the new
- * conversation is stamped with that user's workspace_id (never their
+ * A customer is matched by their From address against a prior conversation in
+ * the same POOL only — never across pools, and never against a chat widget
+ * thread from the same person. Two pools exist:
+ *
+ *   * the shared support pool (support@, hello@) — both feed the one Desk
+ *     inbox, and a reply from the same person on either address threads
+ *     together, because that merge was the point (staff/support#hello.md).
+ *   * a personal pool, one per row in staff_mailboxes — grillo@ doing cold
+ *     outreach needs his replies kept apart from anything support@ or hello@
+ *     ever saw from the same external address, since they are a different
+ *     kind of conversation (sales, not a ticket), worked from /desk/mail, not
+ *     /desk/inbox, and never touched by the assistant.
+ *
+ * Channels stay separate threads too: a signed-in customer's in-app chat and
+ * their email are two different conversations, each labelled by source, so
+ * staff know which one they are answering. A known customer's new email
+ * conversation is still stamped with their workspace_id (never their
  * user_id — that is what the widget keys on to find "your" thread, and
  * setting it here would pull this email thread into the widget on their next
  * visit), which is enough for the Desk's Accounts page to list it alongside
@@ -39,7 +48,19 @@ export const runtime = 'nodejs'
  */
 
 const EVENT_TYPE = 'email.received'
-const INBOUND_ADDRESSES = new Set(['support@brandgauge.app', 'hello@brandgauge.app'])
+const SUPPORT_POOL = ['support@brandgauge.app', 'hello@brandgauge.app']
+
+/** Which addresses a reply to `toAddress` should be matched against. Null if
+ *  `toAddress` is neither the support pool nor anyone's personal mailbox —
+ *  the signal to ignore the email entirely. */
+async function resolvePool(
+  service: Awaited<ReturnType<typeof createServiceClient>>, toAddress: string,
+): Promise<string[] | null> {
+  if (SUPPORT_POOL.includes(toAddress)) return SUPPORT_POOL
+  const { data } = await service
+    .from('staff_mailboxes').select('address').eq('address', toAddress).maybeSingle()
+  return data ? [data.address] : null
+}
 
 /**
  * Resend signs this webhook the same way Svix does, because that is what
@@ -141,13 +162,22 @@ export async function POST(req: NextRequest) {
 
   const data    = event.data ?? {}
   const emailId = data.email_id as string | undefined
-  const to      = (data.to as string[] | undefined) ?? []
+  const to      = (data.to as string[] | undefined)?.map(a => a.toLowerCase()) ?? []
   if (!emailId) return NextResponse.json({ received: true })
 
-  const toAddress = to.map(a => a.toLowerCase()).find(a => INBOUND_ADDRESSES.has(a))
-  if (!toAddress) return NextResponse.json({ received: true })
-
   const service = await createServiceClient()
+
+  // Whichever of our addresses the pool matches on is the one it actually
+  // arrived at — needed as toAddress below even though the match itself runs
+  // against the whole pool.
+  let toAddress: string | undefined
+  let pool: string[] | null = null
+  for (const candidate of to) {
+    pool = await resolvePool(service, candidate)
+    if (pool) { toAddress = candidate; break }
+  }
+  if (!toAddress || !pool) return NextResponse.json({ received: true })
+  const isPersonal = !SUPPORT_POOL.includes(toAddress)
 
   // A retried delivery must not double-post. Checked before the API round
   // trip to Resend, so a repeat delivery costs nothing extra.
@@ -176,6 +206,7 @@ export async function POST(req: NextRequest) {
     .select('id')
     .eq('email', fromAddress)
     .eq('source', 'email')
+    .in('inbound_address', pool)
     .order('last_message_at', { ascending: false })
     .limit(1)
     .maybeSingle()
@@ -236,8 +267,10 @@ export async function POST(req: NextRequest) {
 
   // Same path as a chat message: the assistant decides whether to answer or
   // hand off, and a handoff is what pings staff. A failed send never loses
-  // the email itself, which is already safely in the thread.
-  if (await effectiveAssistantMode() !== 'off') {
+  // the email itself, which is already safely in the thread. Never for a
+  // personal mailbox — cold outreach is a human conversation, and the
+  // assistant has no business drafting a reply to someone's own prospect.
+  if (!isPersonal && await effectiveAssistantMode() !== 'off') {
     try {
       await inngest.send({ name: 'support/message.received', data: { conversationId } })
     } catch (err) {

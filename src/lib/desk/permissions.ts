@@ -44,6 +44,12 @@ export const PERMISSION_GROUPS = [
     ],
   },
   {
+    module: 'Mail',
+    keys: [
+      ['mail.use', 'Use a personal @brandgauge.app mailbox for one-to-one outreach'],
+    ],
+  },
+  {
     module: 'Usage',
     keys: [['usage.view', 'See usage against plan limits']],
   },
