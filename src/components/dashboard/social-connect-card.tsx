@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
-import { CheckIcon as CheckCircle2, RefreshIcon as RefreshCw } from '@/components/brand/icon'
+import { CheckIcon as CheckCircle2, RefreshIcon as RefreshCw, WifiOffIcon as Unplug } from '@/components/brand/icon'
 import { AlertIcon as AlertCircle } from '@/components/brand/icon'
 
 function IgIcon({ className }: { className?: string }) {
@@ -39,8 +41,25 @@ const PLATFORM_META = {
   twitter: { label: 'X (Twitter)', Icon: XIcon, colour: 'text-tx-2' },
 } as const
 
-export function SocialConnectCard({ connections }: { connections: ConnectionStatus[] }) {
+export function SocialConnectCard({ connections: initialConnections }: { connections: ConnectionStatus[] }) {
   const platforms = ['instagram', 'facebook', 'twitter'] as const
+  const [connections, setConnections] = useState(initialConnections)
+  const [disconnecting, setDisconnecting] = useState<string | null>(null)
+
+  async function handleDisconnect(platform: string, label: string) {
+    setDisconnecting(platform)
+    try {
+      const res  = await fetch(`/api/social/disconnect/${platform}`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) { toast.error(data.error ?? `Couldn't disconnect ${label}. Try again.`); return }
+      toast.success(`${label} disconnected`)
+      setConnections(prev => prev.filter(c => c.platform !== platform))
+    } catch {
+      toast.error(`Couldn't disconnect ${label}. Try again.`)
+    } finally {
+      setDisconnecting(null)
+    }
+  }
 
   return (
     <div className="border rounded-xl p-5 bg-card space-y-4">
@@ -79,16 +98,35 @@ export function SocialConnectCard({ connections }: { connections: ConnectionStat
 
               <div className="flex items-center gap-2">
                 {conn ? (
-                  conn.sync_status === 'active' ? (
-                    <span className="flex items-center gap-1 text-xs text-pos">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Connected
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1 text-xs text-destructive">
-                      <AlertCircle className="h-3.5 w-3.5" />
-                      {conn.sync_status}
-                    </span>
-                  )
+                  <>
+                    {conn.sync_status === 'active' ? (
+                      <span className="flex items-center gap-1 text-xs text-pos">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Connected
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-xs text-destructive">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        {conn.sync_status}
+                      </span>
+                    )}
+                    {conn.sync_status === 'error' && (
+                      <a
+                        href={`/api/social/connect/${platform}`}
+                        className="inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleDisconnect(platform, meta.label)}
+                      disabled={disconnecting !== null}
+                      className="inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-destructive hover:bg-accent transition-colors disabled:opacity-50"
+                      aria-label={`Disconnect ${meta.label}`}
+                    >
+                      <Unplug className="h-3.5 w-3.5" />
+                    </button>
+                  </>
                 ) : (
                   <div className="flex flex-col items-end gap-0.5">
                     <a
@@ -103,14 +141,6 @@ export function SocialConnectCard({ connections }: { connections: ConnectionStat
                       </span>
                     )}
                   </div>
-                )}
-                {conn?.sync_status === 'error' && (
-                  <a
-                    href={`/api/social/connect/${platform}`}
-                    className="inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                  >
-                    <RefreshCw className="h-3.5 w-3.5" />
-                  </a>
                 )}
               </div>
             </div>
