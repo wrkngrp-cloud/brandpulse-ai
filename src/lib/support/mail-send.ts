@@ -19,8 +19,8 @@ import type { AttachmentRef } from './attachments'
  * the gap is the margin for a click-to-server round trip and Resend's own
  * cancel call to land before Resend's scheduled dispatch fires regardless.
  */
-export const SEND_DELAY_SECONDS = 12
-export const UNDO_WINDOW_MS = 10_000
+export const SEND_DELAY_SECONDS = 16
+export const UNDO_WINDOW_MS = 12_000
 
 /** A verified attachment ref, turned into Resend's own shape: a signed URL it
  *  fetches itself, so this route never reads the file bytes into memory. */

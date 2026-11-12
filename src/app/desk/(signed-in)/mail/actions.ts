@@ -137,9 +137,11 @@ export async function replyMail(_prev: MailActionState, formData: FormData): Pro
   revalidatePath('/desk/mail')
   revalidatePath('/desk/mail/drafts')
   if (!mail.sent) return { ok: true, warning: 'Your reply is in the thread, but the email did not go out.' }
-  return mail.id
-    ? { ok: true, messageId: posted.id, cancellableUntil: Date.now() + UNDO_WINDOW_MS }
-    : { ok: true }
+  if (!mail.id) {
+    console.error('[mail] reply sent with no Resend id back — cannot offer Undo', { conversationId: conv.id })
+    return { ok: true, warning: 'Sent — Undo is not available for this message.' }
+  }
+  return { ok: true, messageId: posted.id, cancellableUntil: Date.now() + UNDO_WINDOW_MS }
 }
 
 const composeSchema = z.object({
@@ -223,9 +225,11 @@ export async function composeMail(_prev: MailActionState, formData: FormData): P
   revalidatePath('/desk/mail')
   revalidatePath('/desk/mail/drafts')
   if (!mail.sent) return { ok: true, warning: 'Saved, but the email did not go out.' }
-  return mail.id
-    ? { ok: true, messageId: posted.id, cancellableUntil: Date.now() + UNDO_WINDOW_MS }
-    : { ok: true }
+  if (!mail.id) {
+    console.error('[mail] compose sent with no Resend id back — cannot offer Undo', { conversationId: conv.id })
+    return { ok: true, warning: 'Sent — Undo is not available for this message.' }
+  }
+  return { ok: true, messageId: posted.id, cancellableUntil: Date.now() + UNDO_WINDOW_MS }
 }
 
 /**
