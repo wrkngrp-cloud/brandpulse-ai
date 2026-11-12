@@ -1,8 +1,10 @@
 'use client'
 
 import { useActionState, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { replyMail, saveDraft, type MailActionState } from './actions'
 import { AttachmentPicker, type PickedAttachment } from './attachment-picker'
+import { UndoSendBanner } from './undo-send-banner'
 import { Button } from '@/components/ui/button'
 import { Working } from '@/components/brand/working'
 
@@ -15,6 +17,7 @@ export function ReplyBox({ conversationId, fromAddress, initial }: {
   fromAddress:    string
   initial?:       ReplyDraftInitial
 }) {
+  const router = useRouter()
   const [state, formAction, pending] = useActionState<MailActionState, FormData>(replyMail, null)
   const [savePending, startSave] = useTransition()
   const [saveNote, setSaveNote] = useState<string | null>(null)
@@ -26,6 +29,10 @@ export function ReplyBox({ conversationId, fromAddress, initial }: {
   // Bumped on a successful send to remount AttachmentPicker, the only way to
   // clear its own internal state: its chips are not derived from body/cc/bcc.
   const [attachmentsKey, setAttachmentsKey] = useState(0)
+  // The most recent send's Undo window, if it is still within one. Cleared
+  // once undone or once the thread is refreshed, so the banner never shows a
+  // send that has already fully gone out.
+  const [pendingSend, setPendingSend] = useState<{ messageId: string; deadline: number } | null>(null)
 
   // Resetting the form on a successful send is a reaction to this render's
   // state differing from the last one — exactly what React calls "adjusting
@@ -37,6 +44,11 @@ export function ReplyBox({ conversationId, fromAddress, initial }: {
     if (state?.ok) {
       setBody(''); setCc(''); setBcc('')
       setAttachmentsKey(k => k + 1)
+      setPendingSend(
+        state.messageId && state.cancellableUntil
+          ? { messageId: state.messageId, deadline: state.cancellableUntil }
+          : null,
+      )
     }
   }
 
@@ -97,6 +109,14 @@ export function ReplyBox({ conversationId, fromAddress, initial }: {
           {pending ? <><Working className="size-3.5" /> Sending</> : 'Send'}
         </Button>
       </div>
+
+      {pendingSend && (
+        <UndoSendBanner
+          messageId={pendingSend.messageId}
+          deadline={pendingSend.deadline}
+          onUndone={() => { setPendingSend(null); router.refresh() }}
+        />
+      )}
 
       {saveNote && <p className="text-xs text-tx-2" role="status">{saveNote}</p>}
       {state?.error && <p className="text-xs text-neg" role="alert">{state.error}</p>}

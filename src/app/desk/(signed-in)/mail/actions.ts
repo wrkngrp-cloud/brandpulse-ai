@@ -7,12 +7,21 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
 import { myMailboxAddresses } from '@/lib/desk/mail'
 import { lastInboundRfcMessageId } from '@/lib/support/customer-email'
-import { sendPersonalMail } from '@/lib/support/mail-send'
+import { sendPersonalMail, UNDO_WINDOW_MS } from '@/lib/support/mail-send'
+import { cancelMail } from '@/lib/email/send'
 import { findModelNames } from '@/lib/support/assistant/guard'
 import { verifyMailAttachment, signMailAttachment, type AttachmentRef } from '@/lib/support/attachments'
 import { withinLimit } from '@/lib/support/limits'
 
-export type MailActionState = { error?: string; ok?: boolean; warning?: string } | null
+export type MailActionState = {
+  error?: string
+  ok?: boolean
+  warning?: string
+  /** Set only when the send is still pending at Resend and so can still be
+   *  pulled back — the signal the UI uses to show the Undo button at all. */
+  messageId?: string
+  cancellableUntil?: number
+} | null
 
 /** Comma- or newline-separated addresses, each checked. A typo here silently
  *  dropping the address would mean a BCC'd person never knowing they were
@@ -96,11 +105,11 @@ export async function replyMail(_prev: MailActionState, formData: FormData): Pro
 
   const attachments = parseAttachments(session.userId, formData.get('attachments'))
 
-  const { error } = await service.from('support_messages').insert({
+  const { data: posted, error } = await service.from('support_messages').insert({
     conversation_id: conv.id, author_type: 'staff', author_id: session.userId,
     body: parsed.data.body, cc, bcc, attachments,
-  })
-  if (error) return { error: 'Could not post that reply.' }
+  }).select('id').single()
+  if (error || !posted) return { error: 'Could not post that reply.' }
 
   await writeAudit({
     actorId: session.userId, action: 'mail.reply',
@@ -114,6 +123,13 @@ export async function replyMail(_prev: MailActionState, formData: FormData): Pro
     inReplyTo: await lastInboundRfcMessageId(conv.id),
   })
 
+  // The id Resend handed back is what cancelMail needs later. Nothing to
+  // record if the send itself failed outright — there is nothing pending to
+  // pull back.
+  if (mail.sent && mail.id) {
+    await service.from('support_messages').update({ resend_message_id: mail.id }).eq('id', posted.id)
+  }
+
   // Sent — the draft this was answering, if any, is spent.
   await service.from('mail_drafts').delete().eq('user_id', session.userId).eq('conversation_id', conv.id)
 
@@ -121,7 +137,11 @@ export async function replyMail(_prev: MailActionState, formData: FormData): Pro
   revalidatePath('/desk/mail')
   revalidatePath('/desk/mail/drafts')
   if (!mail.sent) return { ok: true, warning: 'Your reply is in the thread, but the email did not go out.' }
-  return { ok: true }
+  if (!mail.id) {
+    console.error('[mail] reply sent with no Resend id back — cannot offer Undo', { conversationId: conv.id })
+    return { ok: true, warning: 'Sent — Undo is not available for this message.' }
+  }
+  return { ok: true, messageId: posted.id, cancellableUntil: Date.now() + UNDO_WINDOW_MS }
 }
 
 const composeSchema = z.object({
@@ -177,11 +197,11 @@ export async function composeMail(_prev: MailActionState, formData: FormData): P
     .select('id').single()
   if (createErr || !conv) return { error: 'Could not start that conversation.' }
 
-  const { error: msgErr } = await service.from('support_messages').insert({
+  const { data: posted, error: msgErr } = await service.from('support_messages').insert({
     conversation_id: conv.id, author_type: 'staff', author_id: session.userId,
     body: parsed.data.body, cc, bcc, attachments,
-  })
-  if (msgErr) return { error: 'Could not post that message.' }
+  }).select('id').single()
+  if (msgErr || !posted) return { error: 'Could not post that message.' }
 
   await writeAudit({
     actorId: session.userId, action: 'mail.compose',
@@ -193,6 +213,10 @@ export async function composeMail(_prev: MailActionState, formData: FormData): P
     body: parsed.data.body, cc, bcc, attachments,
   })
 
+  if (mail.sent && mail.id) {
+    await service.from('support_messages').update({ resend_message_id: mail.id }).eq('id', posted.id)
+  }
+
   const draftId = formData.get('draft_id')
   if (typeof draftId === 'string' && draftId) {
     await service.from('mail_drafts').delete().eq('user_id', session.userId).eq('id', draftId)
@@ -201,16 +225,98 @@ export async function composeMail(_prev: MailActionState, formData: FormData): P
   revalidatePath('/desk/mail')
   revalidatePath('/desk/mail/drafts')
   if (!mail.sent) return { ok: true, warning: 'Saved, but the email did not go out.' }
-  return { ok: true }
+  if (!mail.id) {
+    console.error('[mail] compose sent with no Resend id back — cannot offer Undo', { conversationId: conv.id })
+    return { ok: true, warning: 'Sent — Undo is not available for this message.' }
+  }
+  return { ok: true, messageId: posted.id, cancellableUntil: Date.now() + UNDO_WINDOW_MS }
+}
+
+/**
+ * Pulling a message back before Resend actually sends it (Undo Send).
+ *
+ * The ownership checks are two separate queries on purpose rather than one
+ * join: the message must be the caller's own staff message, and its
+ * conversation must be on one of the caller's own mailbox addresses, which
+ * together rule out both "someone else's reply" and "a message on a
+ * mailbox I don't own," the same two directions every other ownership
+ * check in the Desk guards against.
+ *
+ * Deletes the message once Resend confirms the cancel — not before, so a
+ * failed cancel (already sent, or the window passed) never destroys the
+ * record of something that really did go out. If that leaves the
+ * conversation with no messages at all, it was a fresh compose nobody ever
+ * saw, and the conversation is deleted with it rather than left as an empty
+ * husk in Sent.
+ */
+export async function cancelSentMail(
+  messageId: string,
+): Promise<{ ok?: boolean; conversationDeleted?: boolean; error?: string }> {
+  const session = await requireStaffOrNull('mail.use')
+  if (!session) return { error: 'You do not have permission to use this.' }
+
+  const service = await createServiceClient()
+  const { data: msg } = await service
+    .from('support_messages')
+    .select('id, conversation_id, created_at, resend_message_id')
+    .eq('id', messageId)
+    .eq('author_type', 'staff')
+    .eq('author_id', session.userId)
+    .maybeSingle()
+  if (!msg) return { error: 'That message no longer exists.' }
+
+  const addresses = await myMailboxAddresses(session)
+  const { data: conv } = await service
+    .from('support_conversations')
+    .select('id')
+    .eq('id', msg.conversation_id)
+    .in('inbound_address', addresses)
+    .maybeSingle()
+  if (!conv) return { error: 'That message no longer exists.' }
+
+  if (!msg.resend_message_id) return { error: 'There is nothing to undo on that message.' }
+  if (Date.now() - new Date(msg.created_at).getTime() > UNDO_WINDOW_MS) {
+    return { error: 'Too late — it already went out.' }
+  }
+
+  const result = await cancelMail(msg.resend_message_id)
+  if (!result.cancelled) return { error: `Too late — ${result.reason}` }
+
+  await service.from('support_messages').delete().eq('id', msg.id)
+
+  const { count } = await service
+    .from('support_messages').select('id', { count: 'exact', head: true }).eq('conversation_id', conv.id)
+  const conversationDeleted = (count ?? 0) === 0
+  if (conversationDeleted) {
+    await service.from('support_conversations').delete().eq('id', conv.id)
+  }
+
+  await writeAudit({
+    actorId: session.userId, action: 'mail.cancel',
+    targetType: 'conversation', targetId: conv.id, summary: 'Undid a send from a personal mailbox',
+  })
+
+  revalidatePath(`/desk/mail/${conv.id}`)
+  revalidatePath('/desk/mail')
+  revalidatePath('/desk/mail/sent')
+  return { ok: true, conversationDeleted }
 }
 
 /**
  * One upload, called directly from a client component rather than wrapped in
  * a <form> — the attachment picker needs the signed reference back
  * immediately, before Send is pressed, so it can show a chip and let the
- * person remove it. No API route: Next's server actions take a File
- * argument directly, which is the only reason this works without one
- * (CLAUDE.md: the Desk has no API routes).
+ * person remove it.
+ *
+ * A Server Action rather than a route, because the Desk has no API routes
+ * (CLAUDE.md): on desk.brandgauge.app, src/proxy.ts rewrites every path onto
+ * /desk, including a plain API fetch issued from a page rendered inside the
+ * Desk, and no /desk/api/** route exists to receive it — that attempt 404s.
+ * A Server Action's request goes through Next's own RSC action dispatch
+ * instead, which the proxy never intercepts. Its default 1MB body cap (large
+ * enough for a chat message, not for a phone photo) is raised in
+ * next.config.ts (experimental.serverActions.bodySizeLimit) rather than
+ * worked around here.
  */
 const MAX_BYTES = 10 * 1024 * 1024
 const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'])

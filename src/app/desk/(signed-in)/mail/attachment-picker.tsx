@@ -14,6 +14,14 @@ export interface PickedAttachment {
  * holding the file in browser memory until Send would mean a failed upload
  * surfaces at the worst possible moment.
  *
+ * Calls the uploadMailAttachment Server Action directly rather than a route:
+ * this is rendered inside the Desk, served at desk.brandgauge.app, where
+ * every path gets rewritten onto /desk by src/proxy.ts — including a plain
+ * API fetch, which 404s because the Desk has no API routes to receive it
+ * (CLAUDE.md). A Server Action's request goes through Next's own RSC action
+ * dispatch instead, which the proxy never touches. Its default 1MB body cap
+ * is raised in next.config.ts rather than routed around.
+ *
  * Renders a hidden input carrying the signed refs as JSON, which is what
  * replyMail/composeMail/saveDraft read and verify server-side — nothing
  * here is trusted on its own.

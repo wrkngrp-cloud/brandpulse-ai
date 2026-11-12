@@ -73,6 +73,27 @@ export async function sendMail(payload: CreateEmailOptions): Promise<MailResult>
   }
 }
 
+export type CancelResult =
+  | { cancelled: true }
+  | { cancelled: false; reason: string }
+
+/**
+ * Pulling back a message sent with a future `scheduledAt`, before Resend
+ * actually dispatches it. Refuses cleanly rather than throwing once that
+ * moment has passed — the caller reads `cancelled: false` as "it already
+ * went out," not as a crash.
+ */
+export async function cancelMail(resendId: string): Promise<CancelResult> {
+  if (!emailConfigured()) return { cancelled: false, reason: 'email is not configured' }
+  try {
+    const { error } = await mailer().emails.cancel(resendId)
+    if (error) return { cancelled: false, reason: explain(error.name, error.message) }
+    return { cancelled: true }
+  } catch (err) {
+    return { cancelled: false, reason: err instanceof Error ? err.message : 'the request to Resend failed' }
+  }
+}
+
 export type BulkResult =
   | { sent: number; failed: 0 }
   | { sent: number; failed: number; reason: string; configured: boolean }
