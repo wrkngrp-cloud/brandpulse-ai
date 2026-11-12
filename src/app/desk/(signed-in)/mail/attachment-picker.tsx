@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
-import { uploadMailAttachment } from './actions'
 import { FileIcon, XIcon } from '@/components/brand/icon'
 
 export interface PickedAttachment {
@@ -13,6 +12,12 @@ export interface PickedAttachment {
  * chip it becomes is the only feedback that the upload actually worked, and
  * holding the file in browser memory until Send would mean a failed upload
  * surfaces at the worst possible moment.
+ *
+ * Posts to /api/support/mail-attachment rather than calling a Server Action
+ * directly: a Server Action invoked with a File argument is still bound by
+ * Next's default Server Actions body limit (1MB), so a real phone photo —
+ * routinely several MB — failed outright before any code of ours ran. A
+ * route has no such cap.
  *
  * Renders a hidden input carrying the signed refs as JSON, which is what
  * replyMail/composeMail/saveDraft read and verify server-side — nothing
@@ -29,8 +34,9 @@ export function AttachmentPicker({ name, initial = [] }: { name: string; initial
     startTransition(async () => {
       const fd = new FormData()
       fd.append('file', file)
-      const result = await uploadMailAttachment(fd)
-      if ('error' in result) { setError(result.error); return }
+      const res = await fetch('/api/support/mail-attachment', { method: 'POST', body: fd })
+      const result = await res.json().catch(() => ({ error: 'That upload failed.' }))
+      if (!res.ok || 'error' in result) { setError(result.error ?? 'That upload failed.'); return }
       setItems(list => [...list, result])
     })
   }
