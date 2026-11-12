@@ -28,6 +28,23 @@ export async function exchangeMetaCode(code: string, redirectUri: string) {
   return res.json() as Promise<{ access_token: string; expires_in?: number }>
 }
 
+/**
+ * A Meta login that no longer works: expired (about 60 days), revoked, or a
+ * password change. Thrown instead of returning no posts, so the sync can mark
+ * the connection for reconnecting. A dead token used to read as a quiet week.
+ */
+export class MetaTokenError extends Error {
+  constructor(message: string) { super(message); this.name = 'MetaTokenError' }
+}
+
+async function failFrom(res: Response): Promise<never | null> {
+  const body = await res.json().catch(() => ({})) as { error?: { code?: number; message?: string } }
+  const code = body.error?.code
+  // 190: invalid or expired token. 102: session key invalid.
+  if (code === 190 || code === 102 || res.status === 401) throw new MetaTokenError(body.error?.message ?? 'Meta login expired')
+  return null
+}
+
 export async function getLongLivedToken(shortToken: string) {
   const params = new URLSearchParams({
     grant_type: 'fb_exchange_token',
@@ -60,19 +77,17 @@ export async function fetchInstagramPosts(igAccountId: string, accessToken: stri
   const res = await fetch(
     `${GRAPH}/${igAccountId}/media?fields=${fields}&since=${sinceUnix}&limit=50&access_token=${accessToken}`
   )
-  if (!res.ok) return []
+  if (!res.ok) { await failFrom(res); return [] }
   const data = await res.json() as { data?: Record<string, unknown>[] }
 
   const posts: MetaPost[] = []
   for (const item of data.data ?? []) {
-    // Fetch insights for reach/impressions
-    const insightRes = await fetch(
-      `${GRAPH}/${item.id}/insights?metric=impressions,reach,saved,video_views&period=lifetime&access_token=${accessToken}`
-    )
-    const insights = insightRes.ok ? await insightRes.json() : { data: [] }
-    const metricsMap = Object.fromEntries(
-      (insights.data ?? []).map((m: { name: string; values: { value: number }[] }) => [m.name, m.values[0]?.value ?? 0])
-    )
+    // Media insights. Meta retired `impressions` and `video_views` for media
+    // insights in 2025 and replaced both with `views`; asking for a retired
+    // metric fails the whole call, which is why reach read 0 on every post.
+    // One invalid metric for a media type still fails the call, so a second,
+    // smaller ask follows before giving up.
+    const metricsMap = await mediaInsights(String(item.id), accessToken)
 
     posts.push({
       id: String(item.id),
@@ -81,16 +96,28 @@ export async function fetchInstagramPosts(igAccountId: string, accessToken: stri
       media_url: item.media_url as string | undefined,
       content_type: mapMediaType(String(item.media_type ?? '')),
       reach: metricsMap['reach'] ?? 0,
-      impressions: metricsMap['impressions'] ?? 0,
+      // Meta's replacement for impressions.
+      impressions: metricsMap['views'] ?? 0,
       likes: Number(item.like_count ?? 0),
       comments: Number(item.comments_count ?? 0),
-      shares: 0,
+      shares: metricsMap['shares'] ?? 0,
       saves: metricsMap['saved'] ?? 0,
-      video_views: metricsMap['video_views'] ?? 0,
+      video_views: ['VIDEO', 'REELS', 'REEL'].includes(String(item.media_type ?? '')) ? (metricsMap['views'] ?? 0) : 0,
       posted_at: String(item.timestamp),
     })
   }
   return posts
+}
+
+async function mediaInsights(mediaId: string, accessToken: string): Promise<Record<string, number>> {
+  for (const metrics of ['reach,saved,views,shares', 'reach,saved']) {
+    const res = await fetch(`${GRAPH}/${mediaId}/insights?metric=${metrics}&access_token=${accessToken}`)
+    if (res.status === 401) { await failFrom(res) }
+    if (!res.ok) continue
+    const body = await res.json() as { data?: { name: string; values?: { value: number }[]; total_value?: { value: number } }[] }
+    return Object.fromEntries((body.data ?? []).map(m => [m.name, m.values?.[0]?.value ?? m.total_value?.value ?? 0]))
+  }
+  return {}
 }
 
 export async function fetchFacebookPosts(pageId: string, accessToken: string, since: Date): Promise<MetaPost[]> {
@@ -99,7 +126,7 @@ export async function fetchFacebookPosts(pageId: string, accessToken: string, si
   const res = await fetch(
     `${GRAPH}/${pageId}/posts?fields=${fields}&since=${sinceUnix}&limit=50&access_token=${accessToken}`
   )
-  if (!res.ok) return []
+  if (!res.ok) { await failFrom(res); return [] }
   const data = await res.json() as { data?: Record<string, unknown>[] }
 
   return (data.data ?? []).map(item => ({
@@ -124,4 +151,23 @@ function mapMediaType(type: string): string {
     REEL: 'reel', STORY: 'story',
   }
   return map[type] ?? 'image'
+}
+
+/**
+ * The app-scoped Meta user who owns a token, user or Page. Data deletion
+ * requests arrive with this id, so every Meta-sourced row records it. Uses
+ * debug_token with the app's own credentials, which answers for Page tokens
+ * too, where /me would return the Page. Null when it cannot be read.
+ */
+export async function metaUserIdForToken(token: string): Promise<string | null> {
+  const appId = process.env.META_APP_ID, secret = process.env.META_APP_SECRET
+  if (!appId || !secret) return null
+  try {
+    const res = await fetch(`${GRAPH}/debug_token?input_token=${encodeURIComponent(token)}&access_token=${appId}|${secret}`, { cache: 'no-store' })
+    if (!res.ok) return null
+    const body = await res.json() as { data?: { user_id?: string; is_valid?: boolean } }
+    return body.data?.user_id ?? null
+  } catch {
+    return null
+  }
 }

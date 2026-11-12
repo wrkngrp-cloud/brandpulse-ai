@@ -3,6 +3,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { Redis } from '@upstash/redis'
 import { encrypt } from '@/lib/crypto'
 import { getInstagramAccount } from '@/lib/social/meta'
+import { metaUserIdForToken } from '@/lib/social/meta'
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
@@ -61,16 +62,23 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = await createServiceClient()
+  // Who connected it, for Meta data deletion requests.
+  const metaUserId = await metaUserIdForToken(accessToken)
 
-  await supabase.from('social_connections').upsert({
+  const { error: saveError } = await supabase.from('social_connections').upsert({
     brand_id: brandId,
     platform: 'instagram',
     account_id: pageData.instagram_business_account.id,
     account_name: pageData.name ?? `Page ${pageId}`,
     access_token: encrypt(accessToken),
+    meta_user_id: metaUserId,
     sync_status: 'active',
     connected_at: new Date().toISOString(),
   }, { onConflict: 'brand_id,platform,account_id' })
+  if (saveError) {
+    console.error('[instagram-finish] save failed:', saveError.message)
+    return NextResponse.json({ error: 'We could not save the connection. Try again.' }, { status: 500 })
+  }
 
   await redis.del(`ig-pending:${key}`).catch(() => { /* best-effort cleanup; the key expires on its own TTL anyway */ })
 

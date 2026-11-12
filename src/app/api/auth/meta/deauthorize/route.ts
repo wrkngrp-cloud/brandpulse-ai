@@ -1,79 +1,72 @@
-// Meta Data Deletion Request callback — required by Meta for all apps using Facebook Login.
-// Register this URL in Meta App Dashboard → Facebook Login → Settings → Data Deletion Request URL
-// URL to register: https://brandgauge.app/api/auth/meta/deauthorize
+// Meta Data Deletion Request callback, required for every app using Facebook
+// Login, and checked in App Review. Register it in the Meta App Dashboard
+// under both "Data Deletion Request URL" and "Deauthorize Callback URL":
+//   https://brandgauge.app/api/auth/meta/deauthorize
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createHmac }               from 'crypto'
-import { createServiceClient }      from '@/lib/supabase/server'
+import { randomBytes } from 'crypto'
+import { createServiceClient } from '@/lib/supabase/server'
+import { deleteMetaUserData, parseSignedRequest } from '@/lib/meta/data-deletion'
 
 export const runtime = 'nodejs'
-
-function parseSignedRequest(signedRequest: string, secret: string): Record<string, unknown> | null {
-  const [encodedSig, payload] = signedRequest.split('.')
-  if (!encodedSig || !payload) return null
-
-  const sig  = Buffer.from(encodedSig.replace(/-/g, '+').replace(/_/g, '/'), 'base64')
-  const data = Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8')
-
-  const expectedSig = createHmac('sha256', secret).update(payload).digest()
-  if (!sig.equals(expectedSig)) return null
-
-  try { return JSON.parse(data) } catch { return null }
-}
 
 export async function POST(req: NextRequest) {
   const secret = process.env.META_APP_SECRET
   if (!secret) return NextResponse.json({ error: 'Not configured' }, { status: 500 })
-
-  const APP_URL = process.env.APP_URL || 'https://brandpulse-ai-tau.vercel.app'
+  const APP_URL = process.env.APP_URL || 'https://brandgauge.app'
 
   let signedRequest: string | null = null
-
   const contentType = req.headers.get('content-type') ?? ''
   if (contentType.includes('application/json')) {
     const body = await req.json().catch(() => ({})) as Record<string, unknown>
     signedRequest = typeof body.signed_request === 'string' ? body.signed_request : null
   } else {
     const form = await req.formData().catch(() => null)
-    signedRequest = form ? (form.get('signed_request') as string | null) : null
+    const v = form?.get('signed_request')
+    signedRequest = typeof v === 'string' ? v : null
   }
+  if (!signedRequest) return NextResponse.json({ error: 'Missing signed_request' }, { status: 400 })
 
-  if (!signedRequest) {
-    return NextResponse.json({ error: 'Missing signed_request' }, { status: 400 })
-  }
-
+  // Signature first, before any work.
   const data = parseSignedRequest(signedRequest, secret)
-  if (!data) {
-    return NextResponse.json({ error: 'Invalid signed_request' }, { status: 400 })
+  if (!data) return NextResponse.json({ error: 'Invalid signed_request' }, { status: 400 })
+
+  const metaUserId = typeof data.user_id === 'string' ? data.user_id : null
+  if (!metaUserId) return NextResponse.json({ error: 'No user in request' }, { status: 400 })
+
+  const db = await createServiceClient()
+  const statusToken = randomBytes(18).toString('hex')
+  const confirmation = `BG-${statusToken.slice(0, 10).toUpperCase()}`
+
+  // Recorded and awaited. This used to be a `void` insert, which a lazy query
+  // builder never runs, so no request was ever kept.
+  const { data: row, error: insErr } = await db.from('meta_deletion_requests').insert({
+    meta_user_id: metaUserId,
+    deletion_id:  confirmation,
+    status_token: statusToken,
+    raw_payload:  { user_id: metaUserId, issued_at: data.issued_at ?? null },
+  }).select('id').single()
+  if (insErr || !row) {
+    console.error('[meta-deletion] could not record request:', insErr?.message)
+    return NextResponse.json({ error: 'Could not record the request' }, { status: 500 })
   }
 
-  const userId = data.user_id as string | undefined
-
-  // Log the deletion request and queue cleanup
-  if (userId) {
-    const supabase = await createServiceClient()
-
-    // Find workspace members whose Meta user_id matches — best effort
-    // The deletion_request_id is used to confirm the deletion is complete
-    const deletionId = `meta-del-${Date.now()}-${userId.slice(0, 8)}`
-
-    // In production: queue a job to delete the user's data.
-    // For now: log to a deletions table if it exists, otherwise just acknowledge.
-    void supabase.from('meta_deletion_requests').insert({
-      meta_user_id:    userId,
-      deletion_id:     deletionId,
-      requested_at:    new Date().toISOString(),
-      raw_payload:     data,
-    })  // fire-and-forget; table may not exist yet
-
-    return NextResponse.json({
-      url:               `${APP_URL}/data-deletion-status?id=${deletionId}`,
-      confirmation_code: deletionId,
-    })
+  // The deletion is a handful of row deletes, so it runs now rather than on a
+  // queue: the status page can say "completed" by the time anyone opens it.
+  try {
+    const result = await deleteMetaUserData(db, metaUserId)
+    const found = result.socialConnections + result.adAccounts > 0
+    await db.from('meta_deletion_requests').update({
+      status: found ? 'completed' : 'nothing_found',
+      result, processed_at: new Date().toISOString(),
+    }).eq('id', row.id)
+  } catch (err) {
+    // Recorded as received, so staff can finish it; Meta still gets its answer.
+    console.error('[meta-deletion] deletion failed, left as received:', err)
   }
 
   return NextResponse.json({
-    url:               `${APP_URL}/data-deletion-status?id=unknown`,
-    confirmation_code: 'acknowledged',
+    url:               `${APP_URL}/data-deletion-status?id=${statusToken}`,
+    confirmation_code: confirmation,
   })
 }

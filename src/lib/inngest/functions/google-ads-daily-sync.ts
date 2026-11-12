@@ -1,9 +1,10 @@
 import { inngest } from '@/lib/inngest/client'
 import { createServiceClient } from '@/lib/supabase/server'
 import { decrypt, encrypt } from '@/lib/crypto'
+import { GOOGLE_ADS_API } from '@/lib/google/ads-api'
 
 const TOKEN_URL = 'https://oauth2.googleapis.com/token'
-const ADS_API   = 'https://googleads.googleapis.com/v17'
+const ADS_API   = GOOGLE_ADS_API
 
 const MICROS = 1_000_000
 
@@ -69,7 +70,7 @@ export const googleAdsDailySync = inngest.createFunction(
     // Fetch all active Google ad accounts across all brands
     const { data: accounts } = await supabase
       .from('digital_ad_accounts')
-      .select('id, brand_id, ad_account_id, access_token, refresh_token, token_expiry')
+      .select('id, brand_id, ad_account_id, access_token, refresh_token, token_expiry, currency')
       .eq('platform', 'google')
       .neq('sync_status', 'disconnected')
 
@@ -233,7 +234,9 @@ export const googleAdsDailySync = inngest.createFunction(
               conversions,
               objective:     null,  // Google campaign types don't map onto Meta objectives
               actions:       null,
-              currency:      'NGN',
+              // Google reports cost in the account's own currency, read at
+              // connect. Hardcoding NGN mislabelled every USD account.
+              currency:      account.currency || 'NGN',
             }
           })
 

@@ -51,6 +51,7 @@ export function MetaAdsConnectCard({ account: initialAccount }: Props) {
         no_workspace:           'No workspace found.',
         no_brand:               'No brand found. Complete onboarding first.',
         db_error:               'Failed to save the connection. Try again.',
+        no_ad_account:          'That Meta login has no ad account. Create one in Ads Manager, or log in as someone with access to one.',
         oauth_failed:           'Meta Ads connection failed. Try again.',
         invalid_state:          'Session expired. Try connecting again.',
         meta_not_configured:    'Meta Ads is not configured on this server. Add META_APP_ID and META_APP_SECRET.',

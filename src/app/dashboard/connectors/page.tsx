@@ -14,6 +14,7 @@ import { EmailConnectCard, type EmailConnectorStatus }      from '@/components/d
 import { PixelCard } from './pixel-card'
 import { SharedAccessCard, type SharedAccessState } from '@/components/dashboard/shared-access-card'
 import { googleShareEmail } from '@/lib/shared-access/google'
+import { addDays, lagosToday } from '@/lib/brief/metrics'
 import { metaBusinessId } from '@/lib/shared-access/meta'
 import { Icon, type BrandIconName, BriefcaseIcon as ShoppingCart, ArrowRightIcon as ArrowRight, UsersIcon as Users, MusicIcon as Music2 } from '@/components/brand/icon'
 import { SearchIcon as Search } from '@/components/brand/icon'
@@ -66,6 +67,21 @@ export default async function ConnectorsPage() {
     ])
 
     ga4Connection     = ga4Res.data ?? null
+    if (ga4Connection) {
+      // 30-day totals for the card. Its own read, so before the ga4_daily
+      // migration the error just leaves the card without totals.
+      const since = addDays(lagosToday(), -30)
+      const { data: days } = await supabase.from('ga4_daily').select('sessions, active_users, key_events')
+        .eq('brand_id', brand.id).gte('day', since)
+      if (days?.length) {
+        ga4Connection = { ...ga4Connection, last30: {
+          sessions:    days.reduce((n, d) => n + (d.sessions ?? 0), 0),
+          activeUsers: days.reduce((n, d) => n + (d.active_users ?? 0), 0),
+          keyEvents:   days.reduce((n, d) => n + (d.key_events ?? 0), 0),
+          days:        days.length,
+        } }
+      }
+    }
     metaAdsAccount    = metaAdsRes.data ?? null
 
     // Shared (agency-style) access. Its own reads, so that before the

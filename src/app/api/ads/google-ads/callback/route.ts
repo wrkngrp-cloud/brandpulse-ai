@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse }  from 'next/server'
 import { createServiceClient }        from '@/lib/supabase/server'
 import { Redis }                      from '@upstash/redis'
+import { describeCustomer, GOOGLE_ADS_API } from '@/lib/google/ads-api'
 import { encrypt }                    from '@/lib/crypto'
 
 export const runtime = 'nodejs'
@@ -8,7 +9,7 @@ export const runtime = 'nodejs'
 const redis   = new Redis({ url: process.env.UPSTASH_REDIS_REST_URL!, token: process.env.UPSTASH_REDIS_REST_TOKEN! })
 const APP_URL = process.env.APP_URL || 'http://localhost:3000'
 const TOKEN_URL = 'https://oauth2.googleapis.com/token'
-const ADS_API   = 'https://googleads.googleapis.com/v17'
+const ADS_API   = GOOGLE_ADS_API
 
 interface TokenResponse {
   access_token?:  string
@@ -116,14 +117,20 @@ export async function GET(request: NextRequest) {
     }
 
     const customersData = await customersRes.json() as ListCustomersResponse
-    const firstResource = customersData.resourceNames?.[0]
-    if (!firstResource) {
+    const ids = (customersData.resourceNames ?? []).map(r => r.replace('customers/', ''))
+    if (!ids.length) {
       console.error('[google-ads-callback] no accessible customers found')
       return NextResponse.redirect(returnUrl(returnTo, { error: 'no_ad_accounts' }))
     }
 
-    // "customers/1234567890" → "1234567890"
-    const customerId = firstResource.replace('customers/', '')
+    // Prefer an account that runs ads over a manager (MCC) account, which
+    // holds no metrics of its own. It used to take whichever came first.
+    // Reaching client accounts through a manager needs a picker and the
+    // login-customer-id header; that waits until the developer token is set.
+    const described = (await Promise.all(ids.slice(0, 10).map(id => describeCustomer(id, tokenData.access_token!, developerToken!))))
+      .filter((c): c is NonNullable<typeof c> => !!c)
+    const chosen = described.find(c => !c.manager) ?? described[0] ?? { id: ids[0], name: null, manager: false, currency: null }
+    const customerId = chosen.id
 
     const { error: upsertErr } = await supabase
       .from('digital_ad_accounts')
@@ -132,14 +139,14 @@ export async function GET(request: NextRequest) {
           brand_id:      brandId,
           platform:      'google',
           account_id:    customerId,
-          account_name:  null,
+          account_name:  chosen.name,
           access_token:  encrypt(tokenData.access_token),
           // Google always issues a refresh_token with access_type=offline & prompt=consent,
           // but store whatever we got rather than crashing if it's ever missing
           refresh_token: tokenData.refresh_token ? encrypt(tokenData.refresh_token) : null,
           token_expiry:  tokenExpiry,
           ad_account_id: customerId,
-          currency:      'NGN',
+          currency:      chosen.currency ?? 'NGN',
           sync_status:   'active',
           updated_at:    new Date().toISOString(),
         },
