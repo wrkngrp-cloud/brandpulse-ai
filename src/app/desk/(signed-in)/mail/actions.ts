@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { randomBytes } from 'node:crypto'
+import { randomBytes, randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { createServiceClient } from '@/lib/supabase/server'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
@@ -9,7 +9,8 @@ import { myMailboxAddresses } from '@/lib/desk/mail'
 import { lastInboundRfcMessageId } from '@/lib/support/customer-email'
 import { sendPersonalMail } from '@/lib/support/mail-send'
 import { findModelNames } from '@/lib/support/assistant/guard'
-import { verifyMailAttachment, type AttachmentRef } from '@/lib/support/attachments'
+import { verifyMailAttachment, signMailAttachment, type AttachmentRef } from '@/lib/support/attachments'
+import { withinLimit } from '@/lib/support/limits'
 
 export type MailActionState = { error?: string; ok?: boolean; warning?: string } | null
 
@@ -201,6 +202,54 @@ export async function composeMail(_prev: MailActionState, formData: FormData): P
   revalidatePath('/desk/mail/drafts')
   if (!mail.sent) return { ok: true, warning: 'Saved, but the email did not go out.' }
   return { ok: true }
+}
+
+/**
+ * One upload, called directly from a client component rather than wrapped in
+ * a <form> — the attachment picker needs the signed reference back
+ * immediately, before Send is pressed, so it can show a chip and let the
+ * person remove it.
+ *
+ * A Server Action rather than a route, because the Desk has no API routes
+ * (CLAUDE.md): on desk.brandgauge.app, src/proxy.ts rewrites every path onto
+ * /desk, including a plain API fetch issued from a page rendered inside the
+ * Desk, and no /desk/api/** route exists to receive it — that attempt 404s.
+ * A Server Action's request goes through Next's own RSC action dispatch
+ * instead, which the proxy never intercepts. Its default 1MB body cap (large
+ * enough for a chat message, not for a phone photo) is raised in
+ * next.config.ts (experimental.serverActions.bodySizeLimit) rather than
+ * worked around here.
+ */
+const MAX_BYTES = 10 * 1024 * 1024
+const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'])
+
+export async function uploadMailAttachment(
+  formData: FormData,
+): Promise<{ path: string; name: string; type: string; size: number; signature: string } | { error: string }> {
+  const session = await requireStaffOrNull('mail.use')
+  if (!session) return { error: 'You do not have permission to use this.' }
+
+  const file = formData.get('file')
+  if (!(file instanceof File)) return { error: 'No file received.' }
+
+  if (!await withinLimit(`mail:upload:${session.userId}`, 30, 600)) {
+    return { error: 'Too many uploads. Try again shortly.' }
+  }
+  if (file.size > MAX_BYTES) return { error: 'That file is over 10MB.' }
+  if (!ALLOWED_TYPES.has(file.type)) return { error: 'Images and PDFs only.' }
+
+  const displayName = (file.name || 'attachment').slice(0, 120)
+  const extension = displayName.includes('.') ? displayName.split('.').pop()!.slice(0, 8) : 'bin'
+  const path = `mail/${session.userId}/${randomUUID()}.${extension.replace(/[^a-zA-Z0-9]/g, '')}`
+
+  const service = await createServiceClient()
+  const { error } = await service.storage
+    .from('support-attachments')
+    .upload(path, await file.arrayBuffer(), { contentType: file.type, upsert: false })
+  if (error) return { error: 'Could not upload that file.' }
+
+  const ref = { path, name: displayName, type: file.type, size: file.size }
+  return { ...ref, signature: signMailAttachment(session.userId, ref) }
 }
 
 const saveDraftSchema = z.object({

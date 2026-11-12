@@ -67,6 +67,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: SECURITY_HEADERS }];
   },
+  experimental: {
+    // Default is 1MB, which a Server Action handed a real photo clears
+    // routinely. The Desk has no API routes (CLAUDE.md) to route around this
+    // with instead — on desk.brandgauge.app the proxy rewrites every path
+    // onto /desk, including a plain /api/* fetch, so a route only reachable
+    // from a Desk-rendered page 404s outright. 12MB covers the 10MB
+    // attachment limit used everywhere this app accepts a file, with room
+    // for multipart's own framing overhead.
+    serverActions: { bodySizeLimit: '12mb' },
+  },
 };
 
 export default nextConfig;
