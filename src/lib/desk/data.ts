@@ -3,6 +3,7 @@ import { ALL_PERMISSIONS } from './permissions'
 import { MASKED, maskEmail } from './redact'
 import type { StaffSession } from './auth'
 import { isOverdue } from '@/lib/support/reply-targets'
+import { SUPPORT_POOL } from '@/lib/support/support-pool'
 
 /**
  * The Desk's data layer.
@@ -466,6 +467,12 @@ export async function supportInbox(
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function applyView(query: any, view: InboxView, userId: string) {
+  // A personal mailbox (staff_mailboxes) writes into this same table with its
+  // own inbound_address, and must never surface in the shared queue — it is
+  // worked from /desk/mail, not here. Chat/site/tool rows carry no
+  // inbound_address at all, so they stay in.
+  query = query.or(`inbound_address.is.null,inbound_address.in.(${SUPPORT_POOL.join(',')})`)
+
   switch (view) {
     case 'unassigned': return query.in('status', ['open', 'pending']).is('assigned_to', null)
     case 'mine':       return query.in('status', ['open', 'pending']).eq('assigned_to', userId)

@@ -3,6 +3,7 @@ import { randomBytes, randomUUID, createHmac, timingSafeEqual } from 'node:crypt
 import { createServiceClient } from '@/lib/supabase/server'
 import { inngest } from '@/lib/inngest/client'
 import { effectiveAssistantMode } from '@/lib/support/assistant/mode-db'
+import { SUPPORT_POOL } from '@/lib/support/support-pool'
 
 export const runtime = 'nodejs'
 
@@ -48,7 +49,6 @@ export const runtime = 'nodejs'
  */
 
 const EVENT_TYPE = 'email.received'
-const SUPPORT_POOL = ['support@brandgauge.app', 'hello@brandgauge.app']
 
 /** Which addresses a reply to `toAddress` should be matched against. Null if
  *  `toAddress` is neither the support pool nor anyone's personal mailbox —
