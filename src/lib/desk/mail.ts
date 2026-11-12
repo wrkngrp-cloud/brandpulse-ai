@@ -33,12 +33,19 @@ export interface MailRow {
 }
 
 /**
- * The inbox: every conversation on an address this person owns, newest
- * first within two bands — unread, then read — so what needs a look never
- * hides under something already answered. "Unread" means the newest
- * non-internal message is the customer's and nobody has opened the thread
- * since (see markRead below); a thread you last replied to is read by
- * definition, the same way a sent email isn't bold in any mail client.
+ * The inbox: every conversation on an address this person owns that has
+ * actually received something, newest first within two bands — unread, then
+ * read — so what needs a look never hides under something already answered.
+ * "Unread" means the newest non-internal message is the customer's and
+ * nobody has opened the thread since (see markRead below); a thread you last
+ * replied to is read by definition, the same way a sent email isn't bold in
+ * any mail client.
+ *
+ * A conversation with no customer message yet — a cold-outreach email you
+ * just composed, waiting on a reply — belongs in Sent only, the same way
+ * Gmail does not put a message you sent into your own Inbox just because you
+ * wrote it. Excluded by checking for at least one customer-authored row,
+ * rather than trusting the conversation's existence on the address alone.
  */
 export async function mailInbox(addresses: string[], view: 'unread' | 'all' = 'all'): Promise<MailRow[]> {
   if (!addresses.length) return []
@@ -62,13 +69,15 @@ export async function mailInbox(addresses: string[], view: 'unread' | 'all' = 'a
     .limit(1000)
 
   const latest = new Map<string, { author_type: string; body: string; read_by_staff_at: string | null }>()
+  const everReceived = new Set<string>()
   for (const m of messages ?? []) {
     if (!latest.has(m.conversation_id)) {
       latest.set(m.conversation_id, { author_type: m.author_type, body: m.body, read_by_staff_at: m.read_by_staff_at })
     }
+    if (m.author_type === 'customer') everReceived.add(m.conversation_id)
   }
 
-  const withUnread = rows.map(r => {
+  const withUnread = rows.filter(r => everReceived.has(r.id)).map(r => {
     const last = latest.get(r.id)
     const unread = last?.author_type === 'customer' && !last.read_by_staff_at
     return {
