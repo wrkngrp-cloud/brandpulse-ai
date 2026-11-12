@@ -4,6 +4,7 @@ import { useActionState, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { composeMail, saveDraft, type MailActionState } from './actions'
 import { AttachmentPicker, type PickedAttachment } from './attachment-picker'
+import { UndoSendBanner } from './undo-send-banner'
 import { Button } from '@/components/ui/button'
 import { Working } from '@/components/brand/working'
 
@@ -37,6 +38,8 @@ export function ComposeClient({ fromAddresses, initial }: {
   // Bumped after a successful send to remount AttachmentPicker, the only way
   // to clear its own internal state.
   const [attachmentsKey, setAttachmentsKey] = useState(0)
+  // The most recent send's Undo window, if still within one.
+  const [pendingSend, setPendingSend] = useState<{ messageId: string; deadline: number } | null>(null)
 
   // Resetting the form on a successful send is a reaction to this render's
   // state differing from the last one — exactly what React calls "adjusting
@@ -48,6 +51,11 @@ export function ComposeClient({ fromAddresses, initial }: {
     if (state?.ok) {
       setDraftId(''); setTo(''); setCc(''); setBcc(''); setSubject(''); setBody('')
       setAttachmentsKey(k => k + 1)
+      setPendingSend(
+        state.messageId && state.cancellableUntil
+          ? { messageId: state.messageId, deadline: state.cancellableUntil }
+          : null,
+      )
     }
   }
 
@@ -126,10 +134,22 @@ export function ComposeClient({ fromAddresses, initial }: {
         </div>
       </div>
 
+      {pendingSend && (
+        <UndoSendBanner
+          messageId={pendingSend.messageId}
+          deadline={pendingSend.deadline}
+          onUndone={deleted => {
+            setPendingSend(null)
+            if (deleted) router.push('.')
+            else router.refresh()
+          }}
+        />
+      )}
+
       {saveNote && <p className="text-xs text-tx-2" role="status">{saveNote}</p>}
       {state?.error && <p className="text-xs text-neg" role="alert">{state.error}</p>}
       {state?.warning && <p className="text-xs text-tx-2" role="status">{state.warning}</p>}
-      {state?.ok && <p className="text-xs text-tx-2" role="status">Sent.</p>}
+      {state?.ok && !pendingSend && <p className="text-xs text-tx-2" role="status">Sent.</p>}
     </form>
   )
 }

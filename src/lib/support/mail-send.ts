@@ -11,7 +11,16 @@ import type { AttachmentRef } from './attachments'
  * personal mailbox is a person's own words, sent the moment they press send,
  * with no template wrapped around them — closer to composing in Gmail than
  * to a support macro.
+ *
+ * Every send here is scheduled a few seconds out rather than fired
+ * immediately, which is the only thing that makes Undo Send real rather
+ * than cosmetic: Resend has nothing to pull back once a message is actually
+ * dispatched. UNDO_WINDOW_MS is shorter than SEND_DELAY_SECONDS on purpose —
+ * the gap is the margin for a click-to-server round trip and Resend's own
+ * cancel call to land before Resend's scheduled dispatch fires regardless.
  */
+export const SEND_DELAY_SECONDS = 12
+export const UNDO_WINDOW_MS = 10_000
 
 /** A verified attachment ref, turned into Resend's own shape: a signed URL it
  *  fetches itself, so this route never reads the file bytes into memory. */
@@ -46,5 +55,6 @@ export async function sendPersonalMail(opts: {
     ...(opts.inReplyTo ? { headers: { 'In-Reply-To': opts.inReplyTo, References: opts.inReplyTo } } : {}),
     text: opts.body,
     ...(opts.attachments?.length ? { attachments: await toResendAttachments(opts.attachments) } : {}),
+    scheduledAt: `in ${SEND_DELAY_SECONDS} seconds`,
   })
 }
