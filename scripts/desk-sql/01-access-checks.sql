@@ -736,3 +736,107 @@ select 'another workspace cannot read the brief' as check,
 union all select 'or the moment',
        (select count(*)::text from brand_moments where title = 'Savings vault'), '0';
 reset role;
+
+\echo '── the support assistant (20261109120000)'
+-- A visitor thread, so none of the customer counts above move.
+insert into support_conversations (id, visitor_token, status)
+values ('dddddddd-0000-0000-0000-000000000009', 'assistant-test-visitor', 'open');
+insert into support_messages (conversation_id, author_type, body)
+values ('dddddddd-0000-0000-0000-000000000009', 'customer', 'how do I connect X?');
+insert into support_messages (conversation_id, author_type, body)
+values ('dddddddd-0000-0000-0000-000000000009', 'assistant', 'Connectors, then X (Twitter), then Connect.');
+select 'an assistant reply never sets the human first_response_at' as check,
+       (select (first_response_at is null)::text from support_conversations where id = 'dddddddd-0000-0000-0000-000000000009') as got,
+       'true' as want
+union all
+select 'an assistant reply sets assistant_first_response_at',
+       (select (assistant_first_response_at is not null)::text from support_conversations where id = 'dddddddd-0000-0000-0000-000000000009'),
+       'true'
+union all
+select 'an unknown author is still refused',
+       pg_temp.attempt($q$insert into support_messages (conversation_id, author_type, body)
+         values ('dddddddd-0000-0000-0000-000000000009', 'robot', 'x')$q$), 'refused';
+
+update support_conversations
+   set assistant_state = 'handed_off', assistant_handoff_at = now(), assistant_reply_count = 3
+ where id = 'dddddddd-0000-0000-0000-000000000009';
+insert into support_messages (conversation_id, author_type, body, internal)
+values ('dddddddd-0000-0000-0000-000000000009', 'assistant', 'Handoff note', true);
+select 'an internal assistant note leaves the handoff in place' as check,
+       (select assistant_state from support_conversations where id = 'dddddddd-0000-0000-0000-000000000009') as got,
+       'handed_off' as want;
+
+insert into support_messages (conversation_id, author_type, author_id, body)
+values ('dddddddd-0000-0000-0000-000000000009', 'staff', 'aaaaaaaa-0000-0000-0000-000000000001', 'I have this one');
+select 'a person replying takes the handoff back' as check,
+       (select assistant_state || ',' || (assistant_handoff_at is null)::text
+          from support_conversations where id = 'dddddddd-0000-0000-0000-000000000009') as got,
+       'active,true' as want
+union all
+select 'and that reply is the human first response',
+       (select (first_response_at is not null)::text from support_conversations where id = 'dddddddd-0000-0000-0000-000000000009'),
+       'true';
+
+update support_conversations set status = 'closed', assistant_state = 'handed_off'
+ where id = 'dddddddd-0000-0000-0000-000000000009';
+insert into support_messages (conversation_id, author_type, body)
+values ('dddddddd-0000-0000-0000-000000000009', 'customer', 'one more thing');
+select 'a reopened thread gives the assistant fresh limits' as check,
+       (select status || ',' || assistant_state || ',' || assistant_reply_count::text
+          from support_conversations where id = 'dddddddd-0000-0000-0000-000000000009') as got,
+       'open,active,0' as want
+union all
+select 'the assistant state only takes known values',
+       pg_temp.attempt($q$update support_conversations set assistant_state = 'asleep'
+         where id = 'dddddddd-0000-0000-0000-000000000009'$q$), 'refused';
+
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select 'a customer cannot post as the assistant' as check,
+       pg_temp.attempt($q$insert into support_messages (conversation_id, author_type, author_id, body)
+         values ('dddddddd-0000-0000-0000-000000000001', 'assistant',
+                 'aaaaaaaa-0000-0000-0000-000000000003', 'I am the assistant now')$q$) as got,
+       'refused' as want
+union all
+select 'a customer cannot see another thread''s assistant replies',
+       (select count(*)::text from support_messages where conversation_id = 'dddddddd-0000-0000-0000-000000000009'),
+       '0';
+reset role;
+
+\echo '── the assistant settings override (20261109160000)'
+-- aaaaaaaa-0000-0000-0000-000000000001 is Ada, role support: holds
+-- support.view but not support.manage_assistant. A USING clause filters rows
+-- silently rather than raising, so this is a row-count/value check, the same
+-- shape as the subscriptions checks above, not pg_temp.attempt().
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000001';
+select 'support can read the assistant mode (support.view)' as check,
+       (select count(*)::text from support_assistant_settings where id = 1), '1' as want;
+
+do $$
+begin
+  update support_assistant_settings set mode = 'live' where id = 1;
+  if (select mode from support_assistant_settings where id = 1) = 'live' then
+    raise notice 'FAIL: support changed the assistant mode without support.manage_assistant';
+  else
+    raise notice 'ok: support could not change the assistant mode';
+  end if;
+end $$;
+reset role;
+
+-- aaaaaaaa-0000-0000-0000-000000000002 is The Boss, role super_admin: holds
+-- everything, including support.manage_assistant.
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000002';
+update support_assistant_settings set mode = 'suggest' where id = 1;
+select 'super_admin can change the assistant mode' as check,
+       (select mode from support_assistant_settings where id = 1), 'suggest' as want;
+reset role;
+
+-- A customer (not staff at all) holds no support.* key, so support.view
+-- itself refuses them, the same way it refuses the subscriptions table above.
+set role authenticated;
+set request.jwt.claim.sub = 'aaaaaaaa-0000-0000-0000-000000000003';
+select 'a customer (not staff) cannot read the assistant mode' as check,
+       (select count(*)::text from support_assistant_settings where id = 1), '0' as want;
+reset role;

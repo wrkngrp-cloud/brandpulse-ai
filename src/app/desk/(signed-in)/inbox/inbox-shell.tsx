@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSelectedLayoutSegment } from 'next/navigation'
 import { DeskLink, useDeskRouter } from '@/components/desk/desk-link'
 import { createClient } from '@/lib/supabase/client'
-import { loadInbox } from './actions'
+import { loadInbox, deleteConversation } from './actions'
 import type { InboxRow, InboxCounts, InboxView } from '@/lib/desk/data'
 import { cn } from '@/lib/utils'
 
@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils'
 
 const VIEWS: { key: InboxView; label: string; countKey?: keyof InboxCounts }[] = [
   { key: 'unassigned', label: 'Unassigned', countKey: 'unassigned' },
+  { key: 'assistant',  label: 'Bot working', countKey: 'assistant' },
   { key: 'mine',       label: 'Mine',       countKey: 'mine' },
   { key: 'open',       label: 'Open',       countKey: 'open' },
   { key: 'snoozed',    label: 'Snoozed',    countKey: 'snoozed' },
@@ -49,11 +50,13 @@ function ago(iso: string): string {
 }
 
 export function InboxShell({
-  initialRows, initialCounts, initialView, children,
+  initialRows, initialCounts, initialView, canDelete, children,
 }: {
   initialRows:   InboxRow[]
   initialCounts: InboxCounts
   initialView:   InboxView
+  /** support.delete: admin and super_admin only. Closed conversations only, checked again server-side. */
+  canDelete:     boolean
   children:      React.ReactNode
 }) {
   const router = useDeskRouter()
@@ -183,12 +186,13 @@ export function InboxShell({
         ) : (
           <ul ref={listRef} className="min-h-0 flex-1 divide-y divide-line overflow-y-auto">
             {rows.map((row, index) => (
-              <li key={row.id}>
+              <li key={row.id} className="relative">
                 <DeskLink
                   href={`/desk/inbox/${row.id}`}
                   onClick={() => setCursor(index)}
                   className={cn(
                     'bg-press block px-3 py-2.5',
+                    row.status === 'closed' && canDelete && 'pr-14',
                     openId === row.id && 'bg-shell',
                     cursor === index && openId !== row.id && 'bg-shell/60',
                   )}
@@ -209,6 +213,21 @@ export function InboxShell({
 
                   <p className="mt-0.5 line-clamp-1 text-xs text-tx-2">{row.preview}</p>
 
+                  {/* A case the support assistant handed over. Overdue is
+                      measured against the reply targets in working time. */}
+                  {row.handedOff ? (
+                    <p className="mt-0.5 flex items-center gap-1.5 text-[0.7rem]">
+                      <span className="bg-label text-[0.6rem] text-tx-2">Handed off · {row.priority}</span>
+                      {row.overdue && <span className="bg-label text-[0.6rem] text-tx-flare">Overdue</span>}
+                    </p>
+                  ) : row.assistantActive ? (
+                    <p className="mt-0.5 flex items-center gap-1.5 text-[0.7rem]">
+                      <span className="bg-label text-[0.6rem] text-tx-2">
+                        Bot replying{row.assistantPersona ? ` · ${row.assistantPersona}` : ''}
+                      </span>
+                    </p>
+                  ) : null}
+
                   <p className="mt-0.5 truncate text-[0.7rem] text-tx-3">
                     {[
                       row.workspaceName ? `${row.workspaceName} · ${row.plan}` : 'No account yet',
@@ -217,6 +236,14 @@ export function InboxShell({
                     ].filter(Boolean).join(' · ')}
                   </p>
                 </DeskLink>
+                {row.status === 'closed' && canDelete && (
+                  <form action={deleteConversation} className="absolute right-2 top-2.5">
+                    <input type="hidden" name="conversation_id" value={row.id} />
+                    <button type="submit" className="bg-press rounded-sm border border-line bg-paper px-1.5 py-0.5 text-[0.65rem] text-neg">
+                      Delete
+                    </button>
+                  </form>
+                )}
               </li>
             ))}
           </ul>

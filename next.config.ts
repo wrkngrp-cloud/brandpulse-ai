@@ -56,6 +56,12 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // The support assistant reads its build pack from disk at runtime
+  // (src/lib/support/assistant/knowledge.ts), so the file has to ship with
+  // the function that runs the job.
+  outputFileTracingIncludes: {
+    '/api/inngest': ['./docs/support-assistant/build-pack.md'],
+  },
   // Stop announcing the framework and its presence to anyone scanning.
   poweredByHeader: false,
   async headers() {

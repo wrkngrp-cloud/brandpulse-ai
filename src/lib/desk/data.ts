@@ -2,6 +2,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { ALL_PERMISSIONS } from './permissions'
 import { MASKED, maskEmail } from './redact'
 import type { StaffSession } from './auth'
+import { isOverdue } from '@/lib/support/reply-targets'
 
 /**
  * The Desk's data layer.
@@ -327,10 +328,18 @@ export interface InboxRow {
   waitingSince:  string | null
   /** Minutes from the thread opening to our first reply. Null if we never have. */
   firstResponseMins: number | null
+  priority:      string
+  /** The support assistant handed this to the team and no person has replied since. */
+  handedOff:     boolean
+  /** Handed off and past its reply target (src/lib/support/reply-targets.ts). */
+  overdue:       boolean
+  /** The assistant is the one on this thread right now: unassigned, not handed off, open or pending. */
+  assistantActive:  boolean
+  assistantPersona: string | null
 }
 
 /** The named queues down the side of the inbox. */
-export type InboxView = 'unassigned' | 'mine' | 'open' | 'snoozed' | 'closed' | 'all'
+export type InboxView = 'unassigned' | 'mine' | 'open' | 'snoozed' | 'closed' | 'all' | 'assistant'
 
 export interface InboxCounts {
   unassigned: number
@@ -338,6 +347,7 @@ export interface InboxCounts {
   open:       number
   snoozed:    number
   closed:     number
+  assistant:  number
 }
 
 /**
@@ -358,6 +368,7 @@ export async function supportInbox(
     .select(`
       id, name, email, subject, status, source, page_url, assigned_to,
       first_response_at, last_message_at, created_at,
+      priority, assistant_state, assistant_handoff_at, assistant_persona,
       workspaces ( name, plan ),
       brands ( brand_type )
     `)
@@ -399,6 +410,12 @@ export async function supportInbox(
     const last = latest.get(row.id)
     const workspace = row.workspaces as unknown as { name?: string; plan?: string } | null
     const brand     = row.brands     as unknown as { brand_type?: string } | null
+    // An assistant reply is not a person's reply. A case the assistant handed
+    // over is waiting on us until a person answers, whoever wrote last.
+    const handedOff = row.assistant_state === 'handed_off' && row.status !== 'closed'
+    const waiting   = last?.author_type === 'customer' || handedOff
+    const assistantActive = row.assistant_state === 'active' && !row.assigned_to
+      && (row.status === 'open' || row.status === 'pending')
 
     return {
       id:      row.id,
@@ -413,10 +430,17 @@ export async function supportInbox(
       brandType:     brand?.brand_type ?? null,
       lastMessageAt: row.last_message_at,
       createdAt:     row.created_at,
-      waitingOnUs:   last?.author_type === 'customer',
+      waitingOnUs:   waiting,
       // Only meaningful while they are waiting. Showing an age on a thread we
       // have already answered would read as a backlog that is not there.
-      waitingSince:  last?.author_type === 'customer' ? row.last_message_at : null,
+      waitingSince:  handedOff && row.assistant_handoff_at
+        ? row.assistant_handoff_at
+        : last?.author_type === 'customer' ? row.last_message_at : null,
+      priority:      row.priority ?? 'normal',
+      handedOff,
+      overdue:       handedOff && isOverdue(row.priority, row.assistant_handoff_at),
+      assistantActive,
+      assistantPersona: row.assistant_persona ?? null,
       firstResponseMins: row.first_response_at
         ? Math.max(0, Math.round(
             (new Date(row.first_response_at).getTime() - new Date(row.created_at).getTime()) / 60000,
@@ -430,7 +454,8 @@ export async function supportInbox(
       assignedTo:   names.get(row.assigned_to ?? '') ?? null,
       assignedToId: row.assigned_to ?? null,
     }
-  }).sort((a, b) => Number(b.waitingOnUs) - Number(a.waitingOnUs))
+  }).sort((a, b) =>
+    Number(b.overdue) - Number(a.overdue) || Number(b.waitingOnUs) - Number(a.waitingOnUs))
 }
 
 /**
@@ -446,6 +471,7 @@ function applyView(query: any, view: InboxView, userId: string) {
     case 'mine':       return query.in('status', ['open', 'pending']).eq('assigned_to', userId)
     case 'snoozed':    return query.eq('status', 'snoozed')
     case 'closed':     return query.eq('status', 'closed')
+    case 'assistant':  return query.in('status', ['open', 'pending']).is('assigned_to', null).eq('assistant_state', 'active')
     case 'all':        return query
     case 'open':
     default:           return query.in('status', ['open', 'pending'])
@@ -466,8 +492,8 @@ export async function inboxCounts(session: StaffSession): Promise<InboxCounts> {
       view, session.userId,
     )
 
-  const [unassigned, mine, open, snoozed, closed] = await Promise.all([
-    count('unassigned'), count('mine'), count('open'), count('snoozed'), count('closed'),
+  const [unassigned, mine, open, snoozed, closed, assistant] = await Promise.all([
+    count('unassigned'), count('mine'), count('open'), count('snoozed'), count('closed'), count('assistant'),
   ])
 
   return {
@@ -476,6 +502,7 @@ export async function inboxCounts(session: StaffSession): Promise<InboxCounts> {
     open:       open.count ?? 0,
     snoozed:    snoozed.count ?? 0,
     closed:     closed.count ?? 0,
+    assistant:  assistant.count ?? 0,
   }
 }
 
@@ -503,12 +530,22 @@ export interface DeskThread {
     bhi: number | null
     aiCalls30: number
   } | null
+  /** The support assistant's state on the thread. */
+  assistant: {
+    persona: string | null
+    handedOff: boolean
+    overdue: boolean
+    priority: string
+    tags: string[]
+  }
   messages: {
     id: string
-    author: 'customer' | 'staff' | 'system'
+    author: 'customer' | 'staff' | 'system' | 'assistant'
     authorName: string | null
     body: string
     internal: boolean
+    /** A customer pasted a key, token, password or card number here. */
+    needsRedaction: boolean
     attachments: { name: string; url: string | null; type: string }[]
     createdAt: string
   }[]
@@ -519,14 +556,14 @@ export async function deskThread(session: StaffSession, id: string): Promise<Des
 
   const { data: conv } = await service
     .from('support_conversations')
-    .select('id, name, email, status, source, page_url, user_agent, created_at, first_response_at, assigned_to, workspace_id, brand_id')
+    .select('id, name, email, status, source, page_url, user_agent, created_at, first_response_at, assigned_to, workspace_id, brand_id, priority, tags, assistant_persona, assistant_state, assistant_handoff_at')
     .eq('id', id)
     .maybeSingle()
   if (!conv) return null
 
   const { data: rows } = await service
     .from('support_messages')
-    .select('id, author_type, author_id, body, internal, attachments, created_at')
+    .select('id, author_type, author_id, body, internal, attachments, needs_redaction, created_at')
     .eq('conversation_id', id)
     .order('created_at')
     .limit(500)
@@ -590,14 +627,30 @@ export async function deskThread(session: StaffSession, id: string): Promise<Des
         ))
       : null,
     account,
+    assistant: {
+      persona:   conv.assistant_persona ?? null,
+      handedOff: conv.assistant_state === 'handed_off' && conv.status !== 'closed',
+      overdue:   conv.assistant_state === 'handed_off' && conv.status !== 'closed'
+        && isOverdue(conv.priority, conv.assistant_handoff_at),
+      priority:  conv.priority ?? 'normal',
+      tags:      (conv.tags as string[] | null) ?? [],
+    },
     messages: await Promise.all((rows ?? []).map(async row => ({
       id:     row.id,
-      author: row.author_type as 'customer' | 'staff' | 'system',
-      authorName: row.author_type === 'staff' ? names.get(row.author_id ?? '') ?? 'BrandGauge' : null,
-      body:   canSeeContent || row.author_type !== 'customer'
+      author: row.author_type as 'customer' | 'staff' | 'system' | 'assistant',
+      // The assistant always carries its label in the Desk, so nobody mistakes
+      // its words for a colleague's.
+      authorName: row.author_type === 'staff' ? names.get(row.author_id ?? '') ?? 'BrandGauge'
+        : row.author_type === 'assistant'
+          ? (conv.assistant_persona ? `Assistant (${conv.assistant_persona})` : 'Assistant')
+          : null,
+      // The assistant's internal notes quote the customer (the handoff note's
+      // "What they asked"), so they are customer content too.
+      body:   canSeeContent || (row.author_type !== 'customer' && !(row.author_type === 'assistant' && row.internal))
         ? row.body
         : 'Hidden on your role',
       internal: row.internal,
+      needsRedaction: Boolean(row.needs_redaction),
       attachments: canSeeContent
         ? await signAttachmentsForDesk(row.attachments as { path: string; name: string; type: string }[])
         : [],

@@ -169,6 +169,8 @@ feature and an Inert one.
 | `INNGEST_EVENT_KEY`, `INNGEST_SIGNING_KEY` | Every background job |
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Cache, rate limits, OAuth state. **The scoreboard limiter and cache fail open if this is unavailable**, by design |
 | `RESEND_API_KEY` | All email: briefings, reports, alerts |
+| `RESEND_INBOUND_WEBHOOK_SECRET` | Signature check on `/api/support/inbound`. Without it inbound email to support@/hello@ is refused rather than trusted unsigned |
+| `SUPPORT_NOTIFY_EMAIL` | Who the support assistant pings on a handoff/chase/overdue case, comma-separated. Without it a case still waits in the Desk's Unassigned view, just with nobody emailed |
 | `NEXT_PUBLIC_MAPBOX_TOKEN` | OOH and sighting maps |
 | `META_APP_ID`, `META_APP_SECRET` | Instagram connect, Meta Ads |
 | `TWITTER_CLIENT_ID`, `TWITTER_CLIENT_SECRET`, `TWITTER_BEARER_TOKEN` | X connect and mentions |

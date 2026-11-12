@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { randomBytes, createHash } from 'node:crypto'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getActiveBrand } from '@/lib/active-brand'
+import { personaDisplayName } from '@/lib/support/assistant/config'
 
 /**
  * The support chat, server side.
@@ -23,11 +24,15 @@ const VISITOR_TTL_DAYS = 180
 
 export interface ChatMessage {
   id:        string
-  author:    'customer' | 'staff' | 'system'
+  author:    'customer' | 'staff' | 'system' | 'assistant'
   authorName: string | null
   body:      string
   attachments: { name: string; url: string | null; type: string }[]
   createdAt: string
+  /** Empty on anything but a mail message. Carried through so /desk/mail can
+   *  show who else was on an email without a second query. */
+  cc:  string[]
+  bcc: string[]
 }
 
 export interface ChatThread {
@@ -85,20 +90,17 @@ export async function staffOnline(): Promise<boolean> {
     const service = await createServiceClient()
     const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString()
 
-    const { data } = await service
-      .from('staff')
-      .select('user_id, role, status, last_seen_at')
-      .eq('status', 'active')
-      .gte('last_seen_at', cutoff)
+    // Independent of each other, so run together rather than one after the
+    // other: this query does not depend on who is actually online.
+    const [{ data }, { data: perms }] = await Promise.all([
+      service.from('staff').select('user_id, role, status, last_seen_at')
+        .eq('status', 'active').gte('last_seen_at', cutoff),
+      service.from('role_permissions').select('role').eq('permission', 'support.reply'),
+    ])
 
     if (!data?.length) return false
 
     const userIds = data.map(s => s.user_id)
-    const { data: perms } = await service
-      .from('role_permissions')
-      .select('role')
-      .eq('permission', 'support.reply')
-
     const replyRoles = new Set((perms ?? []).map(p => p.role))
     if (data.some(s => s.role === 'super_admin' || replyRoles.has(s.role))) return true
 
@@ -129,6 +131,7 @@ export async function getOrCreateThread(opts: {
   const { data: { user } } = await supabase.auth.getUser()
 
   let conversation: { id: string; status: string; email: string | null; name: string | null } | null = null
+  let isNew = false
 
   if (user) {
     const { data } = await service
@@ -191,17 +194,26 @@ export async function getOrCreateThread(opts: {
       .single()
 
     conversation = created
+    isNew = true
   }
 
   if (!conversation) throw new Error('Could not open a conversation')
+
+  // A brand-new conversation has no messages yet, so there is nothing to
+  // read; skip the round trip. The two independent reads below were
+  // previously sequential, which was most of this function's latency.
+  const [messages, online] = await Promise.all([
+    isNew ? Promise.resolve([]) : threadMessages(conversation.id),
+    staffOnline(),
+  ])
 
   return {
     id:     conversation.id,
     status: conversation.status as ChatThread['status'],
     email:  conversation.email,
     name:   conversation.name,
-    messages: await threadMessages(conversation.id),
-    staffOnline: await staffOnline(),
+    messages,
+    staffOnline: online,
   }
 }
 
@@ -238,7 +250,7 @@ export async function threadMessages(conversationId: string): Promise<ChatMessag
 
   const { data: rows } = await service
     .from('support_messages')
-    .select('id, author_type, author_id, body, attachments, internal, created_at')
+    .select('id, author_type, author_id, body, attachments, cc, bcc, internal, created_at')
     .eq('conversation_id', conversationId)
     // The customer's view never includes an internal note. The policy says the
     // same thing for a signed-in reader; this covers the service-role path.
@@ -257,13 +269,28 @@ export async function threadMessages(conversationId: string): Promise<ChatMessag
   // First name only. The customer is talking to a person, not to a directory.
   const names = new Map((people ?? []).map(p => [p.user_id, p.full_name.split(' ')[0]]))
 
+  // The support assistant shows as "<persona> from BrandGauge": one name per
+  // thread, never a staff row, so it never appears in the roster or presence.
+  const hasAssistant = (rows ?? []).some(r => r.author_type === 'assistant')
+  const { data: conv } = hasAssistant
+    ? await service.from('support_conversations').select('assistant_persona').eq('id', conversationId).maybeSingle()
+    : { data: null }
+  const assistantName = personaDisplayName(conv?.assistant_persona as string | null | undefined)
+
+  const authorName = (row: { author_type: string; author_id: string | null }) =>
+    row.author_type === 'staff' ? names.get(row.author_id ?? '') ?? 'BrandGauge'
+    : row.author_type === 'assistant' ? assistantName
+    : null
+
   return Promise.all((rows ?? []).map(async row => ({
     id:     row.id,
     author: row.author_type as ChatMessage['author'],
-    authorName: row.author_type === 'staff' ? names.get(row.author_id ?? '') ?? 'BrandGauge' : null,
+    authorName: authorName(row),
     body:   row.body,
     attachments: await signAttachments(row.attachments as AttachmentRow[]),
     createdAt: row.created_at,
+    cc:  (row.cc as string[] | null) ?? [],
+    bcc: (row.bcc as string[] | null) ?? [],
   })))
 }
 

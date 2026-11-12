@@ -35,6 +35,7 @@ import { toolRunRetention }            from '@/lib/inngest/functions/tool-run-re
 import { mondayBriefScheduler, mondayBriefGenerate } from '@/lib/inngest/functions/monday-brief'
 import { metaUserBackfill } from '@/lib/inngest/functions/meta-user-backfill'
 import { metaLoginExpiry } from '@/lib/inngest/functions/meta-login-expiry'
+import { supportAssistantReply, supportAssistantOverdue } from '@/lib/inngest/functions/support-assistant'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -63,5 +64,6 @@ export const { GET, POST, PUT } = serve({
     googleAdsDailySync,
     impersonationSweep,
     leadSignupMatch,
+    supportAssistantReply, supportAssistantOverdue,
   ],
 })

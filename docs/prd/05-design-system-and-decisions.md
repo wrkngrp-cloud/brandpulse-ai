@@ -404,6 +404,18 @@ gains the new pattern.
 
 ---
 
+### LD-20: Support assistant: suggest-only first, then auto-reply behind a mode flag
+
+| | |
+|---|---|
+| **Decision** | Support assistant: suggest-only first, then auto-reply behind a mode flag, owner decision 2026-11-08. `SUPPORT_ASSISTANT_MODE` is `off` (the default, and what unset or unknown means), `suggest` (a draft lands as an internal note for a person to send) or `live` (the assistant posts as `author_type 'assistant'`). It replaces the "suggest, never auto-send" line in `docs/internal-tool-plan.md` section 4. |
+| **What it means** | One Inngest job (`src/lib/inngest/functions/support-assistant.ts`) answers from the build pack in `docs/support-assistant/build-pack.md` on the `chat` tier, through `callAi` with `feature: 'support.assistant'`. A person replying, assigning or closing always wins: the job stands down when a thread is assigned, closed, or a person posted in the last 30 minutes. `first_response_at` stays human-only; the assistant has its own `assistant_first_response_at`. Presence (`staffOnline()`) still means people only. |
+| **Also decided** | Owner, 9 Nov 2026: no AI model, model family or AI company is ever named in the support chat, by the assistant or by staff, under any condition, even when the customer names one first; the words are "BrandGauge's AI model" (TEC-01), and the Desk refuses a staff reply that names one. The assistant never claims to be human: a first "person or bot?" gets HUM-01, a pressed one gets HUM-02, which says plainly it is an automated support assistant and hands off. Interest in BrandGauge or adopting it is always Urgent, tagged lead, and routed to bizdev first. |
+| **Why it's locked** | Auto-reply on a product people pay to get real analysis from is a trade that only holds with the guard rails: the mode flag as a kill switch, the output guard, the hard limits (6 replies, 2 unhelpful, 20 calls a day per thread) and the handoff rules. Each one looks like friction someone will want to remove. |
+| **Watch for** | The mode switched on in an environment as a tidy-up. A guard rule loosened to let a "better" answer through. HUM-01 or HUM-02 softened into a dodge, or a reply claiming to be a person. A vendor or model name reaching the chat through the knowledge base, a macro or a staff reply. `staffOnline()` or `first_response_at` starting to count the assistant. |
+
+---
+
 ## B.1 Decisions that are not locked, and should not be
 
 For contrast, so the table does not swell: the chart library, the specific radius values, the

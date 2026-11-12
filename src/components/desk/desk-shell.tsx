@@ -8,7 +8,7 @@ import { BrandLockup } from '@/components/brand/logo'
 import { cn } from '@/lib/utils'
 import {
   LayoutGridIcon, BuildingIcon, MessageQuoteIcon, UsersIcon,
-  CurrencyIcon, TrendIcon, WrenchIcon, ShieldIcon, LogoutIcon,
+  CurrencyIcon, TrendIcon, WrenchIcon, ShieldIcon, LogoutIcon, MailIcon,
 } from '@/components/brand/icon'
 import { PresenceBeat } from './presence-beat'
 
@@ -40,6 +40,7 @@ const NAV: DeskNavEntry[] = [
   { label: 'Accounts', href: '/desk/accounts', icon: BuildingIcon,      perm: 'accounts.view' },
   { label: 'Inbox',    href: '/desk/inbox',    icon: MessageQuoteIcon,  perm: 'support.view' },
   { label: 'Leads',    href: '/desk/leads',    icon: TrendIcon,         perm: 'leads.view' },
+  { label: 'Mail',     href: '/desk/mail',     icon: MailIcon,          perm: 'mail.use' },
   { label: 'Revenue',  href: '/desk/revenue',  icon: CurrencyIcon,      perm: 'revenue.view' },
   { label: 'Ops',      href: '/desk/ops',      icon: WrenchIcon,        perm: 'ops.view' },
   { label: 'Staff',    href: '/desk/staff',    icon: UsersIcon,         perm: 'staff.view' },

@@ -1,11 +1,13 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { sendMail, emailConfigured } from '@/lib/email/send'
+import { redirect } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/server'
 import { requireStaffOrNull, writeAudit } from '@/lib/desk/auth'
 import { supportInbox, inboxCounts, type InboxRow, type InboxCounts, type InboxView } from '@/lib/desk/data'
 import { z } from 'zod'
+import { findModelNames } from '@/lib/support/assistant/guard'
+import { emailReply } from '@/lib/support/customer-email'
 
 export type ReplyState = { error?: string; ok?: boolean; warning?: string } | null
 
@@ -26,12 +28,10 @@ const replySchema = z.object({
  * An internal note takes none of that. It is a note between us on the thread,
  * and the policy keeps it off the customer's side.
  *
- * The email does not invite a reply into the thread, because there is nothing
- * on the receiving end: no inbound handler exists, and `source = 'email'` is a
- * value nothing writes. It used to say a reply would come straight back here,
- * so a customer who answered by email was answering into a mailbox while the
- * thread still read as waiting on them. Until inbound is built, the email
- * points them at the chat.
+ * The email now does invite a reply: /api/support/inbound carries one back
+ * into this same thread. Before that route existed this comment said the
+ * opposite, because a reply would land in a mailbox nothing read while the
+ * thread still showed as waiting on the customer.
  */
 export async function replyToThread(_prev: ReplyState, formData: FormData): Promise<ReplyState> {
   const internal = formData.get('internal') === 'on'
@@ -49,11 +49,23 @@ export async function replyToThread(_prev: ReplyState, formData: FormData): Prom
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
   const { conversation_id, body } = parsed.data
+
+  // Owner decision, 9 Nov 2026: no AI model or AI company is named in the
+  // support chat, by the assistant or by staff, under any condition. The words
+  // for it are "BrandGauge's AI model". Internal notes are between us and are
+  // not checked.
+  if (!parsed.data.internal) {
+    const named = findModelNames(body)
+    if (named.length) {
+      return { error: `Replies never name an AI model or company (${named.join(', ')}). Say "BrandGauge's AI model" instead.` }
+    }
+  }
+
   const service = await createServiceClient()
 
   const { data: conv } = await service
     .from('support_conversations')
-    .select('id, email, name, user_id, brand_id, source, last_message_at')
+    .select('id, email, name, user_id, brand_id, source, subject, inbound_address, last_message_at')
     .eq('id', conversation_id)
     .maybeSingle()
   if (!conv) return { error: 'That conversation no longer exists.' }
@@ -97,33 +109,13 @@ export async function replyToThread(_prev: ReplyState, formData: FormData): Prom
     }
   }
 
-  // And an email, unless they were writing to us a moment ago, in which case
-  // they are still in the widget and an email is noise.
-  const activeRecently = conv.last_message_at
-    && Date.now() - new Date(conv.last_message_at).getTime() < 10 * 60 * 1000
-
-  let emailed: boolean | null = null
-  if (conv.email && !activeRecently && emailConfigured()) {
-    const mail = await sendMail({
-      from:     'BrandGauge <support@brandgauge.app>',
-      to:       conv.email,
-      subject:  'Re: your message to BrandGauge',
-      replyTo:  'support@brandgauge.app',
-      text:
-`${conv.name ? `Hi ${conv.name.split(' ')[0]},` : 'Hi,'}
-
-${body}
-
-To carry on, open the chat on BrandGauge and your whole conversation is there.
-
-${session.fullName}
-BrandGauge`,
-    })
-    // The reply is in the thread either way, so a refused email does not fail
-    // the action. It is reported back so the person who wrote it knows the
-    // customer may not have seen it in their inbox.
-    emailed = mail.sent
-  }
+  // And an email, when they would not otherwise see this reply at all (an
+  // email-origin conversation, always) or have gone quiet in the widget.
+  const mail = await emailReply(conv, body, session.fullName)
+  // The reply is in the thread either way, so a refused email does not fail
+  // the action. It is reported back so the person who wrote it knows the
+  // customer may not have seen it in their inbox.
+  const emailed = mail ? mail.sent : null
 
   revalidatePath(`/desk/inbox/${conversation_id}`)
   revalidatePath('/desk/inbox')
@@ -174,6 +166,39 @@ export async function assignThread(formData: FormData): Promise<void> {
   })
   revalidatePath(`/desk/inbox/${id}`)
   revalidatePath('/desk/inbox')
+}
+
+/**
+ * Erasing a conversation, so the inbox does not become a permanent stockpile.
+ *
+ * Closed only, checked here against the row itself rather than trusted from
+ * the form: a client is a cache, not a source of truth, and the whole point
+ * of this gate is that nothing live or waiting on a reply can be erased by a
+ * stale screen. support_messages cascades, so the thread's messages go with
+ * it; nothing else in the schema references a conversation in a way that
+ * would block the delete.
+ */
+export async function deleteConversation(formData: FormData): Promise<void> {
+  const session = await requireStaffOrNull('support.delete')
+  if (!session) return
+
+  const id = String(formData.get('conversation_id') ?? '')
+  if (!id) return
+
+  const service = await createServiceClient()
+  const { data: conversation } = await service
+    .from('support_conversations').select('status').eq('id', id).maybeSingle()
+  if (!conversation || conversation.status !== 'closed') return
+
+  await service.from('support_conversations').delete().eq('id', id)
+
+  await writeAudit({
+    actorId: session.userId, action: 'support.delete',
+    targetType: 'conversation', targetId: id,
+    summary: 'Deleted a closed conversation',
+  })
+  revalidatePath('/desk/inbox')
+  redirect('/desk/inbox')
 }
 
 /**

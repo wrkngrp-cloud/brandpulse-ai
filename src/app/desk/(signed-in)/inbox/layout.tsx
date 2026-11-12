@@ -2,6 +2,7 @@ import { requireStaff } from '@/lib/desk/auth'
 import { supportInbox, inboxCounts, type InboxView } from '@/lib/desk/data'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { MessageQuoteIcon } from '@/components/brand/icon'
+import { DeskLink } from '@/components/desk/desk-link'
 import { InboxShell } from './inbox-shell'
 
 export const dynamic = 'force-dynamic'
@@ -40,9 +41,14 @@ export default async function InboxLayout({ children }: { children: React.ReactN
             : `${counts.unassigned} ${counts.unassigned === 1 ? 'conversation is' : 'conversations are'} unassigned.`
         }
         icon={MessageQuoteIcon}
+        actions={
+          <DeskLink href="/desk/inbox/assistant" className="bg-press rounded-sm border border-line px-3 py-1.5 text-xs text-tx-2">
+            Assistant
+          </DeskLink>
+        }
       />
 
-      <InboxShell initialRows={rows} initialCounts={counts} initialView={view}>
+      <InboxShell initialRows={rows} initialCounts={counts} initialView={view} canDelete={session.can('support.delete')}>
         {children}
       </InboxShell>
     </div>

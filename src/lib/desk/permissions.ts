@@ -31,6 +31,8 @@ export const PERMISSION_GROUPS = [
       ['support.reply',  'Reply to a customer'],
       ['support.assign', 'Assign a thread'],
       ['support.close',  'Close a thread'],
+      ['support.manage_assistant', "Change the assistant's live, suggest or off mode"],
+      ['support.delete', 'Delete a closed conversation'],
     ],
   },
   {
@@ -39,6 +41,12 @@ export const PERMISSION_GROUPS = [
       ['leads.view',   'See captured leads'],
       ['leads.edit',   'Work the pipeline: status, notes'],
       ['leads.export', 'Export the lead list'],
+    ],
+  },
+  {
+    module: 'Mail',
+    keys: [
+      ['mail.use', 'Use a personal @brandgauge.app mailbox for one-to-one outreach'],
     ],
   },
   {
