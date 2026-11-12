@@ -108,7 +108,7 @@ export async function replyMail(_prev: MailActionState, formData: FormData): Pro
   })
 
   const mail = await sendPersonalMail({
-    from: conv.inbound_address!, to: conv.email,
+    from: `${session.fullName} <${conv.inbound_address!}>`, to: conv.email,
     subject: conv.subject ? `Re: ${conv.subject}` : 'Re:',
     body: parsed.data.body, cc, bcc, attachments,
     inReplyTo: await lastInboundRfcMessageId(conv.id),
@@ -189,7 +189,7 @@ export async function composeMail(_prev: MailActionState, formData: FormData): P
   })
 
   const mail = await sendPersonalMail({
-    from: fromAddress, to: parsed.data.to, subject: parsed.data.subject,
+    from: `${session.fullName} <${fromAddress}>`, to: parsed.data.to, subject: parsed.data.subject,
     body: parsed.data.body, cc, bcc, attachments,
   })
 
