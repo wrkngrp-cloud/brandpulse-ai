@@ -49,3 +49,33 @@ export function verifyAttachment(
     return false
   }
 }
+
+/**
+ * The same idea, scoped to a staff member rather than a conversation.
+ *
+ * A mail attachment is picked before a conversation necessarily exists (a
+ * fresh compose has none yet, and a draft may never get one), so there is no
+ * conversation id to sign against at upload time. A `mail:` prefix on the
+ * payload keeps this namespace disjoint from signAttachment's — a reference
+ * signed for a person can never verify as one signed for a thread.
+ */
+function mailPayload(userId: string, ref: AttachmentRef): string {
+  return ['mail', userId, ref.path, ref.name, ref.type, String(ref.size)].join('|')
+}
+
+export function signMailAttachment(userId: string, ref: AttachmentRef): string {
+  return createHmac('sha256', key()).update(mailPayload(userId, ref)).digest('base64url')
+}
+
+export function verifyMailAttachment(
+  userId: string, ref: AttachmentRef, signature: string,
+): boolean {
+  try {
+    const expected = Buffer.from(signMailAttachment(userId, ref), 'utf8')
+    const given    = Buffer.from(signature, 'utf8')
+    if (expected.length !== given.length) return false
+    return timingSafeEqual(expected, given)
+  } catch {
+    return false
+  }
+}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { randomBytes, createHmac, timingSafeEqual } from 'node:crypto'
+import { randomBytes, randomUUID, createHmac, timingSafeEqual } from 'node:crypto'
 import { createServiceClient } from '@/lib/supabase/server'
 import { inngest } from '@/lib/inngest/client'
 import { effectiveAssistantMode } from '@/lib/support/assistant/mode-db'
@@ -124,11 +124,13 @@ interface ReceivedEmail {
   id: string
   from: string
   to: string[]
+  cc: string[] | null
+  bcc: string[] | null
   subject: string | null
   message_id: string | null
   text: string | null
   html: string | null
-  attachments: { filename: string }[]
+  attachments: { id: string; filename: string }[]
 }
 
 /** The webhook carries only metadata; the body is a separate fetch by design (Resend's own note: keeps the webhook body small for serverless limits). */
@@ -143,6 +145,57 @@ async function fetchEmailBody(emailId: string): Promise<{ email: ReceivedEmail }
     return { error: `Resend ${res.status}: ${(await res.text()).slice(0, 300)}` }
   }
   return { email: await res.json() }
+}
+
+interface StoredAttachment { path: string; name: string; type: string; size: number }
+
+const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024
+const ALLOWED_ATTACHMENT_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'])
+
+/**
+ * Every attachment on an inbound email, pulled into our own private bucket
+ * in the same {path, name, type, size} shape the chat widget already uses,
+ * so the thread view renders them with no special case. Resend's own
+ * download_url is time-limited; a Desk reader coming back to this thread a
+ * week later needs the file to still be there. A file too large or the
+ * wrong type is skipped with a note rather than failing the whole email —
+ * the text of the message is worth more than one attachment.
+ */
+async function pullAttachments(
+  service: Awaited<ReturnType<typeof createServiceClient>>,
+  emailId: string, conversationId: string,
+  attachments: ReceivedEmail['attachments'],
+): Promise<{ stored: StoredAttachment[]; skipped: string[] }> {
+  const stored: StoredAttachment[] = []
+  const skipped: string[] = []
+
+  for (const att of attachments) {
+    const res = await fetch(`https://api.resend.com/emails/receiving/${emailId}/attachments/${att.id}`, {
+      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` },
+    })
+    if (!res.ok) { skipped.push(att.filename); continue }
+    const meta = await res.json() as { download_url: string; filename: string; content_type: string; size: number }
+
+    if (meta.size > MAX_ATTACHMENT_BYTES || !ALLOWED_ATTACHMENT_TYPES.has(meta.content_type)) {
+      skipped.push(meta.filename)
+      continue
+    }
+
+    const fileRes = await fetch(meta.download_url)
+    if (!fileRes.ok) { skipped.push(meta.filename); continue }
+
+    const displayName = meta.filename.slice(0, 120)
+    const extension = displayName.includes('.') ? displayName.split('.').pop()!.slice(0, 8) : 'bin'
+    const path = `${conversationId}/${randomUUID()}.${extension.replace(/[^a-zA-Z0-9]/g, '')}`
+
+    const { error } = await service.storage.from('support-attachments')
+      .upload(path, await fileRes.arrayBuffer(), { contentType: meta.content_type, upsert: false })
+    if (error) { skipped.push(meta.filename); continue }
+
+    stored.push({ path, name: displayName, type: meta.content_type, size: meta.size })
+  }
+
+  return { stored, skipped }
 }
 
 export async function POST(req: NextRequest) {
@@ -196,10 +249,6 @@ export async function POST(req: NextRequest) {
   const { email } = fetched
 
   const { email: fromAddress, name } = splitFrom(email.from)
-  const attachmentNote = email.attachments?.length
-    ? `\n\n[${email.attachments.length} attachment${email.attachments.length === 1 ? '' : 's'} sent with this email (${email.attachments.map(a => a.filename).join(', ')}) — not pulled in yet; ask them to send it through the chat if it's needed.]`
-    : ''
-  const body = (email.text || (email.html ? htmlToText(email.html) : '') || '(no text in this email)') + attachmentNote
 
   const { data: existing } = await service
     .from('support_conversations')
@@ -252,11 +301,23 @@ export async function POST(req: NextRequest) {
     }
     conversationId = created.id
   }
+  const convId = conversationId as string
+
+  const { stored: attachments, skipped } = email.attachments?.length
+    ? await pullAttachments(service, emailId, convId, email.attachments)
+    : { stored: [], skipped: [] }
+  const skippedNote = skipped.length
+    ? `\n\n[${skipped.length} attachment${skipped.length === 1 ? '' : 's'} could not be saved (${skipped.join(', ')}) — too large, or not an image or PDF.]`
+    : ''
+  const body = (email.text || (email.html ? htmlToText(email.html) : '') || '(no text in this email)') + skippedNote
 
   const { error: msgErr } = await service.from('support_messages').insert({
-    conversation_id: conversationId,
+    conversation_id: convId,
     author_type:     'customer',
     body,
+    attachments,
+    cc:  email.cc ?? [],
+    bcc: email.bcc ?? [],
     email_message_id:     emailId,
     email_rfc_message_id: email.message_id,
   })

@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { requireStaff } from '@/lib/desk/auth'
 import { deskHref } from '@/lib/desk/urls'
-import { myMailboxAddresses, mailInbox } from '@/lib/desk/mail'
-import { ComposeForm } from './compose-form'
+import { myMailboxAddresses, mailInbox, draftsList } from '@/lib/desk/mail'
+import { MailTabs } from './mail-tabs'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,11 +13,18 @@ export const dynamic = 'force-dynamic'
  * from the shared support inbox on purpose (internal-tool-plan.md, "Mail").
  *
  * No queues, no assignment, no assistant: holding mail.use just gets you a
- * list of the conversations on addresses you actually own, oldest-reply-first
- * like any inbox. Someone who holds the permission but owns no address yet
- * sees that stated plainly rather than an empty list that looks like a bug.
+ * list of the conversations on addresses you actually own. Unread-first by
+ * default, same as opening any mail client; "Unread" narrows to only what
+ * still needs a look. Someone who holds the permission but owns no address
+ * yet sees that stated plainly rather than an empty list that looks like a
+ * bug.
  */
-export default async function MailPage() {
+export default async function MailPage({
+  searchParams,
+}: { searchParams: Promise<{ view?: string }> }) {
+  const { view } = await searchParams
+  const unreadOnly = view === 'unread'
+
   const session = await requireStaff('mail.use')
   const addresses = await myMailboxAddresses(session)
 
@@ -29,7 +38,10 @@ export default async function MailPage() {
     )
   }
 
-  const rows = await mailInbox(addresses)
+  const [rows, drafts] = await Promise.all([
+    mailInbox(addresses, unreadOnly ? 'unread' : 'all'),
+    draftsList(session.userId),
+  ])
   const base = await deskHref('/desk/mail')
 
   return (
@@ -39,12 +51,29 @@ export default async function MailPage() {
           <h1 className="text-base font-bold">Mail</h1>
           <p className="text-xs text-tx-3">{addresses.join(', ')}</p>
         </div>
-        <ComposeForm fromAddress={addresses[0]} />
+        <Link href={`${base}/compose`} className={buttonVariants({ size: 'sm' })}>Compose</Link>
+      </div>
+
+      <MailTabs base={base} active="inbox" draftCount={drafts.length} />
+
+      <div className="flex gap-1 text-xs">
+        <Link
+          href={base}
+          className={cn('bg-press rounded-md border border-line px-2 py-1', !unreadOnly && 'bg-shell font-medium')}
+        >
+          All
+        </Link>
+        <Link
+          href={`${base}?view=unread`}
+          className={cn('bg-press rounded-md border border-line px-2 py-1', unreadOnly && 'bg-shell font-medium')}
+        >
+          Unread
+        </Link>
       </div>
 
       {rows.length === 0 ? (
         <p className="rounded-xl border border-line bg-card p-4 text-sm text-tx-3">
-          Nothing here yet. Compose the first one.
+          {unreadOnly ? 'Nothing unread.' : 'Nothing here yet. Compose the first one.'}
         </p>
       ) : (
         <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-card">
@@ -52,14 +81,17 @@ export default async function MailPage() {
             <li key={row.id}>
               <Link href={`${base}/${row.id}`} className="bg-press block px-3 py-2.5">
                 <p className="flex items-baseline justify-between gap-3">
-                  <span className="truncate text-sm font-medium">
+                  <span className={cn('flex items-center gap-1.5 truncate text-sm', row.unread ? 'font-semibold' : 'font-medium')}>
+                    {row.unread && <span className="size-1.5 shrink-0 rounded-full bg-flare" aria-hidden />}
                     {row.name ?? row.email ?? 'Unknown'}
                   </span>
                   <time className="bg-num shrink-0 text-[0.65rem] text-tx-3" dateTime={row.lastMessageAt}>
                     {new Date(row.lastMessageAt).toLocaleDateString('en-NG', { day: '2-digit', month: 'short' })}
                   </time>
                 </p>
-                <p className="truncate text-xs text-tx-2">{row.subject ?? 'No subject'}</p>
+                <p className={cn('truncate text-xs', row.unread ? 'text-tx-1' : 'text-tx-2')}>
+                  {row.subject ?? 'No subject'}
+                </p>
                 <p className="truncate text-xs text-tx-3">{row.preview}</p>
               </Link>
             </li>

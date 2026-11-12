@@ -33,27 +33,33 @@ export function needsEmail(conv: ReplyableConversation): boolean {
   return quietMs >= 10 * 60 * 1000
 }
 
-export async function emailReply(
-  conv: ReplyableConversation, body: string, signOff: string,
-): Promise<MailResult | null> {
-  if (!needsEmail(conv) || !emailConfigured()) return null
-
+/** The RFC Message-ID of the customer's last inbound email on this thread, if
+ *  any — what a reply threads itself to in the recipient's own mail client.
+ *  Shared by the support reply path and a personal mailbox's. */
+export async function lastInboundRfcMessageId(conversationId: string): Promise<string | undefined> {
   const service = await createServiceClient()
-  const { data: lastInbound } = await service
+  const { data } = await service
     .from('support_messages')
     .select('email_rfc_message_id')
-    .eq('conversation_id', conv.id)
+    .eq('conversation_id', conversationId)
     .eq('author_type', 'customer')
     .not('email_rfc_message_id', 'is', null)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
+  return (data?.email_rfc_message_id as string | undefined) ?? undefined
+}
+
+export async function emailReply(
+  conv: ReplyableConversation, body: string, signOff: string,
+): Promise<MailResult | null> {
+  if (!needsEmail(conv) || !emailConfigured()) return null
 
   // Whichever address they wrote to is the one they should see the reply
   // come from — a hello@ conversation answered from support@ reads as a
   // different, unfamiliar sender.
   const from = conv.inbound_address ?? 'support@brandgauge.app'
-  const inReplyTo = (lastInbound?.email_rfc_message_id as string | undefined) ?? undefined
+  const inReplyTo = await lastInboundRfcMessageId(conv.id)
 
   return sendMail({
     from:    `BrandGauge <${from}>`,

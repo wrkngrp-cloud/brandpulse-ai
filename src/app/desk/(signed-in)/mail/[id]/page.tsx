@@ -1,11 +1,18 @@
 import { notFound } from 'next/navigation'
 import { requireStaff } from '@/lib/desk/auth'
-import { myMailboxAddresses, mailThread } from '@/lib/desk/mail'
-import { ReplyBox } from '../reply-box'
+import { myMailboxAddresses, mailThread, markRead, getDraftForConversation } from '@/lib/desk/mail'
+import { signMailAttachment } from '@/lib/support/attachments'
+import { ReplyBox, type ReplyDraftInitial } from '../reply-box'
+import { FileIcon } from '@/components/brand/icon'
 
 export const dynamic = 'force-dynamic'
 
-export default async function MailThreadPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function MailThreadPage({
+  params, searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ draft?: string }>
+}) {
   const { id } = await params
   const session = await requireStaff('mail.use', {
     action: 'mail.thread_view', targetType: 'conversation', targetId: id,
@@ -15,6 +22,19 @@ export default async function MailThreadPage({ params }: { params: Promise<{ id:
   const addresses = await myMailboxAddresses(session)
   const thread = await mailThread(addresses, id)
   if (!thread) notFound()
+
+  // Opening the thread is what clears its unread mark, same as any mail
+  // client — no separate "mark as read" control to forget to press.
+  await markRead(addresses, id)
+
+  const { draft: wantsDraft } = await searchParams
+  const savedDraft = wantsDraft ? await getDraftForConversation(session.userId, id) : null
+  const draftInitial: ReplyDraftInitial | undefined = savedDraft
+    ? {
+        cc: savedDraft.cc, bcc: savedDraft.bcc, body: savedDraft.body,
+        attachments: savedDraft.attachments.map(a => ({ ...a, signature: signMailAttachment(session.userId, a) })),
+      }
+    : undefined
 
   return (
     <div className="space-y-4">
@@ -41,12 +61,33 @@ export default async function MailThreadPage({ params }: { params: Promise<{ id:
                 })}
               </time>
             </p>
+            {(message.cc.length > 0 || message.bcc.length > 0) && (
+              <p className="mb-1 text-[0.65rem] text-tx-3">
+                {message.cc.length > 0 && <>CC: {message.cc.join(', ')}</>}
+                {message.cc.length > 0 && message.bcc.length > 0 && ' · '}
+                {message.bcc.length > 0 && <>BCC: {message.bcc.join(', ')}</>}
+              </p>
+            )}
             <p className="whitespace-pre-wrap">{message.body}</p>
+            {message.attachments.length > 0 && (
+              <ul className="mt-2 space-y-1">
+                {message.attachments.map(file => (
+                  <li key={file.name} className="flex items-center gap-1.5 text-xs">
+                    <FileIcon className="size-3" />
+                    {file.url ? (
+                      <a href={file.url} target="_blank" rel="noopener noreferrer" className="underline">{file.name}</a>
+                    ) : (
+                      <span className="text-tx-3">{file.name}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ul>
 
-      <ReplyBox conversationId={thread.id} />
+      <ReplyBox conversationId={thread.id} fromAddress={thread.inboundAddress ?? addresses[0]} initial={draftInitial} />
     </div>
   )
 }

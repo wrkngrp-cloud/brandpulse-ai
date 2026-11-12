@@ -29,6 +29,10 @@ export interface ChatMessage {
   body:      string
   attachments: { name: string; url: string | null; type: string }[]
   createdAt: string
+  /** Empty on anything but a mail message. Carried through so /desk/mail can
+   *  show who else was on an email without a second query. */
+  cc:  string[]
+  bcc: string[]
 }
 
 export interface ChatThread {
@@ -246,7 +250,7 @@ export async function threadMessages(conversationId: string): Promise<ChatMessag
 
   const { data: rows } = await service
     .from('support_messages')
-    .select('id, author_type, author_id, body, attachments, internal, created_at')
+    .select('id, author_type, author_id, body, attachments, cc, bcc, internal, created_at')
     .eq('conversation_id', conversationId)
     // The customer's view never includes an internal note. The policy says the
     // same thing for a signed-in reader; this covers the service-role path.
@@ -285,6 +289,8 @@ export async function threadMessages(conversationId: string): Promise<ChatMessag
     body:   row.body,
     attachments: await signAttachments(row.attachments as AttachmentRow[]),
     createdAt: row.created_at,
+    cc:  (row.cc as string[] | null) ?? [],
+    bcc: (row.bcc as string[] | null) ?? [],
   })))
 }
 
